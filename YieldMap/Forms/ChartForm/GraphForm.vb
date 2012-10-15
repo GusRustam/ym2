@@ -116,14 +116,28 @@ Namespace Forms.ChartForm
         Private Sub RecalcSpread(ByVal mode As SpreadMode)
             Logger.Trace("RecalcSpread({0})", mode)
             TheChart.Series.ToList.ForEach(
-                Sub(srs) If TypeOf srs.Tag Is SeriesDescr Then srs.Points.ToList.ForEach(Sub(pnt) RecalcPoint(pnt, mode)))
+                Sub(srs)
+                    If TypeOf srs.Tag Is SeriesDescr Then srs.Points.ToList.ForEach(Sub(pnt) RecalcPoint(pnt, mode))
+                    Dim data As SwapCurveSeries = TryCast(srs.Tag, SwapCurveSeries)
+                    If data Is Nothing Then Return
+
+                    Dim curve = data.SwpCurve
+                    curve.SetBenchmark(mode, _spreadBenchmarks.Benchmarks(mode))
+                End Sub)
         End Sub
 
         Private Sub ReplotSpread(ByVal newMode As SpreadMode, ByVal oldMode As SpreadMode)
             Logger.Trace("ReplotSpread({0}, {1})", newMode, oldMode)
             Dim storeOld = oldMode.Equals(SpreadMode.Yield) OrElse _spreadBenchmarks.Benchmarks.ContainsKey(oldMode)
             TheChart.Series.ToList.ForEach(
-                Sub(srs) If TypeOf srs.Tag Is SeriesDescr Then srs.Points.ToList.ForEach(Sub(pnt) ReplotPoint(pnt, newMode, oldMode, storeOld)))
+                Sub(srs)
+                    If TypeOf srs.Tag Is SeriesDescr Then srs.Points.ToList.ForEach(Sub(pnt) ReplotPoint(pnt, newMode, oldMode, storeOld))
+                    Dim data As SwapCurveSeries = TryCast(srs.Tag, SwapCurveSeries)
+                    If data Is Nothing Then Return
+
+                    Dim curve = data.SwpCurve
+                    curve.SetBenchmark(newMode, _spreadBenchmarks.Benchmarks(newMode))
+                End Sub)
             SetYAxisMode(newMode.ToString())
         End Sub
 
@@ -823,23 +837,27 @@ Namespace Forms.ChartForm
                         Function(key)
                             Dim res As New BondDescr
                             Dim point = grp.Elements(key)
-                            res.RIC = point.RIC
-                            res.Name = point.ShortName
-                            res.Price = point.CalcPrice
-                            res.Quote = IIf(point.YieldAtDate <> Date.Today, QuoteType.Close, QuoteType.Last)
-                            res.QuoteDate = point.YieldAtDate
-                            res.State = BondDescr.StateType.Ok
-                            res.ToWhat = point.ToWhat
-                            res.BondYield = point.Yield
-                            res.CalcMode = BondDescr.CalculationMode.SystemPrice
-                            res.Convexity = point.Convexity
-                            res.Duration = point.Duration
-                            res.Live = point.YieldAtDate = Date.Today
-                            res.Maturity = point.Maturity
-                            res.Coupon = point.Coupon
-                            Return res
+                            If point.CalcPrice > 0 And point.Yield > 0 Then
+                                res.RIC = point.RIC
+                                res.Name = point.ShortName
+                                res.Price = point.CalcPrice
+                                res.Quote = IIf(point.YieldAtDate <> Date.Today, QuoteType.Close, QuoteType.Last)
+                                res.QuoteDate = point.YieldAtDate
+                                res.State = BondDescr.StateType.Ok
+                                res.ToWhat = point.ToWhat
+                                res.BondYield = point.Yield
+                                res.CalcMode = BondDescr.CalculationMode.SystemPrice
+                                res.Convexity = point.Convexity
+                                res.Duration = point.Duration
+                                res.Live = point.YieldAtDate = Date.Today
+                                res.Maturity = point.Maturity
+                                res.Coupon = point.Coupon
+                                Return res
+                            Else
+                                Return Nothing
+                            End If
                         End Function)
-                End Function)
+                End Function).Where(Function(elem) elem IsNot Nothing).ToList()
             _tableForm.Bonds = bondsToShow
             _tableForm.ShowDialog()
         End Sub
@@ -1552,6 +1570,7 @@ Namespace Forms.ChartForm
                 Dim newCurve = New YieldCurve(Guid.NewGuid.ToString, selectedItem.Name, ricsInCurve, selectedItem.Color, fieldNames)
                 AddHandler newCurve.Updated, AddressOf OnCurvePaint
                 _moneyMarketCurves.Add(newCurve)
+                'todo ADD BENCHMARKS!!!
                 newCurve.Subscribe()
             End If
         End Sub
@@ -1650,7 +1669,7 @@ Namespace Forms.ChartForm
                             .markerColor = curve.GetInnerColor(),
                             .markerBorderColor = curve.GetOuterColor(),
                             .borderWidth = 2,
-                            .Tag = New SwapCurveSeries With {.Name = curve.GetName()}
+                            .Tag = New SwapCurveSeries With {.Name = curve.GetName(), .SwpCurve = curve }
                         }
                         TheChart.Series.Add(theSeries)
                     Else
@@ -1676,7 +1695,9 @@ Namespace Forms.ChartForm
                                 .IsVisible = True,
                                 .YieldCurveName = curve.GetName(),
                                 .FullName = curve.GetFullName(),
-                                .SwpCurve = curve
+                                .SwpCurve = curve,
+                                .ZSpread = item.ZSpread,
+                                .PointSpread = item.PointSpread
                             }
 
                             Dim yValue = _spreadBenchmarks.CalculateSpreads(theTag)

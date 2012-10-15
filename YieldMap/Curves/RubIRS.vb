@@ -5,7 +5,6 @@ Imports System.Drawing
 Imports YieldMap.Tools.History
 Imports NLog
 Imports YieldMap.Tools.Lists
-Imports System.Globalization
 
 Namespace Curves
     Public Class YieldDuration
@@ -15,9 +14,19 @@ Namespace Curves
         Public Duration As Double
         Public CalcPrice As Double
 
+        Public ZSpread As Double?
+        Public PointSpread As Double?
+        Public ASWSpread As Double?
+        Public OASSpread As Double?
+
         Public Overrides Function ToString() As String
             Return String.Format("{0} {1:P2}:{2:F2}", RIC, Yield / 100, Duration)
         End Function
+
+        Public Sub New(ByVal ric As String, ByVal price As Double)
+            Me.RIC = ric
+            CalcPrice = price
+        End Sub
 
         Public Function CompareTo(ByVal other As YieldDuration) As Integer Implements IComparable(Of YieldDuration).CompareTo
             If Duration < other.Duration Then
@@ -132,10 +141,9 @@ Namespace Curves
                 End Select
                 Try
                     If ric <> BaseInstrument Then
-                        Dim yieldDuration = New YieldDuration() With {
+                        Dim yieldDuration = New YieldDuration(ric, 0) With {
                            .Yield = aYield / 100,
-                           .Duration = GetDuration(ric),
-                           .RIC = ric
+                           .Duration = GetDuration(ric)
                        }
                         AddCurveItem(yieldDuration)
                     Else
@@ -167,9 +175,8 @@ Namespace Curves
                         Logger.Trace("Got RIC {0}", ric)
 
                         ' define yield curve elem
-                        Dim yieldDuration = New YieldDuration() With {
-                            .Duration = GetDuration(ric),
-                            .RIC = ric
+                        Dim yieldDuration = New YieldDuration(ric, 0) With {
+                            .Duration = GetDuration(ric)
                         }
 
                         If ricAndFieldValue.Value.Keys.Contains("393") Or ricAndFieldValue.Value.Keys.Contains("275") Then
@@ -281,11 +288,11 @@ Namespace Curves
         End Sub
 
         Public Function Bootstrap(ByVal data As List(Of YieldDuration)) As List(Of YieldDuration) Implements IBootstrappable.Bootstrap
-            Dim params(0 To CurveData.Count() - 1, 0 To 5) As Object
+            Dim params(0 To CurveData.Count() - 1, 5) As Object
             For i = 0 To CurveData.Count - 1
                 params(i, 0) = InstrumentType
-                params(i, 1) = _theDate ' String.Format(CultureInfo.CreateSpecificCulture("en-US"), "{0:dd/MMM/yy}",
-                params(i, 2) = _theDate.AddDays(CurveData(i).Duration * 365.0) 'String.Format(CultureInfo.CreateSpecificCulture("en-US"), "{0:dd/MMM/yy}", )
+                params(i, 1) = _theDate
+                params(i, 2) = _theDate.AddDays(CurveData(i).Duration * 365.0)
                 params(i, 3) = BaseInstrumentPrice / 100
                 params(i, 4) = CurveData(i).Yield
                 params(i, 5) = Struct
@@ -296,7 +303,7 @@ Namespace Curves
             For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
                 Dim dur = (Commons.FromExcelSerialDate(termStructure.GetValue(i, 1)) - _theDate).TotalDays / 365.0
                 Dim yld = termStructure.GetValue(i, 2)
-                If dur > 0 And yld > 0 Then result.Add(New YieldDuration With {.Yield = yld, .Duration = dur})
+                If dur > 0 And yld > 0 Then result.Add(New YieldDuration("boot", 0) With {.Yield = yld, .Duration = dur})
             Next
             Return result
         End Function

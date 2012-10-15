@@ -1,5 +1,6 @@
 Imports System.Drawing
 Imports AdfinXRtLib
+Imports YieldMap.Forms.ChartForm
 Imports YieldMap.Tools.History
 Imports NLog
 
@@ -15,7 +16,10 @@ Namespace Curves
 
     Public MustInherit Class SwapCurve
         Implements ICurve
+
         Private Shared ReadOnly Logger As Logger = Commons.GetLogger(GetType(SwapCurve))
+        Protected BmkType As SpreadMode
+        Protected BmkCurve As ICurve
 
 #Region "Interface"
         Public MustOverride Function GetBrokers() As String()
@@ -52,6 +56,12 @@ Namespace Curves
 #Region "Internals"
         Private ReadOnly _hstLoaders As New Dictionary(Of String, HistoryLoadManager)
 
+        Public Overrides Function Equals(ByVal obj As Object) As Boolean
+            If Not TypeOf obj Is SwapCurve Then Return False
+            Dim crv = CType(obj, SwapCurve)
+            Return crv.GetBroker = GetBroker() And crv.GetDate = GetDate() And crv.GetQuote() = GetQuote()
+        End Function
+
         '' CURVE DESCRIPTION
         Protected ReadOnly CurveData As New List(Of YieldDuration) ' RIC -> Yield / Duration
         Protected Overridable Property BaseInstrumentPrice As Double
@@ -69,8 +79,25 @@ Namespace Curves
         '' INSERT NEW DATA INTO CURVE
         Protected Sub AddCurveItem(ByVal yieldDuration As YieldDuration)
             CurveData.RemoveAll(Function(item) item.RIC = yieldDuration.RIC)
+            CalculateSpread(yieldDuration)
             CurveData.Add(yieldDuration)
             CurveData.Sort()
+        End Sub
+
+        Protected Overridable Function CalculateSpread(ByVal yD As YieldDuration) As YieldDuration
+            Dim res As New YieldDuration(yD.RIC, yD.CalcPrice) With {.Yield = yD.Yield, .Duration = yD.Duration}
+            If BmkCurve Is Nothing Then Return res
+            If BmkType = SpreadMode.PointSpread Then res.PointSpread = BmkCurve.PointSpread(yD.Yield, yD.Duration)
+            Return res
+        End Function
+
+        Public Sub SetBenchmark(ByVal spreadMode As SpreadMode, ByVal benchmark As ICurve)
+            BmkType = spreadMode
+            BmkCurve = benchmark
+            Dim data = GetCurveData().Select(Function(elem) CalculateSpread(elem)).ToList()
+            CurveData.Clear()
+            CurveData.AddRange(data)
+            NotifyUpdated(Me)
         End Sub
 
         Public Overridable Function PointSpread(ByVal yld As Double, ByVal duration As Double) As Double? Implements ICurve.PointSpread

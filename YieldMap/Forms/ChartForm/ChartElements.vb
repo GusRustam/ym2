@@ -266,7 +266,7 @@ Namespace Forms.ChartForm
             If TypeOf descr Is BondPointDescr Then
                 Dim tag As BondPointDescr = CType(descr, BondPointDescr)
                 tag.ZSpread = ZSpread(zSpreadMainCurve.ToArray(), tag)
-            ElseIf TypeOf descr Is BidAskPointDescr And Benchmarks.ContainsKey(SpreadMode.ZSpread) Then
+            ElseIf TypeOf descr Is BidAskPointDescr Then
                 Dim data = CType(descr, BidAskPointDescr)
                 Dim tag As BondPointDescr = New BondPointDescr(data.BondTag)
                 tag.CalcPrice = data.Price
@@ -298,7 +298,7 @@ Namespace Forms.ChartForm
         End Sub
     End Class
 
-    Friend Class SpreadMode
+    Public Class SpreadMode
         Public Shared Yield As New SpreadMode("Yield", True)
         Public Shared PointSpread As New SpreadMode("PointSpread", True)
         Public Shared ZSpread As New SpreadMode("ZSpread", True)
@@ -341,6 +341,14 @@ Namespace Forms.ChartForm
                 Return _name
             End Get
         End Property
+
+        Public Shared Operator =(a As SpreadMode, b As SpreadMode) As Boolean
+            Return a.Name = b.Name
+        End Operator
+
+        Public Shared Operator <>(a As SpreadMode, b As SpreadMode) As Boolean
+            Return a.Name <> b.Name
+        End Operator
 
         Public Shared Function FromString(ByVal name As String) As SpreadMode
             Dim staticFields = GetType(SpreadMode).GetFields()
@@ -569,13 +577,10 @@ Namespace Forms.ChartForm
 
     Friend Class SwapCurveSeries
         Inherits SeriesDescr
+        Public SwpCurve As SwapCurve
     End Class
 
     Friend Class HistCurveSeries
-        Inherits SeriesDescr
-    End Class
-
-    Friend Class BondYieldCurveSeries
         Inherits SeriesDescr
     End Class
 

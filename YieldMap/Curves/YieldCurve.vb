@@ -147,10 +147,9 @@ Namespace Curves
                             Dim duration = yieldDur.Item1
                             Dim bestYield = yieldDur.Item3
 
-                            Dim yieldDuration = New YieldDuration() With {
+                            Dim yieldDuration = New YieldDuration(ric, price) With {
                                 .Yield = bestYield.Yield,
                                 .Duration = duration,
-                                .RIC = ric,
                                 .CalcPrice = price
                             }
                             AddCurveItem(yieldDuration)
@@ -198,9 +197,8 @@ Namespace Curves
                         Logger.Trace("Got RIC {0}", ric)
 
                         ' define yield curve elem
-                        Dim yieldDuration = New YieldDuration() With {
-                            .Duration = GetDuration(ric),
-                            .RIC = ric
+                        Dim yieldDuration = New YieldDuration(ric, 0) With {
+                            .Duration = GetDuration(ric)
                         }
 
                         If ricAndFieldValue.Value.Keys.Contains(_quote) AndAlso CDbl(ricAndFieldValue.Value(_quote)) > 0 Then
@@ -254,6 +252,19 @@ Namespace Curves
             NotifyUpdated(Me)
         End Sub
 
+        Protected Overrides Function CalculateSpread(ByVal yD As YieldDuration) As YieldDuration
+            If BmkType IsNot Nothing AndAlso BmkType = SpreadMode.ZSpread AndAlso BmkCurve IsNot Nothing AndAlso TypeOf BmkCurve Is YieldCurve Then
+                Dim res As New YieldDuration(yD.RIC, yD.CalcPrice) With {.Yield = yD.Yield, .Duration = yD.Duration}
+                Dim curve = CType(BmkCurve, YieldCurve)
+                Dim bondPointDescr = _descrs(yD.RIC)
+                bondPointDescr.CalcPrice = yD.CalcPrice
+                If _descrs.ContainsKey(yD.RIC) Then res.ZSpread = ZSpread(curve.ToArray(), bondPointDescr)
+                Return res
+            Else
+                Return MyBase.CalculateSpread(yD)
+            End If
+        End Function
+
         Public Overrides Function GetCurveData() As List(Of YieldDuration)
             Return _estimator.Approximate(If(_bootstrapped, Bootstrap(CurveData), CurveData))
         End Function
@@ -297,11 +308,10 @@ Namespace Curves
             For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
                 Dim dur = (Commons.FromExcelSerialDate(termStructure.GetValue(i, 1)) - _date).TotalDays / 365.0
                 Dim yld = termStructure.GetValue(i, 2)
-                If dur > 0 And yld > 0 Then result.Add(New YieldDuration With {.Yield = yld, .Duration = dur})
+                If dur > 0 And yld > 0 Then result.Add(New YieldDuration("boot", 0) With {.Yield = yld, .Duration = dur})
             Next
             Return result
         End Function
-
     End Class
 End Namespace
 

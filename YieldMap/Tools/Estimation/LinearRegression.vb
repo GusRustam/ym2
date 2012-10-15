@@ -290,7 +290,7 @@ Namespace Tools.Estimation
             Dim stepX = (maxX - minX) / 299
             Dim res As New List(Of YieldDuration)
             For i = 0 To 299
-                res.Add(New YieldDuration With {.Duration = currX, .Yield = spline.Interpolate(currX)})
+                res.Add(New YieldDuration("regr", 0) With {.Duration = currX, .Yield = spline.Interpolate(currX)})
                 currX += stepX
             Next
             Return res
@@ -394,7 +394,7 @@ Namespace Tools.Estimation
             Dim stepX = (maxX - minX) / 29
             Dim res As New List(Of YieldDuration)
             For i = 0 To 29
-                res.Add(New YieldDuration With {.Duration = currX, .Yield = NSS(currX, minimum) / 100})
+                res.Add(New YieldDuration("NSS", 0) With {.Duration = currX, .Yield = NSS(currX, minimum) / 100})
                 currX += stepX
             Next
             Return res
@@ -463,7 +463,7 @@ Namespace Tools.Estimation
                 End If
 
                 Return data.Select(
-                    Function(elem) New YieldDuration With {.Duration = elem.Duration, .Yield = _regression.Estimate(elem.Duration)}).ToList()
+                    Function(elem) New YieldDuration("Best", 0) With {.Duration = elem.Duration, .Yield = _regression.Estimate(elem.Duration)}).ToList()
             Else
                 If _estimationModel = EstimationModel.CubicSpline Then
                     Return (New CubicSpline).Interpolate(data)
