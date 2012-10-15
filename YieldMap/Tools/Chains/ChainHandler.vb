@@ -49,7 +49,7 @@ Namespace Tools.Chains
         Private ReadOnly _lockObject As New Object
         Private ReadOnly _listItems As New List(Of String)
 
-        Private ReadOnly _chainManager As AdxRtChain = GetChainManager()
+        Private ReadOnly _chainManager As AdxRtChain = Eikon.SDK.CreateAdxRtChain()
         Private _failed As Boolean = False
         
         Public Delegate Sub DataEventHandler(ByRef sender As Object, ByVal e As ChainItemsData)

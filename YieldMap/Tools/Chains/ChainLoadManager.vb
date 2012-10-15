@@ -9,7 +9,7 @@ Namespace Tools.Chains
 
         Public Function AddListToLoad(ByVal chainName As String, ByVal params As String, Optional ByVal timeOut As Integer = 5) As ChainHandler
             Logger.Debug("AddListToLoad({0}, {1}, {2})", chainName, params, timeOut)
-            Dim chainMan As AdxRtChain = GetChainManager()
+            Dim chainMan As AdxRtChain = Eikon.SDK.CreateAdxRtChain()
             ' Вдруг такой уже есть? Дублировать не будем
             If _loaders.ContainsKey(chainName) Then
                 Return Nothing

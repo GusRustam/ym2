@@ -35,7 +35,7 @@ Namespace Forms.ChartForm
         Public Delegate Sub PointUpdateDelegate(ByVal ric As String, ByVal yield As Double, ByVal duration As Double, ByVal lastPrice As Double)
         Public Event PointUpdated As PointUpdateDelegate
 
-        Private Sub GuiAsync(ByVal action As System.Action)
+        Private Sub GuiAsync(ByVal action As Action)
             If action IsNot Nothing Then
                 If InvokeRequired Then
                     Invoke(action)
@@ -175,9 +175,9 @@ Namespace Forms.ChartForm
             End If
 
             Dim axisFont = New Font(FontFamily.GenericSansSerif, 11)
-            Dim headingFont = New Font(FontFamily.GenericSansSerif, 14, FontStyle.Bold)
+            'Dim headingFont = New Font(FontFamily.GenericSansSerif, 14, FontStyle.Bold)
 
-            TheChart.Titles.Add(New Title("Bond Yield Map", Docking.Top, headingFont, Color.Black))
+            'TheChart.Titles.Add(New Title("Bond Yield Map", Docking.Top, headingFont, Color.Black))
 
             TheChart.AntiAliasing = AntiAliasingStyles.All
             TheChart.TextAntiAliasingQuality = TextAntiAliasingQuality.High
@@ -203,7 +203,7 @@ Namespace Forms.ChartForm
                 .AxisX.ScrollBar.ButtonStyle = ScrollBarButtonStyles.All
                 .AxisX.ScrollBar.IsPositionedInside = True
 
-                .AxisY.Title = "Yield"
+                .AxisY.Title = "Yield, %"
                 .AxisY.TitleFont = axisFont
                 .AxisY.LabelStyle.Format = "P2"
                 .AxisY.MajorGrid.LineDashStyle = ChartDashStyle.Dash
@@ -1574,8 +1574,7 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-
-        Private Sub BootstrapTSMI_Click(sender As Object, e As EventArgs) Handles BootstrapTSMI.Click
+        Private Sub BootstrapTSMIClick(sender As Object, e As EventArgs) Handles BootstrapTSMI.Click
             Logger.Debug("BootstrapTSMI_Click()")
             Dim snd = CType(sender, ToolStripMenuItem)
             Dim curve = _moneyMarketCurves.First(Function(item) item.GetName() = MoneyCurveCMS.Tag.ToString())
@@ -1708,5 +1707,9 @@ Namespace Forms.ChartForm
         End Sub
 #End Region
 #End Region
+
+        Private Sub RelatedQuoteTSMIClick(sender As Object, e As EventArgs) Handles RelatedQuoteTSMI.Click
+            If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then Process.Start("reuters://REALTIME/verb=FullQuote/ric=" + BondCMS.Tag.ToString())
+        End Sub
     End Class
 End Namespace

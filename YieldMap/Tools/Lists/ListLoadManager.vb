@@ -32,7 +32,7 @@ Namespace Tools.Lists
         Implements IDisposable
 
         Private Shared ReadOnly Logger As Logger = GetLogger(GetType(ListLoadManager))
-        Private WithEvents _listManager As New AdxRtList
+        Private WithEvents _listManager As AdxRtList = Eikon.SDK.CreateAdxRtList()
 
         Private ReadOnly _activeTasks As New Dictionary(Of String, ListTaskDescr)
 

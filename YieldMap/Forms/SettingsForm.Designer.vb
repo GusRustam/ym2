@@ -126,7 +126,7 @@
             '
             'SaveSettingsButton
             '
-            Me.SaveSettingsButton.Location = New System.Drawing.Point(12, 260)
+            Me.SaveSettingsButton.Location = New System.Drawing.Point(12, 118)
             Me.SaveSettingsButton.Name = "SaveSettingsButton"
             Me.SaveSettingsButton.Size = New System.Drawing.Size(155, 29)
             Me.SaveSettingsButton.TabIndex = 1
@@ -135,7 +135,7 @@
             '
             'TheCancelButton
             '
-            Me.TheCancelButton.Location = New System.Drawing.Point(12, 295)
+            Me.TheCancelButton.Location = New System.Drawing.Point(12, 153)
             Me.TheCancelButton.Name = "TheCancelButton"
             Me.TheCancelButton.Size = New System.Drawing.Size(155, 29)
             Me.TheCancelButton.TabIndex = 1
@@ -145,7 +145,7 @@
             'Label1
             '
             Me.Label1.AutoSize = True
-            Me.Label1.Location = New System.Drawing.Point(9, 156)
+            Me.Label1.Location = New System.Drawing.Point(9, 420)
             Me.Label1.Name = "Label1"
             Me.Label1.Size = New System.Drawing.Size(75, 13)
             Me.Label1.TabIndex = 2
@@ -153,7 +153,7 @@
             '
             'MaxYieldTextBox
             '
-            Me.MaxYieldTextBox.Location = New System.Drawing.Point(101, 153)
+            Me.MaxYieldTextBox.Location = New System.Drawing.Point(101, 417)
             Me.MaxYieldTextBox.Name = "MaxYieldTextBox"
             Me.MaxYieldTextBox.Size = New System.Drawing.Size(66, 20)
             Me.MaxYieldTextBox.TabIndex = 3
@@ -161,7 +161,7 @@
             'Label2
             '
             Me.Label2.AutoSize = True
-            Me.Label2.Location = New System.Drawing.Point(9, 224)
+            Me.Label2.Location = New System.Drawing.Point(9, 488)
             Me.Label2.Name = "Label2"
             Me.Label2.Size = New System.Drawing.Size(92, 13)
             Me.Label2.TabIndex = 2
@@ -169,7 +169,7 @@
             '
             'MaxDurTextBox
             '
-            Me.MaxDurTextBox.Location = New System.Drawing.Point(101, 221)
+            Me.MaxDurTextBox.Location = New System.Drawing.Point(101, 485)
             Me.MaxDurTextBox.Name = "MaxDurTextBox"
             Me.MaxDurTextBox.Size = New System.Drawing.Size(67, 20)
             Me.MaxDurTextBox.TabIndex = 3
@@ -177,7 +177,7 @@
             'Label3
             '
             Me.Label3.AutoSize = True
-            Me.Label3.Location = New System.Drawing.Point(9, 130)
+            Me.Label3.Location = New System.Drawing.Point(9, 394)
             Me.Label3.Name = "Label3"
             Me.Label3.Size = New System.Drawing.Size(72, 13)
             Me.Label3.TabIndex = 2
@@ -186,7 +186,7 @@
             'Label4
             '
             Me.Label4.AutoSize = True
-            Me.Label4.Location = New System.Drawing.Point(9, 198)
+            Me.Label4.Location = New System.Drawing.Point(9, 462)
             Me.Label4.Name = "Label4"
             Me.Label4.Size = New System.Drawing.Size(89, 13)
             Me.Label4.TabIndex = 2
@@ -194,14 +194,14 @@
             '
             'MinYieldTextBox
             '
-            Me.MinYieldTextBox.Location = New System.Drawing.Point(101, 127)
+            Me.MinYieldTextBox.Location = New System.Drawing.Point(101, 391)
             Me.MinYieldTextBox.Name = "MinYieldTextBox"
             Me.MinYieldTextBox.Size = New System.Drawing.Size(66, 20)
             Me.MinYieldTextBox.TabIndex = 3
             '
             'MinDurTextBox
             '
-            Me.MinDurTextBox.Location = New System.Drawing.Point(101, 195)
+            Me.MinDurTextBox.Location = New System.Drawing.Point(101, 459)
             Me.MinDurTextBox.Name = "MinDurTextBox"
             Me.MinDurTextBox.Size = New System.Drawing.Size(66, 20)
             Me.MinDurTextBox.TabIndex = 3
@@ -210,7 +210,7 @@
             '
             Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
             Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-            Me.ClientSize = New System.Drawing.Size(186, 343)
+            Me.ClientSize = New System.Drawing.Size(186, 191)
             Me.Controls.Add(Me.MinDurTextBox)
             Me.Controls.Add(Me.MaxDurTextBox)
             Me.Controls.Add(Me.MinYieldTextBox)

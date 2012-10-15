@@ -8,10 +8,10 @@ Namespace Tools.RDataTool
 
         Private Shared ReadOnly Logger As Logger = Commons.GetLogger(GetType(BondsDataQuery))
 
-        Public Sub New(ByVal newBondRICs As List(Of String), ByVal sdk As IEikonDesktopSDK)
+        Public Sub New(ByVal newBondRICs As List(Of String))
             Logger.Trace("New()")
             Dim theFields As String = BondStructure.MetaData.GetFieldList
-            AddTask(String.Join(";", newBondRICs), theFields, "", AddressOf OnDataArrived, sdk)
+            AddTask(String.Join(";", newBondRICs), theFields, "", AddressOf OnDataArrived)
         End Sub
 
         Private Sub OnDataArrived(data As Array, err As String)

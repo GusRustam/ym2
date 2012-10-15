@@ -1,5 +1,4 @@
 ﻿Imports Dex2Lib
-Imports EikonDesktopSDKLib
 Imports NLog
 Imports YieldMap.Commons
 
@@ -21,9 +20,9 @@ Namespace Tools.RDataTool
         Private _cookie As Integer
         Private WithEvents _myRData As RData
 
-        Private Sub Load(ByVal sdk As EikonDesktopSDK, data As RQuery, ByVal dataEventHanler As DataEventRawHanler)
+        Private Sub Load(data As RQuery, ByVal dataEventHanler As DataEventRawHanler)
             _dataEventHanler = dataEventHanler
-            _myDex2Mgr = sdk.CreateDex2Mgr()
+            _myDex2Mgr = Eikon.SDK.CreateDex2Mgr()
             If _myDex2Mgr IsNot Nothing Then
                 _cookie = _myDex2Mgr.Initialize()
                 _myRData = _myDex2Mgr.CreateRData(_cookie)
@@ -50,12 +49,12 @@ Namespace Tools.RDataTool
             End If
         End Sub
 
-        Sub AddTask(ByVal theItems As String, ByVal theFields As String, ByVal theParams As String, ByVal handler As DataEventRawHanler, ByVal sdk As EikonDesktopSDK)
+        Sub AddTask(ByVal theItems As String, ByVal theFields As String, ByVal theParams As String, ByVal handler As DataEventRawHanler)
             Logger.Trace("AddTask({0}, {1}, {2})", theItems, theFields, theParams)
             _items = theItems
             _fields = theFields
             _params = theParams
-            Load(sdk, Me, handler)
+            Load(Me, handler)
         End Sub
 
         Sub NotifyDataParsed(data As EventArgs, err As String)

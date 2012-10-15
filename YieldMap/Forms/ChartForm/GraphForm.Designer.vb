@@ -24,8 +24,8 @@
         <System.Diagnostics.DebuggerStepThrough()> _
         Private Sub InitializeComponent()
             Me.components = New System.ComponentModel.Container()
-            Dim ChartArea2 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-            Dim Legend2 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+            Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+            Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
             Me.TheStatusStrip = New System.Windows.Forms.StatusStrip()
             Me.StatusMessage = New System.Windows.Forms.ToolStripStatusLabel()
             Me.TheToolStrip = New System.Windows.Forms.ToolStrip()
@@ -84,6 +84,7 @@
             Me.BrokerTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.QuoteTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.FitTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.BootstrapTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.ToolStripSeparator11 = New System.Windows.Forms.ToolStripSeparator()
             Me.SelDateTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.SpreadCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
@@ -94,7 +95,8 @@
             Me.BidAskCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.RemoveBidAskTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.YAxisCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
-            Me.BootstrapTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
+            Me.RelatedQuoteTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.TheStatusStrip.SuspendLayout()
             Me.TheToolStrip.SuspendLayout()
             Me.BondCMS.SuspendLayout()
@@ -259,9 +261,9 @@
             '
             'BondCMS
             '
-            Me.BondCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainInfoLine1TSMI, Me.MainInfoLine2TSMI, Me.ExtInfoTSMI, Me.ShowHistoryTSMI})
+            Me.BondCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainInfoLine1TSMI, Me.MainInfoLine2TSMI, Me.ExtInfoTSMI, Me.ShowHistoryTSMI, Me.ToolStripSeparator1, Me.RelatedQuoteTSMI})
             Me.BondCMS.Name = "BondContextMenuStrip"
-            Me.BondCMS.Size = New System.Drawing.Size(154, 92)
+            Me.BondCMS.Size = New System.Drawing.Size(154, 142)
             '
             'MainInfoLine1TSMI
             '
@@ -557,11 +559,11 @@
             Me.TheChart.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                 Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-            ChartArea2.Name = "ChartArea1"
-            Me.TheChart.ChartAreas.Add(ChartArea2)
-            Legend2.Enabled = False
-            Legend2.Name = "Legend1"
-            Me.TheChart.Legends.Add(Legend2)
+            ChartArea1.Name = "ChartArea1"
+            Me.TheChart.ChartAreas.Add(ChartArea1)
+            Legend1.Enabled = False
+            Legend1.Name = "Legend1"
+            Me.TheChart.Legends.Add(Legend1)
             Me.TheChart.Location = New System.Drawing.Point(3, 69)
             Me.TheChart.Name = "TheChart"
             Me.TheChart.Size = New System.Drawing.Size(778, 437)
@@ -643,6 +645,13 @@
             Me.FitTSMI.Size = New System.Drawing.Size(152, 22)
             Me.FitTSMI.Text = "Interpolation"
             '
+            'BootstrapTSMI
+            '
+            Me.BootstrapTSMI.CheckOnClick = True
+            Me.BootstrapTSMI.Name = "BootstrapTSMI"
+            Me.BootstrapTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.BootstrapTSMI.Text = "Bootstrap"
+            '
             'ToolStripSeparator11
             '
             Me.ToolStripSeparator11.Name = "ToolStripSeparator11"
@@ -700,12 +709,16 @@
             Me.YAxisCMS.Name = "YAxisCMS"
             Me.YAxisCMS.Size = New System.Drawing.Size(61, 4)
             '
-            'BootstrapTSMI
+            'ToolStripSeparator1
             '
-            Me.BootstrapTSMI.CheckOnClick = True
-            Me.BootstrapTSMI.Name = "BootstrapTSMI"
-            Me.BootstrapTSMI.Size = New System.Drawing.Size(152, 22)
-            Me.BootstrapTSMI.Text = "Bootstrap"
+            Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
+            Me.ToolStripSeparator1.Size = New System.Drawing.Size(150, 6)
+            '
+            'RelatedQuoteTSMI
+            '
+            Me.RelatedQuoteTSMI.Name = "RelatedQuoteTSMI"
+            Me.RelatedQuoteTSMI.Size = New System.Drawing.Size(153, 22)
+            Me.RelatedQuoteTSMI.Text = "Related quote"
             '
             'GraphForm
             '
@@ -808,5 +821,7 @@
         Friend WithEvents YAxisCMS As System.Windows.Forms.ContextMenuStrip
         Friend WithEvents FitTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents BootstrapTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
+        Friend WithEvents RelatedQuoteTSMI As System.Windows.Forms.ToolStripMenuItem
     End Class
 End Namespace
