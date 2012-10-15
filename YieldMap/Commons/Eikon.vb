@@ -3,7 +3,7 @@
 Namespace Commons
 
     Public Class Eikon
-        Private ReadOnly _myEikonDesktopSdk As EikonDesktopSDK
+        Private _myEikonDesktopSdk As EikonDesktopSDK
         Private Shared _sdk As Eikon
 
         Private Sub New()
@@ -22,5 +22,9 @@ Namespace Commons
                 Return Instance._myEikonDesktopSdk
             End Get
         End Property
+
+        Public Sub Clear()
+            _myEikonDesktopSdk = Nothing
+        End Sub
     End Class
 End Namespace

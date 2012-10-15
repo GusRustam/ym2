@@ -70,8 +70,8 @@ Namespace Forms
             sf.ShowDialog()
         End Sub
 
-        Private Sub MainFormFormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
-            _myEikonDesktopSdk = Nothing
+        Private Shared Sub MainFormFormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+            Eikon.Instance.Clear()
         End Sub
 #End Region
 

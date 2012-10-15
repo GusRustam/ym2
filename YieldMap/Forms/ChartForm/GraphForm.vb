@@ -661,6 +661,19 @@ Namespace Forms.ChartForm
                     End If
                 End Sub)
         End Sub
+
+        Private Sub RelatedQuoteTSMIClick(sender As Object, e As EventArgs) Handles RelatedQuoteTSMI.Click
+            If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then Process.Start("reuters://REALTIME/verb=FullQuote/ric=" + BondCMS.Tag.ToString())
+        End Sub
+
+        Private Sub BondDescriptionTSMIClick(sender As Object, e As EventArgs) Handles BondDescriptionTSMI.Click
+            If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then Process.Start("reuters://REALTIME/verb=BondData/ric=" + BondCMS.Tag.ToString())
+
+        End Sub
+
+        Private Sub RelatedChartTSMIClick(sender As Object, e As EventArgs) Handles RelatedChartTSMI.Click
+            If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then Process.Start("reuters://REALTIME/verb=RelatedGraph/ric=" + BondCMS.Tag.ToString())
+        End Sub
 #End Region
 #End Region
 
@@ -1707,9 +1720,5 @@ Namespace Forms.ChartForm
         End Sub
 #End Region
 #End Region
-
-        Private Sub RelatedQuoteTSMIClick(sender As Object, e As EventArgs) Handles RelatedQuoteTSMI.Click
-            If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then Process.Start("reuters://REALTIME/verb=FullQuote/ric=" + BondCMS.Tag.ToString())
-        End Sub
     End Class
 End Namespace
