@@ -161,18 +161,6 @@ Namespace Forms.ChartForm
 
             ZoomCustomButton.CheckOnClick = True
 
-            ' list of portfolios to show
-            Dim portDescrList As List(Of IdName) =
-                (From rw In (New portfolioTableAdapter).GetData() Select New IdName() With {.Id = rw("id"), .Name = rw("portfolio_name")}).ToList()
-            If portDescrList.Count > 0 Then
-                portfolioSelectTSCB.Enabled = True
-                With portfolioSelectTSCB.ComboBox
-                    .BindingContext = BindingContext
-                    .DataSource = portDescrList
-                    .DisplayMember = "Name"
-                    .ValueMember = "Id"
-                End With
-            End If
 
             Dim axisFont = New Font(FontFamily.GenericSansSerif, 11)
             'Dim headingFont = New Font(FontFamily.GenericSansSerif, 14, FontStyle.Bold)
@@ -283,7 +271,7 @@ Namespace Forms.ChartForm
                             Else
                                 MainInfoLine2TSMI.Text =
                                     String.Format("LAST: P [{0:F4}], Y [{1:P2}] {2}, D [{3:F2}] @ {4:dd/MM/yy}",
-                                                  bondDataPoint.CalcPrice, bondDataPoint.Yld.Yield, bondDataPoint.Yld.ToWhat.ToString(), bondDataPoint.Duration, bondDataPoint.Yld.YieldAtDate)
+                                                  bondDataPoint.CalcPrice, bondDataPoint.Yld.Yield, bondDataPoint.Yld.ToWhat.ToString(), bondDataPoint.Duration, bondDataPoint.YieldAtDate)
 
                                 ExtInfoTSMI.Visible = False
                             End If
@@ -575,7 +563,7 @@ Namespace Forms.ChartForm
                         DscrLabel.Text = bondData.Label
                         ConvLabel.Text = String.Format("{0:F2}", bondData.Convexity)
                         YldLabel.Text = String.Format("{0:P2} {1}", bondData.Yld.Yield, bondData.Yld.ToWhat.Abbr)
-                        DatLabel.Text = String.Format("{0:dd/MM/yyyy}", bondData.Yld.YieldAtDate)
+                        DatLabel.Text = String.Format("{0:dd/MM/yyyy}", bondData.YieldAtDate)
                         MatLabel.Text = String.Format("{0:dd/MM/yyyy}", bondData.Maturity)
                         CpnLabel.Text = String.Format("{0:F2}%", bondData.Coupon)
                         PVBPLabel.Text = String.Format("{0:F2}", bondData.PVBP)
@@ -592,7 +580,7 @@ Namespace Forms.ChartForm
                     ElseIf TypeOf point.Tag Is HistCurvePointDescr Then
                         Dim historyDataPoint = CType(point.Tag, HistCurvePointDescr)
                         DscrLabel.Text = historyDataPoint.BaseBondName
-                        DatLabel.Text = String.Format("{0:dd/MM/yyyy}", historyDataPoint.Yld.YieldAtDate)
+                        DatLabel.Text = String.Format("{0:dd/MM/yyyy}", historyDataPoint.YieldAtDate)
                         ConvLabel.Text = String.Format("{0:F2}", historyDataPoint.Convexity)
 
                     ElseIf TypeOf point.Tag Is BidAskPointDescr Then
@@ -617,6 +605,8 @@ Namespace Forms.ChartForm
                     DscrLabel.Text = ""
                     ConvLabel.Text = ""
                     DatLabel.Text = ""
+                    CpnLabel.Text = ""
+                    PVBPLabel.Text = ""
                     YldLabel.Text = ""
                     DurLabel.Text = ""
                     MatLabel.Text = ""
@@ -829,15 +819,15 @@ Namespace Forms.ChartForm
                             res.RIC = point.RIC
                             res.Name = point.ShortName
                             res.Price = point.CalcPrice
-                            res.Quote = IIf(point.Yld.YieldAtDate <> Date.Today, QuoteType.Close, QuoteType.Last)
-                            res.QuoteDate = point.Yld.YieldAtDate
+                            res.Quote = IIf(point.YieldAtDate <> Date.Today, QuoteType.Close, QuoteType.Last)
+                            res.QuoteDate = point.YieldAtDate
                             res.State = BondDescr.StateType.Ok
                             res.ToWhat = point.Yld.ToWhat
                             res.BondYield = point.Yld.Yield
                             res.CalcMode = BondDescr.CalculationMode.SystemPrice
                             res.Convexity = point.Convexity
                             res.Duration = point.Duration
-                            res.Live = point.Yld.YieldAtDate = Date.Today
+                            res.Live = point.YieldAtDate = Date.Today
                             res.Maturity = point.Maturity
                             res.Coupon = point.Coupon
                             Return res
@@ -1144,17 +1134,12 @@ Namespace Forms.ChartForm
                             Dim yieldDur As DataPointDescr =
                                     CalcYield(fieldsAndValues(fieldName), DateTime.Today, _ansamble.GetBondDescription(instrument))
 
-                            Dim duration = yieldDur.Duration
-                            Dim convex = yieldDur.Convexity
-                            Dim pvbp = yieldDur.PVBP
-                            Dim bestYield = yieldDur.Yld
-
                             With bondDataPoint
-                                .Yld = bestYield
-                                .Duration = duration
-                                .Convexity = convex
-                                .PVBP = pvbp
-                                .YieldToDate = bestYield.YieldAtDate
+                                .Yld = yieldDur.Yld
+                                .Duration = yieldDur.Duration
+                                .Convexity = yieldDur.Convexity
+                                .PVBP = yieldDur.PVBP
+                                .YieldAtDate = yieldDur.YieldAtDate
                                 .YieldSource = YieldSource.Realtime
                             End With
 
@@ -1165,11 +1150,11 @@ Namespace Forms.ChartForm
                                 bondDataPoint.IsVisible = True
                                 With point
                                     .YValues = {yValue}
-                                    .MarkerStyle = bestYield.ToWhat.MarkerStyle
-                                    .XValue = duration
+                                    .MarkerStyle = yieldDur.Yld.ToWhat.MarkerStyle
+                                    .XValue = yieldDur.Duration
                                     .IsEmpty = False
                                     .MarkerBorderWidth = 1
-                                    RaiseEvent PointUpdated(instrument, bestYield.Yield, duration, bondDataPoint.CalcPrice)
+                                    RaiseEvent PointUpdated(instrument, yieldDur.Yld.Yield, yieldDur.Duration, bondDataPoint.CalcPrice)
                                 End With
                                 updatedBonds.Add(bondDataPoint.ShortName)
                             End If
@@ -1283,7 +1268,7 @@ Namespace Forms.ChartForm
                         With pointDescr
                             .CalcPrice = maxElem.Close
                             .YieldSource = YieldSource.Historical
-                            '.YieldAtDate = maxdate
+                            .YieldAtDate = maxdate
                         End With
 
                         ' calculating new yield / duration
@@ -1299,8 +1284,6 @@ Namespace Forms.ChartForm
                             .Duration = duration
                             .Convexity = convex
                             .PVBP = pvbp
-                            '.YieldToDate = bestYield.YieldDate
-                            '.ToWhat = bestYield.ToWhat
                         End With
 
                         If Not pointDescr.IsValid() Then
@@ -1388,13 +1371,35 @@ Namespace Forms.ChartForm
             End Set
         End Property
 
+        Private Sub PortfolioTssbDropDownOpening(sender As Object, e As EventArgs) Handles PortfolioTSSB.DropDownOpening
+            ' list of portfolios to show
+            Dim portDescrList As List(Of IdName) =
+                (From rw In (New portfolioTableAdapter).GetData() Select New IdName() With {.Id = rw("id"), .Name = rw("portfolio_name")}).ToList()
 
-        Private Sub PortfolioSelectTSCBSelectedIndexChanged(sender As Object, e As EventArgs) Handles portfolioSelectTSCB.SelectedIndexChanged
-            Logger.Trace("portfolioSelectTSCB_SelectedIndexChanged")
+            PortfolioTSSB.DropDownItems.Clear()
+
+            If portDescrList.Any Then
+                portDescrList.ForEach(
+                    Sub(idname)
+                        Dim item = PortfolioTSSB.DropDownItems.Add(idname.Name, Nothing, AddressOf PortfolioSelectTSCBSelectedIndexChanged)
+                        item.Tag = idname.Id
+                    End Sub)
+                'portfolioSelectTSCB.Enabled = True
+                'With portfolioSelectTSCB.ComboBox
+                '    .BindingContext = BindingContext
+                '    .DataSource = portDescrList
+                '    .DisplayMember = "Name"
+                '    .ValueMember = "Id"
+                'End With
+            End If
+
+        End Sub
+        Private Sub PortfolioSelectTSCBSelectedIndexChanged(sender As Object, e As EventArgs) ' Handles portfolioSelectTSCB.SelectedIndexChanged
+            Logger.Trace("PortfolioSelectTSCBSelectedIndexChanged")
             If ThisFormStatus <> FormDataStatus.Loading Then
                 ThisFormStatus = FormDataStatus.Stopped
                 Try
-                    Dim portID = portfolioSelectTSCB.ComboBox.SelectedValue
+                    Dim portID = CLng(CType(sender, ToolStripMenuItem).Tag)
                     ThisFormDataSource = portID
                     PortfolioTSSB.HideDropDown()
                     DoSetRunning()
@@ -1511,51 +1516,91 @@ Namespace Forms.ChartForm
 
 #Region "VII) Curves"
 #Region "1) Common methods"
-        Private Sub AddBondCurveTSMIClick(sender As Object, e As EventArgs) Handles AddBondCurveTSMI.Click
+        Public Class CurveDescr
+            Public Type As String
+            Public Name As String
+            Public ID As Integer
+            Public Color As String
+        End Class
+
+        Private Sub CurvesTSMIDropDownOpening(sender As System.Object, e As EventArgs) Handles CurvesTSMI.DropDownOpening
+            BondCurvesTSMI.DropDownItems.Clear()
+            Dim chainTA As New chainTableAdapter
+            Dim chainCurves = chainTA.GetData.Where(Function(row) row.curve).Select(
+                Function(row)
+                    Return New CurveDescr With {
+                    .Type = "Chain",
+                    .Name = row.descr,
+                    .ID = row.id,
+                    .Color = row.color}
+                End Function).ToList()
+            DoAdd(chainCurves)
+
+            Dim hawserTA As New hawserTableAdapter
+            Dim hawserCurves = hawserTA.GetData.Where(Function(row) row.curve).Select(
+                Function(row)
+                    Return New CurveDescr With {
+                    .Type = "List",
+                    .Name = row.hawser_name,
+                    .ID = row.id,
+                    .Color = row.color}
+                End Function).ToList()
+            DoAdd(hawserCurves)
+        End Sub
+
+        Private Sub DoAdd(ByVal curves As List(Of CurveDescr))
+            curves.ForEach(
+                Sub(curve)
+                    Dim item = BondCurvesTSMI.DropDownItems.Add(curve.Name, Nothing, AddressOf AddBondCurveTSMIClick)
+                    item.Tag = curve
+                End Sub)
+        End Sub
+
+        Private Sub AddBondCurveTSMIClick(sender As Object, e As EventArgs)
             Logger.Info("AddBondCurveTSMIClick")
-            Dim cForm = New NewCurveForm()
-            cForm.ShowDialog()
+            'Dim cForm = New NewCurveForm()
+            'cForm.ShowDialog()
 
-            If cForm.DialogResult = DialogResult.OK Then
-                If cForm.CurveListView.SelectedItems.Count = 0 Then
-                    MsgBox("Nothing selected")
-                    Return
-                End If
+            'If cForm.DialogResult = DialogResult.OK Then
+            'If cForm.CurveListView.SelectedItems.Count = 0 Then
+            '    MsgBox("Nothing selected")
+            '    Return
+            'End If
 
-                Dim selectedItem = CType(cForm.CurveListView.SelectedItems(0).Tag, NewCurveForm.CurveDescr)
-                Dim ricsInCurve As List(Of String)
+            Dim selectedItem = CType(CType(sender, ToolStripMenuItem).Tag, CurveDescr)
+            Dim ricsInCurve As List(Of String)
 
-                Dim fieldNames As New Dictionary(Of QuoteSource, String)
-                If selectedItem.Type = "List" Then
-                    Dim data As New _ricsInHawserTableAdapter
-                    Dim theData = data.GetData
-                    ricsInCurve = theData.Where(Function(row) row.ric IsNot Nothing AndAlso row.id = selectedItem.ID).Select(Function(row) row.ric).ToList()
-                    Dim hawserData = (New hawserTableAdapter).GetData.First(Function(row) row.id = selectedItem.ID)
-                    fieldNames.Add(QuoteSource.Bid, hawserData.bid_field)
-                    fieldNames.Add(QuoteSource.Ask, hawserData.ask_field)
-                    fieldNames.Add(QuoteSource.Last, hawserData.last_field)
-                    fieldNames.Add(QuoteSource.Hist, hawserData.hist_field)
-                Else
-                    Dim data As New _ricsInChainTableAdapter
-                    Dim theData = data.GetData
-                    ricsInCurve = theData.Where(Function(row) row.ric IsNot Nothing AndAlso row.id = selectedItem.ID).Select(Function(row) row.ric).ToList()
-                    Dim chainData = (New chainTableAdapter).GetData.First(Function(row) row.id = selectedItem.ID)
-                    fieldNames.Add(QuoteSource.Bid, chainData.bid_field)
-                    fieldNames.Add(QuoteSource.Ask, chainData.ask_field)
-                    fieldNames.Add(QuoteSource.Last, chainData.last_field)
-                    fieldNames.Add(QuoteSource.Hist, chainData.hist_field)
-                End If
-
-                If Not ricsInCurve.Any() Then
-                    MsgBox("No rics found")
-                    Return
-                End If
-
-                Dim newCurve = New YieldCurve(Guid.NewGuid.ToString, selectedItem.Name, ricsInCurve, selectedItem.Color, fieldNames)
-                AddHandler newCurve.Updated, AddressOf OnCurvePaint
-                _moneyMarketCurves.Add(newCurve)
-                newCurve.Subscribe()
+            Dim fieldNames As New Dictionary(Of QuoteSource, String)
+            If selectedItem.Type = "List" Then
+                Dim data As New _ricsInHawserTableAdapter
+                Dim theData = data.GetData
+                ricsInCurve = theData.Where(Function(row) row.ric IsNot Nothing AndAlso row.id = selectedItem.ID).Select(Function(row) row.ric).ToList()
+                Dim hawserData = (New hawserTableAdapter).GetData.First(Function(row) row.id = selectedItem.ID)
+                fieldNames.Add(QuoteSource.Bid, hawserData.bid_field)
+                fieldNames.Add(QuoteSource.Ask, hawserData.ask_field)
+                fieldNames.Add(QuoteSource.Last, hawserData.last_field)
+                fieldNames.Add(QuoteSource.Hist, hawserData.hist_field)
+            Else
+                Dim data As New _ricsInChainTableAdapter
+                Dim theData = data.GetData
+                ricsInCurve = theData.Where(Function(row) row.ric IsNot Nothing AndAlso row.id = selectedItem.ID).Select(Function(row) row.ric).ToList()
+                Dim chainData = (New chainTableAdapter).GetData.First(Function(row) row.id = selectedItem.ID)
+                fieldNames.Add(QuoteSource.Bid, chainData.bid_field)
+                fieldNames.Add(QuoteSource.Ask, chainData.ask_field)
+                fieldNames.Add(QuoteSource.Last, chainData.last_field)
+                fieldNames.Add(QuoteSource.Hist, chainData.hist_field)
             End If
+
+            If Not ricsInCurve.Any() Then
+                MsgBox("No rics found")
+                Return
+            End If
+
+            Dim newCurve = New YieldCurve(Guid.NewGuid.ToString, selectedItem.Name, ricsInCurve, selectedItem.Color, fieldNames)
+            AddHandler newCurve.Updated, AddressOf OnCurvePaint
+            _moneyMarketCurves.Add(newCurve)
+            newCurve.Subscribe()
+            'End If
         End Sub
 
         Private Sub SelDateTSMIClick(sender As Object, e As EventArgs) Handles SelDateTSMI.Click
@@ -1722,5 +1767,7 @@ Namespace Forms.ChartForm
         End Sub
 #End Region
 #End Region
+
+
     End Class
 End Namespace

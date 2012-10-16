@@ -24,8 +24,8 @@
         <System.Diagnostics.DebuggerStepThrough()> _
         Private Sub InitializeComponent()
             Me.components = New System.ComponentModel.Container()
-            Dim ChartArea2 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-            Dim Legend2 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+            Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+            Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
             Me.TheStatusStrip = New System.Windows.Forms.StatusStrip()
             Me.StatusMessage = New System.Windows.Forms.ToolStripStatusLabel()
             Me.TheToolStrip = New System.Windows.Forms.ToolStrip()
@@ -33,14 +33,8 @@
             Me.ZoomCustomButton = New System.Windows.Forms.ToolStripButton()
             Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator()
             Me.PortfolioTSSB = New System.Windows.Forms.ToolStripSplitButton()
-            Me.portfolioSelectTSCB = New System.Windows.Forms.ToolStripComboBox()
-            Me.CurvesToolStripSplitButton = New System.Windows.Forms.ToolStripSplitButton()
-            Me.AddBondCurveTSMI = New System.Windows.Forms.ToolStripMenuItem()
-            Me.ToolStripSeparator9 = New System.Windows.Forms.ToolStripSeparator()
-            Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
-            Me.RubIRSTSMI = New System.Windows.Forms.ToolStripMenuItem()
-            Me.RubCCSTSMI = New System.Windows.Forms.ToolStripMenuItem()
-            Me.NDFTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.CurvesTSMI = New System.Windows.Forms.ToolStripSplitButton()
+            Me.BondCurvesTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
             Me.ShowLegendTSB = New System.Windows.Forms.ToolStripButton()
             Me.ShowLabelsTSB = New System.Windows.Forms.ToolStripButton()
@@ -58,12 +52,19 @@
             Me.RelatedChartTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.MainTableLayout = New System.Windows.Forms.TableLayoutPanel()
             Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
+            Me.PVBPLabel = New System.Windows.Forms.Label()
+            Me.Label8 = New System.Windows.Forms.Label()
+            Me.ASWLabel = New System.Windows.Forms.Label()
+            Me.OASLabel = New System.Windows.Forms.Label()
+            Me.CpnLabel = New System.Windows.Forms.Label()
+            Me.Label3 = New System.Windows.Forms.Label()
             Me.DurLabel = New System.Windows.Forms.Label()
             Me.SpreadLabel = New System.Windows.Forms.Label()
             Me.DscrLabel = New System.Windows.Forms.Label()
             Me.Label6 = New System.Windows.Forms.Label()
             Me.DatLabel = New System.Windows.Forms.Label()
             Me.Label1 = New System.Windows.Forms.Label()
+            Me.YldLabel = New System.Windows.Forms.Label()
             Me.ZSpreadLabel = New System.Windows.Forms.Label()
             Me.Label2 = New System.Windows.Forms.Label()
             Me.LinkSpreadLabel = New System.Windows.Forms.LinkLabel()
@@ -73,6 +74,8 @@
             Me.Label5 = New System.Windows.Forms.Label()
             Me.MatLabel = New System.Windows.Forms.Label()
             Me.ConvLabel = New System.Windows.Forms.Label()
+            Me.Label7 = New System.Windows.Forms.Label()
+            Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
             Me.TheChart = New System.Windows.Forms.DataVisualization.Charting.Chart()
             Me.ChartCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.CopyToClipboardTSMI = New System.Windows.Forms.ToolStripMenuItem()
@@ -97,15 +100,10 @@
             Me.BidAskCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.RemoveBidAskTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.YAxisCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
-            Me.Label7 = New System.Windows.Forms.Label()
-            Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
-            Me.YldLabel = New System.Windows.Forms.Label()
-            Me.CpnLabel = New System.Windows.Forms.Label()
-            Me.OASLabel = New System.Windows.Forms.Label()
-            Me.ASWLabel = New System.Windows.Forms.Label()
-            Me.Label8 = New System.Windows.Forms.Label()
-            Me.PVBPLabel = New System.Windows.Forms.Label()
-            Me.Label3 = New System.Windows.Forms.Label()
+            Me.RubIRSTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.RubCCSTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.NDFTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
             Me.TheStatusStrip.SuspendLayout()
             Me.TheToolStrip.SuspendLayout()
             Me.BondCMS.SuspendLayout()
@@ -136,7 +134,7 @@
             '
             'TheToolStrip
             '
-            Me.TheToolStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ZoomAllButton, Me.ZoomCustomButton, Me.ToolStripSeparator3, Me.PortfolioTSSB, Me.CurvesToolStripSplitButton, Me.ToolStripSeparator2, Me.ShowLegendTSB, Me.ShowLabelsTSB, Me.ToolStripSeparator6, Me.AsTableTSB})
+            Me.TheToolStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ZoomAllButton, Me.ZoomCustomButton, Me.ToolStripSeparator3, Me.PortfolioTSSB, Me.CurvesTSMI, Me.ToolStripSeparator2, Me.ShowLegendTSB, Me.ShowLabelsTSB, Me.ToolStripSeparator6, Me.AsTableTSB})
             Me.TheToolStrip.Location = New System.Drawing.Point(0, 0)
             Me.TheToolStrip.Name = "TheToolStrip"
             Me.TheToolStrip.Size = New System.Drawing.Size(784, 25)
@@ -170,63 +168,26 @@
             '
             'PortfolioTSSB
             '
-            Me.PortfolioTSSB.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.portfolioSelectTSCB})
             Me.PortfolioTSSB.Image = Global.YieldMap.My.Resources.Resources.folder
             Me.PortfolioTSSB.ImageTransparentColor = System.Drawing.Color.Magenta
             Me.PortfolioTSSB.Name = "PortfolioTSSB"
             Me.PortfolioTSSB.Size = New System.Drawing.Size(79, 22)
             Me.PortfolioTSSB.Text = "Portfolio"
             '
-            'portfolioSelectTSCB
+            'CurvesTSMI
             '
-            Me.portfolioSelectTSCB.Enabled = False
-            Me.portfolioSelectTSCB.Name = "portfolioSelectTSCB"
-            Me.portfolioSelectTSCB.Size = New System.Drawing.Size(121, 21)
+            Me.CurvesTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BondCurvesTSMI, Me.ToolStripMenuItem1})
+            Me.CurvesTSMI.Image = Global.YieldMap.My.Resources.Resources.graph_edge_curved
+            Me.CurvesTSMI.ImageTransparentColor = System.Drawing.Color.Magenta
+            Me.CurvesTSMI.Name = "CurvesTSMI"
+            Me.CurvesTSMI.Size = New System.Drawing.Size(73, 22)
+            Me.CurvesTSMI.Text = "Curves"
             '
-            'CurvesToolStripSplitButton
+            'BondCurvesTSMI
             '
-            Me.CurvesToolStripSplitButton.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddBondCurveTSMI, Me.ToolStripSeparator9, Me.ToolStripMenuItem1})
-            Me.CurvesToolStripSplitButton.Image = Global.YieldMap.My.Resources.Resources.graph_edge_curved
-            Me.CurvesToolStripSplitButton.ImageTransparentColor = System.Drawing.Color.Magenta
-            Me.CurvesToolStripSplitButton.Name = "CurvesToolStripSplitButton"
-            Me.CurvesToolStripSplitButton.Size = New System.Drawing.Size(73, 22)
-            Me.CurvesToolStripSplitButton.Text = "Curves"
-            '
-            'AddBondCurveTSMI
-            '
-            Me.AddBondCurveTSMI.Name = "AddBondCurveTSMI"
-            Me.AddBondCurveTSMI.Size = New System.Drawing.Size(173, 22)
-            Me.AddBondCurveTSMI.Text = "Add bond curve..."
-            '
-            'ToolStripSeparator9
-            '
-            Me.ToolStripSeparator9.Name = "ToolStripSeparator9"
-            Me.ToolStripSeparator9.Size = New System.Drawing.Size(170, 6)
-            '
-            'ToolStripMenuItem1
-            '
-            Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RubIRSTSMI, Me.RubCCSTSMI, Me.NDFTSMI})
-            Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(173, 22)
-            Me.ToolStripMenuItem1.Text = "IR curves"
-            '
-            'RubIRSTSMI
-            '
-            Me.RubIRSTSMI.Name = "RubIRSTSMI"
-            Me.RubIRSTSMI.Size = New System.Drawing.Size(127, 22)
-            Me.RubIRSTSMI.Text = "Rub IRS"
-            '
-            'RubCCSTSMI
-            '
-            Me.RubCCSTSMI.Name = "RubCCSTSMI"
-            Me.RubCCSTSMI.Size = New System.Drawing.Size(127, 22)
-            Me.RubCCSTSMI.Text = "Rub CCS"
-            '
-            'NDFTSMI
-            '
-            Me.NDFTSMI.Name = "NDFTSMI"
-            Me.NDFTSMI.Size = New System.Drawing.Size(127, 22)
-            Me.NDFTSMI.Text = "NDF"
+            Me.BondCurvesTSMI.Name = "BondCurvesTSMI"
+            Me.BondCurvesTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.BondCurvesTSMI.Text = "Bond curves"
             '
             'ToolStripSeparator2
             '
@@ -392,6 +353,72 @@
             Me.TableLayoutPanel1.Size = New System.Drawing.Size(778, 80)
             Me.TableLayoutPanel1.TabIndex = 4
             '
+            'PVBPLabel
+            '
+            Me.PVBPLabel.AutoSize = True
+            Me.PVBPLabel.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.PVBPLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Me.PVBPLabel.Location = New System.Drawing.Point(318, 63)
+            Me.PVBPLabel.Margin = New System.Windows.Forms.Padding(3)
+            Me.PVBPLabel.Name = "PVBPLabel"
+            Me.PVBPLabel.Size = New System.Drawing.Size(183, 14)
+            Me.PVBPLabel.TabIndex = 7
+            '
+            'Label8
+            '
+            Me.Label8.Anchor = System.Windows.Forms.AnchorStyles.Left
+            Me.Label8.AutoSize = True
+            Me.Label8.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Me.Label8.Location = New System.Drawing.Point(250, 63)
+            Me.Label8.Name = "Label8"
+            Me.Label8.Size = New System.Drawing.Size(39, 13)
+            Me.Label8.TabIndex = 6
+            Me.Label8.Text = "PVBP"
+            '
+            'ASWLabel
+            '
+            Me.ASWLabel.AutoSize = True
+            Me.ASWLabel.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.ASWLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Me.ASWLabel.Location = New System.Drawing.Point(592, 43)
+            Me.ASWLabel.Margin = New System.Windows.Forms.Padding(3)
+            Me.ASWLabel.Name = "ASWLabel"
+            Me.ASWLabel.Size = New System.Drawing.Size(183, 14)
+            Me.ASWLabel.TabIndex = 5
+            '
+            'OASLabel
+            '
+            Me.OASLabel.AutoSize = True
+            Me.OASLabel.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.OASLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Me.OASLabel.Location = New System.Drawing.Point(592, 63)
+            Me.OASLabel.Margin = New System.Windows.Forms.Padding(3)
+            Me.OASLabel.Name = "OASLabel"
+            Me.OASLabel.Size = New System.Drawing.Size(183, 14)
+            Me.OASLabel.TabIndex = 4
+            '
+            'CpnLabel
+            '
+            Me.CpnLabel.AutoSize = True
+            Me.CpnLabel.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.CpnLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Me.CpnLabel.Location = New System.Drawing.Point(61, 63)
+            Me.CpnLabel.Margin = New System.Windows.Forms.Padding(3)
+            Me.CpnLabel.Name = "CpnLabel"
+            Me.CpnLabel.Size = New System.Drawing.Size(183, 14)
+            Me.CpnLabel.TabIndex = 3
+            '
+            'Label3
+            '
+            Me.Label3.Anchor = System.Windows.Forms.AnchorStyles.Left
+            Me.Label3.AutoSize = True
+            Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Me.Label3.Location = New System.Drawing.Point(250, 23)
+            Me.Label3.Name = "Label3"
+            Me.Label3.Size = New System.Drawing.Size(55, 13)
+            Me.Label3.TabIndex = 0
+            Me.Label3.Text = "Duration"
+            '
             'DurLabel
             '
             Me.DurLabel.AutoSize = True
@@ -457,6 +484,17 @@
             Me.Label1.Size = New System.Drawing.Size(35, 13)
             Me.Label1.TabIndex = 0
             Me.Label1.Text = "Yield"
+            '
+            'YldLabel
+            '
+            Me.YldLabel.AutoSize = True
+            Me.YldLabel.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.YldLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Me.YldLabel.Location = New System.Drawing.Point(318, 3)
+            Me.YldLabel.Margin = New System.Windows.Forms.Padding(3)
+            Me.YldLabel.Name = "YldLabel"
+            Me.YldLabel.Size = New System.Drawing.Size(183, 14)
+            Me.YldLabel.TabIndex = 0
             '
             'ZSpreadLabel
             '
@@ -573,16 +611,44 @@
             Me.ConvLabel.Size = New System.Drawing.Size(183, 14)
             Me.ConvLabel.TabIndex = 2
             '
+            'Label7
+            '
+            Me.Label7.Anchor = System.Windows.Forms.AnchorStyles.Left
+            Me.Label7.AutoSize = True
+            Me.Label7.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Me.Label7.Location = New System.Drawing.Point(3, 63)
+            Me.Label7.Name = "Label7"
+            Me.Label7.Size = New System.Drawing.Size(50, 13)
+            Me.Label7.TabIndex = 0
+            Me.Label7.Text = "Coupon"
+            '
+            'LinkLabel1
+            '
+            Me.LinkLabel1.AutoSize = True
+            Me.LinkLabel1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Me.LinkLabel1.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
+            Me.LinkLabel1.LinkColor = System.Drawing.Color.Navy
+            Me.LinkLabel1.LinkVisited = True
+            Me.LinkLabel1.Location = New System.Drawing.Point(507, 63)
+            Me.LinkLabel1.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
+            Me.LinkLabel1.Name = "LinkLabel1"
+            Me.LinkLabel1.Size = New System.Drawing.Size(68, 13)
+            Me.LinkLabel1.TabIndex = 1
+            Me.LinkLabel1.TabStop = True
+            Me.LinkLabel1.Text = "OA Spread"
+            Me.LinkLabel1.Visible = False
+            Me.LinkLabel1.VisitedLinkColor = System.Drawing.Color.Navy
+            '
             'TheChart
             '
             Me.TheChart.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                 Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-            ChartArea2.Name = "ChartArea1"
-            Me.TheChart.ChartAreas.Add(ChartArea2)
-            Legend2.Enabled = False
-            Legend2.Name = "Legend1"
-            Me.TheChart.Legends.Add(Legend2)
+            ChartArea1.Name = "ChartArea1"
+            Me.TheChart.ChartAreas.Add(ChartArea1)
+            Legend1.Enabled = False
+            Legend1.Name = "Legend1"
+            Me.TheChart.Legends.Add(Legend1)
             Me.TheChart.Location = New System.Drawing.Point(3, 89)
             Me.TheChart.Name = "TheChart"
             Me.TheChart.Size = New System.Drawing.Size(778, 417)
@@ -728,110 +794,30 @@
             Me.YAxisCMS.Name = "YAxisCMS"
             Me.YAxisCMS.Size = New System.Drawing.Size(61, 4)
             '
-            'Label7
+            'RubIRSTSMI
             '
-            Me.Label7.Anchor = System.Windows.Forms.AnchorStyles.Left
-            Me.Label7.AutoSize = True
-            Me.Label7.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.Label7.Location = New System.Drawing.Point(3, 63)
-            Me.Label7.Name = "Label7"
-            Me.Label7.Size = New System.Drawing.Size(50, 13)
-            Me.Label7.TabIndex = 0
-            Me.Label7.Text = "Coupon"
+            Me.RubIRSTSMI.Name = "RubIRSTSMI"
+            Me.RubIRSTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.RubIRSTSMI.Text = "Rub IRS"
             '
-            'LinkLabel1
+            'RubCCSTSMI
             '
-            Me.LinkLabel1.AutoSize = True
-            Me.LinkLabel1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.LinkLabel1.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
-            Me.LinkLabel1.LinkColor = System.Drawing.Color.Navy
-            Me.LinkLabel1.LinkVisited = True
-            Me.LinkLabel1.Location = New System.Drawing.Point(507, 63)
-            Me.LinkLabel1.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
-            Me.LinkLabel1.Name = "LinkLabel1"
-            Me.LinkLabel1.Size = New System.Drawing.Size(68, 13)
-            Me.LinkLabel1.TabIndex = 1
-            Me.LinkLabel1.TabStop = True
-            Me.LinkLabel1.Text = "OA Spread"
-            Me.LinkLabel1.Visible = False
-            Me.LinkLabel1.VisitedLinkColor = System.Drawing.Color.Navy
+            Me.RubCCSTSMI.Name = "RubCCSTSMI"
+            Me.RubCCSTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.RubCCSTSMI.Text = "Rub CCS"
             '
-            'YldLabel
+            'NDFTSMI
             '
-            Me.YldLabel.AutoSize = True
-            Me.YldLabel.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.YldLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.YldLabel.Location = New System.Drawing.Point(318, 3)
-            Me.YldLabel.Margin = New System.Windows.Forms.Padding(3)
-            Me.YldLabel.Name = "YldLabel"
-            Me.YldLabel.Size = New System.Drawing.Size(183, 14)
-            Me.YldLabel.TabIndex = 0
+            Me.NDFTSMI.Name = "NDFTSMI"
+            Me.NDFTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.NDFTSMI.Text = "NDF"
             '
-            'CpnLabel
+            'ToolStripMenuItem1
             '
-            Me.CpnLabel.AutoSize = True
-            Me.CpnLabel.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.CpnLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.CpnLabel.Location = New System.Drawing.Point(61, 63)
-            Me.CpnLabel.Margin = New System.Windows.Forms.Padding(3)
-            Me.CpnLabel.Name = "CpnLabel"
-            Me.CpnLabel.Size = New System.Drawing.Size(183, 14)
-            Me.CpnLabel.TabIndex = 3
-            '
-            'OASLabel
-            '
-            Me.OASLabel.AutoSize = True
-            Me.OASLabel.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.OASLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.OASLabel.Location = New System.Drawing.Point(592, 63)
-            Me.OASLabel.Margin = New System.Windows.Forms.Padding(3)
-            Me.OASLabel.Name = "OASLabel"
-            Me.OASLabel.Size = New System.Drawing.Size(183, 14)
-            Me.OASLabel.TabIndex = 4
-            '
-            'ASWLabel
-            '
-            Me.ASWLabel.AutoSize = True
-            Me.ASWLabel.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.ASWLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.ASWLabel.Location = New System.Drawing.Point(592, 43)
-            Me.ASWLabel.Margin = New System.Windows.Forms.Padding(3)
-            Me.ASWLabel.Name = "ASWLabel"
-            Me.ASWLabel.Size = New System.Drawing.Size(183, 14)
-            Me.ASWLabel.TabIndex = 5
-            '
-            'Label8
-            '
-            Me.Label8.Anchor = System.Windows.Forms.AnchorStyles.Left
-            Me.Label8.AutoSize = True
-            Me.Label8.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.Label8.Location = New System.Drawing.Point(250, 63)
-            Me.Label8.Name = "Label8"
-            Me.Label8.Size = New System.Drawing.Size(39, 13)
-            Me.Label8.TabIndex = 6
-            Me.Label8.Text = "PVBP"
-            '
-            'PVBPLabel
-            '
-            Me.PVBPLabel.AutoSize = True
-            Me.PVBPLabel.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.PVBPLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.PVBPLabel.Location = New System.Drawing.Point(318, 63)
-            Me.PVBPLabel.Margin = New System.Windows.Forms.Padding(3)
-            Me.PVBPLabel.Name = "PVBPLabel"
-            Me.PVBPLabel.Size = New System.Drawing.Size(183, 14)
-            Me.PVBPLabel.TabIndex = 7
-            '
-            'Label3
-            '
-            Me.Label3.Anchor = System.Windows.Forms.AnchorStyles.Left
-            Me.Label3.AutoSize = True
-            Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.Label3.Location = New System.Drawing.Point(250, 23)
-            Me.Label3.Name = "Label3"
-            Me.Label3.Size = New System.Drawing.Size(55, 13)
-            Me.Label3.TabIndex = 0
-            Me.Label3.Text = "Duration"
+            Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RubIRSTSMI, Me.RubCCSTSMI, Me.NDFTSMI})
+            Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
+            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(152, 22)
+            Me.ToolStripMenuItem1.Text = "IR curves"
             '
             'GraphForm
             '
@@ -873,16 +859,14 @@
         Friend WithEvents ZoomCustomButton As System.Windows.Forms.ToolStripButton
         Friend WithEvents GraphToolTip As System.Windows.Forms.ToolTip
         Friend WithEvents PortfolioTSSB As System.Windows.Forms.ToolStripSplitButton
-        Friend WithEvents CurvesToolStripSplitButton As System.Windows.Forms.ToolStripSplitButton
+        Friend WithEvents CurvesTSMI As System.Windows.Forms.ToolStripSplitButton
         Friend WithEvents BondCMS As System.Windows.Forms.ContextMenuStrip
-        Friend WithEvents AddBondCurveTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents ExtInfoTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents MainInfoLine2TSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents ShowLabelsTSB As System.Windows.Forms.ToolStripButton
         Friend WithEvents ToolStripSeparator6 As System.Windows.Forms.ToolStripSeparator
         Friend WithEvents MainInfoLine1TSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents ShowHistoryTSMI As System.Windows.Forms.ToolStripMenuItem
-        Friend WithEvents portfolioSelectTSCB As System.Windows.Forms.ToolStripComboBox
         Friend WithEvents MainTableLayout As System.Windows.Forms.TableLayoutPanel
         Friend WithEvents TheChart As System.Windows.Forms.DataVisualization.Charting.Chart
         Friend WithEvents ResizePictureBox As System.Windows.Forms.PictureBox
@@ -899,9 +883,6 @@
         Friend WithEvents DscrLabel As System.Windows.Forms.Label
         Friend WithEvents Label6 As System.Windows.Forms.Label
         Friend WithEvents DatLabel As System.Windows.Forms.Label
-        Friend WithEvents ToolStripSeparator9 As System.Windows.Forms.ToolStripSeparator
-        Friend WithEvents ToolStripMenuItem1 As System.Windows.Forms.ToolStripMenuItem
-        Friend WithEvents RubIRSTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents MoneyCurveCMS As System.Windows.Forms.ContextMenuStrip
         Friend WithEvents MMNameTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents DeleteMMCurveTSMI As System.Windows.Forms.ToolStripMenuItem
@@ -910,8 +891,6 @@
         Friend WithEvents QuoteTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents ToolStripSeparator11 As System.Windows.Forms.ToolStripSeparator
         Friend WithEvents SelDateTSMI As System.Windows.Forms.ToolStripMenuItem
-        Friend WithEvents RubCCSTSMI As System.Windows.Forms.ToolStripMenuItem
-        Friend WithEvents NDFTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents LinkSpreadLabel As System.Windows.Forms.LinkLabel
         Friend WithEvents SpreadCMS As System.Windows.Forms.ContextMenuStrip
         Friend WithEvents ZSpreadLinkLabel As System.Windows.Forms.LinkLabel
@@ -945,5 +924,10 @@
         Friend WithEvents PVBPLabel As System.Windows.Forms.Label
         Friend WithEvents Label8 As System.Windows.Forms.Label
         Friend WithEvents Label3 As System.Windows.Forms.Label
+        Friend WithEvents BondCurvesTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents ToolStripMenuItem1 As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents RubIRSTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents RubCCSTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents NDFTSMI As System.Windows.Forms.ToolStripMenuItem
     End Class
 End Namespace

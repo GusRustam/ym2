@@ -368,11 +368,14 @@ Namespace Forms.ChartForm
         Public Duration As Double
         Public Convexity As Double
         Public PVBP As Double
+        Public YieldAtDate As Date
 
         Public Overridable Property PointSpread As Double?
         Public Overridable Property ZSpread As Double?
         Public Overridable Property OASpread As Double?
         Public Overridable Property ASWSpread As Double?
+
+            
 
         Public Overrides Function ToString() As String
             Return String.Format("{0:P2} {1:F2}", Yld, Duration)
@@ -395,7 +398,7 @@ Namespace Forms.ChartForm
 
         Public YieldSource As YieldSource
         'Public YieldAtDate As DateTime
-        Public YieldToDate As DateTime
+        'Public YieldToDate As DateTime
 
         'Public ToWhat As YieldToWhat
 
@@ -422,8 +425,8 @@ Namespace Forms.ChartForm
                 Maturity = .Maturity
                 Coupon = .Coupon
                 YieldSource = .YieldSource
-                'YieldAtDate = .YieldAtDate
-                YieldToDate = .YieldToDate
+                YieldAtDate = .YieldAtDate
+                'YieldToDate = .YieldToDate
                 'ToWhat = .ToWhat
                 .Yld = descr.Yld
                 CalcPrice = .CalcPrice

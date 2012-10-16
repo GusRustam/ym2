@@ -124,7 +124,8 @@ Namespace Tools
         Implements IComparable(Of YieldStructure)
         Public ToWhat As YieldToWhat
         Public Yield As Double
-        Public YieldAtDate As DateTime
+        'Public YieldAtDate As DateTime
+        Public YieldToDate As Date
 
         Public Function CompareTo(ByVal other As YieldStructure) As Integer Implements IComparable(Of YieldStructure).CompareTo
             Return IIf(Yield < other.Yield, -1, 1)
@@ -133,7 +134,7 @@ Namespace Tools
         Public Overrides Function Equals(ByVal obj As Object) As Boolean
             If TypeOf obj Is YieldStructure Then
                 Dim ys = CType(obj, YieldStructure)
-                Return ys.ToWhat.Equals(ToWhat) And ys.YieldAtDate = YieldAtDate
+                Return ys.ToWhat.Equals(ToWhat) And ys.YieldToDate = YieldToDate
             Else
                 Return False
             End If
@@ -198,7 +199,7 @@ Namespace Tools
             Dim convexity = bondDeriv.GetValue(1, 7)
             Dim pvbp = bondDeriv.GetValue(1, 4)
             Logger.Trace("duration: {0}", duration)
-            Return New DataPointDescr With {.Duration = duration, .Convexity = convexity, .PVBP = pvbp, .Yld = bestYield}
+            Return New DataPointDescr With {.Duration = duration, .Convexity = convexity, .PVBP = pvbp, .Yld = bestYield, .YieldAtDate = dt}
             'Return New Tuple(Of Double, Double, Double, YieldStructure)(duration, convexity, pvbp, bestYield)
         End Function
 
@@ -213,7 +214,7 @@ Namespace Tools
                 If Not YieldToWhat.TryParse(bondYield.GetValue(j, 4).ToString(), toWhat) Then
                     toWhat = YieldToWhat.Maturity
                 End If
-                Dim yieldDescr = New YieldStructure With {.Yield = yield, .YieldAtDate = itsDate, .ToWhat = toWhat}
+                Dim yieldDescr = New YieldStructure With {.Yield = yield, .YieldToDate = itsDate, .ToWhat = toWhat}
                 res.Add(yieldDescr)
             Next
             Return res
