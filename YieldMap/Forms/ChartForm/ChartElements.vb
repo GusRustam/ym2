@@ -213,18 +213,22 @@ Namespace Forms.ChartForm
 
         Public Function GetQuote(ByVal theTag As DataPointDescr, Optional ByVal mode As SpreadMode = Nothing) As Double?
             Dim fieldName = If(mode IsNot Nothing, mode.Name, _currentMode.ToString())
-            If theTag IsNot Nothing AndAlso theTag.IsValid Then
-                Dim value As Object
-                Dim fieldInfo = GetType(DataPointDescr).GetField(fieldName)
-                If fieldInfo IsNot Nothing Then
-                    value = fieldInfo.GetValue(theTag)
-                Else
-                    Dim propertyInfo = GetType(DataPointDescr).GetProperty(fieldName)
-                    value = propertyInfo.GetValue(theTag, Nothing)
+            If fieldName = "Yield" Then
+                Return theTag.Yld.Yield
+            Else
+                If theTag IsNot Nothing AndAlso theTag.IsValid Then
+                    Dim value As Object
+                    Dim fieldInfo = GetType(DataPointDescr).GetField(fieldName)
+                    If fieldInfo IsNot Nothing Then
+                        value = fieldInfo.GetValue(theTag)
+                    Else
+                        Dim propertyInfo = GetType(DataPointDescr).GetProperty(fieldName)
+                        value = propertyInfo.GetValue(theTag, Nothing)
+                    End If
+                    If value IsNot Nothing Then Return CDbl(value)
                 End If
-                If value IsNot Nothing Then Return CDbl(value)
+                Return Nothing
             End If
-            Return Nothing
         End Function
 
         Public Sub SetQuote(ByVal theTag As DataPointDescr, ByVal value As Double?, Optional ByVal mode As SpreadMode = Nothing)
@@ -245,13 +249,13 @@ Namespace Forms.ChartForm
                 If Benchmarks.ContainsKey(SpreadMode.ZSpread) Then CalculateZSpread(descr)
                 If Benchmarks.ContainsKey(SpreadMode.PointSpread) Then
                     Dim spreadMainCurve = Benchmarks(SpreadMode.PointSpread)
-                    descr.PointSpread = spreadMainCurve.PointSpread(descr.Yield, descr.Duration)
+                    descr.PointSpread = spreadMainCurve.PointSpread(descr.Yld.Yield, descr.Duration)
                 End If
                 Return GetQuote(descr)
             Else ' calculate chosen spread
                 If mode.Equals(SpreadMode.PointSpread) And Benchmarks.ContainsKey(SpreadMode.PointSpread) Then
                     Dim spreadMainCurve = Benchmarks(SpreadMode.PointSpread)
-                    descr.PointSpread = spreadMainCurve.PointSpread(descr.Yield, descr.Duration)
+                    descr.PointSpread = spreadMainCurve.PointSpread(descr.Yld.Yield, descr.Duration)
                 ElseIf mode.Equals(SpreadMode.ZSpread) And Benchmarks.ContainsKey(SpreadMode.ZSpread) Then
                     CalculateZSpread(descr)
                 ElseIf Not mode.Equals(SpreadMode.Yield) Then
@@ -350,7 +354,7 @@ Namespace Forms.ChartForm
 #End Region
 
 #Region "IV. Points descriptions"
-    Friend MustInherit Class DataPointDescr
+    Friend Class DataPointDescr
         Public Const AroundZero As Double = 0.0001
 
         Public Overridable ReadOnly Property IsValid As Boolean
@@ -360,9 +364,10 @@ Namespace Forms.ChartForm
         End Property
         Public IsVisible As Boolean
 
-        Public Yield As Double
+        Public Yld As New YieldStructure
         Public Duration As Double
         Public Convexity As Double
+        Public PVBP As Double
 
         Public Overridable Property PointSpread As Double?
         Public Overridable Property ZSpread As Double?
@@ -370,11 +375,11 @@ Namespace Forms.ChartForm
         Public Overridable Property ASWSpread As Double?
 
         Public Overrides Function ToString() As String
-            Return String.Format("{0:P2} {1:F2}", Yield, Duration)
+            Return String.Format("{0:P2} {1:F2}", Yld, Duration)
         End Function
 
         Public Function Fits(ByVal minX As Double, ByVal minY As Double, ByVal maxX As Double, ByVal maxY As Double) As Boolean
-            Return IsValid And (Duration >= minX And Duration <= maxX And Yield >= minY And Yield <= maxY)
+            Return IsValid And (Duration >= minX And Duration <= maxX And Yld.Yield >= minY And Yld.Yield <= maxY)
         End Function
     End Class
 
@@ -389,10 +394,10 @@ Namespace Forms.ChartForm
         Public Coupon As Double
 
         Public YieldSource As YieldSource
-        Public YieldAtDate As DateTime
+        'Public YieldAtDate As DateTime
         Public YieldToDate As DateTime
 
-        Public ToWhat As YieldToWhat
+        'Public ToWhat As YieldToWhat
 
         Public CalcPrice As Double
 
@@ -417,9 +422,10 @@ Namespace Forms.ChartForm
                 Maturity = .Maturity
                 Coupon = .Coupon
                 YieldSource = .YieldSource
-                YieldAtDate = .YieldAtDate
+                'YieldAtDate = .YieldAtDate
                 YieldToDate = .YieldToDate
-                ToWhat = .ToWhat
+                'ToWhat = .ToWhat
+                .Yld = descr.Yld
                 CalcPrice = .CalcPrice
                 SelectedQuote = .SelectedQuote
                 IssuerID = .IssuerID
@@ -438,7 +444,7 @@ Namespace Forms.ChartForm
 
         Public Overrides ReadOnly Property IsValid() As Boolean
             Get
-                Return CalcPrice > AroundZero And Yield > MinYield / 100.0 And Yield < MaxYield / 100.0 And Duration > MinDur And Duration < MaxDur
+                Return CalcPrice > AroundZero And Yld.Yield > MinYield / 100.0 And Yld.Yield < MaxYield / 100.0 And Duration > MinDur And Duration < MaxDur
             End Get
         End Property
 
@@ -447,7 +453,7 @@ Namespace Forms.ChartForm
         End Function
 
         Public Function ToLongString() As String
-            Return String.Format("{0}; Last {1:F2}; {2:P2}/{3:F2}", RIC, CalcPrice, Yield, Duration)
+            Return String.Format("{0}; Last {1:F2}; {2:P2}/{3:F2}", RIC, CalcPrice, Yld, Duration)
         End Function
     End Class
 
@@ -459,7 +465,7 @@ Namespace Forms.ChartForm
 
         Public Overrides ReadOnly Property IsValid() As Boolean
             Get
-                Return Yield > MinYield / 100.0 And Yield < MaxYield / 100.0 And Duration > MinDur And Duration < MaxDur
+                Return Yld.Yield > MinYield / 100.0 And Yld.Yield < MaxYield / 100.0 And Duration > MinDur And Duration < MaxDur
             End Get
         End Property
 
@@ -529,7 +535,7 @@ Namespace Forms.ChartForm
 
         Public HistCurveName As String
         Public RIC As String
-        Public YieldAtDate As DateTime
+        'Public YieldAtDate As DateTime
         Public YieldToDate As DateTime
         Public BaseBondName As String
 

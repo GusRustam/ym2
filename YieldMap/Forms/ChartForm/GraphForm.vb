@@ -277,13 +277,13 @@ Namespace Forms.ChartForm
                             If bondDataPoint.YieldSource = YieldSource.Realtime Then
                                 MainInfoLine2TSMI.Text =
                                     String.Format("LAST: P [{0:F4}], Y [{1:P2}] {2}, D [{3:F2}]",
-                                                  bondDataPoint.CalcPrice, bondDataPoint.Yield, bondDataPoint.ToWhat.ToString(), bondDataPoint.Duration)
+                                                  bondDataPoint.CalcPrice, bondDataPoint.Yld.Yield, bondDataPoint.Yld.ToWhat.ToString(), bondDataPoint.Duration)
                                 StartBidAsk(bondDataPoint)
                                 ExtInfoTSMI.Visible = True
                             Else
                                 MainInfoLine2TSMI.Text =
                                     String.Format("LAST: P [{0:F4}], Y [{1:P2}] {2}, D [{3:F2}] @ {4:dd/MM/yy}",
-                                                  bondDataPoint.CalcPrice, bondDataPoint.Yield, bondDataPoint.ToWhat.ToString(), bondDataPoint.Duration, bondDataPoint.YieldAtDate)
+                                                  bondDataPoint.CalcPrice, bondDataPoint.Yld.Yield, bondDataPoint.Yld.ToWhat.ToString(), bondDataPoint.Duration, bondDataPoint.Yld.YieldAtDate)
 
                                 ExtInfoTSMI.Visible = False
                             End If
@@ -567,15 +567,18 @@ Namespace Forms.ChartForm
                     Dim dat = CType(point.Tag, DataPointDescr)
                     SpreadLabel.Text = If(dat.PointSpread IsNot Nothing, String.Format("{0:F0} b.p.", dat.PointSpread), N_A)
                     ZSpreadLabel.Text = If(dat.ZSpread IsNot Nothing, String.Format("{0:F0} b.p.", dat.ZSpread), N_A)
-                    YldLabel.Text = String.Format("{0:P2}", dat.Yield)
+                    YldLabel.Text = String.Format("{0:P2}", dat.Yld)
                     DurLabel.Text = String.Format("{0:F2}", point.XValue)
 
                     If TypeOf point.Tag Is BondPointDescr And Not point.IsEmpty Then
                         Dim bondData = CType(point.Tag, BondPointDescr)
                         DscrLabel.Text = bondData.Label
                         ConvLabel.Text = String.Format("{0:F2}", bondData.Convexity)
-                        YldLabel.Text = String.Format("{0:P2} {1}", bondData.Yield, bondData.ToWhat.Abbr)
-                        DatLabel.Text = String.Format("{0:dd/MM/yyyy}", bondData.YieldAtDate)
+                        YldLabel.Text = String.Format("{0:P2} {1}", bondData.Yld.Yield, bondData.Yld.ToWhat.Abbr)
+                        DatLabel.Text = String.Format("{0:dd/MM/yyyy}", bondData.Yld.YieldAtDate)
+                        MatLabel.Text = String.Format("{0:dd/MM/yyyy}", bondData.Maturity)
+                        CpnLabel.Text = String.Format("{0:F2}%", bondData.Coupon)
+                        PVBPLabel.Text = String.Format("{0:F2}", bondData.PVBP)
                         CType(htr.Series.Tag, BondPointsSeries).SelectedPointIndex = htr.PointIndex
 
                     ElseIf TypeOf point.Tag Is MoneyMarketPointDescr Then
@@ -589,7 +592,7 @@ Namespace Forms.ChartForm
                     ElseIf TypeOf point.Tag Is HistCurvePointDescr Then
                         Dim historyDataPoint = CType(point.Tag, HistCurvePointDescr)
                         DscrLabel.Text = historyDataPoint.BaseBondName
-                        DatLabel.Text = String.Format("{0:dd/MM/yyyy}", historyDataPoint.YieldAtDate)
+                        DatLabel.Text = String.Format("{0:dd/MM/yyyy}", historyDataPoint.Yld.YieldAtDate)
                         ConvLabel.Text = String.Format("{0:F2}", historyDataPoint.Convexity)
 
                     ElseIf TypeOf point.Tag Is BidAskPointDescr Then
@@ -826,15 +829,15 @@ Namespace Forms.ChartForm
                             res.RIC = point.RIC
                             res.Name = point.ShortName
                             res.Price = point.CalcPrice
-                            res.Quote = IIf(point.YieldAtDate <> Date.Today, QuoteType.Close, QuoteType.Last)
-                            res.QuoteDate = point.YieldAtDate
+                            res.Quote = IIf(point.Yld.YieldAtDate <> Date.Today, QuoteType.Close, QuoteType.Last)
+                            res.QuoteDate = point.Yld.YieldAtDate
                             res.State = BondDescr.StateType.Ok
-                            res.ToWhat = point.ToWhat
-                            res.BondYield = point.Yield
+                            res.ToWhat = point.Yld.ToWhat
+                            res.BondYield = point.Yld.Yield
                             res.CalcMode = BondDescr.CalculationMode.SystemPrice
                             res.Convexity = point.Convexity
                             res.Duration = point.Duration
-                            res.Live = point.YieldAtDate = Date.Today
+                            res.Live = point.Yld.YieldAtDate = Date.Today
                             res.Maturity = point.Maturity
                             res.Coupon = point.Coupon
                             Return res
@@ -923,7 +926,7 @@ Namespace Forms.ChartForm
 #End Region
 
 #Region "e) Benchmark selection"
-        Private Sub LinkSpreadLabelLinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles LinkSpreadLabel.LinkClicked, ASWLinkLabel.LinkClicked
+        Private Sub LinkSpreadLabelLinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles LinkSpreadLabel.LinkClicked, ASWLinkLabel.LinkClicked, LinkLabel1.LinkClicked
             ShowCurveCMS("PointSpread", If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadMode.PointSpread), _spreadBenchmarks.Benchmarks(SpreadMode.PointSpread), Nothing))
         End Sub
 
@@ -962,8 +965,8 @@ Namespace Forms.ChartForm
                                     From bidAsk In {"BID", "ASK"}
                                     Where fieldsAndValues.ContainsKey(bidAsk) AndAlso fieldsAndValues(bidAsk) > 0
                                     Let durYield = CalcYield(fieldsAndValues(bidAsk), DateTime.Today, _ansamble.GetBondDescription(task))
-                                    Select bidAsk + ": " + QuoteDescription(fieldsAndValues(bidAsk), durYield.Item3.Yield,
-                                                                                      durYield.Item1, durYield.Item3.ToWhat)
+                                    Select bidAsk + ": " + QuoteDescription(fieldsAndValues(bidAsk), durYield.Yld.Yield,
+                                                                                      durYield.Duration, durYield.Yld.ToWhat)
                                 ExtInfoTSMI.DropDownItems.Add(itemsString)
                                 found = True
                             Next
@@ -1014,14 +1017,15 @@ Namespace Forms.ChartForm
                             descr = New BidAskPointDescr() With {
                                 .BondTag = bondPointTag,
                                 .BidAsk = bidAsk,
-                                .Yield = durYield.Item3.Yield,
-                                .Duration = durYield.Item1,
-                                .Convexity = durYield.Item2,
+                                .Yld = durYield.Yld,
+                                .PVBP = durYield.PVBP,
+                                .Duration = durYield.Duration,
+                                .Convexity = durYield.Convexity,
                                 .Price = fieldsAndValues(bidAsk)
                             }
                             ' plotting
                             thePoint = New DataPoint() With {
-                                .MarkerStyle = durYield.Item3.ToWhat.MarkerStyle,
+                                .MarkerStyle = durYield.Yld.ToWhat.MarkerStyle,
                                 .Name = bidAsk,
                                 .MarkerColor = Color.DarkKhaki,
                                 .MarkerBorderColor = Color.DarkOliveGreen,
@@ -1030,11 +1034,11 @@ Namespace Forms.ChartForm
                             }
                             series.Points.Add(thePoint)
                         End If
-                        thePoint.XValue = durYield.Item1
+                        thePoint.XValue = durYield.Duration
 
                         With descr
-                            .Duration = durYield.Item1
-                            .Yield = durYield.Item3.Yield
+                            .Duration = durYield.Duration
+                            .Yld.Yield = durYield.Yld.Yield
                         End With
 
                         Dim yValue = _spreadBenchmarks.CalculateSpreads(descr)
@@ -1137,21 +1141,21 @@ Namespace Forms.ChartForm
                             bondDataPoint.CalcPrice = fieldsAndValues(fieldName)
 
                             ' calculating new yield / duration
-                            Dim yieldDur As Tuple(Of Double, Double, YieldStructure) =
+                            Dim yieldDur As DataPointDescr =
                                     CalcYield(fieldsAndValues(fieldName), DateTime.Today, _ansamble.GetBondDescription(instrument))
 
-                            Dim duration = yieldDur.Item1
-                            Dim convex = yieldDur.Item2
-                            Dim bestYield = yieldDur.Item3
+                            Dim duration = yieldDur.Duration
+                            Dim convex = yieldDur.Convexity
+                            Dim pvbp = yieldDur.PVBP
+                            Dim bestYield = yieldDur.Yld
 
                             With bondDataPoint
-                                .Yield = bestYield.Yield
+                                .Yld = bestYield
                                 .Duration = duration
                                 .Convexity = convex
-                                .YieldAtDate = Today
-                                .YieldToDate = bestYield.YieldDate
+                                .PVBP = pvbp
+                                .YieldToDate = bestYield.YieldAtDate
                                 .YieldSource = YieldSource.Realtime
-                                .ToWhat = bestYield.ToWhat
                             End With
 
                             Dim yValue = _spreadBenchmarks.CalculateSpreads(bondDataPoint)
@@ -1159,7 +1163,6 @@ Namespace Forms.ChartForm
                             ' plotting
                             If yValue IsNot Nothing And bondDataPoint.IsValid() Then
                                 bondDataPoint.IsVisible = True
-                                bondDataPoint.ToWhat = bestYield.ToWhat
                                 With point
                                     .YValues = {yValue}
                                     .MarkerStyle = bestYield.ToWhat.MarkerStyle
@@ -1280,23 +1283,24 @@ Namespace Forms.ChartForm
                         With pointDescr
                             .CalcPrice = maxElem.Close
                             .YieldSource = YieldSource.Historical
-                            .YieldAtDate = maxdate
+                            '.YieldAtDate = maxdate
                         End With
 
                         ' calculating new yield / duration
-                        Dim yieldDur As Tuple(Of Double, Double, YieldStructure) =
-                            CalcYield(maxElem.Close, maxdate, _ansamble.GetBondDescription(ric))
+                        Dim yieldDur = CalcYield(maxElem.Close, maxdate, _ansamble.GetBondDescription(ric))
 
-                        Dim duration = yieldDur.Item1
-                        Dim convex = yieldDur.Item2
-                        Dim bestYield = yieldDur.Item3
+                        Dim duration = yieldDur.Duration
+                        Dim convex = yieldDur.Convexity
+                        Dim pvbp = yieldDur.PVBP
+                        Dim bestYield = yieldDur.Yld
 
                         With pointDescr
-                            .Yield = bestYield.Yield
+                            .Yld = bestYield
                             .Duration = duration
                             .Convexity = convex
-                            .YieldToDate = bestYield.YieldDate
-                            .ToWhat = bestYield.ToWhat
+                            .PVBP = pvbp
+                            '.YieldToDate = bestYield.YieldDate
+                            '.ToWhat = bestYield.ToWhat
                         End With
 
                         If Not pointDescr.IsValid() Then
@@ -1460,29 +1464,27 @@ Namespace Forms.ChartForm
                         End If
 
                         Dim baseBondName = _ansamble.GetBondDescription(ric).ShortName
-                        For Each yieldDur As Tuple(Of Date, Tuple(Of Double, Double, YieldStructure)) In _
+                        For Each yieldDur As DataPointDescr In _
                             From bondHistoryDescr In data
                             Where bondHistoryDescr.Value.Close > 0
-                            Select New Tuple(Of Date, Tuple(Of Double, Double, YieldStructure)) _
-                                (bondHistoryDescr.Key, CalcYield(bondHistoryDescr.Value.Close, bondHistoryDescr.Key, _ansamble.GetBondDescription(ric)))
+                            Select CalcYield(bondHistoryDescr.Value.Close, bondHistoryDescr.Key, _ansamble.GetBondDescription(ric))
 
                             Dim point As New DataPoint
-                            Dim duration = yieldDur.Item2.Item1
-                            Dim convex = yieldDur.Item2.Item2
-                            Dim bestYield = yieldDur.Item2.Item3
-                            Dim [date] = yieldDur.Item1
+                            Dim duration = yieldDur.Duration
+                            Dim convex = yieldDur.Convexity
+                            Dim pvbp = yieldDur.PVBP
+                            Dim bestYield = yieldDur.Yld
 
                             Dim theTag = New HistCurvePointDescr With {
                                 .Duration = duration,
                                 .Convexity = convex,
-                                .Yield = bestYield.Yield,
+                                .Yld = bestYield,
+                                .PVBP = pvbp,
                                 .RIC = ric,
-                                .YieldAtDate = [date],
-                                .YieldToDate = bestYield.YieldDate,
                                 .HistCurveName = ric + "_HIST_CURVE",
                                 .BaseBondName = baseBondName
                             }
-
+                            '.YieldToDate = bestYield.YieldAtDate,
                             Dim yValue = _spreadBenchmarks.CalculateSpreads(theTag)
                             If yValue IsNot Nothing Then
                                 With point
@@ -1671,7 +1673,7 @@ Namespace Forms.ChartForm
                     points.ForEach(
                         Sub(item)
                             Dim theTag = New MoneyMarketPointDescr() With {
-                                .Yield = item.Yield,
+                                .Yld = New YieldStructure With {.Yield = item.Yield},
                                 .Duration = item.Duration,
                                 .IsVisible = True,
                                 .YieldCurveName = curve.GetName(),

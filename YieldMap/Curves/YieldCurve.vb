@@ -142,10 +142,10 @@ Namespace Curves
                     End Try
                     If price > 0 Then
                         Try
-                            Dim yieldDur As Tuple(Of Double, Double, YieldStructure) = CalcYield(price, maxdate, _descrs(ric))
+                            Dim yieldDur = CalcYield(price, maxdate, _descrs(ric))
 
-                            Dim duration = yieldDur.Item1
-                            Dim bestYield = yieldDur.Item3
+                            Dim duration = yieldDur.Duration
+                            Dim bestYield = yieldDur.Yld
 
                             Dim yieldDuration = New YieldDuration() With {
                                 .Yield = bestYield.Yield,
@@ -208,11 +208,10 @@ Namespace Curves
                                 Dim price = CDbl(ricAndFieldValue.Value(_quote))
                                 ' calculating new yield / duration
 
-                                Dim yieldDur As Tuple(Of Double, Double, YieldStructure) =
-                                    CalcYield(price, _date, _descrs(ric))
+                                Dim yieldDur = CalcYield(price, _date, _descrs(ric))
 
-                                Dim duration = yieldDur.Item1
-                                Dim bestYield = yieldDur.Item3
+                                Dim duration = yieldDur.Duration
+                                Dim bestYield = yieldDur.Yld
 
                                 With yieldDuration
                                     .Yield = bestYield.Yield

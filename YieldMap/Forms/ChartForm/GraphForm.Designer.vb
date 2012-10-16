@@ -24,8 +24,8 @@
         <System.Diagnostics.DebuggerStepThrough()> _
         Private Sub InitializeComponent()
             Me.components = New System.ComponentModel.Container()
-            Dim ChartArea3 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-            Dim Legend3 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+            Dim ChartArea2 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+            Dim Legend2 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
             Me.TheStatusStrip = New System.Windows.Forms.StatusStrip()
             Me.StatusMessage = New System.Windows.Forms.ToolStripStatusLabel()
             Me.TheToolStrip = New System.Windows.Forms.ToolStrip()
@@ -53,17 +53,17 @@
             Me.ExtInfoTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.ShowHistoryTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
+            Me.BondDescriptionTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.RelatedQuoteTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.RelatedChartTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.MainTableLayout = New System.Windows.Forms.TableLayoutPanel()
             Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
-            Me.Label3 = New System.Windows.Forms.Label()
             Me.DurLabel = New System.Windows.Forms.Label()
             Me.SpreadLabel = New System.Windows.Forms.Label()
             Me.DscrLabel = New System.Windows.Forms.Label()
             Me.Label6 = New System.Windows.Forms.Label()
             Me.DatLabel = New System.Windows.Forms.Label()
             Me.Label1 = New System.Windows.Forms.Label()
-            Me.YldLabel = New System.Windows.Forms.Label()
             Me.ZSpreadLabel = New System.Windows.Forms.Label()
             Me.Label2 = New System.Windows.Forms.Label()
             Me.LinkSpreadLabel = New System.Windows.Forms.LinkLabel()
@@ -97,8 +97,15 @@
             Me.BidAskCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.RemoveBidAskTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.YAxisCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
-            Me.RelatedChartTSMI = New System.Windows.Forms.ToolStripMenuItem()
-            Me.BondDescriptionTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.Label7 = New System.Windows.Forms.Label()
+            Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
+            Me.YldLabel = New System.Windows.Forms.Label()
+            Me.CpnLabel = New System.Windows.Forms.Label()
+            Me.OASLabel = New System.Windows.Forms.Label()
+            Me.ASWLabel = New System.Windows.Forms.Label()
+            Me.Label8 = New System.Windows.Forms.Label()
+            Me.PVBPLabel = New System.Windows.Forms.Label()
+            Me.Label3 = New System.Windows.Forms.Label()
             Me.TheStatusStrip.SuspendLayout()
             Me.TheToolStrip.SuspendLayout()
             Me.BondCMS.SuspendLayout()
@@ -265,7 +272,7 @@
             '
             Me.BondCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainInfoLine1TSMI, Me.MainInfoLine2TSMI, Me.ExtInfoTSMI, Me.ShowHistoryTSMI, Me.ToolStripSeparator1, Me.BondDescriptionTSMI, Me.RelatedQuoteTSMI, Me.RelatedChartTSMI})
             Me.BondCMS.Name = "BondContextMenuStrip"
-            Me.BondCMS.Size = New System.Drawing.Size(165, 186)
+            Me.BondCMS.Size = New System.Drawing.Size(165, 164)
             '
             'MainInfoLine1TSMI
             '
@@ -297,11 +304,23 @@
             Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
             Me.ToolStripSeparator1.Size = New System.Drawing.Size(161, 6)
             '
+            'BondDescriptionTSMI
+            '
+            Me.BondDescriptionTSMI.Name = "BondDescriptionTSMI"
+            Me.BondDescriptionTSMI.Size = New System.Drawing.Size(164, 22)
+            Me.BondDescriptionTSMI.Text = "Bond description"
+            '
             'RelatedQuoteTSMI
             '
             Me.RelatedQuoteTSMI.Name = "RelatedQuoteTSMI"
             Me.RelatedQuoteTSMI.Size = New System.Drawing.Size(164, 22)
             Me.RelatedQuoteTSMI.Text = "Related quote"
+            '
+            'RelatedChartTSMI
+            '
+            Me.RelatedChartTSMI.Name = "RelatedChartTSMI"
+            Me.RelatedChartTSMI.Size = New System.Drawing.Size(164, 22)
+            Me.RelatedChartTSMI.Text = "Related chart"
             '
             'MainTableLayout
             '
@@ -338,14 +357,19 @@
             Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
             Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
             Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-            Me.TableLayoutPanel1.Controls.Add(Me.Label3, 2, 0)
-            Me.TableLayoutPanel1.Controls.Add(Me.DurLabel, 3, 0)
+            Me.TableLayoutPanel1.Controls.Add(Me.PVBPLabel, 3, 3)
+            Me.TableLayoutPanel1.Controls.Add(Me.Label8, 2, 3)
+            Me.TableLayoutPanel1.Controls.Add(Me.ASWLabel, 5, 2)
+            Me.TableLayoutPanel1.Controls.Add(Me.OASLabel, 5, 3)
+            Me.TableLayoutPanel1.Controls.Add(Me.CpnLabel, 1, 3)
+            Me.TableLayoutPanel1.Controls.Add(Me.Label3, 2, 1)
+            Me.TableLayoutPanel1.Controls.Add(Me.DurLabel, 3, 1)
             Me.TableLayoutPanel1.Controls.Add(Me.SpreadLabel, 5, 0)
             Me.TableLayoutPanel1.Controls.Add(Me.DscrLabel, 1, 1)
             Me.TableLayoutPanel1.Controls.Add(Me.Label6, 0, 0)
             Me.TableLayoutPanel1.Controls.Add(Me.DatLabel, 1, 0)
-            Me.TableLayoutPanel1.Controls.Add(Me.Label1, 2, 1)
-            Me.TableLayoutPanel1.Controls.Add(Me.YldLabel, 3, 1)
+            Me.TableLayoutPanel1.Controls.Add(Me.Label1, 2, 0)
+            Me.TableLayoutPanel1.Controls.Add(Me.YldLabel, 3, 0)
             Me.TableLayoutPanel1.Controls.Add(Me.ZSpreadLabel, 5, 1)
             Me.TableLayoutPanel1.Controls.Add(Me.Label2, 0, 1)
             Me.TableLayoutPanel1.Controls.Add(Me.LinkSpreadLabel, 4, 0)
@@ -355,35 +379,28 @@
             Me.TableLayoutPanel1.Controls.Add(Me.Label5, 0, 2)
             Me.TableLayoutPanel1.Controls.Add(Me.MatLabel, 1, 2)
             Me.TableLayoutPanel1.Controls.Add(Me.ConvLabel, 3, 2)
+            Me.TableLayoutPanel1.Controls.Add(Me.Label7, 0, 3)
+            Me.TableLayoutPanel1.Controls.Add(Me.LinkLabel1, 4, 3)
             Me.TableLayoutPanel1.Location = New System.Drawing.Point(3, 3)
             Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
-            Me.TableLayoutPanel1.RowCount = 3
+            Me.TableLayoutPanel1.RowCount = 4
             Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
             Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
             Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-            Me.TableLayoutPanel1.Size = New System.Drawing.Size(778, 60)
+            Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+            Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+            Me.TableLayoutPanel1.Size = New System.Drawing.Size(778, 80)
             Me.TableLayoutPanel1.TabIndex = 4
-            '
-            'Label3
-            '
-            Me.Label3.Anchor = System.Windows.Forms.AnchorStyles.Left
-            Me.Label3.AutoSize = True
-            Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.Label3.Location = New System.Drawing.Point(256, 3)
-            Me.Label3.Name = "Label3"
-            Me.Label3.Size = New System.Drawing.Size(55, 13)
-            Me.Label3.TabIndex = 0
-            Me.Label3.Text = "Duration"
             '
             'DurLabel
             '
             Me.DurLabel.AutoSize = True
             Me.DurLabel.Dock = System.Windows.Forms.DockStyle.Fill
             Me.DurLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.DurLabel.Location = New System.Drawing.Point(324, 3)
+            Me.DurLabel.Location = New System.Drawing.Point(318, 23)
             Me.DurLabel.Margin = New System.Windows.Forms.Padding(3)
             Me.DurLabel.Name = "DurLabel"
-            Me.DurLabel.Size = New System.Drawing.Size(189, 14)
+            Me.DurLabel.Size = New System.Drawing.Size(183, 14)
             Me.DurLabel.TabIndex = 0
             '
             'SpreadLabel
@@ -391,10 +408,10 @@
             Me.SpreadLabel.AutoSize = True
             Me.SpreadLabel.Dock = System.Windows.Forms.DockStyle.Fill
             Me.SpreadLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.SpreadLabel.Location = New System.Drawing.Point(584, 3)
+            Me.SpreadLabel.Location = New System.Drawing.Point(592, 3)
             Me.SpreadLabel.Margin = New System.Windows.Forms.Padding(3)
             Me.SpreadLabel.Name = "SpreadLabel"
-            Me.SpreadLabel.Size = New System.Drawing.Size(191, 14)
+            Me.SpreadLabel.Size = New System.Drawing.Size(183, 14)
             Me.SpreadLabel.TabIndex = 0
             '
             'DscrLabel
@@ -405,7 +422,7 @@
             Me.DscrLabel.Location = New System.Drawing.Point(61, 23)
             Me.DscrLabel.Margin = New System.Windows.Forms.Padding(3)
             Me.DscrLabel.Name = "DscrLabel"
-            Me.DscrLabel.Size = New System.Drawing.Size(189, 14)
+            Me.DscrLabel.Size = New System.Drawing.Size(183, 14)
             Me.DscrLabel.TabIndex = 0
             '
             'Label6
@@ -427,7 +444,7 @@
             Me.DatLabel.Location = New System.Drawing.Point(61, 3)
             Me.DatLabel.Margin = New System.Windows.Forms.Padding(3)
             Me.DatLabel.Name = "DatLabel"
-            Me.DatLabel.Size = New System.Drawing.Size(189, 14)
+            Me.DatLabel.Size = New System.Drawing.Size(183, 14)
             Me.DatLabel.TabIndex = 0
             '
             'Label1
@@ -435,32 +452,21 @@
             Me.Label1.Anchor = System.Windows.Forms.AnchorStyles.Left
             Me.Label1.AutoSize = True
             Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.Label1.Location = New System.Drawing.Point(256, 23)
+            Me.Label1.Location = New System.Drawing.Point(250, 3)
             Me.Label1.Name = "Label1"
             Me.Label1.Size = New System.Drawing.Size(35, 13)
             Me.Label1.TabIndex = 0
             Me.Label1.Text = "Yield"
-            '
-            'YldLabel
-            '
-            Me.YldLabel.AutoSize = True
-            Me.YldLabel.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.YldLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.YldLabel.Location = New System.Drawing.Point(324, 23)
-            Me.YldLabel.Margin = New System.Windows.Forms.Padding(3)
-            Me.YldLabel.Name = "YldLabel"
-            Me.YldLabel.Size = New System.Drawing.Size(189, 14)
-            Me.YldLabel.TabIndex = 0
             '
             'ZSpreadLabel
             '
             Me.ZSpreadLabel.AutoSize = True
             Me.ZSpreadLabel.Dock = System.Windows.Forms.DockStyle.Fill
             Me.ZSpreadLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.ZSpreadLabel.Location = New System.Drawing.Point(584, 23)
+            Me.ZSpreadLabel.Location = New System.Drawing.Point(592, 23)
             Me.ZSpreadLabel.Margin = New System.Windows.Forms.Padding(3)
             Me.ZSpreadLabel.Name = "ZSpreadLabel"
-            Me.ZSpreadLabel.Size = New System.Drawing.Size(191, 14)
+            Me.ZSpreadLabel.Size = New System.Drawing.Size(183, 14)
             Me.ZSpreadLabel.TabIndex = 0
             '
             'Label2
@@ -481,13 +487,13 @@
             Me.LinkSpreadLabel.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
             Me.LinkSpreadLabel.LinkColor = System.Drawing.Color.Navy
             Me.LinkSpreadLabel.LinkVisited = True
-            Me.LinkSpreadLabel.Location = New System.Drawing.Point(519, 3)
+            Me.LinkSpreadLabel.Location = New System.Drawing.Point(507, 3)
             Me.LinkSpreadLabel.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
             Me.LinkSpreadLabel.Name = "LinkSpreadLabel"
-            Me.LinkSpreadLabel.Size = New System.Drawing.Size(47, 13)
+            Me.LinkSpreadLabel.Size = New System.Drawing.Size(55, 13)
             Me.LinkSpreadLabel.TabIndex = 1
             Me.LinkSpreadLabel.TabStop = True
-            Me.LinkSpreadLabel.Text = "Spread"
+            Me.LinkSpreadLabel.Text = "I-Spread"
             Me.LinkSpreadLabel.VisitedLinkColor = System.Drawing.Color.Navy
             '
             'ZSpreadLinkLabel
@@ -497,7 +503,7 @@
             Me.ZSpreadLinkLabel.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
             Me.ZSpreadLinkLabel.LinkColor = System.Drawing.Color.Navy
             Me.ZSpreadLinkLabel.LinkVisited = True
-            Me.ZSpreadLinkLabel.Location = New System.Drawing.Point(519, 23)
+            Me.ZSpreadLinkLabel.Location = New System.Drawing.Point(507, 23)
             Me.ZSpreadLinkLabel.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
             Me.ZSpreadLinkLabel.Name = "ZSpreadLinkLabel"
             Me.ZSpreadLinkLabel.Size = New System.Drawing.Size(59, 13)
@@ -511,7 +517,7 @@
             Me.Label4.Anchor = System.Windows.Forms.AnchorStyles.Left
             Me.Label4.AutoSize = True
             Me.Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.Label4.Location = New System.Drawing.Point(256, 43)
+            Me.Label4.Location = New System.Drawing.Point(250, 43)
             Me.Label4.Name = "Label4"
             Me.Label4.Size = New System.Drawing.Size(62, 13)
             Me.Label4.TabIndex = 0
@@ -524,13 +530,13 @@
             Me.ASWLinkLabel.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
             Me.ASWLinkLabel.LinkColor = System.Drawing.Color.Navy
             Me.ASWLinkLabel.LinkVisited = True
-            Me.ASWLinkLabel.Location = New System.Drawing.Point(519, 43)
+            Me.ASWLinkLabel.Location = New System.Drawing.Point(507, 43)
             Me.ASWLinkLabel.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
             Me.ASWLinkLabel.Name = "ASWLinkLabel"
-            Me.ASWLinkLabel.Size = New System.Drawing.Size(35, 13)
+            Me.ASWLinkLabel.Size = New System.Drawing.Size(79, 13)
             Me.ASWLinkLabel.TabIndex = 1
             Me.ASWLinkLabel.TabStop = True
-            Me.ASWLinkLabel.Text = "ASW"
+            Me.ASWLinkLabel.Text = "ASW Spread"
             Me.ASWLinkLabel.Visible = False
             Me.ASWLinkLabel.VisitedLinkColor = System.Drawing.Color.Navy
             '
@@ -553,7 +559,7 @@
             Me.MatLabel.Location = New System.Drawing.Point(61, 43)
             Me.MatLabel.Margin = New System.Windows.Forms.Padding(3)
             Me.MatLabel.Name = "MatLabel"
-            Me.MatLabel.Size = New System.Drawing.Size(189, 14)
+            Me.MatLabel.Size = New System.Drawing.Size(183, 14)
             Me.MatLabel.TabIndex = 2
             '
             'ConvLabel
@@ -561,10 +567,10 @@
             Me.ConvLabel.AutoSize = True
             Me.ConvLabel.Dock = System.Windows.Forms.DockStyle.Fill
             Me.ConvLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.ConvLabel.Location = New System.Drawing.Point(324, 43)
+            Me.ConvLabel.Location = New System.Drawing.Point(318, 43)
             Me.ConvLabel.Margin = New System.Windows.Forms.Padding(3)
             Me.ConvLabel.Name = "ConvLabel"
-            Me.ConvLabel.Size = New System.Drawing.Size(189, 14)
+            Me.ConvLabel.Size = New System.Drawing.Size(183, 14)
             Me.ConvLabel.TabIndex = 2
             '
             'TheChart
@@ -572,14 +578,14 @@
             Me.TheChart.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                 Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-            ChartArea3.Name = "ChartArea1"
-            Me.TheChart.ChartAreas.Add(ChartArea3)
-            Legend3.Enabled = False
-            Legend3.Name = "Legend1"
-            Me.TheChart.Legends.Add(Legend3)
-            Me.TheChart.Location = New System.Drawing.Point(3, 69)
+            ChartArea2.Name = "ChartArea1"
+            Me.TheChart.ChartAreas.Add(ChartArea2)
+            Legend2.Enabled = False
+            Legend2.Name = "Legend1"
+            Me.TheChart.Legends.Add(Legend2)
+            Me.TheChart.Location = New System.Drawing.Point(3, 89)
             Me.TheChart.Name = "TheChart"
-            Me.TheChart.Size = New System.Drawing.Size(778, 437)
+            Me.TheChart.Size = New System.Drawing.Size(778, 417)
             Me.TheChart.TabIndex = 3
             Me.TheChart.Text = "Chart1"
             '
@@ -620,60 +626,60 @@
             '
             Me.MoneyCurveCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MMNameTSMI, Me.DeleteMMCurveTSMI, Me.ToolStripSeparator10, Me.BrokerTSMI, Me.QuoteTSMI, Me.FitTSMI, Me.BootstrapTSMI, Me.ToolStripSeparator11, Me.SelDateTSMI})
             Me.MoneyCurveCMS.Name = "MoneyCurveCMS"
-            Me.MoneyCurveCMS.Size = New System.Drawing.Size(153, 192)
+            Me.MoneyCurveCMS.Size = New System.Drawing.Size(152, 170)
             '
             'MMNameTSMI
             '
             Me.MMNameTSMI.Enabled = False
             Me.MMNameTSMI.Name = "MMNameTSMI"
-            Me.MMNameTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.MMNameTSMI.Size = New System.Drawing.Size(151, 22)
             Me.MMNameTSMI.Text = "Name"
             '
             'DeleteMMCurveTSMI
             '
             Me.DeleteMMCurveTSMI.Name = "DeleteMMCurveTSMI"
-            Me.DeleteMMCurveTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.DeleteMMCurveTSMI.Size = New System.Drawing.Size(151, 22)
             Me.DeleteMMCurveTSMI.Text = "Delete curve"
             '
             'ToolStripSeparator10
             '
             Me.ToolStripSeparator10.Name = "ToolStripSeparator10"
-            Me.ToolStripSeparator10.Size = New System.Drawing.Size(149, 6)
+            Me.ToolStripSeparator10.Size = New System.Drawing.Size(148, 6)
             '
             'BrokerTSMI
             '
             Me.BrokerTSMI.Name = "BrokerTSMI"
-            Me.BrokerTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.BrokerTSMI.Size = New System.Drawing.Size(151, 22)
             Me.BrokerTSMI.Text = "Broker"
             '
             'QuoteTSMI
             '
             Me.QuoteTSMI.Name = "QuoteTSMI"
-            Me.QuoteTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.QuoteTSMI.Size = New System.Drawing.Size(151, 22)
             Me.QuoteTSMI.Text = "Quote"
             '
             'FitTSMI
             '
             Me.FitTSMI.Name = "FitTSMI"
-            Me.FitTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.FitTSMI.Size = New System.Drawing.Size(151, 22)
             Me.FitTSMI.Text = "Interpolation"
             '
             'BootstrapTSMI
             '
             Me.BootstrapTSMI.CheckOnClick = True
             Me.BootstrapTSMI.Name = "BootstrapTSMI"
-            Me.BootstrapTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.BootstrapTSMI.Size = New System.Drawing.Size(151, 22)
             Me.BootstrapTSMI.Text = "Bootstrap"
             '
             'ToolStripSeparator11
             '
             Me.ToolStripSeparator11.Name = "ToolStripSeparator11"
-            Me.ToolStripSeparator11.Size = New System.Drawing.Size(149, 6)
+            Me.ToolStripSeparator11.Size = New System.Drawing.Size(148, 6)
             '
             'SelDateTSMI
             '
             Me.SelDateTSMI.Name = "SelDateTSMI"
-            Me.SelDateTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.SelDateTSMI.Size = New System.Drawing.Size(151, 22)
             Me.SelDateTSMI.Text = "Select date..."
             '
             'SpreadCMS
@@ -722,17 +728,110 @@
             Me.YAxisCMS.Name = "YAxisCMS"
             Me.YAxisCMS.Size = New System.Drawing.Size(61, 4)
             '
-            'RelatedChartTSMI
+            'Label7
             '
-            Me.RelatedChartTSMI.Name = "RelatedChartTSMI"
-            Me.RelatedChartTSMI.Size = New System.Drawing.Size(164, 22)
-            Me.RelatedChartTSMI.Text = "Related chart"
+            Me.Label7.Anchor = System.Windows.Forms.AnchorStyles.Left
+            Me.Label7.AutoSize = True
+            Me.Label7.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Me.Label7.Location = New System.Drawing.Point(3, 63)
+            Me.Label7.Name = "Label7"
+            Me.Label7.Size = New System.Drawing.Size(50, 13)
+            Me.Label7.TabIndex = 0
+            Me.Label7.Text = "Coupon"
             '
-            'BondDescriptionTSMI
+            'LinkLabel1
             '
-            Me.BondDescriptionTSMI.Name = "BondDescriptionTSMI"
-            Me.BondDescriptionTSMI.Size = New System.Drawing.Size(164, 22)
-            Me.BondDescriptionTSMI.Text = "Bond description"
+            Me.LinkLabel1.AutoSize = True
+            Me.LinkLabel1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Me.LinkLabel1.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
+            Me.LinkLabel1.LinkColor = System.Drawing.Color.Navy
+            Me.LinkLabel1.LinkVisited = True
+            Me.LinkLabel1.Location = New System.Drawing.Point(507, 63)
+            Me.LinkLabel1.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
+            Me.LinkLabel1.Name = "LinkLabel1"
+            Me.LinkLabel1.Size = New System.Drawing.Size(68, 13)
+            Me.LinkLabel1.TabIndex = 1
+            Me.LinkLabel1.TabStop = True
+            Me.LinkLabel1.Text = "OA Spread"
+            Me.LinkLabel1.Visible = False
+            Me.LinkLabel1.VisitedLinkColor = System.Drawing.Color.Navy
+            '
+            'YldLabel
+            '
+            Me.YldLabel.AutoSize = True
+            Me.YldLabel.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.YldLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Me.YldLabel.Location = New System.Drawing.Point(318, 3)
+            Me.YldLabel.Margin = New System.Windows.Forms.Padding(3)
+            Me.YldLabel.Name = "YldLabel"
+            Me.YldLabel.Size = New System.Drawing.Size(183, 14)
+            Me.YldLabel.TabIndex = 0
+            '
+            'CpnLabel
+            '
+            Me.CpnLabel.AutoSize = True
+            Me.CpnLabel.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.CpnLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Me.CpnLabel.Location = New System.Drawing.Point(61, 63)
+            Me.CpnLabel.Margin = New System.Windows.Forms.Padding(3)
+            Me.CpnLabel.Name = "CpnLabel"
+            Me.CpnLabel.Size = New System.Drawing.Size(183, 14)
+            Me.CpnLabel.TabIndex = 3
+            '
+            'OASLabel
+            '
+            Me.OASLabel.AutoSize = True
+            Me.OASLabel.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.OASLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Me.OASLabel.Location = New System.Drawing.Point(592, 63)
+            Me.OASLabel.Margin = New System.Windows.Forms.Padding(3)
+            Me.OASLabel.Name = "OASLabel"
+            Me.OASLabel.Size = New System.Drawing.Size(183, 14)
+            Me.OASLabel.TabIndex = 4
+            '
+            'ASWLabel
+            '
+            Me.ASWLabel.AutoSize = True
+            Me.ASWLabel.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.ASWLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Me.ASWLabel.Location = New System.Drawing.Point(592, 43)
+            Me.ASWLabel.Margin = New System.Windows.Forms.Padding(3)
+            Me.ASWLabel.Name = "ASWLabel"
+            Me.ASWLabel.Size = New System.Drawing.Size(183, 14)
+            Me.ASWLabel.TabIndex = 5
+            '
+            'Label8
+            '
+            Me.Label8.Anchor = System.Windows.Forms.AnchorStyles.Left
+            Me.Label8.AutoSize = True
+            Me.Label8.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Me.Label8.Location = New System.Drawing.Point(250, 63)
+            Me.Label8.Name = "Label8"
+            Me.Label8.Size = New System.Drawing.Size(39, 13)
+            Me.Label8.TabIndex = 6
+            Me.Label8.Text = "PVBP"
+            '
+            'PVBPLabel
+            '
+            Me.PVBPLabel.AutoSize = True
+            Me.PVBPLabel.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.PVBPLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Me.PVBPLabel.Location = New System.Drawing.Point(318, 63)
+            Me.PVBPLabel.Margin = New System.Windows.Forms.Padding(3)
+            Me.PVBPLabel.Name = "PVBPLabel"
+            Me.PVBPLabel.Size = New System.Drawing.Size(183, 14)
+            Me.PVBPLabel.TabIndex = 7
+            '
+            'Label3
+            '
+            Me.Label3.Anchor = System.Windows.Forms.AnchorStyles.Left
+            Me.Label3.AutoSize = True
+            Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Me.Label3.Location = New System.Drawing.Point(250, 23)
+            Me.Label3.Name = "Label3"
+            Me.Label3.Size = New System.Drawing.Size(55, 13)
+            Me.Label3.TabIndex = 0
+            Me.Label3.Text = "Duration"
             '
             'GraphForm
             '
@@ -789,8 +888,6 @@
         Friend WithEvents ResizePictureBox As System.Windows.Forms.PictureBox
         Friend WithEvents TableLayoutPanel1 As System.Windows.Forms.TableLayoutPanel
         Friend WithEvents Label1 As System.Windows.Forms.Label
-        Friend WithEvents YldLabel As System.Windows.Forms.Label
-        Friend WithEvents Label3 As System.Windows.Forms.Label
         Friend WithEvents DurLabel As System.Windows.Forms.Label
         Friend WithEvents SpreadLabel As System.Windows.Forms.Label
         Friend WithEvents ZSpreadLabel As System.Windows.Forms.Label
@@ -839,5 +936,14 @@
         Friend WithEvents RelatedQuoteTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents BondDescriptionTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents RelatedChartTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents CpnLabel As System.Windows.Forms.Label
+        Friend WithEvents YldLabel As System.Windows.Forms.Label
+        Friend WithEvents Label7 As System.Windows.Forms.Label
+        Friend WithEvents LinkLabel1 As System.Windows.Forms.LinkLabel
+        Friend WithEvents ASWLabel As System.Windows.Forms.Label
+        Friend WithEvents OASLabel As System.Windows.Forms.Label
+        Friend WithEvents PVBPLabel As System.Windows.Forms.Label
+        Friend WithEvents Label8 As System.Windows.Forms.Label
+        Friend WithEvents Label3 As System.Windows.Forms.Label
     End Class
 End Namespace

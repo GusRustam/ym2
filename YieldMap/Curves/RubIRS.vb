@@ -5,7 +5,6 @@ Imports System.Drawing
 Imports YieldMap.Tools.History
 Imports NLog
 Imports YieldMap.Tools.Lists
-Imports System.Globalization
 
 Namespace Curves
     Public Class YieldDuration

@@ -124,7 +124,7 @@ Namespace Tools
         Implements IComparable(Of YieldStructure)
         Public ToWhat As YieldToWhat
         Public Yield As Double
-        Public YieldDate As DateTime
+        Public YieldAtDate As DateTime
 
         Public Function CompareTo(ByVal other As YieldStructure) As Integer Implements IComparable(Of YieldStructure).CompareTo
             Return IIf(Yield < other.Yield, -1, 1)
@@ -133,7 +133,7 @@ Namespace Tools
         Public Overrides Function Equals(ByVal obj As Object) As Boolean
             If TypeOf obj Is YieldStructure Then
                 Dim ys = CType(obj, YieldStructure)
-                Return ys.ToWhat.Equals(ToWhat) And ys.YieldDate = YieldDate
+                Return ys.ToWhat.Equals(ToWhat) And ys.YieldAtDate = YieldAtDate
             Else
                 Return False
             End If
@@ -170,7 +170,7 @@ Namespace Tools
             End If
         End Function
 
-        Public Function CalcYield(ByRef price As Double, ByVal dt As DateTime, descr As BondPointDescr) As Tuple(Of Double, Double, YieldStructure)
+        Public Function CalcYield(ByRef price As Double, ByVal dt As DateTime, descr As BondPointDescr) As DataPointDescr
             Logger.Trace("CalcYield({0}, {1})", price, descr.RIC)
 
             If descr.PaymentStream Is Nothing Then
@@ -196,8 +196,10 @@ Namespace Tools
 #End If
             Dim duration = bondDeriv.GetValue(1, 5)
             Dim convexity = bondDeriv.GetValue(1, 7)
+            Dim pvbp = bondDeriv.GetValue(1, 4)
             Logger.Trace("duration: {0}", duration)
-            Return New Tuple(Of Double, Double, YieldStructure)(duration, convexity, bestYield)
+            Return New DataPointDescr With {.Duration = duration, .Convexity = convexity, .PVBP = pvbp, .Yld = bestYield}
+            'Return New Tuple(Of Double, Double, Double, YieldStructure)(duration, convexity, pvbp, bestYield)
         End Function
 
         Private Function ParseBondYield(ByVal bondYield As Array) As List(Of YieldStructure)
@@ -211,7 +213,7 @@ Namespace Tools
                 If Not YieldToWhat.TryParse(bondYield.GetValue(j, 4).ToString(), toWhat) Then
                     toWhat = YieldToWhat.Maturity
                 End If
-                Dim yieldDescr = New YieldStructure With {.Yield = yield, .YieldDate = itsDate, .ToWhat = toWhat}
+                Dim yieldDescr = New YieldStructure With {.Yield = yield, .YieldAtDate = itsDate, .ToWhat = toWhat}
                 res.Add(yieldDescr)
             Next
             Return res
