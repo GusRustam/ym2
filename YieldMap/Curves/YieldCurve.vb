@@ -35,6 +35,9 @@ Namespace Curves
 
         Private WithEvents _quoteLoader As New ListLoadManager
 
+        Private _benchmark As SwapCurve
+        Private _mode As SpreadMode
+
         Private ReadOnly _name As String
         Private ReadOnly _fullname As String
         Private ReadOnly _color As Color
@@ -56,6 +59,13 @@ Namespace Curves
             _quote = fieldNames(QuoteSource.Last)
         End Sub
 
+
+        Public Overrides Function SetModeAndBenchmark(ByVal newMode As SpreadMode, ByVal curve As SwapCurve) As Boolean
+            _mode = newMode
+            _benchmark = curve
+            'todo recalculate
+            Return True
+        End Function
 
         Protected Overrides Sub StartRealTime()
             If Not _quoteLoader.StartNewTask(New ListTaskDescr() With {

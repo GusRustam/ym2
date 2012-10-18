@@ -1,5 +1,4 @@
-﻿Imports EikonDesktopSDKLib
-Imports NLog
+﻿Imports NLog
 Imports System.Reflection
 
 Namespace Tools.RDataTool

@@ -35,6 +35,10 @@
             Me.PortfolioTSSB = New System.Windows.Forms.ToolStripSplitButton()
             Me.CurvesTSMI = New System.Windows.Forms.ToolStripSplitButton()
             Me.BondCurvesTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
+            Me.RubIRSTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.RubCCSTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.NDFTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
             Me.ShowLegendTSB = New System.Windows.Forms.ToolStripButton()
             Me.ShowLabelsTSB = New System.Windows.Forms.ToolStripButton()
@@ -100,10 +104,6 @@
             Me.BidAskCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.RemoveBidAskTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.YAxisCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
-            Me.RubIRSTSMI = New System.Windows.Forms.ToolStripMenuItem()
-            Me.RubCCSTSMI = New System.Windows.Forms.ToolStripMenuItem()
-            Me.NDFTSMI = New System.Windows.Forms.ToolStripMenuItem()
-            Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
             Me.TheStatusStrip.SuspendLayout()
             Me.TheToolStrip.SuspendLayout()
             Me.BondCMS.SuspendLayout()
@@ -186,8 +186,33 @@
             'BondCurvesTSMI
             '
             Me.BondCurvesTSMI.Name = "BondCurvesTSMI"
-            Me.BondCurvesTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.BondCurvesTSMI.Size = New System.Drawing.Size(144, 22)
             Me.BondCurvesTSMI.Text = "Bond curves"
+            '
+            'ToolStripMenuItem1
+            '
+            Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RubIRSTSMI, Me.RubCCSTSMI, Me.NDFTSMI})
+            Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
+            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(144, 22)
+            Me.ToolStripMenuItem1.Text = "IR curves"
+            '
+            'RubIRSTSMI
+            '
+            Me.RubIRSTSMI.Name = "RubIRSTSMI"
+            Me.RubIRSTSMI.Size = New System.Drawing.Size(127, 22)
+            Me.RubIRSTSMI.Text = "Rub IRS"
+            '
+            'RubCCSTSMI
+            '
+            Me.RubCCSTSMI.Name = "RubCCSTSMI"
+            Me.RubCCSTSMI.Size = New System.Drawing.Size(127, 22)
+            Me.RubCCSTSMI.Text = "Rub CCS"
+            '
+            'NDFTSMI
+            '
+            Me.NDFTSMI.Name = "NDFTSMI"
+            Me.NDFTSMI.Size = New System.Drawing.Size(127, 22)
+            Me.NDFTSMI.Text = "NDF"
             '
             'ToolStripSeparator2
             '
@@ -575,7 +600,6 @@
             Me.ASWLinkLabel.TabIndex = 1
             Me.ASWLinkLabel.TabStop = True
             Me.ASWLinkLabel.Text = "ASW Spread"
-            Me.ASWLinkLabel.Visible = False
             Me.ASWLinkLabel.VisitedLinkColor = System.Drawing.Color.Navy
             '
             'Label5
@@ -793,31 +817,6 @@
             '
             Me.YAxisCMS.Name = "YAxisCMS"
             Me.YAxisCMS.Size = New System.Drawing.Size(61, 4)
-            '
-            'RubIRSTSMI
-            '
-            Me.RubIRSTSMI.Name = "RubIRSTSMI"
-            Me.RubIRSTSMI.Size = New System.Drawing.Size(152, 22)
-            Me.RubIRSTSMI.Text = "Rub IRS"
-            '
-            'RubCCSTSMI
-            '
-            Me.RubCCSTSMI.Name = "RubCCSTSMI"
-            Me.RubCCSTSMI.Size = New System.Drawing.Size(152, 22)
-            Me.RubCCSTSMI.Text = "Rub CCS"
-            '
-            'NDFTSMI
-            '
-            Me.NDFTSMI.Name = "NDFTSMI"
-            Me.NDFTSMI.Size = New System.Drawing.Size(152, 22)
-            Me.NDFTSMI.Text = "NDF"
-            '
-            'ToolStripMenuItem1
-            '
-            Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RubIRSTSMI, Me.RubCCSTSMI, Me.NDFTSMI})
-            Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(152, 22)
-            Me.ToolStripMenuItem1.Text = "IR curves"
             '
             'GraphForm
             '

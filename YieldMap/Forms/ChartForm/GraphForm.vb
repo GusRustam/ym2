@@ -412,6 +412,7 @@ Namespace Forms.ChartForm
             Try
                 Select Case str
                     Case SpreadMode.Yield.ToString() : MakeAxisY("Yield, %", "P2", 0.01, 0.005)
+                    Case SpreadMode.ASWSpread.ToString() : MakeAxisY("ASW Spread, b.p.", "N0", 10, 5)
                     Case SpreadMode.PointSpread.ToString() : MakeAxisY("Spread, b.p.", "N0", 10, 5)
                     Case SpreadMode.ZSpread.ToString() : MakeAxisY("Z-Spread, b.p.", "N0", 10, 5)
                 End Select
@@ -514,18 +515,14 @@ Namespace Forms.ChartForm
             SpreadCMS.Items.Clear()
             SpreadCMS.Tag = nm
             If Not _moneyMarketCurves.Any() Then Return
-            AddCurves(_moneyMarketCurves.Cast(Of ICurve).ToList(), refCurve)
-            SpreadCMS.Show(MousePosition)
-        End Sub
-
-        Private Sub AddCurves(ByVal curves As List(Of ICurve), ByVal refCurve As ICurve)
-            curves.ForEach(
+            _moneyMarketCurves.Cast(Of ICurve).ToList().ForEach(
                 Sub(item)
                     Dim elem = CType(SpreadCMS.Items.Add(item.GetFullName(), Nothing, AddressOf OnYieldCurveSelected), ToolStripMenuItem)
                     elem.CheckOnClick = True
                     elem.Checked = refCurve IsNot Nothing AndAlso item.GetFullName() = refCurve.GetFullName()
                     elem.Tag = item
                 End Sub)
+            SpreadCMS.Show(MousePosition)
         End Sub
 
         Private Sub OnYieldCurveSelected(ByVal sender As Object, ByVal eventArgs As EventArgs)
@@ -555,6 +552,7 @@ Namespace Forms.ChartForm
                     Dim dat = CType(point.Tag, DataPointDescr)
                     SpreadLabel.Text = If(dat.PointSpread IsNot Nothing, String.Format("{0:F0} b.p.", dat.PointSpread), N_A)
                     ZSpreadLabel.Text = If(dat.ZSpread IsNot Nothing, String.Format("{0:F0} b.p.", dat.ZSpread), N_A)
+                    ASWLabel.Text = If(dat.ASWSpread IsNot Nothing, String.Format("{0:F0} b.p.", dat.ASWSpread), N_A)
                     YldLabel.Text = String.Format("{0:P2}", dat.Yld)
                     DurLabel.Text = String.Format("{0:F2}", point.XValue)
 
@@ -566,7 +564,7 @@ Namespace Forms.ChartForm
                         DatLabel.Text = String.Format("{0:dd/MM/yyyy}", bondData.YieldAtDate)
                         MatLabel.Text = String.Format("{0:dd/MM/yyyy}", bondData.Maturity)
                         CpnLabel.Text = String.Format("{0:F2}%", bondData.Coupon)
-                        PVBPLabel.Text = String.Format("{0:F2}", bondData.PVBP)
+                        PVBPLabel.Text = String.Format("{0:F4}", bondData.PVBP)
                         CType(htr.Series.Tag, BondPointsSeries).SelectedPointIndex = htr.PointIndex
 
                     ElseIf TypeOf point.Tag Is MoneyMarketPointDescr Then
@@ -598,7 +596,7 @@ Namespace Forms.ChartForm
                     ResetPointSelection()
                 End If
             Catch ex As Exception
-                Logger.WarnException("Something went wrong", ex)
+                Logger.WarnException("Got exception", ex)
                 Logger.Warn("Exception = {0}", ex)
             Finally
                 If Not hasShown Then
@@ -610,6 +608,7 @@ Namespace Forms.ChartForm
                     YldLabel.Text = ""
                     DurLabel.Text = ""
                     MatLabel.Text = ""
+                    ASWLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadMode.ASWSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadMode.ASWSpread).GetFullName(), "")
                     SpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadMode.PointSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadMode.PointSpread).GetFullName(), "")
                     ZSpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadMode.ZSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadMode.ZSpread).GetFullName(), "")
                 End If
@@ -816,6 +815,8 @@ Namespace Forms.ChartForm
                         Function(key)
                             Dim res As New BondDescr
                             Dim point = grp.Elements(key)
+                            If point.Yld.ToWhat Is Nothing Then Return Nothing
+
                             res.RIC = point.RIC
                             res.Name = point.ShortName
                             res.Price = point.CalcPrice
@@ -832,7 +833,7 @@ Namespace Forms.ChartForm
                             res.Coupon = point.Coupon
                             Return res
                         End Function)
-                End Function)
+                End Function).Where(Function(elem) elem IsNot Nothing).ToList()
             _tableForm.Bonds = bondsToShow
             _tableForm.ShowDialog()
         End Sub
@@ -916,12 +917,34 @@ Namespace Forms.ChartForm
 #End Region
 
 #Region "e) Benchmark selection"
-        Private Sub LinkSpreadLabelLinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles LinkSpreadLabel.LinkClicked, ASWLinkLabel.LinkClicked, LinkLabel1.LinkClicked
-            ShowCurveCMS("PointSpread", If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadMode.PointSpread), _spreadBenchmarks.Benchmarks(SpreadMode.PointSpread), Nothing))
+        Private Sub LinkSpreadLabelLinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles LinkSpreadLabel.LinkClicked, LinkLabel1.LinkClicked
+            ShowCurveCMS("PointSpread",
+                If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadMode.PointSpread), _spreadBenchmarks.Benchmarks(SpreadMode.PointSpread), Nothing))
         End Sub
 
         Private Sub ZSpreadLinkLabelLinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles ZSpreadLinkLabel.LinkClicked
-            ShowCurveCMS("ZSpread", If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadMode.ZSpread), _spreadBenchmarks.Benchmarks(SpreadMode.ZSpread), Nothing))
+            ShowCurveCMS("ZSpread",
+                If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadMode.ZSpread), _spreadBenchmarks.Benchmarks(SpreadMode.ZSpread), Nothing))
+        End Sub
+
+        Private Sub ASWLinkLabelLinkClicked(sender As System.Object, e As LinkLabelLinkClickedEventArgs) Handles ASWLinkLabel.LinkClicked
+            Dim refCurve = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadMode.ASWSpread), _spreadBenchmarks.Benchmarks(SpreadMode.ASWSpread), Nothing)
+            SpreadCMS.Items.Clear()
+            SpreadCMS.Tag = "ASWSpread"
+            If Not _moneyMarketCurves.Any() Then Return
+            _moneyMarketCurves.Where(
+                Function(crv)
+                    Return TypeOf crv Is IAssetSwapBenchmark AndAlso CType(crv, IAssetSwapBenchmark).CanBeBenchmark()
+                End Function
+            ).Cast(Of ICurve).ToList().ForEach(
+                Sub(item)
+                    Dim elem = CType(SpreadCMS.Items.Add(item.GetFullName(), Nothing, AddressOf OnYieldCurveSelected), ToolStripMenuItem)
+                    elem.CheckOnClick = True
+                    elem.Checked = refCurve IsNot Nothing AndAlso item.GetFullName() = refCurve.GetFullName()
+                    elem.Tag = item
+                End Sub)
+            SpreadCMS.Show(MousePosition)
+
         End Sub
 #End Region
 #End Region
@@ -1767,7 +1790,5 @@ Namespace Forms.ChartForm
         End Sub
 #End Region
 #End Region
-
-
     End Class
 End Namespace

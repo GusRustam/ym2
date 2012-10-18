@@ -2,11 +2,19 @@
 Imports AdfinXRtLib
 Imports System.Text.RegularExpressions
 Imports System.Drawing
+Imports YieldMap.Forms.ChartForm
 Imports YieldMap.Tools.History
 Imports NLog
 Imports YieldMap.Tools.Lists
 
 Namespace Curves
+    Public Interface IAssetSwapBenchmark
+        Function CanBeBenchmark() As Boolean
+
+        ReadOnly Property FloatLegStructure() As String
+        ReadOnly Property FloatingPointValue() As Double
+    End Interface
+
     Public Class YieldDuration
         Implements IComparable(Of YieldDuration)
         Public RIC As String
@@ -30,6 +38,7 @@ Namespace Curves
     Public Class RubIRS
         Inherits SwapCurve
         Implements IBootstrappable
+        Implements IAssetSwapBenchmark
 
         '' LOGGER
         Private Shared ReadOnly Logger As Logger = Commons.GetLogger(GetType(RubIRS))
@@ -40,6 +49,13 @@ Namespace Curves
             "PDELAY:0 REFDATE:MATURITY RP:1 XD:NO LPAID LTYPE:FIXED CCM:A5P FRQ:Y " +
             "LRECEIVED LTYPE:FLOAT CCM:MMAA FRQ:Q"
 
+        Private Shared ReadOnly FloatLeg =
+            "CLDR:RUS ARND:NO CCM:MMAA CFADJ:YES CRND:NO DMC:MODIFIED EMC:SAMEDAY IC:S1 " +
+            "PDELAY:0 REFDATE:MATURITY RP:1 RT:BULLET XD:NO FRQ:Q "
+
+        Private _benchmark As SwapCurve
+        Private _mode As SpreadMode
+
         Protected Overridable Property InstrumentName As String = "RUBAM3MO"
         Protected Overridable Property BaseInstrument As String = "MOSPRIME3MD="
         Protected Overridable Property AllowedTenors() As String() = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"}
@@ -49,6 +65,16 @@ Namespace Curves
         Private Shared ReadOnly PossibleQuotes() As String = {"BID", "ASK", "MID"}
 
         Private _bootstrapped As Boolean
+
+        '' LOADERS
+        Private WithEvents _quoteLoader As New ListLoadManager
+
+        '' DATA LOADING PARAMETERS
+        Private _theDate As Date
+        Private _broker As String = ""
+        Private _quote As String = "MID"
+        Private ReadOnly _name As String
+
 
         ''' <summary>
         ''' Parsing swap name to retrieve term
@@ -72,15 +98,6 @@ Namespace Curves
             Return AllowedTenors.Select(Function(item) String.Format("{0}{1}Y={2}", InstrumentName, item, broker)).ToList()
         End Function
 
-        '' LOADERS
-        Private WithEvents _quoteLoader As New ListLoadManager
-
-        '' DATA LOADING PARAMETERS
-        Private _theDate As Date
-        Private _broker As String = ""
-        Private _quote As String = "MID"
-        Private ReadOnly _name As String
-
         '' CONSTRUCTOR
         Sub New(ByVal theDate As Date, ByVal aName As String, Optional ByVal broker As String = "")
             _theDate = theDate
@@ -96,7 +113,17 @@ Namespace Curves
             DoLoadRIC(BaseInstrument, {"CLOSE"}.ToList, _theDate)
         End Sub
 
+
         '' START LOADING REALTIME DATA
+        Public Overrides Function SetModeAndBenchmark(ByVal newMode As SpreadMode, ByVal curve As SwapCurve) As Boolean
+            _mode = newMode
+            _benchmark = curve
+
+            If Not _mode.Equals(SpreadMode.PointSpread) Then Return False
+            ' todo recalculate curve
+            Return True
+        End Function
+
         Protected Overrides Sub StartRealTime()
             If Not _quoteLoader.StartNewTask(New ListTaskDescr() With {
                                                 .Name = Me.GetType().Name,
@@ -380,6 +407,21 @@ Namespace Curves
 
         End Sub
 
+        Public Overridable Function CanBeBenchmark() As Boolean Implements IAssetSwapBenchmark.CanBeBenchmark
+            Return True
+        End Function
+
+        Public Overridable ReadOnly Property FloatLegStructure() As String Implements IAssetSwapBenchmark.FloatLegStructure
+            Get
+                Return FloatLeg
+            End Get
+        End Property
+
+        Public Overridable ReadOnly Property FloatingPointValue() As Double Implements IAssetSwapBenchmark.FloatingPointValue
+            Get
+                Return 0
+            End Get
+        End Property
     End Class
 
     Public NotInheritable Class RubCCS
@@ -440,6 +482,10 @@ Namespace Curves
             Dim dateModule As New AdxDateModule
             Dim aDate As Array = dateModule.DfAddPeriod("RUS", GetDate(), term, "")
             Return dateModule.DfCountYears(GetDate(), Commons.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
+        End Function
+
+        Public Overrides Function CanBeBenchmark() As Boolean
+            Return False
         End Function
 
         Protected Overrides Function GetRICs(ByVal broker As String) As List(Of String)

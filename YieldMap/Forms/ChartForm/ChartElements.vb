@@ -247,6 +247,7 @@ Namespace Forms.ChartForm
         Public Function CalculateSpreads(ByVal descr As DataPointDescr, Optional ByVal mode As SpreadMode = Nothing) As Double?
             If mode Is Nothing Then ' calculate all spreads
                 If Benchmarks.ContainsKey(SpreadMode.ZSpread) Then CalculateZSpread(descr)
+                If Benchmarks.ContainsKey(SpreadMode.ASWSpread) Then CalculateASWSpread(descr)
                 If Benchmarks.ContainsKey(SpreadMode.PointSpread) Then
                     Dim spreadMainCurve = Benchmarks(SpreadMode.PointSpread)
                     descr.PointSpread = spreadMainCurve.PointSpread(descr.Yld.Yield, descr.Duration)
@@ -258,12 +259,28 @@ Namespace Forms.ChartForm
                     descr.PointSpread = spreadMainCurve.PointSpread(descr.Yld.Yield, descr.Duration)
                 ElseIf mode.Equals(SpreadMode.ZSpread) And Benchmarks.ContainsKey(SpreadMode.ZSpread) Then
                     CalculateZSpread(descr)
+                ElseIf mode.Equals(SpreadMode.ASWSpread) And Benchmarks.ContainsKey(SpreadMode.ASWSpread) Then
+                    CalculateASWSpread(descr)
                 ElseIf Not mode.Equals(SpreadMode.Yield) Then
                     SetQuote(descr, Nothing, mode)
                 End If
                 Return GetQuote(descr, mode)
             End If
         End Function
+
+        Private Sub CalculateASWSpread(ByVal descr As DataPointDescr)
+            Dim aswSpreadMainCurve = Benchmarks(SpreadMode.ASWSpread)
+            Dim bmk = CType(aswSpreadMainCurve, IAssetSwapBenchmark)
+            If TypeOf descr Is BondPointDescr Then
+                Dim tag As BondPointDescr = CType(descr, BondPointDescr)
+                tag.ASWSpread = ASWSpread(aswSpreadMainCurve.ToArray(), bmk.FloatLegStructure, bmk.FloatingPointValue, tag)
+            ElseIf TypeOf descr Is BidAskPointDescr And Benchmarks.ContainsKey(SpreadMode.ASWSpread) Then
+                Dim data = CType(descr, BidAskPointDescr)
+                Dim tag As BondPointDescr = New BondPointDescr(data.BondTag)
+                tag.CalcPrice = data.Price
+                data.ASWSpread = ASWSpread(aswSpreadMainCurve.ToArray(), bmk.FloatLegStructure, bmk.FloatingPointValue, tag)
+            End If
+        End Sub
 
         Private Sub CalculateZSpread(ByVal descr As DataPointDescr)
             Dim zSpreadMainCurve = Benchmarks(SpreadMode.ZSpread)
@@ -302,12 +319,12 @@ Namespace Forms.ChartForm
         End Sub
     End Class
 
-    Friend Class SpreadMode
+    Public Class SpreadMode
         Public Shared Yield As New SpreadMode("Yield", True)
         Public Shared PointSpread As New SpreadMode("PointSpread", True)
         Public Shared ZSpread As New SpreadMode("ZSpread", True)
-        Public Shared OASpread As New SpreadMode("OSSpread", False)
-        Public Shared ASWSpread As New SpreadMode("ASWSpread", False)
+        Public Shared OASpread As New SpreadMode("OASpread", False)
+        Public Shared ASWSpread As New SpreadMode("ASWSpread", True)
 
         Public Overrides Function Equals(ByVal obj As Object) As Boolean
             If TypeOf obj Is SpreadMode Then
@@ -426,9 +443,7 @@ Namespace Forms.ChartForm
                 Coupon = .Coupon
                 YieldSource = .YieldSource
                 YieldAtDate = .YieldAtDate
-                'YieldToDate = .YieldToDate
-                'ToWhat = .ToWhat
-                .Yld = descr.Yld
+                Yld = descr.Yld
                 CalcPrice = .CalcPrice
                 SelectedQuote = .SelectedQuote
                 IssuerID = .IssuerID

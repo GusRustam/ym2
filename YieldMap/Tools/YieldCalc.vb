@@ -2,6 +2,7 @@
 Imports System.Globalization
 Imports AdfinXAnalyticsFunctions
 Imports System.ComponentModel
+Imports YieldMap.Commons
 Imports YieldMap.Forms.ChartForm
 Imports NLog
 Imports System.Text.RegularExpressions
@@ -150,22 +151,36 @@ Namespace Tools
     ''' </summary>
     ''' <remarks></remarks>
     Friend Module YieldCalc
-        Private ReadOnly Logger As Logger = Commons.GetLogger(GetType(YieldCalc))
-        Private ReadOnly BondModule As New AdxBondModule
+        Private ReadOnly Logger As Logger = GetLogger(GetType(YieldCalc))
+        Private ReadOnly BondModule As AdxBondModule = Eikon.SDK.CreateAdxBondModule()
+        Private ReadOnly SwapModule As AdxSwapModule = Eikon.SDK.CreateAdxSwapModule()
         Public Function QuoteDescription(price As Double, yield As Double, duration As Double, yieldToWhat As YieldToWhat) As String
             Return String.Format("P [{0:F4}], Y [{1:P2}] {2}, D [{3:F2}]",
                                  price, yield, yieldToWhat.Abbr, duration)
         End Function
 
         Public Function ZSpread(ByVal rateArray As Array, descr As BondPointDescr) As Double?
-            '    'Dim rateArrayString = ""
-            '    'For i = 0 To rateArray.GetUpperBound(0)
-            '    '    rateArrayString += String.Format(CultureInfo.CreateSpecificCulture("en-US"), "{0:ddMMMyy} {1:F4} ", rateArray.GetValue(i, 0), rateArray.GetValue(i, 1))
-            '    'Next
-            '    'Logger.Trace("ZSpread({0}, {1})", info.RIC, rateArrayString)
             If descr.CalcPrice > 0 Then
                 Dim settleDate = BondModule.BdSettle(DateTime.Today, descr.PaymentStructure)
-                Return BondModule.AdBondSpread(settleDate, rateArray, descr.CalcPrice / 100.0, descr.Maturity, descr.Coupon / 100.0, descr.PaymentStructure, "ZCTYPE:RATE IM:LIX RM:YC", "", "")
+                If descr.Maturity > Date.Today Then
+                    Return BondModule.AdBondSpread(settleDate, rateArray, descr.CalcPrice / 100.0, descr.Maturity, descr.Coupon / 100.0, descr.PaymentStructure, "ZCTYPE:RATE IM:LIX RM:YC", "", "")
+                Else
+                    Return Nothing
+                End If
+            Else
+                Return Nothing
+            End If
+        End Function
+
+        Public Function ASWSpread(ByVal rateArray As Array, ByVal floatLegStructure As String, ByVal floatingRate As Double, descr As BondPointDescr) As Double?
+            If descr.CalcPrice > 0 Then
+                Dim settleDate = BondModule.BdSettle(DateTime.Today, descr.PaymentStructure)
+                If descr.Maturity > Date.Today Then
+                    Dim res As Array = SwapModule.AdAssetSwapBdSpread(settleDate, descr.Maturity, rateArray, descr.CalcPrice / 100.0, descr.Coupon / 100.0, floatingRate, descr.PaymentStructure, floatLegStructure, "ZCTYPE:RATE IM:LIX RM:YC", "")
+                    Return res.GetValue(1, 1)
+                Else
+                    Return Nothing
+                End If
             Else
                 Return Nothing
             End If

@@ -1,5 +1,6 @@
 Imports System.Drawing
 Imports AdfinXRtLib
+Imports YieldMap.Forms.ChartForm
 Imports YieldMap.Tools.History
 Imports NLog
 
@@ -36,6 +37,8 @@ Namespace Curves
 
         Public MustOverride Function GetName() As String Implements ICurve.GetName
         Public MustOverride Function GetFullName() As String Implements ICurve.GetFullName
+
+        Public MustOverride Function SetModeAndBenchmark(ByVal newMode As SpreadMode, ByVal curve As SwapCurve) As Boolean
 
         Protected MustOverride Sub StartRealTime()
         Protected MustOverride Sub LoadHistory()
