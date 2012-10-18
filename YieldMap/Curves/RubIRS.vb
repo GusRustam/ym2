@@ -383,11 +383,7 @@ Namespace Curves
 
         Public Overrides Function CalculateSpread(ByVal data As List(Of YieldDuration)) As List(Of YieldDuration)
             If BmkSpreadMode Is Nothing Or Benchmark Is Nothing Then Return data
-            If Benchmark.Equals(Me) Then
-                Dim res As New List(Of YieldDuration)(data)
-                res.ForEach(Sub(elem) elem.PointSpread = 0)
-                Return res
-            End If
+            If Benchmark.Equals(Me) Then Return data
 
             Select Case BmkSpreadMode
                 Case SpreadMode.PointSpread

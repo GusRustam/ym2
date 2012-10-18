@@ -424,7 +424,7 @@ Namespace Forms.ChartForm
             Dim item As ToolStripMenuItem = TryCast(sender, ToolStripMenuItem)
             If item IsNot Nothing Then
                 _spreadBenchmarks.CurrentMode = SpreadMode.FromString(item.Text)
-                SetYAxisMode(item.Text)
+                'SetYAxisMode(item.Text)
             End If
         End Sub
 
@@ -449,22 +449,17 @@ Namespace Forms.ChartForm
             GuiAsync(Sub()
                          With TheChart.ChartAreas(0).AxisY
                              Try
-                                 Dim newMax = (
-                                     From srs In TheChart.Series Where srs.Points.Any
+                                 Dim newMax = (From srs In TheChart.Series Where srs.Enabled And srs.Points.Any
                                      Select (From pnt In srs.Points Select pnt.YValues.First).Max).Max 'Where Not pnt.IsEmpty
 
                                  Dim newMin As Double
                                  If _spreadBenchmarks.CurrentMode.Equals(SpreadMode.Yield) Then
-                                     newMin = (
-                                         From srs In TheChart.Series Where srs.Points.Any
+                                     newMin = (From srs In TheChart.Series Where srs.Enabled And srs.Points.Any
                                              Select (From pnt In srs.Points Where pnt.YValues.First > 0 Select pnt.YValues.First).Min).Min
                                  Else
-                                     newMin = (
-                                           From srs In TheChart.Series Where srs.Points.Any
+                                     newMin = (From srs In TheChart.Series Where srs.Enabled And srs.Points.Any
                                                Select (From pnt In srs.Points Select pnt.YValues.First).Min).Min
                                  End If
-
-                                 'Where Not pnt.IsEmpty
 
                                  If newMax > newMin Then
                                      .Maximum = newMax
@@ -1721,10 +1716,6 @@ Namespace Forms.ChartForm
 
         Private Sub PaintSwapCurve(ByVal curve As SwapCurve, ByVal points As List(Of XY))
             Logger.Debug("PaintSwapCurve({0})", curve.GetName())
-            If points.Count < 2 Then
-                Logger.Info("Too little points to plot")
-                Return
-            End If
 
             GuiAsync(
                 Sub()
@@ -1745,6 +1736,13 @@ Namespace Forms.ChartForm
                         theSeries.Points.Clear()
                         theSeries.LegendText = curve.GetFullName()
                     End If
+
+                    If points.Count < 2 Then
+                        theSeries.Enabled = False
+                        Logger.Info("Too little points to plot")
+                        Return
+                    End If
+                    theSeries.Enabled = True
 
                     With theSeries
                         If points.Count <= 50 Then
