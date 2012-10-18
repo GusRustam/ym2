@@ -120,10 +120,10 @@ Namespace Forms.ChartForm
                 Sub(srs)
                     If TypeOf srs.Tag Is BondPointsSeries Then 'todo history / bidask
                         srs.Points.ToList.ForEach(Sub(pnt) RecalcPoint(pnt, mode))
-                    ElseIf TypeOf srs.Tag Is SwapCurveSeries Then
-                        Dim crv = CType(srs.Tag, SwapCurveSeries)
-
-                        'todo
+                        'ElseIf TypeOf srs.Tag Is SwapCurveSeries Then
+                        '    Dim crvSrs = CType(srs.Tag, SwapCurveSeries)
+                        '    Dim crv = crvSrs.SwpCurve
+                        '    crv.SetModeAndBenchmark(mode, If(mode <> SpreadMode.Yield, _spreadBenchmarks.Benchmarks(mode), Nothing))
                     End If
                 End Sub
             )
@@ -137,7 +137,10 @@ Namespace Forms.ChartForm
                     If TypeOf srs.Tag Is BondPointsSeries Then 'todo history / bidask
                         srs.Points.ToList.ForEach(Sub(pnt) ReplotPoint(pnt, newMode, oldMode, storeOld))
                     ElseIf TypeOf srs.Tag Is SwapCurveSeries Then
-                        'todo
+                        Dim crvSrs = CType(srs.Tag, SwapCurveSeries)
+                        Dim crv = crvSrs.SwpCurve
+                        'crv.SetBenchmark()
+                        crv.SetModeAndBenchmark(newMode, If(newMode <> SpreadMode.Yield, _spreadBenchmarks.Benchmarks(newMode), Nothing))
                     End If
                 End Sub
             )
@@ -433,7 +436,7 @@ Namespace Forms.ChartForm
                     Case SpreadMode.PointSpread.ToString() : MakeAxisY("Spread, b.p.", "N0", 10, 5)
                     Case SpreadMode.ZSpread.ToString() : MakeAxisY("Z-Spread, b.p.", "N0", 10, 5)
                 End Select
-                SetChartMinMax()
+                'SetChartMinMax()
             Catch ex As Exception
                 Logger.WarnException("Failed to select y-axis variable " + str, ex)
                 Logger.Warn("Exception = {0}", ex.ToString())
@@ -1710,13 +1713,13 @@ Namespace Forms.ChartForm
             If fitting IsNot Nothing Then fitting.SetFitMode(snd.Tag)
         End Sub
 
-        Private Sub OnCurvePaint(ByVal curve As ICurve, ByVal points As List(Of XY), ByVal base As Double)
-            PaintSwapCurve(curve, points, base)
-            _spreadBenchmarks.UpdateCurve(curve.GetName())
+        Private Sub OnCurvePaint(ByVal curve As ICurve, ByVal points As List(Of XY), ByVal first As Boolean)
+            PaintSwapCurve(curve, points)
+            If Not first Then _spreadBenchmarks.UpdateCurve(curve.GetName())
             SetChartMinMax()
         End Sub
 
-        Private Sub PaintSwapCurve(ByVal curve As SwapCurve, ByVal points As List(Of XY), ByVal base As Double)
+        Private Sub PaintSwapCurve(ByVal curve As SwapCurve, ByVal points As List(Of XY))
             Logger.Debug("PaintSwapCurve({0})", curve.GetName())
             If points.Count < 2 Then
                 Logger.Info("Too little points to plot")
@@ -1735,7 +1738,7 @@ Namespace Forms.ChartForm
                             .markerColor = curve.GetInnerColor(),
                             .markerBorderColor = curve.GetOuterColor(),
                             .borderWidth = 2,
-                            .Tag = New SwapCurveSeries With {.Name = curve.GetName()}
+                            .Tag = New SwapCurveSeries With {.Name = curve.GetName(), .SwpCurve = curve}
                         }
                         TheChart.Series.Add(theSeries)
                     Else
@@ -1774,16 +1777,16 @@ Namespace Forms.ChartForm
                                     theTag.ASWSpread = item.Y
                             End Select
 
-                            Dim yValue = _spreadBenchmarks.CalculateSpreads(theTag)
-                            If yValue IsNot Nothing Then
-                                theSeries.Points.Add(
-                                    New DataPoint With {
-                                        .Name = String.Format("{0}Y", item.X),
-                                        .XValue = item.X,
-                                        .YValues = {yValue.Value},
-                                        .Tag = theTag
-                                    })
-                            End If
+                            'Dim yValue = _spreadBenchmarks.CalculateSpreads(theTag)
+                            'If yValue IsNot Nothing Then
+                            theSeries.Points.Add(
+                                New DataPoint With {
+                                    .Name = String.Format("{0}Y", item.X),
+                                    .XValue = item.X,
+                                    .YValues = {item.Y},
+                                    .Tag = theTag
+                                })
+                            'End If
                         End Sub)
                 End Sub)
         End Sub

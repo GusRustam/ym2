@@ -624,11 +624,6 @@ Namespace Forms.ChartForm
         Inherits SeriesDescr
     End Class
 
-    Friend Class BondYieldCurveSeries
-        Inherits SeriesDescr
-        Public BondCurve As YieldCurve
-    End Class
-
     Friend Class BidAskSeries
         Inherits SeriesDescr
     End Class

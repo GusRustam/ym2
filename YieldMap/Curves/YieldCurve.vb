@@ -105,9 +105,17 @@ Namespace Curves
         End Function
 
         Public Overrides Function CalculateSpread(ByVal data As List(Of YieldDuration)) As List(Of YieldDuration)
-            If BmkSpreadMode Is Nothing Then Return data
-
+            If BmkSpreadMode Is Nothing Or Benchmark Is Nothing Then Return data
             Dim res As New List(Of YieldDuration)(data)
+            If Benchmark.Equals(Me) Then
+                res.ForEach(Sub(elem)
+                                elem.PointSpread = 0
+                                elem.ZSpread = 0
+                                elem.ASWSpread = 0
+                            End Sub)
+                Return res
+            End If
+
             Select Case BmkSpreadMode
                 Case SpreadMode.PointSpread
                     res.ForEach(Sub(elem)
@@ -125,6 +133,7 @@ Namespace Curves
                                     With dscr
                                         .Yld = New YieldStructure() With {.Yield = elem.Yield}
                                         .Duration = elem.Duration
+                                        .CalcPrice = elem.CalcPrice
                                     End With
                                     elem.ZSpread = ZSpread(Benchmark.ToArray(), dscr)
                                 End Sub)

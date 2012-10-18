@@ -12,7 +12,7 @@ Namespace Curves
         Function GetFullName() As String
         Function ToArray() As Array
 
-        Event Updated As Action(Of ICurve, List(Of XY), Double)
+        Event Updated As Action(Of ICurve, List(Of XY), Boolean)
     End Interface
 
     Public MustInherit Class SwapCurve
@@ -63,10 +63,18 @@ Namespace Curves
             End Get
         End Property
 
+        Public Overrides Function Equals(ByVal obj As Object) As Boolean
+            If obj Is Nothing Then Return False
+            If Not TypeOf obj Is SwapCurve Then Return False
+            Dim crv = CType(obj, SwapCurve)
+            Return GetName() = crv.GetName()
+        End Function
+
         Public Sub SetModeAndBenchmark(ByVal newMode As SpreadMode, ByVal curve As SwapCurve)
             _mode = newMode
             _benchmark = curve
-            NotifyUpdated(Me)
+
+            NotifyUpdated(Me, Equals(_benchmark))
         End Sub
 
         '' CURVE DESCRIPTION
@@ -126,9 +134,9 @@ Namespace Curves
 #End Region
 
 #Region "Events"
-        Public Event Updated As Action(Of ICurve, List(Of XY), Double) Implements ICurve.Updated
-        Protected Sub NotifyUpdated(theCurve As ICurve)
-            RaiseEvent Updated(theCurve, GetCurveData(), BaseInstrumentPrice)
+        Public Event Updated As Action(Of ICurve, List(Of XY), Boolean) Implements ICurve.Updated
+        Protected Sub NotifyUpdated(theCurve As ICurve, Optional first As Boolean = False)
+            RaiseEvent Updated(theCurve, GetCurveData(), first)
         End Sub
 #End Region
 
@@ -143,28 +151,6 @@ Namespace Curves
             Next
             Return res
         End Function
-
-        'todo remove
-        'Public Overridable Function PointSpread(ByVal yld As Double, ByVal duration As Double) As Double? Implements ICurve.PointSpread
-        '    Dim data = GetCurveData()
-        '    If data.Count() >= 2 Then
-        '        Dim minDur = data.Min().Duration
-        '        Dim maxDur = data.Max().Duration
-        '        If duration < minDur Or duration > maxDur Then Return Nothing
-
-        '        For i = 0 To data.Count() - 2
-        '            Dim xi = data(i).Duration
-        '            Dim xi1 = data(i + 1).Duration
-        '            If xi <= duration And xi1 >= duration Then
-        '                Dim yi = data(i).Yield
-        '                Dim yi1 = data(i + 1).Yield
-        '                Dim a = (xi1 - duration) / (xi1 - xi)
-        '                Return (yld - (a * yi + (1 - a) * yi1)) * 10000
-        '            End If
-        '        Next
-        '    End If
-        '    Return Nothing
-        'End Function
 
         Public Overridable Function GetCurveData() As List(Of XY)
             Return XY.ConvertToXY(CurveData, BmkSpreadMode)
