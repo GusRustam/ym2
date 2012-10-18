@@ -31,5 +31,17 @@ Namespace Commons
                 args.Continue = True
             End If
         End Sub
+
+        Public Function GetRange(ByVal min As Double, ByVal max As Double, ByVal numsteps As Integer) As List(Of Double)
+            Debug.Assert(numsteps > 1)
+            Dim currX = min
+            Dim stepX = (max - min) / (numsteps - 1)
+            Dim res As New List(Of Double)
+            For i = 0 To numsteps - 1
+                res.Add(currX)
+                currX += stepX
+            Next
+            Return res
+        End Function
     End Module
 End Namespace

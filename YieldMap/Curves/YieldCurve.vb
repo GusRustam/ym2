@@ -15,7 +15,7 @@ Namespace Curves
         Sub SetFitMode(ByVal mode As String)
         Function GetFitMode() As EstimationModel
 
-        Function Estimate(points As List(Of YieldDuration)) As List(Of YieldDuration)
+        Function Estimate(points As List(Of YieldDuration)) As List(Of XY)
     End Interface
 
     Interface IBootstrappable
@@ -34,9 +34,6 @@ Namespace Curves
         Private Shared ReadOnly Logger As Logger = Commons.GetLogger(GetType(YieldCurve))
 
         Private WithEvents _quoteLoader As New ListLoadManager
-
-        Private _benchmark As SwapCurve
-        Private _mode As SpreadMode
 
         Private ReadOnly _name As String
         Private ReadOnly _fullname As String
@@ -58,14 +55,6 @@ Namespace Curves
             _date = Date.Today
             _quote = fieldNames(QuoteSource.Last)
         End Sub
-
-
-        Public Overrides Function SetModeAndBenchmark(ByVal newMode As SpreadMode, ByVal curve As SwapCurve) As Boolean
-            _mode = newMode
-            _benchmark = curve
-            'todo recalculate
-            Return True
-        End Function
 
         Protected Overrides Sub StartRealTime()
             If Not _quoteLoader.StartNewTask(New ListTaskDescr() With {
@@ -113,6 +102,49 @@ Namespace Curves
 
         Public Overrides Function GetInnerColor() As Color
             Return Color.White
+        End Function
+
+        Public Overrides Function CalculateSpread(ByVal data As List(Of YieldDuration)) As List(Of YieldDuration)
+            If BmkSpreadMode Is Nothing Then Return data
+
+            Dim res As New List(Of YieldDuration)(data)
+            Select Case BmkSpreadMode
+                Case SpreadMode.PointSpread
+                    res.ForEach(Sub(elem)
+                                    elem.PointSpread = ISpread(
+                                        Benchmark.ToArray(),
+                                        New DataPointDescr() With {
+                                            .Yld = New YieldStructure() With {.Yield = elem.Yield},
+                                            .Duration = elem.Duration
+                                        })
+                                End Sub)
+                    Return res
+                Case SpreadMode.ZSpread
+                    res.ForEach(Sub(elem)
+                                    Dim dscr = _descrs(elem.RIC)
+                                    With dscr
+                                        .Yld = New YieldStructure() With {.Yield = elem.Yield}
+                                        .Duration = elem.Duration
+                                    End With
+                                    elem.ZSpread = ZSpread(Benchmark.ToArray(), dscr)
+                                End Sub)
+                    Return res
+
+                Case SpreadMode.ASWSpread
+                    res.ForEach(Sub(elem)
+                                    Dim dscr = _descrs(elem.RIC)
+                                    With dscr
+                                        .Yld = New YieldStructure() With {.Yield = elem.Yield}
+                                        .Duration = elem.Duration
+                                    End With
+                                    Dim bmk = CType(Benchmark, IAssetSwapBenchmark)
+                                    elem.ASWSpread = ASWSpread(Benchmark.ToArray(), bmk.FloatLegStructure, bmk.FloatingPointValue, dscr)
+                                End Sub)
+                    Return res
+
+                Case Else
+                    Return data
+            End Select
         End Function
 
         Public Overrides Sub SetDate(ByVal theDate As Date)
@@ -257,22 +289,23 @@ Namespace Curves
             Return EstimationModel.GetEnabledModels()
         End Function
 
-        Public Sub SetFitMode(ByVal mode As String) Implements IFittable.SetFitMode
-            _estimationModel = EstimationModel.FromName(mode)
+        Public Sub SetFitMode(ByVal fitMode As String) Implements IFittable.SetFitMode
+            _estimationModel = EstimationModel.FromName(fitMode)
             _estimator = New Estimator(_estimationModel)
             NotifyUpdated(Me)
         End Sub
 
-        Public Overrides Function GetCurveData() As List(Of YieldDuration)
-            Return _estimator.Approximate(If(_bootstrapped, Bootstrap(CurveData), CurveData))
+        Public Overrides Function GetCurveData() As List(Of XY)
+            Dim crv = CalculateSpread(CurveData)
+            Return _estimator.Approximate(If(_bootstrapped, Bootstrap(crv), crv), BmkSpreadMode)
         End Function
 
         Public Function GetFitMode() As EstimationModel Implements IFittable.GetFitMode
             Return _estimationModel
         End Function
 
-        Public Function Estimate(points As List(Of YieldDuration)) As List(Of YieldDuration) Implements IFittable.Estimate
-            Return _estimator.Approximate(points)
+        Public Function Estimate(points As List(Of YieldDuration)) As List(Of XY) Implements IFittable.Estimate
+            Return _estimator.Approximate(points, BmkSpreadMode)
         End Function
 
         Public Function IsBootstrapped() As Boolean Implements IBootstrappable.IsBootstrapped

@@ -248,15 +248,11 @@ Namespace Forms.ChartForm
             If mode Is Nothing Then ' calculate all spreads
                 If Benchmarks.ContainsKey(SpreadMode.ZSpread) Then CalculateZSpread(descr)
                 If Benchmarks.ContainsKey(SpreadMode.ASWSpread) Then CalculateASWSpread(descr)
-                If Benchmarks.ContainsKey(SpreadMode.PointSpread) Then
-                    Dim spreadMainCurve = Benchmarks(SpreadMode.PointSpread)
-                    descr.PointSpread = spreadMainCurve.PointSpread(descr.Yld.Yield, descr.Duration)
-                End If
+                If Benchmarks.ContainsKey(SpreadMode.PointSpread) Then CalculateISpread(descr)
                 Return GetQuote(descr)
             Else ' calculate chosen spread
                 If mode.Equals(SpreadMode.PointSpread) And Benchmarks.ContainsKey(SpreadMode.PointSpread) Then
-                    Dim spreadMainCurve = Benchmarks(SpreadMode.PointSpread)
-                    descr.PointSpread = spreadMainCurve.PointSpread(descr.Yld.Yield, descr.Duration)
+                    CalculateISpread(descr)
                 ElseIf mode.Equals(SpreadMode.ZSpread) And Benchmarks.ContainsKey(SpreadMode.ZSpread) Then
                     CalculateZSpread(descr)
                 ElseIf mode.Equals(SpreadMode.ASWSpread) And Benchmarks.ContainsKey(SpreadMode.ASWSpread) Then
@@ -267,6 +263,19 @@ Namespace Forms.ChartForm
                 Return GetQuote(descr, mode)
             End If
         End Function
+
+        Private Sub CalculateISpread(ByVal descr As DataPointDescr)
+            Dim iSpreadMainCurve = Benchmarks(SpreadMode.PointSpread)
+            If TypeOf descr Is BondPointDescr Then
+                Dim tag As BondPointDescr = CType(descr, BondPointDescr)
+                tag.PointSpread = ISpread(iSpreadMainCurve.ToArray(), tag)
+            ElseIf TypeOf descr Is BidAskPointDescr And Benchmarks.ContainsKey(SpreadMode.ZSpread) Then
+                Dim data = CType(descr, BidAskPointDescr)
+                Dim tag As BondPointDescr = New BondPointDescr(data.BondTag)
+                tag.CalcPrice = data.Price
+                data.PointSpread = ISpread(iSpreadMainCurve.ToArray(), tag)
+            End If
+        End Sub
 
         Private Sub CalculateASWSpread(ByVal descr As DataPointDescr)
             Dim aswSpreadMainCurve = Benchmarks(SpreadMode.ASWSpread)
@@ -346,6 +355,14 @@ Namespace Forms.ChartForm
             _enabled = enabled
         End Sub
 
+        Public Shared Operator =(ByVal mode1 As SpreadMode, ByVal mode2 As SpreadMode)
+            Return mode1.Name = mode2.Name
+        End Operator
+
+        Public Shared Operator <>(ByVal mode1 As SpreadMode, ByVal mode2 As SpreadMode)
+            Return mode1.Name <> mode2.Name
+        End Operator
+
         Public Shared Function IsEnabled(name As String)
             Dim staticFields = GetType(SpreadMode).GetFields(BindingFlags.Instance Or BindingFlags.Public)
             Return (From info In staticFields Let element = CType(info.GetValue(Nothing), SpreadMode) Select element.Name = name And element.Enabled).FirstOrDefault()
@@ -372,6 +389,7 @@ Namespace Forms.ChartForm
 
 #Region "IV. Points descriptions"
     Friend Class DataPointDescr
+        Implements IComparable(Of DataPointDescr)
         Public Const AroundZero As Double = 0.0001
 
         Public Overridable ReadOnly Property IsValid As Boolean
@@ -392,7 +410,13 @@ Namespace Forms.ChartForm
         Public Overridable Property OASpread As Double?
         Public Overridable Property ASWSpread As Double?
 
-            
+        Public Function CompareTo(ByVal other As DataPointDescr) As Integer Implements IComparable(Of DataPointDescr).CompareTo
+            If Duration < other.Duration Then
+                Return -1
+            Else
+                Return 1
+            End If
+        End Function
 
         Public Overrides Function ToString() As String
             Return String.Format("{0:P2} {1:F2}", Yld, Duration)
@@ -593,6 +617,7 @@ Namespace Forms.ChartForm
 
     Friend Class SwapCurveSeries
         Inherits SeriesDescr
+        Public SwpCurve As SwapCurve
     End Class
 
     Friend Class HistCurveSeries
@@ -601,6 +626,7 @@ Namespace Forms.ChartForm
 
     Friend Class BondYieldCurveSeries
         Inherits SeriesDescr
+        Public BondCurve As YieldCurve
     End Class
 
     Friend Class BidAskSeries

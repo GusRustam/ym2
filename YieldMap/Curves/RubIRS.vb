@@ -2,6 +2,8 @@
 Imports AdfinXRtLib
 Imports System.Text.RegularExpressions
 Imports System.Drawing
+Imports YieldMap.Tools.Estimation
+Imports YieldMap.Tools
 Imports YieldMap.Forms.ChartForm
 Imports YieldMap.Tools.History
 Imports NLog
@@ -21,6 +23,25 @@ Namespace Curves
         Public Yield As Double
         Public Duration As Double
         Public CalcPrice As Double
+        Public PointSpread As Double?
+        Public ZSpread As Double?
+        Public ASWSpread As Double?
+
+        Public Sub New()
+        End Sub
+
+        Public Sub New(ByVal elem As YieldDuration)
+            With elem
+                RIC = .RIC
+                Me.Yield = .Yield
+                Duration = .Duration
+                CalcPrice = .CalcPrice
+                PointSpread = .PointSpread
+                ZSpread = .ZSpread
+                ASWSpread = .ASWSpread
+            End With
+
+        End Sub
 
         Public Overrides Function ToString() As String
             Return String.Format("{0} {1:P2}:{2:F2}", RIC, Yield / 100, Duration)
@@ -52,9 +73,6 @@ Namespace Curves
         Private Shared ReadOnly FloatLeg =
             "CLDR:RUS ARND:NO CCM:MMAA CFADJ:YES CRND:NO DMC:MODIFIED EMC:SAMEDAY IC:S1 " +
             "PDELAY:0 REFDATE:MATURITY RP:1 RT:BULLET XD:NO FRQ:Q "
-
-        Private _benchmark As SwapCurve
-        Private _mode As SpreadMode
 
         Protected Overridable Property InstrumentName As String = "RUBAM3MO"
         Protected Overridable Property BaseInstrument As String = "MOSPRIME3MD="
@@ -115,15 +133,6 @@ Namespace Curves
 
 
         '' START LOADING REALTIME DATA
-        Public Overrides Function SetModeAndBenchmark(ByVal newMode As SpreadMode, ByVal curve As SwapCurve) As Boolean
-            _mode = newMode
-            _benchmark = curve
-
-            If Not _mode.Equals(SpreadMode.PointSpread) Then Return False
-            ' todo recalculate curve
-            Return True
-        End Function
-
         Protected Overrides Sub StartRealTime()
             If Not _quoteLoader.StartNewTask(New ListTaskDescr() With {
                                                 .Name = Me.GetType().Name,
@@ -307,7 +316,7 @@ Namespace Curves
         End Sub
 
         Public Function Bootstrap(ByVal data As List(Of YieldDuration)) As List(Of YieldDuration) Implements IBootstrappable.Bootstrap
-            Dim params(0 To CurveData.Count() - 1, 0 To 5) As Object
+            Dim params(0 To CurveData.Count() - 1, 5) As Object
             For i = 0 To CurveData.Count - 1
                 params(i, 0) = InstrumentType
                 params(i, 1) = _theDate ' String.Format(CultureInfo.CreateSpecificCulture("en-US"), "{0:dd/MMM/yy}",
@@ -331,8 +340,9 @@ Namespace Curves
             Return True
         End Function
 
-        Public Overrides Function GetCurveData() As List(Of YieldDuration)
-            Return If(_bootstrapped, Bootstrap(CurveData), CurveData)
+        Public Overrides Function GetCurveData() As List(Of XY)
+            Dim crv = CalculateSpread(CurveData)
+            Return XY.ConvertToXY(If(_bootstrapped, Bootstrap(crv), crv), BmkSpreadMode)
         End Function
 
         '' OVERRIDEN METHODS
@@ -369,6 +379,24 @@ Namespace Curves
 
         Public Overrides Function GetDate() As Date
             Return _theDate
+        End Function
+
+        Public Overrides Function CalculateSpread(ByVal data As List(Of YieldDuration)) As List(Of YieldDuration)
+            If BmkSpreadMode Is Nothing Then Return data
+            Select Case BmkSpreadMode
+                Case SpreadMode.PointSpread
+                    Dim res As New List(Of YieldDuration)(data)
+                    res.ForEach(Sub(elem)
+                                    elem.PointSpread = ISpread(
+                                        Benchmark.ToArray(),
+                                        New DataPointDescr() With {
+                                            .Yld = New YieldStructure() With {.Yield = elem.Yield},
+                                            .Duration = elem.Duration
+                                        })
+                                End Sub)
+                    Return res
+                Case Else : Return data
+            End Select
         End Function
 
         Public Overrides Function GetName() As String

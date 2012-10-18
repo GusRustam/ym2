@@ -1,4 +1,5 @@
-﻿Imports DotNumerics.Optimization
+﻿Imports YieldMap.Forms.ChartForm
+Imports DotNumerics.Optimization
 Imports MathNet.Numerics.Interpolation.Algorithms
 Imports MathNet.Numerics.LinearAlgebra.Double
 Imports System.Reflection
@@ -281,18 +282,19 @@ Namespace Tools.Estimation
 
 #Region "Interpolation models"
     Public Class CubicSpline
-        Public Function Interpolate(ByVal data As List(Of YieldDuration)) As List(Of YieldDuration)
-            Dim xv = data.Select(Function(elem) elem.Duration).ToList()
-            Dim yv = data.Select(Function(elem) elem.Yield).ToList()
+        Public Function Interpolate(ByVal xv As List(Of Double), ByVal yv As List(Of Double)) As List(Of XY)
             Dim spline As New CubicSplineInterpolation(xv, yv)
 
-            Dim minX = xv.Min, maxX = xv.Max, currX = minX
-            Dim stepX = (maxX - minX) / 299
-            Dim res As New List(Of YieldDuration)
-            For i = 0 To 299
-                res.Add(New YieldDuration With {.Duration = currX, .Yield = spline.Interpolate(currX)})
-                currX += stepX
-            Next
+            Dim res As New List(Of XY)
+            Commons.GetRange(xv.Min, xv.Max, 300).ForEach(Sub(anX) res.Add(New XY With {.X = anX, .Y = spline.Interpolate(anX)}))
+            'Dim minX = xv.Min, maxX = xv.Max, currX = minX
+
+            'Dim stepX = (maxX - minX) / 299
+            'Dim res As New List(Of XY)
+            'For i = 0 To 299
+            '    res.Add(New XY With {.X = currX, .X = spline.Interpolate(currX)})
+            '    currX += stepX
+            'Next
             Return res
         End Function
     End Class
@@ -371,10 +373,10 @@ Namespace Tools.Estimation
             Return res
         End Function
 
-        Public Function Estimate(ByVal data As List(Of YieldDuration)) As List(Of YieldDuration)
-            _xv = data.Select(Function(elem) elem.Duration).ToList()
-            _yv = data.Select(Function(elem) elem.Yield).Select(Function(anY) anY * 100).ToList()
-            _n = data.Count()
+        Public Function Fit(ByVal x As List(Of Double), ByVal y As List(Of Double)) As List(Of XY)
+            _xv = x
+            _yv = y.Select(Function(anY) anY * 100).ToList()
+            _n = x.Count()
 
             Dim vars = New OptBoundVariable() {
                New OptBoundVariable() With {.Name = "b1", .LowerBound = 0, .InitialGuess = 1},
@@ -388,15 +390,17 @@ Namespace Tools.Estimation
             Dim lbfgsb As New L_BFGS_B
             Dim minimum = lbfgsb.ComputeMin(AddressOf NSSCost, AddressOf NSSCg, vars)
 
-            Dim minX = _xv.Min
-            Dim maxX = _xv.Max
-            Dim currX = minX
-            Dim stepX = (maxX - minX) / 29
-            Dim res As New List(Of YieldDuration)
-            For i = 0 To 29
-                res.Add(New YieldDuration With {.Duration = currX, .Yield = NSS(currX, minimum) / 100})
-                currX += stepX
-            Next
+            Dim res As New List(Of XY)
+            Commons.GetRange(_xv.Min, _xv.Max, 30).ForEach(Sub(anX) res.Add(New XY With {.X = anX, .Y = NSS(anX, minimum) / 100}))
+            'Dim minX = _xv.Min
+            'Dim maxX = _xv.Max
+            'Dim currX = minX
+            'Dim stepX = (maxX - minX) / 29
+            'Dim res As New List(Of XY)
+            'For i = 0 To 29
+            '    res.Add(New XY With {.X = currX, .Y = NSS(currX, minimum) / 100})
+            '    currX += stepX
+            'Next
             Return res
         End Function
     End Class
@@ -439,12 +443,13 @@ Namespace Tools.Estimation
             End Select
         End Sub
 
-        Public Function Approximate(ByVal data As List(Of YieldDuration)) As List(Of YieldDuration)
+        Public Function Approximate(ByVal data As List(Of YieldDuration), ByVal what As SpreadMode) As List(Of XY)
+            If what Is Nothing Then what = SpreadMode.Yield
+            Dim dt = XY.ConvertToXY(data, what)
+            Dim x = XY.GetX(dt)
+            Dim y = XY.GetY(dt)
             If _estimationModel.EstimationType = EstimationType.Estimation Then
-                Dim x = data.Select(Function(elem) elem.Duration).ToList()
-                Dim y = data.Select(Function(elem) elem.Yield).ToList()
-
-                If data.Count <= 1 Then Throw New InvalidOperationException("Too little points to fit")
+                If dt.Count <= 1 Then Throw New InvalidOperationException("Too little points to fit")
                 If _estimationModel = EstimationModel.Best Then
                     Dim fits = _regressions.Select(
                         Function(regr)
@@ -457,18 +462,17 @@ Namespace Tools.Estimation
                     Dim minSSE = fits.Select(Function(fit) fit.SSE).Min
                     _regression = fits.First(Function(fit) Math.Abs(fit.SSE - minSSE) < Epsilon).Regression
                 ElseIf _estimationModel = EstimationModel.NSS Then
-                    Return (New NelsonSiegelSvensson).Estimate(data)
+                    Return (New NelsonSiegelSvensson).Fit(x, y)
                 Else
                     _regression.Fit(x, y)
                 End If
 
-                Return data.Select(
-                    Function(elem) New YieldDuration With {.Duration = elem.Duration, .Yield = _regression.Estimate(elem.Duration)}).ToList()
+                Return Commons.GetRange(x.Min, x.Max, 100).Select(Function(anX) New XY With {.X = anX, .Y = _regression.Estimate(anX)}).ToList()
             Else
                 If _estimationModel = EstimationModel.CubicSpline Then
-                    Return (New CubicSpline).Interpolate(data)
+                    Return (New CubicSpline).Interpolate(x, y)
                 Else
-                    Return data
+                    Return XY.ConvertToXY(data, what)
                 End If
             End If
         End Function
@@ -477,6 +481,47 @@ Namespace Tools.Estimation
             Public Regression As LinearRegression
             Public SSE As Double
         End Class
+    End Class
+
+    Public Class XY
+        Public X As Double
+        Public Y As Double
+
+        Public Shared Function ConvertToXY(ByVal data As List(Of YieldDuration), ByVal mode As SpreadMode) As List(Of XY)
+            Dim x As List(Of Double)
+            Dim y As List(Of Double)
+            Select Case mode
+                Case SpreadMode.Yield
+                    x = data.Select(Function(elem) elem.Duration).ToList()
+                    y = data.Select(Function(elem) elem.Yield).ToList()
+                Case SpreadMode.PointSpread
+                    x = data.Where(Function(elem) elem.PointSpread.HasValue).Select(Function(elem) elem.Duration).ToList()
+                    y = data.Where(Function(elem) elem.PointSpread.HasValue).Select(Function(elem) elem.PointSpread.Value).ToList()
+                Case SpreadMode.ZSpread
+                    x = data.Where(Function(elem) elem.ZSpread.HasValue).Select(Function(elem) elem.Duration).ToList()
+                    y = data.Where(Function(elem) elem.ZSpread.HasValue).Select(Function(elem) elem.ZSpread.Value).ToList()
+                Case SpreadMode.ASWSpread
+                    x = data.Where(Function(elem) elem.ASWSpread.HasValue).Select(Function(elem) elem.Duration).ToList()
+                    y = data.Where(Function(elem) elem.ASWSpread.HasValue).Select(Function(elem) elem.ASWSpread.Value).ToList()
+            End Select
+            Return PackXY(x, y)
+        End Function
+
+        Public Shared Function GetX(ByVal xy As List(Of XY)) As List(Of Double)
+            Return xy.Select(Function(elem) elem.X).ToList()
+        End Function
+
+        Public Shared Function GetY(ByVal xy As List(Of XY)) As List(Of Double)
+            Return xy.Select(Function(elem) elem.Y).ToList()
+        End Function
+
+        Public Shared Function PackXY(ByVal x As List(Of Double), ByVal y As List(Of Double)) As List(Of XY)
+            Dim res As New List(Of XY)
+            For i = 0 To x.Count() - 1
+                res.Add(New XY With {.X = x(i), .Y = y(i)})
+            Next
+            Return res
+        End Function
     End Class
 #End Region
 End Namespace

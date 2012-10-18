@@ -15,6 +15,7 @@ Imports YieldMap.Tools
 Imports YieldMap.Tools.History
 Imports YieldMap.BondsDataSetTableAdapters
 Imports NLog
+Imports YieldMap.Tools.Estimation
 
 Namespace Forms.ChartForm
     Public Class GraphForm
@@ -116,14 +117,30 @@ Namespace Forms.ChartForm
         Private Sub RecalcSpread(ByVal mode As SpreadMode)
             Logger.Trace("RecalcSpread({0})", mode)
             TheChart.Series.ToList.ForEach(
-                Sub(srs) If TypeOf srs.Tag Is SeriesDescr Then srs.Points.ToList.ForEach(Sub(pnt) RecalcPoint(pnt, mode)))
+                Sub(srs)
+                    If TypeOf srs.Tag Is BondPointsSeries Then 'todo history / bidask
+                        srs.Points.ToList.ForEach(Sub(pnt) RecalcPoint(pnt, mode))
+                    ElseIf TypeOf srs.Tag Is SwapCurveSeries Then
+                        Dim crv = CType(srs.Tag, SwapCurveSeries)
+
+                        'todo
+                    End If
+                End Sub
+            )
         End Sub
 
         Private Sub ReplotSpread(ByVal newMode As SpreadMode, ByVal oldMode As SpreadMode)
             Logger.Trace("ReplotSpread({0}, {1})", newMode, oldMode)
             Dim storeOld = oldMode.Equals(SpreadMode.Yield) OrElse _spreadBenchmarks.Benchmarks.ContainsKey(oldMode)
             TheChart.Series.ToList.ForEach(
-                Sub(srs) If TypeOf srs.Tag Is SeriesDescr Then srs.Points.ToList.ForEach(Sub(pnt) ReplotPoint(pnt, newMode, oldMode, storeOld)))
+                Sub(srs)
+                    If TypeOf srs.Tag Is BondPointsSeries Then 'todo history / bidask
+                        srs.Points.ToList.ForEach(Sub(pnt) ReplotPoint(pnt, newMode, oldMode, storeOld))
+                    ElseIf TypeOf srs.Tag Is SwapCurveSeries Then
+                        'todo
+                    End If
+                End Sub
+            )
             SetYAxisMode(newMode.ToString())
         End Sub
 
@@ -1693,20 +1710,18 @@ Namespace Forms.ChartForm
             If fitting IsNot Nothing Then fitting.SetFitMode(snd.Tag)
         End Sub
 
-        Private Sub OnCurvePaint(ByVal curve As ICurve, ByVal points As List(Of YieldDuration), ByVal base As Double)
+        Private Sub OnCurvePaint(ByVal curve As ICurve, ByVal points As List(Of XY), ByVal base As Double)
             PaintSwapCurve(curve, points, base)
             _spreadBenchmarks.UpdateCurve(curve.GetName())
             SetChartMinMax()
         End Sub
 
-        Private Sub PaintSwapCurve(ByVal curve As SwapCurve, ByVal points As List(Of YieldDuration), ByVal base As Double)
+        Private Sub PaintSwapCurve(ByVal curve As SwapCurve, ByVal points As List(Of XY), ByVal base As Double)
             Logger.Debug("PaintSwapCurve({0})", curve.GetName())
             If points.Count < 2 Then
                 Logger.Info("Too little points to plot")
                 Return
             End If
-
-            If TypeOf curve Is IFittable Then points = CType(curve, IFittable).Estimate(points)
 
             GuiAsync(
                 Sub()
@@ -1741,20 +1756,30 @@ Namespace Forms.ChartForm
                     points.ForEach(
                         Sub(item)
                             Dim theTag = New MoneyMarketPointDescr() With {
-                                .Yld = New YieldStructure With {.Yield = item.Yield},
-                                .Duration = item.Duration,
+                                .Duration = item.X,
                                 .IsVisible = True,
                                 .YieldCurveName = curve.GetName(),
                                 .FullName = curve.GetFullName(),
                                 .SwpCurve = curve
                             }
 
+                            Select Case curve.BmkSpreadMode
+                                Case SpreadMode.Yield
+                                    theTag.Yld = New YieldStructure With {.Yield = item.Y}
+                                Case SpreadMode.PointSpread
+                                    theTag.PointSpread = item.Y
+                                Case SpreadMode.ZSpread
+                                    theTag.ZSpread = item.Y
+                                Case SpreadMode.ASWSpread
+                                    theTag.ASWSpread = item.Y
+                            End Select
+
                             Dim yValue = _spreadBenchmarks.CalculateSpreads(theTag)
                             If yValue IsNot Nothing Then
                                 theSeries.Points.Add(
                                     New DataPoint With {
-                                        .Name = String.Format("{0}Y", item.Duration),
-                                        .XValue = item.Duration,
+                                        .Name = String.Format("{0}Y", item.X),
+                                        .XValue = item.X,
                                         .YValues = {yValue.Value},
                                         .Tag = theTag
                                     })

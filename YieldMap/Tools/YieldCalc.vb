@@ -2,10 +2,12 @@
 Imports System.Globalization
 Imports AdfinXAnalyticsFunctions
 Imports System.ComponentModel
+Imports YieldMap.Curves
 Imports YieldMap.Commons
 Imports YieldMap.Forms.ChartForm
 Imports NLog
 Imports System.Text.RegularExpressions
+Imports YieldMap.Tools.Estimation
 
 Namespace Tools
     Public Class YieldToWhatConverter
@@ -170,6 +172,34 @@ Namespace Tools
             Else
                 Return Nothing
             End If
+        End Function
+
+        Public Function ISpread(ByVal rateArray As Array, descr As DataPointDescr) As Double?
+            Dim data As New List(Of XY)
+            For i = rateArray.GetLowerBound(0) To rateArray.GetUpperBound(0)
+                data.Add(New XY() With {.Y = rateArray.GetValue(i, 1), .X = (CDate(rateArray.GetValue(i, 0)) - descr.YieldAtDate).Days / 365})
+            Next
+
+            Dim yld = descr.Yld.Yield
+            Dim duration = descr.Duration
+
+            If data.Count() >= 2 Then
+                Dim minDur = data.Select(Function(theXY) theXY.X).Min
+                Dim maxDur = data.Select(Function(theXY) theXY.X).Max
+                If duration < minDur Or duration > maxDur Then Return Nothing
+
+                For i = 0 To data.Count() - 2
+                    Dim xi = data(i).X
+                    Dim xi1 = data(i + 1).X
+                    If xi <= duration And xi1 >= duration Then
+                        Dim yi = data(i).Y
+                        Dim yi1 = data(i + 1).Y
+                        Dim a = (xi1 - duration) / (xi1 - xi)
+                        Return (yld - (a * yi + (1 - a) * yi1)) * 10000
+                    End If
+                Next
+            End If
+            Return Nothing
         End Function
 
         Public Function ASWSpread(ByVal rateArray As Array, ByVal floatLegStructure As String, ByVal floatingRate As Double, descr As BondPointDescr) As Double?
