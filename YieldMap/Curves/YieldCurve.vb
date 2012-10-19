@@ -123,6 +123,7 @@ Namespace Curves
                                         Benchmark.ToArray(),
                                         New DataPointDescr() With {
                                             .Yld = New YieldStructure() With {.Yield = elem.Yield},
+                                            .YieldAtDate = elem.YieldAtDate,
                                             .Duration = elem.Duration
                                         })
                                 End Sub)
@@ -202,7 +203,8 @@ Namespace Curves
                                 .Yield = bestYield.Yield,
                                 .Duration = duration,
                                 .RIC = ric,
-                                .CalcPrice = price
+                                .CalcPrice = price,
+                                .YieldAtDate = maxdate
                             }
                             AddCurveItem(yieldDuration)
                             NotifyUpdated(Me)
@@ -236,7 +238,7 @@ Namespace Curves
             Return String.Format("{0} ({1}, {2})", _fullname, _quote, dateStr)
         End Function
 
-        Private Sub QuoteLoaderOnNewData(data As Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double?)))) Handles _quoteLoader.OnNewData
+        Private Sub OnRealTimeData(data As Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double?)))) Handles _quoteLoader.OnNewData
             Logger.Debug("OnRealTimeData")
             For Each listAndRFV As KeyValuePair(Of String, Dictionary(Of String, Dictionary(Of String, Double?))) In data
                 Dim list = listAndRFV.Key
@@ -268,6 +270,7 @@ Namespace Curves
                                     .Yield = bestYield.Yield
                                     .Duration = duration
                                     .CalcPrice = price
+                                    .YieldAtDate = _date
                                 End With
 
                                 AddCurveItem(yieldDuration)
@@ -321,7 +324,7 @@ Namespace Curves
             Return _bootstrapped
         End Function
 
-        Public Sub SetBootstrapeed(flag As Boolean) Implements IBootstrappable.SetBootstrapped
+        Public Sub SetBootstrapped(flag As Boolean) Implements IBootstrappable.SetBootstrapped
             _bootstrapped = flag
             NotifyUpdated(Me)
         End Sub

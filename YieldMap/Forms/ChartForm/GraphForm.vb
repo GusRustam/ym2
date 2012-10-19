@@ -139,8 +139,7 @@ Namespace Forms.ChartForm
                     ElseIf TypeOf srs.Tag Is SwapCurveSeries Then
                         Dim crvSrs = CType(srs.Tag, SwapCurveSeries)
                         Dim crv = crvSrs.SwpCurve
-                        'crv.SetBenchmark()
-                        crv.SetModeAndBenchmark(newMode, If(newMode <> SpreadMode.Yield, _spreadBenchmarks.Benchmarks(newMode), Nothing))
+                        crv.SetModeAndBenchmark(newMode, If(newMode <> SpreadMode.Yield AndAlso _spreadBenchmarks.Benchmarks.ContainsKey(newMode), _spreadBenchmarks.Benchmarks(newMode), Nothing))
                     End If
                 End Sub
             )
@@ -436,7 +435,8 @@ Namespace Forms.ChartForm
                     Case SpreadMode.PointSpread.ToString() : MakeAxisY("Spread, b.p.", "N0", 10, 5)
                     Case SpreadMode.ZSpread.ToString() : MakeAxisY("Z-Spread, b.p.", "N0", 10, 5)
                 End Select
-                'SetChartMinMax()
+                TheChart.ChartAreas(0).AxisX.ScaleView.ZoomReset()
+                TheChart.ChartAreas(0).AxisY.ScaleView.ZoomReset()
             Catch ex As Exception
                 Logger.WarnException("Failed to select y-axis variable " + str, ex)
                 Logger.Warn("Exception = {0}", ex.ToString())
@@ -1636,6 +1636,7 @@ Namespace Forms.ChartForm
 
             Dim newCurve = New YieldCurve(Guid.NewGuid.ToString, selectedItem.Name, ricsInCurve, selectedItem.Color, fieldNames)
             AddHandler newCurve.Updated, AddressOf OnCurvePaint
+            AddHandler newCurve.Recalculated, AddressOf OnCurveRecalculated
             _moneyMarketCurves.Add(newCurve)
             newCurve.Subscribe()
             'End If
@@ -1708,9 +1709,14 @@ Namespace Forms.ChartForm
             If fitting IsNot Nothing Then fitting.SetFitMode(snd.Tag)
         End Sub
 
-        Private Sub OnCurvePaint(ByVal curve As ICurve, ByVal points As List(Of XY), ByVal first As Boolean)
+        Private Sub OnCurvePaint(ByVal curve As ICurve, ByVal points As List(Of XY))
             PaintSwapCurve(curve, points)
-            If Not first Then _spreadBenchmarks.UpdateCurve(curve.GetName())
+            _spreadBenchmarks.UpdateCurve(curve.GetName())
+            SetChartMinMax()
+        End Sub
+
+        Private Sub OnCurveRecalculated(ByVal curve As ICurve, ByVal points As List(Of XY))
+            PaintSwapCurve(curve, points)
             SetChartMinMax()
         End Sub
 
@@ -1797,6 +1803,7 @@ Namespace Forms.ChartForm
             rubCCS.Subscribe()
             _moneyMarketCurves.Add(rubCCS)
             AddHandler rubCCS.Updated, AddressOf OnCurvePaint
+            AddHandler rubCCS.Recalculated, AddressOf OnCurveRecalculated
         End Sub
 
         Private Sub RubIRSTSMIClick(sender As Object, e As EventArgs) Handles RubIRSTSMI.Click
@@ -1805,6 +1812,7 @@ Namespace Forms.ChartForm
             rubIRS.Subscribe()
             _moneyMarketCurves.Add(rubIRS)
             AddHandler rubIRS.Updated, AddressOf OnCurvePaint
+            AddHandler rubIRS.Recalculated, AddressOf OnCurveRecalculated
         End Sub
 
         Private Sub NDFTSMIClick(sender As Object, e As EventArgs) Handles NDFTSMI.Click
@@ -1813,6 +1821,7 @@ Namespace Forms.ChartForm
             rubNDF.Subscribe()
             _moneyMarketCurves.Add(rubNDF)
             AddHandler rubNDF.Updated, AddressOf OnCurvePaint
+            AddHandler rubNDF.Recalculated, AddressOf OnCurveRecalculated
         End Sub
 #End Region
 #End Region

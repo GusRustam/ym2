@@ -375,7 +375,8 @@ Namespace Tools.Estimation
 
         Public Function Fit(ByVal x As List(Of Double), ByVal y As List(Of Double)) As List(Of XY)
             _xv = x
-            _yv = y.Select(Function(anY) anY * 100).ToList()
+            Dim avgY = y.Average()
+            _yv = y.Select(Function(anY) 10 * anY / avgY).ToList()
             _n = x.Count()
 
             Dim vars = New OptBoundVariable() {
@@ -390,18 +391,7 @@ Namespace Tools.Estimation
             Dim lbfgsb As New L_BFGS_B
             Dim minimum = lbfgsb.ComputeMin(AddressOf NSSCost, AddressOf NSSCg, vars)
 
-            Dim res As New List(Of XY)
-            Commons.GetRange(_xv.Min, _xv.Max, 30).ForEach(Sub(anX) res.Add(New XY With {.X = anX, .Y = NSS(anX, minimum) / 100}))
-            'Dim minX = _xv.Min
-            'Dim maxX = _xv.Max
-            'Dim currX = minX
-            'Dim stepX = (maxX - minX) / 29
-            'Dim res As New List(Of XY)
-            'For i = 0 To 29
-            '    res.Add(New XY With {.X = currX, .Y = NSS(currX, minimum) / 100})
-            '    currX += stepX
-            'Next
-            Return res
+            Return Commons.GetRange(_xv.Min, _xv.Max, 30).Select(Function(anX) New XY With {.X = anX, .Y = avgY * NSS(anX, minimum) / 10}).ToList()
         End Function
     End Class
 #End Region

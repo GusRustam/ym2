@@ -124,7 +124,11 @@ Namespace Forms
 
 #Region "III. Loading chains"
         Private Sub UpdateDatabase()
-            Initialized = DataAlreadyLoaded() OrElse LoadChains()
+            If DataAlreadyLoaded() Then
+                Initialized = True
+            Else
+                LoadChains()
+            End If
         End Sub
 
         Private Shared Function DataAlreadyLoaded() As Boolean
@@ -139,7 +143,7 @@ Namespace Forms
             Return False
         End Function
 
-        Private Function LoadChains() As Boolean
+        Private Sub LoadChains()
             Logger.Info("LoadChains")
 
             'todo start some waiter thread
@@ -155,6 +159,8 @@ Namespace Forms
 
                 For Each chainRow As BondsDataSet.chainRow In chainTable
                     _chainsToLoad.Add(chainRow.chain_name)
+                Next
+                For Each chainRow As BondsDataSet.chainRow In chainTable
                     Logger.Debug("row: {0}", chainRow.chain_name)
                     Dim loadHandler = ListLoader.AddListToLoad(chainRow.chain_name, "UWC:YES LAY:VER", 30)
                     If loadHandler IsNot Nothing Then
@@ -163,12 +169,10 @@ Namespace Forms
                     End If
                 Next
 
-                Return True
             Catch ex As Exception
                 Logger.ErrorException("Failed to do anything", ex)
-                Return False
             End Try
-        End Function
+        End Sub
 
         Private Sub OnChain(ByRef sender As Object, ByVal e As ChainItemsData)
             Logger.Info("OnChain(failed = {0})", e.Failed)
@@ -224,7 +228,9 @@ Namespace Forms
 
             RemoveHandler CType(sender, ChainHandler).OnData, AddressOf OnChain
             _chainsToLoad.Remove(e.ChainName)
-            If _chainsToLoad.Count = 0 Then RaiseEvent AllChainsLoaded()
+            If _chainsToLoad.Count = 0 Then
+                RaiseEvent AllChainsLoaded()
+            End If
         End Sub
 
         Public Sub OnAllChainsLoaded() Handles Me.AllChainsLoaded

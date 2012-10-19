@@ -201,8 +201,8 @@ Namespace Forms.ChartForm
                 Return _currentMode
             End Get
             Set(value As SpreadMode)
-                RaiseEvent ModeSelected(value, _currentMode)
                 _currentMode = value
+                RaiseEvent ModeSelected(value, _currentMode)
             End Set
         End Property
 
@@ -314,8 +314,8 @@ Namespace Forms.ChartForm
         End Sub
 
         Public Sub UpdateCurve(ByVal curveName As String)
-            'Dim modes = (From keyValue In Benchmarks Where keyValue.Value.GetName() = curveName Select keyValue.Key).ToList()
-            'modes.ForEach(Sub(mode) RaiseEvent SpreadUpdated(mode, _currentMode))
+            Dim modes = (From keyValue In Benchmarks Where keyValue.Value.GetName() = curveName Select keyValue.Key).ToList()
+            modes.ForEach(Sub(mode) RaiseEvent SpreadUpdated(mode, _currentMode))
         End Sub
 
         Public Sub SetBenchmark(ByVal mode As SpreadMode, ByVal curve As ICurve)

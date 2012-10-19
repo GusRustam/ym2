@@ -7,12 +7,12 @@ Imports NLog
 
 Namespace Curves
     Public Interface ICurve
-        'Function PointSpread(ByVal yld As Double, ByVal duration As Double) As Double?
         Function GetName() As String
         Function GetFullName() As String
         Function ToArray() As Array
 
-        Event Updated As Action(Of ICurve, List(Of XY), Boolean)
+        Event Updated As Action(Of ICurve, List(Of XY))
+        Event Recalculated As Action(Of ICurve, List(Of XY))
     End Interface
 
     Public MustInherit Class SwapCurve
@@ -74,8 +74,9 @@ Namespace Curves
             _mode = newMode
             _benchmark = curve
 
-            NotifyUpdated(Me, Equals(_benchmark))
+            NotifyRecalculated(Me)
         End Sub
+
 
         '' CURVE DESCRIPTION
         Protected ReadOnly CurveData As New List(Of YieldDuration) ' RIC -> Yield / Duration
@@ -134,9 +135,13 @@ Namespace Curves
 #End Region
 
 #Region "Events"
-        Public Event Updated As Action(Of ICurve, List(Of XY), Boolean) Implements ICurve.Updated
-        Protected Sub NotifyUpdated(theCurve As ICurve, Optional first As Boolean = False)
-            RaiseEvent Updated(theCurve, GetCurveData(), first)
+        Public Event Updated As Action(Of ICurve, List(Of XY)) Implements ICurve.Updated
+        Protected Sub NotifyUpdated(theCurve As ICurve)
+            RaiseEvent Updated(theCurve, GetCurveData())
+        End Sub
+        Public Event Recalculated As Action(Of ICurve, List(Of XY)) Implements ICurve.Recalculated
+        Private Sub NotifyRecalculated(ByVal curve As ICurve)
+            RaiseEvent Recalculated(curve, GetCurveData())
         End Sub
 #End Region
 

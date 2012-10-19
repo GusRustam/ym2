@@ -23,6 +23,7 @@ Namespace Curves
         Public Yield As Double
         Public Duration As Double
         Public CalcPrice As Double
+        Public YieldAtDate As Date
         Public PointSpread As Double?
         Public ZSpread As Double?
         Public ASWSpread As Double?
