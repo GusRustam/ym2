@@ -28,10 +28,21 @@ Namespace Forms
                 Return _initialized
             End Get
             Set(value As Boolean)
+                If value Then GuiAsync(Sub() InitEventLabel.Text = "Initialized successfully")
                 _initialized = value
                 YieldMapButton.Enabled = value
             End Set
         End Property
+
+        Private Sub GuiAsync(ByVal action As Action)
+            If action IsNot Nothing Then
+                If InvokeRequired Then
+                    Invoke(action)
+                Else
+                    action()
+                End If
+            End If
+        End Sub
 
 #Region "I. GUI Events"
         Private Sub ConnectButtonClick(sender As Object, e As EventArgs) Handles ConnectButton.Click
@@ -146,10 +157,6 @@ Namespace Forms
         Private Sub LoadChains()
             Logger.Info("LoadChains")
 
-            'todo start some waiter thread
-            'todo and start chain loading in another interruptible thread. For example, use backgroundworker
-            'todo or maybe backgroundworker already has support for timeout
-
             Try
                 Dim stChainItemsAdapter As New chain_itemsTableAdapter
                 stChainItemsAdapter.ClearAllData()
@@ -183,6 +190,7 @@ Namespace Forms
                 Dim stChainItemsAdapter As New chain_itemsTableAdapter
 
                 Try
+                    GuiAsync(Sub() InitEventLabel.Text = "Loading chain " + e.ChainName)
                     Dim currentChainId As Integer = stChainAdapter.GetIdsByName(e.ChainName).First().id
                     Logger.Debug("filling chain {0}; total items is {1}", e.ChainName, e.ListItems.Count - 1)
 
@@ -229,6 +237,7 @@ Namespace Forms
             RemoveHandler CType(sender, ChainHandler).OnData, AddressOf OnChain
             _chainsToLoad.Remove(e.ChainName)
             If _chainsToLoad.Count = 0 Then
+                GuiAsync(Sub() InitEventLabel.Text = "All chains loaded")
                 RaiseEvent AllChainsLoaded()
             End If
         End Sub
@@ -261,6 +270,7 @@ Namespace Forms
 
         Private Sub OnBondData(e As EventArgs, err As String)
             Logger.Info("OnBondData")
+            GuiAsync(Sub() InitEventLabel.Text = "Bond data loaded, storing into DB")
             Dim bondStructures As BondEventArgs = e
             If bondStructures IsNot Nothing Then
                 FormatBondData(bondStructures)

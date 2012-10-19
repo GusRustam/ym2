@@ -35,6 +35,8 @@ Namespace Forms
             Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
             Me.StatusPicture = New System.Windows.Forms.ToolStripStatusLabel()
             Me.StatusLabel = New System.Windows.Forms.ToolStripStatusLabel()
+            Me.ToolStripStatusLabel1 = New System.Windows.Forms.ToolStripStatusLabel()
+            Me.InitEventLabel = New System.Windows.Forms.ToolStripStatusLabel()
             Me.ToolStrip1.SuspendLayout()
             Me.StatusStrip1.SuspendLayout()
             Me.SuspendLayout()
@@ -106,7 +108,7 @@ Namespace Forms
             '
             'StatusStrip1
             '
-            Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.StatusPicture, Me.StatusLabel})
+            Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.StatusPicture, Me.StatusLabel, Me.ToolStripStatusLabel1, Me.InitEventLabel})
             Me.StatusStrip1.Location = New System.Drawing.Point(0, 551)
             Me.StatusStrip1.Name = "StatusStrip1"
             Me.StatusStrip1.Size = New System.Drawing.Size(792, 22)
@@ -123,6 +125,17 @@ Namespace Forms
             '
             Me.StatusLabel.Name = "StatusLabel"
             Me.StatusLabel.Size = New System.Drawing.Size(0, 17)
+            '
+            'ToolStripStatusLabel1
+            '
+            Me.ToolStripStatusLabel1.Name = "ToolStripStatusLabel1"
+            Me.ToolStripStatusLabel1.Size = New System.Drawing.Size(28, 17)
+            Me.ToolStripStatusLabel1.Text = "       "
+            '
+            'InitEventLabel
+            '
+            Me.InitEventLabel.Name = "InitEventLabel"
+            Me.InitEventLabel.Size = New System.Drawing.Size(0, 17)
             '
             'MainForm
             '
@@ -153,6 +166,8 @@ Namespace Forms
         Friend WithEvents StatusStrip1 As System.Windows.Forms.StatusStrip
         Friend WithEvents StatusPicture As System.Windows.Forms.ToolStripStatusLabel
         Friend WithEvents StatusLabel As System.Windows.Forms.ToolStripStatusLabel
+        Friend WithEvents ToolStripStatusLabel1 As System.Windows.Forms.ToolStripStatusLabel
+        Friend WithEvents InitEventLabel As System.Windows.Forms.ToolStripStatusLabel
 
     End Class
 End Namespace
