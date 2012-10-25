@@ -141,7 +141,11 @@ Namespace Tools
         End Function
 
         Public Overrides Function ToString() As String
-            Return String.Format("[{0:P2} @ {1}]", Yield, ToWhat.ToString())
+            If ToWhat IsNot Nothing Then
+                Return String.Format("[{0:P2} @ {1}]", Yield, ToWhat.ToString())
+            Else
+                Return String.Format("{0:P2}", Yield)
+            End If
         End Function
     End Class
 

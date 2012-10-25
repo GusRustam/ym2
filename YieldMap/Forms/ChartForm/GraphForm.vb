@@ -584,7 +584,7 @@ Namespace Forms.ChartForm
 
                     ElseIf TypeOf point.Tag Is MoneyMarketPointDescr Then
                         Dim data = CType(point.Tag, MoneyMarketPointDescr)
-                        DscrLabel.Text = data.FullName ' .SwpCurve.GetType.Name
+                        DscrLabel.Text = data.SwpCurve.GetFullName()
                         DatLabel.Text = String.Format("{0:dd/MM/yyyy}", data.SwpCurve.GetDate())
                         Dim period = String.Format("{0:F0}D", 365 * data.Duration)
                         Dim aDate = (New AdxDateModule).DfAddPeriod("RUS", Date.Today, period, "")
