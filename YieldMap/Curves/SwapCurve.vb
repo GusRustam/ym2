@@ -11,13 +11,32 @@ Namespace Curves
         Function GetFullName() As String
         Function ToArray() As Array
 
+        Event Cleared As Action(Of ICurve) 'todo subscribe benchmarks on these events!
         Event Updated As Action(Of ICurve, List(Of XY))
         Event Recalculated As Action(Of ICurve, List(Of XY))
     End Interface
 
     Public MustInherit Class SwapCurve
         Implements ICurve
+
+        Private ReadOnly _clearedHandler As Action(Of ICurve)
+        Private ReadOnly _updatedHandler As Action(Of ICurve, List(Of XY))
+        Private ReadOnly _recalculatedHandler As Action(Of ICurve, List(Of XY))
+
         Private Shared ReadOnly Logger As Logger = Commons.GetLogger(GetType(SwapCurve))
+
+        Public Sub New(ByVal clearedHandler As Action(Of ICurve),
+                       ByVal updatedHandler As Action(Of ICurve, List(Of XY)),
+                       ByVal recalculatedHandler As Action(Of ICurve, List(Of XY)))
+
+            _clearedHandler = clearedHandler
+            _updatedHandler = updatedHandler
+            _recalculatedHandler = recalculatedHandler
+
+            If _clearedHandler IsNot Nothing Then AddHandler Cleared, _clearedHandler
+            If _updatedHandler IsNot Nothing Then AddHandler Updated, _updatedHandler
+            If _recalculatedHandler IsNot Nothing Then AddHandler Recalculated, _recalculatedHandler
+        End Sub
 
 #Region "Interface"
         Public MustOverride Function GetBrokers() As String()
@@ -107,7 +126,7 @@ Namespace Curves
                 .EndDate = aDate,
                 .Fields = fields,
                 .Frequency = "D",
-                .InterestingFields = {"BID", "ASK", "CLOSE"}.ToList()
+                .InterestingFields = fields
             }
 
             Dim hst As HistoryLoadManager = New HistoryLoadManager(New AdxRtHistory)
@@ -135,6 +154,7 @@ Namespace Curves
 #End Region
 
 #Region "Events"
+        Public Event Cleared As Action(Of ICurve) Implements ICurve.Cleared
         Public Event Updated As Action(Of ICurve, List(Of XY)) Implements ICurve.Updated
         Protected Sub NotifyUpdated(theCurve As ICurve)
             RaiseEvent Updated(theCurve, GetCurveData())
@@ -164,7 +184,7 @@ Namespace Curves
         '' LOADING DATA
         Public Overridable Sub Subscribe()
             Logger.Debug("Subscirbe({0})", GetName())
-            Cleanup()
+            StopLoaders()
             If GetDate() = Date.Today Then
                 StartRealTime()
             Else
@@ -174,10 +194,22 @@ Namespace Curves
 
         '' CLEANUP
         Public Overridable Sub Cleanup()
+            StopLoaders()
+
+            RaiseEvent Cleared(Me)
+            CurveData.Clear()
+
+            If _clearedHandler IsNot Nothing Then RemoveHandler Cleared, _clearedHandler
+            If _updatedHandler IsNot Nothing Then RemoveHandler Updated, _updatedHandler
+            If _recalculatedHandler IsNot Nothing Then RemoveHandler Recalculated, _recalculatedHandler
+        End Sub
+
+        Protected Overridable Sub StopLoaders()
             _hstLoaders.Keys.ToList().ForEach(Sub(key) _hstLoaders(key).StopTask())
             _hstLoaders.Clear()
             CurveData.Clear()
         End Sub
+
 #End Region
     End Class
 End Namespace

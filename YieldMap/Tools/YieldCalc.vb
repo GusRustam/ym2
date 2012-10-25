@@ -2,7 +2,6 @@
 Imports System.Globalization
 Imports AdfinXAnalyticsFunctions
 Imports System.ComponentModel
-Imports YieldMap.Curves
 Imports YieldMap.Commons
 Imports YieldMap.Forms.ChartForm
 Imports NLog
@@ -64,7 +63,7 @@ Namespace Tools
         End Property
 
         Public Function CompareTo(ByVal other As YieldToWhat) As Integer Implements IComparable(Of YieldToWhat).CompareTo
-            Return _name.CompareTo(other.Name)
+            Return String.Compare(_name, other.Name, StringComparison.Ordinal)
         End Function
 
         Public Overrides Function ToString() As String
@@ -81,7 +80,6 @@ Namespace Tools
         End Function
 
         Public Shared Function TryParse(Of TEnum)(ByVal name As String, ByRef toWhat As TEnum) As Boolean
-            'todo i could do it with attributes and reflection
             If name = Put.Name Then
                 toWhat = Put
                 Return True
@@ -107,7 +105,6 @@ Namespace Tools
         End Operator
 
         Public Shared Function GetValues() As Array
-            'todo i could do it with attributes and reflection
             Return {Put, [Call], Maturity}
         End Function
 
@@ -174,7 +171,7 @@ Namespace Tools
             End If
         End Function
 
-        Public Function ISpread(ByVal rateArray As Array, descr As DataPointDescr) As Double?
+        Public Function PointSpread(ByVal rateArray As Array, descr As DataPointDescr) As Double?
             Dim data As New List(Of XY)
             For i = rateArray.GetLowerBound(0) To rateArray.GetUpperBound(0)
                 data.Add(New XY() With {.Y = rateArray.GetValue(i, 1), .X = (CDate(rateArray.GetValue(i, 0)) - descr.YieldAtDate).Days / 365})
@@ -245,7 +242,6 @@ Namespace Tools
             Dim pvbp = bondDeriv.GetValue(1, 4)
             Logger.Trace("duration: {0}", duration)
             Return New DataPointDescr With {.Duration = duration, .Convexity = convexity, .PVBP = pvbp, .Yld = bestYield, .YieldAtDate = dt}
-            'Return New Tuple(Of Double, Double, Double, YieldStructure)(duration, convexity, pvbp, bestYield)
         End Function
 
         Private Function ParseBondYield(ByVal bondYield As Array) As List(Of YieldStructure)
@@ -253,7 +249,7 @@ Namespace Tools
 
             For j = bondYield.GetLowerBound(0) To bondYield.GetUpperBound(0)
                 Dim yield = CSng(bondYield.GetValue(j, 1))
-                Dim itsDate = Commons.FromExcelSerialDate(bondYield.GetValue(j, 2))
+                Dim itsDate = FromExcelSerialDate(bondYield.GetValue(j, 2))
                 Logger.Trace("Parsing line: {0:P2} {1:dd-MMM-yy} {2} {3}", yield, itsDate, bondYield.GetValue(j, 3).ToString(), bondYield.GetValue(j, 4).ToString())
                 Dim toWhat As YieldToWhat
                 If Not YieldToWhat.TryParse(bondYield.GetValue(j, 4).ToString(), toWhat) Then

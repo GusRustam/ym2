@@ -118,7 +118,10 @@ Namespace Curves
         End Function
 
         '' CONSTRUCTOR
-        Sub New(ByVal theDate As Date, ByVal aName As String, Optional ByVal broker As String = "")
+        Sub New(ByVal theDate As Date, ByVal aName As String, ByVal clearedHandler As Action(Of ICurve),
+            ByVal updatedHandler As Action(Of ICurve, List(Of XY)),
+            ByVal recalculatedHandler As Action(Of ICurve, List(Of XY)), Optional ByVal broker As String = "")
+            MyBase.New(clearedHandler, updatedHandler, recalculatedHandler)
             _theDate = theDate
             _broker = broker
             _name = aName
@@ -128,10 +131,9 @@ Namespace Curves
         Protected Overrides Sub LoadHistory()
             Logger.Debug("LoadHistory")
             Dim rics = GetRICs(_broker)
-            rics.ForEach(Sub(ric) DoLoadRIC(ric, {"CLOSE"}.ToList, _theDate))
-            DoLoadRIC(BaseInstrument, {"CLOSE"}.ToList, _theDate)
+            rics.ForEach(Sub(ric) DoLoadRIC(ric, {"DATE", "BID", "ASK"}.ToList, _theDate))
+            DoLoadRIC(BaseInstrument, {"DATE", "CLOSE"}.ToList, _theDate)
         End Sub
-
 
         '' START LOADING REALTIME DATA
         Protected Overrides Sub StartRealTime()
@@ -158,13 +160,14 @@ Namespace Curves
         '' HISTORICAL DATA ARRIVED
         Protected Overrides Sub OnHistoricalData(ByVal hst As HistoryLoadManager, ByVal ric As String, ByVal datastatus As RT_DataStatus, ByVal data As Dictionary(Of Date, HistoricalItem))
             Logger.Debug("OnHistoricalData({0})", ric)
-            If data IsNot Nothing AndAlso data.Keys.Contains(_theDate) Then
-                Dim elem = data(_theDate)
+            If data IsNot Nothing Then
+                Dim lastDate = data.Keys.Max
+                Dim elem = data(lastDate)
                 Dim aYield As Double
                 Select Case _quote
                     Case "BID" : aYield = elem.Bid
                     Case "ASK" : aYield = elem.Ask
-                    Case "MID" : aYield = elem.Mid
+                    Case "MID" : aYield = If(elem.Bid > 0 And elem.Ask > 0, (elem.Bid + elem.Ask) / 2, If(elem.Bid > 0, elem.Bid, elem.Ask))
                 End Select
                 Try
                     If ric <> BaseInstrument Then
@@ -175,7 +178,7 @@ Namespace Curves
                        }
                         AddCurveItem(yieldDuration)
                     Else
-                        BaseInstrumentPrice = elem.Close
+                        BaseInstrumentPrice = elem.Value
                     End If
                     NotifyUpdated(Me)
                 Catch ex As Exception
@@ -240,9 +243,6 @@ Namespace Curves
                                 Logger.WarnException("Failed to parse realtime data", ex)
                                 Logger.Warn("Exception = {0}", ex.ToString())
                             End Try
-                        Else
-                            'Logger.Warn("Empty data for ric {0};  will try to load history", ric)
-                            'DoLoadRIC(ric, {"TRDPRC_1.TIMESTAMP", "TRDPRC_1.CLOSE"}.ToList, _theDate.AddDays(-1))
                         End If
 
 #If DEBUG Then
@@ -289,9 +289,6 @@ Namespace Curves
                                     Logger.WarnException("Failed to parse realtime base data", ex)
                                     Logger.Warn("Exception = {0}", ex.ToString())
                                 End Try
-                            Else
-                                'Logger.Warn("Empty data for ric {0};  will try to load history", BaseInstrument)
-                                'DoLoadRIC(BaseInstrument, {"CLOSE"}.ToList, _theDate.AddDays(-1))
                             End If
 #If DEBUG Then
                             Dim fieldValue = ricAndFieldValue.Value
@@ -320,8 +317,8 @@ Namespace Curves
             Dim params(0 To CurveData.Count() - 1, 5) As Object
             For i = 0 To CurveData.Count - 1
                 params(i, 0) = InstrumentType
-                params(i, 1) = _theDate ' String.Format(CultureInfo.CreateSpecificCulture("en-US"), "{0:dd/MMM/yy}",
-                params(i, 2) = _theDate.AddDays(CurveData(i).Duration * 365.0) 'String.Format(CultureInfo.CreateSpecificCulture("en-US"), "{0:dd/MMM/yy}", )
+                params(i, 1) = _theDate
+                params(i, 2) = _theDate.AddDays(CurveData(i).Duration * 365.0)
                 params(i, 3) = BaseInstrumentPrice / 100
                 params(i, 4) = CurveData(i).Yield
                 params(i, 5) = Struct
@@ -390,7 +387,7 @@ Namespace Curves
                 Case SpreadMode.PointSpread
                     Dim res As New List(Of YieldDuration)(data)
                     res.ForEach(Sub(elem)
-                                    elem.PointSpread = ISpread(
+                                    elem.PointSpread = PointSpread(
                                         Benchmark.ToArray(),
                                         New DataPointDescr() With {
                                             .Yld = New YieldStructure() With {.Yield = elem.Yield},
@@ -427,18 +424,16 @@ Namespace Curves
         End Function
 
         '' CLEANUP
-        Public Overrides Sub Cleanup()
-            Logger.Debug("Cleanup()")
-            MyBase.Cleanup()
+        Protected Overrides Sub StopLoaders()
+            MyBase.StopLoaders()
             If _quoteLoader IsNot Nothing Then
                 _quoteLoader.DiscardTask(Me.GetType().Name)
                 _quoteLoader.DiscardTask(Me.GetType().Name + "_BASE")
             End If
             StopHistory()
-
         End Sub
 
-        Public Overridable Function CanBeBenchmark() As Boolean Implements IAssetSwapBenchmark.CanBeBenchmark
+        Public Overridable Function BenchmarkEnabled() As Boolean Implements IAssetSwapBenchmark.CanBeBenchmark
             Return True
         End Function
 
@@ -470,8 +465,10 @@ Namespace Curves
             End Get
         End Property
 
-        Public Sub New(ByVal theDate As Date, ByVal aName As String, Optional ByVal broker As String = "")
-            MyBase.New(theDate, aName, broker)
+        Public Sub New(ByVal theDate As Date, ByVal aName As String, ByVal clearedHandler As Action(Of ICurve),
+            ByVal updatedHandler As Action(Of ICurve, List(Of XY)),
+            ByVal recalculatedHandler As Action(Of ICurve, List(Of XY)), Optional ByVal broker As String = "")
+            MyBase.New(theDate, aName, clearedHandler, updatedHandler, recalculatedHandler, broker)
         End Sub
 
         Public Overrides Function GetOuterColor() As Color
@@ -491,8 +488,10 @@ Namespace Curves
         Protected Overrides Property Brokers() As String() = {"GFI", "TRDL", "ICAP", "R", ""}
         Protected Overrides Property BaseInstrument As String = ""
 
-        Public Sub New(ByVal theDate As Date, ByVal aName As String, Optional ByVal broker As String = "")
-            MyBase.New(theDate, aName, broker)
+        Public Sub New(ByVal theDate As Date, ByVal aName As String, ByVal clearedHandler As Action(Of ICurve),
+            ByVal updatedHandler As Action(Of ICurve, List(Of XY)),
+            ByVal recalculatedHandler As Action(Of ICurve, List(Of XY)), Optional ByVal broker As String = "")
+            MyBase.New(theDate, aName, clearedHandler, updatedHandler, recalculatedHandler, broker)
         End Sub
 
         Public Overrides Function GetOuterColor() As Color
@@ -515,7 +514,7 @@ Namespace Curves
             Return dateModule.DfCountYears(GetDate(), Commons.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
         End Function
 
-        Public Overrides Function CanBeBenchmark() As Boolean
+        Public Overrides Function BenchmarkEnabled() As Boolean
             Return False
         End Function
 

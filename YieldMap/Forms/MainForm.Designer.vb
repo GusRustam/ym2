@@ -24,8 +24,9 @@ Namespace Forms
         'Не изменяйте ее в редакторе исходного кода.
         <System.Diagnostics.DebuggerStepThrough()> _
         Private Sub InitializeComponent()
+            Me.components = New System.ComponentModel.Container()
             Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MainForm))
-            Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
+            Me.MainToolStrip = New System.Windows.Forms.ToolStrip()
             Me.ConnectButton = New System.Windows.Forms.ToolStripButton()
             Me.YieldMapButton = New System.Windows.Forms.ToolStripButton()
             Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
@@ -37,19 +38,22 @@ Namespace Forms
             Me.StatusLabel = New System.Windows.Forms.ToolStripStatusLabel()
             Me.ToolStripStatusLabel1 = New System.Windows.Forms.ToolStripStatusLabel()
             Me.InitEventLabel = New System.Windows.Forms.ToolStripStatusLabel()
-            Me.ToolStrip1.SuspendLayout()
+            Me.CMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
+            Me.LogSettingsTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.MainToolStrip.SuspendLayout()
             Me.StatusStrip1.SuspendLayout()
+            Me.CMS.SuspendLayout()
             Me.SuspendLayout()
             '
-            'ToolStrip1
+            'MainToolStrip
             '
-            Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ConnectButton, Me.YieldMapButton, Me.ToolStripSeparator1, Me.DatabaseButton, Me.ToolStripSeparator2, Me.SettingsButton})
-            Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
-            Me.ToolStrip1.Name = "ToolStrip1"
-            Me.ToolStrip1.Size = New System.Drawing.Size(792, 39)
-            Me.ToolStrip1.Stretch = True
-            Me.ToolStrip1.TabIndex = 1
-            Me.ToolStrip1.Text = "ToolStrip1"
+            Me.MainToolStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ConnectButton, Me.YieldMapButton, Me.ToolStripSeparator1, Me.DatabaseButton, Me.ToolStripSeparator2, Me.SettingsButton})
+            Me.MainToolStrip.Location = New System.Drawing.Point(0, 0)
+            Me.MainToolStrip.Name = "MainToolStrip"
+            Me.MainToolStrip.Size = New System.Drawing.Size(792, 39)
+            Me.MainToolStrip.Stretch = True
+            Me.MainToolStrip.TabIndex = 1
+            Me.MainToolStrip.Text = "ToolStrip1"
             '
             'ConnectButton
             '
@@ -94,6 +98,7 @@ Namespace Forms
             '
             Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
             Me.ToolStripSeparator2.Size = New System.Drawing.Size(6, 39)
+            Me.ToolStripSeparator2.Visible = False
             '
             'SettingsButton
             '
@@ -105,6 +110,7 @@ Namespace Forms
             Me.SettingsButton.Size = New System.Drawing.Size(36, 36)
             Me.SettingsButton.Text = "SettingsButton"
             Me.SettingsButton.ToolTipText = "Settings"
+            Me.SettingsButton.Visible = False
             '
             'StatusStrip1
             '
@@ -137,26 +143,39 @@ Namespace Forms
             Me.InitEventLabel.Name = "InitEventLabel"
             Me.InitEventLabel.Size = New System.Drawing.Size(0, 17)
             '
+            'CMS
+            '
+            Me.CMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LogSettingsTSMI})
+            Me.CMS.Name = "CMS"
+            Me.CMS.Size = New System.Drawing.Size(182, 48)
+            '
+            'LogSettingsTSMI
+            '
+            Me.LogSettingsTSMI.Name = "LogSettingsTSMI"
+            Me.LogSettingsTSMI.Size = New System.Drawing.Size(181, 22)
+            Me.LogSettingsTSMI.Text = "Edit logging settings"
+            '
             'MainForm
             '
             Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
             Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
             Me.ClientSize = New System.Drawing.Size(792, 573)
             Me.Controls.Add(Me.StatusStrip1)
-            Me.Controls.Add(Me.ToolStrip1)
+            Me.Controls.Add(Me.MainToolStrip)
             Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
             Me.IsMdiContainer = True
             Me.Name = "MainForm"
             Me.Text = "Thomson Reuters Yield Map"
-            Me.ToolStrip1.ResumeLayout(False)
-            Me.ToolStrip1.PerformLayout()
+            Me.MainToolStrip.ResumeLayout(False)
+            Me.MainToolStrip.PerformLayout()
             Me.StatusStrip1.ResumeLayout(False)
             Me.StatusStrip1.PerformLayout()
+            Me.CMS.ResumeLayout(False)
             Me.ResumeLayout(False)
             Me.PerformLayout()
 
         End Sub
-        Friend WithEvents ToolStrip1 As System.Windows.Forms.ToolStrip
+        Friend WithEvents MainToolStrip As System.Windows.Forms.ToolStrip
         Friend WithEvents ConnectButton As System.Windows.Forms.ToolStripButton
         Friend WithEvents YieldMapButton As System.Windows.Forms.ToolStripButton
         Friend WithEvents ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
@@ -168,6 +187,8 @@ Namespace Forms
         Friend WithEvents StatusLabel As System.Windows.Forms.ToolStripStatusLabel
         Friend WithEvents ToolStripStatusLabel1 As System.Windows.Forms.ToolStripStatusLabel
         Friend WithEvents InitEventLabel As System.Windows.Forms.ToolStripStatusLabel
+        Friend WithEvents CMS As System.Windows.Forms.ContextMenuStrip
+        Friend WithEvents LogSettingsTSMI As System.Windows.Forms.ToolStripMenuItem
 
     End Class
 End Namespace

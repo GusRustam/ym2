@@ -45,6 +45,17 @@ Namespace Forms
         End Sub
 
 #Region "I. GUI Events"
+        Private Shared Sub LogSettingsTSMIClick(sender As Object, e As EventArgs) Handles LogSettingsTSMI.Click
+            Dim sf = New SettingsForm
+            sf.ShowDialog()
+        End Sub
+
+        Private Sub MainToolStripMouseDoubleClick(sender As Object, e As MouseEventArgs) Handles MainToolStrip.MouseDoubleClick
+            If e.Button = MouseButtons.Right Then
+                CMS.Show(Me, e.Location)
+            End If
+        End Sub
+
         Private Sub ConnectButtonClick(sender As Object, e As EventArgs) Handles ConnectButton.Click
             StatusLabel.Text = Connecting_to_Eikon
             ConnectButton.Enabled = False
@@ -237,7 +248,7 @@ Namespace Forms
             RemoveHandler CType(sender, ChainHandler).OnData, AddressOf OnChain
             _chainsToLoad.Remove(e.ChainName)
             If _chainsToLoad.Count = 0 Then
-                GuiAsync(Sub() InitEventLabel.Text = "All chains loaded")
+                GuiAsync(Sub() InitEventLabel.Text = "All chains loaded; will load bond descriptions")
                 RaiseEvent AllChainsLoaded()
             End If
         End Sub
@@ -525,5 +536,6 @@ Namespace Forms
         End Sub
 #End Region
 #End Region
+
     End Class
 End Namespace

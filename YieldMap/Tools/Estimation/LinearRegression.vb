@@ -271,7 +271,7 @@ Namespace Tools.Estimation
         Public Overrides Function GetFormula() As String
             Dim res = String.Format("Y = {0:P2} + {1:P2}*x", _theta(0), _theta(1))
             For i = 2 To P
-                If _theta(i) > 0.000001 Then
+                If Math.Abs(_theta(i)) > 0.000001 Then
                     res += String.Format(" + {0:P2}*x^{1}", _theta(i), i)
                 End If
             Next
@@ -284,18 +284,7 @@ Namespace Tools.Estimation
     Public Class CubicSpline
         Public Function Interpolate(ByVal xv As List(Of Double), ByVal yv As List(Of Double)) As List(Of XY)
             Dim spline As New CubicSplineInterpolation(xv, yv)
-
-            Dim res As New List(Of XY)
-            Commons.GetRange(xv.Min, xv.Max, 300).ForEach(Sub(anX) res.Add(New XY With {.X = anX, .Y = spline.Interpolate(anX)}))
-            'Dim minX = xv.Min, maxX = xv.Max, currX = minX
-
-            'Dim stepX = (maxX - minX) / 299
-            'Dim res As New List(Of XY)
-            'For i = 0 To 299
-            '    res.Add(New XY With {.X = currX, .X = spline.Interpolate(currX)})
-            '    currX += stepX
-            'Next
-            Return res
+            Return Commons.GetRange(xv.Min, xv.Max, 300).Select(Function(anX) New XY With {.X = anX, .Y = spline.Interpolate(anX)})
         End Function
     End Class
 
@@ -327,37 +316,37 @@ Namespace Tools.Estimation
             For i = 0 To _n - 1
                 Dim delta = 2 * (NSS(_xv(i), p) - _yv(i))
                 res(0) += delta
-                res(1) += delta * NSS_CG_db2(_xv(i), p)
-                res(2) += delta * NSS_CG_db3(_xv(i), p)
-                res(3) += delta * NSS_CG_db4(_xv(i), p)
-                res(4) += delta * NSS_CG_dl1(_xv(i), p)
-                res(5) += delta * NSS_CG_dl2(_xv(i), p)
+                res(1) += delta * NSSCgDb2(_xv(i), p)
+                res(2) += delta * NSSCgDb3(_xv(i), p)
+                res(3) += delta * NSSCgDb4(_xv(i), p)
+                res(4) += delta * NSSCgDl1(_xv(i), p)
+                res(5) += delta * NSSCgDl2(_xv(i), p)
             Next
             Return res
         End Function
 
-        Private Function NSS_CG_db2(ByVal t As Double, ByVal p() As Double) As Double
+        Private Shared Function NSSCgDb2(ByVal t As Double, ByVal p() As Double) As Double
             Dim l1 = p(4), tl1 = t / l1
             Dim etl1 = Math.Exp(-tl1)
             Dim metl1 = (1 - etl1) / tl1
             Return metl1
         End Function
 
-        Private Function NSS_CG_db3(ByVal t As Double, ByVal p() As Double) As Double
+        Private Shared Function NSSCgDb3(ByVal t As Double, ByVal p() As Double) As Double
             Dim l1 = p(4), tl1 = t / l1
             Dim etl1 = Math.Exp(-tl1)
             Dim metl1 = (1 - etl1) / tl1
             Return metl1 - etl1
         End Function
 
-        Private Function NSS_CG_db4(ByVal t As Double, ByVal p() As Double) As Double
+        Private Shared Function NSSCgDb4(ByVal t As Double, ByVal p() As Double) As Double
             Dim l2 = p(5), tl2 = t / l2
             Dim etl2 = Math.Exp(-tl2)
             Dim metl2 = (1 - etl2) / tl2
             Return metl2 - etl2
         End Function
 
-        Private Function NSS_CG_dl1(ByVal t As Double, ByVal p() As Double) As Double
+        Private Shared Function NSSCgDl1(ByVal t As Double, ByVal p() As Double) As Double
             Dim b2 = p(1), b3 = p(2), l1 = p(4)
             Dim tl1 = t / l1
             Dim etl1 = Math.Exp(-tl1)
@@ -365,7 +354,7 @@ Namespace Tools.Estimation
             Return res
         End Function
 
-        Private Function NSS_CG_dl2(ByVal t As Double, ByVal p() As Double) As Double
+        Private Shared Function NSSCgDl2(ByVal t As Double, ByVal p() As Double) As Double
             Dim b4 = p(3), l2 = p(5)
             Dim tl2 = t / l2
             Dim etl2 = Math.Exp(-tl2)
@@ -381,9 +370,9 @@ Namespace Tools.Estimation
 
             Dim vars = New OptBoundVariable() {
                New OptBoundVariable() With {.Name = "b1", .LowerBound = 0, .InitialGuess = 1},
-               New OptBoundVariable() With {.Name = "b2", .LowerBound = 0, .InitialGuess = 1},
-               New OptBoundVariable() With {.Name = "b3", .LowerBound = 0, .InitialGuess = 1},
-               New OptBoundVariable() With {.Name = "b4", .LowerBound = 0, .InitialGuess = 1},
+               New OptBoundVariable() With {.Name = "b2", .InitialGuess = 1},
+               New OptBoundVariable() With {.Name = "b3", .InitialGuess = 1},
+               New OptBoundVariable() With {.Name = "b4", .InitialGuess = 1},
                New OptBoundVariable() With {.Name = "l1", .LowerBound = 0.0001, .InitialGuess = 1},
                New OptBoundVariable() With {.Name = "l2", .LowerBound = 0.0001, .InitialGuess = 1}
             }
@@ -391,7 +380,7 @@ Namespace Tools.Estimation
             Dim lbfgsb As New L_BFGS_B
             Dim minimum = lbfgsb.ComputeMin(AddressOf NSSCost, AddressOf NSSCg, vars)
 
-            Return Commons.GetRange(_xv.Min, _xv.Max, 30).Select(Function(anX) New XY With {.X = anX, .Y = avgY * NSS(anX, minimum) / 10}).ToList()
+            Return Commons.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = avgY * NSS(anX, minimum) / 10}).ToList()
         End Function
     End Class
 #End Region

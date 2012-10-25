@@ -46,7 +46,19 @@ Namespace Curves
         Private ReadOnly _fieldNames As Dictionary(Of QuoteSource, String)
         Private _estimationModel As EstimationModel = EstimationModel.DefaultModel
 
-        Public Sub New(ByVal name As String, ByVal fullname As String, ByVal rics As List(Of String), ByVal clr As String, fieldNames As Dictionary(Of QuoteSource, String))
+        Public Sub New(
+            ByVal name As String,
+            ByVal fullname As String,
+            ByVal rics As List(Of String),
+            ByVal clr As String,
+            ByVal fieldNames As Dictionary(Of QuoteSource, String),
+            ByVal clearedHandler As Action(Of ICurve),
+            ByVal updatedHandler As Action(Of ICurve, List(Of XY)),
+            ByVal recalculatedHandler As Action(Of ICurve, List(Of XY))
+        )
+
+            MyBase.New(clearedHandler, updatedHandler, recalculatedHandler)
+
             _name = name
             _fullname = fullname
             _color = Color.FromName(clr)
@@ -69,7 +81,7 @@ Namespace Curves
 
         Protected Overrides Sub LoadHistory()
             Logger.Debug("LoadHistory")
-            _descrs.Keys.ToList().ForEach(Sub(ric) DoLoadRIC(ric, {_fieldNames(QuoteSource.Hist)}.ToList, _date))
+            _descrs.Keys.ToList().ForEach(Sub(ric) DoLoadRIC(ric, {"DATE", _fieldNames(QuoteSource.Hist)}.ToList, _date))
         End Sub
 
         Public Overrides Function GetBrokers() As String()
@@ -119,7 +131,7 @@ Namespace Curves
             Select Case BmkSpreadMode
                 Case SpreadMode.PointSpread
                     res.ForEach(Sub(elem)
-                                    elem.PointSpread = ISpread(
+                                    elem.PointSpread = PointSpread(
                                         Benchmark.ToArray(),
                                         New DataPointDescr() With {
                                             .Yld = New YieldStructure() With {.Yield = elem.Yield},
@@ -167,9 +179,9 @@ Namespace Curves
             Return _date
         End Function
 
-        Public Overrides Sub Cleanup()
+        Protected Overrides Sub StopLoaders()
+            MyBase.StopLoaders()
             _quoteLoader.DiscardTask(_name)
-            MyBase.Cleanup()
         End Sub
 
         Public Overrides Function GetDuration(ByVal ric As String) As Double
@@ -281,7 +293,7 @@ Namespace Curves
                             End Try
                         Else
                             Logger.Warn("Empty data for ric {0};  will try to load history", ric)
-                            DoLoadRIC(ric, {_fieldNames(QuoteSource.Hist)}.ToList, _date.AddDays(-1))
+                            DoLoadRIC(ric, {"DATE", _fieldNames(QuoteSource.Hist)}.ToList, _date.AddDays(-1))
                         End If
 
 #If DEBUG Then

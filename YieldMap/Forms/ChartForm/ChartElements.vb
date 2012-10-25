@@ -268,12 +268,12 @@ Namespace Forms.ChartForm
             Dim iSpreadMainCurve = Benchmarks(SpreadMode.PointSpread)
             If TypeOf descr Is BondPointDescr Then
                 Dim tag As BondPointDescr = CType(descr, BondPointDescr)
-                tag.PointSpread = ISpread(iSpreadMainCurve.ToArray(), tag)
+                tag.PointSpread = PointSpread(iSpreadMainCurve.ToArray(), tag)
             ElseIf TypeOf descr Is BidAskPointDescr And Benchmarks.ContainsKey(SpreadMode.ZSpread) Then
                 Dim data = CType(descr, BidAskPointDescr)
                 Dim tag As BondPointDescr = New BondPointDescr(data.BondTag)
                 tag.CalcPrice = data.Price
-                data.PointSpread = ISpread(iSpreadMainCurve.ToArray(), tag)
+                data.PointSpread = PointSpread(iSpreadMainCurve.ToArray(), tag)
             End If
         End Sub
 
@@ -304,8 +304,8 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Public Sub CleanupCurve(ByVal curveName As String)
-            Dim modes = (From keyValue In Benchmarks Where keyValue.Value.GetName() = curveName Select keyValue.Key).ToList()
+        Public Sub CleanupCurve(ByVal curve As ICurve)
+            Dim modes = (From keyValue In Benchmarks Where keyValue.Value.GetName() = curve.GetName() Select keyValue.Key).ToList()
             modes.ForEach(Sub(mode)
                               Benchmarks.Remove(mode)
                               RaiseEvent SpreadUpdated(mode, _currentMode)

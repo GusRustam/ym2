@@ -25,6 +25,7 @@ Namespace Tools.History
         Public VWAP As Double
 
         Public Volume As Double
+        Public Value As Double
         Public MarketValue As Double
 
         Public CloseYield As Double
@@ -61,6 +62,7 @@ Namespace Tools.History
                     Case "CLOSE YIELD" : res = CloseYield
                     Case "BID" : res = Bid
                     Case "ASK" : res = Ask
+                    Case "VALUE" : res = Value
                 End Select
             Catch ex As Exception
                 res = Nothing
@@ -70,19 +72,20 @@ Namespace Tools.History
 
 
         Public Sub SetPropByValue(propName As String, propValue As String)
-            Dim value = CDbl(propValue)
+            Dim val = CDbl(propValue)
             Select Case propName
-                Case "OPEN" : Open = value
-                Case "ALT OPEN" : AltOpen = value
-                Case "HIGH" : High = value
-                Case "LOW" : Low = value
-                Case "CLOSE" : Close = value
-                Case "VWAP" : VWAP = value
-                Case "VOLUME" : Volume = value
-                Case "MARKET VALUE" : MarketValue = value
-                Case "CLOSE YIELD" : CloseYield = value
-                Case "BID" : Bid = value
-                Case "ASK" : Ask = value
+                Case "OPEN" : Open = val
+                Case "ALT OPEN" : AltOpen = val
+                Case "HIGH" : High = val
+                Case "LOW" : Low = val
+                Case "CLOSE" : Close = val
+                Case "VWAP" : VWAP = val
+                Case "VOLUME" : Volume = val
+                Case "MARKET VALUE" : MarketValue = val
+                Case "CLOSE YIELD" : CloseYield = val
+                Case "BID" : Bid = val
+                Case "ASK" : Ask = val
+                Case "VALUE" : Value = val
             End Select
         End Sub
 
@@ -99,11 +102,12 @@ Namespace Tools.History
             res += IIf(CloseYield > 0, String.Format("[CloseYield] = {0:F2}; ", CloseYield), "")
             res += IIf(Bid > 0, String.Format("[Bid] = {0:F2}; ", Bid), "")
             res += IIf(Ask > 0, String.Format("[Ask] = {0:F2}", Ask), "")
+            res += IIf(Value > 0, String.Format("[Value] = {0:F2}", Value), "")
             Return res
         End Function
 
         Public Function SomePrice() As Boolean
-            Dim arr = {Open, High, Low, Close, AltOpen, VWAP}
+            Dim arr = {Open, High, Low, Close, AltOpen, VWAP, Value}
             Return arr.Any(Function(elem) elem > 0)
         End Function
     End Class
@@ -158,7 +162,7 @@ Namespace Tools.History
                     .Source = "IDN"
                     .ItemName = descr.Item
                     'Logger.Debug("[{0}] [{1}] [{2}]", .ItemName, .Mode, descr.Fields.Aggregate("", Function(str, item) str + ", " + item))
-                    .RequestHistory("DATE, CLOSE")
+                    .RequestHistory(descr.Fields.Aggregate(Function(str, elem) str + ", " + elem))
                     AddHandler NewData, handler
                     .ErrorMode = AdxErrorMode.EXCEPTION
                     If .Data IsNot Nothing Then

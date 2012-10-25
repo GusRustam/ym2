@@ -64,7 +64,7 @@ Namespace Tools
             _issueDate = issueDate
             _maturityDate = maturityDate
 
-            Dim payments As Array = _adFinBond.BdCashflows(issueDate, maturityDate, coupon / 100.0, bondStructure, "IAC")
+            Dim payments As Array = _adFinBond.BdCashflows(issueDate, maturityDate, coupon / 100.0, bondStructure, "RET:A100 IAC")
 
             _dates.AddLast(issueDate)
             _faceValue.Add(1)

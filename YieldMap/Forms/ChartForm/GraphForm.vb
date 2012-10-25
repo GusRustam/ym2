@@ -1246,9 +1246,9 @@ Namespace Forms.ChartForm
                         .Item = bondDataPoint.RIC,
                         .StartDate = DateTime.Today.AddDays(-3),
                         .EndDate = DateTime.Today,
-                        .Fields = {"TRDPRC_1.TIMESTAMP", "TRDPRC_1.CLOSE"}.ToList,
+                        .Fields = {"DATE", "CLOSE"}.ToList,
                         .Frequency = "D",
-                        .InterestingFields = {"CLOSE"}.ToList()
+                        .InterestingFields = {"DATE", "CLOSE"}.ToList()
                         }
                 ' .SingleValue = True,
                 Dim hst = New HistoryLoadManager(New AdxRtHistory)
@@ -1360,7 +1360,7 @@ Namespace Forms.ChartForm
 #Region "V) Portfolio selection"
         Private WriteOnly Property ThisFormDataSource As Integer
             Set(ByVal value As Integer)
-                Logger.Trace("ThisFormDataSource to {0} with id {1}", value)
+                Logger.Trace("ThisFormDataSource to id {0}", value)
 
                 Dim currentPortID As Long
                 If value < 0 Then
@@ -1383,7 +1383,6 @@ Namespace Forms.ChartForm
                             .AskField = port.ask_field,
                             .LastField = port.last_field,
                             .HistField = port.hist_field,
-                            .RicStructure = port.ric_structure,
                             .Brokers = {"MM", ""}.ToList(),
                             .Currency = "",
                             .Color = port.color
@@ -1443,6 +1442,7 @@ Namespace Forms.ChartForm
                     DoSetRunning()
                 Catch ex As Exception
                     Logger.ErrorException("Failed to select a portfolio", ex)
+                    Logger.Error("Exception = {0}", ex.ToString())
                 End Try
             Else
                 Logger.Info("Can not change selected portfolio while form is loading")
@@ -1634,9 +1634,16 @@ Namespace Forms.ChartForm
                 Return
             End If
 
-            Dim newCurve = New YieldCurve(Guid.NewGuid.ToString, selectedItem.Name, ricsInCurve, selectedItem.Color, fieldNames)
-            AddHandler newCurve.Updated, AddressOf OnCurvePaint
-            AddHandler newCurve.Recalculated, AddressOf OnCurveRecalculated
+            Dim newCurve = New YieldCurve(
+                           Guid.NewGuid.ToString,
+                           selectedItem.Name,
+                           ricsInCurve,
+                           selectedItem.Color,
+                           fieldNames,
+                           AddressOf _spreadBenchmarks.CleanupCurve,
+                           AddressOf OnCurvePaint,
+                           AddressOf OnCurveRecalculated)
+
             _moneyMarketCurves.Add(newCurve)
             newCurve.Subscribe()
             'End If
@@ -1667,14 +1674,12 @@ Namespace Forms.ChartForm
                 If irsSeries IsNot Nothing Then TheChart.Series.Remove(irsSeries)
                 _moneyMarketCurves.Remove(curve)
 
-                Dim curveName = curve.GetName()
-                _spreadBenchmarks.CleanupCurve(curveName)
                 curve.Cleanup()
             End If
         End Sub
 
         Private Sub BootstrapTSMIClick(sender As Object, e As EventArgs) Handles BootstrapTSMI.Click
-            Logger.Debug("BootstrapTSMI_Click()")
+            Logger.Debug("BootstrapTSMIClick()")
             Dim snd = CType(sender, ToolStripMenuItem)
             Dim curve = _moneyMarketCurves.First(Function(item) item.GetName() = MoneyCurveCMS.Tag.ToString())
             If curve Is Nothing Then Return
@@ -1710,18 +1715,20 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub OnCurvePaint(ByVal curve As ICurve, ByVal points As List(Of XY))
+            Logger.Debug("OnCurvePaint({0})", curve.GetName())
             PaintSwapCurve(curve, points)
             _spreadBenchmarks.UpdateCurve(curve.GetName())
             SetChartMinMax()
         End Sub
 
         Private Sub OnCurveRecalculated(ByVal curve As ICurve, ByVal points As List(Of XY))
+            Logger.Debug("OnCurveRecalculated({0})", curve.GetName())
             PaintSwapCurve(curve, points)
             SetChartMinMax()
         End Sub
 
         Private Sub PaintSwapCurve(ByVal curve As SwapCurve, ByVal points As List(Of XY))
-            Logger.Debug("PaintSwapCurve({0})", curve.GetName())
+            Logger.Debug("PaintSwapCurve({0}, {1} points)", curve.GetName(), points.Count)
 
             GuiAsync(
                 Sub()
@@ -1751,7 +1758,7 @@ Namespace Forms.ChartForm
                     theSeries.Enabled = True
 
                     With theSeries
-                        If points.Count <= 50 Then
+                        If points.Count < 50 Then
                             .MarkerStyle = MarkerStyle.Circle
                             .MarkerSize = 5
                         Else
@@ -1799,29 +1806,32 @@ Namespace Forms.ChartForm
 #Region "2) Specific curves"
         Private Sub RubCCSTSMIClick(sender As Object, e As EventArgs) Handles RubCCSTSMI.Click
             Logger.Debug("RubCCSTSMIClick()")
-            Dim rubCCS = New RubCCS(DateTime.Today, Guid.NewGuid.ToString())
+            Dim rubCCS = New RubCCS(DateTime.Today, Guid.NewGuid.ToString(),
+                           AddressOf _spreadBenchmarks.CleanupCurve,
+                           AddressOf OnCurvePaint,
+                           AddressOf OnCurveRecalculated)
             rubCCS.Subscribe()
             _moneyMarketCurves.Add(rubCCS)
-            AddHandler rubCCS.Updated, AddressOf OnCurvePaint
-            AddHandler rubCCS.Recalculated, AddressOf OnCurveRecalculated
         End Sub
 
         Private Sub RubIRSTSMIClick(sender As Object, e As EventArgs) Handles RubIRSTSMI.Click
             Logger.Debug("RubIRSTSMIClick()")
-            Dim rubIRS = New RubIRS(DateTime.Today, Guid.NewGuid.ToString())
+            Dim rubIRS = New RubIRS(DateTime.Today, Guid.NewGuid.ToString(),
+                           AddressOf _spreadBenchmarks.CleanupCurve,
+                           AddressOf OnCurvePaint,
+                           AddressOf OnCurveRecalculated)
             rubIRS.Subscribe()
             _moneyMarketCurves.Add(rubIRS)
-            AddHandler rubIRS.Updated, AddressOf OnCurvePaint
-            AddHandler rubIRS.Recalculated, AddressOf OnCurveRecalculated
         End Sub
 
         Private Sub NDFTSMIClick(sender As Object, e As EventArgs) Handles NDFTSMI.Click
             Logger.Debug("NDFTSMI_Click()")
-            Dim rubNDF = New RubNDF(DateTime.Today, Guid.NewGuid.ToString())
+            Dim rubNDF = New RubNDF(DateTime.Today, Guid.NewGuid.ToString(),
+                           AddressOf _spreadBenchmarks.CleanupCurve,
+                           AddressOf OnCurvePaint,
+                           AddressOf OnCurveRecalculated)
             rubNDF.Subscribe()
             _moneyMarketCurves.Add(rubNDF)
-            AddHandler rubNDF.Updated, AddressOf OnCurvePaint
-            AddHandler rubNDF.Recalculated, AddressOf OnCurveRecalculated
         End Sub
 #End Region
 #End Region
