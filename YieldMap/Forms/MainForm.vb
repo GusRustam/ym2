@@ -23,12 +23,14 @@ Namespace Forms
         Private Event AllChainsLoaded As Action
 
         Private _initialized As Boolean = False
+        Private ReadOnly _graphs As New List(Of GraphForm)
+
         Public Property Initialized As Boolean
             Get
                 Return _initialized
             End Get
             Set(value As Boolean)
-                If value Then GuiAsync(Sub() InitEventLabel.Text = "Initialized successfully")
+                If value Then GuiAsync(Sub() InitEventLabel.Text = Initialized_successfully)
                 _initialized = value
                 YieldMapButton.Enabled = value
             End Set
@@ -45,6 +47,14 @@ Namespace Forms
         End Sub
 
 #Region "I. GUI Events"
+        Private Sub TileHorTSBClick(sender As Object, e As EventArgs) Handles TileHorTSB.Click
+            LayoutMdi(MdiLayout.TileVertical)
+        End Sub
+
+        Private Sub TileVerTSBClick(sender As Object, e As EventArgs) Handles TileVerTSB.Click
+            LayoutMdi(MdiLayout.TileHorizontal)
+        End Sub
+
         Private Shared Sub LogSettingsTSMIClick(sender As Object, e As EventArgs) Handles LogSettingsTSMI.Click
             Dim sf = New SettingsForm
             sf.ShowDialog()
@@ -63,7 +73,7 @@ Namespace Forms
         End Sub
 
         Private Shared Sub MainFormLoad(sender As Object, e As EventArgs) Handles MyBase.Load
-            Logger.Info("MainForm_Load")
+            Logger.Info("MainFormLoad")
 
             Dim installPath = Path.GetDirectoryName(Assembly.GetAssembly(GetType(MainForm)).CodeBase)
             installPath = installPath.Substring(6)
@@ -83,8 +93,16 @@ Namespace Forms
             Dim graphForm = New GraphForm
             graphForm.MdiParent = Me
             graphForm.Show()
+            AddHandler graphForm.Closed, AddressOf GraphFormRemoved
+            _graphs.Add(graphForm)
+        End Sub
 
-            LayoutMdi(MdiLayout.TileVertical)
+        Private Sub GraphFormRemoved(ByVal sender As Object, ByVal e As EventArgs)
+            Dim gf As GraphForm = TryCast(sender, GraphForm)
+            If gf IsNot Nothing Then
+                AddHandler gf.Closed, AddressOf GraphFormRemoved
+                _graphs.Remove(gf)
+            End If
         End Sub
 
         Private Shared Sub SettingsButtonClick(sender As Object, e As EventArgs) Handles SettingsButton.Click
@@ -116,24 +134,35 @@ Namespace Forms
             Select Case eEikonStatus
                 Case eEikonStatus.Connected
                     ConnectButton.Enabled = False
+                    YieldMapButton.Enabled = True
                     StatusPicture.Image = Green
                     StatusLabel.Text = Status_Connected
 
                 Case eEikonStatus.Disconnected
                     ConnectButton.Enabled = True
+                    YieldMapButton.Enabled = False
                     StatusPicture.Image = Red
                     StatusLabel.Text = Status_Disconnected
+                    CloseAllGraphForms()
 
                 Case eEikonStatus.LocalMode
                     ConnectButton.Enabled = True
+                    ConnectButton.Enabled = False
                     StatusPicture.Image = Orange
                     StatusLabel.Text = Status_Local
 
                 Case eEikonStatus.Offline
                     ConnectButton.Enabled = True
+                    ConnectButton.Enabled = False
                     StatusPicture.Image = Red
                     StatusLabel.Text = Status_Offline
             End Select
+        End Sub
+
+        Private Sub CloseAllGraphForms()
+            While _graphs.Any
+                _graphs.First.Close()
+            End While
         End Sub
 
         Public Sub OnStatusChanged(ByVal eStatus As EEikonStatus) Handles _myEikonDesktopSdk.OnStatusChanged
@@ -248,7 +277,7 @@ Namespace Forms
             RemoveHandler CType(sender, ChainHandler).OnData, AddressOf OnChain
             _chainsToLoad.Remove(e.ChainName)
             If _chainsToLoad.Count = 0 Then
-                GuiAsync(Sub() InitEventLabel.Text = "All chains loaded; will load bond descriptions")
+                GuiAsync(Sub() InitEventLabel.Text = All_chains_loaded)
                 RaiseEvent AllChainsLoaded()
             End If
         End Sub
@@ -281,7 +310,7 @@ Namespace Forms
 
         Private Sub OnBondData(e As EventArgs, err As String)
             Logger.Info("OnBondData")
-            GuiAsync(Sub() InitEventLabel.Text = "Bond data loaded, storing into DB")
+            GuiAsync(Sub() InitEventLabel.Text = BondDataLoaded)
             Dim bondStructures As BondEventArgs = e
             If bondStructures IsNot Nothing Then
                 FormatBondData(bondStructures)
@@ -536,6 +565,7 @@ Namespace Forms
         End Sub
 #End Region
 #End Region
+
 
     End Class
 End Namespace

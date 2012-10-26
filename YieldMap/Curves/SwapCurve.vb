@@ -11,7 +11,7 @@ Namespace Curves
         Function GetFullName() As String
         Function ToArray() As Array
 
-        Event Cleared As Action(Of ICurve) 'todo subscribe benchmarks on these events!
+        Event Cleared As Action(Of ICurve)
         Event Updated As Action(Of ICurve, List(Of XY))
         Event Recalculated As Action(Of ICurve, List(Of XY))
     End Interface
@@ -24,19 +24,6 @@ Namespace Curves
         Private ReadOnly _recalculatedHandler As Action(Of ICurve, List(Of XY))
 
         Private Shared ReadOnly Logger As Logger = Commons.GetLogger(GetType(SwapCurve))
-
-        Public Sub New(ByVal clearedHandler As Action(Of ICurve),
-                       ByVal updatedHandler As Action(Of ICurve, List(Of XY)),
-                       ByVal recalculatedHandler As Action(Of ICurve, List(Of XY)))
-
-            _clearedHandler = clearedHandler
-            _updatedHandler = updatedHandler
-            _recalculatedHandler = recalculatedHandler
-
-            If _clearedHandler IsNot Nothing Then AddHandler Cleared, _clearedHandler
-            If _updatedHandler IsNot Nothing Then AddHandler Updated, _updatedHandler
-            If _recalculatedHandler IsNot Nothing Then AddHandler Recalculated, _recalculatedHandler
-        End Sub
 
 #Region "Interface"
         Public MustOverride Function GetBrokers() As String()
@@ -167,6 +154,19 @@ Namespace Curves
 
 #Region "Public overridable tools"
         Private ReadOnly _hstLoaders As New Dictionary(Of String, HistoryLoadManager)
+        Public Sub New(ByVal clearedHandler As Action(Of ICurve),
+                       ByVal updatedHandler As Action(Of ICurve, List(Of XY)),
+                       ByVal recalculatedHandler As Action(Of ICurve, List(Of XY)))
+
+            _clearedHandler = clearedHandler
+            _updatedHandler = updatedHandler
+            _recalculatedHandler = recalculatedHandler
+
+            If _clearedHandler IsNot Nothing Then AddHandler Cleared, _clearedHandler
+            If _updatedHandler IsNot Nothing Then AddHandler Updated, _updatedHandler
+            If _recalculatedHandler IsNot Nothing Then AddHandler Recalculated, _recalculatedHandler
+        End Sub
+
         Public Overridable Function ToArray() As Array Implements ICurve.ToArray
             Dim len = CurveData.Count - 1
             Dim res(0 To len, 1) As Object
@@ -209,7 +209,6 @@ Namespace Curves
             _hstLoaders.Clear()
             CurveData.Clear()
         End Sub
-
 #End Region
     End Class
 End Namespace

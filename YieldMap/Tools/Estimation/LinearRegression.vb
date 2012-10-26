@@ -428,7 +428,7 @@ Namespace Tools.Estimation
             Dim x = XY.GetX(dt)
             Dim y = XY.GetY(dt)
             If _estimationModel.EstimationType = EstimationType.Estimation Then
-                If dt.Count <= 1 Then Throw New InvalidOperationException("Too little points to fit")
+                If dt.Count <= 1 Then Return Nothing
                 If _estimationModel = EstimationModel.Best Then
                     Dim fits = _regressions.Select(
                         Function(regr)

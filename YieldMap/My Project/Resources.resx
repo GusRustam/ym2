@@ -223,25 +223,49 @@
   <data name="Yield_Map_Icon_2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Yield Map Icon 2.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Connecting_to_Eikon">
-    <value xml:space="preserve">Status : Connecting to Eikon...</value>
+  <data name="Connecting_to_Eikon" xml:space="preserve">
+    <value>Status : Connecting to Eikon...</value>
   </data>
-  <data name="Reinit_Eikon_forbidden">
-    <value xml:space="preserve">Reinitialization of EikonDesktopSDK is forbidden</value>
+  <data name="Reinit_Eikon_forbidden" xml:space="preserve">
+    <value>Reinitialization of EikonDesktopSDK is forbidden</value>
   </data>
-  <data name="Init_Eikon_Fail">
-    <value xml:space="preserve">Initialization of EikonDesktopSDK Fail</value>
+  <data name="Init_Eikon_Fail" xml:space="preserve">
+    <value>Initialization of EikonDesktopSDK Fail</value>
   </data>
-  <data name="Status_Connected">
-    <value xml:space="preserve">Status : Connected to Eikon</value>
+  <data name="Status_Connected" xml:space="preserve">
+    <value>Status : Connected to Eikon</value>
   </data>
-  <data name="Status_Disconnected">
-    <value xml:space="preserve">Status : Disconnected from Eikon</value>
+  <data name="Status_Disconnected" xml:space="preserve">
+    <value>Status : Disconnected from Eikon</value>
   </data>
-  <data name="Status_Local">
-    <value xml:space="preserve">Status : Eikon local mode</value>
+  <data name="Status_Local" xml:space="preserve">
+    <value>Status : Eikon local mode</value>
   </data>
-  <data name="Status_Offline">
-    <value xml:space="preserve">Status : Offline</value>
+  <data name="Status_Offline" xml:space="preserve">
+    <value>Status : Offline</value>
+  </data>
+  <data name="Initialized_successfully" xml:space="preserve">
+    <value>Initialized successfully</value>
+  </data>
+  <data name="All_chains_loaded" xml:space="preserve">
+    <value>All chains loaded; loading bond descriptions</value>
+  </data>
+  <data name="BondDataLoaded" xml:space="preserve">
+    <value>Bond data loaded, storing into DB</value>
+  </data>
+  <data name="JustTile" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\JustTile.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TileHor" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\TileHor.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TileVer" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\TileVer.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Pin" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Pin.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UnPin" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UnPin.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

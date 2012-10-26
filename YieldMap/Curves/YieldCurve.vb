@@ -370,7 +370,3 @@ Namespace Curves
 
     End Class
 End Namespace
-
-'todo forecasting and modeling this curve!!!!!! 
-' load history and implement HJM !!! 
-' or simple 3-factor model or BDT model or HW model

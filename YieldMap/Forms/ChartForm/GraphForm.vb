@@ -489,6 +489,18 @@ Namespace Forms.ChartForm
 #End Region
 
 #Region "c.3) Other actions"
+        Private Sub PinUnpinTSBClick(sender As Object, e As EventArgs) Handles PinUnpinTSB.Click
+            If ItemDescriptionPanel.Visible Then
+                ItemDescriptionPanel.Visible = False
+                PinUnpinTSB.Image = Pin
+                PinUnpinTSB.ToolTipText = "Show description pane"
+            Else
+                ItemDescriptionPanel.Visible = True
+                PinUnpinTSB.Image = UnPin
+                PinUnpinTSB.ToolTipText = "Hide description pane"
+            End If
+        End Sub
+
         Private Sub ShowLabelsTSBClick(sender As Object, e As EventArgs) Handles ShowLabelsTSB.Click
             Logger.Trace("ShowLabelsTSBClick")
             For Each series As Series In TheChart.Series
@@ -548,7 +560,7 @@ Namespace Forms.ChartForm
             If senderTSMI.Checked Then
                 _spreadBenchmarks.SetBenchmark(SpreadMode.FromString(SpreadCMS.Tag), senderTSMI.Tag)
             Else
-                _spreadBenchmarks.CleanupCurve(CType(senderTSMI.Tag, ICurve).GetName())
+                _spreadBenchmarks.CleanupCurve(CType(senderTSMI.Tag, ICurve))
             End If
             UpdateAxisYTitle(False)
         End Sub
@@ -1596,15 +1608,6 @@ Namespace Forms.ChartForm
 
         Private Sub AddBondCurveTSMIClick(sender As Object, e As EventArgs)
             Logger.Info("AddBondCurveTSMIClick")
-            'Dim cForm = New NewCurveForm()
-            'cForm.ShowDialog()
-
-            'If cForm.DialogResult = DialogResult.OK Then
-            'If cForm.CurveListView.SelectedItems.Count = 0 Then
-            '    MsgBox("Nothing selected")
-            '    Return
-            'End If
-
             Dim selectedItem = CType(CType(sender, ToolStripMenuItem).Tag, CurveDescr)
             Dim ricsInCurve As List(Of String)
 
@@ -1728,7 +1731,7 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub PaintSwapCurve(ByVal curve As SwapCurve, ByVal points As List(Of XY))
-            Logger.Debug("PaintSwapCurve({0}, {1} points)", curve.GetName(), points.Count)
+            Logger.Debug("PaintSwapCurve({0}, {1} points)", curve.GetName(), If(points IsNot Nothing, points.Count, "No"))
 
             GuiAsync(
                 Sub()
@@ -1750,7 +1753,7 @@ Namespace Forms.ChartForm
                         theSeries.LegendText = curve.GetFullName()
                     End If
 
-                    If points.Count < 2 Then
+                    If points Is Nothing OrElse points.Count < 2 Then
                         theSeries.Enabled = False
                         Logger.Info("Too little points to plot")
                         Return
@@ -1778,26 +1781,18 @@ Namespace Forms.ChartForm
                             }
 
                             Select Case curve.BmkSpreadMode
-                                Case SpreadMode.Yield
-                                    theTag.Yld = New YieldStructure With {.Yield = item.Y}
-                                Case SpreadMode.PointSpread
-                                    theTag.PointSpread = item.Y
-                                Case SpreadMode.ZSpread
-                                    theTag.ZSpread = item.Y
-                                Case SpreadMode.ASWSpread
-                                    theTag.ASWSpread = item.Y
+                                Case SpreadMode.Yield : theTag.Yld = New YieldStructure With {.Yield = item.Y}
+                                Case SpreadMode.PointSpread : theTag.PointSpread = item.Y
+                                Case SpreadMode.ZSpread : theTag.ZSpread = item.Y
+                                Case SpreadMode.ASWSpread : theTag.ASWSpread = item.Y
                             End Select
 
-                            'Dim yValue = _spreadBenchmarks.CalculateSpreads(theTag)
-                            'If yValue IsNot Nothing Then
-                            theSeries.Points.Add(
-                                New DataPoint With {
-                                    .Name = String.Format("{0}Y", item.X),
-                                    .XValue = item.X,
-                                    .YValues = {item.Y},
-                                    .Tag = theTag
-                                })
-                            'End If
+                            theSeries.Points.Add(New DataPoint With {
+                                .Name = String.Format("{0}Y", item.X),
+                                .XValue = item.X,
+                                .YValues = {item.Y},
+                                .Tag = theTag
+                            })
                         End Sub)
                 End Sub)
         End Sub
@@ -1835,5 +1830,6 @@ Namespace Forms.ChartForm
         End Sub
 #End Region
 #End Region
+
     End Class
 End Namespace

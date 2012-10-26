@@ -74,10 +74,28 @@ Namespace My.Resources
             End Get
         End Property
         
+        '''<summary>
+        '''  Ищет локализованную строку, похожую на All chains loaded; loading bond descriptions.
+        '''</summary>
+        Friend ReadOnly Property All_chains_loaded() As String
+            Get
+                Return ResourceManager.GetString("All_chains_loaded", resourceCulture)
+            End Get
+        End Property
+        
         Friend ReadOnly Property arrow_rotate_clockwise() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("arrow_rotate_clockwise", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Ищет локализованную строку, похожую на Bond data loaded, storing into DB.
+        '''</summary>
+        Friend ReadOnly Property BondDataLoaded() As String
+            Get
+                Return ResourceManager.GetString("BondDataLoaded", resourceCulture)
             End Get
         End Property
         
@@ -183,6 +201,22 @@ Namespace My.Resources
             End Get
         End Property
         
+        '''<summary>
+        '''  Ищет локализованную строку, похожую на Initialized successfully.
+        '''</summary>
+        Friend ReadOnly Property Initialized_successfully() As String
+            Get
+                Return ResourceManager.GetString("Initialized_successfully", resourceCulture)
+            End Get
+        End Property
+        
+        Friend ReadOnly Property JustTile() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("JustTile", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
         Friend ReadOnly Property Labels() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("Labels", resourceCulture)
@@ -237,6 +271,13 @@ Namespace My.Resources
         Friend ReadOnly Property pencil() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("pencil", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        Friend ReadOnly Property Pin() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("Pin", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
@@ -324,6 +365,27 @@ Namespace My.Resources
         Friend ReadOnly Property text_marked() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("text_marked", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        Friend ReadOnly Property TileHor() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("TileHor", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        Friend ReadOnly Property TileVer() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("TileVer", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        Friend ReadOnly Property UnPin() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("UnPin", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property

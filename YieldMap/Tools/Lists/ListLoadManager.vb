@@ -41,7 +41,14 @@ Namespace Tools.Lists
             Logger.Debug("DiscardTask({0})", taskName)
             If _activeTasks.ContainsKey(taskName) Then
                 Dim descr As ListTaskDescr = _activeTasks(taskName)
-                _listManager.UnregisterItems(descr.GetItemArray())
+                If _listManager IsNot Nothing Then
+                    Try
+                        _listManager.UnregisterItems(descr.GetItemArray())
+                    Catch ex As Exception
+                        Logger.ErrorException("Failed to unregister items", ex)
+                        Logger.Error("Exception = {0}", ex.ToString())
+                    End Try
+                End If
                 _activeTasks.Remove(taskName)
             End If
         End Sub
@@ -56,6 +63,7 @@ Namespace Tools.Lists
                 Return True
             Catch ex As Exception
                 Logger.WarnException("Failed to start loading items", ex)
+                Logger.Warn("Exception = {0}", ex.ToString())
                 Return False
             End Try
         End Function

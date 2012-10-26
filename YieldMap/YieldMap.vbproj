@@ -301,6 +301,7 @@
     <Content Include="Resources\folder.png" />
     <Content Include="Resources\graph_edge_curved.png" />
     <None Include="Resources\Green.png" />
+    <None Include="Resources\JustTile.png" />
     <Content Include="Resources\Labels.png" />
     <Content Include="Resources\media_fast_forward.png" />
     <Content Include="Resources\media_pause.png" />
@@ -308,6 +309,7 @@
     <Content Include="Resources\media_stop_red.png" />
     <None Include="Resources\Orange.png" />
     <Content Include="Resources\pencil.png" />
+    <None Include="Resources\Pin.png" />
     <Content Include="Resources\PlugLarge.png" />
     <None Include="Resources\Red.png" />
     <Content Include="Resources\SettingsLarge.png" />
@@ -315,6 +317,9 @@
     <Content Include="Resources\table2_run.png" />
     <Content Include="Resources\table2_run_small.png" />
     <Content Include="Resources\text_marked.png" />
+    <None Include="Resources\TileVer.png" />
+    <None Include="Resources\TileHor.png" />
+    <None Include="Resources\UnPin.png" />
     <Content Include="Resources\view_1_1.png" />
     <Content Include="Resources\ZoomNext.png" />
     <Content Include="Resources\ZoomPrev.png" />

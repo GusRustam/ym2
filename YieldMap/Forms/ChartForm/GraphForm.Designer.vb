@@ -55,7 +55,7 @@
             Me.RelatedQuoteTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.RelatedChartTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.MainTableLayout = New System.Windows.Forms.TableLayoutPanel()
-            Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
+            Me.ItemDescriptionPanel = New System.Windows.Forms.TableLayoutPanel()
             Me.PVBPLabel = New System.Windows.Forms.Label()
             Me.Label8 = New System.Windows.Forms.Label()
             Me.ASWLabel = New System.Windows.Forms.Label()
@@ -104,11 +104,12 @@
             Me.BidAskCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.RemoveBidAskTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.YAxisCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
+            Me.PinUnpinTSB = New System.Windows.Forms.ToolStripButton()
             Me.TheStatusStrip.SuspendLayout()
             Me.TheToolStrip.SuspendLayout()
             Me.BondCMS.SuspendLayout()
             Me.MainTableLayout.SuspendLayout()
-            Me.TableLayoutPanel1.SuspendLayout()
+            Me.ItemDescriptionPanel.SuspendLayout()
             CType(Me.TheChart, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.ChartCMS.SuspendLayout()
             Me.HistoryCMS.SuspendLayout()
@@ -134,7 +135,7 @@
             '
             'TheToolStrip
             '
-            Me.TheToolStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ZoomAllButton, Me.ZoomCustomButton, Me.ToolStripSeparator3, Me.PortfolioTSSB, Me.CurvesTSMI, Me.ToolStripSeparator2, Me.ShowLegendTSB, Me.ShowLabelsTSB, Me.ToolStripSeparator6, Me.AsTableTSB})
+            Me.TheToolStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ZoomAllButton, Me.ZoomCustomButton, Me.ToolStripSeparator3, Me.PortfolioTSSB, Me.CurvesTSMI, Me.ToolStripSeparator2, Me.ShowLegendTSB, Me.ShowLabelsTSB, Me.ToolStripSeparator6, Me.AsTableTSB, Me.PinUnpinTSB})
             Me.TheToolStrip.Location = New System.Drawing.Point(0, 0)
             Me.TheToolStrip.Name = "TheToolStrip"
             Me.TheToolStrip.Size = New System.Drawing.Size(784, 25)
@@ -315,7 +316,7 @@
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
             Me.MainTableLayout.ColumnCount = 1
             Me.MainTableLayout.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-            Me.MainTableLayout.Controls.Add(Me.TableLayoutPanel1, 0, 0)
+            Me.MainTableLayout.Controls.Add(Me.ItemDescriptionPanel, 0, 0)
             Me.MainTableLayout.Controls.Add(Me.TheChart, 0, 1)
             Me.MainTableLayout.Location = New System.Drawing.Point(0, 28)
             Me.MainTableLayout.Name = "MainTableLayout"
@@ -326,57 +327,57 @@
             Me.MainTableLayout.Size = New System.Drawing.Size(784, 509)
             Me.MainTableLayout.TabIndex = 4
             '
-            'TableLayoutPanel1
+            'ItemDescriptionPanel
             '
-            Me.TableLayoutPanel1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Me.ItemDescriptionPanel.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                 Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-            Me.TableLayoutPanel1.AutoSize = True
-            Me.TableLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
-            Me.TableLayoutPanel1.BackColor = System.Drawing.SystemColors.Control
-            Me.TableLayoutPanel1.ColumnCount = 6
-            Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-            Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
-            Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-            Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
-            Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
-            Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
-            Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-            Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-            Me.TableLayoutPanel1.Controls.Add(Me.PVBPLabel, 3, 3)
-            Me.TableLayoutPanel1.Controls.Add(Me.Label8, 2, 3)
-            Me.TableLayoutPanel1.Controls.Add(Me.ASWLabel, 5, 2)
-            Me.TableLayoutPanel1.Controls.Add(Me.OASLabel, 5, 3)
-            Me.TableLayoutPanel1.Controls.Add(Me.CpnLabel, 1, 3)
-            Me.TableLayoutPanel1.Controls.Add(Me.Label3, 2, 1)
-            Me.TableLayoutPanel1.Controls.Add(Me.DurLabel, 3, 1)
-            Me.TableLayoutPanel1.Controls.Add(Me.SpreadLabel, 5, 0)
-            Me.TableLayoutPanel1.Controls.Add(Me.DscrLabel, 1, 1)
-            Me.TableLayoutPanel1.Controls.Add(Me.Label6, 0, 0)
-            Me.TableLayoutPanel1.Controls.Add(Me.DatLabel, 1, 0)
-            Me.TableLayoutPanel1.Controls.Add(Me.Label1, 2, 0)
-            Me.TableLayoutPanel1.Controls.Add(Me.YldLabel, 3, 0)
-            Me.TableLayoutPanel1.Controls.Add(Me.ZSpreadLabel, 5, 1)
-            Me.TableLayoutPanel1.Controls.Add(Me.Label2, 0, 1)
-            Me.TableLayoutPanel1.Controls.Add(Me.LinkSpreadLabel, 4, 0)
-            Me.TableLayoutPanel1.Controls.Add(Me.ZSpreadLinkLabel, 4, 1)
-            Me.TableLayoutPanel1.Controls.Add(Me.Label4, 2, 2)
-            Me.TableLayoutPanel1.Controls.Add(Me.ASWLinkLabel, 4, 2)
-            Me.TableLayoutPanel1.Controls.Add(Me.Label5, 0, 2)
-            Me.TableLayoutPanel1.Controls.Add(Me.MatLabel, 1, 2)
-            Me.TableLayoutPanel1.Controls.Add(Me.ConvLabel, 3, 2)
-            Me.TableLayoutPanel1.Controls.Add(Me.Label7, 0, 3)
-            Me.TableLayoutPanel1.Controls.Add(Me.LinkLabel1, 4, 3)
-            Me.TableLayoutPanel1.Location = New System.Drawing.Point(3, 3)
-            Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
-            Me.TableLayoutPanel1.RowCount = 4
-            Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-            Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-            Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-            Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-            Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-            Me.TableLayoutPanel1.Size = New System.Drawing.Size(778, 80)
-            Me.TableLayoutPanel1.TabIndex = 4
+            Me.ItemDescriptionPanel.AutoSize = True
+            Me.ItemDescriptionPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+            Me.ItemDescriptionPanel.BackColor = System.Drawing.SystemColors.Control
+            Me.ItemDescriptionPanel.ColumnCount = 6
+            Me.ItemDescriptionPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+            Me.ItemDescriptionPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
+            Me.ItemDescriptionPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+            Me.ItemDescriptionPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
+            Me.ItemDescriptionPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle())
+            Me.ItemDescriptionPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
+            Me.ItemDescriptionPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+            Me.ItemDescriptionPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+            Me.ItemDescriptionPanel.Controls.Add(Me.PVBPLabel, 3, 3)
+            Me.ItemDescriptionPanel.Controls.Add(Me.Label8, 2, 3)
+            Me.ItemDescriptionPanel.Controls.Add(Me.ASWLabel, 5, 2)
+            Me.ItemDescriptionPanel.Controls.Add(Me.OASLabel, 5, 3)
+            Me.ItemDescriptionPanel.Controls.Add(Me.CpnLabel, 1, 3)
+            Me.ItemDescriptionPanel.Controls.Add(Me.Label3, 2, 1)
+            Me.ItemDescriptionPanel.Controls.Add(Me.DurLabel, 3, 1)
+            Me.ItemDescriptionPanel.Controls.Add(Me.SpreadLabel, 5, 0)
+            Me.ItemDescriptionPanel.Controls.Add(Me.DscrLabel, 1, 1)
+            Me.ItemDescriptionPanel.Controls.Add(Me.Label6, 0, 0)
+            Me.ItemDescriptionPanel.Controls.Add(Me.DatLabel, 1, 0)
+            Me.ItemDescriptionPanel.Controls.Add(Me.Label1, 2, 0)
+            Me.ItemDescriptionPanel.Controls.Add(Me.YldLabel, 3, 0)
+            Me.ItemDescriptionPanel.Controls.Add(Me.ZSpreadLabel, 5, 1)
+            Me.ItemDescriptionPanel.Controls.Add(Me.Label2, 0, 1)
+            Me.ItemDescriptionPanel.Controls.Add(Me.LinkSpreadLabel, 4, 0)
+            Me.ItemDescriptionPanel.Controls.Add(Me.ZSpreadLinkLabel, 4, 1)
+            Me.ItemDescriptionPanel.Controls.Add(Me.Label4, 2, 2)
+            Me.ItemDescriptionPanel.Controls.Add(Me.ASWLinkLabel, 4, 2)
+            Me.ItemDescriptionPanel.Controls.Add(Me.Label5, 0, 2)
+            Me.ItemDescriptionPanel.Controls.Add(Me.MatLabel, 1, 2)
+            Me.ItemDescriptionPanel.Controls.Add(Me.ConvLabel, 3, 2)
+            Me.ItemDescriptionPanel.Controls.Add(Me.Label7, 0, 3)
+            Me.ItemDescriptionPanel.Controls.Add(Me.LinkLabel1, 4, 3)
+            Me.ItemDescriptionPanel.Location = New System.Drawing.Point(3, 3)
+            Me.ItemDescriptionPanel.Name = "ItemDescriptionPanel"
+            Me.ItemDescriptionPanel.RowCount = 4
+            Me.ItemDescriptionPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+            Me.ItemDescriptionPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+            Me.ItemDescriptionPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+            Me.ItemDescriptionPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+            Me.ItemDescriptionPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+            Me.ItemDescriptionPanel.Size = New System.Drawing.Size(778, 80)
+            Me.ItemDescriptionPanel.TabIndex = 4
             '
             'PVBPLabel
             '
@@ -818,6 +819,17 @@
             Me.YAxisCMS.Name = "YAxisCMS"
             Me.YAxisCMS.Size = New System.Drawing.Size(61, 4)
             '
+            'PinUnpinTSB
+            '
+            Me.PinUnpinTSB.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+            Me.PinUnpinTSB.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+            Me.PinUnpinTSB.Image = Global.YieldMap.My.Resources.Resources.UnPin
+            Me.PinUnpinTSB.ImageTransparentColor = System.Drawing.Color.Magenta
+            Me.PinUnpinTSB.Name = "PinUnpinTSB"
+            Me.PinUnpinTSB.Size = New System.Drawing.Size(23, 22)
+            Me.PinUnpinTSB.Text = "ToolStripButton1"
+            Me.PinUnpinTSB.ToolTipText = "Hide description pane"
+            '
             'GraphForm
             '
             Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -837,8 +849,8 @@
             Me.BondCMS.ResumeLayout(False)
             Me.MainTableLayout.ResumeLayout(False)
             Me.MainTableLayout.PerformLayout()
-            Me.TableLayoutPanel1.ResumeLayout(False)
-            Me.TableLayoutPanel1.PerformLayout()
+            Me.ItemDescriptionPanel.ResumeLayout(False)
+            Me.ItemDescriptionPanel.PerformLayout()
             CType(Me.TheChart, System.ComponentModel.ISupportInitialize).EndInit()
             Me.ChartCMS.ResumeLayout(False)
             Me.HistoryCMS.ResumeLayout(False)
@@ -869,7 +881,7 @@
         Friend WithEvents MainTableLayout As System.Windows.Forms.TableLayoutPanel
         Friend WithEvents TheChart As System.Windows.Forms.DataVisualization.Charting.Chart
         Friend WithEvents ResizePictureBox As System.Windows.Forms.PictureBox
-        Friend WithEvents TableLayoutPanel1 As System.Windows.Forms.TableLayoutPanel
+        Friend WithEvents ItemDescriptionPanel As System.Windows.Forms.TableLayoutPanel
         Friend WithEvents Label1 As System.Windows.Forms.Label
         Friend WithEvents DurLabel As System.Windows.Forms.Label
         Friend WithEvents SpreadLabel As System.Windows.Forms.Label
@@ -928,5 +940,6 @@
         Friend WithEvents RubIRSTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents RubCCSTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents NDFTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents PinUnpinTSB As System.Windows.Forms.ToolStripButton
     End Class
 End Namespace

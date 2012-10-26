@@ -33,6 +33,9 @@ Namespace Forms
             Me.DatabaseButton = New System.Windows.Forms.ToolStripButton()
             Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
             Me.SettingsButton = New System.Windows.Forms.ToolStripButton()
+            Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator()
+            Me.TileHorTSB = New System.Windows.Forms.ToolStripButton()
+            Me.TileVerTSB = New System.Windows.Forms.ToolStripButton()
             Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
             Me.StatusPicture = New System.Windows.Forms.ToolStripStatusLabel()
             Me.StatusLabel = New System.Windows.Forms.ToolStripStatusLabel()
@@ -47,7 +50,7 @@ Namespace Forms
             '
             'MainToolStrip
             '
-            Me.MainToolStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ConnectButton, Me.YieldMapButton, Me.ToolStripSeparator1, Me.DatabaseButton, Me.ToolStripSeparator2, Me.SettingsButton})
+            Me.MainToolStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ConnectButton, Me.YieldMapButton, Me.ToolStripSeparator1, Me.DatabaseButton, Me.ToolStripSeparator2, Me.SettingsButton, Me.ToolStripSeparator3, Me.TileHorTSB, Me.TileVerTSB})
             Me.MainToolStrip.Location = New System.Drawing.Point(0, 0)
             Me.MainToolStrip.Name = "MainToolStrip"
             Me.MainToolStrip.Size = New System.Drawing.Size(792, 39)
@@ -111,6 +114,32 @@ Namespace Forms
             Me.SettingsButton.Text = "SettingsButton"
             Me.SettingsButton.ToolTipText = "Settings"
             Me.SettingsButton.Visible = False
+            '
+            'ToolStripSeparator3
+            '
+            Me.ToolStripSeparator3.Name = "ToolStripSeparator3"
+            Me.ToolStripSeparator3.Size = New System.Drawing.Size(6, 39)
+            '
+            'TileHorTSB
+            '
+            Me.TileHorTSB.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+            Me.TileHorTSB.Image = Global.YieldMap.My.Resources.Resources.TileHor
+            Me.TileHorTSB.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
+            Me.TileHorTSB.ImageTransparentColor = System.Drawing.Color.Magenta
+            Me.TileHorTSB.Name = "TileHorTSB"
+            Me.TileHorTSB.Size = New System.Drawing.Size(36, 36)
+            Me.TileHorTSB.Text = "Tile horizontally"
+            '
+            'TileVerTSB
+            '
+            Me.TileVerTSB.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+            Me.TileVerTSB.Image = Global.YieldMap.My.Resources.Resources.TileVer
+            Me.TileVerTSB.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
+            Me.TileVerTSB.ImageTransparentColor = System.Drawing.Color.Magenta
+            Me.TileVerTSB.Name = "TileVerTSB"
+            Me.TileVerTSB.Size = New System.Drawing.Size(36, 36)
+            Me.TileVerTSB.Text = "ToolStripButton2"
+            Me.TileVerTSB.ToolTipText = "Tile vertically"
             '
             'StatusStrip1
             '
@@ -189,6 +218,9 @@ Namespace Forms
         Friend WithEvents InitEventLabel As System.Windows.Forms.ToolStripStatusLabel
         Friend WithEvents CMS As System.Windows.Forms.ContextMenuStrip
         Friend WithEvents LogSettingsTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents ToolStripSeparator3 As System.Windows.Forms.ToolStripSeparator
+        Friend WithEvents TileHorTSB As System.Windows.Forms.ToolStripButton
+        Friend WithEvents TileVerTSB As System.Windows.Forms.ToolStripButton
 
     End Class
 End Namespace

@@ -161,7 +161,6 @@ Namespace Tools.History
                 With _historyManager
                     .Source = "IDN"
                     .ItemName = descr.Item
-                    'Logger.Debug("[{0}] [{1}] [{2}]", .ItemName, .Mode, descr.Fields.Aggregate("", Function(str, item) str + ", " + item))
                     .RequestHistory(descr.Fields.Aggregate(Function(str, elem) str + ", " + elem))
                     AddHandler NewData, handler
                     .ErrorMode = AdxErrorMode.EXCEPTION
@@ -256,8 +255,13 @@ Namespace Tools.History
 
         Public Sub StopTask()
             RemoveHandler _historyManager.OnUpdate, AddressOf OnNewData
-            _historyManager.FlushData()
-            _historyManager = Nothing
+            Try
+                _historyManager.FlushData()
+                _historyManager = Nothing
+            Catch ex As Exception
+                Logger.WarnException("Failed to stop task", ex)
+                Logger.Warn("Exception = {0}", ex.ToString())
+            End Try
         End Sub
     End Class
 End NameSpace
