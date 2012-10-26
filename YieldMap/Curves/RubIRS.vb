@@ -174,7 +174,8 @@ Namespace Curves
                         Dim yieldDuration = New YieldDuration() With {
                            .Yield = aYield / 100,
                            .Duration = GetDuration(ric),
-                           .RIC = ric
+                           .RIC = ric,
+                           .YieldAtDate = lastDate
                        }
                         AddCurveItem(yieldDuration)
                     Else
@@ -208,7 +209,8 @@ Namespace Curves
                         ' define yield curve elem
                         Dim yieldDuration = New YieldDuration() With {
                             .Duration = GetDuration(ric),
-                            .RIC = ric
+                            .RIC = ric,
+                            .YieldAtDate = _theDate
                         }
 
                         If ricAndFieldValue.Value.Keys.Contains("393") Or ricAndFieldValue.Value.Keys.Contains("275") Then
@@ -340,7 +342,7 @@ Namespace Curves
 
         Public Overrides Function GetCurveData() As List(Of XY)
             Dim crv = CalculateSpread(CurveData)
-            Return XY.ConvertToXY(If(_bootstrapped, Bootstrap(crv), crv), BmkSpreadMode)
+            Return If(crv Is Nothing, crv, XY.ConvertToXY(If(_bootstrapped, Bootstrap(crv), crv), BmkSpreadMode))
         End Function
 
         '' OVERRIDEN METHODS
@@ -381,7 +383,7 @@ Namespace Curves
 
         Public Overrides Function CalculateSpread(ByVal data As List(Of YieldDuration)) As List(Of YieldDuration)
             If BmkSpreadMode Is Nothing Or Benchmark Is Nothing Then Return data
-            If Benchmark.Equals(Me) Then Return data
+            If Benchmark.Equals(Me) Then Return Nothing
 
             Select Case BmkSpreadMode
                 Case SpreadMode.PointSpread
@@ -391,7 +393,8 @@ Namespace Curves
                                         Benchmark.ToArray(),
                                         New DataPointDescr() With {
                                             .Yld = New YieldStructure() With {.Yield = elem.Yield},
-                                            .Duration = elem.Duration
+                                            .Duration = elem.Duration,
+                                            .YieldAtDate = elem.YieldAtDate
                                         })
                                 End Sub)
                     Return res

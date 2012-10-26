@@ -120,10 +120,6 @@ Namespace Forms.ChartForm
                 Sub(srs)
                     If TypeOf srs.Tag Is BondPointsSeries Then 'todo history / bidask
                         srs.Points.ToList.ForEach(Sub(pnt) RecalcPoint(pnt, mode))
-                        'ElseIf TypeOf srs.Tag Is SwapCurveSeries Then
-                        '    Dim crvSrs = CType(srs.Tag, SwapCurveSeries)
-                        '    Dim crv = crvSrs.SwpCurve
-                        '    crv.SetModeAndBenchmark(mode, If(mode <> SpreadMode.Yield, _spreadBenchmarks.Benchmarks(mode), Nothing))
                     End If
                 End Sub
             )
