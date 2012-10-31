@@ -269,10 +269,19 @@ Namespace Forms.ChartForm
             If TypeOf descr Is BondPointDescr Then
                 Dim tag As BondPointDescr = CType(descr, BondPointDescr)
                 tag.PointSpread = PointSpread(iSpreadMainCurve.ToArray(), tag)
-            ElseIf TypeOf descr Is BidAskPointDescr And Benchmarks.ContainsKey(SpreadMode.ZSpread) Then
+            ElseIf TypeOf descr Is BidAskPointDescr Then
                 Dim data = CType(descr, BidAskPointDescr)
                 Dim tag As BondPointDescr = New BondPointDescr(data.BondTag)
                 tag.CalcPrice = data.Price
+                tag.Duration = data.Duration
+                tag.Yld = data.Yld
+                data.PointSpread = PointSpread(iSpreadMainCurve.ToArray(), tag)
+            ElseIf TypeOf descr Is HistCurvePointDescr Then
+                Dim data = CType(descr, HistCurvePointDescr)
+                Dim tag As BondPointDescr = New BondPointDescr(data.BondTag)
+                tag.CalcPrice = data.Price
+                tag.Duration = data.Duration
+                tag.Yld = data.Yld
                 data.PointSpread = PointSpread(iSpreadMainCurve.ToArray(), tag)
             End If
         End Sub
@@ -283,10 +292,17 @@ Namespace Forms.ChartForm
             If TypeOf descr Is BondPointDescr Then
                 Dim tag As BondPointDescr = CType(descr, BondPointDescr)
                 tag.ASWSpread = ASWSpread(aswSpreadMainCurve.ToArray(), bmk.FloatLegStructure, bmk.FloatingPointValue, tag)
-            ElseIf TypeOf descr Is BidAskPointDescr And Benchmarks.ContainsKey(SpreadMode.ASWSpread) Then
+            ElseIf TypeOf descr Is BidAskPointDescr Then
                 Dim data = CType(descr, BidAskPointDescr)
                 Dim tag As BondPointDescr = New BondPointDescr(data.BondTag)
                 tag.CalcPrice = data.Price
+                tag.Duration = data.Duration
+                data.ASWSpread = ASWSpread(aswSpreadMainCurve.ToArray(), bmk.FloatLegStructure, bmk.FloatingPointValue, tag)
+            ElseIf TypeOf descr Is HistCurvePointDescr Then
+                Dim data = CType(descr, HistCurvePointDescr)
+                Dim tag As BondPointDescr = New BondPointDescr(data.BondTag)
+                tag.CalcPrice = data.Price
+                tag.Duration = data.Duration
                 data.ASWSpread = ASWSpread(aswSpreadMainCurve.ToArray(), bmk.FloatLegStructure, bmk.FloatingPointValue, tag)
             End If
         End Sub
@@ -296,10 +312,17 @@ Namespace Forms.ChartForm
             If TypeOf descr Is BondPointDescr Then
                 Dim tag As BondPointDescr = CType(descr, BondPointDescr)
                 tag.ZSpread = ZSpread(zSpreadMainCurve.ToArray(), tag)
-            ElseIf TypeOf descr Is BidAskPointDescr And Benchmarks.ContainsKey(SpreadMode.ZSpread) Then
+            ElseIf TypeOf descr Is HistCurvePointDescr Then
+                Dim data As HistCurvePointDescr = CType(descr, HistCurvePointDescr)
+                Dim tag As BondPointDescr = New BondPointDescr(data.BondTag)
+                tag.CalcPrice = data.Price
+                tag.Duration = data.Duration
+                data.ZSpread = ZSpread(zSpreadMainCurve.ToArray(), tag)
+            ElseIf TypeOf descr Is BidAskPointDescr Then
                 Dim data = CType(descr, BidAskPointDescr)
                 Dim tag As BondPointDescr = New BondPointDescr(data.BondTag)
                 tag.CalcPrice = data.Price
+                tag.Duration = data.Duration
                 data.ZSpread = ZSpread(zSpreadMainCurve.ToArray(), tag)
             End If
         End Sub
@@ -438,10 +461,6 @@ Namespace Forms.ChartForm
         Public Coupon As Double
 
         Public YieldSource As YieldSource
-        'Public YieldAtDate As DateTime
-        'Public YieldToDate As DateTime
-
-        'Public ToWhat As YieldToWhat
 
         Public CalcPrice As Double
 
@@ -577,9 +596,8 @@ Namespace Forms.ChartForm
 
         Public HistCurveName As String
         Public RIC As String
-        'Public YieldAtDate As DateTime
-        Public YieldToDate As DateTime
-        Public BaseBondName As String
+        Public BondTag As BondPointDescr
+        Public Price As Double
 
         Public Overrides Function ToString() As String
             Return RIC

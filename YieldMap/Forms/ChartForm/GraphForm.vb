@@ -118,7 +118,7 @@ Namespace Forms.ChartForm
             Logger.Trace("RecalcSpread({0})", mode)
             TheChart.Series.ToList.ForEach(
                 Sub(srs)
-                    If TypeOf srs.Tag Is BondPointsSeries Then 'todo history / bidask
+                    If TypeOf srs.Tag Is BondPointsSeries OrElse TypeOf srs.Tag Is HistCurveSeries Then
                         srs.Points.ToList.ForEach(Sub(pnt) RecalcPoint(pnt, mode))
                     End If
                 End Sub
@@ -130,7 +130,7 @@ Namespace Forms.ChartForm
             Dim storeOld = oldMode.Equals(SpreadMode.Yield) OrElse _spreadBenchmarks.Benchmarks.ContainsKey(oldMode)
             TheChart.Series.ToList.ForEach(
                 Sub(srs)
-                    If TypeOf srs.Tag Is BondPointsSeries Then 'todo history / bidask
+                    If TypeOf srs.Tag Is BondPointsSeries OrElse TypeOf srs.Tag Is HistCurveSeries OrElse TypeOf srs.Tag Is BidAskSeries Then
                         srs.Points.ToList.ForEach(Sub(pnt) ReplotPoint(pnt, newMode, oldMode, storeOld))
                     ElseIf TypeOf srs.Tag Is SwapCurveSeries Then
                         Dim crvSrs = CType(srs.Tag, SwapCurveSeries)
@@ -140,6 +140,7 @@ Namespace Forms.ChartForm
                 End Sub
             )
             SetYAxisMode(newMode.ToString())
+            SetChartMinMax()
         End Sub
 
         Private Sub RecalcPoint(ByVal pnt As DataPoint, ByVal newMode As SpreadMode)
@@ -426,10 +427,10 @@ Namespace Forms.ChartForm
         Private Sub SetYAxisMode(ByVal str As String)
             Try
                 Select Case str
-                    Case SpreadMode.Yield.ToString() : MakeAxisY("Yield, %", "P2", 0.01, 0.005)
-                    Case SpreadMode.ASWSpread.ToString() : MakeAxisY("ASW Spread, b.p.", "N0", 10, 5)
-                    Case SpreadMode.PointSpread.ToString() : MakeAxisY("Spread, b.p.", "N0", 10, 5)
-                    Case SpreadMode.ZSpread.ToString() : MakeAxisY("Z-Spread, b.p.", "N0", 10, 5)
+                    Case SpreadMode.Yield.ToString() : MakeAxisY("Yield, %", "P2")
+                    Case SpreadMode.ASWSpread.ToString() : MakeAxisY("ASW Spread, b.p.", "N0")
+                    Case SpreadMode.PointSpread.ToString() : MakeAxisY("Spread, b.p.", "N0")
+                    Case SpreadMode.ZSpread.ToString() : MakeAxisY("Z-Spread, b.p.", "N0")
                 End Select
                 TheChart.ChartAreas(0).AxisX.ScaleView.ZoomReset()
                 TheChart.ChartAreas(0).AxisY.ScaleView.ZoomReset()
@@ -442,44 +443,46 @@ Namespace Forms.ChartForm
         ' these methods simply update the chart by selecting appropriate y-coordinates for points
         Private Sub SetChartMinMax()
             Logger.Debug("SetChartMinMax()")
-            GuiAsync(Sub()
-                         With TheChart.ChartAreas(0).AxisY
-                             Try
-                                 Dim newMax = (From srs In TheChart.Series Where srs.Enabled And srs.Points.Any
-                                     Select (From pnt In srs.Points Select pnt.YValues.First).Max).Max 'Where Not pnt.IsEmpty
+            GuiAsync(
+                Sub()
+                    With TheChart.ChartAreas(0).AxisY
+                        Try
+                            Dim newMax = (From srs In TheChart.Series Where srs.Enabled And srs.Points.Any
+                                Select (From pnt In srs.Points Select pnt.YValues.First).Max).Max 'Where Not pnt.IsEmpty
 
-                                 Dim newMin As Double
-                                 If _spreadBenchmarks.CurrentMode.Equals(SpreadMode.Yield) Then
-                                     newMin = (From srs In TheChart.Series Where srs.Enabled And srs.Points.Any
-                                             Select (From pnt In srs.Points Where pnt.YValues.First > 0 Select pnt.YValues.First).Min).Min
-                                 Else
-                                     newMin = (From srs In TheChart.Series Where srs.Enabled And srs.Points.Any
-                                               Select (From pnt In srs.Points Select pnt.YValues.First).Min).Min
-                                 End If
+                            Dim newMin As Double
+                            If _spreadBenchmarks.CurrentMode.Equals(SpreadMode.Yield) Then
+                                newMin = (From srs In TheChart.Series Where srs.Enabled And srs.Points.Any
+                                        Select (From pnt In srs.Points Where pnt.YValues.First > 0 Select pnt.YValues.First).Min).Min
+                            Else
+                                newMin = (From srs In TheChart.Series Where srs.Enabled And srs.Points.Any
+                                          Select (From pnt In srs.Points Select pnt.YValues.First).Min).Min
+                            End If
 
-                                 If newMax > newMin Then
-                                     .Maximum = newMax
-                                     .Minimum = newMin
-                                 End If
-                                 Dim x As Series = TheChart.Series.FindByName("start")
-                                 If x IsNot Nothing Then
-                                     TheChart.Series.Remove(x)
-                                 End If
-                             Catch ex As Exception
-                                 Logger.InfoException("Failed to set minmax", ex)
-                                 Logger.Info("Exception = {0}", ex.ToString())
-                             End Try
-                         End With
-                     End Sub)
+                            If newMax > newMin Then
+                                .Maximum = newMax
+                                .Minimum = newMin
+                                .MinorGrid.Interval = (.Maximum - .Minimum) / 20
+                                .MajorGrid.Interval = (.Maximum - .Minimum) / 10
+                            End If
+
+                            Dim x As Series = TheChart.Series.FindByName("start")
+                            If x IsNot Nothing Then
+                                TheChart.Series.Remove(x)
+                            End If
+
+                        Catch ex As Exception
+                            Logger.InfoException("Failed to set minmax", ex)
+                            Logger.Info("Exception = {0}", ex.ToString())
+                        End Try
+                    End With
+                End Sub)
         End Sub
 
-        Private Sub MakeAxisY(ByVal title As String, ByVal format As String, ByVal stepBig As Double,
-                              ByVal stepSmall As Double)
+        Private Sub MakeAxisY(ByVal title As String, ByVal format As String)
             With TheChart.ChartAreas(0).AxisY
                 .Title = title
                 .LabelStyle.Format = format
-                .MajorGrid.Interval = stepBig
-                .MinorGrid.Interval = stepSmall
             End With
         End Sub
 #End Region
@@ -600,7 +603,7 @@ Namespace Forms.ChartForm
 
                     ElseIf TypeOf point.Tag Is HistCurvePointDescr Then
                         Dim historyDataPoint = CType(point.Tag, HistCurvePointDescr)
-                        DscrLabel.Text = historyDataPoint.BaseBondName
+                        DscrLabel.Text = historyDataPoint.BondTag.ShortName
                         DatLabel.Text = String.Format("{0:dd/MM/yyyy}", historyDataPoint.YieldAtDate)
                         ConvLabel.Text = String.Format("{0:F2}", historyDataPoint.Convexity)
 
@@ -774,7 +777,7 @@ Namespace Forms.ChartForm
             Logger.Trace("ResizePictureBoxMouseLeave")
             If ZoomCustomButton.Checked And _isResizing Then
                 StopResize()
-                StatusMessage.Text = "Finished cancelled"
+                StatusMessage.Text = "Resize cancelled"
             End If
         End Sub
 
@@ -1463,22 +1466,23 @@ Namespace Forms.ChartForm
             Logger.Trace("ShowHistQuotesTSMIClick")
             Try
                 '1) Load history for 10 days
-                _historicalCurves.AddCurve(BondCMS.Tag + "_HIST",
+                _historicalCurves.AddCurve(BondCMS.Tag,
                                            New HistoryTaskDescr() With {
                                                 .Item = BondCMS.Tag,
                                                 .EndDate = DateTime.Today,
                                                 .StartDate = DateTime.Today.AddDays(-90),
-                                                .Frequency = "W",
-                                                .InterestingFields = {"CLOSE"}.ToList()
+                                                .Fields = {"DATE", "CLOSE"}.ToList(),
+                                                .Frequency = "D",
+                                                .InterestingFields = {"DATE", "CLOSE"}.ToList()
                                             })
-                '2) Take this bond series and add other points into it. They must be ordered by date (regardless of direction)
             Catch ex As Exception
-                Logger.ErrorException("", ex)
+                Logger.ErrorException("Got exception", ex)
+                Logger.Error("Exception = {0}", ex.ToString())
             End Try
         End Sub
 
         Private Sub OnCurveRemoved(ByVal theName As String)
-            Dim item = TheChart.Series.FindByName(theName)
+            Dim item = TheChart.Series.FindByName(theName + "_HIST_CURVE")
             If item IsNot Nothing Then
                 item.Points.Clear()
                 TheChart.Series.Remove(item)
@@ -1514,17 +1518,17 @@ Namespace Forms.ChartForm
                             }
                         End If
 
-                        Dim baseBondName = _ansamble.GetBondDescription(ric).ShortName
-                        For Each yieldDur As DataPointDescr In _
+                        For Each yieldDur As Tuple(Of Double, DataPointDescr) In _
                             From bondHistoryDescr In data
                             Where bondHistoryDescr.Value.Close > 0
-                            Select CalcYield(bondHistoryDescr.Value.Close, bondHistoryDescr.Key, _ansamble.GetBondDescription(ric))
+                            Select New Tuple(Of Double, DataPointDescr)(bondHistoryDescr.Value.Close, CalcYield(bondHistoryDescr.Value.Close, bondHistoryDescr.Key, _ansamble.GetBondDescription(ric)))
 
                             Dim point As New DataPoint
-                            Dim duration = yieldDur.Duration
-                            Dim convex = yieldDur.Convexity
-                            Dim pvbp = yieldDur.PVBP
-                            Dim bestYield = yieldDur.Yld
+                            Dim duration = yieldDur.Item2.Duration
+                            Dim convex = yieldDur.Item2.Convexity
+                            Dim pvbp = yieldDur.Item2.PVBP
+                            Dim bestYield = yieldDur.Item2.Yld
+                            Dim thePrice = yieldDur.Item1
 
                             Dim theTag = New HistCurvePointDescr With {
                                 .Duration = duration,
@@ -1533,9 +1537,10 @@ Namespace Forms.ChartForm
                                 .PVBP = pvbp,
                                 .RIC = ric,
                                 .HistCurveName = ric + "_HIST_CURVE",
-                                .BaseBondName = baseBondName
+                                .Price = thePrice,
+                                .BondTag = _ansamble.GetBondDescription(ric)
                             }
-                            '.YieldToDate = bestYield.YieldAtDate,
+
                             Dim yValue = _spreadBenchmarks.CalculateSpreads(theTag)
                             If yValue IsNot Nothing Then
                                 With point

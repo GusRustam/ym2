@@ -284,7 +284,7 @@ Namespace Tools.Estimation
     Public Class CubicSpline
         Public Function Interpolate(ByVal xv As List(Of Double), ByVal yv As List(Of Double)) As List(Of XY)
             Dim spline As New CubicSplineInterpolation(xv, yv)
-            Return Commons.GetRange(xv.Min, xv.Max, 300).Select(Function(anX) New XY With {.X = anX, .Y = spline.Interpolate(anX)})
+            Return Commons.GetRange(xv.Min, xv.Max, 300).Select(Function(anX) New XY With {.X = anX, .Y = spline.Interpolate(anX)}).ToList()
         End Function
     End Class
 

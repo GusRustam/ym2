@@ -156,7 +156,7 @@ Namespace Tools.History
                         "NBEVENTS:1 FRQ:{0} HEADER:YES START:{1:ddMMMyy}", descr.Frequency, descr.StartDate).ToUpper()
                 Else
                     _historyManager.Mode = String.Format(CultureInfo.CreateSpecificCulture("en-US"),
-                        "ZERO:SKIP FRQ:{0} HEADER:YES START:{1:ddMMMyy} END:{2:ddMMMyy}", descr.Frequency, descr.StartDate, descr.EndDate).ToUpper()
+                        "FRQ:{0} HEADER:YES START:{1:ddMMMyy} END:{2:ddMMMyy}", descr.Frequency, descr.StartDate, descr.EndDate).ToUpper()
                 End If
                 With _historyManager
                     .Source = "IDN"

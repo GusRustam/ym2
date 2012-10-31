@@ -30,6 +30,7 @@ Namespace Forms
                 Return _initialized
             End Get
             Set(value As Boolean)
+                Logger.Warn("Initialized <- {0}", value)
                 If value Then GuiAsync(Sub() InitEventLabel.Text = Initialized_successfully)
                 _initialized = value
                 YieldMapButton.Enabled = value
@@ -134,7 +135,7 @@ Namespace Forms
             Select Case eEikonStatus
                 Case eEikonStatus.Connected
                     ConnectButton.Enabled = False
-                    YieldMapButton.Enabled = True
+                    'YieldMapButton.Enabled = True
                     StatusPicture.Image = Green
                     StatusLabel.Text = Status_Connected
 
