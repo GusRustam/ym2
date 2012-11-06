@@ -2,7 +2,6 @@
 Imports YieldMap.Commons
 
 Namespace Forms
-
     Public Class UnhandledExcForm
         Private Sub CloseButtonClick(sender As Object, e As EventArgs) Handles CloseButton.Click
             Close()
@@ -10,7 +9,7 @@ Namespace Forms
 
         Private Sub SendErrorReportButtonClick(sender As Object, e As EventArgs) Handles SendErrorReportButton.Click
             Try
-                Dim logName = GetMyPath() + "\\" + LogFileName
+                Dim logName = GetMyPath() + "\" + LogFileName
                 Dim mail As New MAPI
                 mail.AddRecipientTo("rustam.guseynov@thomsonreuters.com")
                 If File.Exists(logName) Then mail.AddAttachment(logName)

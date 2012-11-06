@@ -1,4 +1,5 @@
 ﻿Imports System.Data.SQLite
+Imports System.IO
 Imports YieldMap.Commons
 Imports YieldMap.My.Resources
 Imports YieldMap.Forms.ChartForm
@@ -561,7 +562,16 @@ Namespace Forms
 #End Region
 
         Private Shared Sub RaiseExcTSMIClick(sender As Object, e As EventArgs) Handles RaiseExcTSMI.Click
-            Throw New Exception("To kill")
+            Dim logName = GetMyPath() + "\" + LogFileName
+            Try
+                Dim mail As New MAPI
+                mail.AddRecipientTo("rustam.guseynov@thomsonreuters.com")
+                If File.Exists(logName) Then mail.AddAttachment(logName)
+                mail.SendMailPopup("Yield Map Log", "Here's log file")
+            Catch ex As Exception
+                Process.Start("mailto:rustam.guseynov@thomsonreuters.com?subject=YieldMap%20Log&body=Please,%20manually%20attach%20log%20located%20at%20" + logName.Replace(" ", "%20").Replace("\\", "\"))
+            End Try
         End Sub
+
     End Class
 End Namespace

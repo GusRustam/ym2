@@ -177,19 +177,19 @@ Namespace Forms
             '
             Me.CMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LogSettingsTSMI, Me.RaiseExcTSMI})
             Me.CMS.Name = "CMS"
-            Me.CMS.Size = New System.Drawing.Size(182, 70)
+            Me.CMS.Size = New System.Drawing.Size(191, 70)
             '
             'LogSettingsTSMI
             '
             Me.LogSettingsTSMI.Name = "LogSettingsTSMI"
-            Me.LogSettingsTSMI.Size = New System.Drawing.Size(181, 22)
+            Me.LogSettingsTSMI.Size = New System.Drawing.Size(190, 22)
             Me.LogSettingsTSMI.Text = "Edit logging settings"
             '
             'RaiseExcTSMI
             '
             Me.RaiseExcTSMI.Name = "RaiseExcTSMI"
-            Me.RaiseExcTSMI.Size = New System.Drawing.Size(181, 22)
-            Me.RaiseExcTSMI.Text = "Raise exception"
+            Me.RaiseExcTSMI.Size = New System.Drawing.Size(190, 22)
+            Me.RaiseExcTSMI.Text = "Send log to developer"
             '
             'MainForm
             '
