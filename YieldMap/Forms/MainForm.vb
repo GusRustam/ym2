@@ -1,5 +1,6 @@
 ﻿Imports System.Data.SQLite
 Imports System.IO
+Imports System.Drawing.Imaging
 Imports YieldMap.Commons
 Imports YieldMap.My.Resources
 Imports YieldMap.Forms.ChartForm
@@ -563,10 +564,26 @@ Namespace Forms
 
         Private Shared Sub RaiseExcTSMIClick(sender As Object, e As EventArgs) Handles RaiseExcTSMI.Click
             Dim logName = GetMyPath() + "\" + LogFileName
+
+            Dim timestampStr = Date.Now.ToString("yyyy-MM-dd hh-mm-ss")
+            Dim num As Integer
+            Screen.AllScreens.ToList().ForEach(
+                Sub(screen)
+                    Dim bmpScreenshot = New Bitmap(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format32bppArgb)
+                    Dim gfxScreenshot = Graphics.FromImage(bmpScreenshot)
+                    gfxScreenshot.CopyFromScreen(screen.Bounds.X, screen.Bounds.Y, 0, 0, screen.PrimaryScreen.Bounds.Size, CopyPixelOperation.SourceCopy)
+                    bmpScreenshot.Save(GetMyPath() + "\" + String.Format("{0}_{1}.png", timestampStr, num), ImageFormat.Png)
+                    num += 1
+                End Sub)
+
             Try
                 Dim mail As New MAPI
                 mail.AddRecipientTo("rustam.guseynov@thomsonreuters.com")
                 If File.Exists(logName) Then mail.AddAttachment(logName)
+                For i = 0 To num - 1
+                    Dim fName = GetMyPath() + "\" + String.Format("{0}_{1}.png", timestampStr, i)
+                    If File.Exists(fName) Then mail.AddAttachment(fName)
+                Next
                 mail.SendMailPopup("Yield Map Log", "Here's log file")
             Catch ex As Exception
                 Process.Start("mailto:rustam.guseynov@thomsonreuters.com?subject=YieldMap%20Log&body=Please,%20manually%20attach%20log%20located%20at%20" + logName.Replace(" ", "%20").Replace("\\", "\"))
