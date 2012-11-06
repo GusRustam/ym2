@@ -43,6 +43,7 @@ Namespace Forms
             Me.InitEventLabel = New System.Windows.Forms.ToolStripStatusLabel()
             Me.CMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.LogSettingsTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.RaiseExcTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.MainToolStrip.SuspendLayout()
             Me.StatusStrip1.SuspendLayout()
             Me.CMS.SuspendLayout()
@@ -174,15 +175,21 @@ Namespace Forms
             '
             'CMS
             '
-            Me.CMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LogSettingsTSMI})
+            Me.CMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LogSettingsTSMI, Me.RaiseExcTSMI})
             Me.CMS.Name = "CMS"
-            Me.CMS.Size = New System.Drawing.Size(182, 48)
+            Me.CMS.Size = New System.Drawing.Size(182, 70)
             '
             'LogSettingsTSMI
             '
             Me.LogSettingsTSMI.Name = "LogSettingsTSMI"
             Me.LogSettingsTSMI.Size = New System.Drawing.Size(181, 22)
             Me.LogSettingsTSMI.Text = "Edit logging settings"
+            '
+            'RaiseExcTSMI
+            '
+            Me.RaiseExcTSMI.Name = "RaiseExcTSMI"
+            Me.RaiseExcTSMI.Size = New System.Drawing.Size(181, 22)
+            Me.RaiseExcTSMI.Text = "Raise exception"
             '
             'MainForm
             '
@@ -221,6 +228,7 @@ Namespace Forms
         Friend WithEvents ToolStripSeparator3 As System.Windows.Forms.ToolStripSeparator
         Friend WithEvents TileHorTSB As System.Windows.Forms.ToolStripButton
         Friend WithEvents TileVerTSB As System.Windows.Forms.ToolStripButton
+        Friend WithEvents RaiseExcTSMI As System.Windows.Forms.ToolStripMenuItem
 
     End Class
 End Namespace

@@ -1,6 +1,4 @@
 ﻿Imports System.Data.SQLite
-Imports System.IO
-Imports System.Reflection
 Imports YieldMap.Commons
 Imports YieldMap.My.Resources
 Imports YieldMap.Forms.ChartForm
@@ -75,11 +73,6 @@ Namespace Forms
 
         Private Shared Sub MainFormLoad(sender As Object, e As EventArgs) Handles MyBase.Load
             Logger.Info("MainFormLoad")
-
-            Dim installPath = Path.GetDirectoryName(Assembly.GetAssembly(GetType(MainForm)).CodeBase)
-            installPath = installPath.Substring(6)
-            AppDomain.CurrentDomain.SetData("DataDirectory", installPath)
-            My.Settings.Default("bondsConnectionString") = String.Format("data source=""{0}\bonds.sqlite""", installPath)
         End Sub
 
 
@@ -567,6 +560,8 @@ Namespace Forms
 #End Region
 #End Region
 
-
+        Private Shared Sub RaiseExcTSMIClick(sender As Object, e As EventArgs) Handles RaiseExcTSMI.Click
+            Throw New Exception("To kill")
+        End Sub
     End Class
 End Namespace

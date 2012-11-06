@@ -1,4 +1,7 @@
 ﻿Imports System.Data
+Imports System.Reflection
+Imports System.IO
+Imports System.Runtime.InteropServices
 Imports NLog
 Imports System.Text
 
@@ -13,6 +16,10 @@ Namespace Commons
 
     Module Common
         Private ReadOnly Logger As Logger = GetLogger(GetType(Common))
+        <DllImport("user32.dll")> _
+        Public Function SetForegroundWindow(ByVal hWnd As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
+        End Function
+
         Public Function GetWin1251String(ByVal str As String) As String 'todo no effect
             Dim win1251 = Encoding.GetEncoding(1251)
             Dim utf8Bytes = Encoding.UTF8.GetBytes(str)
@@ -31,6 +38,11 @@ Namespace Commons
                 args.Continue = True
             End If
         End Sub
+
+        Public Function GetMyPath() As String
+            Dim installPath = Path.GetDirectoryName(Assembly.GetAssembly(GetType(Common)).CodeBase)
+            Return installPath.Substring(6)
+        End Function
 
         Public Function GetRange(ByVal min As Double, ByVal max As Double, ByVal numsteps As Integer) As List(Of Double)
             Debug.Assert(numsteps > 1)

@@ -8,11 +8,11 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{334FBAA8-D034-4938-84B6-E218A693FDC7}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <StartupObject>YieldMap.My.MyApplication</StartupObject>
+    <StartupObject>Sub Main</StartupObject>
     <RootNamespace>YieldMap</RootNamespace>
     <AssemblyName>YieldMap</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <MyType>WindowsForms</MyType>
+    <MyType>WindowsFormsWithCustomSubMain</MyType>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -120,6 +120,7 @@
     </Compile>
     <Compile Include="Commons\Common.vb" />
     <Compile Include="Commons\Eikon.vb" />
+    <Compile Include="Commons\MAPI.vb" />
     <Compile Include="Commons\SettingsManager.vb" />
     <Compile Include="Commons\YieldMapLogger.vb" />
     <Compile Include="Curves\HistoricalCurve.vb" />
@@ -190,6 +191,13 @@
       <DependentUpon>MainForm.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\UnhandledExcForm.Designer.vb">
+      <DependentUpon>UnhandledExcForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\UnhandledExcForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainModule.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -245,6 +253,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\MainForm.resx">
       <DependentUpon>MainForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\UnhandledExcForm.resx">
+      <DependentUpon>UnhandledExcForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>

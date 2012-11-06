@@ -440,7 +440,7 @@ Namespace Forms.ChartForm
             End Try
         End Sub
 
-        ' these methods simply update the chart by selecting appropriate y-coordinates for points
+        ' this method simply updates the chart by selecting appropriate y-coordinates for points
         Private Sub SetChartMinMax()
             Logger.Debug("SetChartMinMax()")
             GuiAsync(
@@ -1157,7 +1157,7 @@ Namespace Forms.ChartForm
                             Return typed IsNot Nothing AndAlso typed.RIC = instrument
                         End Function) _
                         Then
-                        'todo this won't work in case one adds bonds "on-the-fly""
+
                         Dim descr = _ansamble.GetBondDescription(seriesName, instrument)
                         point = New DataPoint(0, 0) With {
                             .IsEmpty = True,
@@ -1165,7 +1165,7 @@ Namespace Forms.ChartForm
                             .Tag = descr,
                             .ToolTip = descr.ShortName,
                             .IsVisibleInLegend = False
-                            }
+                        }
                         bondSeries.Points.Add(point)
                     Else
                         point = bondSeries.Points.First(Function(pnt) CType(pnt.Tag, BondPointDescr).RIC = instrument)
@@ -1255,7 +1255,7 @@ Namespace Forms.ChartForm
 
                 Dim historyTaskDescr = New HistoryTaskDescr() With {
                         .Item = bondDataPoint.RIC,
-                        .StartDate = DateTime.Today.AddDays(-3),
+                        .StartDate = DateTime.Today.AddDays(-10),
                         .EndDate = DateTime.Today,
                         .Fields = {"DATE", "CLOSE"}.ToList,
                         .Frequency = "D",

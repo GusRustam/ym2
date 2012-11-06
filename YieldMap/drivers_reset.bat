@@ -19,3 +19,4 @@ echo Registering Eikon libraries from %_thPath%
 regsvr32 /s "%_thPath%\Adxoo.dll"
 regsvr32 /s "%_thPath%\Adxfo.dll"
 regsvr32 /s "%_thPath%\rtx.dll"
+regsvr32 /s "%_thPath%\EikonDesktopSDK.dll"
