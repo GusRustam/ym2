@@ -19,20 +19,16 @@ Namespace Commons
             ' 0) Read registry
             LoggingLevel = LogLevel
 
-            ' 1) Setting up some variables
-            Dim installPath = Path.GetDirectoryName(Assembly.GetAssembly(GetType(YieldMapLogger)).CodeBase)
-            installPath = installPath.Substring(6)
-
-            ' 3) Creating logger text config
+            ' 1) Creating logger text config
             Const layoutText As String = "${date} " + ControlChars.Tab + " ${level} " + ControlChars.Tab + " ${callsite:includeSourcePath=false} | ${message} | ${exception:format=Type,Message} | ${stacktrace}"
             TxtTarget = New FileTarget() With {
-                        .FileName = String.Format("{0}\{1}", installPath, LogFileName),
+                        .FileName = String.Format("{0}\{1}", GetMyPath(), LogFileName),
                         .DeleteOldFileOnStartup = True,
                         .Name = "Main",
                         .Layout = Layout.FromString(layoutText)
                     }
 
-            ' 3) Creating logger UDP config
+            ' 2) Creating logger UDP config
             UdpTarget = New ChainsawTarget() With {
                 .Address = "udp://localhost:7071",
                 .Name = "Chainsaw",
