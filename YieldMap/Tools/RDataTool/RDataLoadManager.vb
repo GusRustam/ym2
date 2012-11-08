@@ -22,11 +22,32 @@ Namespace Tools.RDataTool
 
         Private Sub Load(data As RQuery, ByVal dataEventHanler As DataEventRawHanler)
             _dataEventHanler = dataEventHanler
-            _myDex2Mgr = Eikon.SDK.CreateDex2Mgr()
-            If _myDex2Mgr IsNot Nothing Then
-                _cookie = _myDex2Mgr.Initialize()
-                _myRData = _myDex2Mgr.CreateRData(_cookie)
 
+            Try
+                Logger.Info("SDK.CreateDex2Mgr()")
+                _myDex2Mgr = Eikon.SDK.CreateDex2Mgr()
+                _cookie = _myDex2Mgr.Initialize()
+            Catch ex As Exception
+                Logger.Warn("ex = {0}", ex.ToString())
+                Try
+                    Logger.Info("SDK.CreateInstanceFromProgID()")
+                    _myDex2Mgr = Eikon.SDK.CreateInstanceFromProgID("Dex2.Dex2Mgr")
+                    _cookie = _myDex2Mgr.Initialize()
+                Catch ex1 As Exception
+                    Logger.Warn("ex1 = {0}", ex1.ToString())
+                    Try
+                        Logger.Info("CreateReutersObject()")
+                        _myDex2Mgr = CreateReutersObject("Dex2.Dex2Mgr")
+                        _cookie = _myDex2Mgr.Initialize()
+                    Catch ex2 As Exception
+                        Logger.Warn("ex2 = {0}", ex2.ToString())
+                        _myDex2Mgr = Nothing
+                    End Try
+                End Try
+            End Try
+
+            If _myDex2Mgr IsNot Nothing Then
+                _myRData = _myDex2Mgr.CreateRData(_cookie)
                 _myRData.InstrumentIDList = data.Items
                 _myRData.FieldList = data.Fields
                 _myRData.RequestParam = data.Params

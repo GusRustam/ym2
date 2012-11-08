@@ -584,11 +584,14 @@ Namespace Forms
                     Dim fName = GetMyPath() + "\" + String.Format("{0}_{1}.png", timestampStr, i)
                     If File.Exists(fName) Then mail.AddAttachment(fName)
                 Next
-                mail.SendMailPopup("Yield Map Log", "Here's log file")
+                mail.SendMailPopup("Yield Map Log", GetEnvironment())
             Catch ex As Exception
                 Process.Start("mailto:rustam.guseynov@thomsonreuters.com?subject=YieldMap%20Log&body=Please,%20manually%20attach%20log%20located%20at%20" + logName.Replace(" ", "%20").Replace("\\", "\"))
             End Try
         End Sub
 
+        Private Shared Sub ShowLogTSMIClick(sender As Object, e As EventArgs) Handles ShowLogTSMI.Click
+            Process.Start(GetMyPath() + "\" + LogFileName)
+        End Sub
     End Class
 End Namespace

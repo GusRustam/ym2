@@ -1,7 +1,4 @@
-﻿Imports System.ComponentModel
-Imports System.Configuration.Install
-Imports System.Windows.Forms
-Imports System.IO
+﻿Imports System.IO
 
 Public Class RunnerHelper
 
@@ -17,10 +14,10 @@ Public Class RunnerHelper
 
     Protected Overrides Sub OnAfterInstall(ByVal savedState As IDictionary)
         MyBase.OnAfterInstall(savedState)
-        Dim fileName As String = Context.Parameters("Run")
-        Dim targetFolder As String = Context.Parameters("TargetDir")
-        MessageBox.Show("fileName = " + fileName)
-        MessageBox.Show("targetFolder = " + targetFolder)
-        Process.Start(Path.Combine(targetFolder, fileName))
+        Try
+            Process.Start(Path.Combine(Context.Parameters("TargetDir"), Context.Parameters("Run")))
+        Catch ex As Exception
+            MsgBox(ex.ToString(), vbOKOnly, "Error")
+        End Try
     End Sub
 End Class

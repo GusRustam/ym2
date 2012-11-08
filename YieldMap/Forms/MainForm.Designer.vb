@@ -44,6 +44,7 @@ Namespace Forms
             Me.CMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.LogSettingsTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.RaiseExcTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.ShowLogTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.MainToolStrip.SuspendLayout()
             Me.StatusStrip1.SuspendLayout()
             Me.CMS.SuspendLayout()
@@ -175,21 +176,27 @@ Namespace Forms
             '
             'CMS
             '
-            Me.CMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LogSettingsTSMI, Me.RaiseExcTSMI})
+            Me.CMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LogSettingsTSMI, Me.ShowLogTSMI, Me.RaiseExcTSMI})
             Me.CMS.Name = "CMS"
-            Me.CMS.Size = New System.Drawing.Size(268, 48)
+            Me.CMS.Size = New System.Drawing.Size(207, 92)
             '
             'LogSettingsTSMI
             '
             Me.LogSettingsTSMI.Name = "LogSettingsTSMI"
-            Me.LogSettingsTSMI.Size = New System.Drawing.Size(190, 22)
-            Me.LogSettingsTSMI.Text = "Edit logging settings"
+            Me.LogSettingsTSMI.Size = New System.Drawing.Size(206, 22)
+            Me.LogSettingsTSMI.Text = "Logging settings"
             '
             'RaiseExcTSMI
             '
             Me.RaiseExcTSMI.Name = "RaiseExcTSMI"
-            Me.RaiseExcTSMI.Size = New System.Drawing.Size(267, 22)
-            Me.RaiseExcTSMI.Text = "Send log and screenshot to developer"
+            Me.RaiseExcTSMI.Size = New System.Drawing.Size(206, 22)
+            Me.RaiseExcTSMI.Text = "Send report to developer"
+            '
+            'ShowLogTSMI
+            '
+            Me.ShowLogTSMI.Name = "ShowLogTSMI"
+            Me.ShowLogTSMI.Size = New System.Drawing.Size(206, 22)
+            Me.ShowLogTSMI.Text = "Show log"
             '
             'MainForm
             '
@@ -229,6 +236,7 @@ Namespace Forms
         Friend WithEvents TileHorTSB As System.Windows.Forms.ToolStripButton
         Friend WithEvents TileVerTSB As System.Windows.Forms.ToolStripButton
         Friend WithEvents RaiseExcTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents ShowLogTSMI As System.Windows.Forms.ToolStripMenuItem
 
     End Class
 End Namespace

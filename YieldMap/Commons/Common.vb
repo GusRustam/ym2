@@ -16,7 +16,12 @@ Namespace Commons
 
     Module Common
         Private ReadOnly Logger As Logger = GetLogger(GetType(Common))
-        <DllImport("user32.dll")> _
+
+        <DllImport("PLVbaApis.dll")>
+        Function CreateReutersObject(ByVal progId As String) As <MarshalAs(UnmanagedType.IUnknown)> Object
+        End Function
+
+        <DllImport("user32.dll")>
         Public Function SetForegroundWindow(ByVal hWnd As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
         End Function
 
@@ -25,6 +30,21 @@ Namespace Commons
             Dim utf8Bytes = Encoding.UTF8.GetBytes(str)
             Dim win1251Bytes = Encoding.Convert(Encoding.UTF8, win1251, utf8Bytes)
             Return New String(win1251.GetChars(win1251Bytes))
+        End Function
+
+        Public Function GetEnvironment() As String
+            Dim res As String = ""
+            res += String.Format("CommandLine = {0}", Environment.CommandLine) + Environment.NewLine
+            res += String.Format("CurrentDirectory = {0}", Environment.CurrentDirectory) + Environment.NewLine
+            res += String.Format("Is64BitOperatingSystem = {0}", Environment.Is64BitOperatingSystem) + Environment.NewLine
+            res += String.Format("Is64BitProcess = {0}", Environment.Is64BitProcess) + Environment.NewLine
+            res += String.Format("MachineName = {0}", Environment.MachineName) + Environment.NewLine
+            res += String.Format("OSVersion = {0}", Environment.OSVersion) + Environment.NewLine
+            res += String.Format("SystemDirectory = {0}", Environment.SystemDirectory) + Environment.NewLine
+            res += String.Format("UserDomainName = {0}", Environment.UserDomainName) + Environment.NewLine
+            res += String.Format("UserName = {0}", Environment.UserName) + Environment.NewLine
+            res += String.Format("Version = {0}", Environment.Version) + Environment.NewLine
+            Return res
         End Function
 
         Public Function FromExcelSerialDate(ByVal serialDate As Integer) As DateTime
