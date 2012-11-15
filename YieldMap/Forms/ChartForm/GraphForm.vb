@@ -853,6 +853,36 @@ Namespace Forms.ChartForm
             _tableForm.Bonds = bondsToShow
             _tableForm.ShowDialog()
         End Sub
+
+        Private Sub ShowCurveItemsTSMIClick(sender As Object, e As EventArgs) Handles ShowCurveItemsTSMI.Click
+            Dim aCurve = _moneyMarketCurves.First(Function(curve) curve.GetName() = CStr(MoneyCurveCMS.Tag)).GetSnapshot()
+
+            Dim aForm = New Form With {
+                .Text = "Curve items",
+                .Width = 400,
+                .Height = 400,
+                .FormBorderStyle = FormBorderStyle.Sizable
+            }
+
+            Dim aTable = New DataGridView
+            aTable.AutoGenerateColumns = False
+            aTable.Columns.Add("RIC", "RIC")
+            aTable.Columns.Add("Rate", "Rate")
+            aTable.Columns.Add("Duration", "Duration")
+
+            aTable.Columns("RIC").AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            aTable.Columns("Rate").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            aTable.Columns("Rate").DefaultCellStyle = New DataGridViewCellStyle() With {.Format = "P2"}
+            aTable.Columns("Duration").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            aTable.Columns("Duration").DefaultCellStyle = New DataGridViewCellStyle() With {.Format = "N2"}
+
+            aCurve.ForEach(Sub(item) aTable.Rows.Add(New Object() {item.Item1, item.Item2, item.Item3}))
+
+            aForm.Controls.Add(aTable)
+            aTable.Dock = DockStyle.Fill
+
+            aForm.ShowDialog()
+        End Sub
 #End Region
 
 #Region "f) Show bid and ask"
@@ -1821,6 +1851,5 @@ Namespace Forms.ChartForm
         End Sub
 #End Region
 #End Region
-
     End Class
 End Namespace

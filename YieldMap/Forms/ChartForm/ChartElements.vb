@@ -6,13 +6,13 @@ Imports YieldMap.Curves
 
 Namespace Forms.ChartForm
 #Region "I. Enumerations"
-    Friend Enum YieldSource
+    Public Enum YieldSource
         Realtime
         Historical
         Synthetic
     End Enum
 
-    Friend Enum QuoteSource
+    Public Enum QuoteSource
         Bid
         Ask
         Last
@@ -411,7 +411,7 @@ Namespace Forms.ChartForm
 #End Region
 
 #Region "IV. Points descriptions"
-    Friend Class DataPointDescr
+    Public Class DataPointDescr
         Implements IComparable(Of DataPointDescr)
         Public Const AroundZero As Double = 0.0001
 
@@ -450,7 +450,7 @@ Namespace Forms.ChartForm
         End Function
     End Class
 
-    Friend Class BondPointDescr
+    Public Class BondPointDescr
         Inherits DataPointDescr
 
         Public RIC As String

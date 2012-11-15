@@ -44,6 +44,7 @@
             Me.ShowLabelsTSB = New System.Windows.Forms.ToolStripButton()
             Me.ToolStripSeparator6 = New System.Windows.Forms.ToolStripSeparator()
             Me.AsTableTSB = New System.Windows.Forms.ToolStripButton()
+            Me.PinUnpinTSB = New System.Windows.Forms.ToolStripButton()
             Me.GraphToolTip = New System.Windows.Forms.ToolTip(Me.components)
             Me.BondCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.MainInfoLine1TSMI = New System.Windows.Forms.ToolStripMenuItem()
@@ -88,6 +89,7 @@
             Me.ResizePictureBox = New System.Windows.Forms.PictureBox()
             Me.MoneyCurveCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.MMNameTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.ShowCurveItemsTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.DeleteMMCurveTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.ToolStripSeparator10 = New System.Windows.Forms.ToolStripSeparator()
             Me.BrokerTSMI = New System.Windows.Forms.ToolStripMenuItem()
@@ -104,7 +106,6 @@
             Me.BidAskCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.RemoveBidAskTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.YAxisCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
-            Me.PinUnpinTSB = New System.Windows.Forms.ToolStripButton()
             Me.TheStatusStrip.SuspendLayout()
             Me.TheToolStrip.SuspendLayout()
             Me.BondCMS.SuspendLayout()
@@ -255,6 +256,17 @@
             Me.AsTableTSB.Text = "AsTable"
             Me.AsTableTSB.ToolTipText = "Show as table"
             '
+            'PinUnpinTSB
+            '
+            Me.PinUnpinTSB.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+            Me.PinUnpinTSB.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+            Me.PinUnpinTSB.Image = Global.YieldMap.My.Resources.Resources.UnPin
+            Me.PinUnpinTSB.ImageTransparentColor = System.Drawing.Color.Magenta
+            Me.PinUnpinTSB.Name = "PinUnpinTSB"
+            Me.PinUnpinTSB.Size = New System.Drawing.Size(23, 22)
+            Me.PinUnpinTSB.Text = "ToolStripButton1"
+            Me.PinUnpinTSB.ToolTipText = "Hide description pane"
+            '
             'BondCMS
             '
             Me.BondCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainInfoLine1TSMI, Me.MainInfoLine2TSMI, Me.ExtInfoTSMI, Me.ShowHistoryTSMI, Me.ToolStripSeparator1, Me.BondDescriptionTSMI, Me.RelatedQuoteTSMI, Me.RelatedChartTSMI})
@@ -323,7 +335,6 @@
             Me.MainTableLayout.RowCount = 2
             Me.MainTableLayout.RowStyles.Add(New System.Windows.Forms.RowStyle())
             Me.MainTableLayout.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-            Me.MainTableLayout.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
             Me.MainTableLayout.Size = New System.Drawing.Size(784, 509)
             Me.MainTableLayout.TabIndex = 4
             '
@@ -715,9 +726,9 @@
             '
             'MoneyCurveCMS
             '
-            Me.MoneyCurveCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MMNameTSMI, Me.DeleteMMCurveTSMI, Me.ToolStripSeparator10, Me.BrokerTSMI, Me.QuoteTSMI, Me.FitTSMI, Me.BootstrapTSMI, Me.ToolStripSeparator11, Me.SelDateTSMI})
+            Me.MoneyCurveCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MMNameTSMI, Me.ShowCurveItemsTSMI, Me.DeleteMMCurveTSMI, Me.ToolStripSeparator10, Me.BrokerTSMI, Me.QuoteTSMI, Me.FitTSMI, Me.BootstrapTSMI, Me.ToolStripSeparator11, Me.SelDateTSMI})
             Me.MoneyCurveCMS.Name = "MoneyCurveCMS"
-            Me.MoneyCurveCMS.Size = New System.Drawing.Size(152, 170)
+            Me.MoneyCurveCMS.Size = New System.Drawing.Size(152, 192)
             '
             'MMNameTSMI
             '
@@ -725,6 +736,12 @@
             Me.MMNameTSMI.Name = "MMNameTSMI"
             Me.MMNameTSMI.Size = New System.Drawing.Size(151, 22)
             Me.MMNameTSMI.Text = "Name"
+            '
+            'ShowCurveItemsTSMI
+            '
+            Me.ShowCurveItemsTSMI.Name = "ShowCurveItemsTSMI"
+            Me.ShowCurveItemsTSMI.Size = New System.Drawing.Size(151, 22)
+            Me.ShowCurveItemsTSMI.Text = "Show items..."
             '
             'DeleteMMCurveTSMI
             '
@@ -818,17 +835,6 @@
             '
             Me.YAxisCMS.Name = "YAxisCMS"
             Me.YAxisCMS.Size = New System.Drawing.Size(61, 4)
-            '
-            'PinUnpinTSB
-            '
-            Me.PinUnpinTSB.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
-            Me.PinUnpinTSB.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-            Me.PinUnpinTSB.Image = Global.YieldMap.My.Resources.Resources.UnPin
-            Me.PinUnpinTSB.ImageTransparentColor = System.Drawing.Color.Magenta
-            Me.PinUnpinTSB.Name = "PinUnpinTSB"
-            Me.PinUnpinTSB.Size = New System.Drawing.Size(23, 22)
-            Me.PinUnpinTSB.Text = "ToolStripButton1"
-            Me.PinUnpinTSB.ToolTipText = "Hide description pane"
             '
             'GraphForm
             '
@@ -941,5 +947,6 @@
         Friend WithEvents RubCCSTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents NDFTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents PinUnpinTSB As System.Windows.Forms.ToolStripButton
+        Friend WithEvents ShowCurveItemsTSMI As System.Windows.Forms.ToolStripMenuItem
     End Class
 End Namespace

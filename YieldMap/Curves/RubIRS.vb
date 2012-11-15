@@ -19,6 +19,8 @@ Namespace Curves
 
     Public Class YieldDuration
         Implements IComparable(Of YieldDuration)
+
+        Private Shared ReadOnly Logger As Logger = Commons.GetLogger(GetType(YieldDuration))
         Public RIC As String
         Public Yield As Double
         Public Duration As Double
@@ -49,10 +51,17 @@ Namespace Curves
         End Function
 
         Public Function CompareTo(ByVal other As YieldDuration) As Integer Implements IComparable(Of YieldDuration).CompareTo
-            If Duration < other.Duration Then
-                Return -1
+            If other IsNot Nothing Then
+                If Duration < other.Duration Then
+                    Return -1
+                ElseIf Duration > other.Duration Then
+                    Return 1
+                Else
+                    Return 0
+                End If
             Else
-                Return 1
+                Logger.Warn("Comparing to null!")
+                Return 0
             End If
         End Function
     End Class

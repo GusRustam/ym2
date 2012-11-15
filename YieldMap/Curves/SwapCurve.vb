@@ -9,6 +9,7 @@ Namespace Curves
     Public Interface ICurve
         Function GetName() As String
         Function GetFullName() As String
+        Function GetSnapshot() As List(Of Tuple(Of String, Double, Double))
         Function ToArray() As Array
 
         Event Cleared As Action(Of ICurve)
@@ -179,6 +180,10 @@ Namespace Curves
 
         Public Overridable Function GetCurveData() As List(Of XY)
             Return XY.ConvertToXY(CurveData, BmkSpreadMode)
+        End Function
+
+        Public Function GetSnapshot() As List(Of Tuple(Of String, Double, Double)) Implements ICurve.GetSnapshot
+            Return CurveData.Select(Function(elem) New Tuple(Of String, Double, Double)(elem.RIC, elem.Yield, elem.Duration)).ToList()
         End Function
 
         '' LOADING DATA
