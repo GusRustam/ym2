@@ -43,8 +43,9 @@ Namespace Forms
             Me.InitEventLabel = New System.Windows.Forms.ToolStripStatusLabel()
             Me.CMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.LogSettingsTSMI = New System.Windows.Forms.ToolStripMenuItem()
-            Me.RaiseExcTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.ShowLogTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.RaiseExcTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.AboutTSMI = New System.Windows.Forms.ToolStripButton()
             Me.MainToolStrip.SuspendLayout()
             Me.StatusStrip1.SuspendLayout()
             Me.CMS.SuspendLayout()
@@ -52,7 +53,7 @@ Namespace Forms
             '
             'MainToolStrip
             '
-            Me.MainToolStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ConnectButton, Me.YieldMapButton, Me.ToolStripSeparator1, Me.DatabaseButton, Me.ToolStripSeparator2, Me.SettingsButton, Me.ToolStripSeparator3, Me.TileHorTSB, Me.TileVerTSB})
+            Me.MainToolStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ConnectButton, Me.YieldMapButton, Me.ToolStripSeparator1, Me.DatabaseButton, Me.ToolStripSeparator2, Me.SettingsButton, Me.ToolStripSeparator3, Me.TileHorTSB, Me.TileVerTSB, Me.AboutTSMI})
             Me.MainToolStrip.Location = New System.Drawing.Point(0, 0)
             Me.MainToolStrip.Name = "MainToolStrip"
             Me.MainToolStrip.Size = New System.Drawing.Size(792, 39)
@@ -186,17 +187,28 @@ Namespace Forms
             Me.LogSettingsTSMI.Size = New System.Drawing.Size(206, 22)
             Me.LogSettingsTSMI.Text = "Logging settings"
             '
+            'ShowLogTSMI
+            '
+            Me.ShowLogTSMI.Name = "ShowLogTSMI"
+            Me.ShowLogTSMI.Size = New System.Drawing.Size(206, 22)
+            Me.ShowLogTSMI.Text = "Show log"
+            '
             'RaiseExcTSMI
             '
             Me.RaiseExcTSMI.Name = "RaiseExcTSMI"
             Me.RaiseExcTSMI.Size = New System.Drawing.Size(206, 22)
             Me.RaiseExcTSMI.Text = "Send report to developer"
             '
-            'ShowLogTSMI
+            'AboutTSMI
             '
-            Me.ShowLogTSMI.Name = "ShowLogTSMI"
-            Me.ShowLogTSMI.Size = New System.Drawing.Size(206, 22)
-            Me.ShowLogTSMI.Text = "Show log"
+            Me.AboutTSMI.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+            Me.AboutTSMI.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+            Me.AboutTSMI.Image = Global.YieldMap.My.Resources.Resources.about
+            Me.AboutTSMI.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
+            Me.AboutTSMI.ImageTransparentColor = System.Drawing.Color.Magenta
+            Me.AboutTSMI.Name = "AboutTSMI"
+            Me.AboutTSMI.Size = New System.Drawing.Size(36, 36)
+            Me.AboutTSMI.Text = "About Yield Map"
             '
             'MainForm
             '
@@ -237,6 +249,7 @@ Namespace Forms
         Friend WithEvents TileVerTSB As System.Windows.Forms.ToolStripButton
         Friend WithEvents RaiseExcTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents ShowLogTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents AboutTSMI As System.Windows.Forms.ToolStripButton
 
     End Class
 End Namespace

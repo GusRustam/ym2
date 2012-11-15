@@ -3,7 +3,6 @@ Imports NLog
 Imports NLog.Layouts
 Imports NLog.Config
 Imports NLog.Targets
-Imports System.Reflection
 
 Namespace Commons
     Public Module YieldMapLogger
@@ -22,7 +21,7 @@ Namespace Commons
             ' 1) Creating logger text config
             Const layoutText As String = "${date} " + ControlChars.Tab + " ${level} " + ControlChars.Tab + " ${callsite:includeSourcePath=false} | ${message} | ${exception:format=Type,Message} | ${stacktrace}"
             TxtTarget = New FileTarget() With {
-                        .FileName = String.Format("{0}\{1}", GetMyPath(), LogFileName),
+                        .FileName = Path.Combine(LogFilePath, LogFileName),
                         .DeleteOldFileOnStartup = True,
                         .Name = "Main",
                         .Layout = Layout.FromString(layoutText)

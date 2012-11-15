@@ -72,6 +72,14 @@
             Me.UDL_Page = New System.Windows.Forms.TabPage()
             Me.TableLayoutPanel2 = New System.Windows.Forms.TableLayoutPanel()
             Me.ListOfList = New System.Windows.Forms.DataGridView()
+            Me.IdDataGridViewTextBoxColumn1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.HawsernameDataGridViewTextBoxColumn1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.ColorDataGridViewTextBoxColumn1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.ColumnHawserBid = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.ColumnHawserAsk = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.ColumnHawserLast = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.ColumnHawserHist = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.ColumnListCurve = New System.Windows.Forms.DataGridViewCheckBoxColumn()
             Me.HawserBindingSource = New System.Windows.Forms.BindingSource(Me.components)
             Me.ConstituentsDGW = New System.Windows.Forms.DataGridView()
             Me.HawseridDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
@@ -103,6 +111,10 @@
             Me.AddChain = New System.Windows.Forms.Button()
             Me.EditChain = New System.Windows.Forms.Button()
             Me.RemoveChain = New System.Windows.Forms.Button()
+            Me.TabPage2 = New System.Windows.Forms.TabPage()
+            Me.ReloadBondsButton = New System.Windows.Forms.Button()
+            Me.DbUpdatedLabel = New System.Windows.Forms.Label()
+            Me.Label1 = New System.Windows.Forms.Label()
             Me.CidDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.ChainnameDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.IncludeDataGridViewCheckBoxColumn = New System.Windows.Forms.DataGridViewCheckBoxColumn()
@@ -125,14 +137,7 @@
             Me.DataGridViewTextBoxColumn9 = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.DataGridViewTextBoxColumn10 = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.ChainTableAdapter = New YieldMap.BondsDataSetTableAdapters.chainTableAdapter()
-            Me.IdDataGridViewTextBoxColumn1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.HawsernameDataGridViewTextBoxColumn1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.ColorDataGridViewTextBoxColumn1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.ColumnHawserBid = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.ColumnHawserAsk = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.ColumnHawserLast = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.ColumnHawserHist = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.ColumnListCurve = New System.Windows.Forms.DataGridViewCheckBoxColumn()
+            Me.MessageListBox = New System.Windows.Forms.ListBox()
             Me.MainTabControl.SuspendLayout()
             Me.PorfolioPage.SuspendLayout()
             CType(Me.PorfolioElementsDGV, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -158,6 +163,7 @@
             CType(Me.ChainsDGV, System.ComponentModel.ISupportInitialize).BeginInit()
             CType(Me.ChainBindingSource, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.FlowLayoutPanel1.SuspendLayout()
+            Me.TabPage2.SuspendLayout()
             Me.SuspendLayout()
             '
             'MainTabControl
@@ -165,6 +171,7 @@
             Me.MainTabControl.Controls.Add(Me.PorfolioPage)
             Me.MainTabControl.Controls.Add(Me.UDL_Page)
             Me.MainTabControl.Controls.Add(Me.TabPage1)
+            Me.MainTabControl.Controls.Add(Me.TabPage2)
             Me.MainTabControl.Location = New System.Drawing.Point(0, 0)
             Me.MainTabControl.Name = "MainTabControl"
             Me.MainTabControl.SelectedIndex = 0
@@ -628,6 +635,76 @@
             Me.ListOfList.Size = New System.Drawing.Size(517, 497)
             Me.ListOfList.TabIndex = 6
             '
+            'IdDataGridViewTextBoxColumn1
+            '
+            Me.IdDataGridViewTextBoxColumn1.DataPropertyName = "id"
+            Me.IdDataGridViewTextBoxColumn1.HeaderText = "id"
+            Me.IdDataGridViewTextBoxColumn1.Name = "IdDataGridViewTextBoxColumn1"
+            Me.IdDataGridViewTextBoxColumn1.ReadOnly = True
+            Me.IdDataGridViewTextBoxColumn1.Visible = False
+            '
+            'HawsernameDataGridViewTextBoxColumn1
+            '
+            Me.HawsernameDataGridViewTextBoxColumn1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill
+            Me.HawsernameDataGridViewTextBoxColumn1.DataPropertyName = "hawser_name"
+            Me.HawsernameDataGridViewTextBoxColumn1.HeaderText = "Name"
+            Me.HawsernameDataGridViewTextBoxColumn1.Name = "HawsernameDataGridViewTextBoxColumn1"
+            Me.HawsernameDataGridViewTextBoxColumn1.ReadOnly = True
+            '
+            'ColorDataGridViewTextBoxColumn1
+            '
+            Me.ColorDataGridViewTextBoxColumn1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
+            Me.ColorDataGridViewTextBoxColumn1.DataPropertyName = "color"
+            Me.ColorDataGridViewTextBoxColumn1.HeaderText = "Color"
+            Me.ColorDataGridViewTextBoxColumn1.Name = "ColorDataGridViewTextBoxColumn1"
+            Me.ColorDataGridViewTextBoxColumn1.ReadOnly = True
+            Me.ColorDataGridViewTextBoxColumn1.Width = 56
+            '
+            'ColumnHawserBid
+            '
+            Me.ColumnHawserBid.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
+            Me.ColumnHawserBid.DataPropertyName = "bid_field"
+            Me.ColumnHawserBid.HeaderText = "Bid"
+            Me.ColumnHawserBid.Name = "ColumnHawserBid"
+            Me.ColumnHawserBid.ReadOnly = True
+            Me.ColumnHawserBid.Width = 47
+            '
+            'ColumnHawserAsk
+            '
+            Me.ColumnHawserAsk.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
+            Me.ColumnHawserAsk.DataPropertyName = "ask_field"
+            Me.ColumnHawserAsk.HeaderText = "Ask"
+            Me.ColumnHawserAsk.Name = "ColumnHawserAsk"
+            Me.ColumnHawserAsk.ReadOnly = True
+            Me.ColumnHawserAsk.Width = 50
+            '
+            'ColumnHawserLast
+            '
+            Me.ColumnHawserLast.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
+            Me.ColumnHawserLast.DataPropertyName = "last_field"
+            Me.ColumnHawserLast.HeaderText = "Last"
+            Me.ColumnHawserLast.Name = "ColumnHawserLast"
+            Me.ColumnHawserLast.ReadOnly = True
+            Me.ColumnHawserLast.Width = 52
+            '
+            'ColumnHawserHist
+            '
+            Me.ColumnHawserHist.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
+            Me.ColumnHawserHist.DataPropertyName = "hist_field"
+            Me.ColumnHawserHist.HeaderText = "History"
+            Me.ColumnHawserHist.Name = "ColumnHawserHist"
+            Me.ColumnHawserHist.ReadOnly = True
+            Me.ColumnHawserHist.Width = 64
+            '
+            'ColumnListCurve
+            '
+            Me.ColumnListCurve.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
+            Me.ColumnListCurve.DataPropertyName = "curve"
+            Me.ColumnListCurve.HeaderText = "Curve"
+            Me.ColumnListCurve.Name = "ColumnListCurve"
+            Me.ColumnListCurve.ReadOnly = True
+            Me.ColumnListCurve.Width = 41
+            '
             'HawserBindingSource
             '
             Me.HawserBindingSource.DataMember = "hawser"
@@ -926,6 +1003,47 @@
             Me.RemoveChain.TabIndex = 13
             Me.RemoveChain.UseVisualStyleBackColor = True
             '
+            'TabPage2
+            '
+            Me.TabPage2.Controls.Add(Me.MessageListBox)
+            Me.TabPage2.Controls.Add(Me.ReloadBondsButton)
+            Me.TabPage2.Controls.Add(Me.DbUpdatedLabel)
+            Me.TabPage2.Controls.Add(Me.Label1)
+            Me.TabPage2.Location = New System.Drawing.Point(4, 22)
+            Me.TabPage2.Name = "TabPage2"
+            Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
+            Me.TabPage2.Size = New System.Drawing.Size(899, 539)
+            Me.TabPage2.TabIndex = 5
+            Me.TabPage2.Text = "Database"
+            Me.TabPage2.UseVisualStyleBackColor = True
+            '
+            'ReloadBondsButton
+            '
+            Me.ReloadBondsButton.Location = New System.Drawing.Point(11, 170)
+            Me.ReloadBondsButton.Name = "ReloadBondsButton"
+            Me.ReloadBondsButton.Size = New System.Drawing.Size(220, 23)
+            Me.ReloadBondsButton.TabIndex = 2
+            Me.ReloadBondsButton.Text = "Reload bond descriptions"
+            Me.ReloadBondsButton.UseVisualStyleBackColor = True
+            '
+            'DbUpdatedLabel
+            '
+            Me.DbUpdatedLabel.AutoSize = True
+            Me.DbUpdatedLabel.Location = New System.Drawing.Point(86, 13)
+            Me.DbUpdatedLabel.Name = "DbUpdatedLabel"
+            Me.DbUpdatedLabel.Size = New System.Drawing.Size(113, 13)
+            Me.DbUpdatedLabel.TabIndex = 1
+            Me.DbUpdatedLabel.Text = "== last update date =="
+            '
+            'Label1
+            '
+            Me.Label1.AutoSize = True
+            Me.Label1.Location = New System.Drawing.Point(8, 13)
+            Me.Label1.Name = "Label1"
+            Me.Label1.Size = New System.Drawing.Size(72, 13)
+            Me.Label1.TabIndex = 0
+            Me.Label1.Text = "Last updated:"
+            '
             'CidDataGridViewTextBoxColumn
             '
             Me.CidDataGridViewTextBoxColumn.DataPropertyName = "cid"
@@ -1059,75 +1177,13 @@
             '
             Me.ChainTableAdapter.ClearBeforeFill = True
             '
-            'IdDataGridViewTextBoxColumn1
+            'MessageListBox
             '
-            Me.IdDataGridViewTextBoxColumn1.DataPropertyName = "id"
-            Me.IdDataGridViewTextBoxColumn1.HeaderText = "id"
-            Me.IdDataGridViewTextBoxColumn1.Name = "IdDataGridViewTextBoxColumn1"
-            Me.IdDataGridViewTextBoxColumn1.ReadOnly = True
-            Me.IdDataGridViewTextBoxColumn1.Visible = False
-            '
-            'HawsernameDataGridViewTextBoxColumn1
-            '
-            Me.HawsernameDataGridViewTextBoxColumn1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill
-            Me.HawsernameDataGridViewTextBoxColumn1.DataPropertyName = "hawser_name"
-            Me.HawsernameDataGridViewTextBoxColumn1.HeaderText = "Name"
-            Me.HawsernameDataGridViewTextBoxColumn1.Name = "HawsernameDataGridViewTextBoxColumn1"
-            Me.HawsernameDataGridViewTextBoxColumn1.ReadOnly = True
-            '
-            'ColorDataGridViewTextBoxColumn1
-            '
-            Me.ColorDataGridViewTextBoxColumn1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.ColorDataGridViewTextBoxColumn1.DataPropertyName = "color"
-            Me.ColorDataGridViewTextBoxColumn1.HeaderText = "Color"
-            Me.ColorDataGridViewTextBoxColumn1.Name = "ColorDataGridViewTextBoxColumn1"
-            Me.ColorDataGridViewTextBoxColumn1.ReadOnly = True
-            Me.ColorDataGridViewTextBoxColumn1.Width = 56
-            '
-            'ColumnHawserBid
-            '
-            Me.ColumnHawserBid.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.ColumnHawserBid.DataPropertyName = "bid_field"
-            Me.ColumnHawserBid.HeaderText = "Bid"
-            Me.ColumnHawserBid.Name = "ColumnHawserBid"
-            Me.ColumnHawserBid.ReadOnly = True
-            Me.ColumnHawserBid.Width = 47
-            '
-            'ColumnHawserAsk
-            '
-            Me.ColumnHawserAsk.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.ColumnHawserAsk.DataPropertyName = "ask_field"
-            Me.ColumnHawserAsk.HeaderText = "Ask"
-            Me.ColumnHawserAsk.Name = "ColumnHawserAsk"
-            Me.ColumnHawserAsk.ReadOnly = True
-            Me.ColumnHawserAsk.Width = 50
-            '
-            'ColumnHawserLast
-            '
-            Me.ColumnHawserLast.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.ColumnHawserLast.DataPropertyName = "last_field"
-            Me.ColumnHawserLast.HeaderText = "Last"
-            Me.ColumnHawserLast.Name = "ColumnHawserLast"
-            Me.ColumnHawserLast.ReadOnly = True
-            Me.ColumnHawserLast.Width = 52
-            '
-            'ColumnHawserHist
-            '
-            Me.ColumnHawserHist.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.ColumnHawserHist.DataPropertyName = "hist_field"
-            Me.ColumnHawserHist.HeaderText = "History"
-            Me.ColumnHawserHist.Name = "ColumnHawserHist"
-            Me.ColumnHawserHist.ReadOnly = True
-            Me.ColumnHawserHist.Width = 64
-            '
-            'ColumnListCurve
-            '
-            Me.ColumnListCurve.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.ColumnListCurve.DataPropertyName = "curve"
-            Me.ColumnListCurve.HeaderText = "Curve"
-            Me.ColumnListCurve.Name = "ColumnListCurve"
-            Me.ColumnListCurve.ReadOnly = True
-            Me.ColumnListCurve.Width = 41
+            Me.MessageListBox.FormattingEnabled = True
+            Me.MessageListBox.Location = New System.Drawing.Point(10, 30)
+            Me.MessageListBox.Name = "MessageListBox"
+            Me.MessageListBox.Size = New System.Drawing.Size(431, 134)
+            Me.MessageListBox.TabIndex = 3
             '
             'DataBaseManagerForm
             '
@@ -1168,6 +1224,8 @@
             CType(Me.ChainsDGV, System.ComponentModel.ISupportInitialize).EndInit()
             CType(Me.ChainBindingSource, System.ComponentModel.ISupportInitialize).EndInit()
             Me.FlowLayoutPanel1.ResumeLayout(False)
+            Me.TabPage2.ResumeLayout(False)
+            Me.TabPage2.PerformLayout()
             Me.ResumeLayout(False)
 
         End Sub
@@ -1282,5 +1340,10 @@
         Friend WithEvents ColumnHawserLast As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents ColumnHawserHist As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents ColumnListCurve As System.Windows.Forms.DataGridViewCheckBoxColumn
+        Friend WithEvents TabPage2 As System.Windows.Forms.TabPage
+        Friend WithEvents ReloadBondsButton As System.Windows.Forms.Button
+        Friend WithEvents DbUpdatedLabel As System.Windows.Forms.Label
+        Friend WithEvents Label1 As System.Windows.Forms.Label
+        Friend WithEvents MessageListBox As System.Windows.Forms.ListBox
     End Class
 End Namespace

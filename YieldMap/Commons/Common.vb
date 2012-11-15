@@ -2,8 +2,13 @@
 Imports System.Reflection
 Imports System.IO
 Imports System.Runtime.InteropServices
+Imports System.Drawing.Imaging
+Imports System.Runtime.CompilerServices
+Imports YieldMap.BondsDataSetTableAdapters
 Imports NLog
 Imports System.Text
+Imports System.Security.Permissions
+Imports Ionic.Zip
 
 Namespace Commons
     Public Class IdName
@@ -24,6 +29,17 @@ Namespace Commons
         <DllImport("user32.dll")>
         Public Function SetForegroundWindow(ByVal hWnd As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
         End Function
+
+        Public Sub RunCommand(ByVal command As String)
+            Try
+                Dim perm As New SecurityPermission(SecurityPermissionFlag.AllFlags)
+                perm.Demand()
+                Process.Start(command)
+            Catch ex As Exception
+                Logger.WarnException("Failed to run command [" + command + "]", ex)
+                Logger.Warn("Exception = {0}", ex)
+            End Try
+        End Sub
 
         Public Function GetWin1251String(ByVal str As String) As String 'todo no effect
             Dim win1251 = Encoding.GetEncoding(1251)
@@ -75,5 +91,72 @@ Namespace Commons
             Next
             Return res
         End Function
+
+        Public Function GetDbUpdateDate() As Date?
+            Logger.Info("GetDbUpdateDate")
+            Dim settingsData = (New settingsTableAdapter).GetData
+            If settingsData.Count > 0 Then
+                Dim updateDateStr = settingsData.First.lastupdatedate
+                Dim updateDate As DateTime
+                If DateTime.TryParse(updateDateStr, updateDate) Then Return updateDate.Date
+            End If
+            Return Nothing
+        End Function
+
+        Public Sub ZipAndAttachFiles(ByVal mail As MAPI)
+            Using zip As New ZipFile
+                Dim logName = Path.Combine(LogFilePath, LogFileName)
+                If File.Exists(logName) Then zip.AddFile(logName, "")
+
+                Dim dbName = Path.Combine(GetMyPath(), DbFileName)
+                If File.Exists(dbName) Then zip.AddFile(dbName, "")
+
+                Dim timestampStr = Date.Now.ToString("yyyy-MM-dd hh-mm-ss")
+                Dim num As Integer
+                Screen.AllScreens.ToList().ForEach(
+                      Sub(screen)
+                          Dim bmpScreenshot = New Bitmap(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format32bppArgb)
+                          Dim gfxScreenshot = Graphics.FromImage(bmpScreenshot)
+                          gfxScreenshot.CopyFromScreen(screen.Bounds.X, screen.Bounds.Y, 0, 0, screen.PrimaryScreen.Bounds.Size, CopyPixelOperation.SourceCopy)
+                          bmpScreenshot.Save(Path.Combine(LogFilePath, String.Format("{0}_{1}.png", timestampStr, num)), ImageFormat.Png)
+                          num += 1
+                      End Sub)
+
+                For i = 0 To num - 1
+                    Dim fName = Path.Combine(LogFilePath, String.Format("{0}_{1}.png", timestampStr, i))
+                    If File.Exists(fName) Then zip.AddFile(fName, "")
+                Next
+
+                Dim dbZipName = Path.Combine(LogFilePath, ZipFileName)
+                zip.Save(dbZipName)
+                If File.Exists(dbZipName) Then mail.AddAttachment(dbZipName)
+            End Using
+        End Sub
+
+        Public Sub SendErrorReport(ByVal header As String, ByVal message As String)
+            Try
+                Dim mail As New MAPI
+                mail.AddRecipientTo("rustam.guseynov@thomsonreuters.com")
+                ZipAndAttachFiles(mail)
+
+                mail.SendMailPopup(header, message)
+            Catch ex As Exception
+                Clipboard.SetText(message)
+                RunCommand("mailto:rustam.guseynov@thomsonreuters.com?subject=YieldMap%20Error&body=---Paste%20error%20info%20here---")
+            End Try
+        End Sub
+
+        <Extension()>
+        Public Sub GuiAsync(frm As Form, ByVal action As Action)
+            If action IsNot Nothing Then
+                If frm.InvokeRequired Then
+                    frm.Invoke(action)
+                Else
+                    action()
+                End If
+            End If
+        End Sub
+
+
     End Module
 End Namespace

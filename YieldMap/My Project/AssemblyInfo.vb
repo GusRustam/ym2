@@ -10,9 +10,9 @@ Imports System.Runtime.InteropServices
 
 <Assembly: AssemblyTitle("YieldMap")> 
 <Assembly: AssemblyDescription("")> 
-<Assembly: AssemblyCompany("Reuters")> 
+<Assembly: AssemblyCompany("Thomson Reuters")> 
 <Assembly: AssemblyProduct("YieldMap")> 
-<Assembly: AssemblyCopyright("Copyright © Reuters 2012")> 
+<Assembly: AssemblyCopyright("Copyright © Thomson Reuters 2012")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' используя "*", как показано ниже:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("1.0.0.0")> 
+<Assembly: AssemblyVersion("1.0.0.1")> 
 <Assembly: AssemblyFileVersion("1.0.0.0")> 

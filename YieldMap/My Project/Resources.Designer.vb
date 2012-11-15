@@ -67,6 +67,13 @@ Namespace My.Resources
             End Get
         End Property
         
+        Friend ReadOnly Property about() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("about", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
         Friend ReadOnly Property add() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("add", resourceCulture)
@@ -220,6 +227,13 @@ Namespace My.Resources
         Friend ReadOnly Property Labels() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("Labels", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        Friend ReadOnly Property logo() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("logo", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
@@ -380,6 +394,24 @@ Namespace My.Resources
             Get
                 Dim obj As Object = ResourceManager.GetObject("TileVer", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Ищет локализованную строку, похожую на Unhandled domain exception.
+        '''</summary>
+        Friend ReadOnly Property Unhandled_domain_exception() As String
+            Get
+                Return ResourceManager.GetString("Unhandled_domain_exception", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Ищет локализованную строку, похожую на Unhandled thread exception.
+        '''</summary>
+        Friend ReadOnly Property Unhandled_thread_exception() As String
+            Get
+                Return ResourceManager.GetString("Unhandled_thread_exception", resourceCulture)
             End Get
         End Property
         

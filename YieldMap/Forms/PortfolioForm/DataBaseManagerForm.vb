@@ -36,6 +36,11 @@ Namespace Forms.PortfolioForm
                 .Width = ClientSize.Width
                 .Height = ClientSize.Height - 50
             End With
+
+            MessageListBox.Items.Clear()
+            ReloadBondsButton.Enabled = AppMainForm.Initialized
+            If Not AppMainForm.Initialized Then MessageListBox.Items.Add("You need to connect to Eikon in order to update database")
+            DbUpdatedLabel.Text = String.Format("{0:dd MMMM yyyy}", GetDbUpdateDate())
         End Sub
 #End Region
 
@@ -550,5 +555,30 @@ Namespace Forms.PortfolioForm
             End If
         End Sub
 #End Region
+
+        Private Sub InformOnProgress(ByVal message As String)
+            GuiAsync(Sub()
+                         MessageListBox.Items.Add(message)
+                         MessageListBox.SelectedIndex = MessageListBox.Items.Count - 1
+                     End Sub)
+        End Sub
+
+        Private Sub ReloadBondsButtonClick(sender As Object, e As EventArgs) Handles ReloadBondsButton.Click
+            MessageListBox.Items.Clear()
+            Dim initR = New DbInitializer
+            AddHandler initR.Success, Sub()
+                                          InformOnProgress("Database initialized successfully")
+                                          DbUpdatedLabel.Text = String.Format("{0:dd MMMM yyyy}", GetDbUpdateDate())
+                                      End Sub
+            AddHandler initR.Failure,
+                Sub(ex As Exception)
+                    InformOnProgress("Failed to initialize database")
+                    If MsgBox("Failed to initialize database. Would you like to report an error to the developer?", vbYesNo, "Database error") = vbYes Then
+                        SendErrorReport("Yield Map Database Error", "Exception: " + ex.ToString() + Environment.NewLine + Environment.NewLine + GetEnvironment())
+                    End If
+                End Sub
+            AddHandler initR.Progress, AddressOf InformOnProgress
+            initR.UpdateDatabase(True)
+        End Sub
     End Class
 End Namespace

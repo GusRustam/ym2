@@ -36,16 +36,6 @@ Namespace Forms.ChartForm
         Public Delegate Sub PointUpdateDelegate(ByVal ric As String, ByVal yield As Double, ByVal duration As Double, ByVal lastPrice As Double)
         Public Event PointUpdated As PointUpdateDelegate
 
-        Private Sub GuiAsync(ByVal action As Action)
-            If action IsNot Nothing Then
-                If InvokeRequired Then
-                    Invoke(action)
-                Else
-                    action()
-                End If
-            End If
-        End Sub
-
 #Region "I) Dependent forms"
         Private Sub TableFormShown(sender As Object, e As EventArgs) Handles _tableForm.Shown
             AddHandler PointUpdated, AddressOf _tableForm.OnPointUpdated
@@ -681,16 +671,16 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub RelatedQuoteTSMIClick(sender As Object, e As EventArgs) Handles RelatedQuoteTSMI.Click
-            If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then Process.Start("reuters://REALTIME/verb=FullQuote/ric=" + BondCMS.Tag.ToString())
+            If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then RunCommand("reuters://REALTIME/verb=FullQuote/ric=" + BondCMS.Tag.ToString())
         End Sub
 
         Private Sub BondDescriptionTSMIClick(sender As Object, e As EventArgs) Handles BondDescriptionTSMI.Click
-            If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then Process.Start("reuters://REALTIME/verb=BondData/ric=" + BondCMS.Tag.ToString())
+            If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then RunCommand("reuters://REALTIME/verb=BondData/ric=" + BondCMS.Tag.ToString())
 
         End Sub
 
         Private Sub RelatedChartTSMIClick(sender As Object, e As EventArgs) Handles RelatedChartTSMI.Click
-            If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then Process.Start("reuters://REALTIME/verb=RelatedGraph/ric=" + BondCMS.Tag.ToString())
+            If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then RunCommand("reuters://REALTIME/verb=RelatedGraph/ric=" + BondCMS.Tag.ToString())
         End Sub
 #End Region
 #End Region

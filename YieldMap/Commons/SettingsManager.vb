@@ -1,4 +1,5 @@
-﻿Imports Microsoft.Win32
+﻿Imports System.IO
+Imports Microsoft.Win32
 Imports NLog
 
 Namespace Commons
@@ -60,13 +61,19 @@ Namespace Commons
             End Get
         End Property
 
-        Private _logFileName As String = "YieldMap.log"
+        Public Property LogFilePath As String = Path.GetTempPath()
+
+        Public DbFileName As String = "bonds.sqlite"
+
+        Public ZipFileName As String = String.Format("attachments_{0:ddMMyyyy}.zip", Date.Today)
+
+        Private _logFileName As String = String.Format("YieldMap_{0:ddMMyyyy}.log", Date.Today)
         Public Property LogFileName() As String
             Get
                 Return _logFileName
             End Get
             Set(ByVal value As String)
-                Branch.SetValue("logFileName", value.ToString())
+                'Branch.SetValue("logFileName", value.ToString())
                 _logFileName = value
             End Set
         End Property
