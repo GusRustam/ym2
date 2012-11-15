@@ -127,6 +127,7 @@ Namespace Curves
         End Sub
 
         Protected Sub StopLoading(ByVal ric As String)
+            _hstLoaders(ric).StopTask()
             _hstLoaders.Remove(ric)
         End Sub
 

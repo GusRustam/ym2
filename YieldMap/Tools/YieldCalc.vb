@@ -164,12 +164,14 @@ Namespace Tools
 
         Public Function ZSpread(ByVal rateArray As Array, descr As BondPointDescr) As Double?
             If descr.CalcPrice > 0 Then
-                Dim settleDate = BondModule.BdSettle(DateTime.Today, descr.PaymentStructure)
-                If descr.Maturity > Date.Today Then
+                Try
+                    Dim settleDate = BondModule.BdSettle(DateTime.Today, descr.PaymentStructure)
                     Return BondModule.AdBondSpread(settleDate, rateArray, descr.CalcPrice / 100.0, descr.Maturity, descr.Coupon / 100.0, descr.PaymentStructure, "ZCTYPE:RATE IM:LIX RM:YC", "", "")
-                Else
+                Catch ex As Exception
+                    Logger.ErrorException("Failed to calculate Z-Spread", ex)
+                    Logger.Error("Exception = {0}", ex.ToString())
                     Return Nothing
-                End If
+                End Try
             Else
                 Return Nothing
             End If
@@ -205,13 +207,15 @@ Namespace Tools
 
         Public Function ASWSpread(ByVal rateArray As Array, ByVal floatLegStructure As String, ByVal floatingRate As Double, descr As BondPointDescr) As Double?
             If descr.CalcPrice > 0 Then
-                Dim settleDate = BondModule.BdSettle(DateTime.Today, descr.PaymentStructure)
-                If descr.Maturity > Date.Today Then
+                Try
+                    Dim settleDate = BondModule.BdSettle(DateTime.Today, descr.PaymentStructure)
                     Dim res As Array = SwapModule.AdAssetSwapBdSpread(settleDate, descr.Maturity, rateArray, descr.CalcPrice / 100.0, descr.Coupon / 100.0, floatingRate, descr.PaymentStructure, floatLegStructure, "ZCTYPE:RATE IM:LIX RM:YC", "")
                     Return res.GetValue(1, 1)
-                Else
+                Catch ex As Exception
+                    Logger.ErrorException("Failed to calculate ASW-Spread", ex)
+                    Logger.Error("Exception = {0}", ex.ToString())
                     Return Nothing
-                End If
+                End Try
             Else
                 Return Nothing
             End If
