@@ -172,7 +172,20 @@ Namespace Forms.PortfolioForm
                     Dim selectedListID = selectedRow.Cells(0).Value
                     Dim htbTA As New hawser_to_bondTableAdapter
 
-                    bondSelector.SelectedRICs.ForEach(Sub(aRic) htbTA.InsertLink(selectedListID, aRic))
+                    If bondSelector.SelectedRICs.Count > 10 Then
+                        Dim ind As Integer = 0
+                        Dim progress As New ProgressForm(bondSelector.SelectedRICs.Count)
+                        progress.Show()
+                        bondSelector.SelectedRICs.ForEach(
+                            Sub(aRic)
+                                progress.OnItem(aRic, ind)
+                                htbTA.InsertLink(selectedListID, aRic)
+                                ind = ind + 1
+                            End Sub)
+                        progress.Close()
+                    Else
+                        bondSelector.SelectedRICs.ForEach(Sub(aRic) htbTA.InsertLink(selectedListID, aRic))
+                    End If
                     RefreshGrid(selectedListID)
                 End If
             Else
@@ -186,7 +199,20 @@ Namespace Forms.PortfolioForm
                 Dim selectedRow = ListOfList.SelectedRows(0)
                 Dim selectedListID = selectedRow.Cells(0).Value
                 Dim htbTA As New hawser_to_bondTableAdapter
-                selectedRICs.ForEach(Sub(aRic) htbTA.RemoveLink(aRic, selectedListID))
+                If selectedRICs.Count > 10 Then
+                    Dim ind As Integer = 0
+                    Dim progress As New ProgressForm(selectedRICs.Count, False)
+                    progress.Show()
+                    selectedRICs.ForEach(
+                        Sub(aRic)
+                            progress.OnItem(aRic, ind)
+                            htbTA.RemoveLink(aRic, selectedListID)
+                            ind = ind + 1
+                        End Sub)
+                    progress.Close()
+                Else
+                    selectedRICs.ForEach(Sub(aRic) htbTA.RemoveLink(aRic, selectedListID))
+                End If
                 RefreshGrid(selectedListID)
             Else
                 MsgBox("Please select items to remove in the grid")

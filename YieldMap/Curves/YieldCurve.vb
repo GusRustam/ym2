@@ -62,7 +62,18 @@ Namespace Curves
             _name = name
             _fullname = fullname
             _color = Color.FromName(clr)
-            rics.ForEach(Sub(ric) _descrs.Add(ric, GetBondDescr(ric)))
+
+            Dim emptyRics As New List(Of String)
+            rics.ForEach(Sub(ric)
+                             Dim descr = GetBondDescr(ric)
+                             If descr IsNot Nothing Then
+                                 _descrs.Add(ric, descr)
+                             Else
+                                 Logger.Error("No description for ric {0} found", ric)
+                                 emptyRics.Add(ric)
+                             End If
+                         End Sub)
+            emptyRics.ForEach(Sub(ric) rics.Remove(ric))
             _fieldNames = fieldNames
             _date = Date.Today
             _quote = fieldNames(QuoteSource.Last)

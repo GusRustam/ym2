@@ -818,6 +818,7 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub ZoomAllButtonClick(sender As Object, e As EventArgs) Handles ZoomAllButton.Click
+            SetChartMinMax()
             TheChart.ChartAreas(0).AxisX.ScaleView.ZoomReset()
             TheChart.ChartAreas(0).AxisY.ScaleView.ZoomReset()
         End Sub
@@ -1427,8 +1428,12 @@ Namespace Forms.ChartForm
                         ars.ForEach(
                             Sub(ric)
                                 Dim descr = GetBondDescr(ric)
-                                descr.SeriesName = group.Name
-                                group.Elements.Add(ric, descr)
+                                If descr IsNot Nothing Then
+                                    descr.SeriesName = group.Name
+                                    group.Elements.Add(ric, descr)
+                                Else
+                                    Logger.Error("No description for bond {0} found", ric)
+                                End If
                             End Sub)
                         _ansamble.Groups.Add(group)
                     Else
@@ -1654,7 +1659,7 @@ Namespace Forms.ChartForm
             End If
 
             If Not ricsInCurve.Any() Then
-                MsgBox("No rics found")
+                MsgBox("Empty curve selected!")
                 Return
             End If
 
@@ -1670,7 +1675,7 @@ Namespace Forms.ChartForm
 
             _moneyMarketCurves.Add(newCurve)
             newCurve.Subscribe()
-            'End If
+
         End Sub
 
         Private Sub SelDateTSMIClick(sender As Object, e As EventArgs) Handles SelDateTSMI.Click
@@ -1699,6 +1704,7 @@ Namespace Forms.ChartForm
                 _moneyMarketCurves.Remove(curve)
 
                 curve.Cleanup()
+                SetChartMinMax()
             End If
         End Sub
 

@@ -196,6 +196,9 @@
     <Compile Include="Forms\PortfolioForm\NewChainForm.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\PortfolioForm\ProgressForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\SettingsForm.Designer.vb">
       <DependentUpon>SettingsForm.vb</DependentUpon>
     </Compile>
@@ -372,15 +375,6 @@
     <COMReference Include="AdfinXAnalyticsFunctions">
       <Guid>{50647EC1-9EA8-11D4-A5DC-00104BC18698}</Guid>
       <VersionMajor>2</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="AdfinXAnalyticsObjects">
-      <Guid>{3701E4E1-BB0F-11D4-9AC3-00104BC19850}</Guid>
-      <VersionMajor>3</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
