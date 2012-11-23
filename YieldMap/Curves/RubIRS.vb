@@ -17,54 +17,7 @@ Namespace Curves
         ReadOnly Property FloatingPointValue() As Double
     End Interface
 
-    Public Class YieldDuration
-        Implements IComparable(Of YieldDuration)
 
-        Private Shared ReadOnly Logger As Logger = Commons.GetLogger(GetType(YieldDuration))
-        Public RIC As String
-        Public Yield As Double
-        Public Duration As Double
-        Public CalcPrice As Double
-        Public YieldAtDate As Date
-        Public PointSpread As Double?
-        Public ZSpread As Double?
-        Public ASWSpread As Double?
-
-        Public Sub New()
-        End Sub
-
-        Public Sub New(ByVal elem As YieldDuration)
-            With elem
-                RIC = .RIC
-                Me.Yield = .Yield
-                Duration = .Duration
-                CalcPrice = .CalcPrice
-                PointSpread = .PointSpread
-                ZSpread = .ZSpread
-                ASWSpread = .ASWSpread
-            End With
-
-        End Sub
-
-        Public Overrides Function ToString() As String
-            Return String.Format("{0} {1:P2}:{2:F2}", RIC, Yield / 100, Duration)
-        End Function
-
-        Public Function CompareTo(ByVal other As YieldDuration) As Integer Implements IComparable(Of YieldDuration).CompareTo
-            If other IsNot Nothing Then
-                If Duration < other.Duration Then
-                    Return -1
-                ElseIf Duration > other.Duration Then
-                    Return 1
-                Else
-                    Return 0
-                End If
-            Else
-                Logger.Warn("Comparing to null!")
-                Return 0
-            End If
-        End Function
-    End Class
 
     Public Class RubIRS
         Inherits SwapCurve
@@ -122,7 +75,7 @@ Namespace Curves
         ''' <param name="broker">broker name</param>
         ''' <returns>a list of string</returns>
         ''' <remarks></remarks>
-        Protected Overridable Function GetRICs(broker As String) As List(Of String)
+        Protected Overrides Function GetRICs(broker As String) As List(Of String)
             Return AllowedTenors.Select(Function(item) String.Format("{0}{1}Y={2}", InstrumentName, item, broker)).ToList()
         End Function
 
@@ -180,13 +133,11 @@ Namespace Curves
                 End Select
                 Try
                     If ric <> BaseInstrument Then
-                        Dim yieldDuration = New YieldDuration() With {
-                           .Yield = aYield / 100,
-                           .Duration = GetDuration(ric),
-                           .RIC = ric,
-                           .YieldAtDate = lastDate
-                       }
-                        AddCurveItem(yieldDuration)
+                        With Descrs(ric)
+                            .Yield = aYield / 100
+                            .Duration = GetDuration(ric)
+                            .YieldAtDate = lastDate
+                        End With
                     Else
                         BaseInstrumentPrice = elem.Value
                     End If
@@ -216,20 +167,21 @@ Namespace Curves
                         Logger.Trace("Got RIC {0}", ric)
 
                         ' define yield curve elem
-                        Dim yieldDuration = New YieldDuration() With {
-                            .Duration = GetDuration(ric),
-                            .RIC = ric,
-                            .YieldAtDate = _theDate
-                        }
+                        'Dim yieldDuration = New YieldDuration() With {
+                        '    .Duration = GetDuration(ric),
+                        '    .RIC = ric,
+                        '    .YieldAtDate = _theDate
+                        '}
 
+                        Dim duration = GetDuration(ric)
                         If ricAndFieldValue.Value.Keys.Contains("393") Or ricAndFieldValue.Value.Keys.Contains("275") Then
                             Try
                                 If _quote = "BID" Or _quote = "ASK" Then
                                     Dim yld As Double
                                     yld = CDbl(ricAndFieldValue.Value(IIf(_quote = "BID", "393", "275")))
                                     If yld > 0 Then
-                                        yieldDuration.Yield = yld / 100
-                                        AddCurveItem(yieldDuration)
+                                        Descrs(ric).Yield = yld / 100
+                                        'AddCurveItem(yieldDuration)
                                         NotifyUpdated(Me)
                                     End If
                                 Else
@@ -237,16 +189,17 @@ Namespace Curves
                                     Dim askYield = CDbl(ricAndFieldValue.Value("275")) / 100
                                     Dim found = True
                                     If bidYield > 0 And askYield > 0 Then
-                                        yieldDuration.Yield = (bidYield + askYield) / 2
+                                        Descrs(ric).Yield = (bidYield + askYield) / 2
                                     ElseIf bidYield > 0 Then
-                                        yieldDuration.Yield = bidYield
+                                        Descrs(ric).Yield = bidYield
                                     ElseIf askYield > 0 Then
-                                        yieldDuration.Yield = askYield
+                                        Descrs(ric).Yield = askYield
                                     Else
                                         found = False
                                     End If
                                     If found Then
-                                        AddCurveItem(yieldDuration)
+                                        Descrs(ric).Duration = duration
+                                        'AddCurveItem(yieldDuration)
                                         NotifyUpdated(Me)
                                     End If
                                 End If
@@ -398,13 +351,14 @@ Namespace Curves
                 Case SpreadMode.PointSpread
                     Dim res As New List(Of YieldDuration)(data)
                     res.ForEach(Sub(elem)
-                                    elem.PointSpread = PointSpread(
-                                        Benchmark.ToArray(),
-                                        New DataPointDescr() With {
-                                            .Yld = New YieldStructure() With {.Yield = elem.Yield},
-                                            .Duration = elem.Duration,
-                                            .YieldAtDate = elem.YieldAtDate
-                                        })
+                                    CalcPntSprd(Benchmark.ToArray(), Descrs(elem.RIC))
+                                    'elem.PointSpread = PointSpread(
+                                    '    Benchmark.ToArray(),
+                                    '    New DataPointDescr() With {
+                                    '        .Yld = New YieldStructure() With {.Yield = elem.Yield},
+                                    '        .Duration = elem.Duration,
+                                    '        .YieldAtDate = elem.YieldAtDate
+                                    '    })
                                 End Sub)
                     Return res
                 Case Else : Return data

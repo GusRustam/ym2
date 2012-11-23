@@ -9,6 +9,8 @@ Namespace Tools.Lists
         Public Items As List(Of String)
         Public Fields As List(Of String)
 
+        Public Property Descr() As String
+
         Public Function GetItemArray() As Object()
             Dim itemList() As Object
             ReDim itemList(0 To Items.Count - 1)
@@ -103,8 +105,8 @@ Namespace Tools.Lists
                                 Dim val = fields.GetValue(i, 1)
                                 If IsNumeric(val) Then
                                     InsertIntoTRFV(taskRicFieldValue, task, aItemName, fields.GetValue(i, 0), CDbl(val))
-                                Else
-                                    InsertIntoTRFV(taskRicFieldValue, task, aItemName, fields.GetValue(i, 0), Nothing)
+                                    'Else
+                                    '    InsertIntoTRFV(taskRicFieldValue, task, aItemName, fields.GetValue(i, 0), Nothing)
                                 End If
                             Next i
                         Next

@@ -1,5 +1,9 @@
 ﻿Imports System.Drawing
 Imports System.Reflection
+Imports AdfinXRtLib
+Imports NLog
+Imports YieldMap.Tools.History
+Imports YieldMap.Tools.Lists
 Imports YieldMap.Commons
 Imports YieldMap.Tools
 Imports YieldMap.Curves
@@ -12,48 +16,27 @@ Namespace Forms.ChartForm
         Synthetic
     End Enum
 
-    Public Enum QuoteSource
+    Public Enum QuoteSource 'todo get rid, it's too individual
         Bid
         Ask
         Last
         Hist
     End Enum
 
-    Friend Enum GroupType
+    Public Enum GroupType
         Chain
         List
         Bond
     End Enum
-
-    Friend Class TaskDescription
-        Public Name As String
-        Public Field As String
-        Public RICs As New List(Of String)
-    End Class
 #End Region
 
 #Region "II. Groups and ansamble"
-    Friend Class VisualizableAnsamble
-        Public Groups As New List(Of VisualizableGroup)
+    Public Class VisualizableAnsamble
+        Private ReadOnly _groups As New List(Of VisualizableGroup)
 
-        Public Function GetAllRICs() As List(Of String)
-            Dim list = Groups.Select(Function(group) group.Elements.Keys.ToList()).SelectMany(Function(ric) ric).ToList()
-            Return list
-        End Function
+        Private ReadOnly _spreadBmk As SpreadContainer
 
-        Public Function PrepareTasks() As List(Of TaskDescription)
-            Dim result As New List(Of TaskDescription)
-            Groups.ForEach(
-                Sub(group)
-                    result.AddRange(From elem In group.GetListByFields()
-                                    Select New TaskDescription With {
-                                        .Name = String.Format("{0} ({1})", group.Name, elem.Key),
-                                        .RICs = elem.Value,
-                                        .Field = elem.Key
-                                    })
-                End Sub)
-            Return result
-        End Function
+        Public Event Quote As Action(Of VisualizableBond, String)
 
         ''' <summary>
         ''' Get a group containing specified bond 
@@ -63,17 +46,13 @@ Namespace Forms.ChartForm
         ''' <remarks>There might be several groups which contain that element, 
         ''' but they are arranged according to VisualizableGroup sorting rules</remarks>
         Public Function GetInstrumentGroup(ByVal instrument As String) As VisualizableGroup
-            Dim grp = Groups.Where(Function(group) group.Elements.Any(Function(elem) elem.Key = instrument)).ToList()
+            Dim grp = _groups.Where(Function(group) group.HasRic(instrument)).ToList()
             grp.Sort()
             Return grp.First
         End Function
 
         Public Function GetSeriesName(ByVal instrument As String) As String
-            Return GetInstrumentGroup(instrument).Name
-        End Function
-
-        Public Function GetBondDescription(ByVal instrument As String) As BondPointDescr
-            Return GetInstrumentGroup(instrument).Elements(instrument)
+            Return GetInstrumentGroup(instrument).SeriesName
         End Function
 
         Public Function GetColor(ByVal instrument As String) As Color
@@ -81,39 +60,116 @@ Namespace Forms.ChartForm
         End Function
 
         Public Sub Cleanup()
-            Groups.ForEach(Sub(group) group.Cleanup())
-            Groups.Clear()
+            _groups.ForEach(Sub(group) group.Cleanup())
+            _groups.Clear()
         End Sub
 
-        Public Function GetBondDescription(ByVal seriesName As String, ByVal instrument As String) As BondPointDescr
-            Return Groups.First(Function(grp) grp.Name = seriesName).Elements.First(Function(elem) elem.Key = instrument).Value
+        Public Function ContainsRIC(ByVal instrument As String) As Boolean
+            Return _groups.Any(Function(group) group.HasRic(instrument))
         End Function
 
-        Public Function ContainsRIC(ByVal instrument As String) As Boolean
-            Return Groups.Where(Function(group) group.Elements.Any(Function(elem) elem.Key = instrument)).Count > 0
+        Public Sub StartLoadingLiveData()
+            _groups.ForEach(Sub(grp) grp.StartLoadingLiveData())
+        End Sub
+
+        Public Sub AddGroup(ByVal group As VisualizableGroup)
+            _groups.Add(group)
+            AddHandler group.Quote, AddressOf OnGroupQuote
+        End Sub
+
+        Private Sub OnGroupQuote(bond As VisualizableBond, field As String)
+            RaiseEvent Quote(bond, field)
+        End Sub
+
+        Public Sub New(bmk As SpreadContainer)
+            _spreadBmk = bmk
+        End Sub
+
+        Public Sub CalcAllSpreads(ByVal calculation As CalculatedYield, ByVal metaData As DataBaseBondDescription)
+            _spreadBmk.CalcAllSpreads(calculation, metaData)
+        End Sub
+
+        Public Function GetGroup(ByVal seriesName As String) As VisualizableGroup
+            Return _groups.First(Function(grp) grp.SeriesName = seriesName)
         End Function
+    End Class
+
+    Public Class VisualizableBond
+        Private _selectedQuote As String
+        Private ReadOnly _parentGroup As VisualizableGroup
+        Private ReadOnly _metaData As DataBaseBondDescription
+        Private ReadOnly _quotesAndYields As Dictionary(Of String, CalculatedYield)
+        Public TodayVolume As Double
+
+        Sub New(ByVal parentGroup As VisualizableGroup, ByVal selectedQuote As String, ByVal metaData As DataBaseBondDescription)
+            _parentGroup = parentGroup
+            Me.SelectedQuote = selectedQuote
+            _metaData = metaData
+            _quotesAndYields = New Dictionary(Of String, CalculatedYield)
+        End Sub
+
+        Public ReadOnly Property ParentGroup As VisualizableGroup
+            Get
+                Return _parentGroup
+            End Get
+        End Property
+
+        Public Property SelectedQuote As String
+            Get
+                Return _selectedQuote
+            End Get
+            Set(value As String)
+                ' todo raise event with new data if necessary
+                _selectedQuote = value
+            End Set
+        End Property
+
+        Public ReadOnly Property MetaData As DataBaseBondDescription
+            Get
+                Return _metaData
+            End Get
+        End Property
+
+        Public ReadOnly Property QuotesAndYields As Dictionary(Of String, CalculatedYield)
+            Get
+                Return _quotesAndYields
+            End Get
+        End Property
     End Class
 
     ''' <summary>
     ''' Represents separate series on the chart
     ''' </summary>
     ''' <remarks></remarks>
-    Friend Class VisualizableGroup
+    Public Class VisualizableGroup
         Implements IComparable(Of VisualizableGroup)
+        Private Shared ReadOnly Logger As Logger = GetLogger(GetType(VisualizableGroup))
+
+        Private ReadOnly _ansamble As VisualizableAnsamble
+
+        Public Event Quote As Action(Of VisualizableBond, String)
+        Public Event Volume As Action(Of VisualizableBond)
 
         Public Group As GroupType
-        Public Name As String
+        Public SeriesName As String
+        Public Id As String = Guid.NewGuid().ToString()
         Public BidField As String
         Public AskField As String
         Public LastField As String
         Public HistField As String
+        Public VolumeField As String = "VOLUME"
+        Public VWAPField As String = "VWAP"
         Public Currency As String
         Public RicStructure As String
         Public Brokers As New List(Of String)
 
-        Public Elements As New Dictionary(Of String, BondPointDescr) 'ric -> datapoint
-        Public FromID As Long
+        Private ReadOnly _elements As New Dictionary(Of String, VisualizableBond) 'ric -> datapoint
+        Public PortfolioID As Long
         Private _color As String
+
+        Private WithEvents _quoteLoader As New ListLoadManager
+        Private ReadOnly _historyLoaders As New Dictionary(Of String, HistoryLoadManager)
+
 
         Public Property Color() As String
             Get
@@ -124,32 +180,166 @@ Namespace Forms.ChartForm
             End Set
         End Property
 
-        Public Function GetListByFields() As Dictionary(Of String, List(Of String)) 'field -> ric list
-            Dim distFields = Elements.Values.Select(Function(elem) elem.SelectedQuote).Distinct.ToList
-            ' ReSharper fails when xxx inlined
-            Dim xxx = distFields.Select(
-                Function(fld)
-                    Select Case fld
-                        Case QuoteSource.Bid
-                            Return BidField
-                        Case QuoteSource.Ask
-                            Return AskField
-                        Case QuoteSource.Hist
-                            Return HistField
-                        Case Else
-                            Return LastField
-                    End Select
-                End Function)
-            Return xxx.ToDictionary(Of String, List(Of String)) _
-                        (Function(field) field, Function(field) (From el In Elements.Values Select el.RIC).ToList())
-        End Function
-
         Public Function CompareTo(ByVal other As VisualizableGroup) As Integer Implements IComparable(Of VisualizableGroup).CompareTo
             Return Group.CompareTo(other.Group)
         End Function
 
         Public Sub Cleanup()
-            Elements.Clear()
+            _quoteLoader.DiscardTask(Id)
+            _elements.Clear()
+        End Sub
+
+        Public Sub StartLoadingLiveData()
+            Dim descr = New ListTaskDescr() With {
+                    .Items = _elements.Keys.ToList(),
+                    .Fields = {BidField, AskField, LastField, VolumeField, VWAPField}.ToList(),
+                    .Name = Id,
+                    .Descr = SeriesName}
+
+            _quoteLoader.StartNewTask(descr)
+        End Sub
+
+        Private Sub QuoteLoaderOnNewData(data As Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double?)))) Handles _quoteLoader.OnNewData
+            Logger.Trace("QuoteLoaderOnNewData()")
+            ' data is a collection of Task -> RIC -> Field -> Value
+            ' I must calculate all yields and spreads and fire an event
+            If Not data.Keys.Contains(Id) Then Return
+            Dim quotes = data(Id)
+
+            For Each instrAndFields As KeyValuePair(Of String, Dictionary(Of String, Double?)) In quotes
+                Try
+                    Dim instrument As String = instrAndFields.Key
+                    Dim fieldsAndValues As Dictionary(Of String, Double?) = instrAndFields.Value
+
+                    ' checking if this bond is allowed to show up
+                    If Not _elements.Keys.Contains(instrument) Then
+                        Logger.Warn("Unknown instrument {0} in series {1}", instrument, SeriesName)
+                        Continue For
+                    End If
+
+                    ' now update data point
+                    Dim bondDataPoint = _elements(instrument)
+
+                    If fieldsAndValues.ContainsKey(VolumeField) Then
+                        bondDataPoint.TodayVolume = fieldsAndValues(VolumeField)
+                        RaiseEvent Volume(bondDataPoint)
+                    End If
+
+                    For Each fieldName In {BidField, AskField, LastField, VWAPField}
+                        If fieldsAndValues.ContainsKey(fieldName) AndAlso fieldsAndValues(fieldName) > 0 Then
+                            Dim fieldValue = fieldsAndValues(fieldName)
+                            Try
+                                HandleQuote(bondDataPoint, fieldName, fieldValue, Date.Today)
+                            Catch ex As Exception
+                                Logger.WarnException("Failed to plot the point", ex)
+                                Logger.Warn("Exception = {0}", ex.ToString())
+                            End Try
+                        Else
+                            If Not bondDataPoint.QuotesAndYields.ContainsKey(fieldName) Then
+                                DoLoadHistory(bondDataPoint.MetaData, fieldName)
+                            End If
+                        End If
+                    Next
+                Catch ex As Exception
+                    Logger.WarnException("Got exception", ex)
+                    Logger.Warn("Exception = {0}", ex.ToString())
+                End Try
+            Next
+        End Sub
+
+        Private Sub HandleQuote(ByVal bondDataPoint As VisualizableBond, ByVal fieldName As String, ByVal fieldVal As Double?, ByVal calcDate As Date)
+            Dim calculation As New CalculatedYield
+            calculation.Price = fieldVal
+            calculation.YieldSource = If(calcDate = Date.Today, YieldSource.Realtime, YieldSource.Historical)
+            CalculateYields(calcDate, bondDataPoint.MetaData, calculation)
+            _ansamble.CalcAllSpreads(calculation, bondDataPoint.MetaData)
+            bondDataPoint.QuotesAndYields(fieldName) = calculation
+            If bondDataPoint.SelectedQuote = fieldName Then RaiseEvent Quote(bondDataPoint, fieldName)
+        End Sub
+
+
+        Private Sub DoLoadHistory(ByVal bondDataPoint As DataBaseBondDescription, fieldName As String)
+            If Not {LastField, VWAPField}.Contains(fieldName) Then Exit Sub
+
+            If _historyLoaders.Any(Function(elem) elem.Key = bondDataPoint.RIC) Then
+                _historyLoaders(bondDataPoint.RIC).StopTask()
+                _historyLoaders.Remove(bondDataPoint.RIC)
+            End If
+
+            Logger.Debug("Will load {0}", bondDataPoint.RIC)
+
+            Dim historyTaskDescr = New HistoryTaskDescr() With {
+                    .Item = bondDataPoint.RIC,
+                    .StartDate = DateTime.Today.AddDays(-10),
+                    .EndDate = DateTime.Today,
+                    .Fields = {"DATE", "CLOSE", "VWAP"}.ToList,
+                    .Frequency = "D",
+                    .InterestingFields = {"DATE", "CLOSE", "VWAP"}.ToList()
+            }
+            Dim hst = New HistoryLoadManager(Eikon.SDK.CreateAdxRtHistory())
+            hst.StartTask(historyTaskDescr, AddressOf OnHistoricalQuotes)
+            If hst.Success Then
+                Logger.Info("Successfully added task for {0}", historyTaskDescr.Item)
+                _historyLoaders.Add(bondDataPoint.RIC, hst)
+            End If
+        End Sub
+
+        Private Sub OnHistoricalQuotes(ByVal hst As HistoryLoadManager, ByVal ric As String, ByVal datastatus As RT_DataStatus, ByVal data As Dictionary(Of Date, HistoricalItem))
+            Logger.Trace("OnHistoricalQuotes({0})", ric)
+            If datastatus = RT_DataStatus.RT_DS_FULL Then
+                RemoveHandler hst.NewData, AddressOf OnHistoricalQuotes
+
+                If data Is Nothing OrElse data.Count <= 0 Then
+                    Logger.Info("No data on {0} arrived", ric)
+                    Return
+                End If
+
+                Dim maxdate As Date, maxElem As HistoricalItem
+                Try
+                    maxdate = data.Where(Function(kvp) kvp.Value.SomePrice()).Select(Function(kvp) kvp.Key).Max
+                    maxElem = data(maxdate)
+                Catch ex As Exception
+                    Logger.Info("Failed to retreive max date for {0}", ric)
+                    Return
+                End Try
+
+                ' checking if this bond is allowed to show up
+                If Not _elements.Keys.Contains(ric) Then
+                    Logger.Warn("Unknown instrument {0} in series {1}", ric, SeriesName)
+                    Return
+                End If
+
+                ' now update data point
+                Dim bondDataPoint = _elements(ric)
+
+                If maxElem.Close > 0 Then
+                    HandleQuote(bondDataPoint, LastField, maxElem.Close, maxdate)
+                End If
+
+                If maxElem.VWAP > 0 Then
+                    HandleQuote(bondDataPoint, VWAPField, maxElem.Close, maxdate)
+                End If
+            End If
+            If datastatus <> RT_DataStatus.RT_DS_PARTIAL Then
+                SyncLock (_historyLoaders)
+                    If _historyLoaders.Any(Function(elem) elem.Key = ric) Then
+                        _historyLoaders(ric).StopTask()
+                        _historyLoaders.Remove(ric)
+                    End If
+                End SyncLock
+            End If
+        End Sub
+
+        Public Function HasRic(ByVal instrument As String) As Boolean
+            Return _elements.Any(Function(elem) elem.Key = instrument)
+        End Function
+
+        Public Sub AddElement(ByVal ric As String, ByVal descr As DataBaseBondDescription)
+            _elements.Add(ric, New VisualizableBond(Me, LastField, descr))
+        End Sub
+
+        Public Sub New(ansamble As VisualizableAnsamble)
+            _ansamble = ansamble
         End Sub
     End Class
 
@@ -194,7 +384,7 @@ Namespace Forms.ChartForm
 #End Region
 
 #Region "III. Spreads"
-    Friend Class SpreadContainer
+    Public Class SpreadContainer
         Private _currentMode As SpreadMode = SpreadMode.Yield
         Public Property CurrentMode As SpreadMode
             Get
@@ -244,87 +434,24 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Public Function CalculateSpreads(ByVal descr As DataPointDescr, Optional ByVal mode As SpreadMode = Nothing) As Double?
-            If mode Is Nothing Then ' calculate all spreads
-                If Benchmarks.ContainsKey(SpreadMode.ZSpread) Then CalculateZSpread(descr)
-                If Benchmarks.ContainsKey(SpreadMode.ASWSpread) Then CalculateASWSpread(descr)
-                If Benchmarks.ContainsKey(SpreadMode.PointSpread) Then CalculateISpread(descr)
-                Return GetQuote(descr)
-            Else ' calculate chosen spread
-                If mode.Equals(SpreadMode.PointSpread) And Benchmarks.ContainsKey(SpreadMode.PointSpread) Then
-                    CalculateISpread(descr)
-                ElseIf mode.Equals(SpreadMode.ZSpread) And Benchmarks.ContainsKey(SpreadMode.ZSpread) Then
-                    CalculateZSpread(descr)
-                ElseIf mode.Equals(SpreadMode.ASWSpread) And Benchmarks.ContainsKey(SpreadMode.ASWSpread) Then
-                    CalculateASWSpread(descr)
-                ElseIf Not mode.Equals(SpreadMode.Yield) Then
-                    SetQuote(descr, Nothing, mode)
-                End If
-                Return GetQuote(descr, mode)
-            End If
-        End Function
-
-        Private Sub CalculateISpread(ByVal descr As DataPointDescr)
-            Dim iSpreadMainCurve = Benchmarks(SpreadMode.PointSpread)
-            If TypeOf descr Is BondPointDescr Then
-                Dim tag As BondPointDescr = CType(descr, BondPointDescr)
-                tag.PointSpread = PointSpread(iSpreadMainCurve.ToArray(), tag)
-            ElseIf TypeOf descr Is BidAskPointDescr Then
-                Dim data = CType(descr, BidAskPointDescr)
-                Dim tag As BondPointDescr = New BondPointDescr(data.BondTag)
-                tag.CalcPrice = data.Price
-                tag.Duration = data.Duration
-                tag.Yld = data.Yld
-                data.PointSpread = PointSpread(iSpreadMainCurve.ToArray(), tag)
-            ElseIf TypeOf descr Is HistCurvePointDescr Then
-                Dim data = CType(descr, HistCurvePointDescr)
-                Dim tag As BondPointDescr = New BondPointDescr(data.BondTag)
-                tag.CalcPrice = data.Price
-                tag.Duration = data.Duration
-                tag.Yld = data.Yld
-                data.PointSpread = PointSpread(iSpreadMainCurve.ToArray(), tag)
-            End If
+        Public Sub CalcAllSpreads(ByRef descr As CalculatedYield, ByVal data As DataBaseBondDescription)
+            If Benchmarks.ContainsKey(SpreadMode.ZSpread) Then CalcZSpread(descr, data)
+            If Benchmarks.ContainsKey(SpreadMode.ASWSpread) Then CalcASWSpread(descr, data)
+            If Benchmarks.ContainsKey(SpreadMode.PointSpread) Then CalcISpread(descr)
         End Sub
 
-        Private Sub CalculateASWSpread(ByVal descr As DataPointDescr)
+        Private Sub CalcISpread(ByRef descr As CalculatedYield)
+            CalcPntSprd(Benchmarks(SpreadMode.PointSpread).ToArray(), descr)
+        End Sub
+
+        Private Sub CalcASWSpread(ByRef descr As CalculatedYield, ByVal data As DataBaseBondDescription)
             Dim aswSpreadMainCurve = Benchmarks(SpreadMode.ASWSpread)
             Dim bmk = CType(aswSpreadMainCurve, IAssetSwapBenchmark)
-            If TypeOf descr Is BondPointDescr Then
-                Dim tag As BondPointDescr = CType(descr, BondPointDescr)
-                tag.ASWSpread = ASWSpread(aswSpreadMainCurve.ToArray(), bmk.FloatLegStructure, bmk.FloatingPointValue, tag)
-            ElseIf TypeOf descr Is BidAskPointDescr Then
-                Dim data = CType(descr, BidAskPointDescr)
-                Dim tag As BondPointDescr = New BondPointDescr(data.BondTag)
-                tag.CalcPrice = data.Price
-                tag.Duration = data.Duration
-                data.ASWSpread = ASWSpread(aswSpreadMainCurve.ToArray(), bmk.FloatLegStructure, bmk.FloatingPointValue, tag)
-            ElseIf TypeOf descr Is HistCurvePointDescr Then
-                Dim data = CType(descr, HistCurvePointDescr)
-                Dim tag As BondPointDescr = New BondPointDescr(data.BondTag)
-                tag.CalcPrice = data.Price
-                tag.Duration = data.Duration
-                data.ASWSpread = ASWSpread(aswSpreadMainCurve.ToArray(), bmk.FloatLegStructure, bmk.FloatingPointValue, tag)
-            End If
+            CalcASWSprd(aswSpreadMainCurve.ToArray(), bmk.FloatLegStructure, bmk.FloatingPointValue, descr, data)
         End Sub
 
-        Private Sub CalculateZSpread(ByVal descr As DataPointDescr)
-            Dim zSpreadMainCurve = Benchmarks(SpreadMode.ZSpread)
-            If TypeOf descr Is BondPointDescr Then
-                Dim tag As BondPointDescr = CType(descr, BondPointDescr)
-                tag.ZSpread = ZSpread(zSpreadMainCurve.ToArray(), tag)
-            ElseIf TypeOf descr Is HistCurvePointDescr Then
-                Dim data As HistCurvePointDescr = CType(descr, HistCurvePointDescr)
-                Dim tag As BondPointDescr = New BondPointDescr(data.BondTag)
-                tag.CalcPrice = data.Price
-                tag.Duration = data.Duration
-                data.ZSpread = ZSpread(zSpreadMainCurve.ToArray(), tag)
-            ElseIf TypeOf descr Is BidAskPointDescr Then
-                Dim data = CType(descr, BidAskPointDescr)
-                Dim tag As BondPointDescr = New BondPointDescr(data.BondTag)
-                tag.CalcPrice = data.Price
-                tag.Duration = data.Duration
-                data.ZSpread = ZSpread(zSpreadMainCurve.ToArray(), tag)
-            End If
+        Private Sub CalcZSpread(ByRef descr As CalculatedYield, ByVal data As DataBaseBondDescription)
+            CalcZSprd(Benchmarks(SpreadMode.ZSpread).ToArray(), descr, data)
         End Sub
 
         Public Sub CleanupCurve(ByVal curve As ICurve)
@@ -349,6 +476,24 @@ Namespace Forms.ChartForm
             End If
             RaiseEvent SpreadUpdated(mode, _currentMode)
         End Sub
+
+        Public Function GetQt(ByVal calc As CalculatedYield) As Double?
+            Dim fieldName = _currentMode.ToString()
+            If fieldName = "Yield" Then
+                Return calc.Yld.Yield
+            Else
+                Dim value As Object
+                Dim fieldInfo = GetType(CalculatedYield).GetField(fieldName)
+                If fieldInfo IsNot Nothing Then
+                    value = fieldInfo.GetValue(calc)
+                Else
+                    Dim propertyInfo = GetType(DataPointDescr).GetProperty(fieldName)
+                    value = propertyInfo.GetValue(calc, Nothing)
+                End If
+                If value IsNot Nothing Then Return CDbl(value)
+            End If
+            Return Nothing
+        End Function
     End Class
 
     Public Class SpreadMode
@@ -444,109 +589,6 @@ Namespace Forms.ChartForm
         Public Overrides Function ToString() As String
             Return String.Format("{0:P2} {1:F2}", Yld, Duration)
         End Function
-
-        Public Function Fits(ByVal minX As Double, ByVal minY As Double, ByVal maxX As Double, ByVal maxY As Double) As Boolean
-            Return IsValid And (Duration >= minX And Duration <= maxX And Yld.Yield >= minY And Yld.Yield <= maxY)
-        End Function
-    End Class
-
-    Public Class BondPointDescr
-        Inherits DataPointDescr
-
-        Public RIC As String
-        Public ShortName As String
-        Public Label As String
-
-        Public Maturity As Date
-        Public Coupon As Double
-
-        Public YieldSource As YieldSource
-
-        Public CalcPrice As Double
-
-        Public SelectedQuote As QuoteSource
-
-        Public IssuerID As Integer
-        Public SeriesName As String
-        Public PaymentStructure As String
-        Public PaymentStream As BondPayments
-        Public RateStructure As String
-        Public IssueDate As Date
-
-        Public Sub New()
-
-        End Sub
-
-        Public Sub New(ByVal descr As BondPointDescr)
-            With descr
-                RIC = .RIC
-                ShortName = .ShortName
-                Label = .Label
-                Maturity = .Maturity
-                Coupon = .Coupon
-                YieldSource = .YieldSource
-                YieldAtDate = .YieldAtDate
-                Yld = descr.Yld
-                CalcPrice = .CalcPrice
-                SelectedQuote = .SelectedQuote
-                IssuerID = .IssuerID
-                SeriesName = .SeriesName
-                PaymentStructure = .PaymentStructure
-                PaymentStream = New BondPayments(.PaymentStream)
-                RateStructure = .RateStructure
-                IssueDate = .IssueDate
-            End With
-        End Sub
-
-        Public Overrides Property PointSpread As Double?
-        Public Overrides Property ZSpread As Double?
-        Public Overrides Property OASpread As Double?
-        Public Overrides Property ASWSpread As Double?
-
-        Public Overrides ReadOnly Property IsValid() As Boolean
-            Get
-                Return CalcPrice > AroundZero And Yld.Yield > MinYield / 100.0 And Yld.Yield < MaxYield / 100.0 And Duration > MinDur And Duration < MaxDur
-            End Get
-        End Property
-
-        Public Overrides Function ToString() As String
-            Return RIC
-        End Function
-
-        Public Function ToLongString() As String
-            Return String.Format("{0}; Last {1:F2}; {2:P2}/{3:F2}", RIC, CalcPrice, Yld, Duration)
-        End Function
-    End Class
-
-    Friend Class BidAskPointDescr
-        Inherits DataPointDescr
-        Private _bidAsk As String
-        Private _bondTag As BondPointDescr
-        Public Price As Double
-
-        Public Overrides ReadOnly Property IsValid() As Boolean
-            Get
-                Return Yld.Yield > MinYield / 100.0 And Yld.Yield < MaxYield / 100.0 And Duration > MinDur And Duration < MaxDur
-            End Get
-        End Property
-
-        Public Property BidAsk() As String
-            Get
-                Return _bidAsk
-            End Get
-            Set(ByVal value As String)
-                _bidAsk = value
-            End Set
-        End Property
-
-        Public Property BondTag() As BondPointDescr
-            Get
-                Return _bondTag
-            End Get
-            Set(ByVal value As BondPointDescr)
-                _bondTag = value
-            End Set
-        End Property
     End Class
 
     Friend Class MoneyMarketPointDescr
@@ -585,24 +627,24 @@ Namespace Forms.ChartForm
         Public SwpCurve As SwapCurve
     End Class
 
-    Friend Class HistCurvePointDescr
-        Inherits DataPointDescr
+    'Friend Class HistCurvePointDescr
+    '    Inherits DataPointDescr
 
-        Public Overrides ReadOnly Property IsValid() As Boolean
-            Get
-                Return True
-            End Get
-        End Property
+    '    Public Overrides ReadOnly Property IsValid() As Boolean
+    '        Get
+    '            Return True
+    '        End Get
+    '    End Property
 
-        Public HistCurveName As String
-        Public RIC As String
-        Public BondTag As BondPointDescr
-        Public Price As Double
+    '    Public HistCurveName As String
+    '    Public RIC As String
+    '    Public BondTag As BondPointDescr
+    '    Public Price As Double
 
-        Public Overrides Function ToString() As String
-            Return RIC
-        End Function
-    End Class
+    '    Public Overrides Function ToString() As String
+    '        Return RIC
+    '    End Function
+    'End Class
 #End Region
 
 #Region "V. Curves descriptions"

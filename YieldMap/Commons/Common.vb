@@ -41,13 +41,6 @@ Namespace Commons
             End Try
         End Sub
 
-        Public Function GetWin1251String(ByVal str As String) As String 'todo no effect
-            Dim win1251 = Encoding.GetEncoding(1251)
-            Dim utf8Bytes = Encoding.UTF8.GetBytes(str)
-            Dim win1251Bytes = Encoding.Convert(Encoding.UTF8, win1251, utf8Bytes)
-            Return New String(win1251.GetChars(win1251Bytes))
-        End Function
-
         Public Function GetEnvironment() As String
             Dim res As String = ""
             res += String.Format("CommandLine = {0}", Environment.CommandLine) + Environment.NewLine

@@ -152,7 +152,7 @@
     <Compile Include="Forms\AboutForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\ChartForm\BondDescriber.vb" />
+    <Compile Include="Commons\BondDescriber.vb" />
     <Compile Include="Forms\ChartForm\ChartElements.vb" />
     <Compile Include="Forms\ChartForm\GraphForm.Designer.vb">
       <DependentUpon>GraphForm.vb</DependentUpon>
@@ -244,6 +244,7 @@
     <Compile Include="Tools\BondPayments.vb" />
     <Compile Include="Tools\Chains\ChainHandler.vb" />
     <Compile Include="Tools\Chains\ChainLoadManager.vb" />
+    <Compile Include="Tools\Element.vb" />
     <Compile Include="Tools\Estimation\LinearRegression.vb" />
     <Compile Include="Tools\History\HistoryLoadManager.vb" />
     <Compile Include="Tools\Lists\ListLoadManager.vb" />

@@ -3,7 +3,6 @@ Imports DotNumerics.Optimization
 Imports MathNet.Numerics.Interpolation.Algorithms
 Imports MathNet.Numerics.LinearAlgebra.Double
 Imports System.Reflection
-Imports YieldMap.Curves
 
 Namespace Tools.Estimation
     Public Enum EstimationType
@@ -471,8 +470,8 @@ Namespace Tools.Estimation
             Dim y As List(Of Double)
             Select Case mode
                 Case SpreadMode.Yield
-                    x = data.Select(Function(elem) elem.Duration).ToList()
-                    y = data.Select(Function(elem) elem.Yield).ToList()
+                    x = data.Where(Function(elem) elem.Yield.HasValue).Select(Function(elem) elem.Duration).ToList()
+                    y = data.Where(Function(elem) elem.Yield.HasValue).Select(Function(elem) elem.Yield.Value).ToList()
                 Case SpreadMode.PointSpread
                     x = data.Where(Function(elem) elem.PointSpread.HasValue).Select(Function(elem) elem.Duration).ToList()
                     y = data.Where(Function(elem) elem.PointSpread.HasValue).Select(Function(elem) elem.PointSpread.Value).ToList()

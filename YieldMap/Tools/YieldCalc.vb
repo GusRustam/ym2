@@ -3,7 +3,6 @@ Imports System.Globalization
 Imports AdfinXAnalyticsFunctions
 Imports System.ComponentModel
 Imports YieldMap.Commons
-Imports YieldMap.Forms.ChartForm
 Imports NLog
 Imports System.Text.RegularExpressions
 Imports YieldMap.Tools.Estimation
@@ -124,7 +123,6 @@ Namespace Tools
         Implements IComparable(Of YieldStructure)
         Public ToWhat As YieldToWhat
         Public Yield As Double
-        'Public YieldAtDate As DateTime
         Public YieldToDate As Date
 
         Public Function CompareTo(ByVal other As YieldStructure) As Integer Implements IComparable(Of YieldStructure).CompareTo
@@ -162,11 +160,11 @@ Namespace Tools
                                  price, yield, yieldToWhat.Abbr, duration)
         End Function
 
-        Public Function ZSpread(ByVal rateArray As Array, descr As BondPointDescr) As Double?
-            If descr.CalcPrice > 0 Then
+        Public Function CalcZSprd(ByVal rateArray As Array, descr As BasicYieldDuration, data As DataBaseBondDescription) As Double?
+            If descr.Price > 0 Then
                 Try
-                    Dim settleDate = BondModule.BdSettle(DateTime.Today, descr.PaymentStructure)
-                    Return BondModule.AdBondSpread(settleDate, rateArray, descr.CalcPrice / 100.0, descr.Maturity, descr.Coupon / 100.0, descr.PaymentStructure, "ZCTYPE:RATE IM:LIX RM:YC", "", "")
+                    Dim settleDate = BondModule.BdSettle(DateTime.Today, data.PaymentStructure)
+                    Return BondModule.AdBondSpread(settleDate, rateArray, descr.Price / 100.0, data.Maturity, data.Coupon / 100.0, data.PaymentStructure, "ZCTYPE:RATE IM:LIX RM:YC", "", "")
                 Catch ex As Exception
                     Logger.ErrorException("Failed to calculate Z-Spread", ex)
                     Logger.Error("Exception = {0}", ex.ToString())
@@ -177,13 +175,13 @@ Namespace Tools
             End If
         End Function
 
-        Public Function PointSpread(ByVal rateArray As Array, descr As DataPointDescr) As Double?
+        Public Function CalcPntSprd(ByVal rateArray As Array, descr As BasicYieldDuration) As Double?
             Dim data As New List(Of XY)
             For i = rateArray.GetLowerBound(0) To rateArray.GetUpperBound(0)
                 data.Add(New XY() With {.Y = rateArray.GetValue(i, 1), .X = (CDate(rateArray.GetValue(i, 0)) - descr.YieldAtDate).Days / 365})
             Next
 
-            Dim yld = descr.Yld.Yield
+            Dim yld = descr.GetYield()
             Dim duration = descr.Duration
 
             If data.Count() >= 2 Then
@@ -205,14 +203,14 @@ Namespace Tools
             Return Nothing
         End Function
 
-        Public Function ASWSpread(ByVal rateArray As Array, ByVal floatLegStructure As String, ByVal floatingRate As Double, descr As BondPointDescr) As Double?
-            If descr.CalcPrice > 0 Then
+        Public Function CalcASWSprd(ByVal rateArray As Array, ByVal floatLegStructure As String, ByVal floatingRate As Double, descr As BasicYieldDuration, data As DataBaseBondDescription) As Double?
+            If descr.Price > 0 Then
                 Try
-                    Dim settleDate = BondModule.BdSettle(DateTime.Today, descr.PaymentStructure)
-                    Dim res As Array = SwapModule.AdAssetSwapBdSpread(settleDate, descr.Maturity, rateArray, descr.CalcPrice / 100.0, descr.Coupon / 100.0, floatingRate, descr.PaymentStructure, floatLegStructure, "ZCTYPE:RATE IM:LIX RM:YC", "")
+                    Dim settleDate = BondModule.BdSettle(DateTime.Today, data.PaymentStructure)
+                    Dim res As Array = SwapModule.AdAssetSwapBdSpread(settleDate, data.Maturity, rateArray, descr.Price / 100.0, data.Coupon / 100.0, floatingRate, data.PaymentStructure, floatLegStructure, "ZCTYPE:RATE IM:LIX RM:YC", "")
                     Return res.GetValue(1, 1)
                 Catch ex As Exception
-                    Logger.ErrorException("Failed to calculate ASW-Spread", ex)
+                    Logger.ErrorException("Failed to calculate ASW Spread", ex)
                     Logger.Error("Exception = {0}", ex.ToString())
                     Return Nothing
                 End Try
@@ -221,18 +219,13 @@ Namespace Tools
             End If
         End Function
 
-        Public Function CalcYield(ByRef price As Double, ByVal dt As DateTime, descr As BondPointDescr) As DataPointDescr
-            Logger.Trace("CalcYield({0}, {1})", price, descr.RIC)
-
-            If descr.PaymentStream Is Nothing Then
-                descr.PaymentStream = New BondPayments(descr.IssueDate, descr.Maturity, descr.PaymentStructure, descr.Coupon)
-                Logger.Trace("Adding bond payments for {0}: {1}", descr.ShortName, descr.PaymentStream)
-            End If
+        Public Sub CalculateYields(ByVal dt As DateTime, ByVal descr As DataBaseBondDescription, ByRef calc As BasicYieldDuration)
+            Logger.Trace("CalculateYields({0}, {1})", calc.Price, descr.RIC)
 
             Dim coupon = descr.PaymentStream.GetCouponByDate(dt)
             Dim settleDate = BondModule.BdSettle(dt, descr.PaymentStructure)
             Logger.Trace("Coupon: {0}, settleDate: {1}, maturity: {2}", coupon, settleDate, descr.Maturity)
-            Dim bondYield As Array = BondModule.AdBondYield(settleDate, price / 100, descr.Maturity, coupon, descr.PaymentStructure, descr.RateStructure, "")
+            Dim bondYield As Array = BondModule.AdBondYield(settleDate, calc.Price / 100, descr.Maturity, coupon, descr.PaymentStructure, descr.RateStructure, "")
             Dim bestYield = ParseBondYield(bondYield).Max
             Logger.Trace("best Yield: {0}", bestYield)
 
@@ -248,9 +241,20 @@ Namespace Tools
             Dim duration = bondDeriv.GetValue(1, 5)
             Dim convexity = bondDeriv.GetValue(1, 7)
             Dim pvbp = bondDeriv.GetValue(1, 4)
-            Logger.Trace("duration: {0}", duration)
-            Return New DataPointDescr With {.Duration = duration, .Convexity = convexity, .PVBP = pvbp, .Yld = bestYield, .YieldAtDate = dt}
-        End Function
+
+            calc.Duration = duration
+            calc.YieldAtDate = dt
+
+            If TypeOf (calc) Is CalculatedYield Then
+                Dim clc = CType(calc, CalculatedYield)
+                clc.Convexity = convexity
+                clc.PVBP = pvbp
+                clc.Yld = bestYield
+            ElseIf TypeOf (calc) Is YieldDuration Then
+                Dim clc = CType(calc, YieldDuration)
+                clc.Yield = bestYield.Yield
+            End If
+        End Sub
 
         Private Function ParseBondYield(ByVal bondYield As Array) As List(Of YieldStructure)
             Dim res As New List(Of YieldStructure)

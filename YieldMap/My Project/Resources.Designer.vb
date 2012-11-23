@@ -200,6 +200,15 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Ищет локализованную строку, похожую на Hide description pane.
+        '''</summary>
+        Friend ReadOnly Property HideDescriptionPane() As String
+            Get
+                Return ResourceManager.GetString("HideDescriptionPane", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Ищет локализованную строку, похожую на Initialization of EikonDesktopSDK Fail.
         '''</summary>
         Friend ReadOnly Property Init_Eikon_Fail() As String
@@ -323,6 +332,15 @@ Namespace My.Resources
             Get
                 Dim obj As Object = ResourceManager.GetObject("SettingsLarge", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Ищет локализованную строку, похожую на Show description pane.
+        '''</summary>
+        Friend ReadOnly Property ShowDescriptionPane() As String
+            Get
+                Return ResourceManager.GetString("ShowDescriptionPane", resourceCulture)
             End Get
         End Property
         

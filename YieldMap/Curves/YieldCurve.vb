@@ -38,7 +38,8 @@ Namespace Curves
         Private ReadOnly _name As String
         Private ReadOnly _fullname As String
         Private ReadOnly _color As Color
-        Private ReadOnly _descrs As New Dictionary(Of String, BondPointDescr)
+        Private ReadOnly _meta As New Dictionary(Of String, DataBaseBondDescription)
+
         Private _date As Date
         Private _quote As String
         Private _bootstrapped As Boolean
@@ -65,9 +66,9 @@ Namespace Curves
 
             Dim emptyRics As New List(Of String)
             rics.ForEach(Sub(ric)
-                             Dim descr = GetBondDescr(ric)
-                             If descr IsNot Nothing Then
-                                 _descrs.Add(ric, descr)
+                             Dim meta = Commons.GetBondInfo(ric)
+                             If meta IsNot Nothing Then
+                                 _meta.Add(ric, meta)
                              Else
                                  Logger.Error("No description for ric {0} found", ric)
                                  emptyRics.Add(ric)
@@ -82,7 +83,7 @@ Namespace Curves
         Protected Overrides Sub StartRealTime()
             If Not _quoteLoader.StartNewTask(New ListTaskDescr() With {
                                                 .Name = _name,
-                                                .Items = _descrs.Keys.ToList(),
+                                                .Items = Descrs.Keys.ToList(),
                                                 .Fields = {_quote}.ToList()
                                             }) Then
                 Logger.Error("Failed to start loading bonds data")
@@ -92,7 +93,7 @@ Namespace Curves
 
         Protected Overrides Sub LoadHistory()
             Logger.Debug("LoadHistory")
-            _descrs.Keys.ToList().ForEach(Sub(ric) DoLoadRIC(ric, {"DATE", _fieldNames(QuoteSource.Hist)}.ToList, _date))
+            Descrs.Keys.ToList().ForEach(Sub(ric) DoLoadRIC(ric, {"DATE", _fieldNames(QuoteSource.Hist)}.ToList, _date))
         End Sub
 
         Public Overrides Function GetBrokers() As String()
@@ -141,37 +142,16 @@ Namespace Curves
 
             Select Case BmkSpreadMode
                 Case SpreadMode.PointSpread
-                    res.ForEach(Sub(elem)
-                                    elem.PointSpread = PointSpread(
-                                        Benchmark.ToArray(),
-                                        New DataPointDescr() With {
-                                            .Yld = New YieldStructure() With {.Yield = elem.Yield},
-                                            .YieldAtDate = elem.YieldAtDate,
-                                            .Duration = elem.Duration
-                                        })
-                                End Sub)
+                    res.ForEach(Sub(elem) CalcPntSprd(Benchmark.ToArray(), elem))
                     Return res
                 Case SpreadMode.ZSpread
-                    res.ForEach(Sub(elem)
-                                    Dim dscr = _descrs(elem.RIC)
-                                    With dscr
-                                        .Yld = New YieldStructure() With {.Yield = elem.Yield}
-                                        .Duration = elem.Duration
-                                        .CalcPrice = elem.CalcPrice
-                                    End With
-                                    elem.ZSpread = ZSpread(Benchmark.ToArray(), dscr)
-                                End Sub)
+                    res.ForEach(Sub(elem) CalcZSprd(Benchmark.ToArray(), Descrs(elem.RIC), _meta(elem.RIC)))
                     Return res
 
                 Case SpreadMode.ASWSpread
                     res.ForEach(Sub(elem)
-                                    Dim dscr = _descrs(elem.RIC)
-                                    With dscr
-                                        .Yld = New YieldStructure() With {.Yield = elem.Yield}
-                                        .Duration = elem.Duration
-                                    End With
                                     Dim bmk = CType(Benchmark, IAssetSwapBenchmark)
-                                    elem.ASWSpread = ASWSpread(Benchmark.ToArray(), bmk.FloatLegStructure, bmk.FloatingPointValue, dscr)
+                                    CalcASWSprd(Benchmark.ToArray(), bmk.FloatLegStructure, bmk.FloatingPointValue, Descrs(elem.RIC), _meta(elem.RIC))
                                 End Sub)
                     Return res
 
@@ -197,7 +177,7 @@ Namespace Curves
 
         Public Overrides Function GetDuration(ByVal ric As String) As Double
             If Not CurveData.Any(Function(elem) elem.RIC = ric) Then
-                Return _descrs(ric).Duration
+                Return Descrs(ric).Duration
             Else
                 Return CurveData.First(Function(elem) elem.RIC = ric).Duration
             End If
@@ -217,19 +197,8 @@ Namespace Curves
                     End Try
                     If price > 0 Then
                         Try
-                            Dim yieldDur = CalcYield(price, maxdate, _descrs(ric))
-
-                            Dim duration = yieldDur.Duration
-                            Dim bestYield = yieldDur.Yld
-
-                            Dim yieldDuration = New YieldDuration() With {
-                                .Yield = bestYield.Yield,
-                                .Duration = duration,
-                                .RIC = ric,
-                                .CalcPrice = price,
-                                .YieldAtDate = maxdate
-                            }
-                            AddCurveItem(yieldDuration)
+                            Descrs(ric).Price = price
+                            CalculateYields(maxdate, _meta(ric), Descrs(ric))
                             NotifyUpdated(Me)
                         Catch ex As Exception
                             Logger.WarnException("Failed to parse instrument " + ric, ex)
@@ -273,30 +242,11 @@ Namespace Curves
                         Dim ric = ricAndFieldValue.Key
                         Logger.Trace("Got RIC {0}", ric)
 
-                        ' define yield curve elem
-                        Dim yieldDuration = New YieldDuration() With {
-                            .Duration = GetDuration(ric),
-                            .RIC = ric
-                        }
-
                         If ricAndFieldValue.Value.Keys.Contains(_quote) AndAlso CDbl(ricAndFieldValue.Value(_quote)) > 0 Then
                             Try
                                 Dim price = CDbl(ricAndFieldValue.Value(_quote))
-                                ' calculating new yield / duration
-
-                                Dim yieldDur = CalcYield(price, _date, _descrs(ric))
-
-                                Dim duration = yieldDur.Duration
-                                Dim bestYield = yieldDur.Yld
-
-                                With yieldDuration
-                                    .Yield = bestYield.Yield
-                                    .Duration = duration
-                                    .CalcPrice = price
-                                    .YieldAtDate = _date
-                                End With
-
-                                AddCurveItem(yieldDuration)
+                                Descrs(ric).Price = price
+                                CalculateYields(_date, _meta(ric), Descrs(ric))
                                 NotifyUpdated(Me)
                             Catch ex As Exception
                                 Logger.WarnException("Failed to parse realtime data", ex)
@@ -330,6 +280,10 @@ Namespace Curves
             NotifyUpdated(Me)
         End Sub
 
+        Protected Overrides Function GetRICs(ByVal broker As String) As List(Of String)
+            Return _meta.Keys.ToList()
+        End Function
+
         Public Overrides Function GetCurveData() As List(Of XY)
             Dim crv = CalculateSpread(CurveData)
             Return _estimator.Approximate(If(_bootstrapped, Bootstrap(crv), crv), BmkSpreadMode)
@@ -359,13 +313,13 @@ Namespace Curves
         Public Function Bootstrap(ByVal data As List(Of YieldDuration)) As List(Of YieldDuration) Implements IBootstrappable.Bootstrap
             Dim params(0 To CurveData.Count() - 1, 5) As Object
             For i = 0 To CurveData.Count - 1
-                Dim descr = _descrs(CurveData(i).RIC)
+                Dim meta = _meta(CurveData(i).RIC)
                 params(i, 0) = "B"
                 params(i, 1) = _date
-                params(i, 2) = descr.Maturity
-                params(i, 3) = descr.Coupon / 100.0            ' todo coupon @ date
-                params(i, 4) = CurveData(i).CalcPrice / 100.0
-                params(i, 5) = descr.PaymentStructure
+                params(i, 2) = meta.Maturity
+                params(i, 3) = meta.PaymentStream.GetCouponByDate(_date)
+                params(i, 4) = CurveData(i).Price / 100.0
+                params(i, 5) = meta.PaymentStructure
             Next
             Dim curveModule = New AdxYieldCurveModule
 

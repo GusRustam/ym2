@@ -1,5 +1,6 @@
 Imports System.Drawing
 Imports AdfinXRtLib
+Imports YieldMap.Tools
 Imports YieldMap.Tools.Estimation
 Imports YieldMap.Forms.ChartForm
 Imports YieldMap.Tools.History
@@ -19,6 +20,8 @@ Namespace Curves
 
     Public MustInherit Class SwapCurve
         Implements ICurve
+
+        Protected ReadOnly Descrs As New Dictionary(Of String, YieldDuration)
 
         Private ReadOnly _clearedHandler As Action(Of ICurve)
         Private ReadOnly _updatedHandler As Action(Of ICurve, List(Of XY))
@@ -85,20 +88,10 @@ Namespace Curves
         End Sub
 
 
-        '' CURVE DESCRIPTION
-        Protected ReadOnly CurveData As New List(Of YieldDuration) ' RIC -> Yield / Duration
         Protected Overridable Property BaseInstrumentPrice As Double
-
 #End Region
 
 #Region "Protected non-overridable tools"
-        '' INSERT NEW DATA INTO CURVE
-        Protected Sub AddCurveItem(ByVal yieldDuration As YieldDuration)
-            CurveData.RemoveAll(Function(item) item.RIC = yieldDuration.RIC)
-            CurveData.Add(yieldDuration)
-            CurveData.Sort()
-        End Sub
-
         '' LOAD SEPARATE RIC (HISTORICAL)
         Protected Sub DoLoadRIC(ric As String, fields As List(Of String), aDate As Date)
             Logger.Debug("DoLoadRIC({0})", ric)
@@ -142,6 +135,13 @@ Namespace Curves
         End Sub
 #End Region
 
+        Protected ReadOnly Property CurveData() As List(Of YieldDuration)
+            Get
+                Dim list = Descrs.Values.ToList()
+                Return list.Where(Function(elem) elem.Yield.HasValue).ToList()
+            End Get
+        End Property
+
 #Region "Events"
         Public Event Cleared As Action(Of ICurve) Implements ICurve.Cleared
         Public Event Updated As Action(Of ICurve, List(Of XY)) Implements ICurve.Updated
@@ -169,8 +169,10 @@ Namespace Curves
             If _recalculatedHandler IsNot Nothing Then AddHandler Recalculated, _recalculatedHandler
         End Sub
 
+        Protected MustOverride Function GetRICs(ByVal broker As String) As List(Of String)
+
         Public Overridable Function ToArray() As Array Implements ICurve.ToArray
-            Dim len = CurveData.Count - 1
+            Dim len = Descrs.Values.Count - 1
             Dim res(0 To len, 1) As Object
             For i = 0 To len
                 res(i, 0) = DateTime.Today.AddDays(TimeSpan.FromDays(CurveData(i).Duration * 365).TotalDays)
@@ -190,6 +192,8 @@ Namespace Curves
         '' LOADING DATA
         Public Overridable Sub Subscribe()
             Logger.Debug("Subscirbe({0})", GetName())
+            Descrs.Clear()
+            GetRICs(GetBroker()).ForEach(Sub(ric As String) Descrs.Add(ric, New YieldDuration()))
             StopLoaders()
             If GetDate() = Date.Today Then
                 StartRealTime()

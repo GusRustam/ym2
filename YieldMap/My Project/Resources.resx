@@ -280,4 +280,10 @@
   <data name="Unhandled_thread_exception">
     <value xml:space="preserve">Unhandled thread exception</value>
   </data>
+  <data name="ShowDescriptionPane" xml:space="preserve">
+    <value>Show description pane</value>
+  </data>
+  <data name="HideDescriptionPane" xml:space="preserve">
+    <value>Hide description pane</value>
+  </data>
 </root>
