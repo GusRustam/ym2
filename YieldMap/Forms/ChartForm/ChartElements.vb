@@ -16,7 +16,7 @@ Namespace Forms.ChartForm
         Synthetic
     End Enum
 
-    Public Enum QuoteSource 'todo get rid, it's too individual
+    Public Enum QuoteSource
         Bid
         Ask
         Last
@@ -60,7 +60,10 @@ Namespace Forms.ChartForm
         End Function
 
         Public Sub Cleanup()
-            _groups.ForEach(Sub(group) group.Cleanup())
+            _groups.ForEach(Sub(group)
+                                group.Cleanup()
+                                RemoveHandler group.Quote, AddressOf OnGroupQuote
+                            End Sub)
             _groups.Clear()
         End Sub
 
@@ -199,17 +202,17 @@ Namespace Forms.ChartForm
             _quoteLoader.StartNewTask(descr)
         End Sub
 
-        Private Sub QuoteLoaderOnNewData(data As Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double?)))) Handles _quoteLoader.OnNewData
+        Private Sub QuoteLoaderOnNewData(data As Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double)))) Handles _quoteLoader.OnNewData
             Logger.Trace("QuoteLoaderOnNewData()")
             ' data is a collection of Task -> RIC -> Field -> Value
             ' I must calculate all yields and spreads and fire an event
             If Not data.Keys.Contains(Id) Then Return
             Dim quotes = data(Id)
 
-            For Each instrAndFields As KeyValuePair(Of String, Dictionary(Of String, Double?)) In quotes
+            For Each instrAndFields As KeyValuePair(Of String, Dictionary(Of String, Double)) In quotes
                 Try
                     Dim instrument As String = instrAndFields.Key
-                    Dim fieldsAndValues As Dictionary(Of String, Double?) = instrAndFields.Value
+                    Dim fieldsAndValues As Dictionary(Of String, Double) = instrAndFields.Value
 
                     ' checking if this bond is allowed to show up
                     If Not _elements.Keys.Contains(instrument) Then
@@ -256,7 +259,6 @@ Namespace Forms.ChartForm
             bondDataPoint.QuotesAndYields(fieldName) = calculation
             If bondDataPoint.SelectedQuote = fieldName Then RaiseEvent Quote(bondDataPoint, fieldName)
         End Sub
-
 
         Private Sub DoLoadHistory(ByVal bondDataPoint As DataBaseBondDescription, fieldName As String)
             If Not {LastField, VWAPField}.Contains(fieldName) Then Exit Sub
@@ -341,6 +343,10 @@ Namespace Forms.ChartForm
         Public Sub New(ansamble As VisualizableAnsamble)
             _ansamble = ansamble
         End Sub
+
+        Public Function GetElement(ByVal ric As String) As VisualizableBond
+            Return _elements(ric)
+        End Function
     End Class
 
     Friend Class ColorElement

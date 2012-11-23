@@ -38,7 +38,7 @@ Namespace Tools.Lists
 
         Private ReadOnly _activeTasks As New Dictionary(Of String, ListTaskDescr)
 
-        Public Event OnNewData As Action(Of Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double?))))
+        Public Event OnNewData As Action(Of Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double))))
         Public Sub DiscardTask(ByVal taskName As String)
             Logger.Debug("DiscardTask({0})", taskName)
             If _activeTasks.ContainsKey(taskName) Then
@@ -80,17 +80,17 @@ Namespace Tools.Lists
             End With
         End Sub
 
-        Private Shared Sub InsertIntoTRFV(ByRef trfv As Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double?))), ByVal task As String, ByVal ric As String, ByVal field As String, ByVal value As Double?)
-            If Not trfv.ContainsKey(Task) Then trfv.Add(Task, New Dictionary(Of String, Dictionary(Of String, Double?)))
-            Dim rfv As Dictionary(Of String, Dictionary(Of String, Double?)) = trfv(Task)
-            If Not rfv.ContainsKey(Ric) Then rfv.Add(Ric, New Dictionary(Of String, Double?))
-            Dim fv As Dictionary(Of String, Double?) = rfv(ric)
+        Private Shared Sub InsertIntoTRFV(ByRef trfv As Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double))), ByVal task As String, ByVal ric As String, ByVal field As String, ByVal value As Double?)
+            If Not trfv.ContainsKey(task) Then trfv.Add(task, New Dictionary(Of String, Dictionary(Of String, Double)))
+            Dim rfv As Dictionary(Of String, Dictionary(Of String, Double)) = trfv(task)
+            If Not rfv.ContainsKey(ric) Then rfv.Add(ric, New Dictionary(Of String, Double))
+            Dim fv As Dictionary(Of String, Double) = rfv(ric)
             If Not fv.ContainsKey(field) Then fv.Add(field, value)
         End Sub
 
         Private Sub OnTimeHandler() Handles _listManager.OnTime
             Logger.Trace("OnTimeHandler()")
-            Dim taskRicFieldValue As New Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double?))) 'Task -> RIC -> Field -> Value
+            Dim taskRicFieldValue As New Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double))) 'Task -> RIC -> Field -> Value
 
             Try
                 Dim items As Array = _listManager.ListItems(RT_ItemRowView.RT_IRV_UPDATED, RT_ItemColumnView.RT_ICV_STATUS)

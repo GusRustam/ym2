@@ -17,8 +17,6 @@ Namespace Curves
         ReadOnly Property FloatingPointValue() As Double
     End Interface
 
-
-
     Public Class RubIRS
         Inherits SwapCurve
         Implements IBootstrappable
@@ -154,25 +152,19 @@ Namespace Curves
         End Sub
 
         '' REALTIME DATA ARRIVED
-        Private Sub OnRealTimeData(ByVal data As Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double?)))) Handles _quoteLoader.OnNewData
+        Private Sub OnRealTimeData(ByVal data As Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double)))) Handles _quoteLoader.OnNewData
             Logger.Debug("OnRealTimeData")
-            For Each listAndRFV As KeyValuePair(Of String, Dictionary(Of String, Dictionary(Of String, Double?))) In data
+            For Each listAndRFV As KeyValuePair(Of String, Dictionary(Of String, Dictionary(Of String, Double))) In data
                 Dim list = listAndRFV.Key
                 Dim rfv = listAndRFV.Value
 
                 If list = Me.GetType().Name Then
                     Logger.Info(Me.GetType().Name)
-                    For Each ricAndFieldValue As KeyValuePair(Of String, Dictionary(Of String, Double?)) In rfv
+                    For Each ricAndFieldValue As KeyValuePair(Of String, Dictionary(Of String, Double)) In rfv
                         Dim ric = ricAndFieldValue.Key
                         Logger.Trace("Got RIC {0}", ric)
 
                         ' define yield curve elem
-                        'Dim yieldDuration = New YieldDuration() With {
-                        '    .Duration = GetDuration(ric),
-                        '    .RIC = ric,
-                        '    .YieldAtDate = _theDate
-                        '}
-
                         Dim duration = GetDuration(ric)
                         If ricAndFieldValue.Value.Keys.Contains("393") Or ricAndFieldValue.Value.Keys.Contains("275") Then
                             Try
@@ -181,7 +173,6 @@ Namespace Curves
                                     yld = CDbl(ricAndFieldValue.Value(IIf(_quote = "BID", "393", "275")))
                                     If yld > 0 Then
                                         Descrs(ric).Yield = yld / 100
-                                        'AddCurveItem(yieldDuration)
                                         NotifyUpdated(Me)
                                     End If
                                 Else
@@ -199,7 +190,6 @@ Namespace Curves
                                     End If
                                     If found Then
                                         Descrs(ric).Duration = duration
-                                        'AddCurveItem(yieldDuration)
                                         NotifyUpdated(Me)
                                     End If
                                 End If
@@ -211,7 +201,7 @@ Namespace Curves
 
 #If DEBUG Then
                         Dim fieldValue = ricAndFieldValue.Value
-                        For Each fv As KeyValuePair(Of String, Double?) In fieldValue
+                        For Each fv As KeyValuePair(Of String, Double) In fieldValue
                             Logger.Trace("  {0} -> {1}", fv.Key, fv.Value)
                         Next
 #End If
@@ -222,7 +212,7 @@ Namespace Curves
                     If rfv.Keys.First <> BaseInstrument Then
                         Logger.Warn("No base data in {0}", rfv.ToString())
                     Else
-                        For Each ricAndFieldValue As KeyValuePair(Of String, Dictionary(Of String, Double?)) In rfv
+                        For Each ricAndFieldValue As KeyValuePair(Of String, Dictionary(Of String, Double)) In rfv
                             Logger.Trace("Got base instrument {0}", BaseInstrument)
                             If ricAndFieldValue.Value.Keys.Contains("BID") Or ricAndFieldValue.Value.Keys.Contains("ASK") Then
                                 Try
@@ -256,7 +246,7 @@ Namespace Curves
                             End If
 #If DEBUG Then
                             Dim fieldValue = ricAndFieldValue.Value
-                            For Each fv As KeyValuePair(Of String, Double?) In fieldValue
+                            For Each fv As KeyValuePair(Of String, Double) In fieldValue
                                 Logger.Trace("  {0} -> {1}", fv.Key, fv.Value)
                             Next
 #End If

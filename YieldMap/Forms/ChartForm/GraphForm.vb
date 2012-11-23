@@ -386,25 +386,10 @@ Namespace Forms.ChartForm
 
         Private Sub ShowLabelsTSBClick(sender As Object, e As EventArgs) Handles ShowLabelsTSB.Click
             Logger.Trace("ShowLabelsTSBClick")
-            For Each series As Series In TheChart.Series
-                Logger.Trace(" -> series {0}", series.Name)
-                series.SmartLabelStyle.Enabled = True
-                series.SmartLabelStyle.AllowOutsidePlotArea = LabelOutsidePlotAreaStyle.No
-
-                For Each dataPoint As DataPoint In series.Points
-                    'If ShowLabelsTSB.Checked AndAlso TypeOf dataPoint.Tag Is BondPointDescr Then
-                    '    Dim data = CType(dataPoint.Tag, BondPointDescr)
-                    '    If data.IsValid And data.IsVisible Then
-                    '        dataPoint.Label = data.Label
-                    '        Logger.Trace(" ---> adding label {0}", dataPoint.Label)
-                    '    Else
-                    '        Logger.Trace(" ---> removing label...")
-                    '        dataPoint.Label = ""
-                    '    End If
-                    'Else
-                    '    Logger.Trace(" ---> removing label...")
-                    '    dataPoint.Label = ""
-                    'End If
+            For Each series In From srs In TheChart.Series Where TypeOf srs.Tag Is BondPointsSeries
+                Dim points = series.Points
+                For Each dataPoint In From pnt In points Where TypeOf pnt.Tag Is VisualizableBond Select {pnt, CType(pnt.Tag, VisualizableBond)}
+                    dataPoint(0).Label = If(ShowLabelsTSB.Checked, dataPoint(1).Metadata.ShortName, "")
                 Next
             Next
         End Sub
@@ -459,26 +444,26 @@ Namespace Forms.ChartForm
                     hasShown = True
                     Dim point As DataPoint = CType(htr.Object, DataPoint)
 
-                    Dim dat = CType(point.Tag, DataPointDescr)
-                    SpreadLabel.Text = If(dat.PointSpread IsNot Nothing, String.Format("{0:F0} b.p.", dat.PointSpread), N_A)
-                    ZSpreadLabel.Text = If(dat.ZSpread IsNot Nothing, String.Format("{0:F0} b.p.", dat.ZSpread), N_A)
-                    ASWLabel.Text = If(dat.ASWSpread IsNot Nothing, String.Format("{0:F0} b.p.", dat.ASWSpread), N_A)
-                    YldLabel.Text = String.Format("{0:P2}", dat.Yld)
-                    DurLabel.Text = String.Format("{0:F2}", point.XValue)
+                    If TypeOf point.Tag Is VisualizableBond And Not point.IsEmpty Then
+                        Dim bondData = CType(point.Tag, VisualizableBond)
+                        DscrLabel.Text = bondData.MetaData.ShortName
+                        Dim calculatedYield = bondData.QuotesAndYields(bondData.SelectedQuote)
 
-                    'If TypeOf point.Tag Is BondPointDescr And Not point.IsEmpty Then
-                    '    Dim bondData = CType(point.Tag, BondPointDescr)
-                    '    DscrLabel.Text = bondData.Label
-                    '    ConvLabel.Text = String.Format("{0:F2}", bondData.Convexity)
-                    '    YldLabel.Text = String.Format("{0:P2} {1}", bondData.Yld.Yield, bondData.Yld.ToWhat.Abbr)
-                    '    DatLabel.Text = String.Format("{0:dd/MM/yyyy}", bondData.YieldAtDate)
-                    '    MatLabel.Text = String.Format("{0:dd/MM/yyyy}", bondData.Maturity)
-                    '    CpnLabel.Text = String.Format("{0:F2}%", bondData.Coupon)
-                    '    PVBPLabel.Text = String.Format("{0:F4}", bondData.PVBP)
-                    '    CType(htr.Series.Tag, BondPointsSeries).SelectedPointIndex = htr.PointIndex
+                        SpreadLabel.Text = If(calculatedYield.PointSpread IsNot Nothing, String.Format("{0:F0} b.p.", calculatedYield.PointSpread), N_A)
+                        ZSpreadLabel.Text = If(calculatedYield.ZSpread IsNot Nothing, String.Format("{0:F0} b.p.", calculatedYield.ZSpread), N_A)
+                        ASWLabel.Text = If(calculatedYield.ASWSpread IsNot Nothing, String.Format("{0:F0} b.p.", calculatedYield.ASWSpread), N_A)
+                        YldLabel.Text = String.Format("{0:P2}", calculatedYield.Yld)
+                        DurLabel.Text = String.Format("{0:F2}", point.XValue)
 
-                    'Else
-                    If TypeOf point.Tag Is MoneyMarketPointDescr Then
+                        ConvLabel.Text = String.Format("{0:F2}", calculatedYield.Convexity)
+                        YldLabel.Text = String.Format("{0:P2} {1}", calculatedYield.Yld.Yield, calculatedYield.Yld.ToWhat.Abbr)
+                        DatLabel.Text = String.Format("{0:dd/MM/yyyy}", calculatedYield.YieldAtDate)
+                        MatLabel.Text = String.Format("{0:dd/MM/yyyy}", bondData.MetaData.Maturity)
+                        CpnLabel.Text = String.Format("{0:F2}%", bondData.MetaData.Coupon)
+                        PVBPLabel.Text = String.Format("{0:F4}", calculatedYield.PVBP)
+                        CType(htr.Series.Tag, BondPointsSeries).SelectedPointIndex = htr.PointIndex
+
+                    ElseIf TypeOf point.Tag Is MoneyMarketPointDescr Then
                         Dim data = CType(point.Tag, MoneyMarketPointDescr)
                         DscrLabel.Text = data.SwpCurve.GetFullName()
                         DatLabel.Text = String.Format("{0:dd/MM/yyyy}", data.SwpCurve.GetDate())
@@ -486,17 +471,17 @@ Namespace Forms.ChartForm
                         Dim aDate = (New AdxDateModule).DfAddPeriod("RUS", Date.Today, period, "")
                         MatLabel.Text = String.Format("{0:dd/MM/yyyy}", FromExcelSerialDate(aDate.GetValue(1, 1)))
 
+                        ConvLabel.Text = String.Format("{0:F2}", data.Convexity)
+                        YldLabel.Text = String.Format("{0:P2} {1}", data.Yld.Yield, data.Yld.ToWhat.Abbr)
+                        DatLabel.Text = String.Format("{0:dd/MM/yyyy}", data.YieldAtDate)
+                        PVBPLabel.Text = String.Format("{0:F4}", data.PVBP)
+
                         'ElseIf TypeOf point.Tag Is HistCurvePointDescr Then
                         '    Dim historyDataPoint = CType(point.Tag, HistCurvePointDescr)
                         '    DscrLabel.Text = historyDataPoint.BondTag.ShortName
                         '    DatLabel.Text = String.Format("{0:dd/MM/yyyy}", historyDataPoint.YieldAtDate)
                         '    ConvLabel.Text = String.Format("{0:F2}", historyDataPoint.Convexity)
 
-                        'ElseIf TypeOf point.Tag Is BidAskPointDescr Then
-                        '    Dim bidAskDP = CType(point.Tag, BidAskPointDescr)
-                        '    ConvLabel.Text = String.Format("{0:F2}", bidAskDP.Convexity)
-                        '    DscrLabel.Text = bidAskDP.BondTag.Label + " " + bidAskDP.BidAsk
-                        '    DatLabel.Text = String.Format("{0:dd/MM/yyyy}", Date.Today)
                     Else
                         hasShown = False
                     End If
@@ -534,8 +519,13 @@ Namespace Forms.ChartForm
 
                     seriesDescr.ResetSelection()
                     Dim clr = _ansamble.GetGroup(srs.Name).Color
-                    srs.Points.ToList.ForEach(Sub(point) point.BorderColor = Color.FromName(clr))
-                    If seriesDescr.Name = curveName AndAlso pointIndex IsNot Nothing Then srs.Points(pointIndex).Color = Color.Red
+                    srs.Points.ToList.ForEach(Sub(point)
+                                                  Dim tg = CType(point.Tag, VisualizableBond)
+                                                  point.Color = If(tg.QuotesAndYields(tg.SelectedQuote).YieldSource = YieldSource.Historical, Color.LightGray, Color.White)
+                                              End Sub)
+                    If seriesDescr.Name = curveName AndAlso pointIndex IsNot Nothing Then
+                        srs.Points(pointIndex).Color = Color.Red
+                    End If
                 End Sub)
         End Sub
 
@@ -547,7 +537,10 @@ Namespace Forms.ChartForm
 
                     seriesDescr.ResetSelection()
                     Dim clr = _ansamble.GetGroup(srs.Name).Color
-                    srs.Points.ToList.ForEach(Sub(point) point.BorderColor = Color.FromName(clr))
+                    srs.Points.ToList.ForEach(Sub(point)
+                                                  Dim tg = CType(point.Tag, VisualizableBond)
+                                                  point.Color = If(tg.QuotesAndYields(tg.SelectedQuote).YieldSource = YieldSource.Historical, Color.LightGray, Color.White)
+                                              End Sub)
                 End Sub)
         End Sub
 
@@ -997,7 +990,7 @@ Namespace Forms.ChartForm
 
 #Region "VII) Curves"
 #Region "1) Common methods"
-        Public Class CurveDescr
+        Private Class CurveDescr
             Public Type As String
             Public Name As String
             Public ID As Integer
@@ -1264,55 +1257,58 @@ Namespace Forms.ChartForm
 #End Region
 
         Private Sub OnBondQuote(ByVal descr As VisualizableBond, ByVal fieldName As String) Handles _ansamble.Quote
-            GuiAsync(Sub()
-                         Dim group = descr.ParentGroup
-                         Dim calc = descr.QuotesAndYields(fieldName)
-                         Dim ric = descr.MetaData.RIC
+            GuiAsync(
+                Sub()
+                    Dim group = descr.ParentGroup
+                    Dim calc = descr.QuotesAndYields(fieldName)
+                    Dim ric = descr.MetaData.RIC
 
-                         Dim series As Series = TheChart.Series.FindByName(group.SeriesName)
-                         Dim clr = Color.FromName(group.Color)
-                         If series Is Nothing Then
-                             Dim seriesDescr = New BondPointsSeries With {.Name = group.SeriesName, .Color = clr}
-                             AddHandler seriesDescr.SelectedPointChanged, AddressOf OnSelectedPointChanged
-                             series = New Series(group.SeriesName) With {
-                                  .YValuesPerPoint = 1,
-                                  .ChartType = SeriesChartType.Point,
-                                  .IsVisibleInLegend = True,
-                                  .color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.Black),
-                                  .markerSize = 8,
-                                  .markerBorderWidth = 2,
-                                  .markerBorderColor = clr,
-                                  .markerStyle = MarkerStyle.Circle,
-                                  .Tag = seriesDescr
-                              }
-                             With series.EmptyPointStyle
-                                 .BorderWidth = 0
-                                 .MarkerSize = 0
-                                 .MarkerStyle = MarkerStyle.None
-                             End With
-                             TheChart.Series.Add(series)
-                         End If
+                    Dim series As Series = TheChart.Series.FindByName(group.SeriesName)
+                    Dim clr = Color.FromName(group.Color)
+                    If series Is Nothing Then
+                        Dim seriesDescr = New BondPointsSeries With {.Name = group.SeriesName, .Color = clr}
+                        AddHandler seriesDescr.SelectedPointChanged, AddressOf OnSelectedPointChanged
+                        series = New Series(group.SeriesName) With {
+                                 .YValuesPerPoint = 1,
+                                 .ChartType = SeriesChartType.Point,
+                                 .IsVisibleInLegend = True,
+                                 .color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.Black),
+                                 .markerSize = 8,
+                                 .markerBorderWidth = 2,
+                                 .markerBorderColor = clr,
+                                 .markerStyle = MarkerStyle.Circle,
+                                 .Tag = seriesDescr
+                            }
+                        With series.EmptyPointStyle
+                            .BorderWidth = 0
+                            .MarkerSize = 0
+                            .MarkerStyle = MarkerStyle.None
+                        End With
+                        series.SmartLabelStyle.Enabled = True
+                        series.SmartLabelStyle.AllowOutsidePlotArea = LabelOutsidePlotAreaStyle.No
+                        TheChart.Series.Add(series)
+                    End If
 
-                         ' creating data point
-                         Dim point As DataPoint
-                         Dim yValue = _spreadBenchmarks.GetQt(calc)
-                         If Not series.Points.Any(Function(pnt) pnt.Name = ric) Then
-                             If yValue IsNot Nothing Then
-                                 point = New DataPoint(calc.Duration, yValue.Value) With {
-                                                     .Name = descr.MetaData.RIC,
-                                                     .Tag = descr,
-                                                     .ToolTip = descr.MetaData.ShortName,
-                                                     .Color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.LightGray)
-                                 }
-                                 series.Points.Add(point)
-                             End If
-                         Else
-                             point = series.Points.First(Function(pnt) pnt.Name = ric)
-                             point.XValue = calc.Duration
-                             point.YValues = {yValue.Value}
-                             point.Color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.LightGray)
-                         End If
-                     End Sub)
+                    ' creating data point
+                    Dim point As DataPoint
+                    Dim yValue = _spreadBenchmarks.GetQt(calc)
+                    If Not series.Points.Any(Function(pnt) pnt.Name = ric) Then
+                        If yValue IsNot Nothing Then
+                            point = New DataPoint(calc.Duration, yValue.Value) With {
+                                                .Name = descr.MetaData.RIC,
+                                                .Tag = descr,
+                                                .ToolTip = descr.MetaData.ShortName,
+                                                .Color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.LightGray)
+                            }
+                            series.Points.Add(point)
+                        End If
+                    Else
+                        point = series.Points.First(Function(pnt) pnt.Name = ric)
+                        point.XValue = calc.Duration
+                        point.YValues = {yValue.Value}
+                        point.Color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.LightGray)
+                    End If
+                End Sub)
         End Sub
     End Class
 End Namespace

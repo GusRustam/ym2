@@ -230,15 +230,15 @@ Namespace Curves
             Return String.Format("{0} ({1}, {2})", _fullname, _quote, dateStr)
         End Function
 
-        Private Sub OnRealTimeData(data As Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double?)))) Handles _quoteLoader.OnNewData
+        Private Sub OnRealTimeData(data As Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double)))) Handles _quoteLoader.OnNewData
             Logger.Debug("OnRealTimeData")
-            For Each listAndRFV As KeyValuePair(Of String, Dictionary(Of String, Dictionary(Of String, Double?))) In data
+            For Each listAndRFV As KeyValuePair(Of String, Dictionary(Of String, Dictionary(Of String, Double))) In data
                 Dim list = listAndRFV.Key
                 Dim rfv = listAndRFV.Value
 
                 If list = _name Then
                     Logger.Info(_name)
-                    For Each ricAndFieldValue As KeyValuePair(Of String, Dictionary(Of String, Double?)) In rfv
+                    For Each ricAndFieldValue As KeyValuePair(Of String, Dictionary(Of String, Double)) In rfv
                         Dim ric = ricAndFieldValue.Key
                         Logger.Trace("Got RIC {0}", ric)
 
@@ -259,7 +259,7 @@ Namespace Curves
 
 #If DEBUG Then
                         Dim fieldValue = ricAndFieldValue.Value
-                        For Each fv As KeyValuePair(Of String, Double?) In fieldValue
+                        For Each fv As KeyValuePair(Of String, Double) In fieldValue
                             Logger.Trace("  {0} -> {1}", fv.Key, fv.Value)
                         Next
 #End If
