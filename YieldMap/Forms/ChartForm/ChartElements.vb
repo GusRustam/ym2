@@ -88,7 +88,7 @@ Namespace Forms.ChartForm
             _spreadBmk = bmk
         End Sub
 
-        Public Sub CalcAllSpreads(ByVal calculation As CalculatedYield, ByVal metaData As DataBaseBondDescription)
+        Public Sub CalcAllSpreads(ByVal calculation As BondPointDescription, ByVal metaData As DataBaseBondDescription)
             _spreadBmk.CalcAllSpreads(calculation, metaData)
         End Sub
 
@@ -101,14 +101,14 @@ Namespace Forms.ChartForm
         Private _selectedQuote As String
         Private ReadOnly _parentGroup As VisualizableGroup
         Private ReadOnly _metaData As DataBaseBondDescription
-        Private ReadOnly _quotesAndYields As Dictionary(Of String, CalculatedYield)
+        Private ReadOnly _quotesAndYields As Dictionary(Of String, BondPointDescription)
         Public TodayVolume As Double
 
         Sub New(ByVal parentGroup As VisualizableGroup, ByVal selectedQuote As String, ByVal metaData As DataBaseBondDescription)
             _parentGroup = parentGroup
             Me.SelectedQuote = selectedQuote
             _metaData = metaData
-            _quotesAndYields = New Dictionary(Of String, CalculatedYield)
+            _quotesAndYields = New Dictionary(Of String, BondPointDescription)
         End Sub
 
         Public ReadOnly Property ParentGroup As VisualizableGroup
@@ -133,7 +133,7 @@ Namespace Forms.ChartForm
             End Get
         End Property
 
-        Public ReadOnly Property QuotesAndYields As Dictionary(Of String, CalculatedYield)
+        Public ReadOnly Property QuotesAndYields As Dictionary(Of String, BondPointDescription)
             Get
                 Return _quotesAndYields
             End Get
@@ -251,7 +251,7 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub HandleQuote(ByVal bondDataPoint As VisualizableBond, ByVal fieldName As String, ByVal fieldVal As Double?, ByVal calcDate As Date)
-            Dim calculation As New CalculatedYield
+            Dim calculation As New BondPointDescription
             calculation.Price = fieldVal
             calculation.YieldSource = If(calcDate = Date.Today, YieldSource.Realtime, YieldSource.Historical)
             CalculateYields(calcDate, bondDataPoint.MetaData, calculation)
@@ -407,56 +407,23 @@ Namespace Forms.ChartForm
 
         Public Benchmarks As New Dictionary(Of SpreadMode, ICurve)
 
-        Public Function GetQuote(ByVal theTag As DataPointDescr, Optional ByVal mode As SpreadMode = Nothing) As Double?
-            Dim fieldName = If(mode IsNot Nothing, mode.Name, _currentMode.ToString())
-            If fieldName = "Yield" Then
-                Return theTag.Yld.Yield
-            Else
-                If theTag IsNot Nothing AndAlso theTag.IsValid Then
-                    Dim value As Object
-                    Dim fieldInfo = GetType(DataPointDescr).GetField(fieldName)
-                    If fieldInfo IsNot Nothing Then
-                        value = fieldInfo.GetValue(theTag)
-                    Else
-                        Dim propertyInfo = GetType(DataPointDescr).GetProperty(fieldName)
-                        value = propertyInfo.GetValue(theTag, Nothing)
-                    End If
-                    If value IsNot Nothing Then Return CDbl(value)
-                End If
-                Return Nothing
-            End If
-        End Function
-
-        Public Sub SetQuote(ByVal theTag As DataPointDescr, ByVal value As Double?, Optional ByVal mode As SpreadMode = Nothing)
-            Dim fieldName = If(mode IsNot Nothing, mode.Name, _currentMode)
-            If theTag IsNot Nothing AndAlso theTag.IsValid Then
-                Dim fieldInfo = GetType(DataPointDescr).GetField(fieldName)
-                If fieldInfo IsNot Nothing Then
-                    fieldInfo.SetValue(theTag, value)
-                Else
-                    Dim propertyInfo = GetType(DataPointDescr).GetProperty(fieldName)
-                    propertyInfo.SetValue(theTag, value, Nothing)
-                End If
-            End If
-        End Sub
-
-        Public Sub CalcAllSpreads(ByRef descr As CalculatedYield, ByVal data As DataBaseBondDescription)
+        Public Sub CalcAllSpreads(ByRef descr As BondPointDescription, ByVal data As DataBaseBondDescription)
             If Benchmarks.ContainsKey(SpreadMode.ZSpread) Then CalcZSpread(descr, data)
             If Benchmarks.ContainsKey(SpreadMode.ASWSpread) Then CalcASWSpread(descr, data)
             If Benchmarks.ContainsKey(SpreadMode.PointSpread) Then CalcISpread(descr)
         End Sub
 
-        Private Sub CalcISpread(ByRef descr As CalculatedYield)
+        Private Sub CalcISpread(ByRef descr As BondPointDescription)
             CalcPntSprd(Benchmarks(SpreadMode.PointSpread).ToArray(), descr)
         End Sub
 
-        Private Sub CalcASWSpread(ByRef descr As CalculatedYield, ByVal data As DataBaseBondDescription)
+        Private Sub CalcASWSpread(ByRef descr As BondPointDescription, ByVal data As DataBaseBondDescription)
             Dim aswSpreadMainCurve = Benchmarks(SpreadMode.ASWSpread)
             Dim bmk = CType(aswSpreadMainCurve, IAssetSwapBenchmark)
             CalcASWSprd(aswSpreadMainCurve.ToArray(), bmk.FloatLegStructure, bmk.FloatingPointValue, descr, data)
         End Sub
 
-        Private Sub CalcZSpread(ByRef descr As CalculatedYield, ByVal data As DataBaseBondDescription)
+        Private Sub CalcZSpread(ByRef descr As BondPointDescription, ByVal data As DataBaseBondDescription)
             CalcZSprd(Benchmarks(SpreadMode.ZSpread).ToArray(), descr, data)
         End Sub
 
@@ -483,17 +450,17 @@ Namespace Forms.ChartForm
             RaiseEvent SpreadUpdated(mode, _currentMode)
         End Sub
 
-        Public Function GetQt(ByVal calc As CalculatedYield) As Double?
+        Public Function GetQt(ByVal calc As BasePointDescription) As Double?
             Dim fieldName = _currentMode.ToString()
             If fieldName = "Yield" Then
-                Return calc.Yld.Yield
+                Return calc.GetYield()
             Else
                 Dim value As Object
-                Dim fieldInfo = GetType(CalculatedYield).GetField(fieldName)
+                Dim fieldInfo = GetType(BondPointDescription).GetField(fieldName)
                 If fieldInfo IsNot Nothing Then
                     value = fieldInfo.GetValue(calc)
                 Else
-                    Dim propertyInfo = GetType(DataPointDescr).GetProperty(fieldName)
+                    Dim propertyInfo = GetType(BasePointDescription).GetProperty(fieldName)
                     value = propertyInfo.GetValue(calc, Nothing)
                 End If
                 If value IsNot Nothing Then Return CDbl(value)
@@ -562,76 +529,76 @@ Namespace Forms.ChartForm
 #End Region
 
 #Region "IV. Points descriptions"
-    Public Class DataPointDescr
-        Implements IComparable(Of DataPointDescr)
-        Public Const AroundZero As Double = 0.0001
+    'Public Class DataPointDescr
+    '    Implements IComparable(Of DataPointDescr)
+    '    Public Const AroundZero As Double = 0.0001
 
-        Public Overridable ReadOnly Property IsValid As Boolean
-            Get
-                Return False
-            End Get
-        End Property
-        Public IsVisible As Boolean
+    '    Public Overridable ReadOnly Property IsValid As Boolean
+    '        Get
+    '            Return False
+    '        End Get
+    '    End Property
+    '    Public IsVisible As Boolean
 
-        Public Yld As New YieldStructure
-        Public Duration As Double
-        Public Convexity As Double
-        Public PVBP As Double
-        Public YieldAtDate As Date
+    '    Public Yld As New YieldStructure
+    '    Public Duration As Double
+    '    Public Convexity As Double
+    '    Public PVBP As Double
+    '    Public YieldAtDate As Date
 
-        Public Overridable Property PointSpread As Double?
-        Public Overridable Property ZSpread As Double?
-        Public Overridable Property OASpread As Double?
-        Public Overridable Property ASWSpread As Double?
+    '    Public Overridable Property PointSpread As Double?
+    '    Public Overridable Property ZSpread As Double?
+    '    Public Overridable Property OASpread As Double?
+    '    Public Overridable Property ASWSpread As Double?
 
-        Public Function CompareTo(ByVal other As DataPointDescr) As Integer Implements IComparable(Of DataPointDescr).CompareTo
-            If Duration < other.Duration Then
-                Return -1
-            Else
-                Return 1
-            End If
-        End Function
+    '    Public Function CompareTo(ByVal other As DataPointDescr) As Integer Implements IComparable(Of DataPointDescr).CompareTo
+    '        If Duration < other.Duration Then
+    '            Return -1
+    '        Else
+    '            Return 1
+    '        End If
+    '    End Function
 
-        Public Overrides Function ToString() As String
-            Return String.Format("{0:P2} {1:F2}", Yld, Duration)
-        End Function
-    End Class
+    '    Public Overrides Function ToString() As String
+    '        Return String.Format("{0:P2} {1:F2}", Yld, Duration)
+    '    End Function
+    'End Class
 
-    Friend Class MoneyMarketPointDescr
-        Inherits DataPointDescr
+    'Friend Class MoneyMarketPointDescr
+    '    Inherits DataPointDescr
 
-        Public Overrides ReadOnly Property IsValid() As Boolean
-            Get
-                Return True
-            End Get
-        End Property
+    '    Public Overrides ReadOnly Property IsValid() As Boolean
+    '        Get
+    '            Return True
+    '        End Get
+    '    End Property
 
-        Public FullName As String
-        Public YieldCurveName As String
+    '    Public FullName As String
+    '    Public YieldCurveName As String
 
-        Public Overrides Property ZSpread As Double?
-            Get
-                Return Nothing
-            End Get
-            Set(ByVal value As Double?)
-            End Set
-        End Property
-        Public Overrides Property OASpread As Double?
-            Get
-                Return Nothing
-            End Get
-            Set(ByVal value As Double?)
-            End Set
-        End Property
-        Public Overrides Property ASWSpread As Double?
-            Get
-                Return Nothing
-            End Get
-            Set(ByVal value As Double?)
-            End Set
-        End Property
-        Public SwpCurve As SwapCurve
-    End Class
+    '    Public Overrides Property ZSpread As Double?
+    '        Get
+    '            Return Nothing
+    '        End Get
+    '        Set(ByVal value As Double?)
+    '        End Set
+    '    End Property
+    '    Public Overrides Property OASpread As Double?
+    '        Get
+    '            Return Nothing
+    '        End Get
+    '        Set(ByVal value As Double?)
+    '        End Set
+    '    End Property
+    '    Public Overrides Property ASWSpread As Double?
+    '        Get
+    '            Return Nothing
+    '        End Get
+    '        Set(ByVal value As Double?)
+    '        End Set
+    '    End Property
+    '    Public SwpCurve As SwapCurve
+    'End Class
 
     'Friend Class HistCurvePointDescr
     '    Inherits DataPointDescr

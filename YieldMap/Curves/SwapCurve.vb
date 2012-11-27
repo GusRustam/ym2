@@ -21,7 +21,7 @@ Namespace Curves
     Public MustInherit Class SwapCurve
         Implements ICurve
 
-        Protected ReadOnly Descrs As New Dictionary(Of String, YieldDuration)
+        Protected ReadOnly Descrs As New Dictionary(Of String, SwapPointDescription)
 
         Private ReadOnly _clearedHandler As Action(Of ICurve)
         Private ReadOnly _updatedHandler As Action(Of ICurve, List(Of XY))
@@ -46,7 +46,7 @@ Namespace Curves
         Public MustOverride Function GetOuterColor() As Color
         Public MustOverride Function GetInnerColor() As Color
 
-        Public MustOverride Function CalculateSpread(ByVal data As List(Of YieldDuration)) As List(Of YieldDuration)
+        Public MustOverride Function CalculateSpread(ByVal data As List(Of SwapPointDescription)) As List(Of SwapPointDescription)
 
         Public MustOverride Function GetName() As String Implements ICurve.GetName
         Public MustOverride Function GetFullName() As String Implements ICurve.GetFullName
@@ -120,8 +120,11 @@ Namespace Curves
         End Sub
 
         Protected Sub StopLoading(ByVal ric As String)
-            _hstLoaders(ric).StopTask()
-            _hstLoaders.Remove(ric)
+            Logger.Debug("I have rics {0}, will stop loading {1}", _hstLoaders.Keys.Aggregate(Function(curr, elem) curr & ", " & elem), ric)
+            If _hstLoaders.ContainsKey(ric) Then
+                _hstLoaders(ric).StopTask()
+                _hstLoaders.Remove(ric)
+            End If
         End Sub
 
         Protected Sub StopHistory()
@@ -135,7 +138,7 @@ Namespace Curves
         End Sub
 #End Region
 
-        Protected ReadOnly Property CurveData() As List(Of YieldDuration)
+        Protected ReadOnly Property CurveData() As List(Of SwapPointDescription)
             Get
                 Dim list = Descrs.Values.ToList()
                 Return list.Where(Function(elem) elem.Yield.HasValue).ToList()
@@ -193,7 +196,7 @@ Namespace Curves
         Public Overridable Sub Subscribe()
             Logger.Debug("Subscirbe({0})", GetName())
             Descrs.Clear()
-            GetRICs(GetBroker()).ForEach(Sub(ric As String) Descrs.Add(ric, New YieldDuration()))
+            GetRICs(GetBroker()).ForEach(Sub(ric As String) Descrs.Add(ric, New SwapPointDescription()))
             StopLoaders()
             If GetDate() = Date.Today Then
                 StartRealTime()

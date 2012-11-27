@@ -1,5 +1,6 @@
 ﻿Imports System.Data.SQLite
 Imports NLog
+Imports YieldMap.Tools
 Imports YieldMap.Tools.RDataTool
 Imports YieldMap.Tools.Chains
 Imports YieldMap.BondsDataSetTableAdapters
@@ -15,6 +16,29 @@ Namespace Commons
         Public Event Progress As Action(Of String)
         Public Event Success As Action
         Public Event Failure As Action(Of Exception)
+
+#Region "0. Filling bond descriptions"
+        Private Shared _bondDescriptions As BondsDataSet.BondDescriptionsDataTable
+
+        Public Shared Function GetBondInfo(ByVal ric As String) As DataBaseBondDescription
+            If _bondDescriptions.Any(Function(row) row.ric = ric) Then
+                Dim bondDescr = _bondDescriptions.First(Function(row) row.ric = ric)
+                Return New DataBaseBondDescription(ric, bondDescr.bondshortname, bondDescr.bondshortname,
+                                                   bondDescr.maturitydate, bondDescr.coupon, bondDescr.payments,
+                                                   bondDescr.rates, bondDescr.issuedate)
+            Else
+                Return Nothing
+            End If
+        End Function
+
+        Private Shared Sub InitBondDescriber() Handles Me.Success
+            Dim bh As New BondDescriptionsTableAdapter
+            AddHandler bh.Adapter.FillError, AddressOf SkipInvalidRows
+            _bondDescriptions = bh.GetData()
+            RemoveHandler bh.Adapter.FillError, AddressOf SkipInvalidRows
+        End Sub
+#End Region
+
 
 #Region "I. Loading chains"
         Public Sub UpdateDatabase(Optional ByVal force As Boolean = False)

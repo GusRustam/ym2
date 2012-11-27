@@ -1,8 +1,9 @@
-﻿Imports YieldMap.Forms.ChartForm
+﻿Imports YieldMap.Curves
+Imports YieldMap.Forms.ChartForm
 
 Namespace Tools
-    Public MustInherit Class BasicYieldDuration
-        Implements IComparable(Of BasicYieldDuration)
+    Public MustInherit Class BasePointDescription
+        Implements IComparable(Of BasePointDescription)
         Public Duration As Double
         Public Price As Double
         Public YieldAtDate As Date
@@ -14,7 +15,7 @@ Namespace Tools
 
         Public MustOverride Function GetYield() As Double?
 
-        Public Function CompareTo(ByVal other As BasicYieldDuration) As Integer Implements IComparable(Of BasicYieldDuration).CompareTo
+        Public Function CompareTo(ByVal other As BasePointDescription) As Integer Implements IComparable(Of BasePointDescription).CompareTo
             If other IsNot Nothing Then
                 If Duration < other.Duration Then
                     Return -1
@@ -29,11 +30,12 @@ Namespace Tools
         End Function
     End Class
 
-    Public Class YieldDuration
-        Inherits BasicYieldDuration
+    Public Class SwapPointDescription
+        Inherits BasePointDescription
 
         Public RIC As String
         Public Yield As Double?
+        Public SwpCurve As SwapCurve
 
         Public Overrides Function GetYield() As Double?
             Return Yield
@@ -41,7 +43,7 @@ Namespace Tools
         Public Sub New()
         End Sub
 
-        Public Sub New(ByVal elem As YieldDuration)
+        Public Sub New(ByVal elem As SwapPointDescription)
             With elem
                 RIC = .RIC
                 Me.Yield = .Yield
@@ -59,9 +61,8 @@ Namespace Tools
         End Function
     End Class
 
-
-    Public Class CalculatedYield
-        Inherits BasicYieldDuration
+    Public Class BondPointDescription
+        Inherits BasePointDescription
 
         Public ParentBond As VisualizableBond
 

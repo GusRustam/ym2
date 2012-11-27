@@ -267,7 +267,7 @@ Namespace Curves
             NotifyUpdated(Me)
         End Sub
 
-        Public Function Bootstrap(ByVal data As List(Of YieldDuration)) As List(Of YieldDuration) Implements IBootstrappable.Bootstrap
+        Public Function Bootstrap(ByVal data As List(Of SwapPointDescription)) As List(Of SwapPointDescription) Implements IBootstrappable.Bootstrap
             Dim params(0 To CurveData.Count() - 1, 5) As Object
             For i = 0 To CurveData.Count - 1
                 params(i, 0) = InstrumentType
@@ -279,11 +279,11 @@ Namespace Curves
             Next
             Dim curveModule = New AdxYieldCurveModule
             Dim termStructure As Array = curveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
-            Dim result As New List(Of YieldDuration)
+            Dim result As New List(Of SwapPointDescription)
             For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
                 Dim dur = (Commons.FromExcelSerialDate(termStructure.GetValue(i, 1)) - _theDate).TotalDays / 365.0
                 Dim yld = termStructure.GetValue(i, 2)
-                If dur > 0 And yld > 0 Then result.Add(New YieldDuration With {.Yield = yld, .Duration = dur})
+                If dur > 0 And yld > 0 Then result.Add(New SwapPointDescription With {.Yield = yld, .Duration = dur})
             Next
             Return result
         End Function
@@ -333,13 +333,13 @@ Namespace Curves
             Return _theDate
         End Function
 
-        Public Overrides Function CalculateSpread(ByVal data As List(Of YieldDuration)) As List(Of YieldDuration)
+        Public Overrides Function CalculateSpread(ByVal data As List(Of SwapPointDescription)) As List(Of SwapPointDescription)
             If BmkSpreadMode Is Nothing Or Benchmark Is Nothing Then Return data
             If Benchmark.Equals(Me) Then Return Nothing
 
             Select Case BmkSpreadMode
                 Case SpreadMode.PointSpread
-                    Dim res As New List(Of YieldDuration)(data)
+                    Dim res As New List(Of SwapPointDescription)(data)
                     res.ForEach(Sub(elem)
                                     CalcPntSprd(Benchmark.ToArray(), Descrs(elem.RIC))
                                     'elem.PointSpread = PointSpread(

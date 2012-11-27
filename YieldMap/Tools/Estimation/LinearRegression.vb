@@ -364,7 +364,7 @@ Namespace Tools.Estimation
         Public Function Fit(ByVal x As List(Of Double), ByVal y As List(Of Double)) As List(Of XY)
             _xv = x
             Dim avgY = y.Average()
-            _yv = y.Select(Function(anY) 10 * anY / avgY).ToList()
+            _yv = y.Select(Function(yValue) 10 * yValue / avgY).ToList()
             _n = x.Count()
 
             Dim vars = New OptBoundVariable() {
@@ -421,7 +421,7 @@ Namespace Tools.Estimation
             End Select
         End Sub
 
-        Public Function Approximate(ByVal data As List(Of YieldDuration), ByVal what As SpreadMode) As List(Of XY)
+        Public Function Approximate(ByVal data As List(Of SwapPointDescription), ByVal what As SpreadMode) As List(Of XY)
             If what Is Nothing Then what = SpreadMode.Yield
             Dim dt = XY.ConvertToXY(data, what)
             Dim x = XY.GetX(dt)
@@ -465,7 +465,7 @@ Namespace Tools.Estimation
         Public X As Double
         Public Y As Double
 
-        Public Shared Function ConvertToXY(ByVal data As List(Of YieldDuration), ByVal mode As SpreadMode) As List(Of XY)
+        Public Shared Function ConvertToXY(ByVal data As List(Of SwapPointDescription), ByVal mode As SpreadMode) As List(Of XY)
             Dim x As List(Of Double)
             Dim y As List(Of Double)
             Select Case mode

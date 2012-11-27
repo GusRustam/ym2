@@ -60,8 +60,8 @@ Namespace Forms.ChartForm
                         _ansamble.Cleanup()
 
                         '_historicalCurves.Clear()
-                        _moneyMarketCurves.ForEach(Sub(curve) curve.Cleanup())
-                        _moneyMarketCurves.Clear()
+                        '_moneyMarketCurves.ForEach(Sub(curve) curve.Cleanup())
+                        '_moneyMarketCurves.Clear()
                         _bidAskLines.Clear()
 
                         TheChart.Series.Clear()
@@ -177,11 +177,11 @@ Namespace Forms.ChartForm
                         '    End If
 
                         'Else
-                        If TypeOf point.Tag Is MoneyMarketPointDescr Then
-                            Dim curveDataPoint = CType(point.Tag, MoneyMarketPointDescr)
+                        If TypeOf point.Tag Is SwapPointDescription Then
+                            Dim curveDataPoint = CType(point.Tag, SwapPointDescription)
                             MMNameTSMI.Text = curveDataPoint.SwpCurve.GetFullName()
                             MoneyCurveCMS.Show(TheChart, mouseEvent.Location)
-                            MoneyCurveCMS.Tag = curveDataPoint.YieldCurveName
+                            MoneyCurveCMS.Tag = curveDataPoint.SwpCurve.GetName()
                             ShowCurveParameters(curveDataPoint)
 
                             'ElseIf TypeOf point.Tag Is HistCurvePointDescr Then
@@ -206,8 +206,8 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub ShowCurveParameters(ByVal descr As MoneyMarketPointDescr)
-            Dim theCurve = _moneyMarketCurves.First(Function(item) item.GetName() = descr.YieldCurveName)
+        Private Sub ShowCurveParameters(ByVal descr As SwapPointDescription)
+            Dim theCurve = _moneyMarketCurves.First(Function(item) item.GetName() = descr.SwpCurve.GetName())
 
             BrokerTSMI.DropDownItems.Clear()
             Dim brokers = theCurve.GetBrokers()
@@ -463,18 +463,16 @@ Namespace Forms.ChartForm
                         PVBPLabel.Text = String.Format("{0:F4}", calculatedYield.PVBP)
                         CType(htr.Series.Tag, BondPointsSeries).SelectedPointIndex = htr.PointIndex
 
-                    ElseIf TypeOf point.Tag Is MoneyMarketPointDescr Then
-                        Dim data = CType(point.Tag, MoneyMarketPointDescr)
+                    ElseIf TypeOf point.Tag Is SwapPointDescription Then
+                        Dim data = CType(point.Tag, SwapPointDescription)
                         DscrLabel.Text = data.SwpCurve.GetFullName()
                         DatLabel.Text = String.Format("{0:dd/MM/yyyy}", data.SwpCurve.GetDate())
                         Dim period = String.Format("{0:F0}D", 365 * data.Duration)
                         Dim aDate = (New AdxDateModule).DfAddPeriod("RUS", Date.Today, period, "")
                         MatLabel.Text = String.Format("{0:dd/MM/yyyy}", FromExcelSerialDate(aDate.GetValue(1, 1)))
 
-                        ConvLabel.Text = String.Format("{0:F2}", data.Convexity)
-                        YldLabel.Text = String.Format("{0:P2} {1}", data.Yld.Yield, data.Yld.ToWhat.Abbr)
+                        YldLabel.Text = String.Format("{0:P2}", data.Yield)
                         DatLabel.Text = String.Format("{0:dd/MM/yyyy}", data.YieldAtDate)
-                        PVBPLabel.Text = String.Format("{0:F4}", data.PVBP)
 
                         'ElseIf TypeOf point.Tag Is HistCurvePointDescr Then
                         '    Dim historyDataPoint = CType(point.Tag, HistCurvePointDescr)
@@ -518,7 +516,6 @@ Namespace Forms.ChartForm
                     If seriesDescr Is Nothing Then Return
 
                     seriesDescr.ResetSelection()
-                    Dim clr = _ansamble.GetGroup(srs.Name).Color
                     srs.Points.ToList.ForEach(Sub(point)
                                                   Dim tg = CType(point.Tag, VisualizableBond)
                                                   point.Color = If(tg.QuotesAndYields(tg.SelectedQuote).YieldSource = YieldSource.Historical, Color.LightGray, Color.White)
@@ -831,10 +828,9 @@ Namespace Forms.ChartForm
                         Dim ars = (From row In pD Where row.include Select row.ric).ToList
                         Dim rrs = (From row In pD Where Not row.include Select row.ric).ToList
                         ars.RemoveAll(Function(ric) rrs.Contains(ric))
-                        InitBondDescriber()
                         ars.ForEach(
                             Sub(ric)
-                                Dim descr = GetBondInfo(ric)
+                                Dim descr = DbInitializer.GetBondInfo(ric)
                                 If descr IsNot Nothing Then
                                     group.AddElement(ric, descr)
                                 Else
@@ -1197,16 +1193,13 @@ Namespace Forms.ChartForm
 
                     points.ForEach(
                         Sub(item)
-                            Dim theTag = New MoneyMarketPointDescr() With {
+                            Dim theTag = New SwapPointDescription() With {
                                 .Duration = item.X,
-                                .IsVisible = True,
-                                .YieldCurveName = curve.GetName(),
-                                .FullName = curve.GetFullName(),
                                 .SwpCurve = curve
                             }
 
                             Select Case curve.BmkSpreadMode
-                                Case SpreadMode.Yield : theTag.Yld = New YieldStructure With {.Yield = item.Y}
+                                Case SpreadMode.Yield : theTag.yield = item.Y
                                 Case SpreadMode.PointSpread : theTag.PointSpread = item.Y
                                 Case SpreadMode.ZSpread : theTag.ZSpread = item.Y
                                 Case SpreadMode.ASWSpread : theTag.ASWSpread = item.Y

@@ -1,6 +1,7 @@
 ﻿Imports System
 Imports System.Drawing
 Imports AdfinXRtLib
+Imports YieldMap.Commons
 Imports YieldMap.Tools
 Imports YieldMap.Forms.ChartForm
 Imports YieldMap.Tools.History
@@ -15,11 +16,11 @@ Namespace Curves
         Sub SetFitMode(ByVal mode As String)
         Function GetFitMode() As EstimationModel
 
-        Function Estimate(points As List(Of YieldDuration)) As List(Of XY)
+        Function Estimate(points As List(Of SwapPointDescription)) As List(Of XY)
     End Interface
 
     Interface IBootstrappable
-        Function Bootstrap(ByVal data As List(Of YieldDuration)) As List(Of YieldDuration)
+        Function Bootstrap(ByVal data As List(Of SwapPointDescription)) As List(Of SwapPointDescription)
         Function IsBootstrapped() As Boolean
         Function BootstrappingEnabled() As Boolean
         Sub SetBootstrapped(ByVal flag As Boolean)
@@ -66,7 +67,7 @@ Namespace Curves
 
             Dim emptyRics As New List(Of String)
             rics.ForEach(Sub(ric)
-                             Dim meta = Commons.GetBondInfo(ric)
+                             Dim meta = DbInitializer.GetBondInfo(ric)
                              If meta IsNot Nothing Then
                                  _meta.Add(ric, meta)
                              Else
@@ -128,9 +129,9 @@ Namespace Curves
             Return Color.White
         End Function
 
-        Public Overrides Function CalculateSpread(ByVal data As List(Of YieldDuration)) As List(Of YieldDuration)
+        Public Overrides Function CalculateSpread(ByVal data As List(Of SwapPointDescription)) As List(Of SwapPointDescription)
             If BmkSpreadMode Is Nothing Or Benchmark Is Nothing Then Return data
-            Dim res As New List(Of YieldDuration)(data)
+            Dim res As New List(Of SwapPointDescription)(data)
             If Benchmark.Equals(Me) Then
                 res.ForEach(Sub(elem)
                                 elem.PointSpread = 0
@@ -293,7 +294,7 @@ Namespace Curves
             Return _estimationModel
         End Function
 
-        Public Function Estimate(points As List(Of YieldDuration)) As List(Of XY) Implements IFittable.Estimate
+        Public Function Estimate(points As List(Of SwapPointDescription)) As List(Of XY) Implements IFittable.Estimate
             Return _estimator.Approximate(points, BmkSpreadMode)
         End Function
 
@@ -310,7 +311,7 @@ Namespace Curves
             Return True
         End Function
 
-        Public Function Bootstrap(ByVal data As List(Of YieldDuration)) As List(Of YieldDuration) Implements IBootstrappable.Bootstrap
+        Public Function Bootstrap(ByVal data As List(Of SwapPointDescription)) As List(Of SwapPointDescription) Implements IBootstrappable.Bootstrap
             Dim params(0 To CurveData.Count() - 1, 5) As Object
             For i = 0 To CurveData.Count - 1
                 Dim meta = _meta(CurveData(i).RIC)
@@ -324,11 +325,11 @@ Namespace Curves
             Dim curveModule = New AdxYieldCurveModule
 
             Dim termStructure As Array = curveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
-            Dim result As New List(Of YieldDuration)
+            Dim result As New List(Of SwapPointDescription)
             For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
                 Dim dur = (Commons.FromExcelSerialDate(termStructure.GetValue(i, 1)) - _date).TotalDays / 365.0
                 Dim yld = termStructure.GetValue(i, 2)
-                If dur > 0 And yld > 0 Then result.Add(New YieldDuration With {.Yield = yld, .Duration = dur})
+                If dur > 0 And yld > 0 Then result.Add(New SwapPointDescription With {.Yield = yld, .Duration = dur})
             Next
             Return result
         End Function

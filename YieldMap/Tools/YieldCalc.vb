@@ -160,7 +160,7 @@ Namespace Tools
                                  price, yield, yieldToWhat.Abbr, duration)
         End Function
 
-        Public Function CalcZSprd(ByVal rateArray As Array, descr As BasicYieldDuration, data As DataBaseBondDescription) As Double?
+        Public Function CalcZSprd(ByVal rateArray As Array, descr As BasePointDescription, data As DataBaseBondDescription) As Double?
             If descr.Price > 0 Then
                 Try
                     Dim settleDate = BondModule.BdSettle(DateTime.Today, data.PaymentStructure)
@@ -175,7 +175,7 @@ Namespace Tools
             End If
         End Function
 
-        Public Function CalcPntSprd(ByVal rateArray As Array, descr As BasicYieldDuration) As Double?
+        Public Function CalcPntSprd(ByVal rateArray As Array, descr As BasePointDescription) As Double?
             Dim data As New List(Of XY)
             For i = rateArray.GetLowerBound(0) To rateArray.GetUpperBound(0)
                 data.Add(New XY() With {.Y = rateArray.GetValue(i, 1), .X = (CDate(rateArray.GetValue(i, 0)) - descr.YieldAtDate).Days / 365})
@@ -203,7 +203,7 @@ Namespace Tools
             Return Nothing
         End Function
 
-        Public Function CalcASWSprd(ByVal rateArray As Array, ByVal floatLegStructure As String, ByVal floatingRate As Double, descr As BasicYieldDuration, data As DataBaseBondDescription) As Double?
+        Public Function CalcASWSprd(ByVal rateArray As Array, ByVal floatLegStructure As String, ByVal floatingRate As Double, descr As BasePointDescription, data As DataBaseBondDescription) As Double?
             If descr.Price > 0 Then
                 Try
                     Dim settleDate = BondModule.BdSettle(DateTime.Today, data.PaymentStructure)
@@ -219,7 +219,7 @@ Namespace Tools
             End If
         End Function
 
-        Public Sub CalculateYields(ByVal dt As DateTime, ByVal descr As DataBaseBondDescription, ByRef calc As BasicYieldDuration)
+        Public Sub CalculateYields(ByVal dt As DateTime, ByVal descr As DataBaseBondDescription, ByRef calc As BasePointDescription)
             Logger.Trace("CalculateYields({0}, {1})", calc.Price, descr.RIC)
 
             Dim coupon = descr.PaymentStream.GetCouponByDate(dt)
@@ -245,13 +245,13 @@ Namespace Tools
             calc.Duration = duration
             calc.YieldAtDate = dt
 
-            If TypeOf (calc) Is CalculatedYield Then
-                Dim clc = CType(calc, CalculatedYield)
+            If TypeOf (calc) Is BondPointDescription Then
+                Dim clc = CType(calc, BondPointDescription)
                 clc.Convexity = convexity
                 clc.PVBP = pvbp
                 clc.Yld = bestYield
-            ElseIf TypeOf (calc) Is YieldDuration Then
-                Dim clc = CType(calc, YieldDuration)
+            ElseIf TypeOf (calc) Is SwapPointDescription Then
+                Dim clc = CType(calc, SwapPointDescription)
                 clc.Yield = bestYield.Yield
             End If
         End Sub
