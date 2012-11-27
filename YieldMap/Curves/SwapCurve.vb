@@ -2,31 +2,37 @@ Imports System.Drawing
 Imports AdfinXRtLib
 Imports YieldMap.Tools
 Imports YieldMap.Tools.Estimation
-Imports YieldMap.Forms.ChartForm
 Imports YieldMap.Tools.History
 Imports NLog
 
 Namespace Curves
+    Public Interface IBootstrappable
+        Function Bootstrap(ByVal data As List(Of SwapPointDescription)) As List(Of SwapPointDescription)
+        Function IsBootstrapped() As Boolean
+        Function BootstrappingEnabled() As Boolean
+        Sub SetBootstrapped(ByVal flag As Boolean)
+    End Interface
+
+
     Public Interface ICurve
         Function GetName() As String
         Function GetFullName() As String
-        Function GetSnapshot() As List(Of Tuple(Of String, Double, Double))
+        Function GetSnapshot() As List(Of Tuple(Of String, Double?, Double))
         Function ToArray() As Array
 
         Event Cleared As Action(Of ICurve)
-        Event Updated As Action(Of ICurve, List(Of XY))
-        Event Recalculated As Action(Of ICurve, List(Of XY))
+        Event Updated As Action(Of ICurve)
+        Event Recalculated As Action(Of ICurve)
     End Interface
 
     Public MustInherit Class SwapCurve
         Implements ICurve
 
+        Public MustOverride Function GetFitModes() As EstimationModel()
+        Public MustOverride Sub SetFitMode(ByVal mode As String)
+        Public MustOverride Function GetFitMode() As EstimationModel
+
         Protected ReadOnly Descrs As New Dictionary(Of String, SwapPointDescription)
-
-        Private ReadOnly _clearedHandler As Action(Of ICurve)
-        Private ReadOnly _updatedHandler As Action(Of ICurve, List(Of XY))
-        Private ReadOnly _recalculatedHandler As Action(Of ICurve, List(Of XY))
-
         Private Shared ReadOnly Logger As Logger = Commons.GetLogger(GetType(SwapCurve))
 
 #Region "Interface"
@@ -138,39 +144,28 @@ Namespace Curves
         End Sub
 #End Region
 
-        Protected ReadOnly Property CurveData() As List(Of SwapPointDescription)
+        Public ReadOnly Property CurveData() As List(Of SwapPointDescription)
             Get
                 Dim list = Descrs.Values.ToList()
-                Return list.Where(Function(elem) elem.Yield.HasValue).ToList()
+                list.Sort()
+                Return CalculateSpread(list.Where(Function(elem) elem.Yield.HasValue).ToList())
             End Get
         End Property
 
 #Region "Events"
         Public Event Cleared As Action(Of ICurve) Implements ICurve.Cleared
-        Public Event Updated As Action(Of ICurve, List(Of XY)) Implements ICurve.Updated
+        Public Event Updated As Action(Of ICurve) Implements ICurve.Updated
         Protected Sub NotifyUpdated(theCurve As ICurve)
-            RaiseEvent Updated(theCurve, GetCurveData())
+            RaiseEvent Updated(theCurve)
         End Sub
-        Public Event Recalculated As Action(Of ICurve, List(Of XY)) Implements ICurve.Recalculated
+        Public Event Recalculated As Action(Of ICurve) Implements ICurve.Recalculated
         Private Sub NotifyRecalculated(ByVal curve As ICurve)
-            RaiseEvent Recalculated(curve, GetCurveData())
+            RaiseEvent Recalculated(curve)
         End Sub
 #End Region
 
 #Region "Public overridable tools"
         Private ReadOnly _hstLoaders As New Dictionary(Of String, HistoryLoadManager)
-        Public Sub New(ByVal clearedHandler As Action(Of ICurve),
-                       ByVal updatedHandler As Action(Of ICurve, List(Of XY)),
-                       ByVal recalculatedHandler As Action(Of ICurve, List(Of XY)))
-
-            _clearedHandler = clearedHandler
-            _updatedHandler = updatedHandler
-            _recalculatedHandler = recalculatedHandler
-
-            If _clearedHandler IsNot Nothing Then AddHandler Cleared, _clearedHandler
-            If _updatedHandler IsNot Nothing Then AddHandler Updated, _updatedHandler
-            If _recalculatedHandler IsNot Nothing Then AddHandler Recalculated, _recalculatedHandler
-        End Sub
 
         Protected MustOverride Function GetRICs(ByVal broker As String) As List(Of String)
 
@@ -184,19 +179,20 @@ Namespace Curves
             Return res
         End Function
 
-        Public Overridable Function GetCurveData() As List(Of XY)
-            Return XY.ConvertToXY(CurveData, BmkSpreadMode)
-        End Function
+        'Public Overridable Function GetCurveData() As List(Of BasePointDescription)
+        '    Return CurveData.Cast(Of BasePointDescription)().ToList()
+        '    'Return XY.ConvertToXY(CurveData, BmkSpreadMode)
+        'End Function
 
-        Public Function GetSnapshot() As List(Of Tuple(Of String, Double, Double)) Implements ICurve.GetSnapshot
-            Return CurveData.Select(Function(elem) New Tuple(Of String, Double, Double)(elem.RIC, elem.Yield, elem.Duration)).ToList()
+        Public Function GetSnapshot() As List(Of Tuple(Of String, Double?, Double)) Implements ICurve.GetSnapshot
+            Return Descrs.Values.Select(Function(elem) New Tuple(Of String, Double?, Double)(elem.RIC, elem.Yield, elem.Duration)).ToList()
         End Function
 
         '' LOADING DATA
         Public Overridable Sub Subscribe()
             Logger.Debug("Subscirbe({0})", GetName())
             Descrs.Clear()
-            GetRICs(GetBroker()).ForEach(Sub(ric As String) Descrs.Add(ric, New SwapPointDescription()))
+            GetRICs(GetBroker()).ForEach(Sub(ric As String) Descrs.Add(ric, New SwapPointDescription(ric)))
             StopLoaders()
             If GetDate() = Date.Today Then
                 StartRealTime()
@@ -211,10 +207,6 @@ Namespace Curves
 
             RaiseEvent Cleared(Me)
             CurveData.Clear()
-
-            If _clearedHandler IsNot Nothing Then RemoveHandler Cleared, _clearedHandler
-            If _updatedHandler IsNot Nothing Then RemoveHandler Updated, _updatedHandler
-            If _recalculatedHandler IsNot Nothing Then RemoveHandler Recalculated, _recalculatedHandler
         End Sub
 
         Protected Overridable Sub StopLoaders()

@@ -5,10 +5,9 @@ Imports NLog
 Imports YieldMap.Tools.History
 Imports YieldMap.Tools.Lists
 Imports YieldMap.Commons
-Imports YieldMap.Tools
 Imports YieldMap.Curves
 
-Namespace Forms.ChartForm
+Namespace Tools
 #Region "I. Enumerations"
     Public Enum YieldSource
         Realtime
@@ -348,45 +347,6 @@ Namespace Forms.ChartForm
             Return _elements(ric)
         End Function
     End Class
-
-    Friend Class ColorElement
-        Implements IComparable(Of ColorElement)
-
-        Private ReadOnly _color As String
-        Private ReadOnly _whereFrom As Object
-
-        Public Sub New(ByVal color As String, ByVal whereFrom As Object)
-            _color = color
-            _whereFrom = whereFrom
-        End Sub
-
-        Public ReadOnly Property Color As String
-            Get
-                Return IIf(_color <> "", _color, "Gray")
-            End Get
-        End Property
-
-        Public ReadOnly Property WhereFrom As Object
-            Get
-                Return _whereFrom
-            End Get
-        End Property
-
-        Public Function CompareTo(ByVal other As ColorElement) As Integer Implements IComparable(Of ColorElement).CompareTo
-            If WhereFrom = other.WhereFrom Then Return 0
-            If WhereFrom = "list" Then Return 1
-            If WhereFrom = "chain" Then
-                If other.WhereFrom = "list" Then
-                    Return -1
-                ElseIf other.WhereFrom = "chain" Then
-                    Return 0
-                Else
-                    Return 1
-                End If
-            End If
-            Return -1
-        End Function
-    End Class
 #End Region
 
 #Region "III. Spreads"
@@ -529,77 +489,6 @@ Namespace Forms.ChartForm
 #End Region
 
 #Region "IV. Points descriptions"
-    'Public Class DataPointDescr
-    '    Implements IComparable(Of DataPointDescr)
-    '    Public Const AroundZero As Double = 0.0001
-
-    '    Public Overridable ReadOnly Property IsValid As Boolean
-    '        Get
-    '            Return False
-    '        End Get
-    '    End Property
-    '    Public IsVisible As Boolean
-
-    '    Public Yld As New YieldStructure
-    '    Public Duration As Double
-    '    Public Convexity As Double
-    '    Public PVBP As Double
-    '    Public YieldAtDate As Date
-
-    '    Public Overridable Property PointSpread As Double?
-    '    Public Overridable Property ZSpread As Double?
-    '    Public Overridable Property OASpread As Double?
-    '    Public Overridable Property ASWSpread As Double?
-
-    '    Public Function CompareTo(ByVal other As DataPointDescr) As Integer Implements IComparable(Of DataPointDescr).CompareTo
-    '        If Duration < other.Duration Then
-    '            Return -1
-    '        Else
-    '            Return 1
-    '        End If
-    '    End Function
-
-    '    Public Overrides Function ToString() As String
-    '        Return String.Format("{0:P2} {1:F2}", Yld, Duration)
-    '    End Function
-    'End Class
-
-    'Friend Class MoneyMarketPointDescr
-    '    Inherits DataPointDescr
-
-    '    Public Overrides ReadOnly Property IsValid() As Boolean
-    '        Get
-    '            Return True
-    '        End Get
-    '    End Property
-
-    '    Public FullName As String
-    '    Public YieldCurveName As String
-
-    '    Public Overrides Property ZSpread As Double?
-    '        Get
-    '            Return Nothing
-    '        End Get
-    '        Set(ByVal value As Double?)
-    '        End Set
-    '    End Property
-    '    Public Overrides Property OASpread As Double?
-    '        Get
-    '            Return Nothing
-    '        End Get
-    '        Set(ByVal value As Double?)
-    '        End Set
-    '    End Property
-    '    Public Overrides Property ASWSpread As Double?
-    '        Get
-    '            Return Nothing
-    '        End Get
-    '        Set(ByVal value As Double?)
-    '        End Set
-    '    End Property
-    '    Public SwpCurve As SwapCurve
-    'End Class
-
     'Friend Class HistCurvePointDescr
     '    Inherits DataPointDescr
 
@@ -654,10 +543,6 @@ Namespace Forms.ChartForm
     End Class
 
     Friend Class HistCurveSeries
-        Inherits SeriesDescr
-    End Class
-
-    Friend Class BidAskSeries
         Inherits SeriesDescr
     End Class
 #End Region

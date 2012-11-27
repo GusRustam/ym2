@@ -1,5 +1,4 @@
 ﻿Imports YieldMap.Curves
-Imports YieldMap.Forms.ChartForm
 
 Namespace Tools
     Public MustInherit Class BasePointDescription
@@ -32,20 +31,26 @@ Namespace Tools
 
     Public Class SwapPointDescription
         Inherits BasePointDescription
-
-        Public RIC As String
+        Private ReadOnly _ric As String
+        Public ReadOnly Property RIC As String
+            Get
+                Return _ric
+            End Get
+        End Property
         Public Yield As Double?
         Public SwpCurve As SwapCurve
 
         Public Overrides Function GetYield() As Double?
             Return Yield
         End Function
-        Public Sub New()
+
+        Public Sub New(ric As String)
+            _ric = ric
         End Sub
 
         Public Sub New(ByVal elem As SwapPointDescription)
             With elem
-                RIC = .RIC
+                _ric = .RIC
                 Me.Yield = .Yield
                 Duration = .Duration
                 Price = .Price

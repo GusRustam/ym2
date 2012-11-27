@@ -152,7 +152,7 @@
     <Compile Include="Forms\AboutForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\ChartForm\ChartElements.vb" />
+    <Compile Include="Tools\ChartElements.vb" />
     <Compile Include="Forms\ChartForm\GraphForm.Designer.vb">
       <DependentUpon>GraphForm.vb</DependentUpon>
     </Compile>

@@ -49,10 +49,10 @@ Namespace Curves
         Private WithEvents _quoteLoader As New ListLoadManager
 
         '' DATA LOADING PARAMETERS
-        Private _theDate As Date
+        Private _theDate As Date = Date.Today
         Private _broker As String = ""
         Private _quote As String = "MID"
-        Private ReadOnly _name As String
+        Private ReadOnly _name As String = Guid.NewGuid().ToString()
 
 
         ''' <summary>
@@ -76,16 +76,6 @@ Namespace Curves
         Protected Overrides Function GetRICs(broker As String) As List(Of String)
             Return AllowedTenors.Select(Function(item) String.Format("{0}{1}Y={2}", InstrumentName, item, broker)).ToList()
         End Function
-
-        '' CONSTRUCTOR
-        Sub New(ByVal theDate As Date, ByVal aName As String, ByVal clearedHandler As Action(Of ICurve),
-            ByVal updatedHandler As Action(Of ICurve, List(Of XY)),
-            ByVal recalculatedHandler As Action(Of ICurve, List(Of XY)), Optional ByVal broker As String = "")
-            MyBase.New(clearedHandler, updatedHandler, recalculatedHandler)
-            _theDate = theDate
-            _broker = broker
-            _name = aName
-        End Sub
 
         '' START LOADING HISTORICAL DATA
         Protected Overrides Sub LoadHistory()
@@ -283,7 +273,7 @@ Namespace Curves
             For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
                 Dim dur = (Commons.FromExcelSerialDate(termStructure.GetValue(i, 1)) - _theDate).TotalDays / 365.0
                 Dim yld = termStructure.GetValue(i, 2)
-                If dur > 0 And yld > 0 Then result.Add(New SwapPointDescription With {.Yield = yld, .Duration = dur})
+                If dur > 0 And yld > 0 Then result.Add(New SwapPointDescription(CurveData(i).RIC) With {.Yield = yld, .Duration = dur})
             Next
             Return result
         End Function
@@ -292,12 +282,23 @@ Namespace Curves
             Return True
         End Function
 
-        Public Overrides Function GetCurveData() As List(Of XY)
-            Dim crv = CalculateSpread(CurveData)
-            Return If(crv Is Nothing, crv, XY.ConvertToXY(If(_bootstrapped, Bootstrap(crv), crv), BmkSpreadMode))
-        End Function
+        'Public Overrides Function GetCurveData() As List(Of XY)
+        '    Dim crv = CalculateSpread(CurveData)
+        '    Return If(crv Is Nothing, crv, XY.ConvertToXY(If(_bootstrapped, Bootstrap(crv), crv), BmkSpreadMode))
+        'End Function
 
         '' OVERRIDEN METHODS
+        Public Overrides Function GetFitModes() As EstimationModel()
+            Return {EstimationModel.DefaultModel}
+        End Function
+
+        Public Overrides Sub SetFitMode(ByVal mode As String)
+        End Sub
+
+        Public Overrides Function GetFitMode() As EstimationModel
+            Return EstimationModel.DefaultModel
+        End Function
+
         Public Overrides Function GetBrokers() As String()
             Return Brokers
         End Function
@@ -340,16 +341,7 @@ Namespace Curves
             Select Case BmkSpreadMode
                 Case SpreadMode.PointSpread
                     Dim res As New List(Of SwapPointDescription)(data)
-                    res.ForEach(Sub(elem)
-                                    CalcPntSprd(Benchmark.ToArray(), Descrs(elem.RIC))
-                                    'elem.PointSpread = PointSpread(
-                                    '    Benchmark.ToArray(),
-                                    '    New DataPointDescr() With {
-                                    '        .Yld = New YieldStructure() With {.Yield = elem.Yield},
-                                    '        .Duration = elem.Duration,
-                                    '        .YieldAtDate = elem.YieldAtDate
-                                    '    })
-                                End Sub)
+                    res.ForEach(Sub(elem) CalcPntSprd(Benchmark.ToArray(), Descrs(elem.RIC)))
                     Return res
                 Case Else : Return data
             End Select
@@ -421,12 +413,6 @@ Namespace Curves
             End Get
         End Property
 
-        Public Sub New(ByVal theDate As Date, ByVal aName As String, ByVal clearedHandler As Action(Of ICurve),
-            ByVal updatedHandler As Action(Of ICurve, List(Of XY)),
-            ByVal recalculatedHandler As Action(Of ICurve, List(Of XY)), Optional ByVal broker As String = "")
-            MyBase.New(theDate, aName, clearedHandler, updatedHandler, recalculatedHandler, broker)
-        End Sub
-
         Public Overrides Function GetOuterColor() As Color
             Return Color.MidnightBlue
         End Function
@@ -443,12 +429,6 @@ Namespace Curves
         Protected Overrides Property AllowedTenors() As String() = {"1W", "2W", "1M", "2M", "3M", "6M", "9M", "1Y", "18M", "2Y", "3Y", "4Y", "5Y"}
         Protected Overrides Property Brokers() As String() = {"GFI", "TRDL", "ICAP", "R", ""}
         Protected Overrides Property BaseInstrument As String = ""
-
-        Public Sub New(ByVal theDate As Date, ByVal aName As String, ByVal clearedHandler As Action(Of ICurve),
-            ByVal updatedHandler As Action(Of ICurve, List(Of XY)),
-            ByVal recalculatedHandler As Action(Of ICurve, List(Of XY)), Optional ByVal broker As String = "")
-            MyBase.New(theDate, aName, clearedHandler, updatedHandler, recalculatedHandler, broker)
-        End Sub
 
         Public Overrides Function GetOuterColor() As Color
             Return Color.OrangeRed

@@ -3,13 +3,13 @@ Imports System.Windows.Forms
 Imports System.Windows.Forms.DataVisualization.Charting
 Imports System.Drawing
 Imports AdfinXAnalyticsFunctions
+Imports YieldMap.Tools.Estimation
 Imports YieldMap.Curves
 Imports YieldMap.My.Resources
 Imports YieldMap.Commons
 Imports YieldMap.Tools
 Imports YieldMap.BondsDataSetTableAdapters
 Imports NLog
-Imports YieldMap.Tools.Estimation
 
 Namespace Forms.ChartForm
     Public Class GraphForm
@@ -229,23 +229,17 @@ Namespace Forms.ChartForm
                 quotes.ToList.ForEach(Sub(quote) AddItem(quote, (quote = currQuote), QuoteTSMI, AddressOf OnQuoteSelected))
             End If
 
-            Dim fitting As IFittable = TryCast(theCurve, IFittable)
-            If fitting Is Nothing Then
+            'Dim fitting As IFittable = TryCast(theCurve, IFittable)
+            Dim fitModes = theCurve.GetFitModes()
+            If fitModes.Count() <= 1 Then
                 FitTSMI.Visible = False
             Else
                 FitTSMI.Visible = True
-
                 FitTSMI.DropDownItems.Clear()
-                Dim fits = fitting.GetFitModes()
-                If fits.Count = 0 Then
-                    FitTSMI.Enabled = False
-                Else
-                    FitTSMI.Enabled = True
-                    Dim currFit = fitting.GetFitMode()
-                    fits.ToList.ForEach(Sub(fit) AddItem(fit.FullName, (fit = currFit), FitTSMI, AddressOf OnFitSelected, fit.ItemName))
-                End If
+                Dim currFit = theCurve.GetFitMode()
+                fitModes.ToList.ForEach(Sub(fit) AddItem(fit.FullName, (fit = currFit), FitTSMI, AddressOf OnFitSelected, fit.ItemName))
             End If
-
+            
             Dim bootstr As IBootstrappable = TryCast(theCurve, IBootstrappable)
             If bootstr IsNot Nothing AndAlso bootstr.BootstrappingEnabled Then
                 BootstrapTSMI.Visible = True
@@ -1057,15 +1051,11 @@ Namespace Forms.ChartForm
                 Return
             End If
 
-            Dim newCurve = New YieldCurve(
-                           Guid.NewGuid.ToString,
-                           selectedItem.Name,
-                           ricsInCurve,
-                           selectedItem.Color,
-                           fieldNames,
-                           AddressOf _spreadBenchmarks.CleanupCurve,
-                           AddressOf OnCurvePaint,
-                           AddressOf OnCurveRecalculated)
+            Dim newCurve = New YieldCurve(selectedItem.Name, ricsInCurve, selectedItem.Color, fieldNames)
+
+            AddHandler newCurve.Cleared, AddressOf _spreadBenchmarks.CleanupCurve
+            AddHandler newCurve.Recalculated, AddressOf OnCurveRecalculated
+            AddHandler newCurve.Updated, AddressOf OnCurvePaint
 
             _moneyMarketCurves.Add(newCurve)
             newCurve.Subscribe()
@@ -1134,25 +1124,30 @@ Namespace Forms.ChartForm
             Dim snd = CType(sender, ToolStripMenuItem)
             Dim curve = _moneyMarketCurves.First(Function(item) item.GetName() = MoneyCurveCMS.Tag.ToString())
             If curve Is Nothing Then Return
-            Dim fitting As IFittable = TryCast(curve, IFittable)
-            If fitting IsNot Nothing Then fitting.SetFitMode(snd.Tag)
+            'Dim fitting As IFittable = TryCast(curve, IFittable)
+            'If fitting IsNot Nothing Then fitting.SetFitMode(snd.Tag)
+            curve.SetFitMode(snd.Tag)
         End Sub
 
-        Private Sub OnCurvePaint(ByVal curve As ICurve, ByVal points As List(Of XY))
+        Private Sub OnCurvePaint(ByVal curve As ICurve)
             Logger.Debug("OnCurvePaint({0})", curve.GetName())
-            PaintSwapCurve(curve, points)
+            PaintSwapCurve(curve)
             _spreadBenchmarks.UpdateCurve(curve.GetName())
             SetChartMinMax()
         End Sub
 
-        Private Sub OnCurveRecalculated(ByVal curve As ICurve, ByVal points As List(Of XY))
+        Private Sub OnCurveRecalculated(ByVal curve As ICurve)
             Logger.Debug("OnCurveRecalculated({0})", curve.GetName())
-            PaintSwapCurve(curve, points)
+            PaintSwapCurve(curve)
             SetChartMinMax()
         End Sub
 
-        Private Sub PaintSwapCurve(ByVal curve As SwapCurve, ByVal points As List(Of XY))
-            Logger.Debug("PaintSwapCurve({0}, {1} points)", curve.GetName(), If(points IsNot Nothing, points.Count, "No"))
+        Private Sub PaintSwapCurve(ByVal curve As SwapCurve)
+            Logger.Debug("PaintSwapCurve({0} points)", curve.GetName())
+            Dim points = curve.CurveData
+
+            Dim estimator = New Estimator(curve.GetFitMode())
+            Dim xyPoints = estimator.Approximate(XY.ConvertToXY(points, _spreadBenchmarks.CurrentMode))
 
             GuiAsync(
                 Sub()
@@ -1166,7 +1161,9 @@ Namespace Forms.ChartForm
                             .markerColor = curve.GetInnerColor(),
                             .markerBorderColor = curve.GetOuterColor(),
                             .borderWidth = 2,
-                            .Tag = New SwapCurveSeries With {.Name = curve.GetName(), .SwpCurve = curve}
+                            .Tag = New SwapCurveSeries With {.Name = curve.GetName(), .SwpCurve = curve},
+                            .markerStyle = MarkerStyle.None,
+                            .markerSize = 0
                         }
                         TheChart.Series.Add(theSeries)
                     Else
@@ -1181,25 +1178,16 @@ Namespace Forms.ChartForm
                     End If
                     theSeries.Enabled = True
 
-                    With theSeries
-                        If points.Count < 50 Then
-                            .MarkerStyle = MarkerStyle.Circle
-                            .MarkerSize = 5
-                        Else
-                            .MarkerStyle = MarkerStyle.None
-                            .MarkerSize = 0
-                        End If
-                    End With
-
-                    points.ForEach(
+                    xyPoints.ForEach(
                         Sub(item)
-                            Dim theTag = New SwapPointDescription() With {
+                            'todo why ric?
+                            Dim theTag = New SwapPointDescription("") With {
                                 .Duration = item.X,
                                 .SwpCurve = curve
                             }
 
                             Select Case curve.BmkSpreadMode
-                                Case SpreadMode.Yield : theTag.yield = item.Y
+                                Case SpreadMode.Yield : theTag.Yield = item.Y
                                 Case SpreadMode.PointSpread : theTag.PointSpread = item.Y
                                 Case SpreadMode.ZSpread : theTag.ZSpread = item.Y
                                 Case SpreadMode.ASWSpread : theTag.ASWSpread = item.Y
@@ -1219,30 +1207,34 @@ Namespace Forms.ChartForm
 #Region "2) Specific curves"
         Private Sub RubCCSTSMIClick(sender As Object, e As EventArgs) Handles RubCCSTSMI.Click
             Logger.Debug("RubCCSTSMIClick()")
-            Dim rubCCS = New RubCCS(DateTime.Today, Guid.NewGuid.ToString(),
-                           AddressOf _spreadBenchmarks.CleanupCurve,
-                           AddressOf OnCurvePaint,
-                           AddressOf OnCurveRecalculated)
+            Dim rubCCS = New RubCCS()
+
+            AddHandler rubCCS.Cleared, AddressOf _spreadBenchmarks.CleanupCurve
+            AddHandler rubCCS.Recalculated, AddressOf OnCurveRecalculated
+            AddHandler rubCCS.Updated, AddressOf OnCurvePaint
+
             rubCCS.Subscribe()
             _moneyMarketCurves.Add(rubCCS)
         End Sub
 
         Private Sub RubIRSTSMIClick(sender As Object, e As EventArgs) Handles RubIRSTSMI.Click
             Logger.Debug("RubIRSTSMIClick()")
-            Dim rubIRS = New RubIRS(DateTime.Today, Guid.NewGuid.ToString(),
-                           AddressOf _spreadBenchmarks.CleanupCurve,
-                           AddressOf OnCurvePaint,
-                           AddressOf OnCurveRecalculated)
+            Dim rubIRS = New RubIRS()
+            AddHandler rubIRS.Cleared, AddressOf _spreadBenchmarks.CleanupCurve
+            AddHandler rubIRS.Recalculated, AddressOf OnCurveRecalculated
+            AddHandler rubIRS.Updated, AddressOf OnCurvePaint
+
             rubIRS.Subscribe()
             _moneyMarketCurves.Add(rubIRS)
         End Sub
 
         Private Sub NDFTSMIClick(sender As Object, e As EventArgs) Handles NDFTSMI.Click
             Logger.Debug("NDFTSMI_Click()")
-            Dim rubNDF = New RubNDF(DateTime.Today, Guid.NewGuid.ToString(),
-                           AddressOf _spreadBenchmarks.CleanupCurve,
-                           AddressOf OnCurvePaint,
-                           AddressOf OnCurveRecalculated)
+            Dim rubNDF = New RubNDF()
+            AddHandler rubNDF.Cleared, AddressOf _spreadBenchmarks.CleanupCurve
+            AddHandler rubNDF.Recalculated, AddressOf OnCurveRecalculated
+            AddHandler rubNDF.Updated, AddressOf OnCurvePaint
+
             rubNDF.Subscribe()
             _moneyMarketCurves.Add(rubNDF)
         End Sub

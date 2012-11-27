@@ -3,7 +3,6 @@ Imports System.Drawing
 Imports AdfinXRtLib
 Imports YieldMap.Commons
 Imports YieldMap.Tools
-Imports YieldMap.Forms.ChartForm
 Imports YieldMap.Tools.History
 Imports YieldMap.Tools.Lists
 Imports YieldMap.Tools.Estimation
@@ -11,28 +10,13 @@ Imports NLog
 Imports AdfinXAnalyticsFunctions
 
 Namespace Curves
-    Interface IFittable
-        Function GetFitModes() As EstimationModel()
-        Sub SetFitMode(ByVal mode As String)
-        Function GetFitMode() As EstimationModel
-
-        Function Estimate(points As List(Of SwapPointDescription)) As List(Of XY)
-    End Interface
-
-    Interface IBootstrappable
-        Function Bootstrap(ByVal data As List(Of SwapPointDescription)) As List(Of SwapPointDescription)
-        Function IsBootstrapped() As Boolean
-        Function BootstrappingEnabled() As Boolean
-        Sub SetBootstrapped(ByVal flag As Boolean)
-    End Interface
-
     Class YieldCurve
         Inherits SwapCurve
-        Implements IFittable, IBootstrappable
+        Implements IBootstrappable
 
         Private _estimator As New Estimator
 
-        Private Shared ReadOnly Logger As Logger = Commons.GetLogger(GetType(YieldCurve))
+        Private Shared ReadOnly Logger As Logger = GetLogger(GetType(YieldCurve))
 
         Private WithEvents _quoteLoader As New ListLoadManager
 
@@ -48,20 +32,8 @@ Namespace Curves
         Private ReadOnly _fieldNames As Dictionary(Of QuoteSource, String)
         Private _estimationModel As EstimationModel = EstimationModel.DefaultModel
 
-        Public Sub New(
-            ByVal name As String,
-            ByVal fullname As String,
-            ByVal rics As List(Of String),
-            ByVal clr As String,
-            ByVal fieldNames As Dictionary(Of QuoteSource, String),
-            ByVal clearedHandler As Action(Of ICurve),
-            ByVal updatedHandler As Action(Of ICurve, List(Of XY)),
-            ByVal recalculatedHandler As Action(Of ICurve, List(Of XY))
-        )
-
-            MyBase.New(clearedHandler, updatedHandler, recalculatedHandler)
-
-            _name = name
+        Public Sub New(ByVal fullname As String, ByVal rics As List(Of String), ByVal clr As String, ByVal fieldNames As Dictionary(Of QuoteSource, String))
+            _name = Guid.NewGuid.ToString()
             _fullname = fullname
             _color = Color.FromName(clr)
 
@@ -271,11 +243,11 @@ Namespace Curves
             Next
         End Sub
 
-        Public Function GetFitModes() As EstimationModel() Implements IFittable.GetFitModes
+        Public Overrides Function GetFitModes() As EstimationModel()
             Return EstimationModel.GetEnabledModels()
         End Function
 
-        Public Sub SetFitMode(ByVal fitMode As String) Implements IFittable.SetFitMode
+        Public Overrides Sub SetFitMode(ByVal fitMode As String)
             _estimationModel = EstimationModel.FromName(fitMode)
             _estimator = New Estimator(_estimationModel)
             NotifyUpdated(Me)
@@ -285,17 +257,8 @@ Namespace Curves
             Return _meta.Keys.ToList()
         End Function
 
-        Public Overrides Function GetCurveData() As List(Of XY)
-            Dim crv = CalculateSpread(CurveData)
-            Return _estimator.Approximate(If(_bootstrapped, Bootstrap(crv), crv), BmkSpreadMode)
-        End Function
-
-        Public Function GetFitMode() As EstimationModel Implements IFittable.GetFitMode
+        Public Overrides Function GetFitMode() As EstimationModel
             Return _estimationModel
-        End Function
-
-        Public Function Estimate(points As List(Of SwapPointDescription)) As List(Of XY) Implements IFittable.Estimate
-            Return _estimator.Approximate(points, BmkSpreadMode)
         End Function
 
         Public Function IsBootstrapped() As Boolean Implements IBootstrappable.IsBootstrapped
@@ -327,9 +290,9 @@ Namespace Curves
             Dim termStructure As Array = curveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
             Dim result As New List(Of SwapPointDescription)
             For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
-                Dim dur = (Commons.FromExcelSerialDate(termStructure.GetValue(i, 1)) - _date).TotalDays / 365.0
+                Dim dur = (FromExcelSerialDate(termStructure.GetValue(i, 1)) - _date).TotalDays / 365.0
                 Dim yld = termStructure.GetValue(i, 2)
-                If dur > 0 And yld > 0 Then result.Add(New SwapPointDescription With {.Yield = yld, .Duration = dur})
+                If dur > 0 And yld > 0 Then result.Add(New SwapPointDescription(CurveData(i).RIC) With {.Yield = yld, .Duration = dur})
             Next
             Return result
         End Function

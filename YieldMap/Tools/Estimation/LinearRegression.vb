@@ -1,5 +1,4 @@
-﻿Imports YieldMap.Forms.ChartForm
-Imports DotNumerics.Optimization
+﻿Imports DotNumerics.Optimization
 Imports MathNet.Numerics.Interpolation.Algorithms
 Imports MathNet.Numerics.LinearAlgebra.Double
 Imports System.Reflection
@@ -421,13 +420,11 @@ Namespace Tools.Estimation
             End Select
         End Sub
 
-        Public Function Approximate(ByVal data As List(Of SwapPointDescription), ByVal what As SpreadMode) As List(Of XY)
-            If what Is Nothing Then what = SpreadMode.Yield
-            Dim dt = XY.ConvertToXY(data, what)
-            Dim x = XY.GetX(dt)
-            Dim y = XY.GetY(dt)
+        Public Function Approximate(ByVal data As List(Of XY)) As List(Of XY)
+            Dim x = XY.GetX(data)
+            Dim y = XY.GetY(data)
             If _estimationModel.EstimationType = EstimationType.Estimation Then
-                If dt.Count <= 1 Then Return Nothing
+                If data.Count <= 1 Then Return Nothing
                 If _estimationModel = EstimationModel.Best Then
                     Dim fits = _regressions.Select(
                         Function(regr)
@@ -450,7 +447,7 @@ Namespace Tools.Estimation
                 If _estimationModel = EstimationModel.CubicSpline Then
                     Return (New CubicSpline).Interpolate(x, y)
                 Else
-                    Return XY.ConvertToXY(data, what)
+                    Return data
                 End If
             End If
         End Function
