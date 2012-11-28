@@ -217,7 +217,6 @@ Namespace Forms.ChartForm
                 quotes.ToList.ForEach(Sub(quote) AddItem(quote, (quote = currQuote), QuoteTSMI, AddressOf OnQuoteSelected))
             End If
 
-            'Dim fitting As IFittable = TryCast(theCurve, IFittable)
             Dim fitModes = curve.GetFitModes()
             If fitModes.Count() <= 1 Then
                 FitTSMI.Visible = False
@@ -275,7 +274,7 @@ Namespace Forms.ChartForm
         Private Sub ShowYAxisCMS(ByVal loc As Point)
             If Not _spreadBenchmarks.Benchmarks.Any Then Return
             YAxisCMS.Items.Clear()
-            YAxisCMS.Items.Add(SpreadMode.Yield.ToString(), Nothing, AddressOf OnYAxisSelected)
+            YAxisCMS.Items.Add(SpreadType.Yield.ToString(), Nothing, AddressOf OnYAxisSelected)
             _spreadBenchmarks.Benchmarks.Keys.ToList.ForEach(Sub(key) YAxisCMS.Items.Add(key.Name, Nothing, AddressOf OnYAxisSelected))
             YAxisCMS.Show(TheChart, loc)
         End Sub
@@ -284,18 +283,18 @@ Namespace Forms.ChartForm
             Logger.Info("OnYAxisSelected()")
             Dim item As ToolStripMenuItem = TryCast(sender, ToolStripMenuItem)
             If item IsNot Nothing Then
-                _spreadBenchmarks.CurrentMode = SpreadMode.FromString(item.Text)
-                SetYAxisMode(item.Text)
+                _spreadBenchmarks.CurrentType = SpreadType.FromString(item.Text)
+                'SetYAxisMode(item.Text)
             End If
         End Sub
 
         Private Sub SetYAxisMode(ByVal str As String)
             Try
                 Select Case str
-                    Case SpreadMode.Yield.ToString() : MakeAxisY("Yield, %", "P2")
-                    Case SpreadMode.ASWSpread.ToString() : MakeAxisY("ASW Spread, b.p.", "N0")
-                    Case SpreadMode.PointSpread.ToString() : MakeAxisY("Spread, b.p.", "N0")
-                    Case SpreadMode.ZSpread.ToString() : MakeAxisY("Z-Spread, b.p.", "N0")
+                    Case SpreadType.Yield.ToString() : MakeAxisY("Yield, %", "P2")
+                    Case SpreadType.ASWSpread.ToString() : MakeAxisY("ASW Spread, b.p.", "N0")
+                    Case SpreadType.PointSpread.ToString() : MakeAxisY("Spread, b.p.", "N0")
+                    Case SpreadType.ZSpread.ToString() : MakeAxisY("Z-Spread, b.p.", "N0")
                 End Select
                 TheChart.ChartAreas(0).AxisX.ScaleView.ZoomReset()
                 TheChart.ChartAreas(0).AxisY.ScaleView.ZoomReset()
@@ -316,7 +315,7 @@ Namespace Forms.ChartForm
                                 Select (From pnt In srs.Points Select pnt.YValues.First).Max).Max 'Where Not pnt.IsEmpty
 
                             Dim newMin As Double
-                            If _spreadBenchmarks.CurrentMode.Equals(SpreadMode.Yield) Then
+                            If _spreadBenchmarks.CurrentType.Equals(SpreadType.Yield) Then
                                 newMin = (From srs In TheChart.Series Where srs.Enabled And srs.Points.Any
                                         Select (From pnt In srs.Points Where pnt.YValues.First > 0 Select pnt.YValues.First).Min).Min
                             Else
@@ -407,16 +406,16 @@ Namespace Forms.ChartForm
             If senderTSMI Is Nothing Then Return
 
             If senderTSMI.Checked Then
-                _spreadBenchmarks.SetBenchmark(SpreadMode.FromString(SpreadCMS.Tag), senderTSMI.Tag)
+                _spreadBenchmarks.AddType(SpreadType.FromString(SpreadCMS.Tag), senderTSMI.Tag) 'SetBenchmark(SpreadType.FromString(SpreadCMS.Tag), senderTSMI.Tag)
             Else
-                _spreadBenchmarks.CleanupCurve(CType(senderTSMI.Tag, SwapCurve))
+                _spreadBenchmarks.RemoveType(SpreadType.FromString(SpreadCMS.Tag)) 'CleanupCurve(CType(senderTSMI.Tag, SwapCurve))
             End If
 
             UpdateAxisYTitle(False)
 
-            ASWLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadMode.ASWSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadMode.ASWSpread).GetFullName(), "")
-            SpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadMode.PointSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadMode.PointSpread).GetFullName(), "")
-            ZSpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadMode.ZSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadMode.ZSpread).GetFullName(), "")
+            ASWLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadType.ASWSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadType.ASWSpread).GetFullName(), "")
+            SpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadType.PointSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadType.PointSpread).GetFullName(), "")
+            ZSpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadType.ZSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadType.ZSpread).GetFullName(), "")
         End Sub
 #End Region
 
@@ -458,13 +457,13 @@ Namespace Forms.ChartForm
                         Dim aDate = (New AdxDateModule).DfAddPeriod("RUS", Date.Today, period, "")
                         MatLabel.Text = String.Format("{0:dd/MM/yyyy}", FromExcelSerialDate(aDate.GetValue(1, 1)))
 
-                        Select Case _spreadBenchmarks.CurrentMode
-                            Case SpreadMode.Yield : YldLabel.Text = String.Format("{0:P2}", point.YValues(0))
-                            Case SpreadMode.ZSpread : ZSpreadLabel.Text = String.Format("{0:F0} b.p.", point.YValues(0))
-                            Case SpreadMode.PointSpread : SpreadLabel.Text = String.Format("{0:F0} b.p.", point.YValues(0))
-                            Case SpreadMode.ASWSpread : ASWLabel.Text = String.Format("{0:F0} b.p.", point.YValues(0))
+                        Select Case _spreadBenchmarks.CurrentType
+                            Case SpreadType.Yield : YldLabel.Text = String.Format("{0:P2}", point.YValues(0))
+                            Case SpreadType.ZSpread : ZSpreadLabel.Text = String.Format("{0:F0} b.p.", point.YValues(0))
+                            Case SpreadType.PointSpread : SpreadLabel.Text = String.Format("{0:F0} b.p.", point.YValues(0))
+                            Case SpreadType.ASWSpread : ASWLabel.Text = String.Format("{0:F0} b.p.", point.YValues(0))
                         End Select
-                        DurLabel.Text = String.Format("{0:F2}", point.XValue * 365)
+                        DurLabel.Text = String.Format("{0:F2}", point.XValue)
 
                         DatLabel.Text = ""
 
@@ -496,9 +495,9 @@ Namespace Forms.ChartForm
                     YldLabel.Text = ""
                     DurLabel.Text = ""
                     MatLabel.Text = ""
-                    ASWLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadMode.ASWSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadMode.ASWSpread).GetFullName(), "")
-                    SpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadMode.PointSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadMode.PointSpread).GetFullName(), "")
-                    ZSpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadMode.ZSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadMode.ZSpread).GetFullName(), "")
+                    ASWLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadType.ASWSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadType.ASWSpread).GetFullName(), "")
+                    SpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadType.PointSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadType.PointSpread).GetFullName(), "")
+                    ZSpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadType.ZSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadType.ZSpread).GetFullName(), "")
                 End If
             End Try
         End Sub
@@ -755,16 +754,16 @@ Namespace Forms.ChartForm
 #Region "e) Benchmark selection"
         Private Sub LinkSpreadLabelLinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles LinkSpreadLabel.LinkClicked, LinkLabel1.LinkClicked
             ShowCurveCMS("PointSpread",
-                If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadMode.PointSpread), _spreadBenchmarks.Benchmarks(SpreadMode.PointSpread), Nothing))
+                If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadType.PointSpread), _spreadBenchmarks.Benchmarks(SpreadType.PointSpread), Nothing))
         End Sub
 
         Private Sub ZSpreadLinkLabelLinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles ZSpreadLinkLabel.LinkClicked
             ShowCurveCMS("ZSpread",
-                If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadMode.ZSpread), _spreadBenchmarks.Benchmarks(SpreadMode.ZSpread), Nothing))
+                If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadType.ZSpread), _spreadBenchmarks.Benchmarks(SpreadType.ZSpread), Nothing))
         End Sub
 
         Private Sub ASWLinkLabelLinkClicked(sender As System.Object, e As LinkLabelLinkClickedEventArgs) Handles ASWLinkLabel.LinkClicked
-            Dim refCurve = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadMode.ASWSpread), _spreadBenchmarks.Benchmarks(SpreadMode.ASWSpread), Nothing)
+            Dim refCurve = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadType.ASWSpread), _spreadBenchmarks.Benchmarks(SpreadType.ASWSpread), Nothing)
             SpreadCMS.Items.Clear()
             SpreadCMS.Tag = "ASWSpread"
             If Not _moneyMarketCurves.Any() Then Return
@@ -1053,7 +1052,7 @@ Namespace Forms.ChartForm
 
             Dim newCurve = New YieldCurve(selectedItem.Name, ricsInCurve, selectedItem.Color, fieldNames, _spreadBenchmarks)
 
-            AddHandler newCurve.Cleared, AddressOf _spreadBenchmarks.CleanupCurve
+            AddHandler newCurve.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
             AddHandler newCurve.Recalculated, AddressOf OnCurveRecalculated
             AddHandler newCurve.Updated, AddressOf OnCurvePaint
             AddHandler newCurve.Faulted, AddressOf OnCurveFault
@@ -1127,30 +1126,31 @@ Namespace Forms.ChartForm
             curve.SetFitMode(snd.Tag)
         End Sub
 
-        Private Shared Sub OnCurveFault(ByVal curve As SwapCurve, ByVal ex As CurveException)
-            MessageBox.Show(ex.HumanMessage, "Curve error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        Private Shared Sub OnCurveFault(ByVal curve As SwapCurve, ByVal ex As Exception)
+            MessageBox.Show(ex.Message, "Curve error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Sub
 
         Private Sub OnCurvePaint(ByVal curve As SwapCurve)
             Logger.Debug("OnCurvePaint({0})", curve.GetName())
-            PaintSwapCurve(curve)
+            PaintSwapCurve(curve, False)
             _spreadBenchmarks.UpdateCurve(curve.GetName())
             SetChartMinMax()
         End Sub
 
         Private Sub OnCurveRecalculated(ByVal curve As SwapCurve)
             Logger.Debug("OnCurveRecalculated({0})", curve.GetName())
-            PaintSwapCurve(curve)
+            PaintSwapCurve(curve, True)
             SetChartMinMax()
         End Sub
 
-        Private Sub PaintSwapCurve(ByVal curve As SwapCurve)
-            Logger.Debug("PaintSwapCurve({0} points)", curve.GetName())
-            Dim points = curve.GetCurveData()
+        Private Sub PaintSwapCurve(ByVal curve As SwapCurve, raw As Boolean)
+            Logger.Debug("PaintSwapCurve({0}, {1})", curve.GetName(), raw)
+            Dim points As List(Of SwapPointDescription)
+            points = curve.GetCurveData(raw)
             If points Is Nothing Then Return
 
             Dim estimator = New Estimator(curve.GetFitMode())
-            Dim xyPoints = estimator.Approximate(XY.ConvertToXY(points, _spreadBenchmarks.CurrentMode))
+            Dim xyPoints = estimator.Approximate(XY.ConvertToXY(points, _spreadBenchmarks.CurrentType))
 
             GuiAsync(
                 Sub()
@@ -1199,7 +1199,7 @@ Namespace Forms.ChartForm
             Logger.Debug("RubCCSTSMIClick()")
             Dim rubCCS = New RubCCS(_spreadBenchmarks)
 
-            AddHandler rubCCS.Cleared, AddressOf _spreadBenchmarks.CleanupCurve
+            AddHandler rubCCS.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
             AddHandler rubCCS.Recalculated, AddressOf OnCurveRecalculated
             AddHandler rubCCS.Updated, AddressOf OnCurvePaint
 
@@ -1210,7 +1210,7 @@ Namespace Forms.ChartForm
         Private Sub RubIRSTSMIClick(sender As Object, e As EventArgs) Handles RubIRSTSMI.Click
             Logger.Debug("RubIRSTSMIClick()")
             Dim rubIRS = New RubIRS(_spreadBenchmarks)
-            AddHandler rubIRS.Cleared, AddressOf _spreadBenchmarks.CleanupCurve
+            AddHandler rubIRS.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
             AddHandler rubIRS.Recalculated, AddressOf OnCurveRecalculated
             AddHandler rubIRS.Updated, AddressOf OnCurvePaint
 
@@ -1221,7 +1221,7 @@ Namespace Forms.ChartForm
         Private Sub NDFTSMIClick(sender As Object, e As EventArgs) Handles NDFTSMI.Click
             Logger.Debug("NDFTSMI_Click()")
             Dim rubNDF = New RubNDF(_spreadBenchmarks)
-            AddHandler rubNDF.Cleared, AddressOf _spreadBenchmarks.CleanupCurve
+            AddHandler rubNDF.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
             AddHandler rubNDF.Recalculated, AddressOf OnCurveRecalculated
             AddHandler rubNDF.Updated, AddressOf OnCurvePaint
 
@@ -1232,6 +1232,7 @@ Namespace Forms.ChartForm
 #End Region
 
         Private Sub OnGroupClear(ByVal group As VisualizableGroup) Handles _ansamble.Clear
+            Logger.Trace("OnGroupClear()")
             GuiAsync(
                 Sub()
                     Dim series As Series = TheChart.Series.FindByName(group.SeriesName)
@@ -1243,7 +1244,14 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
-        Private Sub OnBondQuote(ByVal descr As VisualizableBond, ByVal fieldName As String) Handles _ansamble.Quote
+        Private Sub OnBondAllQuotes(ByVal data As List(Of VisualizableBond)) Handles _ansamble.AllQuotes
+            Logger.Trace("OnBondAllQuotes()")
+            data.Where(Function(elem) elem.QuotesAndYields.ContainsKey(elem.SelectedQuote)).ToList.ForEach(Sub(elem) OnBondQuote(elem, elem.SelectedQuote, True))
+            SetChartMinMax()
+        End Sub
+
+        Private Sub OnBondQuote(ByVal descr As VisualizableBond, ByVal fieldName As String, Optional ByVal raw As Boolean = False) Handles _ansamble.Quote
+            Logger.Trace("OnBondQuote({0})", descr.MetaData.ShortName)
             GuiAsync(
                 Sub()
                     Dim group = descr.ParentGroup
@@ -1279,37 +1287,49 @@ Namespace Forms.ChartForm
                     ' creating data point
                     Dim point As DataPoint
                     Dim yValue = _spreadBenchmarks.GetQt(calc)
-                    If Not series.Points.Any(Function(pnt) pnt.Name = ric) Then
+                    Dim haveSuchPoint = series.Points.Any(Function(pnt) CType(pnt.Tag, VisualizableBond).MetaData.RIC = ric)
+
+                    If haveSuchPoint Then
+                        point = series.Points.First(Function(pnt) CType(pnt.Tag, VisualizableBond).MetaData.RIC = ric)
                         If yValue IsNot Nothing Then
-                            point = New DataPoint(calc.Duration, yValue.Value) With {
-                                                .Name = descr.MetaData.RIC,
-                                                .Tag = descr,
-                                                .ToolTip = descr.MetaData.ShortName,
-                                                .Color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.LightGray)
-                            }
-                            series.Points.Add(point)
+                            point.XValue = calc.Duration
+                            If yValue.Value <> point.YValues.First Then
+                                Logger.Trace("{0}: delta is {1}", ric, yValue.Value - point.YValues.First)
+                            End If
+                            point.YValues = {yValue.Value}
+                            point.Color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.LightGray)
+                        Else
+                            series.Points.Remove(point)
                         End If
-                    Else
-                        point = series.Points.First(Function(pnt) pnt.Name = ric)
-                        point.XValue = calc.Duration
-                        point.YValues = {yValue.Value}
-                        point.Color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.LightGray)
+                    ElseIf yValue IsNot Nothing Then
+                        point = New DataPoint(calc.Duration, yValue.Value) With {
+                            .Name = descr.MetaData.RIC,
+                            .Tag = descr,
+                            .ToolTip = descr.MetaData.ShortName,
+                            .Color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.LightGray)
+                        }
+                        series.Points.Add(point)
                     End If
-                    'Dim t = New Thread(New ThreadStart(
-                    '        Sub()
-                    '            GuiAsync(
-                    '                Sub()
-                    '                    Thread.Sleep(10000)
-                    '                    point.Color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.LightGray)
-                    '                End Sub)
-                    '        End Sub))
-                    't.Start()
+                    If Not raw Then SetChartMinMax()
                 End Sub)
         End Sub
 
-        Private Sub SpreadBenchmarksSpreadUpdated(newMode As SpreadMode, oldMode As SpreadMode) Handles _spreadBenchmarks.SpreadUpdated
-            _moneyMarketCurves.ForEach(Sub(curve) curve.Recalculate())
-            _ansamble.Recalculate()
+        Private Sub OnBenchmarkRemoved(type As SpreadType) Handles _spreadBenchmarks.BenchmarkRemoved
+            _moneyMarketCurves.ForEach(Sub(curve) curve.CleanupByType(type))
+            _ansamble.CleanupByType(type)
+        End Sub
+
+        Private Sub OnBenchmarkUpdated(type As SpreadType) Handles _spreadBenchmarks.BenchmarkUpdated
+            _moneyMarketCurves.ForEach(Sub(curve) curve.RecalculateByType(type))
+            _ansamble.RecalculateByType(type)
+        End Sub
+
+        Private Sub OnTypeSelected(newType As SpreadType, oldType As SpreadType) Handles _spreadBenchmarks.TypeSelected
+            If newType <> oldType Then
+                SetYAxisMode(newType.ToString())
+                _moneyMarketCurves.ForEach(Sub(curve) curve.RecalculateByType(newType))
+                _ansamble.RecalculateByType(newType)
+            End If
         End Sub
     End Class
 End Namespace

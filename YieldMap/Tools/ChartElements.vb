@@ -35,9 +35,16 @@ Namespace Tools
 
         Private ReadOnly _spreadBmk As SpreadContainer
 
+        Public Event AllQuotes As Action(Of List(Of VisualizableBond))
         Public Event Quote As Action(Of VisualizableBond, String)
         Public Event Volume As Action(Of VisualizableBond)
         Public Event Clear As Action(Of VisualizableGroup)
+
+        Public ReadOnly Property SpreadBmk() As SpreadContainer
+            Get
+                Return _spreadBmk
+            End Get
+        End Property
 
         ''' <summary>
         ''' Get a group containing specified bond 
@@ -79,8 +86,13 @@ Namespace Tools
         Public Sub AddGroup(ByVal group As VisualizableGroup)
             _groups.Add(group)
             AddHandler group.Quote, AddressOf OnBondQuote
+            AddHandler group.AllQuotes, AddressOf OnBondAllQuotes
             AddHandler group.Volume, AddressOf OnBondVolume
             AddHandler group.Clear, AddressOf OnGroupClear
+        End Sub
+
+        Private Sub OnBondAllQuotes(ByVal obj As List(Of VisualizableBond))
+            RaiseEvent AllQuotes(obj)
         End Sub
 
         Private Sub OnGroupClear(ByVal obj As VisualizableGroup)
@@ -99,16 +111,30 @@ Namespace Tools
             _spreadBmk = bmk
         End Sub
 
+        Public Sub CalcAllSpreads(ByVal type As SpreadType, ByRef calculation As BondPointDescription, ByVal metaData As DataBaseBondDescription)
+            _spreadBmk.CalcAllSpreads(calculation, metaData, type)
+        End Sub
+
         Public Sub CalcAllSpreads(ByRef calculation As BondPointDescription, ByVal metaData As DataBaseBondDescription)
-            _spreadBmk.CalcAllSpreads(calculation, metaData)
+            For i = 0 To _spreadBmk.Benchmarks.Keys.Count
+                _spreadBmk.CalcAllSpreads(calculation, metaData, _spreadBmk.Benchmarks.Keys(i))
+            Next
         End Sub
 
         Public Function GetGroup(ByVal seriesName As String) As VisualizableGroup
             Return _groups.First(Function(grp) grp.SeriesName = seriesName)
         End Function
 
-        Public Sub Recalculate()
-            _groups.ForEach(Sub(group) group.Recalculate())
+        Public Sub RecalculateByType(ByVal type As SpreadType)
+            _groups.ForEach(Sub(group) group.RecalculateByType(Type))
+        End Sub
+
+        Public Sub CleanupByType(ByVal type As SpreadType)
+            _groups.ForEach(Sub(group) group.CleanupByType(type))
+        End Sub
+
+        Public Sub CleanupSpread(ByVal type As SpreadType, ByRef descr As BasePointDescription)
+            _spreadBmk.CleanupSpread(descr, type)
         End Sub
     End Class
 
@@ -137,7 +163,7 @@ Namespace Tools
             End Get
             Set(value As String)
                 _selectedQuote = value
-                Recalculate()
+                'Recalculate()
             End Set
         End Property
 
@@ -153,9 +179,15 @@ Namespace Tools
             End Get
         End Property
 
-        Public Sub Recalculate()
+        Public Sub RecalculateByType(type As SpreadType)
             If _quotesAndYields.ContainsKey(_selectedQuote) Then
-                _parentGroup.Ansamble.CalcAllSpreads(_quotesAndYields(_selectedQuote), _metaData)
+                _parentGroup.Ansamble.CalcAllSpreads(type, _quotesAndYields(_selectedQuote), _metaData)
+            End If
+        End Sub
+
+        Public Sub CleanupByType(ByVal type As SpreadType)
+            If _quotesAndYields.ContainsKey(_selectedQuote) Then
+                _parentGroup.Ansamble.CleanupSpread(type, _quotesAndYields(_selectedQuote))
             End If
         End Sub
     End Class
@@ -173,6 +205,7 @@ Namespace Tools
         Public Event Quote As Action(Of VisualizableBond, String)
         Public Event Clear As Action(Of VisualizableGroup)
         Public Event Volume As Action(Of VisualizableBond)
+        Public Event AllQuotes As Action(Of List(Of VisualizableBond))
 
         Public Group As GroupType
         Public SeriesName As String
@@ -354,86 +387,67 @@ Namespace Tools
             Return _elements(ric)
         End Function
 
-        Public Sub Recalculate()
+        Public Sub RecalculateByType(type As SpreadType)
             _elements.Keys.ToList().ForEach(
                 Sub(ric)
                     Dim elem = _elements(ric)
                     If elem.QuotesAndYields.ContainsKey(elem.SelectedQuote) Then
-                        elem.Recalculate()
-                        RaiseEvent Quote(elem, elem.SelectedQuote)
+                        elem.RecalculateByType(type)
                     End If
                 End Sub)
+            If _ansamble.SpreadBmk.CurrentType = type Then RaiseEvent AllQuotes(_elements.Values.ToList())
+        End Sub
 
+        Public Sub CleanupByType(ByVal type As SpreadType)
+            _elements.Keys.ToList().ForEach(
+                Sub(ric)
+                    Dim elem = _elements(ric)
+                    If elem.QuotesAndYields.ContainsKey(elem.SelectedQuote) Then
+                        elem.CleanupByType(type)
+                    End If
+                End Sub)
         End Sub
     End Class
 #End Region
 
 #Region "III. Spreads"
     Public Class SpreadContainer
-        Private _currentMode As SpreadMode = SpreadMode.Yield
-        Public Property CurrentMode As SpreadMode
-            Get
-                Return _currentMode
-            End Get
-            Set(value As SpreadMode)
-                Dim oldMode = _currentMode
-                _currentMode = value
-                RaiseEvent SpreadUpdated(_currentMode, oldMode)
-                'RaiseEvent ModeSelected(value, _currentMode)
-            End Set
-        End Property
+        Public Benchmarks As New Dictionary(Of SpreadType, SwapCurve)
 
-        'Public Event ModeSelected As Action(Of SpreadMode, SpreadMode)
-        Public Event SpreadUpdated As Action(Of SpreadMode, SpreadMode)
-
-        Public Benchmarks As New Dictionary(Of SpreadMode, SwapCurve)
-
-        Public Sub CalcAllSpreads(ByRef descr As BasePointDescription, ByVal data As DataBaseBondDescription)
-            If Benchmarks.ContainsKey(SpreadMode.ZSpread) Then
-                CalcZSprd(Benchmarks(SpreadMode.ZSpread).ToArray(), descr, data)
-            End If
-            If Benchmarks.ContainsKey(SpreadMode.ASWSpread) Then
-                Dim aswSpreadMainCurve = Benchmarks(SpreadMode.ASWSpread)
-                Dim bmk = CType(aswSpreadMainCurve, IAssetSwapBenchmark)
-                CalcASWSprd(aswSpreadMainCurve.ToArray(), bmk.FloatLegStructure, bmk.FloatingPointValue, descr, data)
-            End If
-            If Benchmarks.ContainsKey(SpreadMode.PointSpread) Then
-                CalcPntSprd(Benchmarks(SpreadMode.PointSpread).ToArray(), descr)
-            End If
-        End Sub
-
-        Public Sub CalcAllSpreads(ByRef descr As BasePointDescription)
-            'todo i could also calculate spreads for swaps. I have their structures and so on.
-            If Benchmarks.ContainsKey(SpreadMode.PointSpread) Then
-                CalcPntSprd(Benchmarks(SpreadMode.PointSpread).ToArray(), descr)
-            End If
-        End Sub
-
-        Public Sub CleanupCurve(ByVal curve As SwapCurve)
-            Dim modes = (From keyValue In Benchmarks Where keyValue.Value.GetName() = curve.GetName() Select keyValue.Key).ToList()
-            modes.ForEach(Sub(mode)
-                              Benchmarks.Remove(mode)
-                              RaiseEvent SpreadUpdated(mode, _currentMode)
-                          End Sub)
-            If modes.Contains(CurrentMode) Then CurrentMode = SpreadMode.Yield
-        End Sub
-
-        Public Sub UpdateCurve(ByVal curveName As String)
-            Dim modes = (From keyValue In Benchmarks Where keyValue.Value.GetName() = curveName Select keyValue.Key).ToList()
-            modes.ForEach(Sub(mode) RaiseEvent SpreadUpdated(mode, _currentMode))
-        End Sub
-
-        Public Sub SetBenchmark(ByVal mode As SpreadMode, ByVal curve As SwapCurve)
-            If Not Benchmarks.ContainsKey(mode) Then
-                Benchmarks.Add(mode, curve)
+        Public Sub CalcAllSpreads(ByRef descr As BasePointDescription, Optional ByVal data As DataBaseBondDescription = Nothing, Optional ByVal type As SpreadType = Nothing)
+            If type IsNot Nothing Then
+                If data IsNot Nothing Then
+                    If type = SpreadType.ZSpread AndAlso Benchmarks.ContainsKey(SpreadType.ZSpread) Then
+                        CalcZSprd(Benchmarks(SpreadType.ZSpread).ToArray(), descr, data)
+                    End If
+                    If type = SpreadType.ASWSpread AndAlso Benchmarks.ContainsKey(SpreadType.ASWSpread) Then
+                        Dim aswSpreadMainCurve = Benchmarks(SpreadType.ASWSpread)
+                        Dim bmk = CType(aswSpreadMainCurve, IAssetSwapBenchmark)
+                        CalcASWSprd(aswSpreadMainCurve.ToArray(), bmk.FloatLegStructure, bmk.FloatingPointValue, descr, data)
+                    End If
+                End If
+                If type = SpreadType.PointSpread AndAlso Benchmarks.ContainsKey(SpreadType.PointSpread) Then
+                    CalcPntSprd(Benchmarks(SpreadType.PointSpread).ToArray(), descr)
+                End If
             Else
-                Benchmarks(mode) = curve
+                If data IsNot Nothing Then
+                    If Benchmarks.ContainsKey(SpreadType.ZSpread) Then
+                        CalcZSprd(Benchmarks(SpreadType.ZSpread).ToArray(), descr, data)
+                    End If
+                    If Benchmarks.ContainsKey(SpreadType.ASWSpread) Then
+                        Dim aswSpreadMainCurve = Benchmarks(SpreadType.ASWSpread)
+                        Dim bmk = CType(aswSpreadMainCurve, IAssetSwapBenchmark)
+                        CalcASWSprd(aswSpreadMainCurve.ToArray(), bmk.FloatLegStructure, bmk.FloatingPointValue, descr, data)
+                    End If
+                End If
+                If Benchmarks.ContainsKey(SpreadType.PointSpread) Then
+                    CalcPntSprd(Benchmarks(SpreadType.PointSpread).ToArray(), descr)
+                End If
             End If
-            RaiseEvent SpreadUpdated(mode, _currentMode)
         End Sub
 
         Public Function GetQt(ByVal calc As BasePointDescription) As Double?
-            Dim fieldName = _currentMode.ToString()
+            Dim fieldName = _currentType.ToString()
             If fieldName = "Yield" Then
                 Return calc.GetYield()
             Else
@@ -449,17 +463,74 @@ Namespace Tools
             End If
             Return Nothing
         End Function
+
+        Private _currentType As SpreadType = SpreadType.Yield
+        Public Property CurrentType As SpreadType
+            Get
+                Return _currentType
+            End Get
+            Set(value As SpreadType)
+                Dim oldType = _currentType
+                _currentType = value
+                RaiseEvent TypeSelected(_currentType, oldType)
+            End Set
+        End Property
+
+        Public Event TypeSelected As Action(Of SpreadType, SpreadType)
+        Public Event BenchmarkRemoved As Action(Of SpreadType)
+        Public Event BenchmarkUpdated As Action(Of SpreadType)
+
+        Public Sub OnCurveRemoved(ByVal curve As SwapCurve)
+            Dim types = (From keyValue In Benchmarks Where keyValue.Value.GetName() = curve.GetName() Select keyValue.Key).ToList()
+            types.ForEach(Sub(type)
+                              Benchmarks.Remove(type)
+                              RaiseEvent BenchmarkRemoved(type)
+                          End Sub)
+            If types.Contains(CurrentType) Then CurrentType = SpreadType.Yield
+        End Sub
+
+
+        Public Sub UpdateCurve(ByVal curveName As String)
+            Dim types = (From keyValue In Benchmarks Where keyValue.Value.GetName() = curveName Select keyValue.Key).ToList()
+            types.ForEach(Sub(type) RaiseEvent BenchmarkUpdated(type))
+        End Sub
+
+        Public Sub AddType(ByVal type As SpreadType, ByVal curve As SwapCurve)
+            If Benchmarks.ContainsKey(type) Then
+                Benchmarks.Remove(type)
+            End If
+            Benchmarks.Add(type, curve)
+            RaiseEvent BenchmarkUpdated(type)
+        End Sub
+
+        Public Sub RemoveType(ByVal type As SpreadType)
+            If Benchmarks.ContainsKey(type) Then
+                RaiseEvent BenchmarkRemoved(type)
+                Benchmarks.Remove(type)
+            End If
+            If CurrentType = type Then CurrentType = SpreadType.Yield
+        End Sub
+
+        Public Sub CleanupSpread(ByRef descr As BasePointDescription, ByVal type As SpreadType)
+            If type = SpreadType.ZSpread Then
+                descr.ZSpread = Nothing
+            ElseIf type = SpreadType.ASWSpread Then
+                descr.ASWSpread = Nothing
+            ElseIf type = SpreadType.PointSpread Then
+                descr.PointSpread = Nothing
+            End If
+        End Sub
     End Class
 
-    Public Class SpreadMode
-        Public Shared Yield As New SpreadMode("Yield", True)
-        Public Shared PointSpread As New SpreadMode("PointSpread", True)
-        Public Shared ZSpread As New SpreadMode("ZSpread", True)
-        Public Shared OASpread As New SpreadMode("OASpread", False)
-        Public Shared ASWSpread As New SpreadMode("ASWSpread", True)
+    Public Class SpreadType
+        Public Shared Yield As New SpreadType("Yield", True)
+        Public Shared PointSpread As New SpreadType("PointSpread", True)
+        Public Shared ZSpread As New SpreadType("ZSpread", True)
+        Public Shared OASpread As New SpreadType("OASpread", False)
+        Public Shared ASWSpread As New SpreadType("ASWSpread", True)
 
         Public Overrides Function Equals(ByVal obj As Object) As Boolean
-            If TypeOf obj Is SpreadMode Then
+            If TypeOf obj Is SpreadType Then
                 Return _name = obj.Name
             Else
                 Return False
@@ -478,17 +549,19 @@ Namespace Tools
             _enabled = enabled
         End Sub
 
-        Public Shared Operator =(ByVal mode1 As SpreadMode, ByVal mode2 As SpreadMode)
+        Public Shared Operator =(ByVal mode1 As SpreadType, ByVal mode2 As SpreadType)
+            If mode1 Is Nothing OrElse mode2 Is Nothing Then Return False
             Return mode1.Name = mode2.Name
         End Operator
 
-        Public Shared Operator <>(ByVal mode1 As SpreadMode, ByVal mode2 As SpreadMode)
+        Public Shared Operator <>(ByVal mode1 As SpreadType, ByVal mode2 As SpreadType)
+            If mode1 Is Nothing OrElse mode2 Is Nothing Then Return False
             Return mode1.Name <> mode2.Name
         End Operator
 
         Public Shared Function IsEnabled(name As String)
-            Dim staticFields = GetType(SpreadMode).GetFields(BindingFlags.Instance Or BindingFlags.Public)
-            Return (From info In staticFields Let element = CType(info.GetValue(Nothing), SpreadMode) Select element.Name = name And element.Enabled).FirstOrDefault()
+            Dim staticFields = GetType(SpreadType).GetFields(BindingFlags.Instance Or BindingFlags.Public)
+            Return (From info In staticFields Let element = CType(info.GetValue(Nothing), SpreadType) Select element.Name = name And element.Enabled).FirstOrDefault()
         End Function
 
         Public ReadOnly Property Enabled As Boolean
@@ -503,9 +576,9 @@ Namespace Tools
             End Get
         End Property
 
-        Public Shared Function FromString(ByVal name As String) As SpreadMode
-            Dim staticFields = GetType(SpreadMode).GetFields()
-            Return (From info In staticFields Let element = CType(info.GetValue(Nothing), SpreadMode) Where element.Name = name And element.Enabled Select element).FirstOrDefault()
+        Public Shared Function FromString(ByVal name As String) As SpreadType
+            Dim staticFields = GetType(SpreadType).GetFields()
+            Return (From info In staticFields Let element = CType(info.GetValue(Nothing), SpreadType) Where element.Name = name And element.Enabled Select element).FirstOrDefault()
         End Function
     End Class
 #End Region

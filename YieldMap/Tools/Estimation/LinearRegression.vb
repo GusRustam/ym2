@@ -462,20 +462,20 @@ Namespace Tools.Estimation
         Public X As Double
         Public Y As Double
 
-        Public Shared Function ConvertToXY(ByVal data As List(Of SwapPointDescription), ByVal mode As SpreadMode) As List(Of XY)
+        Public Shared Function ConvertToXY(ByVal data As List(Of SwapPointDescription), ByVal type As SpreadType) As List(Of XY)
             Dim x As List(Of Double)
             Dim y As List(Of Double)
-            Select Case mode
-                Case SpreadMode.Yield
+            Select Case type
+                Case SpreadType.Yield
                     x = data.Where(Function(elem) elem.Yield.HasValue).Select(Function(elem) elem.Duration).ToList()
                     y = data.Where(Function(elem) elem.Yield.HasValue).Select(Function(elem) elem.Yield.Value).ToList()
-                Case SpreadMode.PointSpread
+                Case SpreadType.PointSpread
                     x = data.Where(Function(elem) elem.PointSpread.HasValue).Select(Function(elem) elem.Duration).ToList()
                     y = data.Where(Function(elem) elem.PointSpread.HasValue).Select(Function(elem) elem.PointSpread.Value).ToList()
-                Case SpreadMode.ZSpread
+                Case SpreadType.ZSpread
                     x = data.Where(Function(elem) elem.ZSpread.HasValue).Select(Function(elem) elem.Duration).ToList()
                     y = data.Where(Function(elem) elem.ZSpread.HasValue).Select(Function(elem) elem.ZSpread.Value).ToList()
-                Case SpreadMode.ASWSpread
+                Case SpreadType.ASWSpread
                     x = data.Where(Function(elem) elem.ASWSpread.HasValue).Select(Function(elem) elem.Duration).ToList()
                     y = data.Where(Function(elem) elem.ASWSpread.HasValue).Select(Function(elem) elem.ASWSpread.Value).ToList()
             End Select

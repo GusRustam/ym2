@@ -55,7 +55,7 @@ Namespace Curves
                                                 .Fields = {_quote}.ToList()
                                             }) Then
                 Logger.Error("Failed to start loading bonds data")
-                Throw New DataLoadException("Failed to start loading realtime bonds data")
+                Throw New Exception("Failed to start loading realtime bonds data")
             End If
         End Sub
 
@@ -68,7 +68,7 @@ Namespace Curves
                     Catch ex As Exception
                         Logger.ErrorException("Failed to start loading bonds data", ex)
                         Logger.Error("Exception = {0}", ex.ToString())
-                        Throw New DataLoadException("Failed to start loading historical bonds data")
+                        Throw New Exception("Failed to start loading historical bonds data")
                     End Try
                 End Sub)
         End Sub
@@ -119,12 +119,20 @@ Namespace Curves
             Return Descrs(ric).Duration
         End Function
 
-        Public Overrides Sub Recalculate()
-            Recalculate(Descrs.Values.ToList())
-            NotifyRecalculated(Me)
+        Public Overrides Sub RecalculateByType(ByVal type As SpreadType)
+            Logger.Trace("RecalculateByType({0})", type)
+            Dim rics = Descrs.Keys.ToList()
+            If SpreadBmk.Benchmarks.ContainsKey(type) AndAlso SpreadBmk.Benchmarks(type).GetName() = GetName() Then
+                rics.ForEach(Sub(ric) SpreadBmk.CleanupSpread(Descrs(ric), type))
+            Else
+                rics.ForEach(Sub(ric) SpreadBmk.CalcAllSpreads(Descrs(ric), _meta(ric), type))
+            End If
+
+            If SpreadBmk.CurrentType = type Then NotifyRecalculated(Me)
         End Sub
 
-        Protected Overrides Sub Recalculate(list As List(Of SwapPointDescription))
+        Protected Overrides Sub Recalculate(ByRef list As List(Of SwapPointDescription))
+            Logger.Trace("Recalculate()")
             list.ForEach(Sub(elem) SpreadBmk.CalcAllSpreads(elem, _meta(elem.RIC)))
         End Sub
 
@@ -184,7 +192,7 @@ Namespace Curves
 
         Private Sub OnRealTimeData(data As Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double)))) Handles _quoteLoader.OnNewData
             Logger.Debug("OnRealTimeData")
-            Dim errorList As New List(Of CurveException)
+            Dim errorList As New List(Of Exception)
             For Each listAndRFV As KeyValuePair(Of String, Dictionary(Of String, Dictionary(Of String, Double))) In data
                 Try
                     Dim list = listAndRFV.Key
@@ -224,7 +232,7 @@ Namespace Curves
                 Catch ex As Exception
                     Logger.ErrorException("Failed to load realtime data", ex)
                     Logger.Error("Exception = {0}", ex)
-                    errorList.Add(New DataLoadException(String.Format("Failed to load realtime data for {0}", GetFullName())))
+                    errorList.Add(New Exception(String.Format("Failed to load realtime data for {0}", GetFullName())))
                 End Try
             Next
             errorList.ForEach(Sub(err) NotifyFaulted(Me, err))
@@ -288,7 +296,7 @@ Namespace Curves
                 Next
                 Return result
             Catch ex As Exception
-                Throw New BootstrappingException()
+                Throw New Exception("Bootstrapping failed", ex)
             End Try
         End Function
     End Class

@@ -56,8 +56,13 @@ Namespace Curves
 
         Protected MustOverride Function GetRICs(ByVal broker As String) As List(Of String)
 
-        Public MustOverride Sub Recalculate()
-        Protected MustOverride Sub Recalculate(list As List(Of SwapPointDescription))
+        Public MustOverride Sub RecalculateByType(ByVal type As SpreadType)
+        Protected MustOverride Sub Recalculate(ByRef list As List(Of SwapPointDescription))
+
+        Public Sub CleanupByType(ByVal type As SpreadType)
+            Dim rics = Descrs.Keys.ToList()
+            rics.ForEach(Sub(ric) SpreadBmk.CleanupSpread(Descrs(ric), Type))
+        End Sub
 
 #End Region
 
@@ -76,13 +81,13 @@ Namespace Curves
             _spreadBmk = bmk
         End Sub
 
-        Public Function GetCurveData() As List(Of SwapPointDescription)
+        Public Function GetCurveData(Optional ByVal raw As Boolean = False) As List(Of SwapPointDescription)
             Try
                 Dim list = Descrs.Values.Where(Function(elem) elem.Yield.HasValue).ToList()
                 list.Sort()
                 If IsBootstrapped() Then list = Bootstrap(list)
-                Recalculate(list)
-                Return list 'CalculateSpread(list)
+                If Not raw Then Recalculate(list)
+                Return list
             Catch ex As Exception
                 Logger.WarnException("Failed to obtain data", ex)
                 Logger.Warn("Exception = {0}", ex.ToString())
@@ -98,11 +103,12 @@ Namespace Curves
         End Function
 
         Public Overridable Function ToArray() As Array
-            Dim len = Descrs.Values.Count - 1
+            Dim list = Descrs.Values.Where(Function(elem) elem.Yield.HasValue).ToList()
+            Dim len = list.Count - 1
             Dim res(0 To len, 1) As Object
             For i = 0 To len
-                res(i, 0) = DateTime.Today.AddDays(TimeSpan.FromDays(Descrs.Values(i).Duration * 365).TotalDays)
-                res(i, 1) = Descrs.Values(i).Yield
+                res(i, 0) = DateTime.Today.AddDays(TimeSpan.FromDays(list(i).Duration * 365).TotalDays)
+                res(i, 1) = list(i).Yield
             Next
             Return res
         End Function
@@ -157,7 +163,7 @@ Namespace Curves
             RaiseEvent Updated(theCurve)
         End Sub
 
-        Protected Sub NotifyFaulted(theCurve As SwapCurve, theEx As CurveException)
+        Protected Sub NotifyFaulted(theCurve As SwapCurve, theEx As Exception)
             RaiseEvent Faulted(theCurve, theEx)
         End Sub
 
@@ -165,6 +171,5 @@ Namespace Curves
             RaiseEvent Recalculated(curve)
         End Sub
 #End Region
-
     End Class
 End Namespace

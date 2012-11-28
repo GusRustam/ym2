@@ -79,9 +79,15 @@ Namespace Curves
             Return AllowedTenors.Select(Function(item) String.Format("{0}{1}Y={2}", InstrumentName, item, broker)).ToList()
         End Function
 
-        Public Overrides Sub Recalculate()
-            Recalculate(Descrs.Values.ToList())
-            NotifyRecalculated(Me)
+        Public Overrides Sub RecalculateByType(ByVal type As SpreadType)
+            Logger.Trace("RecalculateByType({0})", type)
+            Dim rics = Descrs.Keys.ToList()
+            If SpreadBmk.Benchmarks.ContainsKey(type) AndAlso SpreadBmk.Benchmarks(type).GetName() = GetName() Then
+                rics.ForEach(Sub(ric) SpreadBmk.CleanupSpread(Descrs(ric), type:=type))
+            Else
+                rics.ForEach(Sub(ric) SpreadBmk.CalcAllSpreads(Descrs(ric), type:=type))
+            End If
+            if SpreadBmk.CurrentType = type then NotifyRecalculated(Me)
         End Sub
 
         '' START LOADING HISTORICAL DATA
@@ -285,7 +291,10 @@ Namespace Curves
             For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
                 Dim dur = (Commons.FromExcelSerialDate(termStructure.GetValue(i, 1)) - _theDate).TotalDays / 365.0
                 Dim yld = termStructure.GetValue(i, 2)
-                If dur > 0 And yld > 0 Then result.Add(New SwapPointDescription(data(i).RIC) With {.Yield = yld, .Duration = dur})
+                If dur > 0 And yld > 0 Then
+                    Dim ric = Descrs.Where(Function(pair) Math.Abs(pair.Value.Duration - dur) < 0.00001).Select(Function(pair) pair.Key).ToList()
+                    If ric.Any() Then result.Add(New SwapPointDescription(ric.First) With {.Yield = yld, .Duration = dur})
+                End If
             Next
             Return result
         End Function
@@ -345,7 +354,8 @@ Namespace Curves
             Return _theDate
         End Function
 
-        Protected Overrides Sub Recalculate(list As List(Of SwapPointDescription))
+        Protected Overrides Sub Recalculate(ByRef list As List(Of SwapPointDescription))
+            Logger.Trace("Recalculate()")
             list.ForEach(Sub(elem) SpreadBmk.CalcAllSpreads(elem))
         End Sub
 
