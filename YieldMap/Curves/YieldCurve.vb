@@ -12,9 +12,6 @@ Imports AdfinXAnalyticsFunctions
 Namespace Curves
     Class YieldCurve
         Inherits SwapCurve
-        Implements IBootstrappable
-
-        Private _estimator As New Estimator
 
         Private Shared ReadOnly Logger As Logger = GetLogger(GetType(YieldCurve))
 
@@ -32,22 +29,20 @@ Namespace Curves
         Private ReadOnly _fieldNames As Dictionary(Of QuoteSource, String)
         Private _estimationModel As EstimationModel = EstimationModel.DefaultModel
 
-        Public Sub New(ByVal fullname As String, ByVal rics As List(Of String), ByVal clr As String, ByVal fieldNames As Dictionary(Of QuoteSource, String))
+        Public Sub New(ByVal fullname As String, ByVal rics As List(Of String), ByVal clr As String, ByVal fieldNames As Dictionary(Of QuoteSource, String), ByVal bmk As SpreadContainer)
+            MyBase.New(bmk)
             _name = Guid.NewGuid.ToString()
             _fullname = fullname
             _color = Color.FromName(clr)
 
-            Dim emptyRics As New List(Of String)
             rics.ForEach(Sub(ric)
                              Dim meta = DbInitializer.GetBondInfo(ric)
                              If meta IsNot Nothing Then
                                  _meta.Add(ric, meta)
                              Else
                                  Logger.Error("No description for ric {0} found", ric)
-                                 emptyRics.Add(ric)
                              End If
                          End Sub)
-            emptyRics.ForEach(Sub(ric) rics.Remove(ric))
             _fieldNames = fieldNames
             _date = Date.Today
             _quote = fieldNames(QuoteSource.Last)
@@ -60,13 +55,22 @@ Namespace Curves
                                                 .Fields = {_quote}.ToList()
                                             }) Then
                 Logger.Error("Failed to start loading bonds data")
-                Throw New InvalidOperationException("Failed to start loading bondss data")
+                Throw New DataLoadException("Failed to start loading realtime bonds data")
             End If
         End Sub
 
         Protected Overrides Sub LoadHistory()
             Logger.Debug("LoadHistory")
-            Descrs.Keys.ToList().ForEach(Sub(ric) DoLoadRIC(ric, {"DATE", _fieldNames(QuoteSource.Hist)}.ToList, _date))
+            Descrs.Keys.ToList().ForEach(
+                Sub(ric)
+                    Try
+                        DoLoadRIC(ric, {"DATE", _fieldNames(QuoteSource.Hist)}.ToList, _date)
+                    Catch ex As Exception
+                        Logger.ErrorException("Failed to start loading bonds data", ex)
+                        Logger.Error("Exception = {0}", ex.ToString())
+                        Throw New DataLoadException("Failed to start loading historical bonds data")
+                    End Try
+                End Sub)
         End Sub
 
         Public Overrides Function GetBrokers() As String()
@@ -77,7 +81,7 @@ Namespace Curves
         End Sub
 
         Public Overrides Function GetBroker() As String
-            Return Nothing
+            Return ""
         End Function
 
         Public Overrides Function GetQuotes() As String()
@@ -101,38 +105,6 @@ Namespace Curves
             Return Color.White
         End Function
 
-        Public Overrides Function CalculateSpread(ByVal data As List(Of SwapPointDescription)) As List(Of SwapPointDescription)
-            If BmkSpreadMode Is Nothing Or Benchmark Is Nothing Then Return data
-            Dim res As New List(Of SwapPointDescription)(data)
-            If Benchmark.Equals(Me) Then
-                res.ForEach(Sub(elem)
-                                elem.PointSpread = 0
-                                elem.ZSpread = 0
-                                elem.ASWSpread = 0
-                            End Sub)
-                Return res
-            End If
-
-            Select Case BmkSpreadMode
-                Case SpreadMode.PointSpread
-                    res.ForEach(Sub(elem) CalcPntSprd(Benchmark.ToArray(), elem))
-                    Return res
-                Case SpreadMode.ZSpread
-                    res.ForEach(Sub(elem) CalcZSprd(Benchmark.ToArray(), Descrs(elem.RIC), _meta(elem.RIC)))
-                    Return res
-
-                Case SpreadMode.ASWSpread
-                    res.ForEach(Sub(elem)
-                                    Dim bmk = CType(Benchmark, IAssetSwapBenchmark)
-                                    CalcASWSprd(Benchmark.ToArray(), bmk.FloatLegStructure, bmk.FloatingPointValue, Descrs(elem.RIC), _meta(elem.RIC))
-                                End Sub)
-                    Return res
-
-                Case Else
-                    Return data
-            End Select
-        End Function
-
         Public Overrides Sub SetDate(ByVal theDate As Date)
             Dim tmp = _date
             _date = theDate
@@ -143,18 +115,18 @@ Namespace Curves
             Return _date
         End Function
 
-        Protected Overrides Sub StopLoaders()
-            MyBase.StopLoaders()
-            _quoteLoader.DiscardTask(_name)
+        Public Overrides Function GetDuration(ByVal ric As String) As Double
+            Return Descrs(ric).Duration
+        End Function
+
+        Public Overrides Sub Recalculate()
+            Recalculate(Descrs.Values.ToList())
+            NotifyRecalculated(Me)
         End Sub
 
-        Public Overrides Function GetDuration(ByVal ric As String) As Double
-            If Not CurveData.Any(Function(elem) elem.RIC = ric) Then
-                Return Descrs(ric).Duration
-            Else
-                Return CurveData.First(Function(elem) elem.RIC = ric).Duration
-            End If
-        End Function
+        Protected Overrides Sub Recalculate(list As List(Of SwapPointDescription))
+            list.ForEach(Sub(elem) SpreadBmk.CalcAllSpreads(elem, _meta(elem.RIC)))
+        End Sub
 
         Protected Overrides Sub OnHistoricalData(ByVal hst As HistoryLoadManager, ByVal ric As String, ByVal datastatus As RT_DataStatus, ByVal data As Dictionary(Of Date, HistoricalItem))
             Logger.Debug("OnHistoricalData({0})", ric)
@@ -187,10 +159,13 @@ Namespace Curves
                 Logger.InfoException("", ex)
                 Logger.Info("Exception = {0}", ex.ToString())
             End Try
-
-            RemoveHandler hst.NewData, AddressOf OnHistoricalData
-            StopLoading(ric)
         End Sub
+
+        Public Overrides Sub Cleanup()
+            _quoteLoader.DiscardTask(_name)
+            MyBase.Cleanup()
+        End Sub
+
 
         Public Overrides Function GetName() As String
             Return _name
@@ -203,44 +178,56 @@ Namespace Curves
             Return String.Format("{0} ({1}, {2})", _fullname, _quote, dateStr)
         End Function
 
+        Public Overrides Function GetSnapshot() As List(Of Tuple(Of String, String, Double?, Double))
+            Return Descrs.Values.Select(Function(elem) New Tuple(Of String, String, Double?, Double)(elem.RIC, _meta(elem.RIC).ShortName, elem.Yield, elem.Duration)).ToList()
+        End Function
+
         Private Sub OnRealTimeData(data As Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double)))) Handles _quoteLoader.OnNewData
             Logger.Debug("OnRealTimeData")
+            Dim errorList As New List(Of CurveException)
             For Each listAndRFV As KeyValuePair(Of String, Dictionary(Of String, Dictionary(Of String, Double))) In data
-                Dim list = listAndRFV.Key
-                Dim rfv = listAndRFV.Value
+                Try
+                    Dim list = listAndRFV.Key
+                    Dim rfv = listAndRFV.Value
 
-                If list = _name Then
-                    Logger.Info(_name)
-                    For Each ricAndFieldValue As KeyValuePair(Of String, Dictionary(Of String, Double)) In rfv
-                        Dim ric = ricAndFieldValue.Key
-                        Logger.Trace("Got RIC {0}", ric)
+                    If list = _name Then
+                        Logger.Info(_name)
+                        For Each ricAndFieldValue As KeyValuePair(Of String, Dictionary(Of String, Double)) In rfv
+                            Dim ric = ricAndFieldValue.Key
+                            Logger.Trace("Got RIC {0}", ric)
 
-                        If ricAndFieldValue.Value.Keys.Contains(_quote) AndAlso CDbl(ricAndFieldValue.Value(_quote)) > 0 Then
-                            Try
-                                Dim price = CDbl(ricAndFieldValue.Value(_quote))
-                                Descrs(ric).Price = price
-                                CalculateYields(_date, _meta(ric), Descrs(ric))
-                                NotifyUpdated(Me)
-                            Catch ex As Exception
-                                Logger.WarnException("Failed to parse realtime data", ex)
-                                Logger.Warn("Exception = {0}", ex.ToString())
-                            End Try
-                        Else
-                            Logger.Warn("Empty data for ric {0};  will try to load history", ric)
-                            DoLoadRIC(ric, {"DATE", _fieldNames(QuoteSource.Hist)}.ToList, _date.AddDays(-1))
-                        End If
+                            If ricAndFieldValue.Value.Keys.Contains(_quote) AndAlso CDbl(ricAndFieldValue.Value(_quote)) > 0 Then
+                                Try
+                                    Dim price = CDbl(ricAndFieldValue.Value(_quote))
+                                    Descrs(ric).Price = price
+                                    CalculateYields(_date, _meta(ric), Descrs(ric))
+                                    NotifyUpdated(Me)
+                                Catch ex As Exception
+                                    Logger.WarnException("Failed to parse realtime data", ex)
+                                    Logger.Warn("Exception = {0}", ex.ToString())
+                                End Try
+                            Else
+                                Logger.Warn("Empty data for ric {0};  will try to load history", ric)
+                                DoLoadRIC(ric, {"DATE", _fieldNames(QuoteSource.Hist)}.ToList, _date.AddDays(-1))
+                            End If
 
 #If DEBUG Then
-                        Dim fieldValue = ricAndFieldValue.Value
-                        For Each fv As KeyValuePair(Of String, Double) In fieldValue
-                            Logger.Trace("  {0} -> {1}", fv.Key, fv.Value)
-                        Next
+                            Dim fieldValue = ricAndFieldValue.Value
+                            For Each fv As KeyValuePair(Of String, Double) In fieldValue
+                                Logger.Trace("  {0} -> {1}", fv.Key, fv.Value)
+                            Next
 #End If
-                    Next
-                Else
-                    Logger.Info("Will not handle unknown list {0}", list)
-                End If
+                        Next
+                    Else
+                        Logger.Info("Will not handle unknown list {0}", list)
+                    End If
+                Catch ex As Exception
+                    Logger.ErrorException("Failed to load realtime data", ex)
+                    Logger.Error("Exception = {0}", ex)
+                    errorList.Add(New DataLoadException(String.Format("Failed to load realtime data for {0}", GetFullName())))
+                End Try
             Next
+            errorList.ForEach(Sub(err) NotifyFaulted(Me, err))
         End Sub
 
         Public Overrides Function GetFitModes() As EstimationModel()
@@ -249,7 +236,6 @@ Namespace Curves
 
         Public Overrides Sub SetFitMode(ByVal fitMode As String)
             _estimationModel = EstimationModel.FromName(fitMode)
-            _estimator = New Estimator(_estimationModel)
             NotifyUpdated(Me)
         End Sub
 
@@ -261,41 +247,49 @@ Namespace Curves
             Return _estimationModel
         End Function
 
-        Public Function IsBootstrapped() As Boolean Implements IBootstrappable.IsBootstrapped
+        Public Overrides Function IsBootstrapped() As Boolean
             Return _bootstrapped
         End Function
 
-        Public Sub SetBootstrapped(flag As Boolean) Implements IBootstrappable.SetBootstrapped
+        Public Overrides Sub SetBootstrapped(flag As Boolean)
             _bootstrapped = flag
             NotifyUpdated(Me)
         End Sub
 
-        Function BootstrappingEnabled() As Boolean Implements IBootstrappable.BootstrappingEnabled
+        Public Overrides Function BootstrappingEnabled() As Boolean
             Return True
         End Function
 
-        Public Function Bootstrap(ByVal data As List(Of SwapPointDescription)) As List(Of SwapPointDescription) Implements IBootstrappable.Bootstrap
-            Dim params(0 To CurveData.Count() - 1, 5) As Object
-            For i = 0 To CurveData.Count - 1
-                Dim meta = _meta(CurveData(i).RIC)
-                params(i, 0) = "B"
-                params(i, 1) = _date
-                params(i, 2) = meta.Maturity
-                params(i, 3) = meta.PaymentStream.GetCouponByDate(_date)
-                params(i, 4) = CurveData(i).Price / 100.0
-                params(i, 5) = meta.PaymentStructure
-            Next
-            Dim curveModule = New AdxYieldCurveModule
+        Public Overrides Function Bootstrap(ByVal data As List(Of SwapPointDescription)) As List(Of SwapPointDescription)
+            Try
+                data = data.Where(Function(elem) _meta(elem.RIC).IssueDate <= _date And _meta(elem.RIC).Maturity > _date).ToList()
+                Dim params(0 To data.Count() - 1, 5) As Object
+                For i = 0 To data.Count - 1
+                    Dim meta = _meta(data(i).RIC)
+                    params(i, 0) = "B"
+                    params(i, 1) = _date
+                    params(i, 2) = meta.Maturity
+                    params(i, 3) = meta.PaymentStream.GetCouponByDate(_date)
+                    params(i, 4) = data(i).Price / 100.0
+                    params(i, 5) = meta.PaymentStructure
+                Next
+                Dim curveModule = New AdxYieldCurveModule
 
-            Dim termStructure As Array = curveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
-            Dim result As New List(Of SwapPointDescription)
-            For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
-                Dim dur = (FromExcelSerialDate(termStructure.GetValue(i, 1)) - _date).TotalDays / 365.0
-                Dim yld = termStructure.GetValue(i, 2)
-                If dur > 0 And yld > 0 Then result.Add(New SwapPointDescription(CurveData(i).RIC) With {.Yield = yld, .Duration = dur})
-            Next
-            Return result
+                Dim termStructure As Array = curveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
+                Dim result As New List(Of SwapPointDescription)
+                For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
+                    Dim matDate = FromExcelSerialDate(termStructure.GetValue(i, 1))
+                    Dim dur = (matDate - _date).TotalDays / 365.0
+                    Dim yld = termStructure.GetValue(i, 2)
+                    If dur > 0 And yld > 0 Then
+                        Dim ric = _meta.First(Function(elem) elem.Value.Maturity = matDate).Key
+                        result.Add(New SwapPointDescription(ric) With {.Yield = yld, .Duration = dur})
+                    End If
+                Next
+                Return result
+            Catch ex As Exception
+                Throw New BootstrappingException()
+            End Try
         End Function
-
     End Class
 End Namespace

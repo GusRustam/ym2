@@ -4,7 +4,6 @@ Imports System.Text.RegularExpressions
 Imports System.Drawing
 Imports YieldMap.Tools.Estimation
 Imports YieldMap.Tools
-Imports YieldMap.Forms.ChartForm
 Imports YieldMap.Tools.History
 Imports NLog
 Imports YieldMap.Tools.Lists
@@ -19,8 +18,11 @@ Namespace Curves
 
     Public Class RubIRS
         Inherits SwapCurve
-        Implements IBootstrappable
         Implements IAssetSwapBenchmark
+
+        Public Sub New(bmk As SpreadContainer)
+            MyBase.New(bmk)
+        End Sub
 
         '' LOGGER
         Private Shared ReadOnly Logger As Logger = Commons.GetLogger(GetType(RubIRS))
@@ -77,6 +79,11 @@ Namespace Curves
             Return AllowedTenors.Select(Function(item) String.Format("{0}{1}Y={2}", InstrumentName, item, broker)).ToList()
         End Function
 
+        Public Overrides Sub Recalculate()
+            Recalculate(Descrs.Values.ToList())
+            NotifyRecalculated(Me)
+        End Sub
+
         '' START LOADING HISTORICAL DATA
         Protected Overrides Sub LoadHistory()
             Logger.Debug("LoadHistory")
@@ -88,7 +95,7 @@ Namespace Curves
         '' START LOADING REALTIME DATA
         Protected Overrides Sub StartRealTime()
             If Not _quoteLoader.StartNewTask(New ListTaskDescr() With {
-                                                .Name = Me.GetType().Name,
+                                                .Name = _name,
                                                 .Items = GetRICs(_broker),
                                                 .Fields = {"275", "393"}.ToList()
                                             }) Then
@@ -97,7 +104,7 @@ Namespace Curves
             End If
             If BaseInstrument <> "" Then
                 If Not _quoteLoader.StartNewTask(New ListTaskDescr() With {
-                                                    .Name = Me.GetType().Name + "_BASE",
+                                                    .Name = _name + "_BASE",
                                                     .Items = {BaseInstrument}.ToList(),
                                                     .Fields = {"BID", "ASK"}.ToList()
                                                 }) Then
@@ -134,11 +141,15 @@ Namespace Curves
                     Logger.WarnException("Failed to parse instrument " + ric, ex)
                     Logger.Warn("Exception = {0}", ex.ToString())
                 End Try
-                RemoveHandler hst.NewData, AddressOf OnHistoricalData
-                StopLoading(ric)
             Else
                 Logger.Warn("No data!")
             End If
+        End Sub
+
+        Public Overrides Sub Cleanup()
+            _quoteLoader.DiscardTask(_name)
+            _quoteLoader.DiscardTask(_name + "_BASE")
+            MyBase.Cleanup()
         End Sub
 
         '' REALTIME DATA ARRIVED
@@ -148,7 +159,7 @@ Namespace Curves
                 Dim list = listAndRFV.Key
                 Dim rfv = listAndRFV.Value
 
-                If list = Me.GetType().Name Then
+                If list = _name Then
                     Logger.Info(Me.GetType().Name)
                     For Each ricAndFieldValue As KeyValuePair(Of String, Dictionary(Of String, Double)) In rfv
                         Dim ric = ricAndFieldValue.Key
@@ -158,6 +169,7 @@ Namespace Curves
                         Dim duration = GetDuration(ric)
                         If ricAndFieldValue.Value.Keys.Contains("393") Or ricAndFieldValue.Value.Keys.Contains("275") Then
                             Try
+                                Descrs(ric).YieldAtDate = GetDate()
                                 If _quote = "BID" Or _quote = "ASK" Then
                                     Dim yld As Double
                                     yld = CDbl(ricAndFieldValue.Value(IIf(_quote = "BID", "393", "275")))
@@ -197,7 +209,7 @@ Namespace Curves
 #End If
 
                     Next
-                ElseIf list = Me.GetType().Name + "_BASE" Then
+                ElseIf list = _name + "_BASE" Then
                     Logger.Info(Me.GetType().Name + "_BASE")
                     If rfv.Keys.First <> BaseInstrument Then
                         Logger.Warn("No base data in {0}", rfv.ToString())
@@ -248,23 +260,23 @@ Namespace Curves
             Next
         End Sub
 
-        Public Function IsBootstrapped() As Boolean Implements IBootstrappable.IsBootstrapped
+        Public Overrides Function IsBootstrapped() As Boolean
             Return _bootstrapped
         End Function
 
-        Public Sub SetBootstrapeed(flag As Boolean) Implements IBootstrappable.SetBootstrapped
+        Public Overrides Sub SetBootstrapped(flag As Boolean)
             _bootstrapped = flag
             NotifyUpdated(Me)
         End Sub
 
-        Public Function Bootstrap(ByVal data As List(Of SwapPointDescription)) As List(Of SwapPointDescription) Implements IBootstrappable.Bootstrap
-            Dim params(0 To CurveData.Count() - 1, 5) As Object
-            For i = 0 To CurveData.Count - 1
+        Public Overrides Function Bootstrap(ByVal data As List(Of SwapPointDescription)) As List(Of SwapPointDescription)
+            Dim params(0 To data.Count() - 1, 5) As Object
+            For i = 0 To data.Count - 1
                 params(i, 0) = InstrumentType
                 params(i, 1) = _theDate
-                params(i, 2) = _theDate.AddDays(CurveData(i).Duration * 365.0)
+                params(i, 2) = _theDate.AddDays(data(i).Duration * 365.0)
                 params(i, 3) = BaseInstrumentPrice / 100
-                params(i, 4) = CurveData(i).Yield
+                params(i, 4) = data(i).Yield
                 params(i, 5) = Struct
             Next
             Dim curveModule = New AdxYieldCurveModule
@@ -273,19 +285,18 @@ Namespace Curves
             For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
                 Dim dur = (Commons.FromExcelSerialDate(termStructure.GetValue(i, 1)) - _theDate).TotalDays / 365.0
                 Dim yld = termStructure.GetValue(i, 2)
-                If dur > 0 And yld > 0 Then result.Add(New SwapPointDescription(CurveData(i).RIC) With {.Yield = yld, .Duration = dur})
+                If dur > 0 And yld > 0 Then result.Add(New SwapPointDescription(data(i).RIC) With {.Yield = yld, .Duration = dur})
             Next
             Return result
         End Function
 
-        Overridable Function BootstrappingEnabled() As Boolean Implements IBootstrappable.BootstrappingEnabled
+        Public Overrides Function BootstrappingEnabled() As Boolean
             Return True
         End Function
 
-        'Public Overrides Function GetCurveData() As List(Of XY)
-        '    Dim crv = CalculateSpread(CurveData)
-        '    Return If(crv Is Nothing, crv, XY.ConvertToXY(If(_bootstrapped, Bootstrap(crv), crv), BmkSpreadMode))
-        'End Function
+        Public Overrides Function GetSnapshot() As List(Of Tuple(Of String, String, Double?, Double))
+            Return Descrs.Values.Select(Function(elem) New Tuple(Of String, String, Double?, Double)(elem.RIC, String.Format("{0:N}Y", GetDuration(elem.RIC)), elem.Yield, elem.Duration)).ToList()
+        End Function
 
         '' OVERRIDEN METHODS
         Public Overrides Function GetFitModes() As EstimationModel()
@@ -334,18 +345,9 @@ Namespace Curves
             Return _theDate
         End Function
 
-        Public Overrides Function CalculateSpread(ByVal data As List(Of SwapPointDescription)) As List(Of SwapPointDescription)
-            If BmkSpreadMode Is Nothing Or Benchmark Is Nothing Then Return data
-            If Benchmark.Equals(Me) Then Return Nothing
-
-            Select Case BmkSpreadMode
-                Case SpreadMode.PointSpread
-                    Dim res As New List(Of SwapPointDescription)(data)
-                    res.ForEach(Sub(elem) CalcPntSprd(Benchmark.ToArray(), Descrs(elem.RIC)))
-                    Return res
-                Case Else : Return data
-            End Select
-        End Function
+        Protected Overrides Sub Recalculate(list As List(Of SwapPointDescription))
+            list.ForEach(Sub(elem) SpreadBmk.CalcAllSpreads(elem))
+        End Sub
 
         Public Overrides Function GetName() As String
             Return _name
@@ -371,16 +373,6 @@ Namespace Curves
             Return Color.NavajoWhite
         End Function
 
-        '' CLEANUP
-        Protected Overrides Sub StopLoaders()
-            MyBase.StopLoaders()
-            If _quoteLoader IsNot Nothing Then
-                _quoteLoader.DiscardTask(Me.GetType().Name)
-                _quoteLoader.DiscardTask(Me.GetType().Name + "_BASE")
-            End If
-            StopHistory()
-        End Sub
-
         Public Overridable Function BenchmarkEnabled() As Boolean Implements IAssetSwapBenchmark.CanBeBenchmark
             Return True
         End Function
@@ -400,6 +392,9 @@ Namespace Curves
 
     Public NotInheritable Class RubCCS
         Inherits RubIRS
+        Public Sub New(bmk As SpreadContainer)
+            MyBase.New(bmk)
+        End Sub
 
         Protected Overrides Property InstrumentName() As String = "RUUSAM3L"
         Protected Overrides Property AllowedTenors() As String() = {"1", "2", "3", "4", "5", "6", "7", "10", "15", "20"}
@@ -424,6 +419,9 @@ Namespace Curves
 
     Public NotInheritable Class RubNDF
         Inherits RubIRS
+        Public Sub New(bmk As SpreadContainer)
+            MyBase.New(bmk)
+        End Sub
 
         Protected Overrides Property InstrumentName() As String = "RUB"
         Protected Overrides Property AllowedTenors() As String() = {"1W", "2W", "1M", "2M", "3M", "6M", "9M", "1Y", "18M", "2Y", "3Y", "4Y", "5Y"}

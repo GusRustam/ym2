@@ -31,34 +31,21 @@ Namespace Tools
 
     Public Class SwapPointDescription
         Inherits BasePointDescription
+
+        Public Yield As Double?
+        Public Overrides Function GetYield() As Double?
+            Return Yield
+        End Function
+
         Private ReadOnly _ric As String
         Public ReadOnly Property RIC As String
             Get
                 Return _ric
             End Get
         End Property
-        Public Yield As Double?
-        Public SwpCurve As SwapCurve
-
-        Public Overrides Function GetYield() As Double?
-            Return Yield
-        End Function
 
         Public Sub New(ric As String)
             _ric = ric
-        End Sub
-
-        Public Sub New(ByVal elem As SwapPointDescription)
-            With elem
-                _ric = .RIC
-                Me.Yield = .Yield
-                Duration = .Duration
-                Price = .Price
-                PointSpread = .PointSpread
-                ZSpread = .ZSpread
-                ASWSpread = .ASWSpread
-            End With
-
         End Sub
 
         Public Overrides Function ToString() As String

@@ -36,6 +36,8 @@ Namespace Tools
         Private ReadOnly _spreadBmk As SpreadContainer
 
         Public Event Quote As Action(Of VisualizableBond, String)
+        Public Event Volume As Action(Of VisualizableBond)
+        Public Event Clear As Action(Of VisualizableGroup)
 
         ''' <summary>
         ''' Get a group containing specified bond 
@@ -61,7 +63,7 @@ Namespace Tools
         Public Sub Cleanup()
             _groups.ForEach(Sub(group)
                                 group.Cleanup()
-                                RemoveHandler group.Quote, AddressOf OnGroupQuote
+                                RemoveHandler group.Quote, AddressOf OnBondQuote
                             End Sub)
             _groups.Clear()
         End Sub
@@ -76,10 +78,20 @@ Namespace Tools
 
         Public Sub AddGroup(ByVal group As VisualizableGroup)
             _groups.Add(group)
-            AddHandler group.Quote, AddressOf OnGroupQuote
+            AddHandler group.Quote, AddressOf OnBondQuote
+            AddHandler group.Volume, AddressOf OnBondVolume
+            AddHandler group.Clear, AddressOf OnGroupClear
         End Sub
 
-        Private Sub OnGroupQuote(bond As VisualizableBond, field As String)
+        Private Sub OnGroupClear(ByVal obj As VisualizableGroup)
+            RaiseEvent Clear(obj)
+        End Sub
+
+        Private Sub OnBondVolume(ByVal obj As VisualizableBond)
+            RaiseEvent Volume(obj)
+        End Sub
+
+        Private Sub OnBondQuote(bond As VisualizableBond, field As String)
             RaiseEvent Quote(bond, field)
         End Sub
 
@@ -87,27 +99,30 @@ Namespace Tools
             _spreadBmk = bmk
         End Sub
 
-        Public Sub CalcAllSpreads(ByVal calculation As BondPointDescription, ByVal metaData As DataBaseBondDescription)
+        Public Sub CalcAllSpreads(ByRef calculation As BondPointDescription, ByVal metaData As DataBaseBondDescription)
             _spreadBmk.CalcAllSpreads(calculation, metaData)
         End Sub
 
         Public Function GetGroup(ByVal seriesName As String) As VisualizableGroup
             Return _groups.First(Function(grp) grp.SeriesName = seriesName)
         End Function
+
+        Public Sub Recalculate()
+            _groups.ForEach(Sub(group) group.Recalculate())
+        End Sub
     End Class
 
     Public Class VisualizableBond
         Private _selectedQuote As String
         Private ReadOnly _parentGroup As VisualizableGroup
         Private ReadOnly _metaData As DataBaseBondDescription
-        Private ReadOnly _quotesAndYields As Dictionary(Of String, BondPointDescription)
+        Private ReadOnly _quotesAndYields As New Dictionary(Of String, BondPointDescription)
         Public TodayVolume As Double
 
         Sub New(ByVal parentGroup As VisualizableGroup, ByVal selectedQuote As String, ByVal metaData As DataBaseBondDescription)
             _parentGroup = parentGroup
             Me.SelectedQuote = selectedQuote
             _metaData = metaData
-            _quotesAndYields = New Dictionary(Of String, BondPointDescription)
         End Sub
 
         Public ReadOnly Property ParentGroup As VisualizableGroup
@@ -121,8 +136,8 @@ Namespace Tools
                 Return _selectedQuote
             End Get
             Set(value As String)
-                ' todo raise event with new data if necessary
                 _selectedQuote = value
+                Recalculate()
             End Set
         End Property
 
@@ -137,6 +152,12 @@ Namespace Tools
                 Return _quotesAndYields
             End Get
         End Property
+
+        Public Sub Recalculate()
+            If _quotesAndYields.ContainsKey(_selectedQuote) Then
+                _parentGroup.Ansamble.CalcAllSpreads(_quotesAndYields(_selectedQuote), _metaData)
+            End If
+        End Sub
     End Class
 
     ''' <summary>
@@ -150,6 +171,7 @@ Namespace Tools
         Private ReadOnly _ansamble As VisualizableAnsamble
 
         Public Event Quote As Action(Of VisualizableBond, String)
+        Public Event Clear As Action(Of VisualizableGroup)
         Public Event Volume As Action(Of VisualizableBond)
 
         Public Group As GroupType
@@ -170,8 +192,6 @@ Namespace Tools
         Private _color As String
 
         Private WithEvents _quoteLoader As New ListLoadManager
-        Private ReadOnly _historyLoaders As New Dictionary(Of String, HistoryLoadManager)
-
 
         Public Property Color() As String
             Get
@@ -182,6 +202,12 @@ Namespace Tools
             End Set
         End Property
 
+        Public ReadOnly Property Ansamble() As VisualizableAnsamble
+            Get
+                Return _ansamble
+            End Get
+        End Property
+
         Public Function CompareTo(ByVal other As VisualizableGroup) As Integer Implements IComparable(Of VisualizableGroup).CompareTo
             Return Group.CompareTo(other.Group)
         End Function
@@ -189,6 +215,7 @@ Namespace Tools
         Public Sub Cleanup()
             _quoteLoader.DiscardTask(Id)
             _elements.Clear()
+            RaiseEvent Clear(Me)
         End Sub
 
         Public Sub StartLoadingLiveData()
@@ -249,7 +276,7 @@ Namespace Tools
             Next
         End Sub
 
-        Private Sub HandleQuote(ByVal bondDataPoint As VisualizableBond, ByVal fieldName As String, ByVal fieldVal As Double?, ByVal calcDate As Date)
+        Private Sub HandleQuote(ByRef bondDataPoint As VisualizableBond, ByVal fieldName As String, ByVal fieldVal As Double?, ByVal calcDate As Date)
             Dim calculation As New BondPointDescription
             calculation.Price = fieldVal
             calculation.YieldSource = If(calcDate = Date.Today, YieldSource.Realtime, YieldSource.Historical)
@@ -261,12 +288,6 @@ Namespace Tools
 
         Private Sub DoLoadHistory(ByVal bondDataPoint As DataBaseBondDescription, fieldName As String)
             If Not {LastField, VWAPField}.Contains(fieldName) Then Exit Sub
-
-            If _historyLoaders.Any(Function(elem) elem.Key = bondDataPoint.RIC) Then
-                _historyLoaders(bondDataPoint.RIC).StopTask()
-                _historyLoaders.Remove(bondDataPoint.RIC)
-            End If
-
             Logger.Debug("Will load {0}", bondDataPoint.RIC)
 
             Dim historyTaskDescr = New HistoryTaskDescr() With {
@@ -279,17 +300,11 @@ Namespace Tools
             }
             Dim hst = New HistoryLoadManager(Eikon.SDK.CreateAdxRtHistory())
             hst.StartTask(historyTaskDescr, AddressOf OnHistoricalQuotes)
-            If hst.Success Then
-                Logger.Info("Successfully added task for {0}", historyTaskDescr.Item)
-                _historyLoaders.Add(bondDataPoint.RIC, hst)
-            End If
         End Sub
 
         Private Sub OnHistoricalQuotes(ByVal hst As HistoryLoadManager, ByVal ric As String, ByVal datastatus As RT_DataStatus, ByVal data As Dictionary(Of Date, HistoricalItem))
             Logger.Trace("OnHistoricalQuotes({0})", ric)
             If datastatus = RT_DataStatus.RT_DS_FULL Then
-                RemoveHandler hst.NewData, AddressOf OnHistoricalQuotes
-
                 If data Is Nothing OrElse data.Count <= 0 Then
                     Logger.Info("No data on {0} arrived", ric)
                     Return
@@ -321,14 +336,6 @@ Namespace Tools
                     HandleQuote(bondDataPoint, VWAPField, maxElem.Close, maxdate)
                 End If
             End If
-            If datastatus <> RT_DataStatus.RT_DS_PARTIAL Then
-                SyncLock (_historyLoaders)
-                    If _historyLoaders.Any(Function(elem) elem.Key = ric) Then
-                        _historyLoaders(ric).StopTask()
-                        _historyLoaders.Remove(ric)
-                    End If
-                End SyncLock
-            End If
         End Sub
 
         Public Function HasRic(ByVal instrument As String) As Boolean
@@ -346,6 +353,18 @@ Namespace Tools
         Public Function GetElement(ByVal ric As String) As VisualizableBond
             Return _elements(ric)
         End Function
+
+        Public Sub Recalculate()
+            _elements.Keys.ToList().ForEach(
+                Sub(ric)
+                    Dim elem = _elements(ric)
+                    If elem.QuotesAndYields.ContainsKey(elem.SelectedQuote) Then
+                        elem.Recalculate()
+                        RaiseEvent Quote(elem, elem.SelectedQuote)
+                    End If
+                End Sub)
+
+        End Sub
     End Class
 #End Region
 
@@ -357,37 +376,40 @@ Namespace Tools
                 Return _currentMode
             End Get
             Set(value As SpreadMode)
+                Dim oldMode = _currentMode
                 _currentMode = value
-                RaiseEvent ModeSelected(value, _currentMode)
+                RaiseEvent SpreadUpdated(_currentMode, oldMode)
+                'RaiseEvent ModeSelected(value, _currentMode)
             End Set
         End Property
 
-        Public Event ModeSelected As Action(Of SpreadMode, SpreadMode)
+        'Public Event ModeSelected As Action(Of SpreadMode, SpreadMode)
         Public Event SpreadUpdated As Action(Of SpreadMode, SpreadMode)
 
-        Public Benchmarks As New Dictionary(Of SpreadMode, ICurve)
+        Public Benchmarks As New Dictionary(Of SpreadMode, SwapCurve)
 
-        Public Sub CalcAllSpreads(ByRef descr As BondPointDescription, ByVal data As DataBaseBondDescription)
-            If Benchmarks.ContainsKey(SpreadMode.ZSpread) Then CalcZSpread(descr, data)
-            If Benchmarks.ContainsKey(SpreadMode.ASWSpread) Then CalcASWSpread(descr, data)
-            If Benchmarks.ContainsKey(SpreadMode.PointSpread) Then CalcISpread(descr)
+        Public Sub CalcAllSpreads(ByRef descr As BasePointDescription, ByVal data As DataBaseBondDescription)
+            If Benchmarks.ContainsKey(SpreadMode.ZSpread) Then
+                CalcZSprd(Benchmarks(SpreadMode.ZSpread).ToArray(), descr, data)
+            End If
+            If Benchmarks.ContainsKey(SpreadMode.ASWSpread) Then
+                Dim aswSpreadMainCurve = Benchmarks(SpreadMode.ASWSpread)
+                Dim bmk = CType(aswSpreadMainCurve, IAssetSwapBenchmark)
+                CalcASWSprd(aswSpreadMainCurve.ToArray(), bmk.FloatLegStructure, bmk.FloatingPointValue, descr, data)
+            End If
+            If Benchmarks.ContainsKey(SpreadMode.PointSpread) Then
+                CalcPntSprd(Benchmarks(SpreadMode.PointSpread).ToArray(), descr)
+            End If
         End Sub
 
-        Private Sub CalcISpread(ByRef descr As BondPointDescription)
-            CalcPntSprd(Benchmarks(SpreadMode.PointSpread).ToArray(), descr)
+        Public Sub CalcAllSpreads(ByRef descr As BasePointDescription)
+            'todo i could also calculate spreads for swaps. I have their structures and so on.
+            If Benchmarks.ContainsKey(SpreadMode.PointSpread) Then
+                CalcPntSprd(Benchmarks(SpreadMode.PointSpread).ToArray(), descr)
+            End If
         End Sub
 
-        Private Sub CalcASWSpread(ByRef descr As BondPointDescription, ByVal data As DataBaseBondDescription)
-            Dim aswSpreadMainCurve = Benchmarks(SpreadMode.ASWSpread)
-            Dim bmk = CType(aswSpreadMainCurve, IAssetSwapBenchmark)
-            CalcASWSprd(aswSpreadMainCurve.ToArray(), bmk.FloatLegStructure, bmk.FloatingPointValue, descr, data)
-        End Sub
-
-        Private Sub CalcZSpread(ByRef descr As BondPointDescription, ByVal data As DataBaseBondDescription)
-            CalcZSprd(Benchmarks(SpreadMode.ZSpread).ToArray(), descr, data)
-        End Sub
-
-        Public Sub CleanupCurve(ByVal curve As ICurve)
+        Public Sub CleanupCurve(ByVal curve As SwapCurve)
             Dim modes = (From keyValue In Benchmarks Where keyValue.Value.GetName() = curve.GetName() Select keyValue.Key).ToList()
             modes.ForEach(Sub(mode)
                               Benchmarks.Remove(mode)
@@ -401,7 +423,7 @@ Namespace Tools
             modes.ForEach(Sub(mode) RaiseEvent SpreadUpdated(mode, _currentMode))
         End Sub
 
-        Public Sub SetBenchmark(ByVal mode As SpreadMode, ByVal curve As ICurve)
+        Public Sub SetBenchmark(ByVal mode As SpreadMode, ByVal curve As SwapCurve)
             If Not Benchmarks.ContainsKey(mode) Then
                 Benchmarks.Add(mode, curve)
             Else

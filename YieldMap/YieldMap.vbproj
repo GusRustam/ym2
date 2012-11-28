@@ -142,6 +142,7 @@
     <Compile Include="Commons\MAPI.vb" />
     <Compile Include="Commons\SettingsManager.vb" />
     <Compile Include="Commons\YieldMapLogger.vb" />
+    <Compile Include="Curves\CurveException.vb" />
     <Compile Include="Curves\HistoricalCurve.vb" />
     <Compile Include="Curves\RubIRS.vb" />
     <Compile Include="Curves\SwapCurve.vb" />

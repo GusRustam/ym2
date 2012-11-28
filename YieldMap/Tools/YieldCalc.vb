@@ -160,22 +160,22 @@ Namespace Tools
                                  price, yield, yieldToWhat.Abbr, duration)
         End Function
 
-        Public Function CalcZSprd(ByVal rateArray As Array, descr As BasePointDescription, data As DataBaseBondDescription) As Double?
+        Public Sub CalcZSprd(ByVal rateArray As Array, ByRef descr As BasePointDescription, data As DataBaseBondDescription)
             If descr.Price > 0 Then
                 Try
                     Dim settleDate = BondModule.BdSettle(DateTime.Today, data.PaymentStructure)
-                    Return BondModule.AdBondSpread(settleDate, rateArray, descr.Price / 100.0, data.Maturity, data.Coupon / 100.0, data.PaymentStructure, "ZCTYPE:RATE IM:LIX RM:YC", "", "")
+                    descr.ZSpread = BondModule.AdBondSpread(settleDate, rateArray, descr.Price / 100.0, data.Maturity, data.Coupon / 100.0, data.PaymentStructure, "ZCTYPE:RATE IM:LIX RM:YC", "", "")
                 Catch ex As Exception
                     Logger.ErrorException("Failed to calculate Z-Spread", ex)
                     Logger.Error("Exception = {0}", ex.ToString())
-                    Return Nothing
+                    descr.ZSpread = Nothing
                 End Try
             Else
-                Return Nothing
+                descr.ZSpread = Nothing
             End If
-        End Function
+        End Sub
 
-        Public Function CalcPntSprd(ByVal rateArray As Array, descr As BasePointDescription) As Double?
+        Public Sub CalcPntSprd(ByVal rateArray As Array, ByRef descr As BasePointDescription)
             Dim data As New List(Of XY)
             For i = rateArray.GetLowerBound(0) To rateArray.GetUpperBound(0)
                 data.Add(New XY() With {.Y = rateArray.GetValue(i, 1), .X = (CDate(rateArray.GetValue(i, 0)) - descr.YieldAtDate).Days / 365})
@@ -187,7 +187,10 @@ Namespace Tools
             If data.Count() >= 2 Then
                 Dim minDur = data.Select(Function(theXY) theXY.X).Min
                 Dim maxDur = data.Select(Function(theXY) theXY.X).Max
-                If duration < minDur Or duration > maxDur Then Return Nothing
+                If duration < minDur Or duration > maxDur Then
+                    descr.PointSpread = Nothing
+                    Return
+                End If
 
                 For i = 0 To data.Count() - 2
                     Dim xi = data(i).X
@@ -196,28 +199,29 @@ Namespace Tools
                         Dim yi = data(i).Y
                         Dim yi1 = data(i + 1).Y
                         Dim a = (xi1 - duration) / (xi1 - xi)
-                        Return (yld - (a * yi + (1 - a) * yi1)) * 10000
+                        descr.PointSpread = (yld - (a * yi + (1 - a) * yi1)) * 10000
+                        Return
                     End If
                 Next
             End If
-            Return Nothing
-        End Function
+            descr.PointSpread = Nothing
+        End Sub
 
-        Public Function CalcASWSprd(ByVal rateArray As Array, ByVal floatLegStructure As String, ByVal floatingRate As Double, descr As BasePointDescription, data As DataBaseBondDescription) As Double?
+        Public Sub CalcASWSprd(ByVal rateArray As Array, ByVal floatLegStructure As String, ByVal floatingRate As Double, ByRef descr As BasePointDescription, data As DataBaseBondDescription)
             If descr.Price > 0 Then
                 Try
                     Dim settleDate = BondModule.BdSettle(DateTime.Today, data.PaymentStructure)
                     Dim res As Array = SwapModule.AdAssetSwapBdSpread(settleDate, data.Maturity, rateArray, descr.Price / 100.0, data.Coupon / 100.0, floatingRate, data.PaymentStructure, floatLegStructure, "ZCTYPE:RATE IM:LIX RM:YC", "")
-                    Return res.GetValue(1, 1)
+                    descr.ASWSpread = res.GetValue(1, 1)
                 Catch ex As Exception
                     Logger.ErrorException("Failed to calculate ASW Spread", ex)
                     Logger.Error("Exception = {0}", ex.ToString())
-                    Return Nothing
+                    descr.ASWSpread = Nothing
                 End Try
             Else
-                Return Nothing
+                descr.ASWSpread = Nothing
             End If
-        End Function
+        End Sub
 
         Public Sub CalculateYields(ByVal dt As DateTime, ByVal descr As DataBaseBondDescription, ByRef calc As BasePointDescription)
             Logger.Trace("CalculateYields({0}, {1})", calc.Price, descr.RIC)
@@ -245,12 +249,12 @@ Namespace Tools
             calc.Duration = duration
             calc.YieldAtDate = dt
 
-            If TypeOf (calc) Is BondPointDescription Then
+            If TypeOf calc Is BondPointDescription Then
                 Dim clc = CType(calc, BondPointDescription)
                 clc.Convexity = convexity
                 clc.PVBP = pvbp
                 clc.Yld = bestYield
-            ElseIf TypeOf (calc) Is SwapPointDescription Then
+            ElseIf TypeOf calc Is SwapPointDescription Then
                 Dim clc = CType(calc, SwapPointDescription)
                 clc.Yield = bestYield.Yield
             End If

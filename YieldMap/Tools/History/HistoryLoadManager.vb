@@ -250,17 +250,14 @@ Namespace Tools.History
                 RaiseEvent NewData(Me, _ric, _historyManager.DataStatus, Nothing)
             Finally
                 _finished = True
-            End Try
-        End Sub
-
-        Public Sub StopTask()
-            RemoveHandler _historyManager.OnUpdate, AddressOf OnNewData
-            Try
-                _historyManager.FlushData()
-                _historyManager = Nothing
-            Catch ex As Exception
-                Logger.WarnException("Failed to stop task", ex)
-                Logger.Warn("Exception = {0}", ex.ToString())
+                Try
+                    RemoveHandler _historyManager.OnUpdate, AddressOf OnNewData
+                    _historyManager.FlushData()
+                    _historyManager = Nothing
+                Catch ex As Exception
+                    Logger.WarnException("Failed to stop task", ex)
+                    Logger.Warn("Exception = {0}", ex.ToString())
+                End Try
             End Try
         End Sub
     End Class

@@ -18,7 +18,6 @@ Namespace Forms.ChartForm
 
         'Private ReadOnly _historicalCurves As New HistoricalCurvesContainer(AddressOf OnHistoricalCurveData, AddressOf OnCurveRemoved)
         Private ReadOnly _moneyMarketCurves As New List(Of SwapCurve)
-        Private ReadOnly _bidAskLines As New List(Of Tuple(Of DataPoint, DataPoint))
 
         Private WithEvents _spreadBenchmarks As New SpreadContainer
         Private WithEvents _ansamble As New VisualizableAnsamble(_spreadBenchmarks)
@@ -60,11 +59,6 @@ Namespace Forms.ChartForm
                         _ansamble.Cleanup()
 
                         '_historicalCurves.Clear()
-                        '_moneyMarketCurves.ForEach(Sub(curve) curve.Cleanup())
-                        '_moneyMarketCurves.Clear()
-                        _bidAskLines.Clear()
-
-                        TheChart.Series.Clear()
 
                         StatusMessage.Text = "Stopped"
                 End Select
@@ -141,6 +135,8 @@ Namespace Forms.ChartForm
 
         Private Sub GraphFormFormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
             Logger.Trace("GraphForm_FormClosing")
+            _moneyMarketCurves.ForEach(Sub(curve) curve.Cleanup())
+            _moneyMarketCurves.Clear()
             ThisFormStatus = FormDataStatus.Stopped
         End Sub
 #End Region
@@ -155,44 +151,38 @@ Namespace Forms.ChartForm
                 Try
                     If htr.ChartElementType = ChartElementType.DataPoint Then
                         Dim point As DataPoint = CType(htr.Object, DataPoint)
-                        'If TypeOf point.Tag Is BondPointDescr Then
-                        '    Dim bondDataPoint = CType(point.Tag, BondPointDescr)
-                        '    With BondCMS
-                        '        .Tag = bondDataPoint.RIC
-                        '        .Show(TheChart, mouseEvent.Location)
-                        '    End With
-                        '    MainInfoLine1TSMI.Text = point.ToolTip
-                        '    If bondDataPoint.YieldSource = YieldSource.Realtime Then
-                        '        MainInfoLine2TSMI.Text =
-                        '            String.Format("LAST: P [{0:F4}], Y [{1:P2}] {2}, D [{3:F2}]",
-                        '                          bondDataPoint.CalcPrice, bondDataPoint.Yld.Yield, bondDataPoint.Yld.ToWhat.ToString(), bondDataPoint.Duration)
-                        '        'StartBidAsk(bondDataPoint)
-                        '        ExtInfoTSMI.Visible = True
-                        '    Else
-                        '        MainInfoLine2TSMI.Text =
-                        '            String.Format("LAST: P [{0:F4}], Y [{1:P2}] {2}, D [{3:F2}] @ {4:dd/MM/yy}",
-                        '                          bondDataPoint.CalcPrice, bondDataPoint.Yld.Yield, bondDataPoint.Yld.ToWhat.ToString(), bondDataPoint.Duration, bondDataPoint.YieldAtDate)
+                        If TypeOf point.Tag Is VisualizableBond Then
+                            Dim bondDataPoint = CType(point.Tag, VisualizableBond)
+                            With BondCMS
+                                .Tag = bondDataPoint.MetaData.RIC
+                                .Show(TheChart, mouseEvent.Location)
+                            End With
+                            MainInfoLine1TSMI.Text = point.ToolTip
+                            Dim description  = bondDataPoint.QuotesAndYields(bondDataPoint.SelectedQuote)
+                            If description.YieldSource = YieldSource.Realtime Then
+                                MainInfoLine2TSMI.Text =
+                                    String.Format("LAST: P [{0:F4}], Y [{1:P2}] {2}, D [{3:F2}]",
+                                                  description.Price, description.Yld.Yield, description.Yld.ToWhat.ToString(), description.Duration)
+                                ExtInfoTSMI.Visible = True
+                            Else
+                                MainInfoLine2TSMI.Text =
+                                    String.Format("LAST: P [{0:F4}], Y [{1:P2}] {2}, D [{3:F2}] @ {4:dd/MM/yy}",
+                                                  description.Price, description.Yld.Yield, description.Yld.ToWhat.ToString(), description.Duration, description.YieldAtDate)
 
-                        '        ExtInfoTSMI.Visible = False
-                        '    End If
+                                ExtInfoTSMI.Visible = False
+                            End If
 
-                        'Else
-                        If TypeOf point.Tag Is SwapPointDescription Then
-                            Dim curveDataPoint = CType(point.Tag, SwapPointDescription)
-                            MMNameTSMI.Text = curveDataPoint.SwpCurve.GetFullName()
+                        ElseIf TypeOf point.Tag Is SwapCurve Then
+                            Dim curve = CType(point.Tag, SwapCurve)
+                            MMNameTSMI.Text = curve.GetFullName()
                             MoneyCurveCMS.Show(TheChart, mouseEvent.Location)
-                            MoneyCurveCMS.Tag = curveDataPoint.SwpCurve.GetName()
-                            ShowCurveParameters(curveDataPoint)
+                            MoneyCurveCMS.Tag = curve.GetName()
+                            ShowCurveParameters(curve)
 
                             'ElseIf TypeOf point.Tag Is HistCurvePointDescr Then
                             '    Dim histDataPoint = CType(point.Tag, HistCurvePointDescr)
                             '    HistoryCMS.Tag = histDataPoint.RIC
                             '    HistoryCMS.Show(TheChart, mouseEvent.Location)
-
-                            'ElseIf TypeOf point.Tag Is BidAskPointDescr Then
-                            '    Dim bidAskDataPoint = CType(point.Tag, BidAskPointDescr)
-                            '    BidAskCMS.Tag = bidAskDataPoint.BondTag.RIC
-                            '    BidAskCMS.Show(TheChart, mouseEvent.Location)
                         End If
                     ElseIf htr.ChartElementType = ChartElementType.PlottingArea Or htr.ChartElementType = ChartElementType.Gridlines Then
                         ChartCMS.Show(TheChart, mouseEvent.Location)
@@ -206,45 +196,42 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub ShowCurveParameters(ByVal descr As SwapPointDescription)
-            Dim theCurve = _moneyMarketCurves.First(Function(item) item.GetName() = descr.SwpCurve.GetName())
-
+        Private Sub ShowCurveParameters(ByVal curve As SwapCurve)
             BrokerTSMI.DropDownItems.Clear()
-            Dim brokers = theCurve.GetBrokers()
+            Dim brokers = curve.GetBrokers()
             If brokers.Count = 0 Then
                 BrokerTSMI.Enabled = False
             Else
                 BrokerTSMI.Enabled = True
-                Dim currBroker = theCurve.GetBroker()
+                Dim currBroker = curve.GetBroker()
                 brokers.ToList.ForEach(Sub(broker) AddItem(broker, (broker = currBroker), BrokerTSMI, AddressOf OnBrokerSelected))
             End If
 
             QuoteTSMI.DropDownItems.Clear()
-            Dim quotes = theCurve.GetQuotes()
+            Dim quotes = curve.GetQuotes()
             If quotes.Count = 0 Then
                 QuoteTSMI.Enabled = False
             Else
                 QuoteTSMI.Enabled = True
-                Dim currQuote = theCurve.GetQuote()
+                Dim currQuote = curve.GetQuote()
                 quotes.ToList.ForEach(Sub(quote) AddItem(quote, (quote = currQuote), QuoteTSMI, AddressOf OnQuoteSelected))
             End If
 
             'Dim fitting As IFittable = TryCast(theCurve, IFittable)
-            Dim fitModes = theCurve.GetFitModes()
+            Dim fitModes = curve.GetFitModes()
             If fitModes.Count() <= 1 Then
                 FitTSMI.Visible = False
             Else
                 FitTSMI.Visible = True
                 FitTSMI.DropDownItems.Clear()
-                Dim currFit = theCurve.GetFitMode()
+                Dim currFit = curve.GetFitMode()
                 fitModes.ToList.ForEach(Sub(fit) AddItem(fit.FullName, (fit = currFit), FitTSMI, AddressOf OnFitSelected, fit.ItemName))
             End If
-            
-            Dim bootstr As IBootstrappable = TryCast(theCurve, IBootstrappable)
-            If bootstr IsNot Nothing AndAlso bootstr.BootstrappingEnabled Then
+
+            If curve.BootstrappingEnabled Then
                 BootstrapTSMI.Visible = True
                 BootstrapTSMI.Enabled = True
-                BootstrapTSMI.Checked = bootstr.IsBootstrapped
+                BootstrapTSMI.Checked = curve.IsBootstrapped
             Else
                 BootstrapTSMI.Enabled = False
                 BootstrapTSMI.Visible = False
@@ -400,11 +387,11 @@ Namespace Forms.ChartForm
 #End Region
 
 #Region "c.4) Curves"
-        Private Sub ShowCurveCMS(nm As String, ByVal refCurve As ICurve)
+        Private Sub ShowCurveCMS(nm As String, ByVal refCurve As SwapCurve)
             SpreadCMS.Items.Clear()
             SpreadCMS.Tag = nm
             If Not _moneyMarketCurves.Any() Then Return
-            _moneyMarketCurves.Cast(Of ICurve).ToList().ForEach(
+            _moneyMarketCurves.Cast(Of SwapCurve).ToList().ForEach(
                 Sub(item)
                     Dim elem = CType(SpreadCMS.Items.Add(item.GetFullName(), Nothing, AddressOf OnYieldCurveSelected), ToolStripMenuItem)
                     elem.CheckOnClick = True
@@ -422,9 +409,14 @@ Namespace Forms.ChartForm
             If senderTSMI.Checked Then
                 _spreadBenchmarks.SetBenchmark(SpreadMode.FromString(SpreadCMS.Tag), senderTSMI.Tag)
             Else
-                _spreadBenchmarks.CleanupCurve(CType(senderTSMI.Tag, ICurve))
+                _spreadBenchmarks.CleanupCurve(CType(senderTSMI.Tag, SwapCurve))
             End If
+
             UpdateAxisYTitle(False)
+
+            ASWLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadMode.ASWSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadMode.ASWSpread).GetFullName(), "")
+            SpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadMode.PointSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadMode.PointSpread).GetFullName(), "")
+            ZSpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadMode.ZSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadMode.ZSpread).GetFullName(), "")
         End Sub
 #End Region
 
@@ -457,16 +449,24 @@ Namespace Forms.ChartForm
                         PVBPLabel.Text = String.Format("{0:F4}", calculatedYield.PVBP)
                         CType(htr.Series.Tag, BondPointsSeries).SelectedPointIndex = htr.PointIndex
 
-                    ElseIf TypeOf point.Tag Is SwapPointDescription Then
-                        Dim data = CType(point.Tag, SwapPointDescription)
-                        DscrLabel.Text = data.SwpCurve.GetFullName()
-                        DatLabel.Text = String.Format("{0:dd/MM/yyyy}", data.SwpCurve.GetDate())
-                        Dim period = String.Format("{0:F0}D", 365 * data.Duration)
+                    ElseIf TypeOf point.Tag Is SwapCurve Then
+                        Dim curve = CType(point.Tag, SwapCurve)
+
+                        DscrLabel.Text = curve.GetFullName()
+                        DatLabel.Text = String.Format("{0:dd/MM/yyyy}", curve.GetDate())
+                        Dim period = String.Format("{0:F0}D", 365 * point.XValue)
                         Dim aDate = (New AdxDateModule).DfAddPeriod("RUS", Date.Today, period, "")
                         MatLabel.Text = String.Format("{0:dd/MM/yyyy}", FromExcelSerialDate(aDate.GetValue(1, 1)))
 
-                        YldLabel.Text = String.Format("{0:P2}", data.Yield)
-                        DatLabel.Text = String.Format("{0:dd/MM/yyyy}", data.YieldAtDate)
+                        Select Case _spreadBenchmarks.CurrentMode
+                            Case SpreadMode.Yield : YldLabel.Text = String.Format("{0:P2}", point.YValues(0))
+                            Case SpreadMode.ZSpread : ZSpreadLabel.Text = String.Format("{0:F0} b.p.", point.YValues(0))
+                            Case SpreadMode.PointSpread : SpreadLabel.Text = String.Format("{0:F0} b.p.", point.YValues(0))
+                            Case SpreadMode.ASWSpread : ASWLabel.Text = String.Format("{0:F0} b.p.", point.YValues(0))
+                        End Select
+                        DurLabel.Text = String.Format("{0:F2}", point.XValue * 365)
+
+                        DatLabel.Text = ""
 
                         'ElseIf TypeOf point.Tag Is HistCurvePointDescr Then
                         '    Dim historyDataPoint = CType(point.Tag, HistCurvePointDescr)
@@ -527,7 +527,6 @@ Namespace Forms.ChartForm
                     If seriesDescr Is Nothing Then Return
 
                     seriesDescr.ResetSelection()
-                    Dim clr = _ansamble.GetGroup(srs.Name).Color
                     srs.Points.ToList.ForEach(Sub(point)
                                                   Dim tg = CType(point.Tag, VisualizableBond)
                                                   point.Color = If(tg.QuotesAndYields(tg.SelectedQuote).YieldSource = YieldSource.Historical, Color.LightGray, Color.White)
@@ -733,16 +732,18 @@ Namespace Forms.ChartForm
             Dim aTable = New DataGridView
             aTable.AutoGenerateColumns = False
             aTable.Columns.Add("RIC", "RIC")
+            aTable.Columns.Add("Descr", "Descr")
             aTable.Columns.Add("Rate", "Rate")
             aTable.Columns.Add("Duration", "Duration")
 
-            aTable.Columns("RIC").AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            aTable.Columns("RIC").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            aTable.Columns("Descr").AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
             aTable.Columns("Rate").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             aTable.Columns("Rate").DefaultCellStyle = New DataGridViewCellStyle() With {.Format = "P2"}
             aTable.Columns("Duration").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             aTable.Columns("Duration").DefaultCellStyle = New DataGridViewCellStyle() With {.Format = "N2"}
 
-            aCurve.ForEach(Sub(item) aTable.Rows.Add(New Object() {item.Item1, item.Item2, item.Item3}))
+            aCurve.ForEach(Sub(item) aTable.Rows.Add(New Object() {item.Item1, item.Item2, item.Item3, item.Item4}))
 
             aForm.Controls.Add(aTable)
             aTable.Dock = DockStyle.Fill
@@ -771,7 +772,7 @@ Namespace Forms.ChartForm
                 Function(crv)
                     Return TypeOf crv Is IAssetSwapBenchmark AndAlso CType(crv, IAssetSwapBenchmark).CanBeBenchmark()
                 End Function
-            ).Cast(Of ICurve).ToList().ForEach(
+            ).Cast(Of SwapCurve).ToList().ForEach(
                 Sub(item)
                     Dim elem = CType(SpreadCMS.Items.Add(item.GetFullName(), Nothing, AddressOf OnYieldCurveSelected), ToolStripMenuItem)
                     elem.CheckOnClick = True
@@ -779,7 +780,6 @@ Namespace Forms.ChartForm
                     elem.Tag = item
                 End Sub)
             SpreadCMS.Show(MousePosition)
-
         End Sub
 #End Region
 #End Region
@@ -1051,11 +1051,12 @@ Namespace Forms.ChartForm
                 Return
             End If
 
-            Dim newCurve = New YieldCurve(selectedItem.Name, ricsInCurve, selectedItem.Color, fieldNames)
+            Dim newCurve = New YieldCurve(selectedItem.Name, ricsInCurve, selectedItem.Color, fieldNames, _spreadBenchmarks)
 
             AddHandler newCurve.Cleared, AddressOf _spreadBenchmarks.CleanupCurve
             AddHandler newCurve.Recalculated, AddressOf OnCurveRecalculated
             AddHandler newCurve.Updated, AddressOf OnCurvePaint
+            AddHandler newCurve.Faulted, AddressOf OnCurveFault
 
             _moneyMarketCurves.Add(newCurve)
             newCurve.Subscribe()
@@ -1097,8 +1098,7 @@ Namespace Forms.ChartForm
             Dim snd = CType(sender, ToolStripMenuItem)
             Dim curve = _moneyMarketCurves.First(Function(item) item.GetName() = MoneyCurveCMS.Tag.ToString())
             If curve Is Nothing Then Return
-            Dim fitting As IBootstrappable = TryCast(curve, IBootstrappable)
-            If fitting IsNot Nothing Then fitting.SetBootstrapped(snd.Checked)
+            If curve.BootstrappingEnabled() Then curve.SetBootstrapped(snd.Checked)
         End Sub
 
         Private Sub OnBrokerSelected(sender As Object, e As EventArgs)
@@ -1124,19 +1124,21 @@ Namespace Forms.ChartForm
             Dim snd = CType(sender, ToolStripMenuItem)
             Dim curve = _moneyMarketCurves.First(Function(item) item.GetName() = MoneyCurveCMS.Tag.ToString())
             If curve Is Nothing Then Return
-            'Dim fitting As IFittable = TryCast(curve, IFittable)
-            'If fitting IsNot Nothing Then fitting.SetFitMode(snd.Tag)
             curve.SetFitMode(snd.Tag)
         End Sub
 
-        Private Sub OnCurvePaint(ByVal curve As ICurve)
+        Private Shared Sub OnCurveFault(ByVal curve As SwapCurve, ByVal ex As CurveException)
+            MessageBox.Show(ex.HumanMessage, "Curve error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Sub
+
+        Private Sub OnCurvePaint(ByVal curve As SwapCurve)
             Logger.Debug("OnCurvePaint({0})", curve.GetName())
             PaintSwapCurve(curve)
             _spreadBenchmarks.UpdateCurve(curve.GetName())
             SetChartMinMax()
         End Sub
 
-        Private Sub OnCurveRecalculated(ByVal curve As ICurve)
+        Private Sub OnCurveRecalculated(ByVal curve As SwapCurve)
             Logger.Debug("OnCurveRecalculated({0})", curve.GetName())
             PaintSwapCurve(curve)
             SetChartMinMax()
@@ -1144,7 +1146,8 @@ Namespace Forms.ChartForm
 
         Private Sub PaintSwapCurve(ByVal curve As SwapCurve)
             Logger.Debug("PaintSwapCurve({0} points)", curve.GetName())
-            Dim points = curve.CurveData
+            Dim points = curve.GetCurveData()
+            If points Is Nothing Then Return
 
             Dim estimator = New Estimator(curve.GetFitMode())
             Dim xyPoints = estimator.Approximate(XY.ConvertToXY(points, _spreadBenchmarks.CurrentMode))
@@ -1180,24 +1183,11 @@ Namespace Forms.ChartForm
 
                     xyPoints.ForEach(
                         Sub(item)
-                            'todo why ric?
-                            Dim theTag = New SwapPointDescription("") With {
-                                .Duration = item.X,
-                                .SwpCurve = curve
-                            }
-
-                            Select Case curve.BmkSpreadMode
-                                Case SpreadMode.Yield : theTag.Yield = item.Y
-                                Case SpreadMode.PointSpread : theTag.PointSpread = item.Y
-                                Case SpreadMode.ZSpread : theTag.ZSpread = item.Y
-                                Case SpreadMode.ASWSpread : theTag.ASWSpread = item.Y
-                            End Select
-
                             theSeries.Points.Add(New DataPoint With {
                                 .Name = String.Format("{0}Y", item.X),
                                 .XValue = item.X,
                                 .YValues = {item.Y},
-                                .Tag = theTag
+                                .Tag = curve
                             })
                         End Sub)
                 End Sub)
@@ -1207,7 +1197,7 @@ Namespace Forms.ChartForm
 #Region "2) Specific curves"
         Private Sub RubCCSTSMIClick(sender As Object, e As EventArgs) Handles RubCCSTSMI.Click
             Logger.Debug("RubCCSTSMIClick()")
-            Dim rubCCS = New RubCCS()
+            Dim rubCCS = New RubCCS(_spreadBenchmarks)
 
             AddHandler rubCCS.Cleared, AddressOf _spreadBenchmarks.CleanupCurve
             AddHandler rubCCS.Recalculated, AddressOf OnCurveRecalculated
@@ -1219,7 +1209,7 @@ Namespace Forms.ChartForm
 
         Private Sub RubIRSTSMIClick(sender As Object, e As EventArgs) Handles RubIRSTSMI.Click
             Logger.Debug("RubIRSTSMIClick()")
-            Dim rubIRS = New RubIRS()
+            Dim rubIRS = New RubIRS(_spreadBenchmarks)
             AddHandler rubIRS.Cleared, AddressOf _spreadBenchmarks.CleanupCurve
             AddHandler rubIRS.Recalculated, AddressOf OnCurveRecalculated
             AddHandler rubIRS.Updated, AddressOf OnCurvePaint
@@ -1230,7 +1220,7 @@ Namespace Forms.ChartForm
 
         Private Sub NDFTSMIClick(sender As Object, e As EventArgs) Handles NDFTSMI.Click
             Logger.Debug("NDFTSMI_Click()")
-            Dim rubNDF = New RubNDF()
+            Dim rubNDF = New RubNDF(_spreadBenchmarks)
             AddHandler rubNDF.Cleared, AddressOf _spreadBenchmarks.CleanupCurve
             AddHandler rubNDF.Recalculated, AddressOf OnCurveRecalculated
             AddHandler rubNDF.Updated, AddressOf OnCurvePaint
@@ -1240,6 +1230,18 @@ Namespace Forms.ChartForm
         End Sub
 #End Region
 #End Region
+
+        Private Sub OnGroupClear(ByVal group As VisualizableGroup) Handles _ansamble.Clear
+            GuiAsync(
+                Sub()
+                    Dim series As Series = TheChart.Series.FindByName(group.SeriesName)
+
+                    If series IsNot Nothing Then
+                        series.Points.Clear()
+                        TheChart.Series.Remove(series)
+                    End If
+                End Sub)
+        End Sub
 
         Private Sub OnBondQuote(ByVal descr As VisualizableBond, ByVal fieldName As String) Handles _ansamble.Quote
             GuiAsync(
@@ -1293,7 +1295,21 @@ Namespace Forms.ChartForm
                         point.YValues = {yValue.Value}
                         point.Color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.LightGray)
                     End If
+                    'Dim t = New Thread(New ThreadStart(
+                    '        Sub()
+                    '            GuiAsync(
+                    '                Sub()
+                    '                    Thread.Sleep(10000)
+                    '                    point.Color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.LightGray)
+                    '                End Sub)
+                    '        End Sub))
+                    't.Start()
                 End Sub)
+        End Sub
+
+        Private Sub SpreadBenchmarksSpreadUpdated(newMode As SpreadMode, oldMode As SpreadMode) Handles _spreadBenchmarks.SpreadUpdated
+            _moneyMarketCurves.ForEach(Sub(curve) curve.Recalculate())
+            _ansamble.Recalculate()
         End Sub
     End Class
 End Namespace
