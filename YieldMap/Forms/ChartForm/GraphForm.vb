@@ -78,7 +78,7 @@ Namespace Forms.ChartForm
             ThisFormDataSource = -1
         End Sub
 
-        Private Sub InitChart(Optional ByVal chartEmpty As Boolean = True)
+        Private Sub InitChart()
             Dim axisFont = New Font(FontFamily.GenericSansSerif, 11)
             TheChart.AntiAliasing = AntiAliasingStyles.All
             TheChart.TextAntiAliasingQuality = TextAntiAliasingQuality.High
@@ -89,7 +89,6 @@ Namespace Forms.ChartForm
                 .AxisX.LabelStyle.Format = "F2"
                 .AxisX.MajorGrid.LineDashStyle = ChartDashStyle.Dash
                 .AxisX.MinorGrid.LineDashStyle = ChartDashStyle.Dot
-
 
                 .AxisX.MajorGrid.Interval = 1.0
                 .AxisX.MajorGrid.Enabled = True
@@ -123,14 +122,9 @@ Namespace Forms.ChartForm
                 .AxisY.ScrollBar.IsPositionedInside = True
             End With
 
-            If chartEmpty Then
-                Dim series As Series = New Series("start") With {.ChartType = SeriesChartType.Point}
-                series.Points.Add(New DataPoint(1, 0.1) With {.Color = Color.Black, .MarkerStyle = MarkerStyle.None, .MarkerSize = 1})
-                TheChart.Series.Add(series)
-
-                Dim headingFont = New Font(FontFamily.GenericSansSerif, 14, FontStyle.Bold)
-                TheChart.Titles.Add(New Title("Please select a portfolio to show", Docking.Top, headingFont, Color.Gray))
-            End If
+            'Dim series As Series = New Series("start") With {.ChartType = SeriesChartType.Point}
+            'series.Points.Add(New DataPoint(1, 0.1) With {.Color = Color.Black, .MarkerStyle = MarkerStyle.None, .MarkerSize = 1})
+            'TheChart.Series.Add(series)
         End Sub
 
         Private Sub GraphFormFormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
@@ -309,6 +303,7 @@ Namespace Forms.ChartForm
             Logger.Debug("SetChartMinMax()")
             GuiAsync(
                 Sub()
+                    TheChart.Invalidate()
                     With TheChart.ChartAreas(0).AxisY
                         Try
                             Dim newMax = (From srs In TheChart.Series Where srs.Enabled And srs.Points.Any
@@ -420,6 +415,7 @@ Namespace Forms.ChartForm
 #End Region
 
 #Region "c.5) Mouse move and point selection"
+
         Private Sub TheChartMouseMove(sender As Object, e As MouseEventArgs) Handles TheChart.MouseMove
             Dim mouseEvent As MouseEventArgs = e
             Dim hasShown = False
@@ -1264,16 +1260,16 @@ Namespace Forms.ChartForm
                         Dim seriesDescr = New BondPointsSeries With {.Name = group.SeriesName, .Color = clr}
                         AddHandler seriesDescr.SelectedPointChanged, AddressOf OnSelectedPointChanged
                         series = New Series(group.SeriesName) With {
-                                 .YValuesPerPoint = 1,
-                                 .ChartType = SeriesChartType.Point,
-                                 .IsVisibleInLegend = True,
-                                 .color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.Black),
-                                 .markerSize = 8,
-                                 .markerBorderWidth = 2,
-                                 .markerBorderColor = clr,
-                                 .markerStyle = MarkerStyle.Circle,
-                                 .Tag = seriesDescr
-                            }
+                            .YValuesPerPoint = 1,
+                            .ChartType = SeriesChartType.Point,
+                            .IsVisibleInLegend = True,
+                            .color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.Black),
+                            .markerSize = 8,
+                            .markerBorderWidth = 2,
+                            .markerBorderColor = clr,
+                            .markerStyle = MarkerStyle.Circle,
+                            .Tag = seriesDescr
+                        }
                         With series.EmptyPointStyle
                             .BorderWidth = 0
                             .MarkerSize = 0
@@ -1329,6 +1325,23 @@ Namespace Forms.ChartForm
                 SetYAxisMode(newType.ToString())
                 _moneyMarketCurves.ForEach(Sub(curve) curve.RecalculateByType(newType))
                 _ansamble.RecalculateByType(newType)
+            End If
+        End Sub
+
+        Private Sub TheChartInvalidated(sender As Object, e As InvalidateEventArgs) Handles TheChart.Invalidated
+            If TheChart.Series IsNot Nothing AndAlso TheChart.Series.Count = 0 AndAlso Not MainTableLayout.Controls.ContainsKey("InfoLabel") Then
+                TheChart.Visible = False
+                Dim a As New Label With {
+                    .Name = "InfoLabel",
+                    .Text = "Please select portfolio to show",
+                    .Font = New Font(FontFamily.GenericSansSerif, 14, FontStyle.Bold),
+                    .Dock = DockStyle.Fill,
+                    .TextAlign = ContentAlignment.MiddleCenter
+                }
+                MainTableLayout.Controls.Add(a, 0, 1)
+            Else
+                If MainTableLayout.Controls.ContainsKey("InfoLabel") Then MainTableLayout.Controls.RemoveByKey("InfoLabel")
+                TheChart.Visible = True
             End If
         End Sub
     End Class
