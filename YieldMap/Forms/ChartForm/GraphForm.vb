@@ -152,7 +152,7 @@ Namespace Forms.ChartForm
                                 .Show(TheChart, mouseEvent.Location)
                             End With
                             MainInfoLine1TSMI.Text = point.ToolTip
-                            Dim description  = bondDataPoint.QuotesAndYields(bondDataPoint.SelectedQuote)
+                            Dim description = bondDataPoint.QuotesAndYields(bondDataPoint.SelectedQuote)
                             If description.YieldSource = YieldSource.Realtime Then
                                 MainInfoLine2TSMI.Text =
                                     String.Format("LAST: P [{0:F4}], Y [{1:P2}] {2}, D [{3:F2}]",
@@ -1331,18 +1331,16 @@ Namespace Forms.ChartForm
         Private Sub TheChartInvalidated(sender As Object, e As InvalidateEventArgs) Handles TheChart.Invalidated
             If TheChart.Series IsNot Nothing AndAlso TheChart.Series.Count = 0 AndAlso Not MainTableLayout.Controls.ContainsKey("InfoLabel") Then
                 TheChart.Visible = False
-                Dim a As New Label With {
-                    .Name = "InfoLabel",
-                    .Text = "Please select portfolio to show",
-                    .Font = New Font(FontFamily.GenericSansSerif, 14, FontStyle.Bold),
-                    .Dock = DockStyle.Fill,
-                    .TextAlign = ContentAlignment.MiddleCenter
-                }
-                MainTableLayout.Controls.Add(a, 0, 1)
+                InfoLabel.Visible = True
             Else
-                If MainTableLayout.Controls.ContainsKey("InfoLabel") Then MainTableLayout.Controls.RemoveByKey("InfoLabel")
+                InfoLabel.Visible = False
                 TheChart.Visible = True
             End If
+        End Sub
+
+        Private Sub GraphFormSizeChanged(sender As System.Object, e As EventArgs) Handles MyBase.SizeChanged
+            InfoLabel.Left = (MainPanel.ClientSize.Width - InfoLabel.Width) / 2
+            InfoLabel.Top = (MainPanel.ClientSize.Height - InfoLabel.Height) / 2
         End Sub
     End Class
 End Namespace

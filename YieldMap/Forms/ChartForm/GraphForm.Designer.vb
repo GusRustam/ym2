@@ -81,12 +81,14 @@
             Me.ConvLabel = New System.Windows.Forms.Label()
             Me.Label7 = New System.Windows.Forms.Label()
             Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
+            Me.MainPanel = New System.Windows.Forms.Panel()
+            Me.InfoLabel = New System.Windows.Forms.Label()
             Me.TheChart = New System.Windows.Forms.DataVisualization.Charting.Chart()
+            Me.ResizePictureBox = New System.Windows.Forms.PictureBox()
             Me.ChartCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.CopyToClipboardTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.HistoryCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.RemoveHistoryTSMI = New System.Windows.Forms.ToolStripMenuItem()
-            Me.ResizePictureBox = New System.Windows.Forms.PictureBox()
             Me.MoneyCurveCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.MMNameTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.ShowCurveItemsTSMI = New System.Windows.Forms.ToolStripMenuItem()
@@ -111,10 +113,11 @@
             Me.BondCMS.SuspendLayout()
             Me.MainTableLayout.SuspendLayout()
             Me.ItemDescriptionPanel.SuspendLayout()
+            Me.MainPanel.SuspendLayout()
             CType(Me.TheChart, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.ResizePictureBox, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.ChartCMS.SuspendLayout()
             Me.HistoryCMS.SuspendLayout()
-            CType(Me.ResizePictureBox, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.MoneyCurveCMS.SuspendLayout()
             Me.DurConvCMS.SuspendLayout()
             Me.BidAskCMS.SuspendLayout()
@@ -188,32 +191,32 @@
             'BondCurvesTSMI
             '
             Me.BondCurvesTSMI.Name = "BondCurvesTSMI"
-            Me.BondCurvesTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.BondCurvesTSMI.Size = New System.Drawing.Size(144, 22)
             Me.BondCurvesTSMI.Text = "Bond curves"
             '
             'ToolStripMenuItem1
             '
             Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RubIRSTSMI, Me.RubCCSTSMI, Me.NDFTSMI})
             Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(152, 22)
+            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(144, 22)
             Me.ToolStripMenuItem1.Text = "IR curves"
             '
             'RubIRSTSMI
             '
             Me.RubIRSTSMI.Name = "RubIRSTSMI"
-            Me.RubIRSTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.RubIRSTSMI.Size = New System.Drawing.Size(127, 22)
             Me.RubIRSTSMI.Text = "Rub IRS"
             '
             'RubCCSTSMI
             '
             Me.RubCCSTSMI.Name = "RubCCSTSMI"
-            Me.RubCCSTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.RubCCSTSMI.Size = New System.Drawing.Size(127, 22)
             Me.RubCCSTSMI.Text = "Rub CCS"
             '
             'NDFTSMI
             '
             Me.NDFTSMI.Name = "NDFTSMI"
-            Me.NDFTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.NDFTSMI.Size = New System.Drawing.Size(127, 22)
             Me.NDFTSMI.Text = "NDF"
             '
             'ToolStripSeparator2
@@ -329,7 +332,7 @@
             Me.MainTableLayout.ColumnCount = 1
             Me.MainTableLayout.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
             Me.MainTableLayout.Controls.Add(Me.ItemDescriptionPanel, 0, 0)
-            Me.MainTableLayout.Controls.Add(Me.TheChart, 0, 1)
+            Me.MainTableLayout.Controls.Add(Me.MainPanel, 0, 1)
             Me.MainTableLayout.Location = New System.Drawing.Point(0, 28)
             Me.MainTableLayout.Name = "MainTableLayout"
             Me.MainTableLayout.RowCount = 2
@@ -675,21 +678,52 @@
             Me.LinkLabel1.Visible = False
             Me.LinkLabel1.VisitedLinkColor = System.Drawing.Color.Navy
             '
+            'MainPanel
+            '
+            Me.MainPanel.Controls.Add(Me.InfoLabel)
+            Me.MainPanel.Controls.Add(Me.TheChart)
+            Me.MainPanel.Controls.Add(Me.ResizePictureBox)
+            Me.MainPanel.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.MainPanel.Location = New System.Drawing.Point(3, 89)
+            Me.MainPanel.Name = "MainPanel"
+            Me.MainPanel.Size = New System.Drawing.Size(778, 417)
+            Me.MainPanel.TabIndex = 5
+            '
+            'InfoLabel
+            '
+            Me.InfoLabel.AutoSize = True
+            Me.InfoLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 14.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Me.InfoLabel.ForeColor = System.Drawing.SystemColors.ControlDarkDark
+            Me.InfoLabel.Location = New System.Drawing.Point(205, 182)
+            Me.InfoLabel.Name = "InfoLabel"
+            Me.InfoLabel.Size = New System.Drawing.Size(393, 24)
+            Me.InfoLabel.TabIndex = 5
+            Me.InfoLabel.Text = "Please select a curve or portfolio to show"
+            Me.InfoLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+            Me.InfoLabel.Visible = False
+            '
             'TheChart
             '
-            Me.TheChart.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                Or System.Windows.Forms.AnchorStyles.Left) _
-                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
             ChartArea1.Name = "ChartArea1"
             Me.TheChart.ChartAreas.Add(ChartArea1)
+            Me.TheChart.Dock = System.Windows.Forms.DockStyle.Fill
             Legend1.Enabled = False
             Legend1.Name = "Legend1"
             Me.TheChart.Legends.Add(Legend1)
-            Me.TheChart.Location = New System.Drawing.Point(3, 89)
+            Me.TheChart.Location = New System.Drawing.Point(0, 0)
             Me.TheChart.Name = "TheChart"
             Me.TheChart.Size = New System.Drawing.Size(778, 417)
-            Me.TheChart.TabIndex = 3
+            Me.TheChart.TabIndex = 4
             Me.TheChart.Text = "Chart1"
+            '
+            'ResizePictureBox
+            '
+            Me.ResizePictureBox.Location = New System.Drawing.Point(184, 238)
+            Me.ResizePictureBox.Name = "ResizePictureBox"
+            Me.ResizePictureBox.Size = New System.Drawing.Size(181, 106)
+            Me.ResizePictureBox.TabIndex = 4
+            Me.ResizePictureBox.TabStop = False
+            Me.ResizePictureBox.Visible = False
             '
             'ChartCMS
             '
@@ -714,15 +748,6 @@
             Me.RemoveHistoryTSMI.Name = "RemoveHistoryTSMI"
             Me.RemoveHistoryTSMI.Size = New System.Drawing.Size(160, 22)
             Me.RemoveHistoryTSMI.Text = "Remove history"
-            '
-            'ResizePictureBox
-            '
-            Me.ResizePictureBox.Location = New System.Drawing.Point(509, 400)
-            Me.ResizePictureBox.Name = "ResizePictureBox"
-            Me.ResizePictureBox.Size = New System.Drawing.Size(181, 106)
-            Me.ResizePictureBox.TabIndex = 4
-            Me.ResizePictureBox.TabStop = False
-            Me.ResizePictureBox.Visible = False
             '
             'MoneyCurveCMS
             '
@@ -841,7 +866,6 @@
             Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
             Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
             Me.ClientSize = New System.Drawing.Size(784, 562)
-            Me.Controls.Add(Me.ResizePictureBox)
             Me.Controls.Add(Me.MainTableLayout)
             Me.Controls.Add(Me.TheToolStrip)
             Me.Controls.Add(Me.TheStatusStrip)
@@ -857,10 +881,12 @@
             Me.MainTableLayout.PerformLayout()
             Me.ItemDescriptionPanel.ResumeLayout(False)
             Me.ItemDescriptionPanel.PerformLayout()
+            Me.MainPanel.ResumeLayout(False)
+            Me.MainPanel.PerformLayout()
             CType(Me.TheChart, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.ResizePictureBox, System.ComponentModel.ISupportInitialize).EndInit()
             Me.ChartCMS.ResumeLayout(False)
             Me.HistoryCMS.ResumeLayout(False)
-            CType(Me.ResizePictureBox, System.ComponentModel.ISupportInitialize).EndInit()
             Me.MoneyCurveCMS.ResumeLayout(False)
             Me.DurConvCMS.ResumeLayout(False)
             Me.BidAskCMS.ResumeLayout(False)
@@ -885,7 +911,6 @@
         Friend WithEvents MainInfoLine1TSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents ShowHistoryTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents MainTableLayout As System.Windows.Forms.TableLayoutPanel
-        Friend WithEvents TheChart As System.Windows.Forms.DataVisualization.Charting.Chart
         Friend WithEvents ResizePictureBox As System.Windows.Forms.PictureBox
         Friend WithEvents ItemDescriptionPanel As System.Windows.Forms.TableLayoutPanel
         Friend WithEvents Label1 As System.Windows.Forms.Label
@@ -948,5 +973,8 @@
         Friend WithEvents NDFTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents PinUnpinTSB As System.Windows.Forms.ToolStripButton
         Friend WithEvents ShowCurveItemsTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents MainPanel As System.Windows.Forms.Panel
+        Friend WithEvents InfoLabel As System.Windows.Forms.Label
+        Friend WithEvents TheChart As System.Windows.Forms.DataVisualization.Charting.Chart
     End Class
 End Namespace
