@@ -150,6 +150,15 @@ Namespace My.Resources
             End Get
         End Property
         
+        '''<summary>
+        '''  Ищет локализованную строку, похожую на Database updated successfully.
+        '''</summary>
+        Friend ReadOnly Property DatabaseUpdatedSuccessfully() As String
+            Get
+                Return ResourceManager.GetString("DatabaseUpdatedSuccessfully", resourceCulture)
+            End Get
+        End Property
+        
         Friend ReadOnly Property DefaultZoom() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("DefaultZoom", resourceCulture)
@@ -168,6 +177,15 @@ Namespace My.Resources
             Get
                 Dim obj As Object = ResourceManager.GetObject("eyeglasses", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Ищет локализованную строку, похожую на Failed to update database.
+        '''</summary>
+        Friend ReadOnly Property FailedToUpdateDatabase() As String
+            Get
+                Return ResourceManager.GetString("FailedToUpdateDatabase", resourceCulture)
             End Get
         End Property
         

@@ -415,7 +415,6 @@ Namespace Forms.ChartForm
 #End Region
 
 #Region "c.5) Mouse move and point selection"
-
         Private Sub TheChartMouseMove(sender As Object, e As MouseEventArgs) Handles TheChart.MouseMove
             Dim mouseEvent As MouseEventArgs = e
             Dim hasShown = False
@@ -443,6 +442,8 @@ Namespace Forms.ChartForm
                         CpnLabel.Text = String.Format("{0:F2}%", bondData.MetaData.Coupon)
                         PVBPLabel.Text = String.Format("{0:F4}", calculatedYield.PVBP)
                         CType(htr.Series.Tag, BondPointsSeries).SelectedPointIndex = htr.PointIndex
+
+                        PlotBidAsk(bondData)
 
                     ElseIf TypeOf point.Tag Is SwapCurve Then
                         Dim curve = CType(point.Tag, SwapCurve)
@@ -477,6 +478,7 @@ Namespace Forms.ChartForm
                 Else
                     UpdateAxisYTitle(False)
                     ResetPointSelection()
+                    HideBidAsk()
                 End If
             Catch ex As Exception
                 Logger.WarnException("Got exception", ex)
@@ -496,6 +498,38 @@ Namespace Forms.ChartForm
                     ZSpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadType.ZSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadType.ZSpread).GetFullName(), "")
                 End If
             End Try
+        End Sub
+
+        Private Sub HideBidAsk()
+            Dim bidAskSeries = TheChart.Series.FindByName("BidAskSeries")
+            If bidAskSeries IsNot Nothing Then TheChart.Series.Remove(bidAskSeries)
+        End Sub
+
+        Private Sub PlotBidAsk(ByVal bond As VisualizableBond)
+            If Not (bond.QuotesAndYields.ContainsKey(QuoteSource.Bid.ToString.ToUpper()) Or bond.QuotesAndYields.ContainsKey(QuoteSource.Ask.ToString.ToUpper())) Then Return
+            Dim bidAskSeries = TheChart.Series.FindByName("BidAskSeries")
+            If bidAskSeries Is Nothing Then
+                bidAskSeries = New Series("BidAskSeries") With {
+                            .YValuesPerPoint = 1,
+                            .ChartType = SeriesChartType.Line,
+                            .IsVisibleInLegend = True,
+                            .color = Color.FromName(bond.ParentGroup.Color),
+                            .markerSize = 4,
+                            .markerStyle = MarkerStyle.Circle
+                        }
+                TheChart.Series.Add(bidAskSeries)
+            End If
+            bidAskSeries.Points.Clear()
+            If bond.QuotesAndYields.ContainsKey(QuoteSource.Bid.ToString.ToUpper()) Then
+                Dim calc = bond.QuotesAndYields(QuoteSource.Bid.ToString.ToUpper())
+                Dim yValue = _spreadBenchmarks.GetQt(calc)
+                bidAskSeries.Points.Add(New DataPoint(calc.Duration, yValue.Value))
+            End If
+            If bond.QuotesAndYields.ContainsKey(QuoteSource.Ask.ToString.ToUpper()) Then
+                Dim calc = bond.QuotesAndYields(QuoteSource.Ask.ToString.ToUpper())
+                Dim yValue = _spreadBenchmarks.GetQt(calc)
+                bidAskSeries.Points.Add(New DataPoint(calc.Duration, yValue.Value))
+            End If
         End Sub
 
         Private Sub OnSelectedPointChanged(ByVal curveName As String, ByVal pointIndex As Integer?)
@@ -535,7 +569,6 @@ Namespace Forms.ChartForm
 
         Private Sub BondDescriptionTSMIClick(sender As Object, e As EventArgs) Handles BondDescriptionTSMI.Click
             If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then RunCommand("reuters://REALTIME/verb=BondData/ric=" + BondCMS.Tag.ToString())
-
         End Sub
 
         Private Sub RelatedChartTSMIClick(sender As Object, e As EventArgs) Handles RelatedChartTSMI.Click
@@ -551,6 +584,10 @@ Namespace Forms.ChartForm
 
         Private Sub ZoomCustomButtonClick(sender As Object, e As EventArgs) Handles ZoomCustomButton.Click
             Logger.Trace("ZoomCustomButtonClick")
+            If Not TheChart.Visible Then
+                ZoomCustomButton.Checked = False
+                Return
+            End If
             If ZoomCustomButton.Checked Then
                 ResizePictureBox.Visible = True
                 Dim bmp As New Bitmap(TheChart.Width, TheChart.Height)
@@ -982,7 +1019,7 @@ Namespace Forms.ChartForm
             Public Color As String
         End Class
 
-        Private Sub CurvesTSMIDropDownOpening(sender As System.Object, e As EventArgs) Handles CurvesTSMI.DropDownOpening
+        Private Sub CurvesTSMIDropDownOpening(sender As Object, e As EventArgs) Handles CurvesTSMI.DropDownOpening
             BondCurvesTSMI.DropDownItems.Clear()
             Dim chainTA As New chainTableAdapter
             Dim chainCurves = chainTA.GetData.Where(Function(row) row.curve).Select(
@@ -1341,6 +1378,10 @@ Namespace Forms.ChartForm
         Private Sub GraphFormSizeChanged(sender As System.Object, e As EventArgs) Handles MyBase.SizeChanged
             InfoLabel.Left = (MainPanel.ClientSize.Width - InfoLabel.Width) / 2
             InfoLabel.Top = (MainPanel.ClientSize.Height - InfoLabel.Height) / 2
+        End Sub
+
+        Private Sub TheToolStrip_ItemClicked(sender As System.Object, e As System.Windows.Forms.ToolStripItemClickedEventArgs) Handles TheToolStrip.ItemClicked
+
         End Sub
     End Class
 End Namespace

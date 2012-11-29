@@ -25,6 +25,7 @@ Namespace Forms
                 If value Then GuiAsync(Sub() StatusLabel.Text = Initialized_successfully)
                 _initialized = value
                 YieldMapButton.Enabled = value
+                NewChartTSMI.Enabled = value
             End Set
         End Property
 
@@ -66,6 +67,11 @@ Namespace Forms
         End Sub
 
         Private Sub YieldMapButtonClick(sender As Object, e As EventArgs) Handles YieldMapButton.Click
+            StartNewChart()
+        End Sub
+
+        Private Sub StartNewChart()
+
             Logger.Info("GraphButtonClick()")
             Dim graphForm = New GraphForm
             graphForm.MdiParent = Me
@@ -160,11 +166,11 @@ Namespace Forms
                 Dim initR = New DbInitializer
                 AddHandler initR.Success, Sub()
                                               Initialized = True
-                                              InitEventLabel.Text = "Database updated successfully"
+                                              InitEventLabel.Text = DatabaseUpdatedSuccessfully
                                           End Sub
                 AddHandler initR.Failure, Sub(ex As Exception)
                                               Initialized = False
-                                              InitEventLabel.Text = "Failed to update database"
+                                              InitEventLabel.Text = FailedToUpdateDatabase
                                               If MsgBox("Failed to initialize database. Would you like to report an error to the developer?", vbYesNo, "Database error") = vbYes Then
                                                   SendErrorReport("Yield Map Database Error", "Exception: " + ex.ToString() + Environment.NewLine + Environment.NewLine + GetEnvironment())
                                               End If
@@ -175,5 +181,44 @@ Namespace Forms
         End Sub
 #End Region
 
+        Private Sub ToolbarTSMIClick(sender As Object, e As EventArgs) Handles ToolbarTSMI.Click
+            MainToolStrip.Visible = ToolbarTSMI.Checked
+        End Sub
+
+        Private Shared Sub AboutMenuTSMIClick(sender As Object, e As EventArgs) Handles AboutMenuTSMI.Click
+            Dim af As New AboutForm
+            af.ShowDialog()
+        End Sub
+
+        Private Shared Sub DatabaseManagerTSMIClick(sender As Object, e As EventArgs) Handles DatabaseManagerTSMI.Click
+            Dim managerForm = New DataBaseManagerForm
+            managerForm.ShowDialog()
+        End Sub
+
+        Private Sub ExitTSMIClick(sender As Object, e As EventArgs) Handles ExitTSMI.Click
+            Close()
+        End Sub
+
+        Private Sub ConnectTSMIClick(sender As Object, e As EventArgs) Handles ConnectTSMI.Click
+            StatusLabel.Text = Connecting_to_Eikon
+            ConnectButton.Enabled = False
+            ConnectToEikon()
+        End Sub
+
+        Private Sub NewChartTSMIClick(sender As Object, e As EventArgs) Handles NewChartTSMI.Click
+            StartNewChart()
+        End Sub
+
+        Private Sub TileWindowsHorizontallyTSMIClick(sender As Object, e As EventArgs) Handles TileWindowsHorizontallyTSMI.Click
+            LayoutMdi(MdiLayout.TileHorizontal)
+        End Sub
+
+        Private Sub TileVerticallyTSMIClick(sender As Object, e As EventArgs) Handles TileVerticallyTSMI.Click
+            LayoutMdi(MdiLayout.TileVertical)
+        End Sub
+
+        Private Sub CascadeTSMIClick(sender As Object, e As EventArgs) Handles CascadeTSMI.Click
+            LayoutMdi(MdiLayout.Cascade)
+        End Sub
     End Class
 End Namespace

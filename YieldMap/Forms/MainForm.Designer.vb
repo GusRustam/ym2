@@ -36,6 +36,7 @@ Namespace Forms
             Me.ToolStripSeparator3 = New System.Windows.Forms.ToolStripSeparator()
             Me.TileHorTSB = New System.Windows.Forms.ToolStripButton()
             Me.TileVerTSB = New System.Windows.Forms.ToolStripButton()
+            Me.AboutTSMI = New System.Windows.Forms.ToolStripButton()
             Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
             Me.StatusPicture = New System.Windows.Forms.ToolStripStatusLabel()
             Me.StatusLabel = New System.Windows.Forms.ToolStripStatusLabel()
@@ -45,21 +46,37 @@ Namespace Forms
             Me.LogSettingsTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.ShowLogTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.RaiseExcTSMI = New System.Windows.Forms.ToolStripMenuItem()
-            Me.AboutTSMI = New System.Windows.Forms.ToolStripButton()
+            Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
+            Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.ConnectTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.NewChartTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripSeparator()
+            Me.ExitTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.ToolsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.DatabaseManagerTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.SettingsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.ViewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.ToolbarTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.ToolStripSeparator4 = New System.Windows.Forms.ToolStripSeparator()
+            Me.TileWindowsHorizontallyTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.TileVerticallyTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.CascadeTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.AboutMenuTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.MainToolStrip.SuspendLayout()
             Me.StatusStrip1.SuspendLayout()
             Me.CMS.SuspendLayout()
+            Me.MenuStrip1.SuspendLayout()
             Me.SuspendLayout()
             '
             'MainToolStrip
             '
             Me.MainToolStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ConnectButton, Me.YieldMapButton, Me.ToolStripSeparator1, Me.DatabaseButton, Me.ToolStripSeparator2, Me.SettingsButton, Me.ToolStripSeparator3, Me.TileHorTSB, Me.TileVerTSB, Me.AboutTSMI})
-            Me.MainToolStrip.Location = New System.Drawing.Point(0, 0)
+            Me.MainToolStrip.Location = New System.Drawing.Point(0, 24)
             Me.MainToolStrip.Name = "MainToolStrip"
             Me.MainToolStrip.Size = New System.Drawing.Size(792, 39)
             Me.MainToolStrip.Stretch = True
             Me.MainToolStrip.TabIndex = 1
-            Me.MainToolStrip.Text = "ToolStrip1"
             '
             'ConnectButton
             '
@@ -144,6 +161,17 @@ Namespace Forms
             Me.TileVerTSB.Text = "ToolStripButton2"
             Me.TileVerTSB.ToolTipText = "Tile vertically"
             '
+            'AboutTSMI
+            '
+            Me.AboutTSMI.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
+            Me.AboutTSMI.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+            Me.AboutTSMI.Image = Global.YieldMap.My.Resources.Resources.about
+            Me.AboutTSMI.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
+            Me.AboutTSMI.ImageTransparentColor = System.Drawing.Color.Magenta
+            Me.AboutTSMI.Name = "AboutTSMI"
+            Me.AboutTSMI.Size = New System.Drawing.Size(36, 36)
+            Me.AboutTSMI.Text = "About Yield Map"
+            '
             'StatusStrip1
             '
             Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.StatusPicture, Me.StatusLabel, Me.ToolStripStatusLabel1, Me.InitEventLabel})
@@ -179,7 +207,7 @@ Namespace Forms
             '
             Me.CMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LogSettingsTSMI, Me.ShowLogTSMI, Me.RaiseExcTSMI})
             Me.CMS.Name = "CMS"
-            Me.CMS.Size = New System.Drawing.Size(207, 92)
+            Me.CMS.Size = New System.Drawing.Size(207, 70)
             '
             'LogSettingsTSMI
             '
@@ -199,16 +227,116 @@ Namespace Forms
             Me.RaiseExcTSMI.Size = New System.Drawing.Size(206, 22)
             Me.RaiseExcTSMI.Text = "Send report to developer"
             '
-            'AboutTSMI
+            'MenuStrip1
             '
-            Me.AboutTSMI.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right
-            Me.AboutTSMI.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-            Me.AboutTSMI.Image = Global.YieldMap.My.Resources.Resources.about
-            Me.AboutTSMI.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None
-            Me.AboutTSMI.ImageTransparentColor = System.Drawing.Color.Magenta
-            Me.AboutTSMI.Name = "AboutTSMI"
-            Me.AboutTSMI.Size = New System.Drawing.Size(36, 36)
-            Me.AboutTSMI.Text = "About Yield Map"
+            Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem, Me.ToolsToolStripMenuItem, Me.ViewToolStripMenuItem, Me.HelpToolStripMenuItem})
+            Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
+            Me.MenuStrip1.Name = "MenuStrip1"
+            Me.MenuStrip1.Size = New System.Drawing.Size(792, 24)
+            Me.MenuStrip1.TabIndex = 5
+            Me.MenuStrip1.Text = "MenuStrip1"
+            '
+            'FileToolStripMenuItem
+            '
+            Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ConnectTSMI, Me.NewChartTSMI, Me.ToolStripMenuItem1, Me.ExitTSMI})
+            Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
+            Me.FileToolStripMenuItem.Size = New System.Drawing.Size(35, 20)
+            Me.FileToolStripMenuItem.Text = "File"
+            '
+            'ConnectTSMI
+            '
+            Me.ConnectTSMI.Name = "ConnectTSMI"
+            Me.ConnectTSMI.Size = New System.Drawing.Size(134, 22)
+            Me.ConnectTSMI.Text = "Connect"
+            '
+            'NewChartTSMI
+            '
+            Me.NewChartTSMI.Enabled = False
+            Me.NewChartTSMI.Name = "NewChartTSMI"
+            Me.NewChartTSMI.Size = New System.Drawing.Size(134, 22)
+            Me.NewChartTSMI.Text = "New chart"
+            '
+            'ToolStripMenuItem1
+            '
+            Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
+            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(131, 6)
+            '
+            'ExitTSMI
+            '
+            Me.ExitTSMI.Name = "ExitTSMI"
+            Me.ExitTSMI.Size = New System.Drawing.Size(134, 22)
+            Me.ExitTSMI.Text = "Exit"
+            '
+            'ToolsToolStripMenuItem
+            '
+            Me.ToolsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DatabaseManagerTSMI, Me.SettingsToolStripMenuItem})
+            Me.ToolsToolStripMenuItem.Name = "ToolsToolStripMenuItem"
+            Me.ToolsToolStripMenuItem.Size = New System.Drawing.Size(44, 20)
+            Me.ToolsToolStripMenuItem.Text = "Tools"
+            '
+            'DatabaseManagerTSMI
+            '
+            Me.DatabaseManagerTSMI.Name = "DatabaseManagerTSMI"
+            Me.DatabaseManagerTSMI.Size = New System.Drawing.Size(176, 22)
+            Me.DatabaseManagerTSMI.Text = "Database manager"
+            '
+            'SettingsToolStripMenuItem
+            '
+            Me.SettingsToolStripMenuItem.Name = "SettingsToolStripMenuItem"
+            Me.SettingsToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
+            Me.SettingsToolStripMenuItem.Text = "Settings"
+            '
+            'ViewToolStripMenuItem
+            '
+            Me.ViewToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolbarTSMI, Me.ToolStripSeparator4, Me.TileWindowsHorizontallyTSMI, Me.TileVerticallyTSMI, Me.CascadeTSMI})
+            Me.ViewToolStripMenuItem.Name = "ViewToolStripMenuItem"
+            Me.ViewToolStripMenuItem.Size = New System.Drawing.Size(41, 20)
+            Me.ViewToolStripMenuItem.Text = "View"
+            '
+            'ToolbarTSMI
+            '
+            Me.ToolbarTSMI.Checked = True
+            Me.ToolbarTSMI.CheckOnClick = True
+            Me.ToolbarTSMI.CheckState = System.Windows.Forms.CheckState.Checked
+            Me.ToolbarTSMI.Name = "ToolbarTSMI"
+            Me.ToolbarTSMI.Size = New System.Drawing.Size(159, 22)
+            Me.ToolbarTSMI.Text = "Toolbar"
+            '
+            'ToolStripSeparator4
+            '
+            Me.ToolStripSeparator4.Name = "ToolStripSeparator4"
+            Me.ToolStripSeparator4.Size = New System.Drawing.Size(156, 6)
+            '
+            'TileWindowsHorizontallyTSMI
+            '
+            Me.TileWindowsHorizontallyTSMI.Name = "TileWindowsHorizontallyTSMI"
+            Me.TileWindowsHorizontallyTSMI.Size = New System.Drawing.Size(159, 22)
+            Me.TileWindowsHorizontallyTSMI.Text = "Tile horizontally"
+            '
+            'TileVerticallyTSMI
+            '
+            Me.TileVerticallyTSMI.Name = "TileVerticallyTSMI"
+            Me.TileVerticallyTSMI.Size = New System.Drawing.Size(159, 22)
+            Me.TileVerticallyTSMI.Text = "Tile vertically"
+            '
+            'CascadeTSMI
+            '
+            Me.CascadeTSMI.Name = "CascadeTSMI"
+            Me.CascadeTSMI.Size = New System.Drawing.Size(159, 22)
+            Me.CascadeTSMI.Text = "Cascade"
+            '
+            'HelpToolStripMenuItem
+            '
+            Me.HelpToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AboutMenuTSMI})
+            Me.HelpToolStripMenuItem.Name = "HelpToolStripMenuItem"
+            Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(40, 20)
+            Me.HelpToolStripMenuItem.Text = "Help"
+            '
+            'AboutMenuTSMI
+            '
+            Me.AboutMenuTSMI.Name = "AboutMenuTSMI"
+            Me.AboutMenuTSMI.Size = New System.Drawing.Size(114, 22)
+            Me.AboutMenuTSMI.Text = "About"
             '
             'MainForm
             '
@@ -217,8 +345,10 @@ Namespace Forms
             Me.ClientSize = New System.Drawing.Size(792, 573)
             Me.Controls.Add(Me.StatusStrip1)
             Me.Controls.Add(Me.MainToolStrip)
+            Me.Controls.Add(Me.MenuStrip1)
             Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
             Me.IsMdiContainer = True
+            Me.MainMenuStrip = Me.MenuStrip1
             Me.Name = "MainForm"
             Me.Text = "Thomson Reuters Yield Map"
             Me.MainToolStrip.ResumeLayout(False)
@@ -226,6 +356,8 @@ Namespace Forms
             Me.StatusStrip1.ResumeLayout(False)
             Me.StatusStrip1.PerformLayout()
             Me.CMS.ResumeLayout(False)
+            Me.MenuStrip1.ResumeLayout(False)
+            Me.MenuStrip1.PerformLayout()
             Me.ResumeLayout(False)
             Me.PerformLayout()
 
@@ -250,6 +382,23 @@ Namespace Forms
         Friend WithEvents RaiseExcTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents ShowLogTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents AboutTSMI As System.Windows.Forms.ToolStripButton
+        Friend WithEvents MenuStrip1 As System.Windows.Forms.MenuStrip
+        Friend WithEvents FileToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents ConnectTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents ExitTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents ToolsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents DatabaseManagerTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents SettingsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents HelpToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents AboutMenuTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents ViewToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents ToolbarTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents NewChartTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents ToolStripMenuItem1 As System.Windows.Forms.ToolStripSeparator
+        Friend WithEvents ToolStripSeparator4 As System.Windows.Forms.ToolStripSeparator
+        Friend WithEvents TileWindowsHorizontallyTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents TileVerticallyTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents CascadeTSMI As System.Windows.Forms.ToolStripMenuItem
 
     End Class
 End Namespace

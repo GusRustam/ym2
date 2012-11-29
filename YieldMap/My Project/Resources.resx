@@ -286,4 +286,10 @@
   <data name="HideDescriptionPane" xml:space="preserve">
     <value>Hide description pane</value>
   </data>
+  <data name="DatabaseUpdatedSuccessfully" xml:space="preserve">
+    <value>Database updated successfully</value>
+  </data>
+  <data name="FailedToUpdateDatabase" xml:space="preserve">
+    <value>Failed to update database</value>
+  </data>
 </root>
