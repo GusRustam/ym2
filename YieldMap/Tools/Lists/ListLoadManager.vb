@@ -134,5 +134,14 @@ Namespace Tools.Lists
             _listManager.UnregisterAllItems()
             _listManager.CloseAllLinks()
         End Sub
+
+        Public Sub DiscardItem(ByVal taskName As String, ByVal ric As String)
+            Logger.Debug("DiscardItem({0}, {1})", taskName, ric)
+            _listManager.UnregisterItems(ric)
+            If Not _activeTasks.ContainsKey(taskName) Then Return
+
+            _activeTasks(taskName).Items.Remove(ric)
+            If _activeTasks(taskName).Items.Count = 0 Then _activeTasks.Remove(taskName)
+        End Sub
     End Class
 End Namespace

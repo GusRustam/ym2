@@ -36,6 +36,7 @@ Namespace Tools
         Private ReadOnly _spreadBmk As SpreadContainer
 
         Public Event AllQuotes As Action(Of List(Of VisualizableBond))
+        Public Event RemovedItem As Action(Of VisualizableGroup, String)
         Public Event Quote As Action(Of VisualizableBond, String)
         Public Event Volume As Action(Of VisualizableBond)
         Public Event Clear As Action(Of VisualizableGroup)
@@ -86,9 +87,14 @@ Namespace Tools
         Public Sub AddGroup(ByVal group As VisualizableGroup)
             _groups.Add(group)
             AddHandler group.Quote, AddressOf OnBondQuote
+            AddHandler group.RemovedItem, AddressOf OnRemovedItem
             AddHandler group.AllQuotes, AddressOf OnBondAllQuotes
             AddHandler group.Volume, AddressOf OnBondVolume
             AddHandler group.Clear, AddressOf OnGroupClear
+        End Sub
+
+        Private Sub OnRemovedItem(ByVal grp As VisualizableGroup, ByVal ric As String)
+            RaiseEvent RemovedItem(grp, ric)
         End Sub
 
         Private Sub OnBondAllQuotes(ByVal obj As List(Of VisualizableBond))
@@ -111,22 +117,12 @@ Namespace Tools
             _spreadBmk = bmk
         End Sub
 
-        Public Sub CalcAllSpreads(ByVal type As SpreadType, ByRef calculation As BondPointDescription, ByVal metaData As DataBaseBondDescription)
-            _spreadBmk.CalcAllSpreads(calculation, metaData, type)
-        End Sub
-
-        Public Sub CalcAllSpreads(ByRef calculation As BondPointDescription, ByVal metaData As DataBaseBondDescription)
-            For i = 0 To _spreadBmk.Benchmarks.Keys.Count
-                _spreadBmk.CalcAllSpreads(calculation, metaData, _spreadBmk.Benchmarks.Keys(i))
-            Next
-        End Sub
-
         Public Function GetGroup(ByVal seriesName As String) As VisualizableGroup
             Return _groups.First(Function(grp) grp.SeriesName = seriesName)
         End Function
 
         Public Sub RecalculateByType(ByVal type As SpreadType)
-            _groups.ForEach(Sub(group) group.RecalculateByType(Type))
+            _groups.ForEach(Sub(group) group.RecalculateByType(type))
         End Sub
 
         Public Sub CleanupByType(ByVal type As SpreadType)
@@ -135,6 +131,21 @@ Namespace Tools
 
         Public Sub CleanupSpread(ByVal type As SpreadType, ByRef descr As BasePointDescription)
             _spreadBmk.CleanupSpread(descr, type)
+        End Sub
+
+        Public Sub RemoveGroup(ByVal groupId As String)
+            While _groups.Any(Function(grp) grp.Id = groupId)
+                Dim g = _groups.First(Function(grp) grp.Id = groupId)
+                g.Cleanup()
+                _groups.Remove(g)
+            End While
+        End Sub
+
+        Public Sub RemovePoint(ByVal ric As String)
+            While _groups.Any(Function(grp) grp.HasRic(ric))
+                Dim g = _groups.First(Function(grp) grp.HasRic(ric))
+                g.RemoveRIC(ric)
+            End While
         End Sub
     End Class
 
@@ -163,7 +174,6 @@ Namespace Tools
             End Get
             Set(value As String)
                 _selectedQuote = value
-                'Recalculate()
             End Set
         End Property
 
@@ -181,7 +191,7 @@ Namespace Tools
 
         Public Sub RecalculateByType(type As SpreadType)
             If _quotesAndYields.ContainsKey(_selectedQuote) Then
-                _parentGroup.Ansamble.CalcAllSpreads(type, _quotesAndYields(_selectedQuote), _metaData)
+                _parentGroup.Ansamble.SpreadBmk.CalcAllSpreads(_quotesAndYields(_selectedQuote), _metaData, type)
             End If
         End Sub
 
@@ -203,6 +213,7 @@ Namespace Tools
         Private ReadOnly _ansamble As VisualizableAnsamble
 
         Public Event Quote As Action(Of VisualizableBond, String)
+        Public Event RemovedItem As Action(Of VisualizableGroup, String)
         Public Event Clear As Action(Of VisualizableGroup)
         Public Event Volume As Action(Of VisualizableBond)
         Public Event AllQuotes As Action(Of List(Of VisualizableBond))
@@ -214,7 +225,7 @@ Namespace Tools
         Public AskField As String
         Public LastField As String
         Public HistField As String
-        Public VolumeField As String = "VOLUME"
+        Public VolumeField As String = "CF_VOLUME"
         Public VWAPField As String = "VWAP"
         Public Currency As String
         Public RicStructure As String
@@ -314,7 +325,11 @@ Namespace Tools
             calculation.Price = fieldVal
             calculation.YieldSource = If(calcDate = Date.Today, YieldSource.Realtime, YieldSource.Historical)
             CalculateYields(calcDate, bondDataPoint.MetaData, calculation)
-            _ansamble.CalcAllSpreads(calculation, bondDataPoint.MetaData)
+
+            Dim container = _ansamble.SpreadBmk
+            For i = 0 To container.Benchmarks.Keys.Count
+                container.CalcAllSpreads(calculation, bondDataPoint.MetaData, container.Benchmarks.Keys(i))
+            Next
             bondDataPoint.QuotesAndYields(fieldName) = calculation
             If bondDataPoint.SelectedQuote = fieldName Then RaiseEvent Quote(bondDataPoint, fieldName)
         End Sub
@@ -407,12 +422,36 @@ Namespace Tools
                     End If
                 End Sub)
         End Sub
+
+        Public Sub RemoveRIC(ByVal ric As String)
+            _quoteLoader.DiscardItem(Id, ric)
+            While _elements.Any(Function(elem) elem.Key = ric)
+                _elements.Remove(ric)
+            End While
+            RaiseEvent RemovedItem(Me, ric)
+        End Sub
     End Class
 #End Region
 
 #Region "III. Spreads"
     Public Class SpreadContainer
         Public Benchmarks As New Dictionary(Of SpreadType, SwapCurve)
+
+        Public Event TypeSelected As Action(Of SpreadType, SpreadType)
+        Public Event BenchmarkRemoved As Action(Of SpreadType)
+        Public Event BenchmarkUpdated As Action(Of SpreadType)
+
+        Private _currentType As SpreadType = SpreadType.Yield
+        Public Property CurrentType As SpreadType
+            Get
+                Return _currentType
+            End Get
+            Set(value As SpreadType)
+                Dim oldType = _currentType
+                _currentType = value
+                RaiseEvent TypeSelected(_currentType, oldType)
+            End Set
+        End Property
 
         Public Sub CalcAllSpreads(ByRef descr As BasePointDescription, Optional ByVal data As DataBaseBondDescription = Nothing, Optional ByVal type As SpreadType = Nothing)
             If type IsNot Nothing Then
@@ -446,7 +485,7 @@ Namespace Tools
             End If
         End Sub
 
-        Public Function GetQt(ByVal calc As BasePointDescription) As Double?
+        Public Function GetActualQuote(ByVal calc As BasePointDescription) As Double?
             Dim fieldName = _currentType.ToString()
             If fieldName = "Yield" Then
                 Return calc.GetYield()
@@ -464,21 +503,6 @@ Namespace Tools
             Return Nothing
         End Function
 
-        Private _currentType As SpreadType = SpreadType.Yield
-        Public Property CurrentType As SpreadType
-            Get
-                Return _currentType
-            End Get
-            Set(value As SpreadType)
-                Dim oldType = _currentType
-                _currentType = value
-                RaiseEvent TypeSelected(_currentType, oldType)
-            End Set
-        End Property
-
-        Public Event TypeSelected As Action(Of SpreadType, SpreadType)
-        Public Event BenchmarkRemoved As Action(Of SpreadType)
-        Public Event BenchmarkUpdated As Action(Of SpreadType)
 
         Public Sub OnCurveRemoved(ByVal curve As SwapCurve)
             Dim types = (From keyValue In Benchmarks Where keyValue.Value.GetName() = curve.GetName() Select keyValue.Key).ToList()
@@ -488,7 +512,6 @@ Namespace Tools
                           End Sub)
             If types.Contains(CurrentType) Then CurrentType = SpreadType.Yield
         End Sub
-
 
         Public Sub UpdateCurve(ByVal curveName As String)
             Dim types = (From keyValue In Benchmarks Where keyValue.Value.GetName() = curveName Select keyValue.Key).ToList()
@@ -605,13 +628,8 @@ Namespace Tools
 #End Region
 
 #Region "V. Curves descriptions"
-    Friend MustInherit Class SeriesDescr
+    Friend Class BondSetSeries
         Public Name As String
-    End Class
-
-    Friend Class BondPointsSeries
-        Inherits SeriesDescr
-
         Public Event SelectedPointChanged As Action(Of String, Integer?)
 
         Public Color As Color
@@ -632,13 +650,7 @@ Namespace Tools
         End Sub
     End Class
 
-    Friend Class SwapCurveSeries
-        Inherits SeriesDescr
-        Public SwpCurve As SwapCurve
-    End Class
-
     Friend Class HistCurveSeries
-        Inherits SeriesDescr
     End Class
 #End Region
 End Namespace

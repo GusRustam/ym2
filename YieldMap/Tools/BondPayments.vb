@@ -1,12 +1,12 @@
-﻿Imports AdfinXAnalyticsFunctions
-Imports NLog
+﻿Imports NLog
+Imports AdfinXAnalyticsFunctions
 
 Namespace Tools
     Public Class BondPayments
         Private Shared ReadOnly Logger As Logger = Commons.GetLogger(GetType(BondPayments))
         Private ReadOnly _adFinBond As New AdxBondModule
         Private ReadOnly _adFinCommon As New AdxDateModule
-        
+
         Private ReadOnly _issueDate As DateTime
 
         Public ReadOnly Property IssueDate() As Date
@@ -52,7 +52,7 @@ Namespace Tools
         End Property
 
         Private ReadOnly _maturityDate As DateTime
-        
+
         Private ReadOnly _dates As New LinkedList(Of DateTime)
         Private ReadOnly _faceValue As New List(Of Double)
 
@@ -114,13 +114,13 @@ Namespace Tools
                                   calcDate, _issueDate, _maturityDate))
             End If
         End Function
-        
+
         Public Overrides Function ToString() As String
             Dim res As String = "Payments are:" + Environment.NewLine
-            for i = 0 To _dates.Count-1
+            For i = 0 To _dates.Count - 1
                 res += String.Format("{0:dd-MM-yy} | {1:F4} | {2:P} | {3:F4} | {4:F4}" + Environment.NewLine, _dates(i), _cpnPmts(i), _cpns(i), _redempts(i), _faceValue(i))
             Next
             Return res
         End Function
     End Class
-End NameSpace
+End Namespace

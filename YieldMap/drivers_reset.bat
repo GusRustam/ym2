@@ -1,26 +1,40 @@
 @echo off
+SETLOCAL
+set FLD=Thomson Reuters\TRD 6\Program
+if exist "%USERPROFILE%\Local Settings\Application Data\%FLD%" (
+	set THPATH=%USERPROFILE%\Local Settings\Application Data\%FLD%
+	
+) else if exist "%CommonProgramFiles%\%FLD%" (
+	set THPATH=%CommonProgramFiles%\%FLD%
+	
+) else if exist "%ProgramFiles%\%FLD%" (
+	set THPATH=%ProgramFiles%\%FLD%
+	
+) else if exist "%ProgramFiles(x86)% \%FLD%" (
+	set THPATH=%ProgramFiles(x86)% \%FLD%
+	
+) else if exist "%COMMONPROGRAMFILES(x86)%\%FLD%" (
+	set THPATH=%COMMONPROGRAMFILES(x86)%\%FLD%
+	
+) else (
+	echo Failed to find Thomson Reuters Eikon home folder
+	goto :ext
+	
+)
 
-echo Unregistering old Xtra libraries
+if /I [%1] EQU [/u] ( 
+	set ACTION=unregister
+) else  (
+	set ACTION=register
+)
 
-regsvr32 /s /u "C:\Program Files\Reuters\Common\adfin\Adxoo.dll"
-regsvr32 /s /u "C:\Program Files\Reuters\Common\adfin\Adxfo.dll"
-regsvr32 /s /u "C:\Program Files\Reuters\Common\adfin\rtx.dll"
-"C:\Program Files\Reuters\Common\Dex\dex.exe" /UnRegServer
+echo --- %ACTION%ing Eikon libraries located at %THPATH%
 
-if exist "C:\Program Files\Thomson Reuters\TRD 6" goto usePF
-set _thPath=%USERPROFILE%\Local Settings\Application Data\Thomson Reuters\TRD 6\Program
-goto reg
+(regsvr32 /s %1 "%THPATH%\Adxfo.dll" && (echo AdFin Functions %ACTION%ed successfully)) || echo Failed to %ACTION% AdFin Functions
+(regsvr32 /s %1 "%THPATH%\rtx.dll"  && (echo AdFin RealTime %ACTION%ed successfully)) || echo Failed to %ACTION% AdFin RealTime
+(regsvr32 /s %1 "%THPATH%\Dex2.dll" && (echo Dex2 %ACTION%ed successfully)) || echo Failed to %ACTION% Dex2
+(regsvr32 /s %1 "%THPATH%\EikonDesktopSDK.dll" && (echo Desktop SDK %ACTION%ed successfully))  || echo Failed to %ACTION% Desktop SDK
 
-:usePF
-set _thPath=C:\Program Files\Thomson Reuters\TRD 6\Program
-
-:reg
-echo Registering Eikon libraries from %_thPath%
-
-regsvr32 /s "%_thPath%\Adxoo.dll"
-regsvr32 /s "%_thPath%\Adxfo.dll"
-regsvr32 /s "%_thPath%\rtx.dll"
-regsvr32 /s "%_thPath%\Dex2.dll"
-regsvr32 /s "%_thPath%\EikonDesktopSDK.dll"
-
+:ext
+ENDLOCAL
 pause

@@ -64,10 +64,66 @@ Namespace Forms.ChartForm
                 End Select
             End Set
         End Property
+
+        Private WriteOnly Property ThisFormDataSource As Integer
+            Set(ByVal value As Integer)
+                Logger.Trace("ThisFormDataSource to id {0}", value)
+
+                Dim currentPortID As Long
+                If value < 0 Then
+                    ThisFormStatus = FormDataStatus.Running
+                    Return
+                ElseIf value = 0 Then
+                    currentPortID = (New portfolioTableAdapter).GetDefaultPortfolios.First.id
+                Else
+                    currentPortID = value
+                End If
+
+                Dim portfolioSources = (New PortfolioSourcesTableAdapter).GetData()
+                Dim portfolioUnitedDataTable = (New PortfolioUnitedTableAdapter).GetData()
+                For Each port In (From p In portfolioSources Where p.portfolioID = currentPortID Select p)
+                    Dim groupType As GroupType
+                    Dim group As VisualizableGroup
+                    If groupType.TryParse(port.whereFrom, groupType) Then
+                        group = New VisualizableGroup(_ansamble) With {
+                            .Group = groupType,
+                            .SeriesName = port.whereFromDescr,
+                            .PortfolioID = port.fromID,
+                            .BidField = port.bid_field,
+                            .AskField = port.ask_field,
+                            .LastField = port.last_field,
+                            .HistField = port.hist_field,
+                            .Brokers = {"MM", ""}.ToList(),
+                            .Currency = "",
+                            .Color = port.color
+                        }
+
+                        Dim pD = From elem In portfolioUnitedDataTable Where elem.pid = currentPortID And elem.fromID = group.PortfolioID
+                        Dim ars = (From row In pD Where row.include Select row.ric).ToList
+                        Dim rrs = (From row In pD Where Not row.include Select row.ric).ToList
+                        ars.RemoveAll(Function(ric) rrs.Contains(ric))
+                        ars.ForEach(
+                            Sub(ric)
+                                Dim descr = DbInitializer.GetBondInfo(ric)
+                                If descr IsNot Nothing Then
+                                    group.AddElement(ric, descr)
+                                Else
+                                    Logger.Error("No description for bond {0} found", ric)
+                                End If
+                            End Sub)
+                        _ansamble.AddGroup(group)
+                    Else
+                        Logger.Error("Failed to parse {0}", port.whereFrom)
+                    End If
+                Next
+                _ansamble.StartLoadingLiveData()
+            End Set
+        End Property
+
 #End Region
 
-#Region "III) General GUI Actions and startup"
-#Region "a) Begin and end"
+#Region "III) Event handling"
+#Region "a) Form events"
         Private Sub GraphFormLoad(sender As Object, e As EventArgs) Handles MyBase.Load
             Logger.Trace("GraphFormLoad")
             ThisFormStatus = FormDataStatus.Loading
@@ -129,14 +185,20 @@ Namespace Forms.ChartForm
 
         Private Sub GraphFormFormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
             Logger.Trace("GraphForm_FormClosing")
+            _ansamble.Cleanup()
             _moneyMarketCurves.ForEach(Sub(curve) curve.Cleanup())
             _moneyMarketCurves.Clear()
             ThisFormStatus = FormDataStatus.Stopped
         End Sub
+
+        Private Sub GraphFormSizeChanged(sender As Object, e As EventArgs) Handles MyBase.SizeChanged
+            InfoLabel.Left = (MainPanel.ClientSize.Width - InfoLabel.Width) / 2
+            InfoLabel.Top = (MainPanel.ClientSize.Height - InfoLabel.Height) / 2
+        End Sub
 #End Region
 
-#Region "c) Show legend, labels, tooltip and other info"
-#Region "c.1) Click"
+#Region "b) Chart events"
+        ' The chart
         Private Sub TheChartClick(sender As Object, e As EventArgs) Handles TheChart.Click
             Logger.Trace("TheChartClick")
             Dim mouseEvent As MouseEventArgs = e
@@ -152,19 +214,16 @@ Namespace Forms.ChartForm
                                 .Show(TheChart, mouseEvent.Location)
                             End With
                             MainInfoLine1TSMI.Text = point.ToolTip
-                            Dim description = bondDataPoint.QuotesAndYields(bondDataPoint.SelectedQuote)
-                            If description.YieldSource = YieldSource.Realtime Then
-                                MainInfoLine2TSMI.Text =
-                                    String.Format("LAST: P [{0:F4}], Y [{1:P2}] {2}, D [{3:F2}]",
-                                                  description.Price, description.Yld.Yield, description.Yld.ToWhat.ToString(), description.Duration)
-                                ExtInfoTSMI.Visible = True
-                            Else
-                                MainInfoLine2TSMI.Text =
-                                    String.Format("LAST: P [{0:F4}], Y [{1:P2}] {2}, D [{3:F2}] @ {4:dd/MM/yy}",
-                                                  description.Price, description.Yld.Yield, description.Yld.ToWhat.ToString(), description.Duration, description.YieldAtDate)
 
-                                ExtInfoTSMI.Visible = False
-                            End If
+                            ExtInfoTSMI.DropDownItems.Clear()
+                            bondDataPoint.QuotesAndYields.Keys.ToList.ForEach(
+                                Sub(key)
+                                    Dim x = bondDataPoint.QuotesAndYields(key)
+                                    ExtInfoTSMI.DropDownItems.Add(String.Format("{0}: {1:F4}, {2:P2} {3}, {4:F2}", key, x.Price, x.Yld.Yield, x.Yld.ToWhat.Abbr, x.Duration))
+                                End Sub)
+                            ExtInfoTSMI.DropDownItems.Add("-")
+                            ExtInfoTSMI.DropDownItems.Add(String.Format("Today volume: {0:N0}", bondDataPoint.TodayVolume))
+
 
                         ElseIf TypeOf point.Tag Is SwapCurve Then
                             Dim curve = CType(point.Tag, SwapCurve)
@@ -180,6 +239,10 @@ Namespace Forms.ChartForm
                         End If
                     ElseIf htr.ChartElementType = ChartElementType.PlottingArea Or htr.ChartElementType = ChartElementType.Gridlines Then
                         ChartCMS.Show(TheChart, mouseEvent.Location)
+                    ElseIf htr.ChartElementType = ChartElementType.LegendItem Then
+                        Dim item = CType(htr.Object, LegendItem)
+                        BondSetCMS.Tag = item.Tag
+                        BondSetCMS.Show(TheChart, mouseEvent.Location)
                     End If
                 Catch ex As Exception
                     Logger.WarnException("Something went wrong", ex)
@@ -190,231 +253,16 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub ShowCurveParameters(ByVal curve As SwapCurve)
-            BrokerTSMI.DropDownItems.Clear()
-            Dim brokers = curve.GetBrokers()
-            If brokers.Count = 0 Then
-                BrokerTSMI.Enabled = False
+        Private Sub TheChartInvalidated(sender As Object, e As InvalidateEventArgs) Handles TheChart.Invalidated
+            If TheChart.Series IsNot Nothing AndAlso TheChart.Series.Count = 0 AndAlso Not MainTableLayout.Controls.ContainsKey("InfoLabel") Then
+                TheChart.Visible = False
+                InfoLabel.Visible = True
             Else
-                BrokerTSMI.Enabled = True
-                Dim currBroker = curve.GetBroker()
-                brokers.ToList.ForEach(Sub(broker) AddItem(broker, (broker = currBroker), BrokerTSMI, AddressOf OnBrokerSelected))
-            End If
-
-            QuoteTSMI.DropDownItems.Clear()
-            Dim quotes = curve.GetQuotes()
-            If quotes.Count = 0 Then
-                QuoteTSMI.Enabled = False
-            Else
-                QuoteTSMI.Enabled = True
-                Dim currQuote = curve.GetQuote()
-                quotes.ToList.ForEach(Sub(quote) AddItem(quote, (quote = currQuote), QuoteTSMI, AddressOf OnQuoteSelected))
-            End If
-
-            Dim fitModes = curve.GetFitModes()
-            If fitModes.Count() <= 1 Then
-                FitTSMI.Visible = False
-            Else
-                FitTSMI.Visible = True
-                FitTSMI.DropDownItems.Clear()
-                Dim currFit = curve.GetFitMode()
-                fitModes.ToList.ForEach(Sub(fit) AddItem(fit.FullName, (fit = currFit), FitTSMI, AddressOf OnFitSelected, fit.ItemName))
-            End If
-
-            If curve.BootstrappingEnabled Then
-                BootstrapTSMI.Visible = True
-                BootstrapTSMI.Enabled = True
-                BootstrapTSMI.Checked = curve.IsBootstrapped
-            Else
-                BootstrapTSMI.Enabled = False
-                BootstrapTSMI.Visible = False
+                InfoLabel.Visible = False
+                TheChart.Visible = True
             End If
         End Sub
 
-        Private Shared Sub AddItem(ByVal name As String, ByVal checked As Boolean, ByVal toolStripMenuItem As ToolStripMenuItem, ByVal eventHandler As EventHandler, Optional ByVal tag As Object = Nothing)
-            Dim num = toolStripMenuItem.DropDownItems.Add(New ToolStripMenuItem(name, Nothing, eventHandler) With {.Checked = checked})
-            Dim item = toolStripMenuItem.DropDownItems(num)
-            If tag IsNot Nothing Then item.Tag = tag
-        End Sub
-
-        Private Sub BondContextMenuStripClosing(sender As Object, e As ToolStripDropDownClosingEventArgs) Handles BondCMS.Closing
-            Logger.Trace("BondContextMenuStripClosing")
-            ExtInfoTSMI.Enabled = False
-            ExtInfoTSMI.Visible = True
-            ExtInfoTSMI.Text = "Loading info"
-            ExtInfoTSMI.DropDownItems.Clear()
-        End Sub
-#End Region
-
-#Region "c.2) Y-Axis: yield / spread / z-spread"
-        Private Sub UpdateAxisYTitle(ByVal mouseOver As Boolean)
-            Dim axisFont As Font, clr As Color
-
-            If _spreadBenchmarks.Benchmarks.Any() Then
-                clr = Color.DarkBlue
-                Dim fs As FontStyle = IIf(Not mouseOver, FontStyle.Bold, FontStyle.Bold Or FontStyle.Underline)
-                axisFont = New Font(FontFamily.GenericSansSerif, 11, fs)
-            Else
-                clr = Color.Black
-                axisFont = New Font(FontFamily.GenericSansSerif, 11)
-            End If
-
-            With TheChart.ChartAreas(0).AxisY
-                .TitleFont = axisFont
-                .TitleForeColor = clr
-            End With
-        End Sub
-
-        Private Sub ShowYAxisCMS(ByVal loc As Point)
-            If Not _spreadBenchmarks.Benchmarks.Any Then Return
-            YAxisCMS.Items.Clear()
-            YAxisCMS.Items.Add(SpreadType.Yield.ToString(), Nothing, AddressOf OnYAxisSelected)
-            _spreadBenchmarks.Benchmarks.Keys.ToList.ForEach(Sub(key) YAxisCMS.Items.Add(key.Name, Nothing, AddressOf OnYAxisSelected))
-            YAxisCMS.Show(TheChart, loc)
-        End Sub
-
-        Private Sub OnYAxisSelected(ByVal sender As Object, ByVal e As EventArgs)
-            Logger.Info("OnYAxisSelected()")
-            Dim item As ToolStripMenuItem = TryCast(sender, ToolStripMenuItem)
-            If item IsNot Nothing Then
-                _spreadBenchmarks.CurrentType = SpreadType.FromString(item.Text)
-                'SetYAxisMode(item.Text)
-            End If
-        End Sub
-
-        Private Sub SetYAxisMode(ByVal str As String)
-            Try
-                Select Case str
-                    Case SpreadType.Yield.ToString() : MakeAxisY("Yield, %", "P2")
-                    Case SpreadType.ASWSpread.ToString() : MakeAxisY("ASW Spread, b.p.", "N0")
-                    Case SpreadType.PointSpread.ToString() : MakeAxisY("Spread, b.p.", "N0")
-                    Case SpreadType.ZSpread.ToString() : MakeAxisY("Z-Spread, b.p.", "N0")
-                End Select
-                TheChart.ChartAreas(0).AxisX.ScaleView.ZoomReset()
-                TheChart.ChartAreas(0).AxisY.ScaleView.ZoomReset()
-            Catch ex As Exception
-                Logger.WarnException("Failed to select y-axis variable " + str, ex)
-                Logger.Warn("Exception = {0}", ex.ToString())
-            End Try
-        End Sub
-
-        ' this method simply updates the chart by selecting appropriate y-coordinates for points
-        Private Sub SetChartMinMax()
-            Logger.Debug("SetChartMinMax()")
-            GuiAsync(
-                Sub()
-                    TheChart.Invalidate()
-                    With TheChart.ChartAreas(0).AxisY
-                        Try
-                            Dim newMax = (From srs In TheChart.Series Where srs.Enabled And srs.Points.Any
-                                Select (From pnt In srs.Points Select pnt.YValues.First).Max).Max 'Where Not pnt.IsEmpty
-
-                            Dim newMin As Double
-                            If _spreadBenchmarks.CurrentType.Equals(SpreadType.Yield) Then
-                                newMin = (From srs In TheChart.Series Where srs.Enabled And srs.Points.Any
-                                        Select (From pnt In srs.Points Where pnt.YValues.First > 0 Select pnt.YValues.First).Min).Min
-                            Else
-                                newMin = (From srs In TheChart.Series Where srs.Enabled And srs.Points.Any
-                                          Select (From pnt In srs.Points Select pnt.YValues.First).Min).Min
-                            End If
-
-                            If newMax > newMin Then
-                                .Maximum = newMax
-                                .Minimum = newMin
-                                .MinorGrid.Interval = (.Maximum - .Minimum) / 20
-                                .MajorGrid.Interval = (.Maximum - .Minimum) / 10
-                            End If
-
-                            Dim x As Series = TheChart.Series.FindByName("start")
-                            If x IsNot Nothing Then
-                                TheChart.Series.Remove(x)
-                            End If
-
-                        Catch ex As Exception
-                            Logger.InfoException("Failed to set minmax", ex)
-                            Logger.Info("Exception = {0}", ex.ToString())
-                        End Try
-                    End With
-                End Sub)
-        End Sub
-
-        Private Sub MakeAxisY(ByVal title As String, ByVal format As String)
-            With TheChart.ChartAreas(0).AxisY
-                .Title = title
-                .LabelStyle.Format = format
-            End With
-        End Sub
-#End Region
-
-#Region "c.3) Other actions"
-        Private Sub PinUnpinTSBClick(sender As Object, e As EventArgs) Handles PinUnpinTSB.Click
-            If ItemDescriptionPanel.Visible Then
-                ItemDescriptionPanel.Visible = False
-                PinUnpinTSB.Image = Pin
-                PinUnpinTSB.ToolTipText = ShowDescriptionPane
-            Else
-                ItemDescriptionPanel.Visible = True
-                PinUnpinTSB.Image = UnPin
-                PinUnpinTSB.ToolTipText = HideDescriptionPane
-            End If
-        End Sub
-
-        Private Sub ShowLabelsTSBClick(sender As Object, e As EventArgs) Handles ShowLabelsTSB.Click
-            Logger.Trace("ShowLabelsTSBClick")
-            For Each series In From srs In TheChart.Series Where TypeOf srs.Tag Is BondPointsSeries
-                Dim points = series.Points
-                For Each dataPoint In From pnt In points Where TypeOf pnt.Tag Is VisualizableBond Select {pnt, CType(pnt.Tag, VisualizableBond)}
-                    dataPoint(0).Label = If(ShowLabelsTSB.Checked, dataPoint(1).Metadata.ShortName, "")
-                Next
-            Next
-        End Sub
-
-        Private Sub ShowLegendTSBClicked(sender As Object, e As EventArgs) Handles ShowLegendTSB.Click
-            TheChart.Legends(0).Enabled = ShowLegendTSB.Checked
-        End Sub
-
-        Private Sub CopyToClipboardTSMIClick(sender As Object, e As EventArgs) Handles CopyToClipboardTSMI.Click
-            Dim bmp As New Bitmap(TheChart.Width, TheChart.Height)
-            TheChart.DrawToBitmap(bmp, TheChart.ClientRectangle)
-            Clipboard.SetImage(bmp)
-        End Sub
-#End Region
-
-#Region "c.4) Curves"
-        Private Sub ShowCurveCMS(nm As String, ByVal refCurve As SwapCurve)
-            SpreadCMS.Items.Clear()
-            SpreadCMS.Tag = nm
-            If Not _moneyMarketCurves.Any() Then Return
-            _moneyMarketCurves.Cast(Of SwapCurve).ToList().ForEach(
-                Sub(item)
-                    Dim elem = CType(SpreadCMS.Items.Add(item.GetFullName(), Nothing, AddressOf OnYieldCurveSelected), ToolStripMenuItem)
-                    elem.CheckOnClick = True
-                    elem.Checked = refCurve IsNot Nothing AndAlso item.GetFullName() = refCurve.GetFullName()
-                    elem.Tag = item
-                End Sub)
-            SpreadCMS.Show(MousePosition)
-        End Sub
-
-        Private Sub OnYieldCurveSelected(ByVal sender As Object, ByVal eventArgs As EventArgs)
-            Logger.Info("OnYieldCurveSelected()")
-            Dim senderTSMI = TryCast(sender, ToolStripMenuItem)
-            If senderTSMI Is Nothing Then Return
-
-            If senderTSMI.Checked Then
-                _spreadBenchmarks.AddType(SpreadType.FromString(SpreadCMS.Tag), senderTSMI.Tag) 'SetBenchmark(SpreadType.FromString(SpreadCMS.Tag), senderTSMI.Tag)
-            Else
-                _spreadBenchmarks.RemoveType(SpreadType.FromString(SpreadCMS.Tag)) 'CleanupCurve(CType(senderTSMI.Tag, SwapCurve))
-            End If
-
-            UpdateAxisYTitle(False)
-
-            ASWLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadType.ASWSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadType.ASWSpread).GetFullName(), "")
-            SpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadType.PointSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadType.PointSpread).GetFullName(), "")
-            ZSpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadType.ZSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadType.ZSpread).GetFullName(), "")
-        End Sub
-#End Region
-
-#Region "c.5) Mouse move and point selection"
         Private Sub TheChartMouseMove(sender As Object, e As MouseEventArgs) Handles TheChart.MouseMove
             Dim mouseEvent As MouseEventArgs = e
             Dim hasShown = False
@@ -441,7 +289,7 @@ Namespace Forms.ChartForm
                         MatLabel.Text = String.Format("{0:dd/MM/yyyy}", bondData.MetaData.Maturity)
                         CpnLabel.Text = String.Format("{0:F2}%", bondData.MetaData.Coupon)
                         PVBPLabel.Text = String.Format("{0:F4}", calculatedYield.PVBP)
-                        CType(htr.Series.Tag, BondPointsSeries).SelectedPointIndex = htr.PointIndex
+                        CType(htr.Series.Tag, BondSetSeries).SelectedPointIndex = htr.PointIndex
 
                         PlotBidAsk(bondData)
 
@@ -500,42 +348,10 @@ Namespace Forms.ChartForm
             End Try
         End Sub
 
-        Private Sub HideBidAsk()
-            Dim bidAskSeries = TheChart.Series.FindByName("BidAskSeries")
-            If bidAskSeries IsNot Nothing Then TheChart.Series.Remove(bidAskSeries)
-        End Sub
-
-        Private Sub PlotBidAsk(ByVal bond As VisualizableBond)
-            If Not (bond.QuotesAndYields.ContainsKey(QuoteSource.Bid.ToString.ToUpper()) Or bond.QuotesAndYields.ContainsKey(QuoteSource.Ask.ToString.ToUpper())) Then Return
-            Dim bidAskSeries = TheChart.Series.FindByName("BidAskSeries")
-            If bidAskSeries Is Nothing Then
-                bidAskSeries = New Series("BidAskSeries") With {
-                            .YValuesPerPoint = 1,
-                            .ChartType = SeriesChartType.Line,
-                            .IsVisibleInLegend = True,
-                            .color = Color.FromName(bond.ParentGroup.Color),
-                            .markerSize = 4,
-                            .markerStyle = MarkerStyle.Circle
-                        }
-                TheChart.Series.Add(bidAskSeries)
-            End If
-            bidAskSeries.Points.Clear()
-            If bond.QuotesAndYields.ContainsKey(QuoteSource.Bid.ToString.ToUpper()) Then
-                Dim calc = bond.QuotesAndYields(QuoteSource.Bid.ToString.ToUpper())
-                Dim yValue = _spreadBenchmarks.GetQt(calc)
-                bidAskSeries.Points.Add(New DataPoint(calc.Duration, yValue.Value))
-            End If
-            If bond.QuotesAndYields.ContainsKey(QuoteSource.Ask.ToString.ToUpper()) Then
-                Dim calc = bond.QuotesAndYields(QuoteSource.Ask.ToString.ToUpper())
-                Dim yValue = _spreadBenchmarks.GetQt(calc)
-                bidAskSeries.Points.Add(New DataPoint(calc.Duration, yValue.Value))
-            End If
-        End Sub
-
         Private Sub OnSelectedPointChanged(ByVal curveName As String, ByVal pointIndex As Integer?)
             TheChart.Series.ToList.ForEach(
                 Sub(srs)
-                    Dim seriesDescr = TryCast(srs.Tag, BondPointsSeries)
+                    Dim seriesDescr = TryCast(srs.Tag, BondSetSeries)
                     If seriesDescr Is Nothing Then Return
 
                     seriesDescr.ResetSelection()
@@ -549,64 +365,7 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
-        Private Sub ResetPointSelection()
-            TheChart.Series.ToList.ForEach(
-                Sub(srs)
-                    Dim seriesDescr = TryCast(srs.Tag, BondPointsSeries)
-                    If seriesDescr Is Nothing Then Return
-
-                    seriesDescr.ResetSelection()
-                    srs.Points.ToList.ForEach(Sub(point)
-                                                  Dim tg = CType(point.Tag, VisualizableBond)
-                                                  point.Color = If(tg.QuotesAndYields(tg.SelectedQuote).YieldSource = YieldSource.Historical, Color.LightGray, Color.White)
-                                              End Sub)
-                End Sub)
-        End Sub
-
-        Private Sub RelatedQuoteTSMIClick(sender As Object, e As EventArgs) Handles RelatedQuoteTSMI.Click
-            If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then RunCommand("reuters://REALTIME/verb=FullQuote/ric=" + BondCMS.Tag.ToString())
-        End Sub
-
-        Private Sub BondDescriptionTSMIClick(sender As Object, e As EventArgs) Handles BondDescriptionTSMI.Click
-            If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then RunCommand("reuters://REALTIME/verb=BondData/ric=" + BondCMS.Tag.ToString())
-        End Sub
-
-        Private Sub RelatedChartTSMIClick(sender As Object, e As EventArgs) Handles RelatedChartTSMI.Click
-            If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then RunCommand("reuters://REALTIME/verb=RelatedGraph/ric=" + BondCMS.Tag.ToString())
-        End Sub
-#End Region
-#End Region
-
-#Region "d) Zoom, in and out"
-        Private _resizeBasePoint As Point
-        Private _isResizing As Boolean = False
-        Private _resizeRectangle As New Rectangle
-
-        Private Sub ZoomCustomButtonClick(sender As Object, e As EventArgs) Handles ZoomCustomButton.Click
-            Logger.Trace("ZoomCustomButtonClick")
-            If Not TheChart.Visible Then
-                ZoomCustomButton.Checked = False
-                Return
-            End If
-            If ZoomCustomButton.Checked Then
-                ResizePictureBox.Visible = True
-                Dim bmp As New Bitmap(TheChart.Width, TheChart.Height)
-                TheChart.DrawToBitmap(bmp, TheChart.ClientRectangle)
-                With ResizePictureBox
-                    .Image = bmp
-                    .BringToFront()
-                    .Parent = TheChart.Parent
-                    .Location = TheChart.Location
-                    .Size = TheChart.Size
-                End With
-                TheChart.Enabled = False
-                TheChart.Visible = False
-                ResizePictureBox.BringToFront()
-            Else
-                StopResize()
-            End If
-        End Sub
-
+        ' The chart resizing
         Private Sub ResizePictureBoxMouseDown(sender As Object, e As MouseEventArgs) Handles ResizePictureBox.MouseDown
             Logger.Trace("ResizePictureBoxMouseDown")
             If ZoomCustomButton.Checked Then
@@ -687,69 +446,183 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub SetZoomRange(ByVal minX As Double, ByVal minY As Double, ByVal maxX As Double, ByVal maxY As Double)
-            If minX > maxX Then
-                Dim tmp = minX
-                minX = maxX
-                maxX = tmp
-            End If
-            TheChart.ChartAreas(0).AxisX.ScaleView.Zoom(minX, maxX)
-            TheChart.ChartAreas(0).AxisY.ScaleView.Zoom(minY, maxY)
-        End Sub
-
         Private Sub ResizePictureBoxPaint(sender As Object, e As PaintEventArgs) Handles ResizePictureBox.Paint
             Logger.Trace("ResizePictureBoxMouseUp")
             If ZoomCustomButton.Checked And _isResizing Then
                 e.Graphics.DrawRectangle(New Pen(Color.Black), _resizeRectangle)
             End If
         End Sub
+#End Region
 
-        Private Sub StopResize()
-            ZoomCustomButton.Checked = False
-            _isResizing = False
-            ResizePictureBox.Visible = False
-            TheChart.Visible = True
-            TheChart.Enabled = True
-            TheChart.BringToFront()
-        End Sub
-
+#Region "c) Toolbar events"
         Private Sub ZoomAllButtonClick(sender As Object, e As EventArgs) Handles ZoomAllButton.Click
             SetChartMinMax()
             TheChart.ChartAreas(0).AxisX.ScaleView.ZoomReset()
             TheChart.ChartAreas(0).AxisY.ScaleView.ZoomReset()
         End Sub
+
+        Private Sub ZoomCustomButtonClick(sender As Object, e As EventArgs) Handles ZoomCustomButton.Click
+            Logger.Trace("ZoomCustomButtonClick")
+            If Not TheChart.Visible Then
+                ZoomCustomButton.Checked = False
+                Return
+            End If
+            If ZoomCustomButton.Checked Then
+                ResizePictureBox.Visible = True
+                Dim bmp As New Bitmap(TheChart.Width, TheChart.Height)
+                TheChart.DrawToBitmap(bmp, TheChart.ClientRectangle)
+                With ResizePictureBox
+                    .Image = bmp
+                    .BringToFront()
+                    .Parent = TheChart.Parent
+                    .Location = TheChart.Location
+                    .Size = TheChart.Size
+                End With
+                TheChart.Enabled = False
+                TheChart.Visible = False
+                ResizePictureBox.BringToFront()
+            Else
+                StopResize()
+            End If
+        End Sub
+
+        Private Sub PortfolioTssbDropDownOpening(sender As Object, e As EventArgs) Handles PortfolioTSSB.DropDownOpening
+            ' list of portfolios to show
+            Dim portDescrList As List(Of IdName) =
+                (From rw In (New portfolioTableAdapter).GetData() Select New IdName() With {.Id = rw("id"), .Name = rw("portfolio_name")}).ToList()
+
+            PortfolioTSSB.DropDownItems.Clear()
+
+            If portDescrList.Any Then
+                portDescrList.ForEach(
+                    Sub(idname)
+                        Dim item = PortfolioTSSB.DropDownItems.Add(idname.Name, Nothing, AddressOf PortfolioSelectTSCBSelectedIndexChanged)
+                        item.Tag = idname.Id
+                    End Sub)
+            End If
+        End Sub
+
+        Private Sub PortfolioSelectTSCBSelectedIndexChanged(sender As Object, e As EventArgs)
+            Logger.Trace("PortfolioSelectTSCBSelectedIndexChanged")
+            If ThisFormStatus <> FormDataStatus.Loading Then
+                ThisFormStatus = FormDataStatus.Stopped
+                Try
+                    Dim portID = CLng(CType(sender, ToolStripMenuItem).Tag)
+                    ThisFormDataSource = portID
+                    PortfolioTSSB.HideDropDown()
+                Catch ex As Exception
+                    Logger.ErrorException("Failed to select a portfolio", ex)
+                    Logger.Error("Exception = {0}", ex.ToString())
+                End Try
+            Else
+                Logger.Info("Can not change selected portfolio while form is loading")
+            End If
+        End Sub
+
+        Private Sub RubCCSTSMIClick(sender As Object, e As EventArgs) Handles RubCCSTSMI.Click
+            Logger.Debug("RubCCSTSMIClick()")
+            Dim rubCCS = New RubCCS(_spreadBenchmarks)
+
+            AddHandler rubCCS.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
+            AddHandler rubCCS.Recalculated, AddressOf OnCurveRecalculated
+            AddHandler rubCCS.Updated, AddressOf OnCurvePaint
+
+            rubCCS.Subscribe()
+            _moneyMarketCurves.Add(rubCCS)
+        End Sub
+
+        Private Sub RubIRSTSMIClick(sender As Object, e As EventArgs) Handles RubIRSTSMI.Click
+            Logger.Debug("RubIRSTSMIClick()")
+            Dim rubIRS = New RubIRS(_spreadBenchmarks)
+            AddHandler rubIRS.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
+            AddHandler rubIRS.Recalculated, AddressOf OnCurveRecalculated
+            AddHandler rubIRS.Updated, AddressOf OnCurvePaint
+
+            rubIRS.Subscribe()
+            _moneyMarketCurves.Add(rubIRS)
+        End Sub
+
+        Private Sub NDFTSMIClick(sender As Object, e As EventArgs) Handles NDFTSMI.Click
+            Logger.Debug("NDFTSMI_Click()")
+            Dim rubNDF = New RubNDF(_spreadBenchmarks)
+            AddHandler rubNDF.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
+            AddHandler rubNDF.Recalculated, AddressOf OnCurveRecalculated
+            AddHandler rubNDF.Updated, AddressOf OnCurvePaint
+
+            rubNDF.Subscribe()
+            _moneyMarketCurves.Add(rubNDF)
+        End Sub
+
+        Private Sub ShowLegendTSBClicked(sender As Object, e As EventArgs) Handles ShowLegendTSB.Click
+            TheChart.Legends(0).Enabled = ShowLegendTSB.Checked
+        End Sub
+
+        Private Sub ShowLabelsTSBClick(sender As Object, e As EventArgs) Handles ShowLabelsTSB.Click
+            Logger.Trace("ShowLabelsTSBClick")
+            For Each series In From srs In TheChart.Series Where TypeOf srs.Tag Is BondSetSeries
+                Dim points = series.Points
+                For Each dataPoint In From pnt In points Where TypeOf pnt.Tag Is VisualizableBond Select {pnt, CType(pnt.Tag, VisualizableBond)}
+                    dataPoint(0).Label = If(ShowLabelsTSB.Checked, dataPoint(1).Metadata.ShortName, "")
+                Next
+            Next
+        End Sub
+
+        Private Sub PinUnpinTSBClick(sender As Object, e As EventArgs) Handles PinUnpinTSB.Click
+            If ItemDescriptionPanel.Visible Then
+                ItemDescriptionPanel.Visible = False
+                PinUnpinTSB.Image = Pin
+                PinUnpinTSB.ToolTipText = ShowDescriptionPane
+            Else
+                ItemDescriptionPanel.Visible = True
+                PinUnpinTSB.Image = UnPin
+                PinUnpinTSB.ToolTipText = HideDescriptionPane
+            End If
+        End Sub
 #End Region
 
-#Region "e) Show as table"
-        'Private Sub AsTableTSBClick(sender As Object, e As EventArgs) Handles AsTableTSB.Click
-        '    Dim bondsToShow = _ansamble.Groups.SelectMany(
-        '        Function(grp)
-        '            Return grp.Elements.Keys.ToList.Select(
-        '                Function(key)
-        '                    Dim res As New BondDescr
-        '                    Dim point = grp.Elements(key)
-        '                    If point.Yld.ToWhat Is Nothing Then Return Nothing
+#Region "d) Context menu events"
+        ' Selection of y-axis type (yield / spread)
+        Private Sub OnYAxisSelected(ByVal sender As Object, ByVal e As EventArgs)
+            Logger.Info("OnYAxisSelected()")
+            Dim item As ToolStripMenuItem = TryCast(sender, ToolStripMenuItem)
+            If item IsNot Nothing Then _spreadBenchmarks.CurrentType = SpreadType.FromString(item.Text)
+        End Sub
 
-        '                    res.RIC = point.RIC
-        '                    res.Name = point.ShortName
-        '                    res.Price = point.CalcPrice
-        '                    res.Quote = IIf(point.YieldAtDate <> Date.Today, QuoteType.Close, QuoteType.Last)
-        '                    res.QuoteDate = point.YieldAtDate
-        '                    res.State = BondDescr.StateType.Ok
-        '                    res.ToWhat = point.Yld.ToWhat
-        '                    res.BondYield = point.Yld.Yield
-        '                    res.CalcMode = BondDescr.CalculationMode.SystemPrice
-        '                    res.Convexity = point.Convexity
-        '                    res.Duration = point.Duration
-        '                    res.Live = point.YieldAtDate = Date.Today
-        '                    res.Maturity = point.Maturity
-        '                    res.Coupon = point.Coupon
-        '                    Return res
-        '                End Function)
-        '        End Function).Where(Function(elem) elem IsNot Nothing).ToList()
-        '    _tableForm.Bonds = bondsToShow
-        '    _tableForm.ShowDialog()
-        'End Sub
+        Private Sub CopyToClipboardTSMIClick(sender As Object, e As EventArgs) Handles CopyToClipboardTSMI.Click
+            Dim bmp As New Bitmap(TheChart.Width, TheChart.Height)
+            TheChart.DrawToBitmap(bmp, TheChart.ClientRectangle)
+            Clipboard.SetImage(bmp)
+        End Sub
+
+        Private Sub OnYieldCurveSelected(ByVal sender As Object, ByVal eventArgs As EventArgs)
+            Logger.Info("OnYieldCurveSelected()")
+            Dim senderTSMI = TryCast(sender, ToolStripMenuItem)
+            If senderTSMI Is Nothing Then Return
+
+            If senderTSMI.Checked Then
+                _spreadBenchmarks.AddType(SpreadType.FromString(SpreadCMS.Tag), senderTSMI.Tag)
+            Else
+                _spreadBenchmarks.RemoveType(SpreadType.FromString(SpreadCMS.Tag))
+            End If
+
+            UpdateAxisYTitle(False)
+
+            ASWLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadType.ASWSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadType.ASWSpread).GetFullName(), "")
+            SpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadType.PointSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadType.PointSpread).GetFullName(), "")
+            ZSpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadType.ZSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadType.ZSpread).GetFullName(), "")
+        End Sub
+
+        Private Sub RelatedQuoteTSMIClick(sender As Object, e As EventArgs) Handles RelatedQuoteTSMI.Click
+            If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then RunCommand("reuters://REALTIME/verb=FullQuote/ric=" + BondCMS.Tag.ToString())
+        End Sub
+
+        Private Sub BondDescriptionTSMIClick(sender As Object, e As EventArgs) Handles BondDescriptionTSMI.Click
+            If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then RunCommand("reuters://REALTIME/verb=BondData/ric=" + BondCMS.Tag.ToString())
+        End Sub
+
+        Private Sub RelatedChartTSMIClick(sender As Object, e As EventArgs) Handles RelatedChartTSMI.Click
+            If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then RunCommand("reuters://REALTIME/verb=RelatedGraph/ric=" + BondCMS.Tag.ToString())
+        End Sub
 
         Private Sub ShowCurveItemsTSMIClick(sender As Object, e As EventArgs) Handles ShowCurveItemsTSMI.Click
             Dim aCurve = _moneyMarketCurves.First(Function(curve) curve.GetName() = CStr(MoneyCurveCMS.Tag)).GetSnapshot()
@@ -782,10 +655,38 @@ Namespace Forms.ChartForm
 
             aForm.ShowDialog()
         End Sub
-#End Region
 
-#Region "e) Benchmark selection"
-        Private Sub LinkSpreadLabelLinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles LinkSpreadLabel.LinkClicked, LinkLabel1.LinkClicked
+        'Private Sub AsTableTSBClick(sender As Object, e As EventArgs) Handles AsTableTSB.Click
+        '    Dim bondsToShow = _ansamble.Groups.SelectMany(
+        '        Function(grp)
+        '            Return grp.Elements.Keys.ToList.Select(
+        '                Function(key)
+        '                    Dim res As New BondDescr
+        '                    Dim point = grp.Elements(key)
+        '                    If point.Yld.ToWhat Is Nothing Then Return Nothing
+
+        '                    res.RIC = point.RIC
+        '                    res.Name = point.ShortName
+        '                    res.Price = point.CalcPrice
+        '                    res.Quote = IIf(point.YieldAtDate <> Date.Today, QuoteType.Close, QuoteType.Last)
+        '                    res.QuoteDate = point.YieldAtDate
+        '                    res.State = BondDescr.StateType.Ok
+        '                    res.ToWhat = point.Yld.ToWhat
+        '                    res.BondYield = point.Yld.Yield
+        '                    res.CalcMode = BondDescr.CalculationMode.SystemPrice
+        '                    res.Convexity = point.Convexity
+        '                    res.Duration = point.Duration
+        '                    res.Live = point.YieldAtDate = Date.Today
+        '                    res.Maturity = point.Maturity
+        '                    res.Coupon = point.Coupon
+        '                    Return res
+        '                End Function)
+        '        End Function).Where(Function(elem) elem IsNot Nothing).ToList()
+        '    _tableForm.Bonds = bondsToShow
+        '    _tableForm.ShowDialog()
+        'End Sub
+
+        Private Sub LinkSpreadLabelLinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles SpreadLinkLabel.LinkClicked
             ShowCurveCMS("PointSpread",
                 If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadType.PointSpread), _spreadBenchmarks.Benchmarks(SpreadType.PointSpread), Nothing))
         End Sub
@@ -813,211 +714,6 @@ Namespace Forms.ChartForm
                 End Sub)
             SpreadCMS.Show(MousePosition)
         End Sub
-#End Region
-#End Region
-
-#Region "V) Portfolio selection"
-        Private WriteOnly Property ThisFormDataSource As Integer
-            Set(ByVal value As Integer)
-                Logger.Trace("ThisFormDataSource to id {0}", value)
-
-                Dim currentPortID As Long
-                If value < 0 Then
-                    ThisFormStatus = FormDataStatus.Running
-                    Return
-                ElseIf value = 0 Then
-                    currentPortID = (New portfolioTableAdapter).GetDefaultPortfolios.First.id
-                Else
-                    currentPortID = value
-                End If
-
-                Dim portfolioSources = (New PortfolioSourcesTableAdapter).GetData()
-                Dim portfolioUnitedDataTable = (New PortfolioUnitedTableAdapter).GetData()
-                For Each port In (From p In portfolioSources Where p.portfolioID = currentPortID Select p)
-                    Dim groupType As GroupType
-                    Dim group As VisualizableGroup
-                    If groupType.TryParse(port.whereFrom, groupType) Then
-                        group = New VisualizableGroup(_ansamble) With {
-                            .Group = groupType,
-                            .SeriesName = port.whereFromDescr,
-                            .PortfolioID = port.fromID,
-                            .BidField = port.bid_field,
-                            .AskField = port.ask_field,
-                            .LastField = port.last_field,
-                            .HistField = port.hist_field,
-                            .Brokers = {"MM", ""}.ToList(),
-                            .Currency = "",
-                            .Color = port.color
-                        }
-
-                        Dim pD = From elem In portfolioUnitedDataTable Where elem.pid = currentPortID And elem.fromID = group.PortfolioID
-                        Dim ars = (From row In pD Where row.include Select row.ric).ToList
-                        Dim rrs = (From row In pD Where Not row.include Select row.ric).ToList
-                        ars.RemoveAll(Function(ric) rrs.Contains(ric))
-                        ars.ForEach(
-                            Sub(ric)
-                                Dim descr = DbInitializer.GetBondInfo(ric)
-                                If descr IsNot Nothing Then
-                                    group.AddElement(ric, descr)
-                                Else
-                                    Logger.Error("No description for bond {0} found", ric)
-                                End If
-                            End Sub)
-                        _ansamble.AddGroup(group)
-                    Else
-                        Logger.Error("Failed to parse {0}", port.whereFrom)
-                    End If
-                Next
-                _ansamble.StartLoadingLiveData()
-            End Set
-        End Property
-
-        Private Sub PortfolioTssbDropDownOpening(sender As Object, e As EventArgs) Handles PortfolioTSSB.DropDownOpening
-            ' list of portfolios to show
-            Dim portDescrList As List(Of IdName) =
-                (From rw In (New portfolioTableAdapter).GetData() Select New IdName() With {.Id = rw("id"), .Name = rw("portfolio_name")}).ToList()
-
-            PortfolioTSSB.DropDownItems.Clear()
-
-            If portDescrList.Any Then
-                portDescrList.ForEach(
-                    Sub(idname)
-                        Dim item = PortfolioTSSB.DropDownItems.Add(idname.Name, Nothing, AddressOf PortfolioSelectTSCBSelectedIndexChanged)
-                        item.Tag = idname.Id
-                    End Sub)
-            End If
-        End Sub
-
-        Private Sub PortfolioSelectTSCBSelectedIndexChanged(sender As Object, e As EventArgs) ' Handles portfolioSelectTSCB.SelectedIndexChanged
-            Logger.Trace("PortfolioSelectTSCBSelectedIndexChanged")
-            If ThisFormStatus <> FormDataStatus.Loading Then
-                ThisFormStatus = FormDataStatus.Stopped
-                Try
-                    Dim portID = CLng(CType(sender, ToolStripMenuItem).Tag)
-                    ThisFormDataSource = portID
-                    PortfolioTSSB.HideDropDown()
-                Catch ex As Exception
-                    Logger.ErrorException("Failed to select a portfolio", ex)
-                    Logger.Error("Exception = {0}", ex.ToString())
-                End Try
-            Else
-                Logger.Info("Can not change selected portfolio while form is loading")
-            End If
-        End Sub
-#End Region
-
-#Region "VI) Show historical data"
-        Private Sub ShowHistoryTSMIClick(sender As Object, e As EventArgs) Handles ShowHistoryTSMI.Click
-            Logger.Trace("ShowHistQuotesTSMIClick")
-            Try
-                '1) Load history for 10 days
-                '_historicalCurves.AddCurve(BondCMS.Tag,
-                '                           New HistoryTaskDescr() With {
-                '                                .Item = BondCMS.Tag,
-                '                                .EndDate = DateTime.Today,
-                '                                .StartDate = DateTime.Today.AddDays(-90),
-                '                                .Fields = {"DATE", "CLOSE"}.ToList(),
-                '                                .Frequency = "D",
-                '                                .InterestingFields = {"DATE", "CLOSE"}.ToList()
-                '                            })
-            Catch ex As Exception
-                Logger.ErrorException("Got exception", ex)
-                Logger.Error("Exception = {0}", ex.ToString())
-            End Try
-        End Sub
-
-        'Private Sub OnCurveRemoved(ByVal theName As String)
-        '    Dim item = TheChart.Series.FindByName(theName + "_HIST_CURVE")
-        '    If item IsNot Nothing Then
-        '        item.Points.Clear()
-        '        TheChart.Series.Remove(item)
-        '    Else
-        '        Logger.Warn("Failed to remove historical series {0}", theName)
-        '    End If
-        'End Sub
-
-        Private Sub RemoveHistoryTSMIClick(sender As Object, e As EventArgs) Handles RemoveHistoryTSMI.Click
-            '_historicalCurves.RemoveCurve(HistoryCMS.Tag)
-        End Sub
-
-        'Public Sub OnHistoricalCurveData(ByVal hst As HistoryLoadManager, ByVal ric As String, ByVal datastatus As RT_DataStatus,
-        '                                 ByVal data As Dictionary(Of Date, HistoricalItem))
-        '    Logger.Debug("OnHistoricalCurveData")
-        '    If data Is Nothing Then
-        '        StatusMessage.Text = String.Format("No historical data on {0} available", _ansamble.GetBondDescription(ric).ShortName)
-        '        Return
-        '    End If
-        '    GuiAsync(
-        '        Sub()
-        '            Try
-        '                Dim series As Series = TheChart.Series.FindByName(ric + "_HIST_CURVE")
-        '                If series Is Nothing Then
-        '                    series = New Series(ric + "_HIST_CURVE") With {
-        '                        .YValuesPerPoint = 1,
-        '                        .ChartType = SeriesChartType.Line,
-        '                        .borderWidth = 1,
-        '                        .borderDashStyle = ChartDashStyle.Dash,
-        '                        .borderColor = Color.Green,
-        '                        .Tag = New HistCurveSeries() With {.Name = ric},
-        '                        .IsVisibleInLegend = False
-        '                    }
-        '                End If
-
-        '                For Each yieldDur As Tuple(Of Double, DataPointDescr) In _
-        '                    From bondHistoryDescr In data
-        '                    Where bondHistoryDescr.Value.Close > 0
-        '                    Select New Tuple(Of Double, DataPointDescr)(bondHistoryDescr.Value.Close, CalcYield(bondHistoryDescr.Value.Close, bondHistoryDescr.Key, _ansamble.GetBondDescription(ric)))
-
-        '                    Dim point As New DataPoint
-        '                    Dim duration = yieldDur.Item2.Duration
-        '                    Dim convex = yieldDur.Item2.Convexity
-        '                    Dim pvbp = yieldDur.Item2.PVBP
-        '                    Dim bestYield = yieldDur.Item2.Yld
-        '                    Dim thePrice = yieldDur.Item1
-
-        '                    Dim theTag = New HistCurvePointDescr With {
-        '                        .Duration = duration,
-        '                        .Convexity = convex,
-        '                        .Yld = bestYield,
-        '                        .PVBP = pvbp,
-        '                        .RIC = ric,
-        '                        .HistCurveName = ric + "_HIST_CURVE",
-        '                        .Price = thePrice,
-        '                        .BondTag = _ansamble.GetBondDescription(ric)
-        '                    }
-
-        '                    Dim yValue = _spreadBenchmarks.CalculateSpreads(theTag)
-        '                    If yValue IsNot Nothing Then
-        '                        With point
-        '                            .YValues = {yValue}
-        '                            .XValue = duration
-        '                            .MarkerStyle = bestYield.ToWhat.MarkerStyle
-        '                            .MarkerBorderWidth = 1
-        '                            .Tag = theTag
-        '                            .IsEmpty = Not theTag.IsValid
-        '                        End With
-        '                        series.Points.Add(point)
-        '                    End If
-        '                Next
-        '                If series.Points.Count > 0 Then TheChart.Series.Add(series)
-        '            Catch ex As Exception
-        '                Logger.WarnException("Failed to plot a chart", ex)
-        '            End Try
-        '        End Sub)
-        '    If datastatus <> RT_DataStatus.RT_DS_PARTIAL Then
-        '        RemoveHandler hst.NewData, AddressOf OnHistoricalCurveData
-        '    End If
-        'End Sub
-#End Region
-
-#Region "VII) Curves"
-#Region "1) Common methods"
-        Private Class CurveDescr
-            Public Type As String
-            Public Name As String
-            Public ID As Integer
-            Public Color As String
-        End Class
 
         Private Sub CurvesTSMIDropDownOpening(sender As Object, e As EventArgs) Handles CurvesTSMI.DropDownOpening
             BondCurvesTSMI.DropDownItems.Clear()
@@ -1042,14 +738,6 @@ Namespace Forms.ChartForm
                     .Color = row.color}
                 End Function).ToList()
             DoAdd(hawserCurves)
-        End Sub
-
-        Private Sub DoAdd(ByVal curves As List(Of CurveDescr))
-            curves.ForEach(
-                Sub(curve)
-                    Dim item = BondCurvesTSMI.DropDownItems.Add(curve.Name, Nothing, AddressOf AddBondCurveTSMIClick)
-                    item.Tag = curve
-                End Sub)
         End Sub
 
         Private Sub AddBondCurveTSMIClick(sender As Object, e As EventArgs)
@@ -1176,94 +864,16 @@ Namespace Forms.ChartForm
             SetChartMinMax()
         End Sub
 
-        Private Sub PaintSwapCurve(ByVal curve As SwapCurve, raw As Boolean)
-            Logger.Debug("PaintSwapCurve({0}, {1})", curve.GetName(), raw)
-            Dim points As List(Of SwapPointDescription)
-            points = curve.GetCurveData(raw)
-            If points Is Nothing Then Return
+        Private Sub RemoveFromChartTSMIClick(sender As Object, e As EventArgs) Handles RemoveFromChartTSMI.Click
+            _ansamble.RemoveGroup(BondSetCMS.Tag)
+        End Sub
 
-            Dim estimator = New Estimator(curve.GetFitMode())
-            Dim xyPoints = estimator.Approximate(XY.ConvertToXY(points, _spreadBenchmarks.CurrentType))
-
-            GuiAsync(
-                Sub()
-                    Dim theSeries = TheChart.Series.FindByName(curve.GetName())
-                    If theSeries Is Nothing Then
-                        theSeries = New Series() With {
-                            .Name = curve.GetName(),
-                            .legendText = curve.GetFullName(),
-                            .ChartType = SeriesChartType.Line,
-                            .color = curve.GetOuterColor(),
-                            .markerColor = curve.GetInnerColor(),
-                            .markerBorderColor = curve.GetOuterColor(),
-                            .borderWidth = 2,
-                            .Tag = New SwapCurveSeries With {.Name = curve.GetName(), .SwpCurve = curve},
-                            .markerStyle = MarkerStyle.None,
-                            .markerSize = 0
-                        }
-                        TheChart.Series.Add(theSeries)
-                    Else
-                        theSeries.Points.Clear()
-                        theSeries.LegendText = curve.GetFullName()
-                    End If
-
-                    If points Is Nothing OrElse points.Count < 2 Then
-                        theSeries.Enabled = False
-                        Logger.Info("Too little points to plot")
-                        Return
-                    End If
-                    theSeries.Enabled = True
-
-                    xyPoints.ForEach(
-                        Sub(item)
-                            theSeries.Points.Add(New DataPoint With {
-                                .Name = String.Format("{0}Y", item.X),
-                                .XValue = item.X,
-                                .YValues = {item.Y},
-                                .Tag = curve
-                            })
-                        End Sub)
-                End Sub)
+        Private Sub RemovePointTSMIClick(sender As Object, e As EventArgs) Handles RemovePointTSMI.Click
+            _ansamble.RemovePoint(BondCMS.Tag.ToString())
         End Sub
 #End Region
 
-#Region "2) Specific curves"
-        Private Sub RubCCSTSMIClick(sender As Object, e As EventArgs) Handles RubCCSTSMI.Click
-            Logger.Debug("RubCCSTSMIClick()")
-            Dim rubCCS = New RubCCS(_spreadBenchmarks)
-
-            AddHandler rubCCS.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
-            AddHandler rubCCS.Recalculated, AddressOf OnCurveRecalculated
-            AddHandler rubCCS.Updated, AddressOf OnCurvePaint
-
-            rubCCS.Subscribe()
-            _moneyMarketCurves.Add(rubCCS)
-        End Sub
-
-        Private Sub RubIRSTSMIClick(sender As Object, e As EventArgs) Handles RubIRSTSMI.Click
-            Logger.Debug("RubIRSTSMIClick()")
-            Dim rubIRS = New RubIRS(_spreadBenchmarks)
-            AddHandler rubIRS.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
-            AddHandler rubIRS.Recalculated, AddressOf OnCurveRecalculated
-            AddHandler rubIRS.Updated, AddressOf OnCurvePaint
-
-            rubIRS.Subscribe()
-            _moneyMarketCurves.Add(rubIRS)
-        End Sub
-
-        Private Sub NDFTSMIClick(sender As Object, e As EventArgs) Handles NDFTSMI.Click
-            Logger.Debug("NDFTSMI_Click()")
-            Dim rubNDF = New RubNDF(_spreadBenchmarks)
-            AddHandler rubNDF.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
-            AddHandler rubNDF.Recalculated, AddressOf OnCurveRecalculated
-            AddHandler rubNDF.Updated, AddressOf OnCurvePaint
-
-            rubNDF.Subscribe()
-            _moneyMarketCurves.Add(rubNDF)
-        End Sub
-#End Region
-#End Region
-
+#Region "e) Assembly and curves events"
         Private Sub OnGroupClear(ByVal group As VisualizableGroup) Handles _ansamble.Clear
             Logger.Trace("OnGroupClear()")
             GuiAsync(
@@ -1274,6 +884,12 @@ Namespace Forms.ChartForm
                         series.Points.Clear()
                         TheChart.Series.Remove(series)
                     End If
+
+                    With TheChart.Legends(0).CustomItems
+                        While .Any(Function(elem) elem.Name = group.SeriesName)
+                            .Remove(.First(Function(elem) elem.Name = group.SeriesName))
+                        End While
+                    End With
                 End Sub)
         End Sub
 
@@ -1294,12 +910,12 @@ Namespace Forms.ChartForm
                     Dim series As Series = TheChart.Series.FindByName(group.SeriesName)
                     Dim clr = Color.FromName(group.Color)
                     If series Is Nothing Then
-                        Dim seriesDescr = New BondPointsSeries With {.Name = group.SeriesName, .Color = clr}
+                        Dim seriesDescr = New BondSetSeries With {.Name = group.SeriesName, .Color = clr}
                         AddHandler seriesDescr.SelectedPointChanged, AddressOf OnSelectedPointChanged
                         series = New Series(group.SeriesName) With {
                             .YValuesPerPoint = 1,
                             .ChartType = SeriesChartType.Point,
-                            .IsVisibleInLegend = True,
+                            .IsVisibleInLegend = False,
                             .color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.Black),
                             .markerSize = 8,
                             .markerBorderWidth = 2,
@@ -1315,11 +931,15 @@ Namespace Forms.ChartForm
                         series.SmartLabelStyle.Enabled = True
                         series.SmartLabelStyle.AllowOutsidePlotArea = LabelOutsidePlotAreaStyle.No
                         TheChart.Series.Add(series)
+                        Dim legendItem As New LegendItem(group.SeriesName, clr, "") With {
+                            .Tag = group.Id
+                        }
+                        TheChart.Legends(0).CustomItems.Add(legendItem)
                     End If
 
                     ' creating data point
                     Dim point As DataPoint
-                    Dim yValue = _spreadBenchmarks.GetQt(calc)
+                    Dim yValue = _spreadBenchmarks.GetActualQuote(calc)
                     Dim haveSuchPoint = series.Points.Any(Function(pnt) CType(pnt.Tag, VisualizableBond).MetaData.RIC = ric)
 
                     If haveSuchPoint Then
@@ -1331,6 +951,7 @@ Namespace Forms.ChartForm
                             End If
                             point.YValues = {yValue.Value}
                             point.Color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.LightGray)
+                            If ShowLabelsTSB.Checked Then point.Label = descr.MetaData.ShortName
                         Else
                             series.Points.Remove(point)
                         End If
@@ -1341,9 +962,25 @@ Namespace Forms.ChartForm
                             .ToolTip = descr.MetaData.ShortName,
                             .Color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.LightGray)
                         }
+                        If ShowLabelsTSB.Checked Then point.Label = descr.MetaData.ShortName
                         series.Points.Add(point)
                     End If
                     If Not raw Then SetChartMinMax()
+                End Sub)
+        End Sub
+
+        Private Sub OnRemovedItem(group As VisualizableGroup, ric As String) Handles _ansamble.RemovedItem
+            Logger.Trace("OnRemovedItem({0})", ric)
+            GuiAsync(
+                Sub()
+                    Dim series As Series = TheChart.Series.FindByName(group.SeriesName)
+                    If series IsNot Nothing Then
+                        While series.Points.Any(Function(pnt) CType(pnt.Tag, VisualizableBond).MetaData.RIC = ric)
+                            series.Points.Remove(series.Points.First(Function(pnt) CType(pnt.Tag, VisualizableBond).MetaData.RIC = ric))
+                        End While
+                    End If
+                    If series.Points.Count = 0 Then _ansamble.RemoveGroup(group.Id)
+                    SetChartMinMax()
                 End Sub)
         End Sub
 
@@ -1364,24 +1001,111 @@ Namespace Forms.ChartForm
                 _ansamble.RecalculateByType(newType)
             End If
         End Sub
+#End Region
+#End Region
 
-        Private Sub TheChartInvalidated(sender As Object, e As InvalidateEventArgs) Handles TheChart.Invalidated
-            If TheChart.Series IsNot Nothing AndAlso TheChart.Series.Count = 0 AndAlso Not MainTableLayout.Controls.ContainsKey("InfoLabel") Then
-                TheChart.Visible = False
-                InfoLabel.Visible = True
-            Else
-                InfoLabel.Visible = False
-                TheChart.Visible = True
-            End If
+#Region "VI) Show historical data"
+        Private Sub ShowHistoryTSMIClick(sender As Object, e As EventArgs) Handles ShowHistoryTSMI.Click
+            Logger.Trace("ShowHistQuotesTSMIClick")
+            Try
+                '1) Load history for 10 days
+                '_historicalCurves.AddCurve(BondCMS.Tag,
+                '                           New HistoryTaskDescr() With {
+                '                                .Item = BondCMS.Tag,
+                '                                .EndDate = DateTime.Today,
+                '                                .StartDate = DateTime.Today.AddDays(-90),
+                '                                .Fields = {"DATE", "CLOSE"}.ToList(),
+                '                                .Frequency = "D",
+                '                                .InterestingFields = {"DATE", "CLOSE"}.ToList()
+                '                            })
+            Catch ex As Exception
+                Logger.ErrorException("Got exception", ex)
+                Logger.Error("Exception = {0}", ex.ToString())
+            End Try
         End Sub
 
-        Private Sub GraphFormSizeChanged(sender As System.Object, e As EventArgs) Handles MyBase.SizeChanged
-            InfoLabel.Left = (MainPanel.ClientSize.Width - InfoLabel.Width) / 2
-            InfoLabel.Top = (MainPanel.ClientSize.Height - InfoLabel.Height) / 2
+        'Private Sub OnCurveRemoved(ByVal theName As String)
+        '    Dim item = TheChart.Series.FindByName(theName + "_HIST_CURVE")
+        '    If item IsNot Nothing Then
+        '        item.Points.Clear()
+        '        TheChart.Series.Remove(item)
+        '    Else
+        '        Logger.Warn("Failed to remove historical series {0}", theName)
+        '    End If
+        'End Sub
+
+        Private Sub RemoveHistoryTSMIClick(sender As Object, e As EventArgs) Handles RemoveHistoryTSMI.Click
+            '_historicalCurves.RemoveCurve(HistoryCMS.Tag)
         End Sub
 
-        Private Sub TheToolStrip_ItemClicked(sender As System.Object, e As System.Windows.Forms.ToolStripItemClickedEventArgs) Handles TheToolStrip.ItemClicked
+        'Public Sub OnHistoricalCurveData(ByVal hst As HistoryLoadManager, ByVal ric As String, ByVal datastatus As RT_DataStatus,
+        '                                 ByVal data As Dictionary(Of Date, HistoricalItem))
+        '    Logger.Debug("OnHistoricalCurveData")
+        '    If data Is Nothing Then
+        '        StatusMessage.Text = String.Format("No historical data on {0} available", _ansamble.GetBondDescription(ric).ShortName)
+        '        Return
+        '    End If
+        '    GuiAsync(
+        '        Sub()
+        '            Try
+        '                Dim series As Series = TheChart.Series.FindByName(ric + "_HIST_CURVE")
+        '                If series Is Nothing Then
+        '                    series = New Series(ric + "_HIST_CURVE") With {
+        '                        .YValuesPerPoint = 1,
+        '                        .ChartType = SeriesChartType.Line,
+        '                        .borderWidth = 1,
+        '                        .borderDashStyle = ChartDashStyle.Dash,
+        '                        .borderColor = Color.Green,
+        '                        .Tag = New HistCurveSeries() With {.Name = ric},
+        '                        .IsVisibleInLegend = False
+        '                    }
+        '                End If
 
-        End Sub
+        '                For Each yieldDur As Tuple(Of Double, DataPointDescr) In _
+        '                    From bondHistoryDescr In data
+        '                    Where bondHistoryDescr.Value.Close > 0
+        '                    Select New Tuple(Of Double, DataPointDescr)(bondHistoryDescr.Value.Close, CalcYield(bondHistoryDescr.Value.Close, bondHistoryDescr.Key, _ansamble.GetBondDescription(ric)))
+
+        '                    Dim point As New DataPoint
+        '                    Dim duration = yieldDur.Item2.Duration
+        '                    Dim convex = yieldDur.Item2.Convexity
+        '                    Dim pvbp = yieldDur.Item2.PVBP
+        '                    Dim bestYield = yieldDur.Item2.Yld
+        '                    Dim thePrice = yieldDur.Item1
+
+        '                    Dim theTag = New HistCurvePointDescr With {
+        '                        .Duration = duration,
+        '                        .Convexity = convex,
+        '                        .Yld = bestYield,
+        '                        .PVBP = pvbp,
+        '                        .RIC = ric,
+        '                        .HistCurveName = ric + "_HIST_CURVE",
+        '                        .Price = thePrice,
+        '                        .BondTag = _ansamble.GetBondDescription(ric)
+        '                    }
+
+        '                    Dim yValue = _spreadBenchmarks.CalculateSpreads(theTag)
+        '                    If yValue IsNot Nothing Then
+        '                        With point
+        '                            .YValues = {yValue}
+        '                            .XValue = duration
+        '                            .MarkerStyle = bestYield.ToWhat.MarkerStyle
+        '                            .MarkerBorderWidth = 1
+        '                            .Tag = theTag
+        '                            .IsEmpty = Not theTag.IsValid
+        '                        End With
+        '                        series.Points.Add(point)
+        '                    End If
+        '                Next
+        '                If series.Points.Count > 0 Then TheChart.Series.Add(series)
+        '            Catch ex As Exception
+        '                Logger.WarnException("Failed to plot a chart", ex)
+        '            End Try
+        '        End Sub)
+        '    If datastatus <> RT_DataStatus.RT_DS_PARTIAL Then
+        '        RemoveHandler hst.NewData, AddressOf OnHistoricalCurveData
+        '    End If
+        'End Sub
+#End Region
     End Class
 End Namespace

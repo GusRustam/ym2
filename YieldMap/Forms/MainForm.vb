@@ -71,7 +71,6 @@ Namespace Forms
         End Sub
 
         Private Sub StartNewChart()
-
             Logger.Info("GraphButtonClick()")
             Dim graphForm = New GraphForm
             graphForm.MdiParent = Me
@@ -93,7 +92,8 @@ Namespace Forms
             sf.ShowDialog()
         End Sub
 
-        Private Shared Sub MainFormFormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        Private Sub MainFormFormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+            CloseAllGraphForms()
             Eikon.Instance.Clear()
         End Sub
 

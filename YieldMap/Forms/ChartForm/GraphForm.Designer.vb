@@ -48,13 +48,14 @@
             Me.GraphToolTip = New System.Windows.Forms.ToolTip(Me.components)
             Me.BondCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.MainInfoLine1TSMI = New System.Windows.Forms.ToolStripMenuItem()
-            Me.MainInfoLine2TSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.ExtInfoTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.ShowHistoryTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
             Me.BondDescriptionTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.RelatedQuoteTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.RelatedChartTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.ToolStripSeparator4 = New System.Windows.Forms.ToolStripSeparator()
+            Me.RemovePointTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.MainTableLayout = New System.Windows.Forms.TableLayoutPanel()
             Me.ItemDescriptionPanel = New System.Windows.Forms.TableLayoutPanel()
             Me.PVBPLabel = New System.Windows.Forms.Label()
@@ -72,7 +73,7 @@
             Me.YldLabel = New System.Windows.Forms.Label()
             Me.ZSpreadLabel = New System.Windows.Forms.Label()
             Me.Label2 = New System.Windows.Forms.Label()
-            Me.LinkSpreadLabel = New System.Windows.Forms.LinkLabel()
+            Me.SpreadLinkLabel = New System.Windows.Forms.LinkLabel()
             Me.ZSpreadLinkLabel = New System.Windows.Forms.LinkLabel()
             Me.Label4 = New System.Windows.Forms.Label()
             Me.ASWLinkLabel = New System.Windows.Forms.LinkLabel()
@@ -80,7 +81,7 @@
             Me.MatLabel = New System.Windows.Forms.Label()
             Me.ConvLabel = New System.Windows.Forms.Label()
             Me.Label7 = New System.Windows.Forms.Label()
-            Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
+            Me.OASpreadLinkLabel = New System.Windows.Forms.LinkLabel()
             Me.MainPanel = New System.Windows.Forms.Panel()
             Me.InfoLabel = New System.Windows.Forms.Label()
             Me.TheChart = New System.Windows.Forms.DataVisualization.Charting.Chart()
@@ -108,6 +109,8 @@
             Me.BidAskCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.RemoveBidAskTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.YAxisCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
+            Me.BondSetCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
+            Me.RemoveFromChartTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.TheStatusStrip.SuspendLayout()
             Me.TheToolStrip.SuspendLayout()
             Me.BondCMS.SuspendLayout()
@@ -121,6 +124,7 @@
             Me.MoneyCurveCMS.SuspendLayout()
             Me.DurConvCMS.SuspendLayout()
             Me.BidAskCMS.SuspendLayout()
+            Me.BondSetCMS.SuspendLayout()
             Me.SuspendLayout()
             '
             'TheStatusStrip
@@ -191,32 +195,32 @@
             'BondCurvesTSMI
             '
             Me.BondCurvesTSMI.Name = "BondCurvesTSMI"
-            Me.BondCurvesTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.BondCurvesTSMI.Size = New System.Drawing.Size(144, 22)
             Me.BondCurvesTSMI.Text = "Bond curves"
             '
             'ToolStripMenuItem1
             '
             Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RubIRSTSMI, Me.RubCCSTSMI, Me.NDFTSMI})
             Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(152, 22)
+            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(144, 22)
             Me.ToolStripMenuItem1.Text = "IR curves"
             '
             'RubIRSTSMI
             '
             Me.RubIRSTSMI.Name = "RubIRSTSMI"
-            Me.RubIRSTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.RubIRSTSMI.Size = New System.Drawing.Size(127, 22)
             Me.RubIRSTSMI.Text = "Rub IRS"
             '
             'RubCCSTSMI
             '
             Me.RubCCSTSMI.Name = "RubCCSTSMI"
-            Me.RubCCSTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.RubCCSTSMI.Size = New System.Drawing.Size(127, 22)
             Me.RubCCSTSMI.Text = "Rub CCS"
             '
             'NDFTSMI
             '
             Me.NDFTSMI.Name = "NDFTSMI"
-            Me.NDFTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.NDFTSMI.Size = New System.Drawing.Size(127, 22)
             Me.NDFTSMI.Text = "NDF"
             '
             'ToolStripSeparator2
@@ -272,57 +276,61 @@
             '
             'BondCMS
             '
-            Me.BondCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainInfoLine1TSMI, Me.MainInfoLine2TSMI, Me.ExtInfoTSMI, Me.ShowHistoryTSMI, Me.ToolStripSeparator1, Me.BondDescriptionTSMI, Me.RelatedQuoteTSMI, Me.RelatedChartTSMI})
+            Me.BondCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainInfoLine1TSMI, Me.ExtInfoTSMI, Me.ShowHistoryTSMI, Me.ToolStripSeparator1, Me.BondDescriptionTSMI, Me.RelatedQuoteTSMI, Me.RelatedChartTSMI, Me.ToolStripSeparator4, Me.RemovePointTSMI})
             Me.BondCMS.Name = "BondContextMenuStrip"
-            Me.BondCMS.Size = New System.Drawing.Size(165, 164)
+            Me.BondCMS.Size = New System.Drawing.Size(178, 192)
             '
             'MainInfoLine1TSMI
             '
             Me.MainInfoLine1TSMI.Name = "MainInfoLine1TSMI"
-            Me.MainInfoLine1TSMI.Size = New System.Drawing.Size(164, 22)
+            Me.MainInfoLine1TSMI.Size = New System.Drawing.Size(177, 22)
             Me.MainInfoLine1TSMI.Text = "Description"
-            '
-            'MainInfoLine2TSMI
-            '
-            Me.MainInfoLine2TSMI.Name = "MainInfoLine2TSMI"
-            Me.MainInfoLine2TSMI.Size = New System.Drawing.Size(164, 22)
-            Me.MainInfoLine2TSMI.Text = "Current quote"
             '
             'ExtInfoTSMI
             '
-            Me.ExtInfoTSMI.Enabled = False
             Me.ExtInfoTSMI.Name = "ExtInfoTSMI"
-            Me.ExtInfoTSMI.Size = New System.Drawing.Size(164, 22)
-            Me.ExtInfoTSMI.Text = "Loading info"
+            Me.ExtInfoTSMI.Size = New System.Drawing.Size(177, 22)
+            Me.ExtInfoTSMI.Text = "Quotes"
             '
             'ShowHistoryTSMI
             '
             Me.ShowHistoryTSMI.Name = "ShowHistoryTSMI"
-            Me.ShowHistoryTSMI.Size = New System.Drawing.Size(164, 22)
+            Me.ShowHistoryTSMI.Size = New System.Drawing.Size(177, 22)
             Me.ShowHistoryTSMI.Text = "Show history"
             '
             'ToolStripSeparator1
             '
             Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-            Me.ToolStripSeparator1.Size = New System.Drawing.Size(161, 6)
+            Me.ToolStripSeparator1.Size = New System.Drawing.Size(174, 6)
             '
             'BondDescriptionTSMI
             '
             Me.BondDescriptionTSMI.Name = "BondDescriptionTSMI"
-            Me.BondDescriptionTSMI.Size = New System.Drawing.Size(164, 22)
+            Me.BondDescriptionTSMI.Size = New System.Drawing.Size(177, 22)
             Me.BondDescriptionTSMI.Text = "Bond description"
             '
             'RelatedQuoteTSMI
             '
             Me.RelatedQuoteTSMI.Name = "RelatedQuoteTSMI"
-            Me.RelatedQuoteTSMI.Size = New System.Drawing.Size(164, 22)
+            Me.RelatedQuoteTSMI.Size = New System.Drawing.Size(177, 22)
             Me.RelatedQuoteTSMI.Text = "Related quote"
             '
             'RelatedChartTSMI
             '
             Me.RelatedChartTSMI.Name = "RelatedChartTSMI"
-            Me.RelatedChartTSMI.Size = New System.Drawing.Size(164, 22)
+            Me.RelatedChartTSMI.Size = New System.Drawing.Size(177, 22)
             Me.RelatedChartTSMI.Text = "Related chart"
+            '
+            'ToolStripSeparator4
+            '
+            Me.ToolStripSeparator4.Name = "ToolStripSeparator4"
+            Me.ToolStripSeparator4.Size = New System.Drawing.Size(174, 6)
+            '
+            'RemovePointTSMI
+            '
+            Me.RemovePointTSMI.Name = "RemovePointTSMI"
+            Me.RemovePointTSMI.Size = New System.Drawing.Size(177, 22)
+            Me.RemovePointTSMI.Text = "Remove from chart"
             '
             'MainTableLayout
             '
@@ -373,7 +381,7 @@
             Me.ItemDescriptionPanel.Controls.Add(Me.YldLabel, 3, 0)
             Me.ItemDescriptionPanel.Controls.Add(Me.ZSpreadLabel, 5, 1)
             Me.ItemDescriptionPanel.Controls.Add(Me.Label2, 0, 1)
-            Me.ItemDescriptionPanel.Controls.Add(Me.LinkSpreadLabel, 4, 0)
+            Me.ItemDescriptionPanel.Controls.Add(Me.SpreadLinkLabel, 4, 0)
             Me.ItemDescriptionPanel.Controls.Add(Me.ZSpreadLinkLabel, 4, 1)
             Me.ItemDescriptionPanel.Controls.Add(Me.Label4, 2, 2)
             Me.ItemDescriptionPanel.Controls.Add(Me.ASWLinkLabel, 4, 2)
@@ -381,7 +389,7 @@
             Me.ItemDescriptionPanel.Controls.Add(Me.MatLabel, 1, 2)
             Me.ItemDescriptionPanel.Controls.Add(Me.ConvLabel, 3, 2)
             Me.ItemDescriptionPanel.Controls.Add(Me.Label7, 0, 3)
-            Me.ItemDescriptionPanel.Controls.Add(Me.LinkLabel1, 4, 3)
+            Me.ItemDescriptionPanel.Controls.Add(Me.OASpreadLinkLabel, 4, 3)
             Me.ItemDescriptionPanel.Location = New System.Drawing.Point(3, 3)
             Me.ItemDescriptionPanel.Name = "ItemDescriptionPanel"
             Me.ItemDescriptionPanel.RowCount = 4
@@ -560,19 +568,19 @@
             '
             'LinkSpreadLabel
             '
-            Me.LinkSpreadLabel.AutoSize = True
-            Me.LinkSpreadLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.LinkSpreadLabel.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
-            Me.LinkSpreadLabel.LinkColor = System.Drawing.Color.Navy
-            Me.LinkSpreadLabel.LinkVisited = True
-            Me.LinkSpreadLabel.Location = New System.Drawing.Point(507, 3)
-            Me.LinkSpreadLabel.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
-            Me.LinkSpreadLabel.Name = "LinkSpreadLabel"
-            Me.LinkSpreadLabel.Size = New System.Drawing.Size(55, 13)
-            Me.LinkSpreadLabel.TabIndex = 1
-            Me.LinkSpreadLabel.TabStop = True
-            Me.LinkSpreadLabel.Text = "I-Spread"
-            Me.LinkSpreadLabel.VisitedLinkColor = System.Drawing.Color.Navy
+            Me.SpreadLinkLabel.AutoSize = True
+            Me.SpreadLinkLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Me.SpreadLinkLabel.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
+            Me.SpreadLinkLabel.LinkColor = System.Drawing.Color.Navy
+            Me.SpreadLinkLabel.LinkVisited = True
+            Me.SpreadLinkLabel.Location = New System.Drawing.Point(507, 3)
+            Me.SpreadLinkLabel.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
+            Me.SpreadLinkLabel.Name = "LinkSpreadLabel"
+            Me.SpreadLinkLabel.Size = New System.Drawing.Size(55, 13)
+            Me.SpreadLinkLabel.TabIndex = 1
+            Me.SpreadLinkLabel.TabStop = True
+            Me.SpreadLinkLabel.Text = "I-Spread"
+            Me.SpreadLinkLabel.VisitedLinkColor = System.Drawing.Color.Navy
             '
             'ZSpreadLinkLabel
             '
@@ -661,22 +669,22 @@
             Me.Label7.TabIndex = 0
             Me.Label7.Text = "Coupon"
             '
-            'LinkLabel1
+            'OASpreadLinkLabel
             '
-            Me.LinkLabel1.AutoSize = True
-            Me.LinkLabel1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.LinkLabel1.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
-            Me.LinkLabel1.LinkColor = System.Drawing.Color.Navy
-            Me.LinkLabel1.LinkVisited = True
-            Me.LinkLabel1.Location = New System.Drawing.Point(507, 63)
-            Me.LinkLabel1.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
-            Me.LinkLabel1.Name = "LinkLabel1"
-            Me.LinkLabel1.Size = New System.Drawing.Size(68, 13)
-            Me.LinkLabel1.TabIndex = 1
-            Me.LinkLabel1.TabStop = True
-            Me.LinkLabel1.Text = "OA Spread"
-            Me.LinkLabel1.Visible = False
-            Me.LinkLabel1.VisitedLinkColor = System.Drawing.Color.Navy
+            Me.OASpreadLinkLabel.AutoSize = True
+            Me.OASpreadLinkLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Me.OASpreadLinkLabel.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline
+            Me.OASpreadLinkLabel.LinkColor = System.Drawing.Color.Navy
+            Me.OASpreadLinkLabel.LinkVisited = True
+            Me.OASpreadLinkLabel.Location = New System.Drawing.Point(507, 63)
+            Me.OASpreadLinkLabel.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
+            Me.OASpreadLinkLabel.Name = "OASpreadLinkLabel"
+            Me.OASpreadLinkLabel.Size = New System.Drawing.Size(68, 13)
+            Me.OASpreadLinkLabel.TabIndex = 1
+            Me.OASpreadLinkLabel.TabStop = True
+            Me.OASpreadLinkLabel.Text = "OA Spread"
+            Me.OASpreadLinkLabel.Visible = False
+            Me.OASpreadLinkLabel.VisitedLinkColor = System.Drawing.Color.Navy
             '
             'MainPanel
             '
@@ -861,6 +869,18 @@
             Me.YAxisCMS.Name = "YAxisCMS"
             Me.YAxisCMS.Size = New System.Drawing.Size(61, 4)
             '
+            'BondSetCMS
+            '
+            Me.BondSetCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RemoveFromChartTSMI})
+            Me.BondSetCMS.Name = "BondSetCMS"
+            Me.BondSetCMS.Size = New System.Drawing.Size(178, 26)
+            '
+            'RemoveFromChartTSMI
+            '
+            Me.RemoveFromChartTSMI.Name = "RemoveFromChartTSMI"
+            Me.RemoveFromChartTSMI.Size = New System.Drawing.Size(177, 22)
+            Me.RemoveFromChartTSMI.Text = "Remove from chart"
+            '
             'GraphForm
             '
             Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -890,6 +910,7 @@
             Me.MoneyCurveCMS.ResumeLayout(False)
             Me.DurConvCMS.ResumeLayout(False)
             Me.BidAskCMS.ResumeLayout(False)
+            Me.BondSetCMS.ResumeLayout(False)
             Me.ResumeLayout(False)
             Me.PerformLayout()
 
@@ -905,7 +926,6 @@
         Friend WithEvents CurvesTSMI As System.Windows.Forms.ToolStripSplitButton
         Friend WithEvents BondCMS As System.Windows.Forms.ContextMenuStrip
         Friend WithEvents ExtInfoTSMI As System.Windows.Forms.ToolStripMenuItem
-        Friend WithEvents MainInfoLine2TSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents ShowLabelsTSB As System.Windows.Forms.ToolStripButton
         Friend WithEvents ToolStripSeparator6 As System.Windows.Forms.ToolStripSeparator
         Friend WithEvents MainInfoLine1TSMI As System.Windows.Forms.ToolStripMenuItem
@@ -933,7 +953,7 @@
         Friend WithEvents QuoteTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents ToolStripSeparator11 As System.Windows.Forms.ToolStripSeparator
         Friend WithEvents SelDateTSMI As System.Windows.Forms.ToolStripMenuItem
-        Friend WithEvents LinkSpreadLabel As System.Windows.Forms.LinkLabel
+        Friend WithEvents SpreadLinkLabel As System.Windows.Forms.LinkLabel
         Friend WithEvents SpreadCMS As System.Windows.Forms.ContextMenuStrip
         Friend WithEvents ZSpreadLinkLabel As System.Windows.Forms.LinkLabel
         Friend WithEvents Label4 As System.Windows.Forms.Label
@@ -960,7 +980,7 @@
         Friend WithEvents CpnLabel As System.Windows.Forms.Label
         Friend WithEvents YldLabel As System.Windows.Forms.Label
         Friend WithEvents Label7 As System.Windows.Forms.Label
-        Friend WithEvents LinkLabel1 As System.Windows.Forms.LinkLabel
+        Friend WithEvents OASpreadLinkLabel As System.Windows.Forms.LinkLabel
         Friend WithEvents ASWLabel As System.Windows.Forms.Label
         Friend WithEvents OASLabel As System.Windows.Forms.Label
         Friend WithEvents PVBPLabel As System.Windows.Forms.Label
@@ -976,5 +996,9 @@
         Friend WithEvents MainPanel As System.Windows.Forms.Panel
         Friend WithEvents InfoLabel As System.Windows.Forms.Label
         Friend WithEvents TheChart As System.Windows.Forms.DataVisualization.Charting.Chart
+        Friend WithEvents BondSetCMS As System.Windows.Forms.ContextMenuStrip
+        Friend WithEvents RemoveFromChartTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents ToolStripSeparator4 As System.Windows.Forms.ToolStripSeparator
+        Friend WithEvents RemovePointTSMI As System.Windows.Forms.ToolStripMenuItem
     End Class
 End Namespace

@@ -1,4 +1,5 @@
 ﻿Imports System.Threading
+Imports System.Runtime.InteropServices
 Imports YieldMap.My.Resources
 Imports YieldMap.Forms
 
@@ -42,12 +43,10 @@ Module MainModule
         frm.ShowDialog()
     End Sub
 
-
     Private Sub ThreadEventHandler(ByVal sender As Object, ByVal e As ThreadExceptionEventArgs)
         Dim frm As New UnhandledExcForm
         frm.Text = Unhandled_thread_exception
         frm.ErrorTextBox.Text = Commons.GetEnvironment() + Environment.NewLine + Environment.NewLine + e.Exception.ToString()
         frm.ShowDialog()
     End Sub
-
 End Module

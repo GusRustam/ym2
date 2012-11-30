@@ -4,12 +4,13 @@
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
     <security>
       <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
+        <requestedExecutionLevel level="requireAdministrator" uiAccess="false" />
         <!-- Параметры манифеста UAC
           При необходимости изменить уровень управления учетными записями Windows замените 
           узел requestedExecutionLevel одним из следующих значений.
 
         <requestedExecutionLevel  level="asInvoker" uiAccess="false" />
-        <requestedExecutionLevel  level="requireAdministrator" uiAccess="false" />
+        
         <requestedExecutionLevel  level="highestAvailable" uiAccess="false" />
 
             При указании узла requestedExecutionLevel виртуализация файлов и реестра будет отключена.
@@ -19,8 +20,8 @@
         <requestedExecutionLevel level="asInvoker" uiAccess="false" />
       </requestedPrivileges>
       <applicationRequestMinimum>
-        <PermissionSet Unrestricted="true" ID="Custom" SameSite="site" />
         <defaultAssemblyRequest permissionSetReference="Custom" />
+        <PermissionSet ID="Custom" SameSite="site" Unrestricted="true" />
       </applicationRequestMinimum>
     </security>
   </trustInfo>
@@ -28,20 +29,30 @@
     <application>
       <!-- Список версий Windows, для работы с которыми предназначено данное приложение. Windows будет автоматически выбирать наиболее совместимую среду.-->
       <!-- Если ваше приложение предназначено для работы с Windows 7, раскомментируйте следующий узел supportedOS-->
-      <supportedOS Id="{35138b9a-5d96-4fbd-8e2d-a2440225f93a}"/>
+      <supportedOS Id="{35138b9a-5d96-4fbd-8e2d-a2440225f93a}" />
     </application>
   </compatibility>
   <!-- Включите темы для наиболее общих элементов управления и диалоговых окон Windows (Windows XP и последующие версии) -->
-  <!-- <dependency>
+  <!--<dependency>
     <dependentAssembly>
       <assemblyIdentity
           type="win32"
-          name="Microsoft.Windows.Common-Controls"
-          version="6.0.0.0"
+          name="Interop.AdfinXAnalyticsFunctions"
+          version="2.0.0.0"
           processorArchitecture="*"
-          publicKeyToken="6595b64144ccf1df"
+          publicKeyToken="B77A5C561934E089"
           language="*"
         />
     </dependentAssembly>
+  <dependentAssembly>
+    <assemblyIdentity
+        type="win32"
+        name="Interop.Dex2"
+        version="2.0.0.0"
+        processorArchitecture="*"
+        publicKeyToken="B77A5C561934E089"
+        language="*"
+        />
+  </dependentAssembly>
   </dependency>-->
 </asmv1:assembly>
