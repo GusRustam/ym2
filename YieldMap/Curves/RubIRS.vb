@@ -292,8 +292,8 @@ Namespace Curves
                 Dim dur = (Commons.FromExcelSerialDate(termStructure.GetValue(i, 1)) - _theDate).TotalDays / 365.0
                 Dim yld = termStructure.GetValue(i, 2)
                 If dur > 0 And yld > 0 Then
-                    Dim ric = Descrs.Where(Function(pair) Math.Abs(pair.Value.Duration - dur) < 0.00001).Select(Function(pair) pair.Key).ToList()
-                    If ric.Any() Then result.Add(New SwapPointDescription(ric.First) With {.Yield = yld, .Duration = dur})
+                    Dim ric = Descrs.Where(Function(pair) Math.Abs(pair.Value.Duration - dur) < 0.00001).Select(Function(pair) pair.Value).ToList()
+                    If ric.Any() Then result.Add(New SwapPointDescription(ric.First.RIC) With {.Yield = yld, .Duration = dur, .YieldAtDate = ric.First.YieldAtDate})
                 End If
             Next
             Return result

@@ -24,8 +24,8 @@
         <System.Diagnostics.DebuggerStepThrough()> _
         Private Sub InitializeComponent()
             Me.components = New System.ComponentModel.Container()
-            Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-            Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+            Dim ChartArea2 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+            Dim Legend2 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
             Me.TheStatusStrip = New System.Windows.Forms.StatusStrip()
             Me.StatusMessage = New System.Windows.Forms.ToolStripStatusLabel()
             Me.TheToolStrip = New System.Windows.Forms.ToolStrip()
@@ -88,7 +88,7 @@
             Me.ResizePictureBox = New System.Windows.Forms.PictureBox()
             Me.ChartCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.CopyToClipboardTSMI = New System.Windows.Forms.ToolStripMenuItem()
-            Me.ToolStripSeparator5 = New System.Windows.Forms.ToolStripSeparator()
+            Me.ClipboardSeparator = New System.Windows.Forms.ToolStripSeparator()
             Me.AddBondToChartTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.EnterRICTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.SelectFromAListTSMI = New System.Windows.Forms.ToolStripMenuItem()
@@ -716,12 +716,12 @@
             '
             'TheChart
             '
-            ChartArea1.Name = "ChartArea1"
-            Me.TheChart.ChartAreas.Add(ChartArea1)
+            ChartArea2.Name = "ChartArea1"
+            Me.TheChart.ChartAreas.Add(ChartArea2)
             Me.TheChart.Dock = System.Windows.Forms.DockStyle.Fill
-            Legend1.Enabled = False
-            Legend1.Name = "Legend1"
-            Me.TheChart.Legends.Add(Legend1)
+            Legend2.Enabled = False
+            Legend2.Name = "Legend1"
+            Me.TheChart.Legends.Add(Legend2)
             Me.TheChart.Location = New System.Drawing.Point(0, 0)
             Me.TheChart.Name = "TheChart"
             Me.TheChart.Size = New System.Drawing.Size(778, 417)
@@ -739,9 +739,9 @@
             '
             'ChartCMS
             '
-            Me.ChartCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToClipboardTSMI, Me.ToolStripSeparator5, Me.AddBondToChartTSMI})
+            Me.ChartCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToClipboardTSMI, Me.ClipboardSeparator, Me.AddBondToChartTSMI})
             Me.ChartCMS.Name = "ChartCMS"
-            Me.ChartCMS.Size = New System.Drawing.Size(185, 54)
+            Me.ChartCMS.Size = New System.Drawing.Size(185, 76)
             '
             'CopyToClipboardTSMI
             '
@@ -749,10 +749,10 @@
             Me.CopyToClipboardTSMI.Size = New System.Drawing.Size(184, 22)
             Me.CopyToClipboardTSMI.Text = "Copy to clipboard"
             '
-            'ToolStripSeparator5
+            'ClipboardSeparator
             '
-            Me.ToolStripSeparator5.Name = "ToolStripSeparator5"
-            Me.ToolStripSeparator5.Size = New System.Drawing.Size(181, 6)
+            Me.ClipboardSeparator.Name = "ClipboardSeparator"
+            Me.ClipboardSeparator.Size = New System.Drawing.Size(181, 6)
             '
             'AddBondToChartTSMI
             '
@@ -1028,7 +1028,7 @@
         Friend WithEvents RemoveFromChartTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents ToolStripSeparator4 As System.Windows.Forms.ToolStripSeparator
         Friend WithEvents RemovePointTSMI As System.Windows.Forms.ToolStripMenuItem
-        Friend WithEvents ToolStripSeparator5 As System.Windows.Forms.ToolStripSeparator
+        Friend WithEvents ClipboardSeparator As System.Windows.Forms.ToolStripSeparator
         Friend WithEvents AddBondToChartTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents EnterRICTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents SelectFromAListTSMI As System.Windows.Forms.ToolStripMenuItem

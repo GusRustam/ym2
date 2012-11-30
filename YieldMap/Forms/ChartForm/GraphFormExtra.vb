@@ -6,6 +6,51 @@ Imports YieldMap.Commons
 
 Namespace Forms.ChartForm
     Partial Class GraphForm
+        Private Sub InitChart()
+            Dim axisFont = New Font(FontFamily.GenericSansSerif, 11)
+            TheChart.AntiAliasing = AntiAliasingStyles.All
+            TheChart.TextAntiAliasingQuality = TextAntiAliasingQuality.High
+
+            With TheChart.ChartAreas(0)
+                .AxisX.Title = "Duration, years"
+                .AxisX.TitleFont = axisFont
+                .AxisX.LabelStyle.Format = "F2"
+                .AxisX.MajorGrid.LineDashStyle = ChartDashStyle.Dash
+                .AxisX.MinorGrid.LineDashStyle = ChartDashStyle.Dot
+
+                .AxisX.MajorGrid.Interval = 1.0
+                .AxisX.MajorGrid.Enabled = True
+                .AxisX.MinorGrid.Interval = 0.25
+                .AxisX.MinorGrid.Enabled = True
+
+                .AxisX.ScaleView.Zoomable = True
+                .AxisX.ScaleView.SmallScrollMinSize = 1.0 / 12.0
+
+                .AxisX.ScrollBar.Enabled = True
+                .AxisX.ScrollBar.Size = 14
+                .AxisX.ScrollBar.ButtonStyle = ScrollBarButtonStyles.All
+                .AxisX.ScrollBar.IsPositionedInside = True
+
+                .AxisY.Title = "Yield, %"
+                .AxisY.TitleFont = axisFont
+                .AxisY.LabelStyle.Format = "P2"
+                .AxisY.MajorGrid.LineDashStyle = ChartDashStyle.Dash
+                .AxisY.MinorGrid.LineDashStyle = ChartDashStyle.Dot
+                .AxisY.MajorGrid.Interval = 0.01
+                .AxisY.MajorGrid.Enabled = True
+                .AxisY.MinorGrid.Interval = 0.005
+                .AxisY.MinorGrid.Enabled = True
+
+                .AxisY.ScaleView.Zoomable = True
+                .AxisY.ScaleView.SmallScrollMinSize = 0.01 / 10
+
+                .AxisY.ScrollBar.Enabled = True
+                .AxisY.ScrollBar.Size = 14
+                .AxisY.ScrollBar.ButtonStyle = ScrollBarButtonStyles.All
+                .AxisY.ScrollBar.IsPositionedInside = True
+            End With
+        End Sub
+
         Private Sub ShowCurveParameters(ByVal curve As SwapCurve)
             BrokerTSMI.DropDownItems.Clear()
             Dim brokers = curve.GetBrokers()
@@ -252,11 +297,13 @@ Namespace Forms.ChartForm
         Private Sub PaintSwapCurve(ByVal curve As SwapCurve, raw As Boolean)
             Logger.Debug("PaintSwapCurve({0}, {1})", curve.GetName(), raw)
             Dim points As List(Of SwapPointDescription)
-            points = curve.GetCurveData(raw)
+            points = curve.GetCurveData()
             If points Is Nothing Then Return
 
             Dim estimator = New Estimator(curve.GetFitMode())
             Dim xyPoints = estimator.Approximate(XY.ConvertToXY(points, _spreadBenchmarks.CurrentType))
+
+            If xyPoints Is Nothing Then Return
 
             GuiAsync(
                 Sub()

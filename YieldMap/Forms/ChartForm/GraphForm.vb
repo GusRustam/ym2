@@ -3,6 +3,7 @@ Imports System.Windows.Forms
 Imports System.Windows.Forms.DataVisualization.Charting
 Imports System.Drawing
 Imports AdfinXAnalyticsFunctions
+Imports System.ComponentModel
 Imports YieldMap.Curves
 Imports YieldMap.My.Resources
 Imports YieldMap.Commons
@@ -133,54 +134,6 @@ Namespace Forms.ChartForm
             ThisFormDataSource = -1
         End Sub
 
-        Private Sub InitChart()
-            Dim axisFont = New Font(FontFamily.GenericSansSerif, 11)
-            TheChart.AntiAliasing = AntiAliasingStyles.All
-            TheChart.TextAntiAliasingQuality = TextAntiAliasingQuality.High
-
-            With TheChart.ChartAreas(0)
-                .AxisX.Title = "Duration, years"
-                .AxisX.TitleFont = axisFont
-                .AxisX.LabelStyle.Format = "F2"
-                .AxisX.MajorGrid.LineDashStyle = ChartDashStyle.Dash
-                .AxisX.MinorGrid.LineDashStyle = ChartDashStyle.Dot
-
-                .AxisX.MajorGrid.Interval = 1.0
-                .AxisX.MajorGrid.Enabled = True
-                .AxisX.MinorGrid.Interval = 0.25
-                .AxisX.MinorGrid.Enabled = True
-
-                .AxisX.ScaleView.Zoomable = True
-                .AxisX.ScaleView.SmallScrollMinSize = 1.0 / 12.0
-
-                .AxisX.ScrollBar.Enabled = True
-                .AxisX.ScrollBar.Size = 14
-                .AxisX.ScrollBar.ButtonStyle = ScrollBarButtonStyles.All
-                .AxisX.ScrollBar.IsPositionedInside = True
-
-                .AxisY.Title = "Yield, %"
-                .AxisY.TitleFont = axisFont
-                .AxisY.LabelStyle.Format = "P2"
-                .AxisY.MajorGrid.LineDashStyle = ChartDashStyle.Dash
-                .AxisY.MinorGrid.LineDashStyle = ChartDashStyle.Dot
-                .AxisY.MajorGrid.Interval = 0.01
-                .AxisY.MajorGrid.Enabled = True
-                .AxisY.MinorGrid.Interval = 0.005
-                .AxisY.MinorGrid.Enabled = True
-
-                .AxisY.ScaleView.Zoomable = True
-                .AxisY.ScaleView.SmallScrollMinSize = 0.01 / 10
-
-                .AxisY.ScrollBar.Enabled = True
-                .AxisY.ScrollBar.Size = 14
-                .AxisY.ScrollBar.ButtonStyle = ScrollBarButtonStyles.All
-                .AxisY.ScrollBar.IsPositionedInside = True
-            End With
-
-            'Dim series As Series = New Series("start") With {.ChartType = SeriesChartType.Point}
-            'series.Points.Add(New DataPoint(1, 0.1) With {.Color = Color.Black, .MarkerStyle = MarkerStyle.None, .MarkerSize = 1})
-            'TheChart.Series.Add(series)
-        End Sub
 
         Private Sub GraphFormFormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
             Logger.Trace("GraphForm_FormClosing")
@@ -194,6 +147,17 @@ Namespace Forms.ChartForm
             InfoLabel.Left = (MainPanel.ClientSize.Width - InfoLabel.Width) / 2
             InfoLabel.Top = (MainPanel.ClientSize.Height - InfoLabel.Height) / 2
         End Sub
+
+        Private Sub GraphFormClick(sender As Object, e As EventArgs) Handles MainPanel.Click
+            Dim mouseEvent As MouseEventArgs = e
+            If mouseEvent.X >= TheChart.Left And mouseEvent.X <= TheChart.Right And
+                mouseEvent.Y >= TheChart.Top And mouseEvent.X <= TheChart.Bottom And
+                mouseEvent.Button = MouseButtons.Right Then
+
+                ChartCMS.Show(MainPanel, mouseEvent.Location)
+            End If
+        End Sub
+
 #End Region
 
 #Region "b) Chart events"
@@ -577,6 +541,11 @@ Namespace Forms.ChartForm
                 PinUnpinTSB.ToolTipText = HideDescriptionPane
             End If
         End Sub
+
+        Private Sub ChartCMSOpening(sender As Object, e As CancelEventArgs) Handles ChartCMS.Opening
+            CopyToClipboardTSMI.Visible = TheChart.Visible
+            ClipboardSeparator.Visible = TheChart.Visible
+        End Sub
 #End Region
 
 #Region "d) Context menu events"
@@ -920,6 +889,7 @@ Namespace Forms.ChartForm
 
                 descr = DbInitializer.GetBondInfo(askForm.SelectedRic)
                 If descr IsNot Nothing Then
+                    group.SeriesName = descr.ShortName
                     group.AddElement(askForm.SelectedRic, descr)
                     group.StartLoadingLiveData()
                     _ansamble.AddGroup(group)

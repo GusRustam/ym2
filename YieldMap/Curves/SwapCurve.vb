@@ -104,6 +104,7 @@ Namespace Curves
 
         Public Overridable Function ToArray() As Array
             Dim list = Descrs.Values.Where(Function(elem) elem.Yield.HasValue).ToList()
+            list.Sort()
             Dim len = list.Count - 1
             Dim res(0 To len, 1) As Object
             For i = 0 To len
