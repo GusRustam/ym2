@@ -894,52 +894,51 @@ Namespace Forms.ChartForm
             '_historicalCurves.RemoveCurve(HistoryCMS.Tag)
         End Sub
 
-        Private Sub EnterRIC_TSMIClick(sender As Object, e As EventArgs) Handles EnterRICTSMI.Click
-            Dim selectedRic As String
-
-            Dim askForm As New Form()
-            With askForm
-                .Width = 300
-                .Height = 100
-                .FormBorderStyle = FormBorderStyle.None
-                .BackColor = Color.CornflowerBlue
-            End With
+        Private Sub EnterRICTSMIClick(sender As Object, e As EventArgs) Handles EnterRICTSMI.Click
+            Dim askForm As New ManualRicForm()
             AddHandler askForm.Activated,
                 Sub(snd As Object, evnt As EventArgs)
                     askForm.Left = Left + (Width - askForm.Width) / 2
                     askForm.Top = Top + (Height - askForm.Height) / 2
                 End Sub
 
-            AddHandler askForm.Leave,
-                Sub(snd As Object, evnt As EventArgs)
-                    selectedRic = ""
-                    askForm.Close()
-                End Sub
+            askForm.ShowDialog(Me)
+            If askForm.SelectedRic <> "" Then
+                Dim group = New VisualizableGroup(_ansamble)
+                Dim descr As DataBaseBondDescription
 
-            Dim txtBox As New TextBox
-            With txtBox
-                .Width = 250
-                .Location = New Point((askForm.Width - .Width) / 2, (askForm.Height - .Height) / 2)
-            End With
-            AddHandler txtBox.KeyUp,
-                Sub(snd As Object, evnt As KeyEventArgs)
-                    evnt.Handled = True
-                    If evnt.KeyCode = Keys.Escape Then
-                        selectedRic = ""
-                        askForm.Close()
-                    ElseIf evnt.KeyCode = Keys.Enter Then
-                        selectedRic = txtBox.Text
-                        askForm.Close()
-                    Else
-                        evnt.Handled = False
-                    End If
-                End Sub
-            askForm.Controls.Add(txtBox)
+                Dim layout As New fields_layoutTableAdapter
+                Dim info = layout.GetData().First(Function(row) row.id = askForm.LayoutId)
 
-            Dim cmbBox As New ComboBox
-            askForm.Show(Me)
-            If selectedRic <> "" Then
+                group.AskField = info.ask_field
+                group.BidField = info.bid_field
+                group.LastField = info.last_field
+                group.HistField = info.hist_field
+                group.VWAPField = info.vwap_field
+                group.VolumeField = info.volume_field
+                group.Color = "Coral"
 
+                descr = DbInitializer.GetBondInfo(askForm.SelectedRic)
+                If descr IsNot Nothing Then
+                    group.AddElement(askForm.SelectedRic, descr)
+                    group.StartLoadingLiveData()
+                    _ansamble.AddGroup(group)
+                Else
+                    Dim selectedRic As String = askForm.SelectedRic
+                    DbInitializer.RequestBondInfo(
+                        askForm.SelectedRic,
+                        Sub(dscr As DataBaseBondDescription)
+                            If dscr Is Nothing Then
+                                MsgBox("No bond found (RIC " & selectedRic & ")", MsgBoxStyle.Exclamation)
+                                _ansamble.RemoveGroup(group.Id)
+                            Else
+                                group.SeriesName = dscr.ShortName
+                                group.AddElement(selectedRic, dscr)
+                                group.StartLoadingLiveData()
+                                _ansamble.AddGroup(group)
+                            End If
+                        End Sub)
+                End If
             End If
         End Sub
 

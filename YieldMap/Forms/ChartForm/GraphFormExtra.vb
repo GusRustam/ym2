@@ -69,11 +69,15 @@ Namespace Forms.ChartForm
         Private Sub PlotBidAsk(ByVal bond As VisualizableBond)
             If Not (bond.QuotesAndYields.ContainsKey(QuoteSource.Bid.ToString.ToUpper()) Or bond.QuotesAndYields.ContainsKey(QuoteSource.Ask.ToString.ToUpper())) Then Return
             Dim bidAskSeries = TheChart.Series.FindByName("BidAskSeries")
+            Dim minX = TheChart.ChartAreas(0).AxisX.Minimum
+            Dim maxX = TheChart.ChartAreas(0).AxisX.Maximum
+            Dim minY = TheChart.ChartAreas(0).AxisY.Minimum
+            Dim maxY = TheChart.ChartAreas(0).AxisY.Minimum
             If bidAskSeries Is Nothing Then
                 bidAskSeries = New Series("BidAskSeries") With {
                             .YValuesPerPoint = 1,
                             .ChartType = SeriesChartType.Line,
-                            .IsVisibleInLegend = True,
+                            .IsVisibleInLegend = False,
                             .color = Color.FromName(bond.ParentGroup.Color),
                             .markerSize = 4,
                             .markerStyle = MarkerStyle.Circle
@@ -91,6 +95,10 @@ Namespace Forms.ChartForm
                 Dim yValue = _spreadBenchmarks.GetActualQuote(calc)
                 bidAskSeries.Points.Add(New DataPoint(calc.Duration, yValue.Value))
             End If
+            TheChart.ChartAreas(0).AxisX.Minimum = minX
+            TheChart.ChartAreas(0).AxisX.Maximum = maxX
+            TheChart.ChartAreas(0).AxisY.Minimum = minY
+            TheChart.ChartAreas(0).AxisY.Minimum = maxY
         End Sub
 
         Private Sub UpdateAxisYTitle(ByVal mouseOver As Boolean)

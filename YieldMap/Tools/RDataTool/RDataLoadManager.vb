@@ -64,8 +64,8 @@ Namespace Tools.RDataTool
             ElseIf datastatus = DEX2_DataStatus.DE_DS_PARTIAL Then
                 _dataEventHanler(_myRData.Data, Nothing)
             ElseIf datastatus = DEX2_DataStatus.DE_DS_NULL_ERROR Then
-                Logger.Error("Failed to load data from Dex2: {0}", Err.ToString)
-                _dataEventHanler(Nothing, Err.ToString)
+                Logger.Error("Failed to load data from Dex2: {0}", [error].ToString)
+                _dataEventHanler(Nothing, [error].ToString)
                 _myRData.CancelRequest()
             End If
         End Sub

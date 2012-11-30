@@ -19,6 +19,24 @@ Namespace Commons
 
 #Region "0. Filling bond descriptions"
         Private Shared _bondDescriptions As BondsDataSet.BondDescriptionsDataTable
+ 
+        Public Shared Sub RequestBondInfo(ByVal ric As String, ByVal action As Action(Of DataBaseBondDescription))
+            Dim dataLoader As New BondsDataQuery(New List(Of String) From {ric})
+            AddHandler dataLoader.ParsedData,
+                Sub(data As EventArgs, err As String)
+                    Dim bondStructures As BondEventArgs = data
+                    If bondStructures IsNot Nothing Then
+                        FormatBondData(bondStructures)
+                        Dim bondDescr = bondStructures.Data(ric)
+                        action(New DataBaseBondDescription(ric, bondDescr.ShortName & " " & bondDescr.Series, bondDescr.ShortName & " " & bondDescr.Series,
+                                                   bondDescr.MaturityDate, bondDescr.Coupon, bondDescr.Payments,
+                                                   bondDescr.Rates, bondDescr.IssueDate))
+                    Else
+                        Logger.Warn("No data arrived! Message is [{0}]", err)
+                        action(Nothing)
+                    End If
+                End Sub
+        End Sub
 
         Public Shared Function GetBondInfo(ByVal ric As String) As DataBaseBondDescription
             If _bondDescriptions.Any(Function(row) row.ric = ric) Then
@@ -164,7 +182,7 @@ Namespace Commons
             cota.ClearAllData()
 
             Dim ricStr = (New chain_itemsTableAdapter).GetData().Select(Function(row As BondsDataSet.chain_itemsRow) row.item_ric).Distinct.ToList
-            Dim dataLoader As New BondsDataQuery(ricStr) ', _myEikonDesktopSdk
+            Dim dataLoader As New BondsDataQuery(ricStr)
             AddHandler dataLoader.ParsedData, AddressOf OnBondData
         End Sub
 

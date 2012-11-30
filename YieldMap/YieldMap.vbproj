@@ -131,11 +131,6 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BondsDataSet.Designer.vb">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>BondsDataSet.xsd</DependentUpon>
-    </Compile>
     <Compile Include="Commons\Common.vb" />
     <Compile Include="Commons\DbInitializer.vb" />
     <Compile Include="Commons\Eikon.vb" />
@@ -146,14 +141,24 @@
     <Compile Include="Curves\RubIRS.vb" />
     <Compile Include="Curves\SwapCurve.vb" />
     <Compile Include="Curves\YieldCurve.vb" />
-    <Compile Include="Database\Database.vb" />
     <Compile Include="Forms\AboutForm.Designer.vb">
       <DependentUpon>AboutForm.vb</DependentUpon>
     </Compile>
     <Compile Include="Forms\AboutForm.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="BondsDataSet.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BondsDataSet.xsd</DependentUpon>
+    </Compile>
     <Compile Include="Forms\ChartForm\GraphFormExtra.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ChartForm\ManualRicForm.Designer.vb">
+      <DependentUpon>ManualRicForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ChartForm\ManualRicForm.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Tools\ChartElements.vb" />
@@ -262,6 +267,9 @@
     <EmbeddedResource Include="Forms\ChartForm\GraphForm.resx">
       <DependentUpon>GraphForm.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ChartForm\ManualRicForm.resx">
+      <DependentUpon>ManualRicForm.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\DatePickerForm.resx">
       <DependentUpon>DatePickerForm.vb</DependentUpon>
     </EmbeddedResource>
@@ -304,6 +312,7 @@
     <None Include="bonds.sqlite">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="drivers_reset.bat" />
     <None Include="BondsDataSet.xsc">
       <DependentUpon>BondsDataSet.xsd</DependentUpon>
     </None>
@@ -315,7 +324,6 @@
     <None Include="BondsDataSet.xss">
       <DependentUpon>BondsDataSet.xsd</DependentUpon>
     </None>
-    <None Include="drivers_reset.bat" />
     <None Include="My Project\app.manifest" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>

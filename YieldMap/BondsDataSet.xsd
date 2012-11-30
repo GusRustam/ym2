@@ -4,12 +4,12 @@
     <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
       <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
         <Connections>
-          <Connection AppSettingsObjectName="MySettings" AppSettingsPropertyName="bondsConnectionString" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="bondsConnectionString (MySettings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.YieldMapAddIn.MySettings.GlobalReference.Default.bondsConnectionString" Provider="System.Data.SQLite" />
+          <Connection AppSettingsObjectName="Settings" AppSettingsPropertyName="bondsConnectionString" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="bondsConnectionString (Settings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.YieldMap.My.Settings.GlobalReference.Default.bondsConnectionString" Provider="System.Data.SQLite" />
         </Connections>
         <Tables>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="bondTableAdapter" GeneratorDataComponentClassName="bondTableAdapter" Name="bond" UserDataComponentName="bondTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.bond" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.bond" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="false">
                     <CommandText>DELETE FROM [bond] WHERE (([id] = @Original_id) AND ((@IsNull_ric = 1 AND [ric] IS NULL) OR ([ric] = @Original_ric)) AND ((@IsNull_payments = 1 AND [payments] IS NULL) OR ([payments] = @Original_payments)) AND ((@IsNull_rates = 1 AND [rates] IS NULL) OR ([rates] = @Original_rates)) AND ((@IsNull_descr = 1 AND [descr] IS NULL) OR ([descr] = @Original_descr)) AND ((@IsNull_series = 1 AND [series] IS NULL) OR ([series] = @Original_series)) AND ((@IsNull_issuer_id = 1 AND [issuer_id] IS NULL) OR ([issuer_id] = @Original_issuer_id)) AND ((@IsNull_currency_id = 1 AND [currency_id] IS NULL) OR ([currency_id] = @Original_currency_id)) AND ((@IsNull_ir_fixing_ric = 1 AND [ir_fixing_ric] IS NULL) OR ([ir_fixing_ric] = @Original_ir_fixing_ric)) AND ((@IsNull_dsply_name = 1 AND [dsply_name] IS NULL) OR ([dsply_name] = @Original_dsply_name)) AND ((@IsNull_is_straight = 1 AND [is_straight] IS NULL) OR ([is_straight] = @Original_is_straight)) AND ((@IsNull_is_putable = 1 AND [is_putable] IS NULL) OR ([is_putable] = @Original_is_putable)) AND ((@IsNull_is_floater = 1 AND [is_floater] IS NULL) OR ([is_floater] = @Original_is_floater)) AND ((@IsNull_is_convertible = 1 AND [is_convertible] IS NULL) OR ([is_convertible] = @Original_is_convertible)) AND ((@IsNull_issue_size = 1 AND [issue_size] IS NULL) OR ([issue_size] = @Original_issue_size)) AND ((@IsNull_maturitydate = 1 AND [maturitydate] IS NULL) OR ([maturitydate] = @Original_maturitydate)) AND ((@IsNull_issuedate = 1 AND [issuedate] IS NULL) OR ([issuedate] = @Original_issuedate)) AND ((@IsNull_nextputdate = 1 AND [nextputdate] IS NULL) OR ([nextputdate] = @Original_nextputdate)))</CommandText>
@@ -168,7 +168,7 @@ FROM            bond</CommandText>
               <Mapping SourceColumn="nextputdate" DataSetColumn="nextputdate" />
             </Mappings>
             <Sources>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="ClearAllData" Modifier="Public" Name="ClearAllData" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="ClearAllData">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="ClearAllData" Modifier="Public" Name="ClearAllData" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="ClearAllData">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>DELETE FROM [bond] </CommandText>
@@ -180,7 +180,7 @@ FROM            bond</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="portfolioTableAdapter" GeneratorDataComponentClassName="portfolioTableAdapter" Name="portfolio" UserDataComponentName="portfolioTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.portfolio" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.portfolio" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="false">
                     <CommandText>DELETE FROM [portfolio] WHERE (([id] = @Original_id) AND ((@IsNull_portfolio_name = 1 AND [portfolio_name] IS NULL) OR ([portfolio_name] = @Original_portfolio_name)) AND ((@IsNull_is_default = 1 AND [is_default] IS NULL) OR ([is_default] = @Original_is_default)))</CommandText>
@@ -230,7 +230,7 @@ FROM            bond</CommandText>
               <Mapping SourceColumn="is_default" DataSetColumn="is_default" />
             </Mappings>
             <Sources>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.portfolio" DbObjectType="Table" GenerateMethods="Get" GenerateShortCommands="true" GeneratorGetMethodName="GetDefaultPortfolios" GetMethodModifier="Public" GetMethodName="GetDefaultPortfolios" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDefaultPortfolios" UserSourceName="GetDefaultPortfolios">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.portfolio" DbObjectType="Table" GenerateMethods="Get" GenerateShortCommands="true" GeneratorGetMethodName="GetDefaultPortfolios" GetMethodModifier="Public" GetMethodName="GetDefaultPortfolios" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDefaultPortfolios" UserSourceName="GetDefaultPortfolios">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>SELECT [id], [portfolio_name], [is_default] FROM [portfolio] WHERE is_default = 1</CommandText>
@@ -238,7 +238,7 @@ FROM            bond</CommandText>
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="RemoveById" Modifier="Public" Name="RemoveById" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="RemoveById">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="RemoveById" Modifier="Public" Name="RemoveById" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="RemoveById">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>DELETE FROM [portfolio] WHERE ([id] = @Original_id)</CommandText>
@@ -248,7 +248,7 @@ FROM            bond</CommandText>
                   </DbCommand>
                 </DeleteCommand>
               </DbSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="RenameById" Modifier="Public" Name="RenameById" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="RenameById">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="RenameById" Modifier="Public" Name="RenameById" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="RenameById">
                 <UpdateCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>UPDATE [portfolio] SET [portfolio_name] = @portfolio_name WHERE ([id] = @Original_id)</CommandText>
@@ -263,7 +263,7 @@ FROM            bond</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="chain_itemsTableAdapter" GeneratorDataComponentClassName="chain_itemsTableAdapter" Name="chain_items" UserDataComponentName="chain_itemsTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.chain_items" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.chain_items" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="false">
                     <CommandText>DELETE FROM [chain_items] WHERE (([id] = @Original_id) AND ((@IsNull_item_ric = 1 AND [item_ric] IS NULL) OR ([item_ric] = @Original_item_ric)) AND ((@IsNull_id_chain = 1 AND [id_chain] IS NULL) OR ([id_chain] = @Original_id_chain)))</CommandText>
@@ -313,7 +313,7 @@ FROM            bond</CommandText>
               <Mapping SourceColumn="id_chain" DataSetColumn="id_chain" />
             </Mappings>
             <Sources>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="ClearAllData" Modifier="Public" Name="ClearAllData" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="ClearAllData">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="ClearAllData" Modifier="Public" Name="ClearAllData" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="ClearAllData">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>DELETE FROM [chain_items]</CommandText>
@@ -321,7 +321,7 @@ FROM            bond</CommandText>
                   </DbCommand>
                 </DeleteCommand>
               </DbSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.chain_items" DbObjectType="Table" GenerateMethods="Get" GenerateShortCommands="true" GeneratorGetMethodName="GetRicsByChain" GetMethodModifier="Public" GetMethodName="GetRicsByChain" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetRicsByChain" UserSourceName="GetRicsByChain">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.chain_items" DbObjectType="Table" GenerateMethods="Get" GenerateShortCommands="true" GeneratorGetMethodName="GetRicsByChain" GetMethodModifier="Public" GetMethodName="GetRicsByChain" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetRicsByChain" UserSourceName="GetRicsByChain">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>SELECT [id], [item_ric], [id_chain] FROM [chain_items] WHERE id_chain = ?</CommandText>
@@ -335,7 +335,7 @@ FROM            bond</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="chainTableAdapter" GeneratorDataComponentClassName="chainTableAdapter" Name="chain" UserDataComponentName="chainTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.chain" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.chain" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="false">
                     <CommandText>DELETE FROM [main].[sqlite_default_schema].[chain] WHERE (([id] = @Original_id) AND ((@IsNull_chain_name = 1 AND [chain_name] IS NULL) OR ([chain_name] = @Original_chain_name)) AND ((@IsNull_descr = 1 AND [descr] IS NULL) OR ([descr] = @Original_descr)) AND ((@IsNull_curve = 1 AND [curve] IS NULL) OR ([curve] = @Original_curve)) AND ((@IsNull_sort_num = 1 AND [sort_num] IS NULL) OR ([sort_num] = @Original_sort_num)) AND ((@IsNull_is_necessary = 1 AND [is_necessary] IS NULL) OR ([is_necessary] = @Original_is_necessary)) AND ((@IsNull_type = 1 AND [type] IS NULL) OR ([type] = @Original_type)) AND ((@IsNull_color = 1 AND [color] IS NULL) OR ([color] = @Original_color)) AND ((@IsNull_bid_field = 1 AND [bid_field] IS NULL) OR ([bid_field] = @Original_bid_field)) AND ((@IsNull_ask_field = 1 AND [ask_field] IS NULL) OR ([ask_field] = @Original_ask_field)) AND ((@IsNull_last_field = 1 AND [last_field] IS NULL) OR ([last_field] = @Original_last_field)) AND ((@IsNull_hist_field = 1 AND [hist_field] IS NULL) OR ([hist_field] = @Original_hist_field)))</CommandText>
@@ -449,7 +449,7 @@ FROM         chain</CommandText>
               <Mapping SourceColumn="hist_field" DataSetColumn="hist_field" />
             </Mappings>
             <Sources>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.chain" DbObjectType="Table" GenerateMethods="Get" GenerateShortCommands="true" GeneratorGetMethodName="GetIdsByName" GetMethodModifier="Public" GetMethodName="GetIdsByName" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetIdsByName" UserSourceName="GetIdsByName">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.chain" DbObjectType="Table" GenerateMethods="Get" GenerateShortCommands="true" GeneratorGetMethodName="GetIdsByName" GetMethodModifier="Public" GetMethodName="GetIdsByName" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetIdsByName" UserSourceName="GetIdsByName">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>SELECT ask_field, bid_field, chain_name, color, curve, descr, hist_field, id, is_necessary, last_field, sort_num, type FROM chain WHERE (chain_name = @Param1)</CommandText>
@@ -459,7 +459,7 @@ FROM         chain</CommandText>
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.chain" DbObjectType="Table" GenerateShortCommands="true" GeneratorSourceName="InsertNew" Modifier="Public" Name="InsertNew" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="InsertNew">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.chain" DbObjectType="Table" GenerateShortCommands="true" GeneratorSourceName="InsertNew" Modifier="Public" Name="InsertNew" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="InsertNew">
                 <InsertCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>INSERT INTO [chain] ([chain_name], [descr], [color]) VALUES (@chain_name, @descr, @color)</CommandText>
@@ -488,7 +488,7 @@ VALUES     (@chain_name, @descr, @color, @bid, @ask, @last, @hist, @crv)</Comman
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="RemoveItem" Modifier="Public" Name="RemoveItem" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="RemoveItem">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="RemoveItem" Modifier="Public" Name="RemoveItem" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="RemoveItem">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>DELETE FROM [chain] WHERE ([id] = @Original_id) </CommandText>
@@ -498,7 +498,7 @@ VALUES     (@chain_name, @descr, @color, @bid, @ask, @last, @hist, @crv)</Comman
                   </DbCommand>
                 </DeleteCommand>
               </DbSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="UpdateItem" Modifier="Public" Name="UpdateItem" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy2" UserSourceName="UpdateItem">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="UpdateItem" Modifier="Public" Name="UpdateItem" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy2" UserSourceName="UpdateItem">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>UPDATE    chain
@@ -534,7 +534,7 @@ WHERE     (id = @Original_id)</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="countryTableAdapter" GeneratorDataComponentClassName="countryTableAdapter" Name="country" UserDataComponentName="countryTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.country" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.country" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="false">
                     <CommandText>DELETE FROM [country] WHERE (([id] = @Original_id) AND ((@IsNull_country = 1 AND [country] IS NULL) OR ([country] = @Original_country)))</CommandText>
@@ -577,7 +577,7 @@ WHERE     (id = @Original_id)</CommandText>
               <Mapping SourceColumn="country" DataSetColumn="country" />
             </Mappings>
             <Sources>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="ClearAllData" Modifier="Public" Name="ClearAllData" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="ClearAllData">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="ClearAllData" Modifier="Public" Name="ClearAllData" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="ClearAllData">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>DELETE FROM [country] </CommandText>
@@ -589,7 +589,7 @@ WHERE     (id = @Original_id)</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="currencyTableAdapter" GeneratorDataComponentClassName="currencyTableAdapter" Name="currency" UserDataComponentName="currencyTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.currency" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.currency" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="false">
                     <CommandText>DELETE FROM [currency] WHERE (([id] = @Original_id) AND ((@IsNull_currency = 1 AND [currency] IS NULL) OR ([currency] = @Original_currency)))</CommandText>
@@ -632,7 +632,7 @@ WHERE     (id = @Original_id)</CommandText>
               <Mapping SourceColumn="currency" DataSetColumn="currency" />
             </Mappings>
             <Sources>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="ClearAllData" Modifier="Public" Name="ClearAllData" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="ClearAllData">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="ClearAllData" Modifier="Public" Name="ClearAllData" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="ClearAllData">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>DELETE FROM [currency] </CommandText>
@@ -644,7 +644,7 @@ WHERE     (id = @Original_id)</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="issuerTableAdapter" GeneratorDataComponentClassName="issuerTableAdapter" Name="issuer" UserDataComponentName="issuerTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.issuer" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.issuer" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="false">
                     <CommandText>DELETE FROM [issuer] WHERE (([id] = @Original_id) AND ((@IsNull_shortname = 1 AND [shortname] IS NULL) OR ([shortname] = @Original_shortname)) AND ((@IsNull_issuername = 1 AND [issuername] IS NULL) OR ([issuername] = @Original_issuername)) AND ((@IsNull_ticker = 1 AND [ticker] IS NULL) OR ([ticker] = @Original_ticker)) AND ((@IsNull_country_id = 1 AND [country_id] IS NULL) OR ([country_id] = @Original_country_id)))</CommandText>
@@ -708,7 +708,7 @@ WHERE     (id = @Original_id)</CommandText>
               <Mapping SourceColumn="country_id" DataSetColumn="country_id" />
             </Mappings>
             <Sources>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="ClearAllData" Modifier="Public" Name="ClearAllData" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="ClearAllData">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="ClearAllData" Modifier="Public" Name="ClearAllData" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="ClearAllData">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>DELETE FROM [issuer] </CommandText>
@@ -716,7 +716,7 @@ WHERE     (id = @Original_id)</CommandText>
                   </DbCommand>
                 </DeleteCommand>
               </DbSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.issuer" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="GetOrderedIssuers" GenerateMethods="Fill" GenerateShortCommands="true" GeneratorSourceName="GetOrderedIssuers" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="GetOrderedIssuers">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.issuer" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="GetOrderedIssuers" GenerateMethods="Fill" GenerateShortCommands="true" GeneratorSourceName="GetOrderedIssuers" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="GetOrderedIssuers">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="false">
                     <CommandText>SELECT country_id, id, issuername, shortname, ticker FROM issuer ORDER BY shortname</CommandText>
@@ -728,7 +728,7 @@ WHERE     (id = @Original_id)</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="PortfolioUnitedTableAdapter" GeneratorDataComponentClassName="PortfolioUnitedTableAdapter" Name="PortfolioUnited" UserDataComponentName="PortfolioUnitedTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.PortfolioUnited" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.PortfolioUnited" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>SELECT [pid], [bid], [ric], [descr], [payments], [rates], [bondshortname], [dsply_name], [include], [color], [whereFrom], fromID FROM [PortfolioUnited]</CommandText>
@@ -755,7 +755,7 @@ WHERE     (id = @Original_id)</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="settingsTableAdapter" GeneratorDataComponentClassName="settingsTableAdapter" Name="settings" UserDataComponentName="settingsTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.settings" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.settings" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
                 <InsertCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="false">
                     <CommandText>INSERT INTO [settings] ([lastupdatedate]) VALUES (@lastupdatedate)</CommandText>
@@ -776,7 +776,7 @@ WHERE     (id = @Original_id)</CommandText>
               <Mapping SourceColumn="lastupdatedate" DataSetColumn="lastupdatedate" />
             </Mappings>
             <Sources>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="ClearAllData" Modifier="Public" Name="ClearAllData" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="ClearAllData">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="ClearAllData" Modifier="Public" Name="ClearAllData" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="ClearAllData">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>DELETE from settings</CommandText>
@@ -788,7 +788,7 @@ WHERE     (id = @Original_id)</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="BondDescriptionsTableAdapter" GeneratorDataComponentClassName="BondDescriptionsTableAdapter" Name="BondDescriptions" UserDataComponentName="BondDescriptionsTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.BondDescriptions" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.BondDescriptions" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>SELECT        ric, descr, payments, rates, maturitydate, bondshortname, is_putable, issuedate, coupon, issuer_id, issname, issue_size
@@ -817,7 +817,7 @@ ORDER BY bondshortname</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="hawserTableAdapter" GeneratorDataComponentClassName="hawserTableAdapter" Name="hawser" UserDataComponentName="hawserTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.hawser" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.hawser" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="false">
                     <CommandText>DELETE FROM [main].[sqlite_default_schema].[hawser] WHERE (([id] = @Original_id) AND ((@IsNull_hawser_name = 1 AND [hawser_name] IS NULL) OR ([hawser_name] = @Original_hawser_name)) AND ((@IsNull_color = 1 AND [color] IS NULL) OR ([color] = @Original_color)) AND ((@IsNull_bid_field = 1 AND [bid_field] IS NULL) OR ([bid_field] = @Original_bid_field)) AND ((@IsNull_last_field = 1 AND [last_field] IS NULL) OR ([last_field] = @Original_last_field)) AND ((@IsNull_ask_field = 1 AND [ask_field] IS NULL) OR ([ask_field] = @Original_ask_field)) AND ((@IsNull_hist_field = 1 AND [hist_field] IS NULL) OR ([hist_field] = @Original_hist_field)) AND ((@IsNull_curve = 1 AND [curve] IS NULL) OR ([curve] = @Original_curve)))</CommandText>
@@ -903,7 +903,7 @@ FROM         hawser</CommandText>
               <Mapping SourceColumn="curve" DataSetColumn="curve" />
             </Mappings>
             <Sources>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="DeleteById" Modifier="Public" Name="DeleteById" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="DeleteById">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="DeleteById" Modifier="Public" Name="DeleteById" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="DeleteById">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>DELETE FROM [hawser] WHERE ([id] = @Original_id) </CommandText>
@@ -913,7 +913,7 @@ FROM         hawser</CommandText>
                   </DbCommand>
                 </DeleteCommand>
               </DbSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.hawser" DbObjectType="Table" GenerateShortCommands="true" GeneratorSourceName="InsertNew" Modifier="Public" Name="InsertNew" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="InsertNew">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.hawser" DbObjectType="Table" GenerateShortCommands="true" GeneratorSourceName="InsertNew" Modifier="Public" Name="InsertNew" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="InsertNew">
                 <InsertCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>INSERT INTO hawser (hawser_name, color)
@@ -941,7 +941,7 @@ VALUES     (@hawser_name, @color, @bid, @ask, @last, @hist, @crv)</CommandText>
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="RenameById" Modifier="Public" Name="RenameById" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy2" UserSourceName="RenameById">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="RenameById" Modifier="Public" Name="RenameById" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy2" UserSourceName="RenameById">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>UPDATE    hawser
@@ -974,7 +974,7 @@ WHERE     (id = @Original_id)</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="HawserDataTableAdapter" GeneratorDataComponentClassName="HawserDataTableAdapter" Name="HawserData" UserDataComponentName="HawserDataTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.HawserData" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.HawserData" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="false">
                     <CommandText>SELECT [hawser_id], [RIC], [Bond], [bond_id] FROM [HawserData]</CommandText>
@@ -990,7 +990,7 @@ WHERE     (id = @Original_id)</CommandText>
               <Mapping SourceColumn="[bond_id]" DataSetColumn="bond_id" />
             </Mappings>
             <Sources>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.HawserData" DbObjectType="View" GenerateMethods="Get" GenerateShortCommands="true" GeneratorGetMethodName="GetDataById" GetMethodModifier="Public" GetMethodName="GetDataById" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataById" UserSourceName="GetDataById">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.HawserData" DbObjectType="View" GenerateMethods="Get" GenerateShortCommands="true" GeneratorGetMethodName="GetDataById" GetMethodModifier="Public" GetMethodName="GetDataById" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataById" UserSourceName="GetDataById">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>SELECT [hawser_id], [RIC], [Bond], [bond_id] FROM [HawserData] WHERE [hawser_id] = @HID</CommandText>
@@ -1004,7 +1004,7 @@ WHERE     (id = @Original_id)</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="hawser_to_bondTableAdapter" GeneratorDataComponentClassName="hawser_to_bondTableAdapter" Name="hawser_to_bond" UserDataComponentName="hawser_to_bondTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.hawser_to_bond" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.hawser_to_bond" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="false">
                     <CommandText>DELETE FROM [hawser_to_bond] WHERE (([id] = @Original_id) AND ([id_hawser] = @Original_id_hawser) AND ((@IsNull_bond_ric = 1 AND [bond_ric] IS NULL) OR ([bond_ric] = @Original_bond_ric)))</CommandText>
@@ -1054,7 +1054,7 @@ WHERE     (id = @Original_id)</CommandText>
               <Mapping SourceColumn="bond_ric" DataSetColumn="bond_ric" />
             </Mappings>
             <Sources>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="DeleteLinkByHawser" Modifier="Public" Name="DeleteLinkByHawser" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="DeleteLinkByHawser">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="DeleteLinkByHawser" Modifier="Public" Name="DeleteLinkByHawser" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="DeleteLinkByHawser">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>DELETE FROM [hawser_to_bond] WHERE ([id_hawser] = @Original_id_hawser)</CommandText>
@@ -1064,7 +1064,7 @@ WHERE     (id = @Original_id)</CommandText>
                   </DbCommand>
                 </DeleteCommand>
               </DbSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.hawser_to_bond" DbObjectType="Table" GenerateMethods="Get" GenerateShortCommands="true" GeneratorGetMethodName="GetRicsByHawser" GetMethodModifier="Public" GetMethodName="GetRicsByHawser" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetRicsByHawser" UserSourceName="GetRicsByHawser">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.hawser_to_bond" DbObjectType="Table" GenerateMethods="Get" GenerateShortCommands="true" GeneratorGetMethodName="GetRicsByHawser" GetMethodModifier="Public" GetMethodName="GetRicsByHawser" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetRicsByHawser" UserSourceName="GetRicsByHawser">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>SELECT [id], [id_hawser], [bond_ric] FROM [hawser_to_bond] WHERE id_hawser = @id_hawser</CommandText>
@@ -1074,7 +1074,7 @@ WHERE     (id = @Original_id)</CommandText>
                   </DbCommand>
                 </SelectCommand>
               </DbSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="InsertLink" Modifier="Public" Name="InsertLink" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="InsertLink">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="InsertLink" Modifier="Public" Name="InsertLink" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="InsertLink">
                 <InsertCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>INSERT INTO [hawser_to_bond] ([id_hawser], [bond_ric]) VALUES ( @id_hawser, @bond_ric)</CommandText>
@@ -1085,7 +1085,7 @@ WHERE     (id = @Original_id)</CommandText>
                   </DbCommand>
                 </InsertCommand>
               </DbSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="RemoveBond" Modifier="Public" Name="RemoveBond" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy2" UserSourceName="RemoveBond">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="RemoveBond" Modifier="Public" Name="RemoveBond" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy2" UserSourceName="RemoveBond">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>DELETE FROM [hawser_to_bond] WHERE [bond_ric] = @Original_bond_ric</CommandText>
@@ -1095,7 +1095,7 @@ WHERE     (id = @Original_id)</CommandText>
                   </DbCommand>
                 </DeleteCommand>
               </DbSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="RemoveLink" Modifier="Public" Name="RemoveLink" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy3" UserSourceName="RemoveLink">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="RemoveLink" Modifier="Public" Name="RemoveLink" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy3" UserSourceName="RemoveLink">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>DELETE FROM [hawser_to_bond] WHERE   ([bond_ric] = @Original_bond_ric) AND ([id_hawser] = @Original_id_hawser) </CommandText>
@@ -1110,7 +1110,7 @@ WHERE     (id = @Original_id)</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="_portfolioByBondsTableAdapter" GeneratorDataComponentClassName="_portfolioByBondsTableAdapter" Name="_portfolioByBonds" UserDataComponentName="_portfolioByBondsTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main._portfolioByBonds" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main._portfolioByBonds" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="false">
                     <CommandText>SELECT [pid], [bid], [ric], [descr], [payments], [rates], [bondshortname], [dsply_name], [include] FROM [_portfolioByBonds]</CommandText>
@@ -1134,7 +1134,7 @@ WHERE     (id = @Original_id)</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="_portfolioByChainTableAdapter" GeneratorDataComponentClassName="_portfolioByChainTableAdapter" Name="_portfolioByChain" UserDataComponentName="_portfolioByChainTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main._portfolioByChain" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main._portfolioByChain" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="false">
                     <CommandText>SELECT [pid], [bid], [ric], [descr], [payments], [rates], [bondshortname], [dsply_name], [include] FROM [_portfolioByChain]</CommandText>
@@ -1158,7 +1158,7 @@ WHERE     (id = @Original_id)</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="_portfolioByHawserTableAdapter" GeneratorDataComponentClassName="_portfolioByHawserTableAdapter" Name="_portfolioByHawser" UserDataComponentName="_portfolioByHawserTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main._portfolioByHawser" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main._portfolioByHawser" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="false">
                     <CommandText>SELECT [pid], [bid], [ric], [descr], [payments], [rates], [bondshortname], [dsply_name], [include] FROM [_portfolioByHawser]</CommandText>
@@ -1182,7 +1182,7 @@ WHERE     (id = @Original_id)</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="ChainsInPortfolioTableAdapter" GeneratorDataComponentClassName="ChainsInPortfolioTableAdapter" Name="ChainsInPortfolio" UserDataComponentName="ChainsInPortfolioTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.ChainsInPortfolio" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.ChainsInPortfolio" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>SELECT [pid], [cid], [chain_name], [include], [color] FROM [ChainsInPortfolio]</CommandText>
@@ -1202,7 +1202,7 @@ WHERE     (id = @Original_id)</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="HawsersInPortfolioTableAdapter" GeneratorDataComponentClassName="HawsersInPortfolioTableAdapter" Name="HawsersInPortfolio" UserDataComponentName="HawsersInPortfolioTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.HawsersInPortfolio" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.HawsersInPortfolio" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>SELECT [pid], [hid], [hawser_name], [include], [color] FROM [HawsersInPortfolio]</CommandText>
@@ -1222,7 +1222,7 @@ WHERE     (id = @Original_id)</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="portfolio_to_bondTableAdapter" GeneratorDataComponentClassName="portfolio_to_bondTableAdapter" Name="portfolio_to_bond" UserDataComponentName="portfolio_to_bondTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.portfolio_to_bond" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.portfolio_to_bond" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="false">
                     <CommandText>DELETE FROM [main].[sqlite_default_schema].[portfolio_to_bond] WHERE (([id] = @Original_id) AND ((@IsNull_id_portfolio = 1 AND [id_portfolio] IS NULL) OR ([id_portfolio] = @Original_id_portfolio)) AND ((@IsNull_include = 1 AND [include] IS NULL) OR ([include] = @Original_include)) AND ((@IsNull_bond_ric = 1 AND [bond_ric] IS NULL) OR ([bond_ric] = @Original_bond_ric)))</CommandText>
@@ -1281,7 +1281,7 @@ WHERE     (id = @Original_id)</CommandText>
               <Mapping SourceColumn="bond_ric" DataSetColumn="bond_ric" />
             </Mappings>
             <Sources>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="DeleteLinkByPortfolio" Modifier="Public" Name="DeleteLinkByPortfolio" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="DeleteLinkByPortfolio">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="DeleteLinkByPortfolio" Modifier="Public" Name="DeleteLinkByPortfolio" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="DeleteLinkByPortfolio">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>DELETE FROM  [portfolio_to_bond] WHERE ([id] = @Original_id)</CommandText>
@@ -1291,7 +1291,7 @@ WHERE     (id = @Original_id)</CommandText>
                   </DbCommand>
                 </DeleteCommand>
               </DbSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="InsertLink" Modifier="Public" Name="InsertLink" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="InsertLink">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="InsertLink" Modifier="Public" Name="InsertLink" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="InsertLink">
                 <InsertCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>INSERT INTO [portfolio_to_bond] ( [id_portfolio], [bond_ric], [include]) VALUES ( @id_portfolio, @bond_ric, @include)</CommandText>
@@ -1303,7 +1303,7 @@ WHERE     (id = @Original_id)</CommandText>
                   </DbCommand>
                 </InsertCommand>
               </DbSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="RemoveLink" Modifier="Public" Name="RemoveLink" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy2" UserSourceName="RemoveLink">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="RemoveLink" Modifier="Public" Name="RemoveLink" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy2" UserSourceName="RemoveLink">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>DELETE FROM [portfolio_to_bond] WHERE ([bond_ric] = @Original_bond_ric) AND  ([id_portfolio] = @Original_id_portfolio) </CommandText>
@@ -1318,7 +1318,7 @@ WHERE     (id = @Original_id)</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="portfolio_to_chainTableAdapter" GeneratorDataComponentClassName="portfolio_to_chainTableAdapter" Name="portfolio_to_chain" UserDataComponentName="portfolio_to_chainTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.portfolio_to_chain" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.portfolio_to_chain" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="false">
                     <CommandText>DELETE FROM [main].[sqlite_default_schema].[portfolio_to_chain] WHERE (([id] = @Original_id) AND ((@IsNull_id_portfolio = 1 AND [id_portfolio] IS NULL) OR ([id_portfolio] = @Original_id_portfolio)) AND ((@IsNull_id_chain = 1 AND [id_chain] IS NULL) OR ([id_chain] = @Original_id_chain)) AND ((@IsNull_include = 1 AND [include] IS NULL) OR ([include] = @Original_include)))</CommandText>
@@ -1377,7 +1377,7 @@ WHERE     (id = @Original_id)</CommandText>
               <Mapping SourceColumn="include" DataSetColumn="include" />
             </Mappings>
             <Sources>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="DeleteLinkByPortfolio" Modifier="Public" Name="DeleteLinkByPortfolio" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="DeleteLinkByPortfolio">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="DeleteLinkByPortfolio" Modifier="Public" Name="DeleteLinkByPortfolio" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="DeleteLinkByPortfolio">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>DELETE FROM [portfolio_to_chain] WHERE ([id] = @Original_id)</CommandText>
@@ -1387,7 +1387,7 @@ WHERE     (id = @Original_id)</CommandText>
                   </DbCommand>
                 </DeleteCommand>
               </DbSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="InsertLink" Modifier="Public" Name="InsertLink" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="InsertLink">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="InsertLink" Modifier="Public" Name="InsertLink" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="InsertLink">
                 <InsertCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>INSERT INTO [portfolio_to_chain] ( [id_portfolio], [id_chain], [include]) VALUES ( @id_portfolio, @id_chain, @include)</CommandText>
@@ -1399,7 +1399,7 @@ WHERE     (id = @Original_id)</CommandText>
                   </DbCommand>
                 </InsertCommand>
               </DbSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="RemoveLink" Modifier="Public" Name="RemoveLink" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy2" UserSourceName="RemoveLink">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="RemoveLink" Modifier="Public" Name="RemoveLink" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy2" UserSourceName="RemoveLink">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>DELETE FROM [portfolio_to_chain] WHERE ([id_chain] = @Original_id_chain) AND  ([id_portfolio] = @Original_id_portfolio) </CommandText>
@@ -1414,7 +1414,7 @@ WHERE     (id = @Original_id)</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="portfolio_to_hawserTableAdapter" GeneratorDataComponentClassName="portfolio_to_hawserTableAdapter" Name="portfolio_to_hawser" UserDataComponentName="portfolio_to_hawserTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.portfolio_to_hawser" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.portfolio_to_hawser" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="false">
                     <CommandText>DELETE FROM [main].[sqlite_default_schema].[portfolio_to_hawser] WHERE (([id] = @Original_id) AND ((@IsNull_id_portfolio = 1 AND [id_portfolio] IS NULL) OR ([id_portfolio] = @Original_id_portfolio)) AND ((@IsNull_id_hawser = 1 AND [id_hawser] IS NULL) OR ([id_hawser] = @Original_id_hawser)) AND ((@IsNull_include = 1 AND [include] IS NULL) OR ([include] = @Original_include)))</CommandText>
@@ -1473,7 +1473,7 @@ WHERE     (id = @Original_id)</CommandText>
               <Mapping SourceColumn="include" DataSetColumn="include" />
             </Mappings>
             <Sources>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="DeleteLinkByPortfolio" Modifier="Public" Name="DeleteLinkByPortfolio" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="DeleteLinkByPortfolio">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="DeleteLinkByPortfolio" Modifier="Public" Name="DeleteLinkByPortfolio" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy" UserSourceName="DeleteLinkByPortfolio">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>DELETE FROM [portfolio_to_hawser] WHERE ([id] = @Original_id) </CommandText>
@@ -1483,7 +1483,7 @@ WHERE     (id = @Original_id)</CommandText>
                   </DbCommand>
                 </DeleteCommand>
               </DbSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="InsertLink" Modifier="Public" Name="InsertLink" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="InsertLink">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="InsertLink" Modifier="Public" Name="InsertLink" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy1" UserSourceName="InsertLink">
                 <InsertCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>INSERT INTO [portfolio_to_hawser] ( [id_portfolio], [id_hawser], [include]) VALUES ( @id_portfolio, @id_hawser, @include)</CommandText>
@@ -1495,7 +1495,7 @@ WHERE     (id = @Original_id)</CommandText>
                   </DbCommand>
                 </InsertCommand>
               </DbSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="RemoveLink" Modifier="Public" Name="RemoveLink" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy2" UserSourceName="RemoveLink">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="" DbObjectType="Unknown" GenerateShortCommands="true" GeneratorSourceName="RemoveLink" Modifier="Public" Name="RemoveLink" QueryType="NoData" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetDataBy2" UserSourceName="RemoveLink">
                 <DeleteCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>DELETE FROM [portfolio_to_hawser] WHERE ([id_hawser] = @Original_id_hawser) AND  ([id_portfolio] = @Original_id_portfolio) </CommandText>
@@ -1510,7 +1510,7 @@ WHERE     (id = @Original_id)</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="PortfolioSourcesTableAdapter" GeneratorDataComponentClassName="PortfolioSourcesTableAdapter" Name="PortfolioSources" UserDataComponentName="PortfolioSourcesTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main.PortfolioSources" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.PortfolioSources" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
                     <CommandText>SELECT [portfolioID], [whereFrom], [fromID], bid_field, ask_field, last_field, hist_field, portfolio_name, ric_structure, whereFromName, whereFromDescr, color FROM [PortfolioSources]</CommandText>
@@ -1537,7 +1537,7 @@ WHERE     (id = @Original_id)</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="_ricsInChainTableAdapter" GeneratorDataComponentClassName="_ricsInChainTableAdapter" Name="_ricsInChain" UserDataComponentName="_ricsInChainTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main._ricsInChain" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main._ricsInChain" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="false">
                     <CommandText>SELECT [id], [ric] FROM [_ricsInChain]</CommandText>
@@ -1554,7 +1554,7 @@ WHERE     (id = @Original_id)</CommandText>
           </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="_ricsInHawserTableAdapter" GeneratorDataComponentClassName="_ricsInHawserTableAdapter" Name="_ricsInHawser" UserDataComponentName="_ricsInHawserTableAdapter">
             <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (MySettings)" DbObjectName="main._ricsInHawser" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main._ricsInHawser" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="false">
                     <CommandText>SELECT [id], [ric] FROM [_ricsInHawser]</CommandText>
@@ -1566,6 +1566,86 @@ WHERE     (id = @Original_id)</CommandText>
             <Mappings>
               <Mapping SourceColumn="[id]" DataSetColumn="id" />
               <Mapping SourceColumn="[ric]" DataSetColumn="ric" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="fields_layoutTableAdapter" GeneratorDataComponentClassName="fields_layoutTableAdapter" Name="fields_layout" UserDataComponentName="fields_layoutTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.fields_layout" DbObjectType="Table" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="true" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <DeleteCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>DELETE FROM [main].[sqlite_default_schema].[fields_layout] WHERE (([id] = @Original_id) AND ([bid_field] = @Original_bid_field) AND ([ask_field] = @Original_ask_field) AND ([last_field] = @Original_last_field) AND ([hist_field] = @Original_hist_field) AND ((@IsNull_vwap_field = 1 AND [vwap_field] IS NULL) OR ([vwap_field] = @Original_vwap_field)) AND ((@IsNull_volume_field = 1 AND [volume_field] IS NULL) OR ([volume_field] = @Original_volume_field)) AND ((@IsNull_name = 1 AND [name] IS NULL) OR ([name] = @Original_name)))</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int64" Direction="Input" ParameterName="@Original_id" Precision="0" ProviderType="Int64" Scale="0" Size="0" SourceColumn="id" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_bid_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="bid_field" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_ask_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="ask_field" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_last_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="last_field" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_hist_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="hist_field" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_vwap_field" Precision="0" ProviderType="Int32" Scale="0" Size="0" SourceColumn="vwap_field" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_vwap_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="vwap_field" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_volume_field" Precision="0" ProviderType="Int32" Scale="0" Size="0" SourceColumn="volume_field" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_volume_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="volume_field" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_name" Precision="0" ProviderType="Int32" Scale="0" Size="0" SourceColumn="name" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_name" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="name" SourceColumnNullMapping="false" SourceVersion="Original" />
+                    </Parameters>
+                  </DbCommand>
+                </DeleteCommand>
+                <InsertCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>INSERT INTO [main].[sqlite_default_schema].[fields_layout] ([bid_field], [ask_field], [last_field], [hist_field], [vwap_field], [volume_field], [name]) VALUES (@bid_field, @ask_field, @last_field, @hist_field, @vwap_field, @volume_field, @name)</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@bid_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="bid_field" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@ask_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="ask_field" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@last_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="last_field" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@hist_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="hist_field" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@vwap_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="vwap_field" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@volume_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="volume_field" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@name" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="name" SourceColumnNullMapping="false" SourceVersion="Current" />
+                    </Parameters>
+                  </DbCommand>
+                </InsertCommand>
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT [id], [bid_field], [ask_field], [last_field], [hist_field], [vwap_field], [volume_field], [name] FROM [fields_layout]</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+                <UpdateCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>UPDATE [main].[sqlite_default_schema].[fields_layout] SET [bid_field] = @bid_field, [ask_field] = @ask_field, [last_field] = @last_field, [hist_field] = @hist_field, [vwap_field] = @vwap_field, [volume_field] = @volume_field, [name] = @name WHERE (([id] = @Original_id) AND ([bid_field] = @Original_bid_field) AND ([ask_field] = @Original_ask_field) AND ([last_field] = @Original_last_field) AND ([hist_field] = @Original_hist_field) AND ((@IsNull_vwap_field = 1 AND [vwap_field] IS NULL) OR ([vwap_field] = @Original_vwap_field)) AND ((@IsNull_volume_field = 1 AND [volume_field] IS NULL) OR ([volume_field] = @Original_volume_field)) AND ((@IsNull_name = 1 AND [name] IS NULL) OR ([name] = @Original_name)))</CommandText>
+                    <Parameters>
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@bid_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="bid_field" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@ask_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="ask_field" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@last_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="last_field" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@hist_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="hist_field" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@vwap_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="vwap_field" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@volume_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="volume_field" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@name" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="name" SourceColumnNullMapping="false" SourceVersion="Current" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="Int64" Direction="Input" ParameterName="@Original_id" Precision="0" ProviderType="Int64" Scale="0" Size="0" SourceColumn="id" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_bid_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="bid_field" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_ask_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="ask_field" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_last_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="last_field" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="false" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_hist_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="hist_field" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_vwap_field" Precision="0" ProviderType="Int32" Scale="0" Size="0" SourceColumn="vwap_field" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_vwap_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="vwap_field" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_volume_field" Precision="0" ProviderType="Int32" Scale="0" Size="0" SourceColumn="volume_field" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_volume_field" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="volume_field" SourceColumnNullMapping="false" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="Int32" Direction="Input" ParameterName="@IsNull_name" Precision="0" ProviderType="Int32" Scale="0" Size="0" SourceColumn="name" SourceColumnNullMapping="true" SourceVersion="Original" />
+                      <Parameter AllowDbNull="true" AutogeneratedName="" DataSourceName="" DbType="String" Direction="Input" ParameterName="@Original_name" Precision="0" ProviderType="String" Scale="0" Size="0" SourceColumn="name" SourceColumnNullMapping="false" SourceVersion="Original" />
+                    </Parameters>
+                  </DbCommand>
+                </UpdateCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="id" DataSetColumn="id" />
+              <Mapping SourceColumn="bid_field" DataSetColumn="bid_field" />
+              <Mapping SourceColumn="ask_field" DataSetColumn="ask_field" />
+              <Mapping SourceColumn="last_field" DataSetColumn="last_field" />
+              <Mapping SourceColumn="hist_field" DataSetColumn="hist_field" />
+              <Mapping SourceColumn="vwap_field" DataSetColumn="vwap_field" />
+              <Mapping SourceColumn="volume_field" DataSetColumn="volume_field" />
+              <Mapping SourceColumn="name" DataSetColumn="name" />
             </Mappings>
             <Sources />
           </TableAdapter>
@@ -2339,6 +2419,62 @@ WHERE     (id = @Original_id)</CommandText>
             </xs:sequence>
           </xs:complexType>
         </xs:element>
+        <xs:element name="fields_layout" msprop:Generator_TableClassName="fields_layoutDataTable" msprop:Generator_TableVarName="tablefields_layout" msprop:Generator_TablePropName="fields_layout" msprop:Generator_RowDeletingName="fields_layoutRowDeleting" msprop:Generator_UserTableName="fields_layout" msprop:Generator_RowChangingName="fields_layoutRowChanging" msprop:Generator_RowEvHandlerName="fields_layoutRowChangeEventHandler" msprop:Generator_RowDeletedName="fields_layoutRowDeleted" msprop:Generator_RowEvArgName="fields_layoutRowChangeEvent" msprop:Generator_RowChangedName="fields_layoutRowChanged" msprop:Generator_RowClassName="fields_layoutRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="id" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_ColumnVarNameInTable="columnid" msprop:Generator_ColumnPropNameInRow="id" msprop:Generator_ColumnPropNameInTable="idColumn" msprop:Generator_UserColumnName="id" type="xs:long" />
+              <xs:element name="bid_field" msprop:Generator_ColumnVarNameInTable="columnbid_field" msprop:Generator_ColumnPropNameInRow="bid_field" msprop:Generator_ColumnPropNameInTable="bid_fieldColumn" msprop:Generator_UserColumnName="bid_field">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ask_field" msprop:Generator_ColumnVarNameInTable="columnask_field" msprop:Generator_ColumnPropNameInRow="ask_field" msprop:Generator_ColumnPropNameInTable="ask_fieldColumn" msprop:Generator_UserColumnName="ask_field">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="last_field" msprop:Generator_ColumnVarNameInTable="columnlast_field" msprop:Generator_ColumnPropNameInRow="last_field" msprop:Generator_ColumnPropNameInTable="last_fieldColumn" msprop:Generator_UserColumnName="last_field">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="hist_field" msprop:Generator_ColumnVarNameInTable="columnhist_field" msprop:Generator_ColumnPropNameInRow="hist_field" msprop:Generator_ColumnPropNameInTable="hist_fieldColumn" msprop:Generator_UserColumnName="hist_field">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="vwap_field" msprop:Generator_ColumnVarNameInTable="columnvwap_field" msprop:Generator_ColumnPropNameInRow="vwap_field" msprop:Generator_ColumnPropNameInTable="vwap_fieldColumn" msprop:Generator_UserColumnName="vwap_field" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="volume_field" msprop:Generator_ColumnVarNameInTable="columnvolume_field" msprop:Generator_ColumnPropNameInRow="volume_field" msprop:Generator_ColumnPropNameInTable="volume_fieldColumn" msprop:Generator_UserColumnName="volume_field" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="name" msprop:Generator_ColumnVarNameInTable="columnname" msprop:Generator_ColumnPropNameInRow="name" msprop:Generator_ColumnPropNameInTable="nameColumn" msprop:Generator_UserColumnName="name" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
       </xs:choice>
     </xs:complexType>
     <xs:unique name="Constraint1" msdata:PrimaryKey="true">
@@ -2398,6 +2534,10 @@ WHERE     (id = @Original_id)</CommandText>
       <xs:selector xpath=".//mstns:PortfolioSources" />
       <xs:field xpath="mstns:portfolioID" />
       <xs:field xpath="mstns:fromID" />
+    </xs:unique>
+    <xs:unique name="fields_layout_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:fields_layout" />
+      <xs:field xpath="mstns:id" />
     </xs:unique>
   </xs:element>
 </xs:schema>
