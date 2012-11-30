@@ -88,6 +88,10 @@
             Me.ResizePictureBox = New System.Windows.Forms.PictureBox()
             Me.ChartCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.CopyToClipboardTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.ToolStripSeparator5 = New System.Windows.Forms.ToolStripSeparator()
+            Me.AddBondToChartTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.EnterRICTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.SelectFromAListTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.HistoryCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.RemoveHistoryTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.MoneyCurveCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
@@ -278,7 +282,7 @@
             '
             Me.BondCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainInfoLine1TSMI, Me.ExtInfoTSMI, Me.ShowHistoryTSMI, Me.ToolStripSeparator1, Me.BondDescriptionTSMI, Me.RelatedQuoteTSMI, Me.RelatedChartTSMI, Me.ToolStripSeparator4, Me.RemovePointTSMI})
             Me.BondCMS.Name = "BondContextMenuStrip"
-            Me.BondCMS.Size = New System.Drawing.Size(178, 192)
+            Me.BondCMS.Size = New System.Drawing.Size(178, 170)
             '
             'MainInfoLine1TSMI
             '
@@ -566,7 +570,7 @@
             Me.Label2.TabIndex = 0
             Me.Label2.Text = "Descr"
             '
-            'LinkSpreadLabel
+            'SpreadLinkLabel
             '
             Me.SpreadLinkLabel.AutoSize = True
             Me.SpreadLinkLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
@@ -575,7 +579,7 @@
             Me.SpreadLinkLabel.LinkVisited = True
             Me.SpreadLinkLabel.Location = New System.Drawing.Point(507, 3)
             Me.SpreadLinkLabel.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
-            Me.SpreadLinkLabel.Name = "LinkSpreadLabel"
+            Me.SpreadLinkLabel.Name = "SpreadLinkLabel"
             Me.SpreadLinkLabel.Size = New System.Drawing.Size(55, 13)
             Me.SpreadLinkLabel.TabIndex = 1
             Me.SpreadLinkLabel.TabStop = True
@@ -735,15 +739,39 @@
             '
             'ChartCMS
             '
-            Me.ChartCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToClipboardTSMI})
+            Me.ChartCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToClipboardTSMI, Me.ToolStripSeparator5, Me.AddBondToChartTSMI})
             Me.ChartCMS.Name = "ChartCMS"
-            Me.ChartCMS.Size = New System.Drawing.Size(170, 26)
+            Me.ChartCMS.Size = New System.Drawing.Size(185, 54)
             '
             'CopyToClipboardTSMI
             '
             Me.CopyToClipboardTSMI.Name = "CopyToClipboardTSMI"
-            Me.CopyToClipboardTSMI.Size = New System.Drawing.Size(169, 22)
+            Me.CopyToClipboardTSMI.Size = New System.Drawing.Size(184, 22)
             Me.CopyToClipboardTSMI.Text = "Copy to clipboard"
+            '
+            'ToolStripSeparator5
+            '
+            Me.ToolStripSeparator5.Name = "ToolStripSeparator5"
+            Me.ToolStripSeparator5.Size = New System.Drawing.Size(181, 6)
+            '
+            'AddBondToChartTSMI
+            '
+            Me.AddBondToChartTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.EnterRICTSMI, Me.SelectFromAListTSMI})
+            Me.AddBondToChartTSMI.Name = "AddBondToChartTSMI"
+            Me.AddBondToChartTSMI.Size = New System.Drawing.Size(184, 22)
+            Me.AddBondToChartTSMI.Text = "Add bond onto chart"
+            '
+            'EnterRICTSMI
+            '
+            Me.EnterRICTSMI.Name = "EnterRICTSMI"
+            Me.EnterRICTSMI.Size = New System.Drawing.Size(176, 22)
+            Me.EnterRICTSMI.Text = "Enter RIC..."
+            '
+            'SelectFromAListTSMI
+            '
+            Me.SelectFromAListTSMI.Name = "SelectFromAListTSMI"
+            Me.SelectFromAListTSMI.Size = New System.Drawing.Size(176, 22)
+            Me.SelectFromAListTSMI.Text = "Select from a list..."
             '
             'HistoryCMS
             '
@@ -1000,5 +1028,9 @@
         Friend WithEvents RemoveFromChartTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents ToolStripSeparator4 As System.Windows.Forms.ToolStripSeparator
         Friend WithEvents RemovePointTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents ToolStripSeparator5 As System.Windows.Forms.ToolStripSeparator
+        Friend WithEvents AddBondToChartTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents EnterRICTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents SelectFromAListTSMI As System.Windows.Forms.ToolStripMenuItem
     End Class
 End Namespace

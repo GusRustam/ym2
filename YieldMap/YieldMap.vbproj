@@ -146,6 +146,7 @@
     <Compile Include="Curves\RubIRS.vb" />
     <Compile Include="Curves\SwapCurve.vb" />
     <Compile Include="Curves\YieldCurve.vb" />
+    <Compile Include="Database\Database.vb" />
     <Compile Include="Forms\AboutForm.Designer.vb">
       <DependentUpon>AboutForm.vb</DependentUpon>
     </Compile>

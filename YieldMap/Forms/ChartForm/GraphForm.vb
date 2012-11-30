@@ -3,7 +3,6 @@ Imports System.Windows.Forms
 Imports System.Windows.Forms.DataVisualization.Charting
 Imports System.Drawing
 Imports AdfinXAnalyticsFunctions
-Imports YieldMap.Tools.Estimation
 Imports YieldMap.Curves
 Imports YieldMap.My.Resources
 Imports YieldMap.Commons
@@ -696,7 +695,7 @@ Namespace Forms.ChartForm
                 If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadType.ZSpread), _spreadBenchmarks.Benchmarks(SpreadType.ZSpread), Nothing))
         End Sub
 
-        Private Sub ASWLinkLabelLinkClicked(sender As System.Object, e As LinkLabelLinkClickedEventArgs) Handles ASWLinkLabel.LinkClicked
+        Private Sub ASWLinkLabelLinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles ASWLinkLabel.LinkClicked
             Dim refCurve = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadType.ASWSpread), _spreadBenchmarks.Benchmarks(SpreadType.ASWSpread), Nothing)
             SpreadCMS.Items.Clear()
             SpreadCMS.Tag = "ASWSpread"
@@ -871,6 +870,82 @@ Namespace Forms.ChartForm
         Private Sub RemovePointTSMIClick(sender As Object, e As EventArgs) Handles RemovePointTSMI.Click
             _ansamble.RemovePoint(BondCMS.Tag.ToString())
         End Sub
+
+        Private Sub ShowHistoryTSMIClick(sender As Object, e As EventArgs) Handles ShowHistoryTSMI.Click
+            Logger.Trace("ShowHistQuotesTSMIClick")
+            Try
+                '1) Load history for 10 days
+                '_historicalCurves.AddCurve(BondCMS.Tag,
+                '                           New HistoryTaskDescr() With {
+                '                                .Item = BondCMS.Tag,
+                '                                .EndDate = DateTime.Today,
+                '                                .StartDate = DateTime.Today.AddDays(-90),
+                '                                .Fields = {"DATE", "CLOSE"}.ToList(),
+                '                                .Frequency = "D",
+                '                                .InterestingFields = {"DATE", "CLOSE"}.ToList()
+                '                            })
+            Catch ex As Exception
+                Logger.ErrorException("Got exception", ex)
+                Logger.Error("Exception = {0}", ex.ToString())
+            End Try
+        End Sub
+
+        Private Sub RemoveHistoryTSMIClick(sender As Object, e As EventArgs) Handles RemoveHistoryTSMI.Click
+            '_historicalCurves.RemoveCurve(HistoryCMS.Tag)
+        End Sub
+
+        Private Sub EnterRIC_TSMIClick(sender As Object, e As EventArgs) Handles EnterRICTSMI.Click
+            Dim selectedRic As String
+
+            Dim askForm As New Form()
+            With askForm
+                .Width = 300
+                .Height = 100
+                .FormBorderStyle = FormBorderStyle.None
+                .BackColor = Color.CornflowerBlue
+            End With
+            AddHandler askForm.Activated,
+                Sub(snd As Object, evnt As EventArgs)
+                    askForm.Left = Left + (Width - askForm.Width) / 2
+                    askForm.Top = Top + (Height - askForm.Height) / 2
+                End Sub
+
+            AddHandler askForm.Leave,
+                Sub(snd As Object, evnt As EventArgs)
+                    selectedRic = ""
+                    askForm.Close()
+                End Sub
+
+            Dim txtBox As New TextBox
+            With txtBox
+                .Width = 250
+                .Location = New Point((askForm.Width - .Width) / 2, (askForm.Height - .Height) / 2)
+            End With
+            AddHandler txtBox.KeyUp,
+                Sub(snd As Object, evnt As KeyEventArgs)
+                    evnt.Handled = True
+                    If evnt.KeyCode = Keys.Escape Then
+                        selectedRic = ""
+                        askForm.Close()
+                    ElseIf evnt.KeyCode = Keys.Enter Then
+                        selectedRic = txtBox.Text
+                        askForm.Close()
+                    Else
+                        evnt.Handled = False
+                    End If
+                End Sub
+            askForm.Controls.Add(txtBox)
+
+            Dim cmbBox As New ComboBox
+            askForm.Show(Me)
+            If selectedRic <> "" Then
+
+            End If
+        End Sub
+
+        Private Sub SelectFromAListTSMIClick(sender As Object, e As EventArgs) Handles SelectFromAListTSMI.Click
+
+        End Sub
 #End Region
 
 #Region "e) Assembly and curves events"
@@ -1001,42 +1076,6 @@ Namespace Forms.ChartForm
                 _ansamble.RecalculateByType(newType)
             End If
         End Sub
-#End Region
-#End Region
-
-#Region "VI) Show historical data"
-        Private Sub ShowHistoryTSMIClick(sender As Object, e As EventArgs) Handles ShowHistoryTSMI.Click
-            Logger.Trace("ShowHistQuotesTSMIClick")
-            Try
-                '1) Load history for 10 days
-                '_historicalCurves.AddCurve(BondCMS.Tag,
-                '                           New HistoryTaskDescr() With {
-                '                                .Item = BondCMS.Tag,
-                '                                .EndDate = DateTime.Today,
-                '                                .StartDate = DateTime.Today.AddDays(-90),
-                '                                .Fields = {"DATE", "CLOSE"}.ToList(),
-                '                                .Frequency = "D",
-                '                                .InterestingFields = {"DATE", "CLOSE"}.ToList()
-                '                            })
-            Catch ex As Exception
-                Logger.ErrorException("Got exception", ex)
-                Logger.Error("Exception = {0}", ex.ToString())
-            End Try
-        End Sub
-
-        'Private Sub OnCurveRemoved(ByVal theName As String)
-        '    Dim item = TheChart.Series.FindByName(theName + "_HIST_CURVE")
-        '    If item IsNot Nothing Then
-        '        item.Points.Clear()
-        '        TheChart.Series.Remove(item)
-        '    Else
-        '        Logger.Warn("Failed to remove historical series {0}", theName)
-        '    End If
-        'End Sub
-
-        Private Sub RemoveHistoryTSMIClick(sender As Object, e As EventArgs) Handles RemoveHistoryTSMI.Click
-            '_historicalCurves.RemoveCurve(HistoryCMS.Tag)
-        End Sub
 
         'Public Sub OnHistoricalCurveData(ByVal hst As HistoryLoadManager, ByVal ric As String, ByVal datastatus As RT_DataStatus,
         '                                 ByVal data As Dictionary(Of Date, HistoricalItem))
@@ -1106,6 +1145,17 @@ Namespace Forms.ChartForm
         '        RemoveHandler hst.NewData, AddressOf OnHistoricalCurveData
         '    End If
         'End Sub
+
+        'Private Sub OnCurveRemoved(ByVal theName As String)
+        '    Dim item = TheChart.Series.FindByName(theName + "_HIST_CURVE")
+        '    If item IsNot Nothing Then
+        '        item.Points.Clear()
+        '        TheChart.Series.Remove(item)
+        '    Else
+        '        Logger.Warn("Failed to remove historical series {0}", theName)
+        '    End If
+        'End Sub
+#End Region
 #End Region
     End Class
 End Namespace
