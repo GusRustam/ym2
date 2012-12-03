@@ -137,7 +137,7 @@ Namespace Curves
         Public Overridable Sub Subscribe()
             Logger.Debug("Subscirbe({0})", GetName())
 
-            Descrs.Clear()
+            Cleanup()
             GetRICs(GetBroker()).ForEach(Sub(ric As String) Descrs.Add(ric, New SwapPointDescription(ric)))
 
             If GetDate() = Date.Today Then
