@@ -1,7 +1,7 @@
 ﻿Imports System.Reflection
 Imports YieldMap.Commons
 
-Namespace Forms
+Namespace Forms.MainForm
     Public Class AboutForm
         Private Sub AboutFormLoad(sender As Object, e As EventArgs) Handles MyBase.Load
             BuildVerLabel.Text = Assembly.GetAssembly(GetType(Common)).GetName().Version.ToString()

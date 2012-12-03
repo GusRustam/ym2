@@ -128,6 +128,15 @@ Namespace Forms.ChartForm
             Logger.Trace("GraphFormLoad")
             ThisFormStatus = FormDataStatus.Loading
 
+            ItemDescriptionPanel.Visible = ShowChartToolBar
+            If ItemDescriptionPanel.Visible Then
+                PinUnpinTSB.Image = Pin
+                PinUnpinTSB.ToolTipText = ShowDescriptionPane
+            Else
+                PinUnpinTSB.Image = UnPin
+                PinUnpinTSB.ToolTipText = HideDescriptionPane
+            End If
+
             ZoomCustomButton.CheckOnClick = True
             InitChart()
 

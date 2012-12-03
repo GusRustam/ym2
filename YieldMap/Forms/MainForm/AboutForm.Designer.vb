@@ -1,4 +1,4 @@
-﻿Namespace Forms
+﻿Namespace Forms.MainForm
     <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
     Partial Class AboutForm
         Inherits System.Windows.Forms.Form

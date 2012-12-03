@@ -1,5 +1,5 @@
 ﻿
-Namespace Forms
+Namespace Forms.MainForm
     <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
     Partial Class MainForm
         Inherits System.Windows.Forms.Form
@@ -246,25 +246,25 @@ Namespace Forms
             'ConnectTSMI
             '
             Me.ConnectTSMI.Name = "ConnectTSMI"
-            Me.ConnectTSMI.Size = New System.Drawing.Size(134, 22)
-            Me.ConnectTSMI.Text = "Connect"
+            Me.ConnectTSMI.Size = New System.Drawing.Size(166, 22)
+            Me.ConnectTSMI.Text = "Connect to Eikon"
             '
             'NewChartTSMI
             '
             Me.NewChartTSMI.Enabled = False
             Me.NewChartTSMI.Name = "NewChartTSMI"
-            Me.NewChartTSMI.Size = New System.Drawing.Size(134, 22)
-            Me.NewChartTSMI.Text = "New chart"
+            Me.NewChartTSMI.Size = New System.Drawing.Size(166, 22)
+            Me.NewChartTSMI.Text = "New chart..."
             '
             'ToolStripMenuItem1
             '
             Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(131, 6)
+            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(163, 6)
             '
             'ExitTSMI
             '
             Me.ExitTSMI.Name = "ExitTSMI"
-            Me.ExitTSMI.Size = New System.Drawing.Size(134, 22)
+            Me.ExitTSMI.Size = New System.Drawing.Size(166, 22)
             Me.ExitTSMI.Text = "Exit"
             '
             'ToolsToolStripMenuItem
@@ -277,14 +277,14 @@ Namespace Forms
             'DatabaseManagerTSMI
             '
             Me.DatabaseManagerTSMI.Name = "DatabaseManagerTSMI"
-            Me.DatabaseManagerTSMI.Size = New System.Drawing.Size(176, 22)
-            Me.DatabaseManagerTSMI.Text = "Database manager"
+            Me.DatabaseManagerTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.DatabaseManagerTSMI.Text = "Database manager..."
             '
             'SettingsToolStripMenuItem
             '
             Me.SettingsToolStripMenuItem.Name = "SettingsToolStripMenuItem"
-            Me.SettingsToolStripMenuItem.Size = New System.Drawing.Size(176, 22)
-            Me.SettingsToolStripMenuItem.Text = "Settings"
+            Me.SettingsToolStripMenuItem.Size = New System.Drawing.Size(188, 22)
+            Me.SettingsToolStripMenuItem.Text = "Settings..."
             '
             'ViewToolStripMenuItem
             '
@@ -335,8 +335,8 @@ Namespace Forms
             'AboutMenuTSMI
             '
             Me.AboutMenuTSMI.Name = "AboutMenuTSMI"
-            Me.AboutMenuTSMI.Size = New System.Drawing.Size(114, 22)
-            Me.AboutMenuTSMI.Text = "About"
+            Me.AboutMenuTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.AboutMenuTSMI.Text = "About..."
             '
             'MainForm
             '

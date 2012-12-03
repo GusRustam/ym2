@@ -141,10 +141,16 @@
     <Compile Include="Curves\RubIRS.vb" />
     <Compile Include="Curves\SwapCurve.vb" />
     <Compile Include="Curves\YieldCurve.vb" />
-    <Compile Include="Forms\AboutForm.Designer.vb">
+    <Compile Include="Forms\ChartForm\ChartSettingsForm.Designer.vb">
+      <DependentUpon>ChartSettingsForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ChartForm\ChartSettingsForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\MainForm\AboutForm.Designer.vb">
       <DependentUpon>AboutForm.vb</DependentUpon>
     </Compile>
-    <Compile Include="Forms\AboutForm.vb">
+    <Compile Include="Forms\MainForm\AboutForm.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="BondsDataSet.Designer.vb">
@@ -207,10 +213,10 @@
     <Compile Include="Forms\PortfolioForm\ProgressForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\SettingsForm.Designer.vb">
+    <Compile Include="Forms\MainForm\SettingsForm.Designer.vb">
       <DependentUpon>SettingsForm.vb</DependentUpon>
     </Compile>
-    <Compile Include="Forms\SettingsForm.vb">
+    <Compile Include="Forms\MainForm\SettingsForm.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\TableForm\BondDescr.vb" />
@@ -220,10 +226,10 @@
     <Compile Include="Forms\TableForm\TableForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\MainForm.vb">
+    <Compile Include="Forms\MainForm\MainForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\MainForm.Designer.vb">
+    <Compile Include="Forms\MainForm\MainForm.Designer.vb">
       <DependentUpon>MainForm.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
@@ -261,7 +267,10 @@
     <Compile Include="Tools\YieldCalc.vb" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Forms\AboutForm.resx">
+    <EmbeddedResource Include="Forms\ChartForm\ChartSettingsForm.resx">
+      <DependentUpon>ChartSettingsForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\MainForm\AboutForm.resx">
       <DependentUpon>AboutForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ChartForm\GraphForm.resx">
@@ -288,13 +297,13 @@
     <EmbeddedResource Include="Forms\PortfolioForm\NewChainForm.resx">
       <DependentUpon>NewChainForm.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\SettingsForm.resx">
+    <EmbeddedResource Include="Forms\MainForm\SettingsForm.resx">
       <DependentUpon>SettingsForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\TableForm\TableForm.resx">
       <DependentUpon>TableForm.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\MainForm.resx">
+    <EmbeddedResource Include="Forms\MainForm\MainForm.resx">
       <DependentUpon>MainForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\UnhandledExcForm.resx">

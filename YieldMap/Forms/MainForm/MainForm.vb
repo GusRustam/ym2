@@ -6,7 +6,7 @@ Imports YieldMap.Forms.PortfolioForm
 Imports EikonDesktopSDKLib
 Imports NLog
 
-Namespace Forms
+Namespace Forms.MainForm
     Public Class MainForm
         Private Shared ReadOnly Logger As Logger = GetLogger(GetType(MainForm))
 
@@ -55,8 +55,10 @@ Namespace Forms
             ConnectToEikon()
         End Sub
 
-        Private Shared Sub MainFormLoad(sender As Object, e As EventArgs) Handles MyBase.Load
+        Private Sub MainFormLoad(sender As Object, e As EventArgs) Handles MyBase.Load
             Logger.Info("MainFormLoad")
+            MainToolStrip.Visible = ShowMainToolBar
+            ToolbarTSMI.Checked = ShowMainToolBar
         End Sub
 
 
@@ -77,6 +79,7 @@ Namespace Forms
             graphForm.Show()
             AddHandler graphForm.Closed, AddressOf GraphFormRemoved
             _graphs.Add(graphForm)
+            If _graphs.Count = 1 Then LayoutMdi(MdiLayout.TileHorizontal)
         End Sub
 
         Private Sub GraphFormRemoved(ByVal sender As Object, ByVal e As EventArgs)
@@ -219,6 +222,11 @@ Namespace Forms
 
         Private Sub CascadeTSMIClick(sender As Object, e As EventArgs) Handles CascadeTSMI.Click
             LayoutMdi(MdiLayout.Cascade)
+        End Sub
+
+        Private Sub SettingsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SettingsToolStripMenuItem.Click
+            Dim sf As New SettingsForm
+            sf.ShowDialog()
         End Sub
     End Class
 End Namespace

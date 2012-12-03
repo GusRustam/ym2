@@ -35,15 +35,15 @@ Namespace Commons
             }
 
             ' 4) Selecting congiguration and initializing
-            SetLoggingLevel()
+            ResetLoggers()
 
             Logger = LogManager.GetCurrentClassLogger()
             Logger.Debug("Logger initialized")
         End Sub
 
-        Public Sub SetLoggingLevel()
-            Dim loggerConfig As LoggingConfiguration = new LoggingConfiguration()
-            
+        Public Sub ResetLoggers()
+            Dim loggerConfig As LoggingConfiguration = New LoggingConfiguration()
+
             loggerConfig.AddTarget("Main", TxtTarget)
             loggerConfig.AddTarget("Chainsaw", UdpTarget)
             loggerConfig.LoggingRules.Add(New LoggingRule("*", LoggingLevel, TxtTarget))

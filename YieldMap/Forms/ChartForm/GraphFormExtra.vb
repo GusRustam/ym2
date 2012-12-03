@@ -183,41 +183,78 @@ Namespace Forms.ChartForm
         ' this method simply updates the chart by selecting appropriate y-coordinates for points
         Private Sub SetChartMinMax()
             Logger.Debug("SetChartMinMax()")
-            GuiAsync(
-                Sub()
-                    TheChart.Invalidate()
-                    With TheChart.ChartAreas(0).AxisY
-                        Try
-                            Dim newMax = (From srs In TheChart.Series Where srs.Enabled And srs.Points.Any
-                                Select (From pnt In srs.Points Select pnt.YValues.First).Max).Max 'Where Not pnt.IsEmpty
+            GuiAsync(AddressOf DoSetMinMax)
+        End Sub
 
-                            Dim newMin As Double
-                            If _spreadBenchmarks.CurrentType.Equals(SpreadType.Yield) Then
-                                newMin = (From srs In TheChart.Series Where srs.Enabled And srs.Points.Any
-                                        Select (From pnt In srs.Points Where pnt.YValues.First > 0 Select pnt.YValues.First).Min).Min
-                            Else
-                                newMin = (From srs In TheChart.Series Where srs.Enabled And srs.Points.Any
-                                          Select (From pnt In srs.Points Select pnt.YValues.First).Min).Min
-                            End If
+        Private Sub DoSetMinMax()
+            TheChart.Invalidate()
+            With TheChart.ChartAreas(0).AxisY
+                Try
+                    Dim lstMax = From srs In TheChart.Series
+                                 Where srs.Enabled And srs.Points.Any
+                                 Select (
+                                     From pnt In srs.Points
+                                     Where pnt.YValues.Any
+                                     Select pnt.YValues.First).Max
 
-                            If newMax > newMin Then
-                                .Maximum = newMax
-                                .Minimum = newMin
-                                .MinorGrid.Interval = (.Maximum - .Minimum) / 20
-                                .MajorGrid.Interval = (.Maximum - .Minimum) / 10
-                            End If
+                    If Not lstMax.Any Then
+                        Logger.Warn("Nothing to use as maximum")
+                        Return
+                    End If
 
-                            Dim x As Series = TheChart.Series.FindByName("start")
-                            If x IsNot Nothing Then
-                                TheChart.Series.Remove(x)
-                            End If
+                    Dim newMax = lstMax.Max
 
-                        Catch ex As Exception
-                            Logger.InfoException("Failed to set minmax", ex)
-                            Logger.Info("Exception = {0}", ex.ToString())
-                        End Try
-                    End With
-                End Sub)
+                    Dim lstMin = From srs In TheChart.Series
+                                 Where srs.Enabled And srs.Points.Any
+                                 Select (
+                                     From pnt In srs.Points
+                                     Where pnt.YValues.Any And (_spreadBenchmarks.CurrentType <> SpreadType.Yield OrElse pnt.YValues.First > 0)
+                                     Select pnt.YValues.First).Min
+                    
+
+                    If Not lstMin.Any Then
+                        Logger.Warn("Nothing to use as minimum")
+                        Return
+                    End If
+
+                    Dim newMin = lstMin.Min
+
+                    Dim minMin As Double?, maxMax As Double?
+                    If _spreadBenchmarks.CurrentType = SpreadType.Yield Then
+                        minMin = MinYield / 100
+                        maxMax = MaxYield / 100
+                    Else
+                        minMin = MinSpread
+                        maxMax = MaxSpread
+                    End If
+
+                    If newMax > newMin Then
+                        Dim theMin As Double, theMax As Double
+                        If minMin.HasValue Then theMin = Math.Max(minMin.Value, newMin)
+                        If maxMax.HasValue Then theMax = Math.Min(maxMax.Value, newMax)
+
+                        Dim pow = If(_spreadBenchmarks.CurrentType = SpreadType.Yield, 3, 0)
+                        theMax = Math.Ceiling(theMax * (10 ^ pow)) / (10 ^ pow)
+                        theMin = Math.Floor(theMin * (10 ^ pow)) / (10 ^ pow)
+                        If theMax > theMin Then
+                            .Maximum = theMax
+                            .Minimum = theMin
+                        Else
+                            .Maximum = newMin
+                            .Minimum = newMax
+                            StatusMessage.Text = "Ignoring default chart range settings"
+                            Logger.Warn("Min > Max")
+                        End If
+                        .MinorGrid.Interval = (.Maximum - .Minimum) / 20
+                        .MajorGrid.Interval = (.Maximum - .Minimum) / 10
+                    Else
+                        Logger.Warn("Min > Max 2")
+                    End If
+                Catch ex As Exception
+                    Logger.WarnException("Failed to set minmax", ex)
+                    Logger.Warn("Exception = {0}", ex.ToString())
+                End Try
+            End With
         End Sub
 
         Private Sub MakeAxisY(ByVal title As String, ByVal format As String)

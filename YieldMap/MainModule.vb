@@ -1,5 +1,6 @@
 ﻿Imports System.Threading
 Imports System.Runtime.InteropServices
+Imports YieldMap.Forms.MainForm
 Imports YieldMap.My.Resources
 Imports YieldMap.Forms
 
