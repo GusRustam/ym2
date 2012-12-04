@@ -143,7 +143,6 @@ Namespace Forms.ChartForm
             ThisFormDataSource = -1
         End Sub
 
-
         Private Sub GraphFormFormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
             Logger.Trace("GraphForm_FormClosing")
             _ansamble.Cleanup()
@@ -894,7 +893,7 @@ Namespace Forms.ChartForm
                 group.HistField = info.hist_field
                 group.VWAPField = info.vwap_field
                 group.VolumeField = info.volume_field
-                group.Color = "Coral"
+                group.Color = "Red"
 
                 descr = DbInitializer.GetBondInfo(askForm.SelectedRic)
                 If descr IsNot Nothing Then
@@ -903,6 +902,7 @@ Namespace Forms.ChartForm
                     group.StartLoadingLiveData()
                     _ansamble.AddGroup(group)
                 Else
+                    Dim handled As Boolean = False
                     Dim selectedRic As String = askForm.SelectedRic
                     DbInitializer.RequestBondInfo(
                         askForm.SelectedRic,
@@ -911,6 +911,8 @@ Namespace Forms.ChartForm
                                 MsgBox("No bond found (RIC " & selectedRic & ")", MsgBoxStyle.Exclamation)
                                 _ansamble.RemoveGroup(group.Id)
                             Else
+                                If handled Then Return
+                                handled = True
                                 group.SeriesName = dscr.ShortName
                                 group.AddElement(selectedRic, dscr)
                                 group.StartLoadingLiveData()

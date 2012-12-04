@@ -42,14 +42,6 @@ Namespace Forms.ChartForm
             End Function
         End Class
 
-        Private Sub ManualRicFormActivated(sender As Object, e As EventArgs) Handles Me.Activated
-            Dim layoutTA As New fields_layoutTableAdapter
-            For Each row In layoutTA.GetData()
-                LayoutComboBox.Items.Add(New IdValue(row))
-            Next
-            LayoutComboBox.SelectedIndex = 0
-        End Sub
-
         Private Sub RicTextBoxKeyUp(sender As Object, e As KeyEventArgs) Handles RicTextBox.KeyUp, LayoutComboBox.KeyUp
             e.Handled = True
             If e.KeyCode = Keys.Escape Then
@@ -67,6 +59,14 @@ Namespace Forms.ChartForm
         Private Sub ManualRicFormLeave(sender As Object, e As EventArgs) Handles Me.Leave
             _selectedRic = ""
             Close()
+        End Sub
+
+        Private Sub ManualRicFormLoad(sender As Object, e As EventArgs) Handles Me.Load
+            Dim layoutTA As New fields_layoutTableAdapter
+            For Each row In layoutTA.GetData()
+                LayoutComboBox.Items.Add(New IdValue(row))
+            Next
+            LayoutComboBox.SelectedIndex = 0
         End Sub
     End Class
 End Namespace
