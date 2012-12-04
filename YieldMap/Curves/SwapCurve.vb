@@ -82,6 +82,7 @@ Namespace Curves
         End Sub
 
         Public Function GetCurveData(Optional ByVal raw As Boolean = False) As List(Of SwapPointDescription)
+            Logger.Trace("GetCurveData({0}, raw = {1})", GetFullName(), raw)
             Try
                 Dim list = Descrs.Values.Where(Function(elem) elem.Yield.HasValue).ToList()
                 list.Sort()

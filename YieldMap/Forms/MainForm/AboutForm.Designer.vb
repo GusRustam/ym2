@@ -30,7 +30,6 @@
             Me.Label4 = New System.Windows.Forms.Label()
             Me.Label5 = New System.Windows.Forms.Label()
             Me.OsVerLabel = New System.Windows.Forms.Label()
-            Me.SetLogPropsButton = New System.Windows.Forms.Button()
             Me.SendReportButton = New System.Windows.Forms.Button()
             Me.CloseButton = New System.Windows.Forms.Button()
             CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -102,18 +101,9 @@
             Me.OsVerLabel.TabIndex = 3
             Me.OsVerLabel.Text = "===OS version ==="
             '
-            'SetLogPropsButton
-            '
-            Me.SetLogPropsButton.Location = New System.Drawing.Point(407, 12)
-            Me.SetLogPropsButton.Name = "SetLogPropsButton"
-            Me.SetLogPropsButton.Size = New System.Drawing.Size(137, 23)
-            Me.SetLogPropsButton.TabIndex = 4
-            Me.SetLogPropsButton.Text = "Set log preferences"
-            Me.SetLogPropsButton.UseVisualStyleBackColor = True
-            '
             'SendReportButton
             '
-            Me.SendReportButton.Location = New System.Drawing.Point(407, 41)
+            Me.SendReportButton.Location = New System.Drawing.Point(407, 12)
             Me.SendReportButton.Name = "SendReportButton"
             Me.SendReportButton.Size = New System.Drawing.Size(137, 23)
             Me.SendReportButton.TabIndex = 4
@@ -137,7 +127,6 @@
             Me.ClientSize = New System.Drawing.Size(556, 339)
             Me.Controls.Add(Me.SendReportButton)
             Me.Controls.Add(Me.CloseButton)
-            Me.Controls.Add(Me.SetLogPropsButton)
             Me.Controls.Add(Me.OsVerLabel)
             Me.Controls.Add(Me.BuildVerLabel)
             Me.Controls.Add(Me.Label4)
@@ -160,7 +149,6 @@
         Friend WithEvents Label4 As System.Windows.Forms.Label
         Friend WithEvents Label5 As System.Windows.Forms.Label
         Friend WithEvents OsVerLabel As System.Windows.Forms.Label
-        Friend WithEvents SetLogPropsButton As System.Windows.Forms.Button
         Friend WithEvents SendReportButton As System.Windows.Forms.Button
         Friend WithEvents CloseButton As System.Windows.Forms.Button
     End Class

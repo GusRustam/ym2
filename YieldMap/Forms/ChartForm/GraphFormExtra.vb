@@ -107,11 +107,13 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub HideBidAsk()
+            If Not ShowBidAsk Then Return
             Dim bidAskSeries = TheChart.Series.FindByName("BidAskSeries")
             If bidAskSeries IsNot Nothing Then TheChart.Series.Remove(bidAskSeries)
         End Sub
 
         Private Sub PlotBidAsk(ByVal bond As VisualizableBond)
+            If Not ShowBidAsk Then Return
             If Not (bond.QuotesAndYields.ContainsKey(QuoteSource.Bid.ToString.ToUpper()) Or bond.QuotesAndYields.ContainsKey(QuoteSource.Ask.ToString.ToUpper())) Then Return
             Dim bidAskSeries = TheChart.Series.FindByName("BidAskSeries")
             Dim minX = TheChart.ChartAreas(0).AxisX.Minimum
@@ -315,7 +317,6 @@ Namespace Forms.ChartForm
             TheChart.BringToFront()
         End Sub
 
-
         Private Class CurveDescr
             Public Type As String
             Public Name As String
@@ -334,13 +335,14 @@ Namespace Forms.ChartForm
         Private Sub PaintSwapCurve(ByVal curve As SwapCurve, raw As Boolean)
             Logger.Debug("PaintSwapCurve({0}, {1})", curve.GetName(), raw)
             Dim points As List(Of SwapPointDescription)
-            points = curve.GetCurveData()
+            points = curve.GetCurveData(raw)
             If points Is Nothing Then Return
 
             Dim estimator = New Estimator(curve.GetFitMode())
             Dim xyPoints = estimator.Approximate(XY.ConvertToXY(points, _spreadBenchmarks.CurrentType))
 
             If xyPoints Is Nothing Then Return
+            Logger.Trace("Got points to plot")
 
             GuiAsync(
                 Sub()

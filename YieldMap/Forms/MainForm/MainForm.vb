@@ -52,6 +52,7 @@ Namespace Forms.MainForm
         Private Sub ConnectButtonClick(sender As Object, e As EventArgs) Handles ConnectButton.Click
             StatusLabel.Text = Connecting_to_Eikon
             ConnectButton.Enabled = False
+            ConnectTSMI.Enabled = False
             ConnectToEikon()
         End Sub
 
@@ -132,11 +133,13 @@ Namespace Forms.MainForm
         Private Sub UpdateUserFormAccordingToConnectionStatus(ByVal eEikonStatus As EEikonStatus)
             Select Case eEikonStatus
                 Case eEikonStatus.Connected
+                    ConnectTSMI.Enabled = False
                     ConnectButton.Enabled = False
                     StatusPicture.Image = Green
                     StatusLabel.Text = Status_Connected
 
                 Case eEikonStatus.Disconnected
+                    ConnectTSMI.Enabled = True
                     ConnectButton.Enabled = True
                     YieldMapButton.Enabled = False
                     StatusPicture.Image = Red
@@ -144,14 +147,16 @@ Namespace Forms.MainForm
                     CloseAllGraphForms()
 
                 Case eEikonStatus.LocalMode
+                    ConnectTSMI.Enabled = True
                     ConnectButton.Enabled = True
-                    ConnectButton.Enabled = False
+                    YieldMapButton.Enabled = False
                     StatusPicture.Image = Orange
                     StatusLabel.Text = Status_Local
 
                 Case eEikonStatus.Offline
+                    ConnectTSMI.Enabled = True
                     ConnectButton.Enabled = True
-                    ConnectButton.Enabled = False
+                    YieldMapButton.Enabled = False
                     StatusPicture.Image = Red
                     StatusLabel.Text = Status_Offline
             End Select
@@ -204,6 +209,7 @@ Namespace Forms.MainForm
 
         Private Sub ConnectTSMIClick(sender As Object, e As EventArgs) Handles ConnectTSMI.Click
             StatusLabel.Text = Connecting_to_Eikon
+            ConnectTSMI.Enabled = False
             ConnectButton.Enabled = False
             ConnectToEikon()
         End Sub

@@ -8,11 +8,6 @@ Namespace Forms.MainForm
             OsVerLabel.Text = Environment.OSVersion.VersionString
         End Sub
 
-        Private Shared Sub SetLogPropsButtonClick(sender As Object, e As EventArgs) Handles SetLogPropsButton.Click
-            Dim sf = New SettingsForm
-            sf.ShowDialog()
-        End Sub
-
         Private Shared Sub SendReportButtonClick(sender As Object, e As EventArgs) Handles SendReportButton.Click
             SendErrorReport("Yield Map Info", GetEnvironment())
         End Sub

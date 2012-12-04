@@ -87,7 +87,7 @@ Namespace Curves
             Else
                 rics.ForEach(Sub(ric) SpreadBmk.CalcAllSpreads(Descrs(ric), type:=type))
             End If
-            if SpreadBmk.CurrentType = type then NotifyRecalculated(Me)
+            If SpreadBmk.CurrentType = type Then NotifyRecalculated(Me)
         End Sub
 
         '' START LOADING HISTORICAL DATA

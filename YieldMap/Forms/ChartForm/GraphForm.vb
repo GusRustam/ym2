@@ -953,7 +953,7 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub OnBondQuote(ByVal descr As VisualizableBond, ByVal fieldName As String, Optional ByVal raw As Boolean = False) Handles _ansamble.Quote
-            Logger.Trace("OnBondQuote({0})", descr.MetaData.ShortName)
+            Logger.Trace("OnBondQuote({0}, {1})", descr.MetaData.ShortName, descr.ParentGroup.SeriesName)
             GuiAsync(
                 Sub()
                     Dim group = descr.ParentGroup
@@ -1038,16 +1038,19 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub OnBenchmarkRemoved(type As SpreadType) Handles _spreadBenchmarks.BenchmarkRemoved
+            Logger.Trace("OnBenchmarkRemoved({0})", type)
             _moneyMarketCurves.ForEach(Sub(curve) curve.CleanupByType(type))
             _ansamble.CleanupByType(type)
         End Sub
 
         Private Sub OnBenchmarkUpdated(type As SpreadType) Handles _spreadBenchmarks.BenchmarkUpdated
+            Logger.Trace("OnBenchmarkUpdated({0})", type)
             _moneyMarketCurves.ForEach(Sub(curve) curve.RecalculateByType(type))
             _ansamble.RecalculateByType(type)
         End Sub
 
         Private Sub OnTypeSelected(newType As SpreadType, oldType As SpreadType) Handles _spreadBenchmarks.TypeSelected
+            Logger.Trace("OnTypeSelected({0}, {1})", newType, oldType)
             If newType <> oldType Then
                 SetYAxisMode(newType.ToString())
                 _moneyMarketCurves.ForEach(Sub(curve) curve.RecalculateByType(newType))
