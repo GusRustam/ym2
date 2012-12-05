@@ -85,14 +85,18 @@ Namespace Forms.ChartForm
                     Dim groupType As GroupType
                     Dim group As VisualizableGroup
                     If groupType.TryParse(port.whereFrom, groupType) Then
+                        Dim fieldSetId = port.id_field_set
+                        Dim fields = (New field_layoutTableAdapter).GetData().Where(Function(row) row.field_set_id = fieldSetId)
+                        Dim realTime = fields.First(Function(row) row.is_realtime = 1)
+                        Dim history = fields.First(Function(row) row.is_realtime = 0)
                         group = New VisualizableGroup(_ansamble) With {
                             .Group = groupType,
                             .SeriesName = port.whereFromDescr,
                             .PortfolioID = port.fromID,
-                            .BidField = port.bid_field,
-                            .AskField = port.ask_field,
-                            .LastField = port.last_field,
-                            .HistField = port.hist_field,
+                            .BidField = realTime.bid_field,
+                            .AskField = realTime.ask_field,
+                            .LastField = realTime.last_field,
+                            .HistField = history.last_field,
                             .Brokers = {"MM", ""}.ToList(),
                             .Currency = "",
                             .Color = port.color
@@ -722,25 +726,27 @@ Namespace Forms.ChartForm
             Dim ricsInCurve As List(Of String)
 
             Dim fieldNames As New Dictionary(Of QuoteSource, String)
+            Dim fieldSetId As Integer
             If selectedItem.Type = "List" Then
                 Dim data As New _ricsInHawserTableAdapter
                 Dim theData = data.GetData
                 ricsInCurve = theData.Where(Function(row) row.ric IsNot Nothing AndAlso row.id = selectedItem.ID).Select(Function(row) row.ric).ToList()
-                Dim hawserData = (New hawserTableAdapter).GetData.First(Function(row) row.id = selectedItem.ID)
-                fieldNames.Add(QuoteSource.Bid, hawserData.bid_field)
-                fieldNames.Add(QuoteSource.Ask, hawserData.ask_field)
-                fieldNames.Add(QuoteSource.Last, hawserData.last_field)
-                fieldNames.Add(QuoteSource.Hist, hawserData.hist_field)
+                fieldSetId = (New hawserTableAdapter).GetData.First(Function(row) row.id = selectedItem.ID).id_field_set
             Else
                 Dim data As New _ricsInChainTableAdapter
                 Dim theData = data.GetData
                 ricsInCurve = theData.Where(Function(row) row.ric IsNot Nothing AndAlso row.id = selectedItem.ID).Select(Function(row) row.ric).ToList()
-                Dim chainData = (New chainTableAdapter).GetData.First(Function(row) row.id = selectedItem.ID)
-                fieldNames.Add(QuoteSource.Bid, chainData.bid_field)
-                fieldNames.Add(QuoteSource.Ask, chainData.ask_field)
-                fieldNames.Add(QuoteSource.Last, chainData.last_field)
-                fieldNames.Add(QuoteSource.Hist, chainData.hist_field)
+                fieldSetId = (New chainTableAdapter).GetData.First(Function(row) row.id = selectedItem.ID).id_field_set
             End If
+
+            Dim layoutData = (New field_layoutTableAdapter).GetData.Where(Function(row) row.field_set_id = fieldSetId)
+            Dim realTime = layoutData.First(Function(row) row.is_realtime = 1)
+            Dim history = layoutData.First(Function(row) row.is_realtime = 0)
+
+            fieldNames.Add(QuoteSource.Bid, realTime.bid_field)
+            fieldNames.Add(QuoteSource.Ask, realTime.ask_field)
+            fieldNames.Add(QuoteSource.Last, realTime.last_field)
+            fieldNames.Add(QuoteSource.Hist, history.last_field)
 
             If Not ricsInCurve.Any() Then
                 MsgBox("Empty curve selected!")
@@ -884,15 +890,17 @@ Namespace Forms.ChartForm
                 Dim group = New VisualizableGroup(_ansamble)
                 Dim descr As DataBaseBondDescription
 
-                Dim layout As New fields_layoutTableAdapter
-                Dim info = layout.GetData().First(Function(row) row.id = askForm.LayoutId)
+                Dim layout As New field_layoutTableAdapter
+                Dim setInfo = layout.GetData().Where(Function(row) row.id = askForm.LayoutId)
+                Dim realTime = setInfo.First(Function(row) row.is_realtime = 1)
+                Dim history = setInfo.First(Function(row) row.is_realtime = 0)
 
-                group.AskField = info.ask_field
-                group.BidField = info.bid_field
-                group.LastField = info.last_field
-                group.HistField = info.hist_field
-                group.VWAPField = info.vwap_field
-                group.VolumeField = info.volume_field
+                group.AskField = realTime.ask_field
+                group.BidField = realTime.bid_field
+                group.LastField = realTime.last_field
+                group.HistField = history.last_field
+                group.VWAPField = realTime.vwap_field
+                group.VolumeField = realTime.volume_field
                 group.Color = "Red"
 
                 descr = DbInitializer.GetBondInfo(askForm.SelectedRic)

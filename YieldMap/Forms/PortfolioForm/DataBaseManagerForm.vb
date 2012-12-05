@@ -65,23 +65,16 @@ Namespace Forms.PortfolioForm
             f.TheLayout.RowStyles(1).Height = 0
             f.Text = "New user-defined list"
             f.RICLabel.Text = "List name"
-            f.BidTextBox.Text = ""
-            f.AskTextBox.Text = ""
-            f.LastTextBox.Text = ""
-            f.CloseTextBox.Text = ""
             f.CurveCheckBox.Checked = False
 
             If f.ShowDialog() = DialogResult.OK Then
                 Dim newName = f.RICTextBox.Text
                 Dim newColor = f.ColorsComboBox.Text
-                Dim bid = f.BidTextBox.Text
-                Dim ask = f.AskTextBox.Text
-                Dim last = f.LastTextBox.Text
-                Dim close = f.CloseTextBox.Text
                 Dim crv = f.CurveCheckBox.Checked
+                Dim fieldSetId = f.FieldLayoutComboBox.SelectedValue
                 If newName <> "" Then
                     Try
-                        _hawserTA.InsertNew(newName, newColor, bid, ask, last, close, crv)
+                        _hawserTA.InsertNew(newName, newColor, crv, fieldSetId)
                         RefreshList()
                         ListOfList.Rows(0).Selected = True
                     Catch ex As Exception
@@ -109,22 +102,15 @@ Namespace Forms.PortfolioForm
             f.RICLabel.Text = "List name"
             f.RICTextBox.Text = selectedRow.Cells(1).Value.ToString()
             f.ColorsComboBox.Text = selectedRow.Cells(2).Value.ToString()
-            f.BidTextBox.Text = selectedRow.Cells(3).Value.ToString()
-            f.AskTextBox.Text = selectedRow.Cells(4).Value.ToString()
-            f.LastTextBox.Text = selectedRow.Cells(5).Value.ToString()
-            f.CloseTextBox.Text = selectedRow.Cells(6).Value.ToString()
-            f.CurveCheckBox.Checked = CBool(selectedRow.Cells(7).Value)
+            f.CurveCheckBox.Checked = CBool(selectedRow.Cells(3).Value)
 
             If f.ShowDialog() = DialogResult.OK Then
                 Dim newName = f.RICTextBox.Text
                 Dim newColor = f.ColorsComboBox.Text
-                Dim bid = f.BidTextBox.Text
-                Dim ask = f.AskTextBox.Text
-                Dim last = f.LastTextBox.Text
-                Dim close = f.CloseTextBox.Text
                 Dim crv = f.CurveCheckBox.Checked
+                Dim layoutId = f.FieldLayoutComboBox.SelectedValue
                 If newName <> "" Then
-                    _hawserTA.RenameById(newName, newColor, bid, ask, last, close, crv, CInt(selectedRow.Cells(0).Value))
+                    _hawserTA.RenameById(newName, newColor, crv, CInt(selectedRow.Cells(0).Value), layoutId)
                     RefreshList()
                     RefreshGrid(-1)
                 End If
@@ -292,20 +278,17 @@ Namespace Forms.PortfolioForm
             PortfolioUnitedTableAdapter.Fill(BondsDataSet.PortfolioUnited)
             HawsersInPortfolioTableAdapter.Fill(BondsDataSet.HawsersInPortfolio)
             ChainsInPortfolioTableAdapter.Fill(BondsDataSet.ChainsInPortfolio)
-            _portfolioByBondsTableAdapter.Fill(BondsDataSet._portfolioByBonds)
 
             ConstPortLabel.Text = IIf(filterId > 0, "Constituents for " + hName, "")
             Dim filterStr = String.Format("pid = {0:D}", filterId)
 
             PortfolioUnitedBindingSource.Filter = filterStr
             ChainsInPortfolioBindingSource.Filter = filterStr
-            PortfolioByBondsBindingSource.Filter = filterStr
             HawsersInPortfolioBindingSource.Filter = filterStr
 
             PorfolioElementsDGV.Columns(0).Visible = False
             PortUserListDGV.Columns(0).Visible = False
             PortChainsDGV.Columns(0).Visible = False
-            PortBondDGV.Columns(0).Visible = False
 
             PortUserListDGV.Columns(1).Visible = False
             PortChainsDGV.Columns(1).Visible = False
@@ -359,7 +342,6 @@ Namespace Forms.PortfolioForm
                            "Remove a portfolio") = vbYes Then
                     Try
                         _portfolioTA.RemoveById(dataRowView("id"))
-                        Call (New portfolio_to_bondTableAdapter).DeleteLinkByPortfolio(dataRowView("id"))
                         Call (New portfolio_to_hawserTableAdapter).DeleteLinkByPortfolio(dataRowView("id"))
                         Call (New portfolio_to_chainTableAdapter).DeleteLinkByPortfolio(dataRowView("id"))
                     Catch ex As Exception
@@ -372,30 +354,6 @@ Namespace Forms.PortfolioForm
                 MsgBox("Please select portfolio to remove")
             End If
             RefreshPortfolioList()
-        End Sub
-
-        Private Sub AddBondButtonClick(sender As Object, e As EventArgs) Handles AddBondButton.Click
-            If PortfoliosListBox.Items.Count > 0 Then
-                Dim bondSelector As New BondSelectorForm
-                bondSelector.CanExclude = True
-                If bondSelector.ShowDialog() = DialogResult.OK Then
-                    Dim include = bondSelector.IncludeCB.Checked
-                    Dim dataRowView As DataRowView
-                    If PortfoliosListBox.SelectedIndex >= 0 Then
-                        dataRowView = CType(PortfoliosListBox.SelectedItem, DataRowView)
-                    Else
-                        dataRowView = CType(PortfoliosListBox.Items(0), DataRowView)
-                    End If
-                    Dim selectedListID = dataRowView("id")
-                    Dim aName = dataRowView("portfolio_name")
-
-                    Dim htbTA As New portfolio_to_bondTableAdapter
-                    bondSelector.SelectedRICs.ForEach(Sub(aRic) htbTA.InsertLink(selectedListID, aRic, include))
-                    RefreshPortfolioGrids(selectedListID, aName)
-                End If
-            Else
-                MsgBox("Please first select a list for items to add")
-            End If
         End Sub
 
         Private Sub AddChainButtonClick(sender As Object, e As EventArgs) Handles AddChainButton.Click
@@ -471,20 +429,6 @@ Namespace Forms.PortfolioForm
                 MsgBox("Please select items to remove in the grid")
             End If
         End Sub
-
-        Private Sub RemoveBondButtonClick(sender As Object, e As EventArgs) Handles RemoveBondButton.Click
-            If PortBondDGV.SelectedRows.Count > 0 Then
-                Dim selectedRICs = (From aRow As DataGridViewRow In PortBondDGV.SelectedRows Select CStr(aRow.Cells(1).Value)).ToList
-                Dim dataRowView As DataRowView = CType(PortfoliosListBox.SelectedItem, DataRowView)
-                Dim selectedListID = dataRowView("id")
-                Dim aName = dataRowView("portfolio_name")
-                Dim htbTA As New portfolio_to_bondTableAdapter
-                selectedRICs.ForEach(Sub(aRic) htbTA.RemoveLink(aRic, selectedListID))
-                RefreshPortfolioGrids(selectedListID, aName)
-            Else
-                MsgBox("Please select items to remove in the grid")
-            End If
-        End Sub
 #End Region
 
 #Region "Chain editor"
@@ -514,11 +458,7 @@ Namespace Forms.PortfolioForm
             Dim theRic = selectedRow.Cells.Item(1).Value.ToString()
             Dim descr = selectedRow.Cells.Item(2).Value.ToString()
             Dim clr = selectedRow.Cells.Item(3).Value.ToString()
-            Dim bid = selectedRow.Cells.Item(4).Value.ToString()
-            Dim ask = selectedRow.Cells.Item(5).Value.ToString()
-            Dim last = selectedRow.Cells.Item(6).Value.ToString()
-            Dim hist = selectedRow.Cells.Item(7).Value.ToString()
-            Dim crv = CBool(selectedRow.Cells.Item(8).Value)
+            Dim crv = CBool(selectedRow.Cells.Item(4).Value)
 
 
             Dim f = New NewChainForm
@@ -526,22 +466,15 @@ Namespace Forms.PortfolioForm
             f.DescrTextBox.Text = descr
             f.RICTextBox.Text = theRic
             f.ColorsComboBox.Text = clr
-            f.BidTextBox.Text = bid
-            f.AskTextBox.Text = ask
-            f.LastTextBox.Text = last
-            f.CloseTextBox.Text = hist
             f.CurveCheckBox.Checked = crv
 
             If f.ShowDialog() = DialogResult.OK Then
                 theRic = f.RICTextBox.Text
                 descr = f.DescrTextBox.Text
                 clr = f.ColorsComboBox.Text
-                bid = f.BidTextBox.Text
-                ask = f.AskTextBox.Text
-                last = f.LastTextBox.Text
-                hist = f.CloseTextBox.Text
                 crv = f.CurveCheckBox.Checked
-                ChainTableAdapter.UpdateItem(theRic, descr, clr, bid, ask, last, hist, crv, id)
+                Dim layoutId = f.FieldLayoutComboBox.SelectedValue
+                ChainTableAdapter.UpdateItem(theRic, descr, clr, crv, layoutId, id)
                 FillChains()
             End If
         End Sub
@@ -552,12 +485,9 @@ Namespace Forms.PortfolioForm
                 Dim newRic = f.RICTextBox.Text
                 Dim descr = f.DescrTextBox.Text
                 Dim clr = f.ColorsComboBox.SelectedItem.ToString()
-                Dim bid = f.BidTextBox.Text
-                Dim ask = f.AskTextBox.Text
-                Dim last = f.LastTextBox.Text
-                Dim hist = f.CloseTextBox.Text
                 Dim crv = f.CurveCheckBox.Checked
-                ChainTableAdapter.InsertNew(newRic, descr, clr, bid, ask, last, hist, crv)
+                Dim layoutId = f.FieldLayoutComboBox.SelectedValue
+                ChainTableAdapter.InsertNew(newRic, descr, clr, crv, layoutId)
                 FillChains()
             End If
         End Sub

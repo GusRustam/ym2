@@ -131,6 +131,9 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BondsDataSet.vb">
+      <DependentUpon>BondsDataSet.xsd</DependentUpon>
+    </Compile>
     <Compile Include="Commons\Common.vb" />
     <Compile Include="Commons\DbInitializer.vb" />
     <Compile Include="Commons\Eikon.vb" />

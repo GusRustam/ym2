@@ -39,8 +39,6 @@ Partial Public Class BondsDataSet
     
     Private tableissuer As issuerDataTable
     
-    Private tablePortfolioUnited As PortfolioUnitedDataTable
-    
     Private tablesettings As settingsDataTable
     
     Private tableBondDescriptions As BondDescriptionsDataTable
@@ -51,8 +49,6 @@ Partial Public Class BondsDataSet
     
     Private tablehawser_to_bond As hawser_to_bondDataTable
     
-    Private table_portfolioByBonds As _portfolioByBondsDataTable
-    
     Private table_portfolioByChain As _portfolioByChainDataTable
     
     Private table_portfolioByHawser As _portfolioByHawserDataTable
@@ -60,8 +56,6 @@ Partial Public Class BondsDataSet
     Private tableChainsInPortfolio As ChainsInPortfolioDataTable
     
     Private tableHawsersInPortfolio As HawsersInPortfolioDataTable
-    
-    Private tableportfolio_to_bond As portfolio_to_bondDataTable
     
     Private tableportfolio_to_chain As portfolio_to_chainDataTable
     
@@ -73,7 +67,11 @@ Partial Public Class BondsDataSet
     
     Private table_ricsInHawser As _ricsInHawserDataTable
     
-    Private tablefields_layout As fields_layoutDataTable
+    Private tablefield_layout As field_layoutDataTable
+    
+    Private tablefield_set As field_setDataTable
+    
+    Private tablePortfolioUnited As PortfolioUnitedDataTable
     
     Private _schemaSerializationMode As Global.System.Data.SchemaSerializationMode = Global.System.Data.SchemaSerializationMode.IncludeSchema
     
@@ -125,9 +123,6 @@ Partial Public Class BondsDataSet
             If (Not (ds.Tables("issuer")) Is Nothing) Then
                 MyBase.Tables.Add(New issuerDataTable(ds.Tables("issuer")))
             End If
-            If (Not (ds.Tables("PortfolioUnited")) Is Nothing) Then
-                MyBase.Tables.Add(New PortfolioUnitedDataTable(ds.Tables("PortfolioUnited")))
-            End If
             If (Not (ds.Tables("settings")) Is Nothing) Then
                 MyBase.Tables.Add(New settingsDataTable(ds.Tables("settings")))
             End If
@@ -143,9 +138,6 @@ Partial Public Class BondsDataSet
             If (Not (ds.Tables("hawser_to_bond")) Is Nothing) Then
                 MyBase.Tables.Add(New hawser_to_bondDataTable(ds.Tables("hawser_to_bond")))
             End If
-            If (Not (ds.Tables("_portfolioByBonds")) Is Nothing) Then
-                MyBase.Tables.Add(New _portfolioByBondsDataTable(ds.Tables("_portfolioByBonds")))
-            End If
             If (Not (ds.Tables("_portfolioByChain")) Is Nothing) Then
                 MyBase.Tables.Add(New _portfolioByChainDataTable(ds.Tables("_portfolioByChain")))
             End If
@@ -157,9 +149,6 @@ Partial Public Class BondsDataSet
             End If
             If (Not (ds.Tables("HawsersInPortfolio")) Is Nothing) Then
                 MyBase.Tables.Add(New HawsersInPortfolioDataTable(ds.Tables("HawsersInPortfolio")))
-            End If
-            If (Not (ds.Tables("portfolio_to_bond")) Is Nothing) Then
-                MyBase.Tables.Add(New portfolio_to_bondDataTable(ds.Tables("portfolio_to_bond")))
             End If
             If (Not (ds.Tables("portfolio_to_chain")) Is Nothing) Then
                 MyBase.Tables.Add(New portfolio_to_chainDataTable(ds.Tables("portfolio_to_chain")))
@@ -176,8 +165,14 @@ Partial Public Class BondsDataSet
             If (Not (ds.Tables("_ricsInHawser")) Is Nothing) Then
                 MyBase.Tables.Add(New _ricsInHawserDataTable(ds.Tables("_ricsInHawser")))
             End If
-            If (Not (ds.Tables("fields_layout")) Is Nothing) Then
-                MyBase.Tables.Add(New fields_layoutDataTable(ds.Tables("fields_layout")))
+            If (Not (ds.Tables("field_layout")) Is Nothing) Then
+                MyBase.Tables.Add(New field_layoutDataTable(ds.Tables("field_layout")))
+            End If
+            If (Not (ds.Tables("field_set")) Is Nothing) Then
+                MyBase.Tables.Add(New field_setDataTable(ds.Tables("field_set")))
+            End If
+            If (Not (ds.Tables("PortfolioUnited")) Is Nothing) Then
+                MyBase.Tables.Add(New PortfolioUnitedDataTable(ds.Tables("PortfolioUnited")))
             End If
             Me.DataSetName = ds.DataSetName
             Me.Prefix = ds.Prefix
@@ -270,16 +265,6 @@ Partial Public Class BondsDataSet
      Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
      Global.System.ComponentModel.Browsable(false),  _
      Global.System.ComponentModel.DesignerSerializationVisibility(Global.System.ComponentModel.DesignerSerializationVisibility.Content)>  _
-    Public ReadOnly Property PortfolioUnited() As PortfolioUnitedDataTable
-        Get
-            Return Me.tablePortfolioUnited
-        End Get
-    End Property
-    
-    <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-     Global.System.ComponentModel.Browsable(false),  _
-     Global.System.ComponentModel.DesignerSerializationVisibility(Global.System.ComponentModel.DesignerSerializationVisibility.Content)>  _
     Public ReadOnly Property settings() As settingsDataTable
         Get
             Return Me.tablesettings
@@ -330,16 +315,6 @@ Partial Public Class BondsDataSet
      Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
      Global.System.ComponentModel.Browsable(false),  _
      Global.System.ComponentModel.DesignerSerializationVisibility(Global.System.ComponentModel.DesignerSerializationVisibility.Content)>  _
-    Public ReadOnly Property _portfolioByBonds() As _portfolioByBondsDataTable
-        Get
-            Return Me.table_portfolioByBonds
-        End Get
-    End Property
-    
-    <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-     Global.System.ComponentModel.Browsable(false),  _
-     Global.System.ComponentModel.DesignerSerializationVisibility(Global.System.ComponentModel.DesignerSerializationVisibility.Content)>  _
     Public ReadOnly Property _portfolioByChain() As _portfolioByChainDataTable
         Get
             Return Me.table_portfolioByChain
@@ -373,16 +348,6 @@ Partial Public Class BondsDataSet
     Public ReadOnly Property HawsersInPortfolio() As HawsersInPortfolioDataTable
         Get
             Return Me.tableHawsersInPortfolio
-        End Get
-    End Property
-    
-    <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-     Global.System.ComponentModel.Browsable(false),  _
-     Global.System.ComponentModel.DesignerSerializationVisibility(Global.System.ComponentModel.DesignerSerializationVisibility.Content)>  _
-    Public ReadOnly Property portfolio_to_bond() As portfolio_to_bondDataTable
-        Get
-            Return Me.tableportfolio_to_bond
         End Get
     End Property
     
@@ -440,9 +405,29 @@ Partial Public Class BondsDataSet
      Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
      Global.System.ComponentModel.Browsable(false),  _
      Global.System.ComponentModel.DesignerSerializationVisibility(Global.System.ComponentModel.DesignerSerializationVisibility.Content)>  _
-    Public ReadOnly Property fields_layout() As fields_layoutDataTable
+    Public ReadOnly Property field_layout() As field_layoutDataTable
         Get
-            Return Me.tablefields_layout
+            Return Me.tablefield_layout
+        End Get
+    End Property
+    
+    <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
+     Global.System.ComponentModel.Browsable(false),  _
+     Global.System.ComponentModel.DesignerSerializationVisibility(Global.System.ComponentModel.DesignerSerializationVisibility.Content)>  _
+    Public ReadOnly Property field_set() As field_setDataTable
+        Get
+            Return Me.tablefield_set
+        End Get
+    End Property
+    
+    <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
+     Global.System.ComponentModel.Browsable(false),  _
+     Global.System.ComponentModel.DesignerSerializationVisibility(Global.System.ComponentModel.DesignerSerializationVisibility.Content)>  _
+    Public ReadOnly Property PortfolioUnited() As PortfolioUnitedDataTable
+        Get
+            Return Me.tablePortfolioUnited
         End Get
     End Property
     
@@ -534,9 +519,6 @@ Partial Public Class BondsDataSet
             If (Not (ds.Tables("issuer")) Is Nothing) Then
                 MyBase.Tables.Add(New issuerDataTable(ds.Tables("issuer")))
             End If
-            If (Not (ds.Tables("PortfolioUnited")) Is Nothing) Then
-                MyBase.Tables.Add(New PortfolioUnitedDataTable(ds.Tables("PortfolioUnited")))
-            End If
             If (Not (ds.Tables("settings")) Is Nothing) Then
                 MyBase.Tables.Add(New settingsDataTable(ds.Tables("settings")))
             End If
@@ -552,9 +534,6 @@ Partial Public Class BondsDataSet
             If (Not (ds.Tables("hawser_to_bond")) Is Nothing) Then
                 MyBase.Tables.Add(New hawser_to_bondDataTable(ds.Tables("hawser_to_bond")))
             End If
-            If (Not (ds.Tables("_portfolioByBonds")) Is Nothing) Then
-                MyBase.Tables.Add(New _portfolioByBondsDataTable(ds.Tables("_portfolioByBonds")))
-            End If
             If (Not (ds.Tables("_portfolioByChain")) Is Nothing) Then
                 MyBase.Tables.Add(New _portfolioByChainDataTable(ds.Tables("_portfolioByChain")))
             End If
@@ -566,9 +545,6 @@ Partial Public Class BondsDataSet
             End If
             If (Not (ds.Tables("HawsersInPortfolio")) Is Nothing) Then
                 MyBase.Tables.Add(New HawsersInPortfolioDataTable(ds.Tables("HawsersInPortfolio")))
-            End If
-            If (Not (ds.Tables("portfolio_to_bond")) Is Nothing) Then
-                MyBase.Tables.Add(New portfolio_to_bondDataTable(ds.Tables("portfolio_to_bond")))
             End If
             If (Not (ds.Tables("portfolio_to_chain")) Is Nothing) Then
                 MyBase.Tables.Add(New portfolio_to_chainDataTable(ds.Tables("portfolio_to_chain")))
@@ -585,8 +561,14 @@ Partial Public Class BondsDataSet
             If (Not (ds.Tables("_ricsInHawser")) Is Nothing) Then
                 MyBase.Tables.Add(New _ricsInHawserDataTable(ds.Tables("_ricsInHawser")))
             End If
-            If (Not (ds.Tables("fields_layout")) Is Nothing) Then
-                MyBase.Tables.Add(New fields_layoutDataTable(ds.Tables("fields_layout")))
+            If (Not (ds.Tables("field_layout")) Is Nothing) Then
+                MyBase.Tables.Add(New field_layoutDataTable(ds.Tables("field_layout")))
+            End If
+            If (Not (ds.Tables("field_set")) Is Nothing) Then
+                MyBase.Tables.Add(New field_setDataTable(ds.Tables("field_set")))
+            End If
+            If (Not (ds.Tables("PortfolioUnited")) Is Nothing) Then
+                MyBase.Tables.Add(New PortfolioUnitedDataTable(ds.Tables("PortfolioUnited")))
             End If
             Me.DataSetName = ds.DataSetName
             Me.Prefix = ds.Prefix
@@ -662,12 +644,6 @@ Partial Public Class BondsDataSet
                 Me.tableissuer.InitVars
             End If
         End If
-        Me.tablePortfolioUnited = CType(MyBase.Tables("PortfolioUnited"),PortfolioUnitedDataTable)
-        If (initTable = true) Then
-            If (Not (Me.tablePortfolioUnited) Is Nothing) Then
-                Me.tablePortfolioUnited.InitVars
-            End If
-        End If
         Me.tablesettings = CType(MyBase.Tables("settings"),settingsDataTable)
         If (initTable = true) Then
             If (Not (Me.tablesettings) Is Nothing) Then
@@ -698,12 +674,6 @@ Partial Public Class BondsDataSet
                 Me.tablehawser_to_bond.InitVars
             End If
         End If
-        Me.table_portfolioByBonds = CType(MyBase.Tables("_portfolioByBonds"),_portfolioByBondsDataTable)
-        If (initTable = true) Then
-            If (Not (Me.table_portfolioByBonds) Is Nothing) Then
-                Me.table_portfolioByBonds.InitVars
-            End If
-        End If
         Me.table_portfolioByChain = CType(MyBase.Tables("_portfolioByChain"),_portfolioByChainDataTable)
         If (initTable = true) Then
             If (Not (Me.table_portfolioByChain) Is Nothing) Then
@@ -726,12 +696,6 @@ Partial Public Class BondsDataSet
         If (initTable = true) Then
             If (Not (Me.tableHawsersInPortfolio) Is Nothing) Then
                 Me.tableHawsersInPortfolio.InitVars
-            End If
-        End If
-        Me.tableportfolio_to_bond = CType(MyBase.Tables("portfolio_to_bond"),portfolio_to_bondDataTable)
-        If (initTable = true) Then
-            If (Not (Me.tableportfolio_to_bond) Is Nothing) Then
-                Me.tableportfolio_to_bond.InitVars
             End If
         End If
         Me.tableportfolio_to_chain = CType(MyBase.Tables("portfolio_to_chain"),portfolio_to_chainDataTable)
@@ -764,10 +728,22 @@ Partial Public Class BondsDataSet
                 Me.table_ricsInHawser.InitVars
             End If
         End If
-        Me.tablefields_layout = CType(MyBase.Tables("fields_layout"),fields_layoutDataTable)
+        Me.tablefield_layout = CType(MyBase.Tables("field_layout"),field_layoutDataTable)
         If (initTable = true) Then
-            If (Not (Me.tablefields_layout) Is Nothing) Then
-                Me.tablefields_layout.InitVars
+            If (Not (Me.tablefield_layout) Is Nothing) Then
+                Me.tablefield_layout.InitVars
+            End If
+        End If
+        Me.tablefield_set = CType(MyBase.Tables("field_set"),field_setDataTable)
+        If (initTable = true) Then
+            If (Not (Me.tablefield_set) Is Nothing) Then
+                Me.tablefield_set.InitVars
+            End If
+        End If
+        Me.tablePortfolioUnited = CType(MyBase.Tables("PortfolioUnited"),PortfolioUnitedDataTable)
+        If (initTable = true) Then
+            If (Not (Me.tablePortfolioUnited) Is Nothing) Then
+                Me.tablePortfolioUnited.InitVars
             End If
         End If
     End Sub
@@ -794,8 +770,6 @@ Partial Public Class BondsDataSet
         MyBase.Tables.Add(Me.tablecurrency)
         Me.tableissuer = New issuerDataTable()
         MyBase.Tables.Add(Me.tableissuer)
-        Me.tablePortfolioUnited = New PortfolioUnitedDataTable()
-        MyBase.Tables.Add(Me.tablePortfolioUnited)
         Me.tablesettings = New settingsDataTable()
         MyBase.Tables.Add(Me.tablesettings)
         Me.tableBondDescriptions = New BondDescriptionsDataTable()
@@ -806,8 +780,6 @@ Partial Public Class BondsDataSet
         MyBase.Tables.Add(Me.tableHawserData)
         Me.tablehawser_to_bond = New hawser_to_bondDataTable()
         MyBase.Tables.Add(Me.tablehawser_to_bond)
-        Me.table_portfolioByBonds = New _portfolioByBondsDataTable()
-        MyBase.Tables.Add(Me.table_portfolioByBonds)
         Me.table_portfolioByChain = New _portfolioByChainDataTable()
         MyBase.Tables.Add(Me.table_portfolioByChain)
         Me.table_portfolioByHawser = New _portfolioByHawserDataTable()
@@ -816,8 +788,6 @@ Partial Public Class BondsDataSet
         MyBase.Tables.Add(Me.tableChainsInPortfolio)
         Me.tableHawsersInPortfolio = New HawsersInPortfolioDataTable()
         MyBase.Tables.Add(Me.tableHawsersInPortfolio)
-        Me.tableportfolio_to_bond = New portfolio_to_bondDataTable()
-        MyBase.Tables.Add(Me.tableportfolio_to_bond)
         Me.tableportfolio_to_chain = New portfolio_to_chainDataTable()
         MyBase.Tables.Add(Me.tableportfolio_to_chain)
         Me.tableportfolio_to_hawser = New portfolio_to_hawserDataTable()
@@ -828,8 +798,12 @@ Partial Public Class BondsDataSet
         MyBase.Tables.Add(Me.table_ricsInChain)
         Me.table_ricsInHawser = New _ricsInHawserDataTable()
         MyBase.Tables.Add(Me.table_ricsInHawser)
-        Me.tablefields_layout = New fields_layoutDataTable()
-        MyBase.Tables.Add(Me.tablefields_layout)
+        Me.tablefield_layout = New field_layoutDataTable()
+        MyBase.Tables.Add(Me.tablefield_layout)
+        Me.tablefield_set = New field_setDataTable()
+        MyBase.Tables.Add(Me.tablefield_set)
+        Me.tablePortfolioUnited = New PortfolioUnitedDataTable()
+        MyBase.Tables.Add(Me.tablePortfolioUnited)
     End Sub
     
     <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
@@ -876,12 +850,6 @@ Partial Public Class BondsDataSet
     
     <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
      Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-    Private Function ShouldSerializePortfolioUnited() As Boolean
-        Return false
-    End Function
-    
-    <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
     Private Function ShouldSerializesettings() As Boolean
         Return false
     End Function
@@ -912,12 +880,6 @@ Partial Public Class BondsDataSet
     
     <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
      Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-    Private Function ShouldSerialize_portfolioByBonds() As Boolean
-        Return false
-    End Function
-    
-    <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
     Private Function ShouldSerialize_portfolioByChain() As Boolean
         Return false
     End Function
@@ -937,12 +899,6 @@ Partial Public Class BondsDataSet
     <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
      Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
     Private Function ShouldSerializeHawsersInPortfolio() As Boolean
-        Return false
-    End Function
-    
-    <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-    Private Function ShouldSerializeportfolio_to_bond() As Boolean
         Return false
     End Function
     
@@ -978,7 +934,19 @@ Partial Public Class BondsDataSet
     
     <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
      Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-    Private Function ShouldSerializefields_layout() As Boolean
+    Private Function ShouldSerializefield_layout() As Boolean
+        Return false
+    End Function
+    
+    <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+    Private Function ShouldSerializefield_set() As Boolean
+        Return false
+    End Function
+    
+    <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+    Private Function ShouldSerializePortfolioUnited() As Boolean
         Return false
     End Function
     
@@ -1062,9 +1030,6 @@ Partial Public Class BondsDataSet
     Public Delegate Sub issuerRowChangeEventHandler(ByVal sender As Object, ByVal e As issuerRowChangeEvent)
     
     <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-    Public Delegate Sub PortfolioUnitedRowChangeEventHandler(ByVal sender As Object, ByVal e As PortfolioUnitedRowChangeEvent)
-    
-    <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
     Public Delegate Sub settingsRowChangeEventHandler(ByVal sender As Object, ByVal e As settingsRowChangeEvent)
     
     <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
@@ -1080,9 +1045,6 @@ Partial Public Class BondsDataSet
     Public Delegate Sub hawser_to_bondRowChangeEventHandler(ByVal sender As Object, ByVal e As hawser_to_bondRowChangeEvent)
     
     <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-    Public Delegate Sub _portfolioByBondsRowChangeEventHandler(ByVal sender As Object, ByVal e As _portfolioByBondsRowChangeEvent)
-    
-    <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
     Public Delegate Sub _portfolioByChainRowChangeEventHandler(ByVal sender As Object, ByVal e As _portfolioByChainRowChangeEvent)
     
     <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
@@ -1093,9 +1055,6 @@ Partial Public Class BondsDataSet
     
     <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
     Public Delegate Sub HawsersInPortfolioRowChangeEventHandler(ByVal sender As Object, ByVal e As HawsersInPortfolioRowChangeEvent)
-    
-    <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-    Public Delegate Sub portfolio_to_bondRowChangeEventHandler(ByVal sender As Object, ByVal e As portfolio_to_bondRowChangeEvent)
     
     <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
     Public Delegate Sub portfolio_to_chainRowChangeEventHandler(ByVal sender As Object, ByVal e As portfolio_to_chainRowChangeEvent)
@@ -1113,7 +1072,13 @@ Partial Public Class BondsDataSet
     Public Delegate Sub _ricsInHawserRowChangeEventHandler(ByVal sender As Object, ByVal e As _ricsInHawserRowChangeEvent)
     
     <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-    Public Delegate Sub fields_layoutRowChangeEventHandler(ByVal sender As Object, ByVal e As fields_layoutRowChangeEvent)
+    Public Delegate Sub field_layoutRowChangeEventHandler(ByVal sender As Object, ByVal e As field_layoutRowChangeEvent)
+    
+    <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+    Public Delegate Sub field_setRowChangeEventHandler(ByVal sender As Object, ByVal e As field_setRowChangeEvent)
+    
+    <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+    Public Delegate Sub PortfolioUnitedRowChangeEventHandler(ByVal sender As Object, ByVal e As PortfolioUnitedRowChangeEvent)
     
     '''<summary>
     '''Represents the strongly named DataTable class.
@@ -2225,21 +2190,9 @@ Partial Public Class BondsDataSet
         
         Private columncurve As Global.System.Data.DataColumn
         
-        Private columnsort_num As Global.System.Data.DataColumn
-        
-        Private columnis_necessary As Global.System.Data.DataColumn
-        
-        Private columntype As Global.System.Data.DataColumn
-        
         Private columncolor As Global.System.Data.DataColumn
         
-        Private columnbid_field As Global.System.Data.DataColumn
-        
-        Private columnask_field As Global.System.Data.DataColumn
-        
-        Private columnlast_field As Global.System.Data.DataColumn
-        
-        Private columnhist_field As Global.System.Data.DataColumn
+        Private columnid_field_set As Global.System.Data.DataColumn
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
@@ -2310,30 +2263,6 @@ Partial Public Class BondsDataSet
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property sort_numColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnsort_num
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property is_necessaryColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnis_necessary
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property typeColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columntype
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public ReadOnly Property colorColumn() As Global.System.Data.DataColumn
             Get
                 Return Me.columncolor
@@ -2342,33 +2271,9 @@ Partial Public Class BondsDataSet
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property bid_fieldColumn() As Global.System.Data.DataColumn
+        Public ReadOnly Property id_field_setColumn() As Global.System.Data.DataColumn
             Get
-                Return Me.columnbid_field
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property ask_fieldColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnask_field
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property last_fieldColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnlast_field
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property hist_fieldColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnhist_field
+                Return Me.columnid_field_set
             End Get
         End Property
         
@@ -2409,9 +2314,9 @@ Partial Public Class BondsDataSet
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Overloads Function AddchainRow(ByVal chain_name As String, ByVal descr As String, ByVal curve As Boolean, ByVal sort_num As Long, ByVal is_necessary As Boolean, ByVal type As String, ByVal color As String, ByVal bid_field As String, ByVal ask_field As String, ByVal last_field As String, ByVal hist_field As String) As chainRow
+        Public Overloads Function AddchainRow(ByVal chain_name As String, ByVal descr As String, ByVal curve As Boolean, ByVal color As String, ByVal id_field_set As Long) As chainRow
             Dim rowchainRow As chainRow = CType(Me.NewRow,chainRow)
-            Dim columnValuesArray() As Object = New Object() {Nothing, chain_name, descr, curve, sort_num, is_necessary, type, color, bid_field, ask_field, last_field, hist_field}
+            Dim columnValuesArray() As Object = New Object() {Nothing, chain_name, descr, curve, color, id_field_set}
             rowchainRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowchainRow)
             Return rowchainRow
@@ -2444,14 +2349,8 @@ Partial Public Class BondsDataSet
             Me.columnchain_name = MyBase.Columns("chain_name")
             Me.columndescr = MyBase.Columns("descr")
             Me.columncurve = MyBase.Columns("curve")
-            Me.columnsort_num = MyBase.Columns("sort_num")
-            Me.columnis_necessary = MyBase.Columns("is_necessary")
-            Me.columntype = MyBase.Columns("type")
             Me.columncolor = MyBase.Columns("color")
-            Me.columnbid_field = MyBase.Columns("bid_field")
-            Me.columnask_field = MyBase.Columns("ask_field")
-            Me.columnlast_field = MyBase.Columns("last_field")
-            Me.columnhist_field = MyBase.Columns("hist_field")
+            Me.columnid_field_set = MyBase.Columns("id_field_set")
         End Sub
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
@@ -2465,22 +2364,10 @@ Partial Public Class BondsDataSet
             MyBase.Columns.Add(Me.columndescr)
             Me.columncurve = New Global.System.Data.DataColumn("curve", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columncurve)
-            Me.columnsort_num = New Global.System.Data.DataColumn("sort_num", GetType(Long), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnsort_num)
-            Me.columnis_necessary = New Global.System.Data.DataColumn("is_necessary", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnis_necessary)
-            Me.columntype = New Global.System.Data.DataColumn("type", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columntype)
             Me.columncolor = New Global.System.Data.DataColumn("color", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columncolor)
-            Me.columnbid_field = New Global.System.Data.DataColumn("bid_field", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnbid_field)
-            Me.columnask_field = New Global.System.Data.DataColumn("ask_field", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnask_field)
-            Me.columnlast_field = New Global.System.Data.DataColumn("last_field", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnlast_field)
-            Me.columnhist_field = New Global.System.Data.DataColumn("hist_field", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnhist_field)
+            Me.columnid_field_set = New Global.System.Data.DataColumn("id_field_set", GetType(Long), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnid_field_set)
             Me.Constraints.Add(New Global.System.Data.UniqueConstraint("Constraint1", New Global.System.Data.DataColumn() {Me.columnid}, true))
             Me.columnid.AutoIncrement = true
             Me.columnid.AutoIncrementSeed = -1
@@ -2489,12 +2376,7 @@ Partial Public Class BondsDataSet
             Me.columnid.Unique = true
             Me.columnchain_name.MaxLength = 2147483647
             Me.columndescr.MaxLength = 2147483647
-            Me.columntype.MaxLength = 2147483647
             Me.columncolor.MaxLength = 2147483647
-            Me.columnbid_field.MaxLength = 2147483647
-            Me.columnask_field.MaxLength = 2147483647
-            Me.columnlast_field.MaxLength = 2147483647
-            Me.columnhist_field.MaxLength = 2147483647
         End Sub
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
@@ -3504,419 +3386,6 @@ Partial Public Class BondsDataSet
     '''</summary>
     <Global.System.Serializable(),  _
      Global.System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")>  _
-    Partial Public Class PortfolioUnitedDataTable
-        Inherits Global.System.Data.TypedTableBase(Of PortfolioUnitedRow)
-        
-        Private columnpid As Global.System.Data.DataColumn
-        
-        Private columnbid As Global.System.Data.DataColumn
-        
-        Private columnric As Global.System.Data.DataColumn
-        
-        Private columndescr As Global.System.Data.DataColumn
-        
-        Private columnpayments As Global.System.Data.DataColumn
-        
-        Private columnrates As Global.System.Data.DataColumn
-        
-        Private columnbondshortname As Global.System.Data.DataColumn
-        
-        Private columndsply_name As Global.System.Data.DataColumn
-        
-        Private columninclude As Global.System.Data.DataColumn
-        
-        Private columncolor As Global.System.Data.DataColumn
-        
-        Private columnwhereFrom As Global.System.Data.DataColumn
-        
-        Private columnfromID As Global.System.Data.DataColumn
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub New()
-            MyBase.New
-            Me.TableName = "PortfolioUnited"
-            Me.BeginInit
-            Me.InitClass
-            Me.EndInit
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Friend Sub New(ByVal table As Global.System.Data.DataTable)
-            MyBase.New
-            Me.TableName = table.TableName
-            If (table.CaseSensitive <> table.DataSet.CaseSensitive) Then
-                Me.CaseSensitive = table.CaseSensitive
-            End If
-            If (table.Locale.ToString <> table.DataSet.Locale.ToString) Then
-                Me.Locale = table.Locale
-            End If
-            If (table.Namespace <> table.DataSet.Namespace) Then
-                Me.Namespace = table.Namespace
-            End If
-            Me.Prefix = table.Prefix
-            Me.MinimumCapacity = table.MinimumCapacity
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Sub New(ByVal info As Global.System.Runtime.Serialization.SerializationInfo, ByVal context As Global.System.Runtime.Serialization.StreamingContext)
-            MyBase.New(info, context)
-            Me.InitVars
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property pidColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnpid
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property bidColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnbid
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property ricColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnric
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property descrColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columndescr
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property paymentsColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnpayments
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property ratesColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnrates
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property bondshortnameColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnbondshortname
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property dsply_nameColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columndsply_name
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property includeColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columninclude
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property colorColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columncolor
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property whereFromColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnwhereFrom
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property fromIDColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnfromID
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-         Global.System.ComponentModel.Browsable(false)>  _
-        Public ReadOnly Property Count() As Integer
-            Get
-                Return Me.Rows.Count
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Default ReadOnly Property Item(ByVal index As Integer) As PortfolioUnitedRow
-            Get
-                Return CType(Me.Rows(index),PortfolioUnitedRow)
-            End Get
-        End Property
-        
-        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Event PortfolioUnitedRowChanging As PortfolioUnitedRowChangeEventHandler
-        
-        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Event PortfolioUnitedRowChanged As PortfolioUnitedRowChangeEventHandler
-        
-        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Event PortfolioUnitedRowDeleting As PortfolioUnitedRowChangeEventHandler
-        
-        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Event PortfolioUnitedRowDeleted As PortfolioUnitedRowChangeEventHandler
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Overloads Sub AddPortfolioUnitedRow(ByVal row As PortfolioUnitedRow)
-            Me.Rows.Add(row)
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Overloads Function AddPortfolioUnitedRow(ByVal ric As String, ByVal descr As String, ByVal payments As String, ByVal rates As String, ByVal bondshortname As Object, ByVal dsply_name As String, ByVal include As Boolean, ByVal color As String, ByVal whereFrom As Object) As PortfolioUnitedRow
-            Dim rowPortfolioUnitedRow As PortfolioUnitedRow = CType(Me.NewRow,PortfolioUnitedRow)
-            Dim columnValuesArray() As Object = New Object() {Nothing, Nothing, ric, descr, payments, rates, bondshortname, dsply_name, include, color, whereFrom, Nothing}
-            rowPortfolioUnitedRow.ItemArray = columnValuesArray
-            Me.Rows.Add(rowPortfolioUnitedRow)
-            Return rowPortfolioUnitedRow
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Overrides Function Clone() As Global.System.Data.DataTable
-            Dim cln As PortfolioUnitedDataTable = CType(MyBase.Clone,PortfolioUnitedDataTable)
-            cln.InitVars
-            Return cln
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Overrides Function CreateInstance() As Global.System.Data.DataTable
-            Return New PortfolioUnitedDataTable()
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Friend Sub InitVars()
-            Me.columnpid = MyBase.Columns("pid")
-            Me.columnbid = MyBase.Columns("bid")
-            Me.columnric = MyBase.Columns("ric")
-            Me.columndescr = MyBase.Columns("descr")
-            Me.columnpayments = MyBase.Columns("payments")
-            Me.columnrates = MyBase.Columns("rates")
-            Me.columnbondshortname = MyBase.Columns("bondshortname")
-            Me.columndsply_name = MyBase.Columns("dsply_name")
-            Me.columninclude = MyBase.Columns("include")
-            Me.columncolor = MyBase.Columns("color")
-            Me.columnwhereFrom = MyBase.Columns("whereFrom")
-            Me.columnfromID = MyBase.Columns("fromID")
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Private Sub InitClass()
-            Me.columnpid = New Global.System.Data.DataColumn("pid", GetType(Long), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnpid)
-            Me.columnbid = New Global.System.Data.DataColumn("bid", GetType(Long), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnbid)
-            Me.columnric = New Global.System.Data.DataColumn("ric", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnric)
-            Me.columndescr = New Global.System.Data.DataColumn("descr", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columndescr)
-            Me.columnpayments = New Global.System.Data.DataColumn("payments", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnpayments)
-            Me.columnrates = New Global.System.Data.DataColumn("rates", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnrates)
-            Me.columnbondshortname = New Global.System.Data.DataColumn("bondshortname", GetType(Object), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnbondshortname)
-            Me.columndsply_name = New Global.System.Data.DataColumn("dsply_name", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columndsply_name)
-            Me.columninclude = New Global.System.Data.DataColumn("include", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columninclude)
-            Me.columncolor = New Global.System.Data.DataColumn("color", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columncolor)
-            Me.columnwhereFrom = New Global.System.Data.DataColumn("whereFrom", GetType(Object), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnwhereFrom)
-            Me.columnfromID = New Global.System.Data.DataColumn("fromID", GetType(Long), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnfromID)
-            Me.columnpid.AutoIncrement = true
-            Me.columnpid.AutoIncrementSeed = -1
-            Me.columnpid.AutoIncrementStep = -1
-            Me.columnpid.AllowDBNull = false
-            Me.columnbid.AutoIncrement = true
-            Me.columnbid.AutoIncrementSeed = -1
-            Me.columnbid.AutoIncrementStep = -1
-            Me.columnbid.AllowDBNull = false
-            Me.columnric.MaxLength = 2147483647
-            Me.columndescr.MaxLength = 2147483647
-            Me.columnpayments.MaxLength = 2147483647
-            Me.columnrates.MaxLength = 2147483647
-            Me.columndsply_name.MaxLength = 2147483647
-            Me.columncolor.MaxLength = 2147483647
-            Me.columnfromID.AutoIncrement = true
-            Me.columnfromID.AutoIncrementSeed = -1
-            Me.columnfromID.AutoIncrementStep = -1
-            Me.columnfromID.AllowDBNull = false
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function NewPortfolioUnitedRow() As PortfolioUnitedRow
-            Return CType(Me.NewRow,PortfolioUnitedRow)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Overrides Function NewRowFromBuilder(ByVal builder As Global.System.Data.DataRowBuilder) As Global.System.Data.DataRow
-            Return New PortfolioUnitedRow(builder)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Overrides Function GetRowType() As Global.System.Type
-            Return GetType(PortfolioUnitedRow)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Overrides Sub OnRowChanged(ByVal e As Global.System.Data.DataRowChangeEventArgs)
-            MyBase.OnRowChanged(e)
-            If (Not (Me.PortfolioUnitedRowChangedEvent) Is Nothing) Then
-                RaiseEvent PortfolioUnitedRowChanged(Me, New PortfolioUnitedRowChangeEvent(CType(e.Row,PortfolioUnitedRow), e.Action))
-            End If
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Overrides Sub OnRowChanging(ByVal e As Global.System.Data.DataRowChangeEventArgs)
-            MyBase.OnRowChanging(e)
-            If (Not (Me.PortfolioUnitedRowChangingEvent) Is Nothing) Then
-                RaiseEvent PortfolioUnitedRowChanging(Me, New PortfolioUnitedRowChangeEvent(CType(e.Row,PortfolioUnitedRow), e.Action))
-            End If
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Overrides Sub OnRowDeleted(ByVal e As Global.System.Data.DataRowChangeEventArgs)
-            MyBase.OnRowDeleted(e)
-            If (Not (Me.PortfolioUnitedRowDeletedEvent) Is Nothing) Then
-                RaiseEvent PortfolioUnitedRowDeleted(Me, New PortfolioUnitedRowChangeEvent(CType(e.Row,PortfolioUnitedRow), e.Action))
-            End If
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Overrides Sub OnRowDeleting(ByVal e As Global.System.Data.DataRowChangeEventArgs)
-            MyBase.OnRowDeleting(e)
-            If (Not (Me.PortfolioUnitedRowDeletingEvent) Is Nothing) Then
-                RaiseEvent PortfolioUnitedRowDeleting(Me, New PortfolioUnitedRowChangeEvent(CType(e.Row,PortfolioUnitedRow), e.Action))
-            End If
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub RemovePortfolioUnitedRow(ByVal row As PortfolioUnitedRow)
-            Me.Rows.Remove(row)
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Shared Function GetTypedTableSchema(ByVal xs As Global.System.Xml.Schema.XmlSchemaSet) As Global.System.Xml.Schema.XmlSchemaComplexType
-            Dim type As Global.System.Xml.Schema.XmlSchemaComplexType = New Global.System.Xml.Schema.XmlSchemaComplexType()
-            Dim sequence As Global.System.Xml.Schema.XmlSchemaSequence = New Global.System.Xml.Schema.XmlSchemaSequence()
-            Dim ds As BondsDataSet = New BondsDataSet()
-            Dim any1 As Global.System.Xml.Schema.XmlSchemaAny = New Global.System.Xml.Schema.XmlSchemaAny()
-            any1.Namespace = "http://www.w3.org/2001/XMLSchema"
-            any1.MinOccurs = New Decimal(0)
-            any1.MaxOccurs = Decimal.MaxValue
-            any1.ProcessContents = Global.System.Xml.Schema.XmlSchemaContentProcessing.Lax
-            sequence.Items.Add(any1)
-            Dim any2 As Global.System.Xml.Schema.XmlSchemaAny = New Global.System.Xml.Schema.XmlSchemaAny()
-            any2.Namespace = "urn:schemas-microsoft-com:xml-diffgram-v1"
-            any2.MinOccurs = New Decimal(1)
-            any2.ProcessContents = Global.System.Xml.Schema.XmlSchemaContentProcessing.Lax
-            sequence.Items.Add(any2)
-            Dim attribute1 As Global.System.Xml.Schema.XmlSchemaAttribute = New Global.System.Xml.Schema.XmlSchemaAttribute()
-            attribute1.Name = "namespace"
-            attribute1.FixedValue = ds.Namespace
-            type.Attributes.Add(attribute1)
-            Dim attribute2 As Global.System.Xml.Schema.XmlSchemaAttribute = New Global.System.Xml.Schema.XmlSchemaAttribute()
-            attribute2.Name = "tableTypeName"
-            attribute2.FixedValue = "PortfolioUnitedDataTable"
-            type.Attributes.Add(attribute2)
-            type.Particle = sequence
-            Dim dsSchema As Global.System.Xml.Schema.XmlSchema = ds.GetSchemaSerializable
-            If xs.Contains(dsSchema.TargetNamespace) Then
-                Dim s1 As Global.System.IO.MemoryStream = New Global.System.IO.MemoryStream()
-                Dim s2 As Global.System.IO.MemoryStream = New Global.System.IO.MemoryStream()
-                Try 
-                    Dim schema As Global.System.Xml.Schema.XmlSchema = Nothing
-                    dsSchema.Write(s1)
-                    Dim schemas As Global.System.Collections.IEnumerator = xs.Schemas(dsSchema.TargetNamespace).GetEnumerator
-                    Do While schemas.MoveNext
-                        schema = CType(schemas.Current,Global.System.Xml.Schema.XmlSchema)
-                        s2.SetLength(0)
-                        schema.Write(s2)
-                        If (s1.Length = s2.Length) Then
-                            s1.Position = 0
-                            s2.Position = 0
-                            
-                            Do While ((s1.Position <> s1.Length)  _
-                                        AndAlso (s1.ReadByte = s2.ReadByte))
-                                
-                                
-                            Loop
-                            If (s1.Position = s1.Length) Then
-                                Return type
-                            End If
-                        End If
-                        
-                    Loop
-                Finally
-                    If (Not (s1) Is Nothing) Then
-                        s1.Close
-                    End If
-                    If (Not (s2) Is Nothing) Then
-                        s2.Close
-                    End If
-                End Try
-            End If
-            xs.Add(dsSchema)
-            Return type
-        End Function
-    End Class
-    
-    '''<summary>
-    '''Represents the strongly named DataTable class.
-    '''</summary>
-    <Global.System.Serializable(),  _
-     Global.System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")>  _
     Partial Public Class settingsDataTable
         Inherits Global.System.Data.TypedTableBase(Of settingsRow)
         
@@ -4581,15 +4050,9 @@ Partial Public Class BondsDataSet
         
         Private columncolor As Global.System.Data.DataColumn
         
-        Private columnbid_field As Global.System.Data.DataColumn
-        
-        Private columnlast_field As Global.System.Data.DataColumn
-        
-        Private columnask_field As Global.System.Data.DataColumn
-        
-        Private columnhist_field As Global.System.Data.DataColumn
-        
         Private columncurve As Global.System.Data.DataColumn
+        
+        Private columnid_field_set As Global.System.Data.DataColumn
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
@@ -4652,41 +4115,17 @@ Partial Public Class BondsDataSet
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property bid_fieldColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnbid_field
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property last_fieldColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnlast_field
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property ask_fieldColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnask_field
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property hist_fieldColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnhist_field
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public ReadOnly Property curveColumn() As Global.System.Data.DataColumn
             Get
                 Return Me.columncurve
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property id_field_setColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnid_field_set
             End Get
         End Property
         
@@ -4727,9 +4166,9 @@ Partial Public Class BondsDataSet
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Overloads Function AddhawserRow(ByVal hawser_name As String, ByVal color As String, ByVal bid_field As String, ByVal last_field As String, ByVal ask_field As String, ByVal hist_field As String, ByVal curve As Boolean) As hawserRow
+        Public Overloads Function AddhawserRow(ByVal hawser_name As String, ByVal color As String, ByVal curve As Boolean, ByVal id_field_set As Long) As hawserRow
             Dim rowhawserRow As hawserRow = CType(Me.NewRow,hawserRow)
-            Dim columnValuesArray() As Object = New Object() {Nothing, hawser_name, color, bid_field, last_field, ask_field, hist_field, curve}
+            Dim columnValuesArray() As Object = New Object() {Nothing, hawser_name, color, curve, id_field_set}
             rowhawserRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowhawserRow)
             Return rowhawserRow
@@ -4761,11 +4200,8 @@ Partial Public Class BondsDataSet
             Me.columnid = MyBase.Columns("id")
             Me.columnhawser_name = MyBase.Columns("hawser_name")
             Me.columncolor = MyBase.Columns("color")
-            Me.columnbid_field = MyBase.Columns("bid_field")
-            Me.columnlast_field = MyBase.Columns("last_field")
-            Me.columnask_field = MyBase.Columns("ask_field")
-            Me.columnhist_field = MyBase.Columns("hist_field")
             Me.columncurve = MyBase.Columns("curve")
+            Me.columnid_field_set = MyBase.Columns("id_field_set")
         End Sub
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
@@ -4777,16 +4213,10 @@ Partial Public Class BondsDataSet
             MyBase.Columns.Add(Me.columnhawser_name)
             Me.columncolor = New Global.System.Data.DataColumn("color", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columncolor)
-            Me.columnbid_field = New Global.System.Data.DataColumn("bid_field", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnbid_field)
-            Me.columnlast_field = New Global.System.Data.DataColumn("last_field", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnlast_field)
-            Me.columnask_field = New Global.System.Data.DataColumn("ask_field", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnask_field)
-            Me.columnhist_field = New Global.System.Data.DataColumn("hist_field", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnhist_field)
             Me.columncurve = New Global.System.Data.DataColumn("curve", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columncurve)
+            Me.columnid_field_set = New Global.System.Data.DataColumn("id_field_set", GetType(Long), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnid_field_set)
             Me.Constraints.Add(New Global.System.Data.UniqueConstraint("Constraint1", New Global.System.Data.DataColumn() {Me.columnid}, true))
             Me.columnid.AutoIncrement = true
             Me.columnid.AutoIncrementSeed = -1
@@ -4795,10 +4225,6 @@ Partial Public Class BondsDataSet
             Me.columnid.Unique = true
             Me.columnhawser_name.MaxLength = 2147483647
             Me.columncolor.MaxLength = 2147483647
-            Me.columnbid_field.MaxLength = 2147483647
-            Me.columnlast_field.MaxLength = 2147483647
-            Me.columnask_field.MaxLength = 2147483647
-            Me.columnhist_field.MaxLength = 2147483647
         End Sub
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
@@ -5482,381 +4908,6 @@ Partial Public Class BondsDataSet
             Dim attribute2 As Global.System.Xml.Schema.XmlSchemaAttribute = New Global.System.Xml.Schema.XmlSchemaAttribute()
             attribute2.Name = "tableTypeName"
             attribute2.FixedValue = "hawser_to_bondDataTable"
-            type.Attributes.Add(attribute2)
-            type.Particle = sequence
-            Dim dsSchema As Global.System.Xml.Schema.XmlSchema = ds.GetSchemaSerializable
-            If xs.Contains(dsSchema.TargetNamespace) Then
-                Dim s1 As Global.System.IO.MemoryStream = New Global.System.IO.MemoryStream()
-                Dim s2 As Global.System.IO.MemoryStream = New Global.System.IO.MemoryStream()
-                Try 
-                    Dim schema As Global.System.Xml.Schema.XmlSchema = Nothing
-                    dsSchema.Write(s1)
-                    Dim schemas As Global.System.Collections.IEnumerator = xs.Schemas(dsSchema.TargetNamespace).GetEnumerator
-                    Do While schemas.MoveNext
-                        schema = CType(schemas.Current,Global.System.Xml.Schema.XmlSchema)
-                        s2.SetLength(0)
-                        schema.Write(s2)
-                        If (s1.Length = s2.Length) Then
-                            s1.Position = 0
-                            s2.Position = 0
-                            
-                            Do While ((s1.Position <> s1.Length)  _
-                                        AndAlso (s1.ReadByte = s2.ReadByte))
-                                
-                                
-                            Loop
-                            If (s1.Position = s1.Length) Then
-                                Return type
-                            End If
-                        End If
-                        
-                    Loop
-                Finally
-                    If (Not (s1) Is Nothing) Then
-                        s1.Close
-                    End If
-                    If (Not (s2) Is Nothing) Then
-                        s2.Close
-                    End If
-                End Try
-            End If
-            xs.Add(dsSchema)
-            Return type
-        End Function
-    End Class
-    
-    '''<summary>
-    '''Represents the strongly named DataTable class.
-    '''</summary>
-    <Global.System.Serializable(),  _
-     Global.System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")>  _
-    Partial Public Class _portfolioByBondsDataTable
-        Inherits Global.System.Data.TypedTableBase(Of _portfolioByBondsRow)
-        
-        Private columnpid As Global.System.Data.DataColumn
-        
-        Private columnbid As Global.System.Data.DataColumn
-        
-        Private columnric As Global.System.Data.DataColumn
-        
-        Private columndescr As Global.System.Data.DataColumn
-        
-        Private columnpayments As Global.System.Data.DataColumn
-        
-        Private columnrates As Global.System.Data.DataColumn
-        
-        Private columnbondshortname As Global.System.Data.DataColumn
-        
-        Private columndsply_name As Global.System.Data.DataColumn
-        
-        Private columninclude As Global.System.Data.DataColumn
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub New()
-            MyBase.New
-            Me.TableName = "_portfolioByBonds"
-            Me.BeginInit
-            Me.InitClass
-            Me.EndInit
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Friend Sub New(ByVal table As Global.System.Data.DataTable)
-            MyBase.New
-            Me.TableName = table.TableName
-            If (table.CaseSensitive <> table.DataSet.CaseSensitive) Then
-                Me.CaseSensitive = table.CaseSensitive
-            End If
-            If (table.Locale.ToString <> table.DataSet.Locale.ToString) Then
-                Me.Locale = table.Locale
-            End If
-            If (table.Namespace <> table.DataSet.Namespace) Then
-                Me.Namespace = table.Namespace
-            End If
-            Me.Prefix = table.Prefix
-            Me.MinimumCapacity = table.MinimumCapacity
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Sub New(ByVal info As Global.System.Runtime.Serialization.SerializationInfo, ByVal context As Global.System.Runtime.Serialization.StreamingContext)
-            MyBase.New(info, context)
-            Me.InitVars
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property pidColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnpid
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property bidColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnbid
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property ricColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnric
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property descrColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columndescr
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property paymentsColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnpayments
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property ratesColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnrates
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property bondshortnameColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnbondshortname
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property dsply_nameColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columndsply_name
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property includeColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columninclude
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-         Global.System.ComponentModel.Browsable(false)>  _
-        Public ReadOnly Property Count() As Integer
-            Get
-                Return Me.Rows.Count
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Default ReadOnly Property Item(ByVal index As Integer) As _portfolioByBondsRow
-            Get
-                Return CType(Me.Rows(index),_portfolioByBondsRow)
-            End Get
-        End Property
-        
-        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Event _portfolioByBondsRowChanging As _portfolioByBondsRowChangeEventHandler
-        
-        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Event _portfolioByBondsRowChanged As _portfolioByBondsRowChangeEventHandler
-        
-        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Event _portfolioByBondsRowDeleting As _portfolioByBondsRowChangeEventHandler
-        
-        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Event _portfolioByBondsRowDeleted As _portfolioByBondsRowChangeEventHandler
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Overloads Sub Add_portfolioByBondsRow(ByVal row As _portfolioByBondsRow)
-            Me.Rows.Add(row)
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Overloads Function Add_portfolioByBondsRow(ByVal bid As Long, ByVal ric As String, ByVal descr As String, ByVal payments As String, ByVal rates As String, ByVal bondshortname As Object, ByVal dsply_name As String, ByVal include As Boolean) As _portfolioByBondsRow
-            Dim row_portfolioByBondsRow As _portfolioByBondsRow = CType(Me.NewRow,_portfolioByBondsRow)
-            Dim columnValuesArray() As Object = New Object() {Nothing, bid, ric, descr, payments, rates, bondshortname, dsply_name, include}
-            row_portfolioByBondsRow.ItemArray = columnValuesArray
-            Me.Rows.Add(row_portfolioByBondsRow)
-            Return row_portfolioByBondsRow
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Overrides Function Clone() As Global.System.Data.DataTable
-            Dim cln As _portfolioByBondsDataTable = CType(MyBase.Clone,_portfolioByBondsDataTable)
-            cln.InitVars
-            Return cln
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Overrides Function CreateInstance() As Global.System.Data.DataTable
-            Return New _portfolioByBondsDataTable()
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Friend Sub InitVars()
-            Me.columnpid = MyBase.Columns("pid")
-            Me.columnbid = MyBase.Columns("bid")
-            Me.columnric = MyBase.Columns("ric")
-            Me.columndescr = MyBase.Columns("descr")
-            Me.columnpayments = MyBase.Columns("payments")
-            Me.columnrates = MyBase.Columns("rates")
-            Me.columnbondshortname = MyBase.Columns("bondshortname")
-            Me.columndsply_name = MyBase.Columns("dsply_name")
-            Me.columninclude = MyBase.Columns("include")
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Private Sub InitClass()
-            Me.columnpid = New Global.System.Data.DataColumn("pid", GetType(Long), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnpid)
-            Me.columnbid = New Global.System.Data.DataColumn("bid", GetType(Long), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnbid)
-            Me.columnric = New Global.System.Data.DataColumn("ric", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnric)
-            Me.columndescr = New Global.System.Data.DataColumn("descr", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columndescr)
-            Me.columnpayments = New Global.System.Data.DataColumn("payments", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnpayments)
-            Me.columnrates = New Global.System.Data.DataColumn("rates", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnrates)
-            Me.columnbondshortname = New Global.System.Data.DataColumn("bondshortname", GetType(Object), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnbondshortname)
-            Me.columndsply_name = New Global.System.Data.DataColumn("dsply_name", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columndsply_name)
-            Me.columninclude = New Global.System.Data.DataColumn("include", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columninclude)
-            Me.columnpid.AutoIncrement = true
-            Me.columnpid.AutoIncrementSeed = -1
-            Me.columnpid.AutoIncrementStep = -1
-            Me.columnpid.AllowDBNull = false
-            Me.columnpid.Caption = "[pid]"
-            Me.columnbid.AllowDBNull = false
-            Me.columnbid.Caption = "[bid]"
-            Me.columnric.Caption = "[ric]"
-            Me.columnric.MaxLength = 2147483647
-            Me.columndescr.Caption = "[descr]"
-            Me.columndescr.MaxLength = 2147483647
-            Me.columnpayments.Caption = "[payments]"
-            Me.columnpayments.MaxLength = 2147483647
-            Me.columnrates.Caption = "[rates]"
-            Me.columnrates.MaxLength = 2147483647
-            Me.columnbondshortname.Caption = "[bondshortname]"
-            Me.columndsply_name.Caption = "[dsply_name]"
-            Me.columndsply_name.MaxLength = 2147483647
-            Me.columninclude.Caption = "[include]"
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function New_portfolioByBondsRow() As _portfolioByBondsRow
-            Return CType(Me.NewRow,_portfolioByBondsRow)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Overrides Function NewRowFromBuilder(ByVal builder As Global.System.Data.DataRowBuilder) As Global.System.Data.DataRow
-            Return New _portfolioByBondsRow(builder)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Overrides Function GetRowType() As Global.System.Type
-            Return GetType(_portfolioByBondsRow)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Overrides Sub OnRowChanged(ByVal e As Global.System.Data.DataRowChangeEventArgs)
-            MyBase.OnRowChanged(e)
-            If (Not (Me._portfolioByBondsRowChangedEvent) Is Nothing) Then
-                RaiseEvent _portfolioByBondsRowChanged(Me, New _portfolioByBondsRowChangeEvent(CType(e.Row,_portfolioByBondsRow), e.Action))
-            End If
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Overrides Sub OnRowChanging(ByVal e As Global.System.Data.DataRowChangeEventArgs)
-            MyBase.OnRowChanging(e)
-            If (Not (Me._portfolioByBondsRowChangingEvent) Is Nothing) Then
-                RaiseEvent _portfolioByBondsRowChanging(Me, New _portfolioByBondsRowChangeEvent(CType(e.Row,_portfolioByBondsRow), e.Action))
-            End If
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Overrides Sub OnRowDeleted(ByVal e As Global.System.Data.DataRowChangeEventArgs)
-            MyBase.OnRowDeleted(e)
-            If (Not (Me._portfolioByBondsRowDeletedEvent) Is Nothing) Then
-                RaiseEvent _portfolioByBondsRowDeleted(Me, New _portfolioByBondsRowChangeEvent(CType(e.Row,_portfolioByBondsRow), e.Action))
-            End If
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Overrides Sub OnRowDeleting(ByVal e As Global.System.Data.DataRowChangeEventArgs)
-            MyBase.OnRowDeleting(e)
-            If (Not (Me._portfolioByBondsRowDeletingEvent) Is Nothing) Then
-                RaiseEvent _portfolioByBondsRowDeleting(Me, New _portfolioByBondsRowChangeEvent(CType(e.Row,_portfolioByBondsRow), e.Action))
-            End If
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Remove_portfolioByBondsRow(ByVal row As _portfolioByBondsRow)
-            Me.Rows.Remove(row)
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Shared Function GetTypedTableSchema(ByVal xs As Global.System.Xml.Schema.XmlSchemaSet) As Global.System.Xml.Schema.XmlSchemaComplexType
-            Dim type As Global.System.Xml.Schema.XmlSchemaComplexType = New Global.System.Xml.Schema.XmlSchemaComplexType()
-            Dim sequence As Global.System.Xml.Schema.XmlSchemaSequence = New Global.System.Xml.Schema.XmlSchemaSequence()
-            Dim ds As BondsDataSet = New BondsDataSet()
-            Dim any1 As Global.System.Xml.Schema.XmlSchemaAny = New Global.System.Xml.Schema.XmlSchemaAny()
-            any1.Namespace = "http://www.w3.org/2001/XMLSchema"
-            any1.MinOccurs = New Decimal(0)
-            any1.MaxOccurs = Decimal.MaxValue
-            any1.ProcessContents = Global.System.Xml.Schema.XmlSchemaContentProcessing.Lax
-            sequence.Items.Add(any1)
-            Dim any2 As Global.System.Xml.Schema.XmlSchemaAny = New Global.System.Xml.Schema.XmlSchemaAny()
-            any2.Namespace = "urn:schemas-microsoft-com:xml-diffgram-v1"
-            any2.MinOccurs = New Decimal(1)
-            any2.ProcessContents = Global.System.Xml.Schema.XmlSchemaContentProcessing.Lax
-            sequence.Items.Add(any2)
-            Dim attribute1 As Global.System.Xml.Schema.XmlSchemaAttribute = New Global.System.Xml.Schema.XmlSchemaAttribute()
-            attribute1.Name = "namespace"
-            attribute1.FixedValue = ds.Namespace
-            type.Attributes.Add(attribute1)
-            Dim attribute2 As Global.System.Xml.Schema.XmlSchemaAttribute = New Global.System.Xml.Schema.XmlSchemaAttribute()
-            attribute2.Name = "tableTypeName"
-            attribute2.FixedValue = "_portfolioByBondsDataTable"
             type.Attributes.Add(attribute2)
             type.Particle = sequence
             Dim dsSchema As Global.System.Xml.Schema.XmlSchema = ds.GetSchemaSerializable
@@ -7275,307 +6326,6 @@ Partial Public Class BondsDataSet
     '''</summary>
     <Global.System.Serializable(),  _
      Global.System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")>  _
-    Partial Public Class portfolio_to_bondDataTable
-        Inherits Global.System.Data.TypedTableBase(Of portfolio_to_bondRow)
-        
-        Private columnid As Global.System.Data.DataColumn
-        
-        Private columnid_portfolio As Global.System.Data.DataColumn
-        
-        Private columninclude As Global.System.Data.DataColumn
-        
-        Private columnbond_ric As Global.System.Data.DataColumn
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub New()
-            MyBase.New
-            Me.TableName = "portfolio_to_bond"
-            Me.BeginInit
-            Me.InitClass
-            Me.EndInit
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Friend Sub New(ByVal table As Global.System.Data.DataTable)
-            MyBase.New
-            Me.TableName = table.TableName
-            If (table.CaseSensitive <> table.DataSet.CaseSensitive) Then
-                Me.CaseSensitive = table.CaseSensitive
-            End If
-            If (table.Locale.ToString <> table.DataSet.Locale.ToString) Then
-                Me.Locale = table.Locale
-            End If
-            If (table.Namespace <> table.DataSet.Namespace) Then
-                Me.Namespace = table.Namespace
-            End If
-            Me.Prefix = table.Prefix
-            Me.MinimumCapacity = table.MinimumCapacity
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Sub New(ByVal info As Global.System.Runtime.Serialization.SerializationInfo, ByVal context As Global.System.Runtime.Serialization.StreamingContext)
-            MyBase.New(info, context)
-            Me.InitVars
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property idColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnid
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property id_portfolioColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnid_portfolio
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property includeColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columninclude
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property bond_ricColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnbond_ric
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-         Global.System.ComponentModel.Browsable(false)>  _
-        Public ReadOnly Property Count() As Integer
-            Get
-                Return Me.Rows.Count
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Default ReadOnly Property Item(ByVal index As Integer) As portfolio_to_bondRow
-            Get
-                Return CType(Me.Rows(index),portfolio_to_bondRow)
-            End Get
-        End Property
-        
-        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Event portfolio_to_bondRowChanging As portfolio_to_bondRowChangeEventHandler
-        
-        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Event portfolio_to_bondRowChanged As portfolio_to_bondRowChangeEventHandler
-        
-        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Event portfolio_to_bondRowDeleting As portfolio_to_bondRowChangeEventHandler
-        
-        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Event portfolio_to_bondRowDeleted As portfolio_to_bondRowChangeEventHandler
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Overloads Sub Addportfolio_to_bondRow(ByVal row As portfolio_to_bondRow)
-            Me.Rows.Add(row)
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Overloads Function Addportfolio_to_bondRow(ByVal id As Long, ByVal id_portfolio As Long, ByVal include As Boolean, ByVal bond_ric As String) As portfolio_to_bondRow
-            Dim rowportfolio_to_bondRow As portfolio_to_bondRow = CType(Me.NewRow,portfolio_to_bondRow)
-            Dim columnValuesArray() As Object = New Object() {id, id_portfolio, include, bond_ric}
-            rowportfolio_to_bondRow.ItemArray = columnValuesArray
-            Me.Rows.Add(rowportfolio_to_bondRow)
-            Return rowportfolio_to_bondRow
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function FindByid(ByVal id As Long) As portfolio_to_bondRow
-            Return CType(Me.Rows.Find(New Object() {id}),portfolio_to_bondRow)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Overrides Function Clone() As Global.System.Data.DataTable
-            Dim cln As portfolio_to_bondDataTable = CType(MyBase.Clone,portfolio_to_bondDataTable)
-            cln.InitVars
-            Return cln
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Overrides Function CreateInstance() As Global.System.Data.DataTable
-            Return New portfolio_to_bondDataTable()
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Friend Sub InitVars()
-            Me.columnid = MyBase.Columns("id")
-            Me.columnid_portfolio = MyBase.Columns("id_portfolio")
-            Me.columninclude = MyBase.Columns("include")
-            Me.columnbond_ric = MyBase.Columns("bond_ric")
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Private Sub InitClass()
-            Me.columnid = New Global.System.Data.DataColumn("id", GetType(Long), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnid)
-            Me.columnid_portfolio = New Global.System.Data.DataColumn("id_portfolio", GetType(Long), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnid_portfolio)
-            Me.columninclude = New Global.System.Data.DataColumn("include", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columninclude)
-            Me.columnbond_ric = New Global.System.Data.DataColumn("bond_ric", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnbond_ric)
-            Me.Constraints.Add(New Global.System.Data.UniqueConstraint("Constraint1", New Global.System.Data.DataColumn() {Me.columnid}, true))
-            Me.columnid.AllowDBNull = false
-            Me.columnid.Unique = true
-            Me.columnbond_ric.MaxLength = 2147483647
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function Newportfolio_to_bondRow() As portfolio_to_bondRow
-            Return CType(Me.NewRow,portfolio_to_bondRow)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Overrides Function NewRowFromBuilder(ByVal builder As Global.System.Data.DataRowBuilder) As Global.System.Data.DataRow
-            Return New portfolio_to_bondRow(builder)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Overrides Function GetRowType() As Global.System.Type
-            Return GetType(portfolio_to_bondRow)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Overrides Sub OnRowChanged(ByVal e As Global.System.Data.DataRowChangeEventArgs)
-            MyBase.OnRowChanged(e)
-            If (Not (Me.portfolio_to_bondRowChangedEvent) Is Nothing) Then
-                RaiseEvent portfolio_to_bondRowChanged(Me, New portfolio_to_bondRowChangeEvent(CType(e.Row,portfolio_to_bondRow), e.Action))
-            End If
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Overrides Sub OnRowChanging(ByVal e As Global.System.Data.DataRowChangeEventArgs)
-            MyBase.OnRowChanging(e)
-            If (Not (Me.portfolio_to_bondRowChangingEvent) Is Nothing) Then
-                RaiseEvent portfolio_to_bondRowChanging(Me, New portfolio_to_bondRowChangeEvent(CType(e.Row,portfolio_to_bondRow), e.Action))
-            End If
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Overrides Sub OnRowDeleted(ByVal e As Global.System.Data.DataRowChangeEventArgs)
-            MyBase.OnRowDeleted(e)
-            If (Not (Me.portfolio_to_bondRowDeletedEvent) Is Nothing) Then
-                RaiseEvent portfolio_to_bondRowDeleted(Me, New portfolio_to_bondRowChangeEvent(CType(e.Row,portfolio_to_bondRow), e.Action))
-            End If
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Overrides Sub OnRowDeleting(ByVal e As Global.System.Data.DataRowChangeEventArgs)
-            MyBase.OnRowDeleting(e)
-            If (Not (Me.portfolio_to_bondRowDeletingEvent) Is Nothing) Then
-                RaiseEvent portfolio_to_bondRowDeleting(Me, New portfolio_to_bondRowChangeEvent(CType(e.Row,portfolio_to_bondRow), e.Action))
-            End If
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Removeportfolio_to_bondRow(ByVal row As portfolio_to_bondRow)
-            Me.Rows.Remove(row)
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Shared Function GetTypedTableSchema(ByVal xs As Global.System.Xml.Schema.XmlSchemaSet) As Global.System.Xml.Schema.XmlSchemaComplexType
-            Dim type As Global.System.Xml.Schema.XmlSchemaComplexType = New Global.System.Xml.Schema.XmlSchemaComplexType()
-            Dim sequence As Global.System.Xml.Schema.XmlSchemaSequence = New Global.System.Xml.Schema.XmlSchemaSequence()
-            Dim ds As BondsDataSet = New BondsDataSet()
-            Dim any1 As Global.System.Xml.Schema.XmlSchemaAny = New Global.System.Xml.Schema.XmlSchemaAny()
-            any1.Namespace = "http://www.w3.org/2001/XMLSchema"
-            any1.MinOccurs = New Decimal(0)
-            any1.MaxOccurs = Decimal.MaxValue
-            any1.ProcessContents = Global.System.Xml.Schema.XmlSchemaContentProcessing.Lax
-            sequence.Items.Add(any1)
-            Dim any2 As Global.System.Xml.Schema.XmlSchemaAny = New Global.System.Xml.Schema.XmlSchemaAny()
-            any2.Namespace = "urn:schemas-microsoft-com:xml-diffgram-v1"
-            any2.MinOccurs = New Decimal(1)
-            any2.ProcessContents = Global.System.Xml.Schema.XmlSchemaContentProcessing.Lax
-            sequence.Items.Add(any2)
-            Dim attribute1 As Global.System.Xml.Schema.XmlSchemaAttribute = New Global.System.Xml.Schema.XmlSchemaAttribute()
-            attribute1.Name = "namespace"
-            attribute1.FixedValue = ds.Namespace
-            type.Attributes.Add(attribute1)
-            Dim attribute2 As Global.System.Xml.Schema.XmlSchemaAttribute = New Global.System.Xml.Schema.XmlSchemaAttribute()
-            attribute2.Name = "tableTypeName"
-            attribute2.FixedValue = "portfolio_to_bondDataTable"
-            type.Attributes.Add(attribute2)
-            type.Particle = sequence
-            Dim dsSchema As Global.System.Xml.Schema.XmlSchema = ds.GetSchemaSerializable
-            If xs.Contains(dsSchema.TargetNamespace) Then
-                Dim s1 As Global.System.IO.MemoryStream = New Global.System.IO.MemoryStream()
-                Dim s2 As Global.System.IO.MemoryStream = New Global.System.IO.MemoryStream()
-                Try 
-                    Dim schema As Global.System.Xml.Schema.XmlSchema = Nothing
-                    dsSchema.Write(s1)
-                    Dim schemas As Global.System.Collections.IEnumerator = xs.Schemas(dsSchema.TargetNamespace).GetEnumerator
-                    Do While schemas.MoveNext
-                        schema = CType(schemas.Current,Global.System.Xml.Schema.XmlSchema)
-                        s2.SetLength(0)
-                        schema.Write(s2)
-                        If (s1.Length = s2.Length) Then
-                            s1.Position = 0
-                            s2.Position = 0
-                            
-                            Do While ((s1.Position <> s1.Length)  _
-                                        AndAlso (s1.ReadByte = s2.ReadByte))
-                                
-                                
-                            Loop
-                            If (s1.Position = s1.Length) Then
-                                Return type
-                            End If
-                        End If
-                        
-                    Loop
-                Finally
-                    If (Not (s1) Is Nothing) Then
-                        s1.Close
-                    End If
-                    If (Not (s2) Is Nothing) Then
-                        s2.Close
-                    End If
-                End Try
-            End If
-            xs.Add(dsSchema)
-            Return type
-        End Function
-    End Class
-    
-    '''<summary>
-    '''Represents the strongly named DataTable class.
-    '''</summary>
-    <Global.System.Serializable(),  _
-     Global.System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")>  _
     Partial Public Class portfolio_to_chainDataTable
         Inherits Global.System.Data.TypedTableBase(Of portfolio_to_chainRow)
         
@@ -8185,23 +6935,15 @@ Partial Public Class BondsDataSet
         
         Private columnfromID As Global.System.Data.DataColumn
         
-        Private columnbid_field As Global.System.Data.DataColumn
-        
-        Private columnask_field As Global.System.Data.DataColumn
-        
-        Private columnlast_field As Global.System.Data.DataColumn
-        
-        Private columnhist_field As Global.System.Data.DataColumn
-        
         Private columnportfolio_name As Global.System.Data.DataColumn
-        
-        Private columnric_structure As Global.System.Data.DataColumn
         
         Private columnwhereFromName As Global.System.Data.DataColumn
         
         Private columnwhereFromDescr As Global.System.Data.DataColumn
         
         Private columncolor As Global.System.Data.DataColumn
+        
+        Private columnid_field_set As Global.System.Data.DataColumn
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
@@ -8264,49 +7006,9 @@ Partial Public Class BondsDataSet
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property bid_fieldColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnbid_field
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property ask_fieldColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnask_field
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property last_fieldColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnlast_field
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property hist_fieldColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnhist_field
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public ReadOnly Property portfolio_nameColumn() As Global.System.Data.DataColumn
             Get
                 Return Me.columnportfolio_name
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property ric_structureColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnric_structure
             End Get
         End Property
         
@@ -8331,6 +7033,14 @@ Partial Public Class BondsDataSet
         Public ReadOnly Property colorColumn() As Global.System.Data.DataColumn
             Get
                 Return Me.columncolor
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property id_field_setColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnid_field_set
             End Get
         End Property
         
@@ -8371,9 +7081,9 @@ Partial Public Class BondsDataSet
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Overloads Function AddPortfolioSourcesRow(ByVal whereFrom As Object, ByVal bid_field As String, ByVal ask_field As String, ByVal last_field As String, ByVal hist_field As String, ByVal portfolio_name As String, ByVal ric_structure As String, ByVal whereFromName As String, ByVal whereFromDescr As String, ByVal color As String) As PortfolioSourcesRow
+        Public Overloads Function AddPortfolioSourcesRow(ByVal whereFrom As Object, ByVal portfolio_name As String, ByVal whereFromName As String, ByVal whereFromDescr As String, ByVal color As String, ByVal id_field_set As Integer) As PortfolioSourcesRow
             Dim rowPortfolioSourcesRow As PortfolioSourcesRow = CType(Me.NewRow,PortfolioSourcesRow)
-            Dim columnValuesArray() As Object = New Object() {Nothing, whereFrom, Nothing, bid_field, ask_field, last_field, hist_field, portfolio_name, ric_structure, whereFromName, whereFromDescr, color}
+            Dim columnValuesArray() As Object = New Object() {Nothing, whereFrom, Nothing, portfolio_name, whereFromName, whereFromDescr, color, id_field_set}
             rowPortfolioSourcesRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowPortfolioSourcesRow)
             Return rowPortfolioSourcesRow
@@ -8405,15 +7115,11 @@ Partial Public Class BondsDataSet
             Me.columnportfolioID = MyBase.Columns("portfolioID")
             Me.columnwhereFrom = MyBase.Columns("whereFrom")
             Me.columnfromID = MyBase.Columns("fromID")
-            Me.columnbid_field = MyBase.Columns("bid_field")
-            Me.columnask_field = MyBase.Columns("ask_field")
-            Me.columnlast_field = MyBase.Columns("last_field")
-            Me.columnhist_field = MyBase.Columns("hist_field")
             Me.columnportfolio_name = MyBase.Columns("portfolio_name")
-            Me.columnric_structure = MyBase.Columns("ric_structure")
             Me.columnwhereFromName = MyBase.Columns("whereFromName")
             Me.columnwhereFromDescr = MyBase.Columns("whereFromDescr")
             Me.columncolor = MyBase.Columns("color")
+            Me.columnid_field_set = MyBase.Columns("id_field_set")
         End Sub
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
@@ -8425,24 +7131,16 @@ Partial Public Class BondsDataSet
             MyBase.Columns.Add(Me.columnwhereFrom)
             Me.columnfromID = New Global.System.Data.DataColumn("fromID", GetType(Long), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnfromID)
-            Me.columnbid_field = New Global.System.Data.DataColumn("bid_field", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnbid_field)
-            Me.columnask_field = New Global.System.Data.DataColumn("ask_field", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnask_field)
-            Me.columnlast_field = New Global.System.Data.DataColumn("last_field", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnlast_field)
-            Me.columnhist_field = New Global.System.Data.DataColumn("hist_field", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnhist_field)
             Me.columnportfolio_name = New Global.System.Data.DataColumn("portfolio_name", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnportfolio_name)
-            Me.columnric_structure = New Global.System.Data.DataColumn("ric_structure", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnric_structure)
             Me.columnwhereFromName = New Global.System.Data.DataColumn("whereFromName", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnwhereFromName)
             Me.columnwhereFromDescr = New Global.System.Data.DataColumn("whereFromDescr", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnwhereFromDescr)
             Me.columncolor = New Global.System.Data.DataColumn("color", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columncolor)
+            Me.columnid_field_set = New Global.System.Data.DataColumn("id_field_set", GetType(Integer), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnid_field_set)
             Me.Constraints.Add(New Global.System.Data.UniqueConstraint("Constraint1", New Global.System.Data.DataColumn() {Me.columnportfolioID, Me.columnfromID}, true))
             Me.columnportfolioID.AutoIncrement = true
             Me.columnportfolioID.AutoIncrementSeed = -1
@@ -8452,12 +7150,7 @@ Partial Public Class BondsDataSet
             Me.columnfromID.AutoIncrementSeed = -1
             Me.columnfromID.AutoIncrementStep = -1
             Me.columnfromID.AllowDBNull = false
-            Me.columnbid_field.MaxLength = 2147483647
-            Me.columnask_field.MaxLength = 2147483647
-            Me.columnlast_field.MaxLength = 2147483647
-            Me.columnhist_field.MaxLength = 2147483647
             Me.columnportfolio_name.MaxLength = 2147483647
-            Me.columnric_structure.MaxLength = 2147483647
             Me.columnwhereFromName.MaxLength = 2147483647
             Me.columnwhereFromDescr.MaxLength = 2147483647
             Me.columncolor.MaxLength = 2147483647
@@ -9134,8 +7827,8 @@ Partial Public Class BondsDataSet
     '''</summary>
     <Global.System.Serializable(),  _
      Global.System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")>  _
-    Partial Public Class fields_layoutDataTable
-        Inherits Global.System.Data.TypedTableBase(Of fields_layoutRow)
+    Partial Public Class field_layoutDataTable
+        Inherits Global.System.Data.TypedTableBase(Of field_layoutRow)
         
         Private columnid As Global.System.Data.DataColumn
         
@@ -9145,19 +7838,21 @@ Partial Public Class BondsDataSet
         
         Private columnlast_field As Global.System.Data.DataColumn
         
-        Private columnhist_field As Global.System.Data.DataColumn
-        
         Private columnvwap_field As Global.System.Data.DataColumn
+        
+        Private columntimestamp_field As Global.System.Data.DataColumn
         
         Private columnvolume_field As Global.System.Data.DataColumn
         
-        Private columnname As Global.System.Data.DataColumn
+        Private columnfield_set_id As Global.System.Data.DataColumn
+        
+        Private columnis_realtime As Global.System.Data.DataColumn
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public Sub New()
             MyBase.New
-            Me.TableName = "fields_layout"
+            Me.TableName = "field_layout"
             Me.BeginInit
             Me.InitClass
             Me.EndInit
@@ -9222,17 +7917,17 @@ Partial Public Class BondsDataSet
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property hist_fieldColumn() As Global.System.Data.DataColumn
+        Public ReadOnly Property vwap_fieldColumn() As Global.System.Data.DataColumn
             Get
-                Return Me.columnhist_field
+                Return Me.columnvwap_field
             End Get
         End Property
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property vwap_fieldColumn() As Global.System.Data.DataColumn
+        Public ReadOnly Property timestamp_fieldColumn() As Global.System.Data.DataColumn
             Get
-                Return Me.columnvwap_field
+                Return Me.columntimestamp_field
             End Get
         End Property
         
@@ -9246,9 +7941,17 @@ Partial Public Class BondsDataSet
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property nameColumn() As Global.System.Data.DataColumn
+        Public ReadOnly Property field_set_idColumn() As Global.System.Data.DataColumn
             Get
-                Return Me.columnname
+                Return Me.columnfield_set_id
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property is_realtimeColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnis_realtime
             End Get
         End Property
         
@@ -9263,50 +7966,50 @@ Partial Public Class BondsDataSet
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Default ReadOnly Property Item(ByVal index As Integer) As fields_layoutRow
+        Public Default ReadOnly Property Item(ByVal index As Integer) As field_layoutRow
             Get
-                Return CType(Me.Rows(index),fields_layoutRow)
+                Return CType(Me.Rows(index),field_layoutRow)
             End Get
         End Property
         
         <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Event fields_layoutRowChanging As fields_layoutRowChangeEventHandler
+        Public Event field_layoutRowChanging As field_layoutRowChangeEventHandler
         
         <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Event fields_layoutRowChanged As fields_layoutRowChangeEventHandler
+        Public Event field_layoutRowChanged As field_layoutRowChangeEventHandler
         
         <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Event fields_layoutRowDeleting As fields_layoutRowChangeEventHandler
+        Public Event field_layoutRowDeleting As field_layoutRowChangeEventHandler
         
         <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Event fields_layoutRowDeleted As fields_layoutRowChangeEventHandler
+        Public Event field_layoutRowDeleted As field_layoutRowChangeEventHandler
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Overloads Sub Addfields_layoutRow(ByVal row As fields_layoutRow)
+        Public Overloads Sub Addfield_layoutRow(ByVal row As field_layoutRow)
             Me.Rows.Add(row)
         End Sub
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Overloads Function Addfields_layoutRow(ByVal bid_field As String, ByVal ask_field As String, ByVal last_field As String, ByVal hist_field As String, ByVal vwap_field As String, ByVal volume_field As String, ByVal name As String) As fields_layoutRow
-            Dim rowfields_layoutRow As fields_layoutRow = CType(Me.NewRow,fields_layoutRow)
-            Dim columnValuesArray() As Object = New Object() {Nothing, bid_field, ask_field, last_field, hist_field, vwap_field, volume_field, name}
-            rowfields_layoutRow.ItemArray = columnValuesArray
-            Me.Rows.Add(rowfields_layoutRow)
-            Return rowfields_layoutRow
+        Public Overloads Function Addfield_layoutRow(ByVal bid_field As String, ByVal ask_field As String, ByVal last_field As String, ByVal vwap_field As String, ByVal timestamp_field As String, ByVal volume_field As String, ByVal field_set_id As Long, ByVal is_realtime As Long) As field_layoutRow
+            Dim rowfield_layoutRow As field_layoutRow = CType(Me.NewRow,field_layoutRow)
+            Dim columnValuesArray() As Object = New Object() {Nothing, bid_field, ask_field, last_field, vwap_field, timestamp_field, volume_field, field_set_id, is_realtime}
+            rowfield_layoutRow.ItemArray = columnValuesArray
+            Me.Rows.Add(rowfield_layoutRow)
+            Return rowfield_layoutRow
         End Function
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function FindByid(ByVal id As Long) As fields_layoutRow
-            Return CType(Me.Rows.Find(New Object() {id}),fields_layoutRow)
+        Public Function FindByid(ByVal id As Long) As field_layoutRow
+            Return CType(Me.Rows.Find(New Object() {id}),field_layoutRow)
         End Function
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public Overrides Function Clone() As Global.System.Data.DataTable
-            Dim cln As fields_layoutDataTable = CType(MyBase.Clone,fields_layoutDataTable)
+            Dim cln As field_layoutDataTable = CType(MyBase.Clone,field_layoutDataTable)
             cln.InitVars
             Return cln
         End Function
@@ -9314,7 +8017,7 @@ Partial Public Class BondsDataSet
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Protected Overrides Function CreateInstance() As Global.System.Data.DataTable
-            Return New fields_layoutDataTable()
+            Return New field_layoutDataTable()
         End Function
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
@@ -9324,10 +8027,11 @@ Partial Public Class BondsDataSet
             Me.columnbid_field = MyBase.Columns("bid_field")
             Me.columnask_field = MyBase.Columns("ask_field")
             Me.columnlast_field = MyBase.Columns("last_field")
-            Me.columnhist_field = MyBase.Columns("hist_field")
             Me.columnvwap_field = MyBase.Columns("vwap_field")
+            Me.columntimestamp_field = MyBase.Columns("timestamp_field")
             Me.columnvolume_field = MyBase.Columns("volume_field")
-            Me.columnname = MyBase.Columns("name")
+            Me.columnfield_set_id = MyBase.Columns("field_set_id")
+            Me.columnis_realtime = MyBase.Columns("is_realtime")
         End Sub
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
@@ -9341,57 +8045,54 @@ Partial Public Class BondsDataSet
             MyBase.Columns.Add(Me.columnask_field)
             Me.columnlast_field = New Global.System.Data.DataColumn("last_field", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnlast_field)
-            Me.columnhist_field = New Global.System.Data.DataColumn("hist_field", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnhist_field)
             Me.columnvwap_field = New Global.System.Data.DataColumn("vwap_field", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnvwap_field)
+            Me.columntimestamp_field = New Global.System.Data.DataColumn("timestamp_field", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columntimestamp_field)
             Me.columnvolume_field = New Global.System.Data.DataColumn("volume_field", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnvolume_field)
-            Me.columnname = New Global.System.Data.DataColumn("name", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnname)
+            Me.columnfield_set_id = New Global.System.Data.DataColumn("field_set_id", GetType(Long), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnfield_set_id)
+            Me.columnis_realtime = New Global.System.Data.DataColumn("is_realtime", GetType(Long), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnis_realtime)
             Me.Constraints.Add(New Global.System.Data.UniqueConstraint("Constraint1", New Global.System.Data.DataColumn() {Me.columnid}, true))
             Me.columnid.AutoIncrement = true
             Me.columnid.AutoIncrementSeed = -1
             Me.columnid.AutoIncrementStep = -1
             Me.columnid.AllowDBNull = false
             Me.columnid.Unique = true
-            Me.columnbid_field.AllowDBNull = false
             Me.columnbid_field.MaxLength = 2147483647
-            Me.columnask_field.AllowDBNull = false
             Me.columnask_field.MaxLength = 2147483647
-            Me.columnlast_field.AllowDBNull = false
             Me.columnlast_field.MaxLength = 2147483647
-            Me.columnhist_field.AllowDBNull = false
-            Me.columnhist_field.MaxLength = 2147483647
             Me.columnvwap_field.MaxLength = 2147483647
+            Me.columntimestamp_field.MaxLength = 2147483647
             Me.columnvolume_field.MaxLength = 2147483647
-            Me.columnname.MaxLength = 2147483647
         End Sub
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function Newfields_layoutRow() As fields_layoutRow
-            Return CType(Me.NewRow,fields_layoutRow)
+        Public Function Newfield_layoutRow() As field_layoutRow
+            Return CType(Me.NewRow,field_layoutRow)
         End Function
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Protected Overrides Function NewRowFromBuilder(ByVal builder As Global.System.Data.DataRowBuilder) As Global.System.Data.DataRow
-            Return New fields_layoutRow(builder)
+            Return New field_layoutRow(builder)
         End Function
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Protected Overrides Function GetRowType() As Global.System.Type
-            Return GetType(fields_layoutRow)
+            Return GetType(field_layoutRow)
         End Function
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Protected Overrides Sub OnRowChanged(ByVal e As Global.System.Data.DataRowChangeEventArgs)
             MyBase.OnRowChanged(e)
-            If (Not (Me.fields_layoutRowChangedEvent) Is Nothing) Then
-                RaiseEvent fields_layoutRowChanged(Me, New fields_layoutRowChangeEvent(CType(e.Row,fields_layoutRow), e.Action))
+            If (Not (Me.field_layoutRowChangedEvent) Is Nothing) Then
+                RaiseEvent field_layoutRowChanged(Me, New field_layoutRowChangeEvent(CType(e.Row,field_layoutRow), e.Action))
             End If
         End Sub
         
@@ -9399,8 +8100,8 @@ Partial Public Class BondsDataSet
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Protected Overrides Sub OnRowChanging(ByVal e As Global.System.Data.DataRowChangeEventArgs)
             MyBase.OnRowChanging(e)
-            If (Not (Me.fields_layoutRowChangingEvent) Is Nothing) Then
-                RaiseEvent fields_layoutRowChanging(Me, New fields_layoutRowChangeEvent(CType(e.Row,fields_layoutRow), e.Action))
+            If (Not (Me.field_layoutRowChangingEvent) Is Nothing) Then
+                RaiseEvent field_layoutRowChanging(Me, New field_layoutRowChangeEvent(CType(e.Row,field_layoutRow), e.Action))
             End If
         End Sub
         
@@ -9408,8 +8109,8 @@ Partial Public Class BondsDataSet
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Protected Overrides Sub OnRowDeleted(ByVal e As Global.System.Data.DataRowChangeEventArgs)
             MyBase.OnRowDeleted(e)
-            If (Not (Me.fields_layoutRowDeletedEvent) Is Nothing) Then
-                RaiseEvent fields_layoutRowDeleted(Me, New fields_layoutRowChangeEvent(CType(e.Row,fields_layoutRow), e.Action))
+            If (Not (Me.field_layoutRowDeletedEvent) Is Nothing) Then
+                RaiseEvent field_layoutRowDeleted(Me, New field_layoutRowChangeEvent(CType(e.Row,field_layoutRow), e.Action))
             End If
         End Sub
         
@@ -9417,14 +8118,14 @@ Partial Public Class BondsDataSet
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Protected Overrides Sub OnRowDeleting(ByVal e As Global.System.Data.DataRowChangeEventArgs)
             MyBase.OnRowDeleting(e)
-            If (Not (Me.fields_layoutRowDeletingEvent) Is Nothing) Then
-                RaiseEvent fields_layoutRowDeleting(Me, New fields_layoutRowChangeEvent(CType(e.Row,fields_layoutRow), e.Action))
+            If (Not (Me.field_layoutRowDeletingEvent) Is Nothing) Then
+                RaiseEvent field_layoutRowDeleting(Me, New field_layoutRowChangeEvent(CType(e.Row,field_layoutRow), e.Action))
             End If
         End Sub
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Removefields_layoutRow(ByVal row As fields_layoutRow)
+        Public Sub Removefield_layoutRow(ByVal row As field_layoutRow)
             Me.Rows.Remove(row)
         End Sub
         
@@ -9451,7 +8152,731 @@ Partial Public Class BondsDataSet
             type.Attributes.Add(attribute1)
             Dim attribute2 As Global.System.Xml.Schema.XmlSchemaAttribute = New Global.System.Xml.Schema.XmlSchemaAttribute()
             attribute2.Name = "tableTypeName"
-            attribute2.FixedValue = "fields_layoutDataTable"
+            attribute2.FixedValue = "field_layoutDataTable"
+            type.Attributes.Add(attribute2)
+            type.Particle = sequence
+            Dim dsSchema As Global.System.Xml.Schema.XmlSchema = ds.GetSchemaSerializable
+            If xs.Contains(dsSchema.TargetNamespace) Then
+                Dim s1 As Global.System.IO.MemoryStream = New Global.System.IO.MemoryStream()
+                Dim s2 As Global.System.IO.MemoryStream = New Global.System.IO.MemoryStream()
+                Try 
+                    Dim schema As Global.System.Xml.Schema.XmlSchema = Nothing
+                    dsSchema.Write(s1)
+                    Dim schemas As Global.System.Collections.IEnumerator = xs.Schemas(dsSchema.TargetNamespace).GetEnumerator
+                    Do While schemas.MoveNext
+                        schema = CType(schemas.Current,Global.System.Xml.Schema.XmlSchema)
+                        s2.SetLength(0)
+                        schema.Write(s2)
+                        If (s1.Length = s2.Length) Then
+                            s1.Position = 0
+                            s2.Position = 0
+                            
+                            Do While ((s1.Position <> s1.Length)  _
+                                        AndAlso (s1.ReadByte = s2.ReadByte))
+                                
+                                
+                            Loop
+                            If (s1.Position = s1.Length) Then
+                                Return type
+                            End If
+                        End If
+                        
+                    Loop
+                Finally
+                    If (Not (s1) Is Nothing) Then
+                        s1.Close
+                    End If
+                    If (Not (s2) Is Nothing) Then
+                        s2.Close
+                    End If
+                End Try
+            End If
+            xs.Add(dsSchema)
+            Return type
+        End Function
+    End Class
+    
+    '''<summary>
+    '''Represents the strongly named DataTable class.
+    '''</summary>
+    <Global.System.Serializable(),  _
+     Global.System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")>  _
+    Partial Public Class field_setDataTable
+        Inherits Global.System.Data.TypedTableBase(Of field_setRow)
+        
+        Private columnid As Global.System.Data.DataColumn
+        
+        Private columnname As Global.System.Data.DataColumn
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub New()
+            MyBase.New
+            Me.TableName = "field_set"
+            Me.BeginInit
+            Me.InitClass
+            Me.EndInit
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Friend Sub New(ByVal table As Global.System.Data.DataTable)
+            MyBase.New
+            Me.TableName = table.TableName
+            If (table.CaseSensitive <> table.DataSet.CaseSensitive) Then
+                Me.CaseSensitive = table.CaseSensitive
+            End If
+            If (table.Locale.ToString <> table.DataSet.Locale.ToString) Then
+                Me.Locale = table.Locale
+            End If
+            If (table.Namespace <> table.DataSet.Namespace) Then
+                Me.Namespace = table.Namespace
+            End If
+            Me.Prefix = table.Prefix
+            Me.MinimumCapacity = table.MinimumCapacity
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Protected Sub New(ByVal info As Global.System.Runtime.Serialization.SerializationInfo, ByVal context As Global.System.Runtime.Serialization.StreamingContext)
+            MyBase.New(info, context)
+            Me.InitVars
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property idColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnid
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property nameColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnname
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
+         Global.System.ComponentModel.Browsable(false)>  _
+        Public ReadOnly Property Count() As Integer
+            Get
+                Return Me.Rows.Count
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Default ReadOnly Property Item(ByVal index As Integer) As field_setRow
+            Get
+                Return CType(Me.Rows(index),field_setRow)
+            End Get
+        End Property
+        
+        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Event field_setRowChanging As field_setRowChangeEventHandler
+        
+        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Event field_setRowChanged As field_setRowChangeEventHandler
+        
+        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Event field_setRowDeleting As field_setRowChangeEventHandler
+        
+        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Event field_setRowDeleted As field_setRowChangeEventHandler
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Overloads Sub Addfield_setRow(ByVal row As field_setRow)
+            Me.Rows.Add(row)
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Overloads Function Addfield_setRow(ByVal id As Long, ByVal name As String) As field_setRow
+            Dim rowfield_setRow As field_setRow = CType(Me.NewRow,field_setRow)
+            Dim columnValuesArray() As Object = New Object() {id, name}
+            rowfield_setRow.ItemArray = columnValuesArray
+            Me.Rows.Add(rowfield_setRow)
+            Return rowfield_setRow
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function FindByid(ByVal id As Long) As field_setRow
+            Return CType(Me.Rows.Find(New Object() {id}),field_setRow)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Overrides Function Clone() As Global.System.Data.DataTable
+            Dim cln As field_setDataTable = CType(MyBase.Clone,field_setDataTable)
+            cln.InitVars
+            Return cln
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Protected Overrides Function CreateInstance() As Global.System.Data.DataTable
+            Return New field_setDataTable()
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Friend Sub InitVars()
+            Me.columnid = MyBase.Columns("id")
+            Me.columnname = MyBase.Columns("name")
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Private Sub InitClass()
+            Me.columnid = New Global.System.Data.DataColumn("id", GetType(Long), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnid)
+            Me.columnname = New Global.System.Data.DataColumn("name", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnname)
+            Me.Constraints.Add(New Global.System.Data.UniqueConstraint("Constraint1", New Global.System.Data.DataColumn() {Me.columnid}, true))
+            Me.columnid.AllowDBNull = false
+            Me.columnid.Unique = true
+            Me.columnname.MaxLength = 2147483647
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function Newfield_setRow() As field_setRow
+            Return CType(Me.NewRow,field_setRow)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Protected Overrides Function NewRowFromBuilder(ByVal builder As Global.System.Data.DataRowBuilder) As Global.System.Data.DataRow
+            Return New field_setRow(builder)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Protected Overrides Function GetRowType() As Global.System.Type
+            Return GetType(field_setRow)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Protected Overrides Sub OnRowChanged(ByVal e As Global.System.Data.DataRowChangeEventArgs)
+            MyBase.OnRowChanged(e)
+            If (Not (Me.field_setRowChangedEvent) Is Nothing) Then
+                RaiseEvent field_setRowChanged(Me, New field_setRowChangeEvent(CType(e.Row,field_setRow), e.Action))
+            End If
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Protected Overrides Sub OnRowChanging(ByVal e As Global.System.Data.DataRowChangeEventArgs)
+            MyBase.OnRowChanging(e)
+            If (Not (Me.field_setRowChangingEvent) Is Nothing) Then
+                RaiseEvent field_setRowChanging(Me, New field_setRowChangeEvent(CType(e.Row,field_setRow), e.Action))
+            End If
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Protected Overrides Sub OnRowDeleted(ByVal e As Global.System.Data.DataRowChangeEventArgs)
+            MyBase.OnRowDeleted(e)
+            If (Not (Me.field_setRowDeletedEvent) Is Nothing) Then
+                RaiseEvent field_setRowDeleted(Me, New field_setRowChangeEvent(CType(e.Row,field_setRow), e.Action))
+            End If
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Protected Overrides Sub OnRowDeleting(ByVal e As Global.System.Data.DataRowChangeEventArgs)
+            MyBase.OnRowDeleting(e)
+            If (Not (Me.field_setRowDeletingEvent) Is Nothing) Then
+                RaiseEvent field_setRowDeleting(Me, New field_setRowChangeEvent(CType(e.Row,field_setRow), e.Action))
+            End If
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub Removefield_setRow(ByVal row As field_setRow)
+            Me.Rows.Remove(row)
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Shared Function GetTypedTableSchema(ByVal xs As Global.System.Xml.Schema.XmlSchemaSet) As Global.System.Xml.Schema.XmlSchemaComplexType
+            Dim type As Global.System.Xml.Schema.XmlSchemaComplexType = New Global.System.Xml.Schema.XmlSchemaComplexType()
+            Dim sequence As Global.System.Xml.Schema.XmlSchemaSequence = New Global.System.Xml.Schema.XmlSchemaSequence()
+            Dim ds As BondsDataSet = New BondsDataSet()
+            Dim any1 As Global.System.Xml.Schema.XmlSchemaAny = New Global.System.Xml.Schema.XmlSchemaAny()
+            any1.Namespace = "http://www.w3.org/2001/XMLSchema"
+            any1.MinOccurs = New Decimal(0)
+            any1.MaxOccurs = Decimal.MaxValue
+            any1.ProcessContents = Global.System.Xml.Schema.XmlSchemaContentProcessing.Lax
+            sequence.Items.Add(any1)
+            Dim any2 As Global.System.Xml.Schema.XmlSchemaAny = New Global.System.Xml.Schema.XmlSchemaAny()
+            any2.Namespace = "urn:schemas-microsoft-com:xml-diffgram-v1"
+            any2.MinOccurs = New Decimal(1)
+            any2.ProcessContents = Global.System.Xml.Schema.XmlSchemaContentProcessing.Lax
+            sequence.Items.Add(any2)
+            Dim attribute1 As Global.System.Xml.Schema.XmlSchemaAttribute = New Global.System.Xml.Schema.XmlSchemaAttribute()
+            attribute1.Name = "namespace"
+            attribute1.FixedValue = ds.Namespace
+            type.Attributes.Add(attribute1)
+            Dim attribute2 As Global.System.Xml.Schema.XmlSchemaAttribute = New Global.System.Xml.Schema.XmlSchemaAttribute()
+            attribute2.Name = "tableTypeName"
+            attribute2.FixedValue = "field_setDataTable"
+            type.Attributes.Add(attribute2)
+            type.Particle = sequence
+            Dim dsSchema As Global.System.Xml.Schema.XmlSchema = ds.GetSchemaSerializable
+            If xs.Contains(dsSchema.TargetNamespace) Then
+                Dim s1 As Global.System.IO.MemoryStream = New Global.System.IO.MemoryStream()
+                Dim s2 As Global.System.IO.MemoryStream = New Global.System.IO.MemoryStream()
+                Try 
+                    Dim schema As Global.System.Xml.Schema.XmlSchema = Nothing
+                    dsSchema.Write(s1)
+                    Dim schemas As Global.System.Collections.IEnumerator = xs.Schemas(dsSchema.TargetNamespace).GetEnumerator
+                    Do While schemas.MoveNext
+                        schema = CType(schemas.Current,Global.System.Xml.Schema.XmlSchema)
+                        s2.SetLength(0)
+                        schema.Write(s2)
+                        If (s1.Length = s2.Length) Then
+                            s1.Position = 0
+                            s2.Position = 0
+                            
+                            Do While ((s1.Position <> s1.Length)  _
+                                        AndAlso (s1.ReadByte = s2.ReadByte))
+                                
+                                
+                            Loop
+                            If (s1.Position = s1.Length) Then
+                                Return type
+                            End If
+                        End If
+                        
+                    Loop
+                Finally
+                    If (Not (s1) Is Nothing) Then
+                        s1.Close
+                    End If
+                    If (Not (s2) Is Nothing) Then
+                        s2.Close
+                    End If
+                End Try
+            End If
+            xs.Add(dsSchema)
+            Return type
+        End Function
+    End Class
+    
+    '''<summary>
+    '''Represents the strongly named DataTable class.
+    '''</summary>
+    <Global.System.Serializable(),  _
+     Global.System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")>  _
+    Partial Public Class PortfolioUnitedDataTable
+        Inherits Global.System.Data.TypedTableBase(Of PortfolioUnitedRow)
+        
+        Private columnpid As Global.System.Data.DataColumn
+        
+        Private columnbid As Global.System.Data.DataColumn
+        
+        Private columnric As Global.System.Data.DataColumn
+        
+        Private columnpayments As Global.System.Data.DataColumn
+        
+        Private columnrates As Global.System.Data.DataColumn
+        
+        Private columnbondshortname As Global.System.Data.DataColumn
+        
+        Private columndsply_name As Global.System.Data.DataColumn
+        
+        Private columninclude As Global.System.Data.DataColumn
+        
+        Private columncolor As Global.System.Data.DataColumn
+        
+        Private columnwhereFrom As Global.System.Data.DataColumn
+        
+        Private columnfromID As Global.System.Data.DataColumn
+        
+        Private columnportfolio_name As Global.System.Data.DataColumn
+        
+        Private columnwhereFromName As Global.System.Data.DataColumn
+        
+        Private columnwhereFromDescr As Global.System.Data.DataColumn
+        
+        Private columnid_field_set As Global.System.Data.DataColumn
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub New()
+            MyBase.New
+            Me.TableName = "PortfolioUnited"
+            Me.BeginInit
+            Me.InitClass
+            Me.EndInit
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Friend Sub New(ByVal table As Global.System.Data.DataTable)
+            MyBase.New
+            Me.TableName = table.TableName
+            If (table.CaseSensitive <> table.DataSet.CaseSensitive) Then
+                Me.CaseSensitive = table.CaseSensitive
+            End If
+            If (table.Locale.ToString <> table.DataSet.Locale.ToString) Then
+                Me.Locale = table.Locale
+            End If
+            If (table.Namespace <> table.DataSet.Namespace) Then
+                Me.Namespace = table.Namespace
+            End If
+            Me.Prefix = table.Prefix
+            Me.MinimumCapacity = table.MinimumCapacity
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Protected Sub New(ByVal info As Global.System.Runtime.Serialization.SerializationInfo, ByVal context As Global.System.Runtime.Serialization.StreamingContext)
+            MyBase.New(info, context)
+            Me.InitVars
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property pidColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnpid
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property bidColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnbid
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property ricColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnric
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property paymentsColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnpayments
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property ratesColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnrates
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property bondshortnameColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnbondshortname
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property dsply_nameColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columndsply_name
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property includeColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columninclude
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property colorColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columncolor
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property whereFromColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnwhereFrom
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property fromIDColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnfromID
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property portfolio_nameColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnportfolio_name
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property whereFromNameColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnwhereFromName
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property whereFromDescrColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnwhereFromDescr
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property id_field_setColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnid_field_set
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
+         Global.System.ComponentModel.Browsable(false)>  _
+        Public ReadOnly Property Count() As Integer
+            Get
+                Return Me.Rows.Count
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Default ReadOnly Property Item(ByVal index As Integer) As PortfolioUnitedRow
+            Get
+                Return CType(Me.Rows(index),PortfolioUnitedRow)
+            End Get
+        End Property
+        
+        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Event PortfolioUnitedRowChanging As PortfolioUnitedRowChangeEventHandler
+        
+        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Event PortfolioUnitedRowChanged As PortfolioUnitedRowChangeEventHandler
+        
+        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Event PortfolioUnitedRowDeleting As PortfolioUnitedRowChangeEventHandler
+        
+        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Event PortfolioUnitedRowDeleted As PortfolioUnitedRowChangeEventHandler
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Overloads Sub AddPortfolioUnitedRow(ByVal row As PortfolioUnitedRow)
+            Me.Rows.Add(row)
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Overloads Function AddPortfolioUnitedRow(ByVal bid As Long, ByVal ric As String, ByVal payments As String, ByVal rates As String, ByVal bondshortname As Object, ByVal dsply_name As String, ByVal include As Boolean, ByVal color As String, ByVal whereFrom As Object, ByVal fromID As Long, ByVal portfolio_name As String, ByVal whereFromName As String, ByVal whereFromDescr As String, ByVal id_field_set As Long) As PortfolioUnitedRow
+            Dim rowPortfolioUnitedRow As PortfolioUnitedRow = CType(Me.NewRow,PortfolioUnitedRow)
+            Dim columnValuesArray() As Object = New Object() {Nothing, bid, ric, payments, rates, bondshortname, dsply_name, include, color, whereFrom, fromID, portfolio_name, whereFromName, whereFromDescr, id_field_set}
+            rowPortfolioUnitedRow.ItemArray = columnValuesArray
+            Me.Rows.Add(rowPortfolioUnitedRow)
+            Return rowPortfolioUnitedRow
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Overrides Function Clone() As Global.System.Data.DataTable
+            Dim cln As PortfolioUnitedDataTable = CType(MyBase.Clone,PortfolioUnitedDataTable)
+            cln.InitVars
+            Return cln
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Protected Overrides Function CreateInstance() As Global.System.Data.DataTable
+            Return New PortfolioUnitedDataTable()
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Friend Sub InitVars()
+            Me.columnpid = MyBase.Columns("pid")
+            Me.columnbid = MyBase.Columns("bid")
+            Me.columnric = MyBase.Columns("ric")
+            Me.columnpayments = MyBase.Columns("payments")
+            Me.columnrates = MyBase.Columns("rates")
+            Me.columnbondshortname = MyBase.Columns("bondshortname")
+            Me.columndsply_name = MyBase.Columns("dsply_name")
+            Me.columninclude = MyBase.Columns("include")
+            Me.columncolor = MyBase.Columns("color")
+            Me.columnwhereFrom = MyBase.Columns("whereFrom")
+            Me.columnfromID = MyBase.Columns("fromID")
+            Me.columnportfolio_name = MyBase.Columns("portfolio_name")
+            Me.columnwhereFromName = MyBase.Columns("whereFromName")
+            Me.columnwhereFromDescr = MyBase.Columns("whereFromDescr")
+            Me.columnid_field_set = MyBase.Columns("id_field_set")
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Private Sub InitClass()
+            Me.columnpid = New Global.System.Data.DataColumn("pid", GetType(Long), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnpid)
+            Me.columnbid = New Global.System.Data.DataColumn("bid", GetType(Long), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnbid)
+            Me.columnric = New Global.System.Data.DataColumn("ric", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnric)
+            Me.columnpayments = New Global.System.Data.DataColumn("payments", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnpayments)
+            Me.columnrates = New Global.System.Data.DataColumn("rates", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnrates)
+            Me.columnbondshortname = New Global.System.Data.DataColumn("bondshortname", GetType(Object), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnbondshortname)
+            Me.columndsply_name = New Global.System.Data.DataColumn("dsply_name", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columndsply_name)
+            Me.columninclude = New Global.System.Data.DataColumn("include", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columninclude)
+            Me.columncolor = New Global.System.Data.DataColumn("color", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columncolor)
+            Me.columnwhereFrom = New Global.System.Data.DataColumn("whereFrom", GetType(Object), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnwhereFrom)
+            Me.columnfromID = New Global.System.Data.DataColumn("fromID", GetType(Long), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnfromID)
+            Me.columnportfolio_name = New Global.System.Data.DataColumn("portfolio_name", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnportfolio_name)
+            Me.columnwhereFromName = New Global.System.Data.DataColumn("whereFromName", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnwhereFromName)
+            Me.columnwhereFromDescr = New Global.System.Data.DataColumn("whereFromDescr", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnwhereFromDescr)
+            Me.columnid_field_set = New Global.System.Data.DataColumn("id_field_set", GetType(Long), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnid_field_set)
+            Me.columnpid.AutoIncrement = true
+            Me.columnpid.AutoIncrementSeed = -1
+            Me.columnpid.AutoIncrementStep = -1
+            Me.columnpid.AllowDBNull = false
+            Me.columnbid.AllowDBNull = false
+            Me.columnric.MaxLength = 2147483647
+            Me.columnpayments.MaxLength = 2147483647
+            Me.columnrates.MaxLength = 2147483647
+            Me.columndsply_name.MaxLength = 2147483647
+            Me.columncolor.MaxLength = 2147483647
+            Me.columnfromID.AllowDBNull = false
+            Me.columnportfolio_name.MaxLength = 2147483647
+            Me.columnwhereFromName.MaxLength = 2147483647
+            Me.columnwhereFromDescr.MaxLength = 2147483647
+            Me.columnid_field_set.AllowDBNull = false
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function NewPortfolioUnitedRow() As PortfolioUnitedRow
+            Return CType(Me.NewRow,PortfolioUnitedRow)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Protected Overrides Function NewRowFromBuilder(ByVal builder As Global.System.Data.DataRowBuilder) As Global.System.Data.DataRow
+            Return New PortfolioUnitedRow(builder)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Protected Overrides Function GetRowType() As Global.System.Type
+            Return GetType(PortfolioUnitedRow)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Protected Overrides Sub OnRowChanged(ByVal e As Global.System.Data.DataRowChangeEventArgs)
+            MyBase.OnRowChanged(e)
+            If (Not (Me.PortfolioUnitedRowChangedEvent) Is Nothing) Then
+                RaiseEvent PortfolioUnitedRowChanged(Me, New PortfolioUnitedRowChangeEvent(CType(e.Row,PortfolioUnitedRow), e.Action))
+            End If
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Protected Overrides Sub OnRowChanging(ByVal e As Global.System.Data.DataRowChangeEventArgs)
+            MyBase.OnRowChanging(e)
+            If (Not (Me.PortfolioUnitedRowChangingEvent) Is Nothing) Then
+                RaiseEvent PortfolioUnitedRowChanging(Me, New PortfolioUnitedRowChangeEvent(CType(e.Row,PortfolioUnitedRow), e.Action))
+            End If
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Protected Overrides Sub OnRowDeleted(ByVal e As Global.System.Data.DataRowChangeEventArgs)
+            MyBase.OnRowDeleted(e)
+            If (Not (Me.PortfolioUnitedRowDeletedEvent) Is Nothing) Then
+                RaiseEvent PortfolioUnitedRowDeleted(Me, New PortfolioUnitedRowChangeEvent(CType(e.Row,PortfolioUnitedRow), e.Action))
+            End If
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Protected Overrides Sub OnRowDeleting(ByVal e As Global.System.Data.DataRowChangeEventArgs)
+            MyBase.OnRowDeleting(e)
+            If (Not (Me.PortfolioUnitedRowDeletingEvent) Is Nothing) Then
+                RaiseEvent PortfolioUnitedRowDeleting(Me, New PortfolioUnitedRowChangeEvent(CType(e.Row,PortfolioUnitedRow), e.Action))
+            End If
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub RemovePortfolioUnitedRow(ByVal row As PortfolioUnitedRow)
+            Me.Rows.Remove(row)
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Shared Function GetTypedTableSchema(ByVal xs As Global.System.Xml.Schema.XmlSchemaSet) As Global.System.Xml.Schema.XmlSchemaComplexType
+            Dim type As Global.System.Xml.Schema.XmlSchemaComplexType = New Global.System.Xml.Schema.XmlSchemaComplexType()
+            Dim sequence As Global.System.Xml.Schema.XmlSchemaSequence = New Global.System.Xml.Schema.XmlSchemaSequence()
+            Dim ds As BondsDataSet = New BondsDataSet()
+            Dim any1 As Global.System.Xml.Schema.XmlSchemaAny = New Global.System.Xml.Schema.XmlSchemaAny()
+            any1.Namespace = "http://www.w3.org/2001/XMLSchema"
+            any1.MinOccurs = New Decimal(0)
+            any1.MaxOccurs = Decimal.MaxValue
+            any1.ProcessContents = Global.System.Xml.Schema.XmlSchemaContentProcessing.Lax
+            sequence.Items.Add(any1)
+            Dim any2 As Global.System.Xml.Schema.XmlSchemaAny = New Global.System.Xml.Schema.XmlSchemaAny()
+            any2.Namespace = "urn:schemas-microsoft-com:xml-diffgram-v1"
+            any2.MinOccurs = New Decimal(1)
+            any2.ProcessContents = Global.System.Xml.Schema.XmlSchemaContentProcessing.Lax
+            sequence.Items.Add(any2)
+            Dim attribute1 As Global.System.Xml.Schema.XmlSchemaAttribute = New Global.System.Xml.Schema.XmlSchemaAttribute()
+            attribute1.Name = "namespace"
+            attribute1.FixedValue = ds.Namespace
+            type.Attributes.Add(attribute1)
+            Dim attribute2 As Global.System.Xml.Schema.XmlSchemaAttribute = New Global.System.Xml.Schema.XmlSchemaAttribute()
+            attribute2.Name = "tableTypeName"
+            attribute2.FixedValue = "PortfolioUnitedDataTable"
             type.Attributes.Add(attribute2)
             type.Particle = sequence
             Dim dsSchema As Global.System.Xml.Schema.XmlSchema = ds.GetSchemaSerializable
@@ -10216,51 +9641,6 @@ Partial Public Class BondsDataSet
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property sort_num() As Long
-            Get
-                Try 
-                    Return CType(Me(Me.tablechain.sort_numColumn),Long)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'sort_num' в таблице 'chain' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablechain.sort_numColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property is_necessary() As Boolean
-            Get
-                Try 
-                    Return CType(Me(Me.tablechain.is_necessaryColumn),Boolean)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'is_necessary' в таблице 'chain' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablechain.is_necessaryColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property type() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tablechain.typeColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'type' в таблице 'chain' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablechain.typeColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public Property color() As String
             Get
                 Try 
@@ -10276,61 +9656,16 @@ Partial Public Class BondsDataSet
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property bid_field() As String
+        Public Property id_field_set() As Long
             Get
                 Try 
-                    Return CType(Me(Me.tablechain.bid_fieldColumn),String)
+                    Return CType(Me(Me.tablechain.id_field_setColumn),Long)
                 Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'bid_field' в таблице 'chain' равно DBNull.", e)
+                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'id_field_set' в таблице 'chain' равно DBNull.", e)
                 End Try
             End Get
             Set
-                Me(Me.tablechain.bid_fieldColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property ask_field() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tablechain.ask_fieldColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'ask_field' в таблице 'chain' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablechain.ask_fieldColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property last_field() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tablechain.last_fieldColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'last_field' в таблице 'chain' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablechain.last_fieldColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property hist_field() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tablechain.hist_fieldColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'hist_field' в таблице 'chain' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablechain.hist_fieldColumn) = value
+                Me(Me.tablechain.id_field_setColumn) = value
             End Set
         End Property
         
@@ -10372,42 +9707,6 @@ Partial Public Class BondsDataSet
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function Issort_numNull() As Boolean
-            Return Me.IsNull(Me.tablechain.sort_numColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Setsort_numNull()
-            Me(Me.tablechain.sort_numColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function Isis_necessaryNull() As Boolean
-            Return Me.IsNull(Me.tablechain.is_necessaryColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Setis_necessaryNull()
-            Me(Me.tablechain.is_necessaryColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function IstypeNull() As Boolean
-            Return Me.IsNull(Me.tablechain.typeColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub SettypeNull()
-            Me(Me.tablechain.typeColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public Function IscolorNull() As Boolean
             Return Me.IsNull(Me.tablechain.colorColumn)
         End Function
@@ -10420,50 +9719,14 @@ Partial Public Class BondsDataSet
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function Isbid_fieldNull() As Boolean
-            Return Me.IsNull(Me.tablechain.bid_fieldColumn)
+        Public Function Isid_field_setNull() As Boolean
+            Return Me.IsNull(Me.tablechain.id_field_setColumn)
         End Function
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Setbid_fieldNull()
-            Me(Me.tablechain.bid_fieldColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function Isask_fieldNull() As Boolean
-            Return Me.IsNull(Me.tablechain.ask_fieldColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Setask_fieldNull()
-            Me(Me.tablechain.ask_fieldColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function Islast_fieldNull() As Boolean
-            Return Me.IsNull(Me.tablechain.last_fieldColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Setlast_fieldNull()
-            Me(Me.tablechain.last_fieldColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function Ishist_fieldNull() As Boolean
-            Return Me.IsNull(Me.tablechain.hist_fieldColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Sethist_fieldNull()
-            Me(Me.tablechain.hist_fieldColumn) = Global.System.Convert.DBNull
+        Public Sub Setid_field_setNull()
+            Me(Me.tablechain.id_field_setColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
     
@@ -10707,298 +9970,6 @@ Partial Public Class BondsDataSet
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public Sub Setcountry_idNull()
             Me(Me.tableissuer.country_idColumn) = Global.System.Convert.DBNull
-        End Sub
-    End Class
-    
-    '''<summary>
-    '''Represents strongly named DataRow class.
-    '''</summary>
-    Partial Public Class PortfolioUnitedRow
-        Inherits Global.System.Data.DataRow
-        
-        Private tablePortfolioUnited As PortfolioUnitedDataTable
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Friend Sub New(ByVal rb As Global.System.Data.DataRowBuilder)
-            MyBase.New(rb)
-            Me.tablePortfolioUnited = CType(Me.Table,PortfolioUnitedDataTable)
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property pid() As Long
-            Get
-                Return CType(Me(Me.tablePortfolioUnited.pidColumn),Long)
-            End Get
-            Set
-                Me(Me.tablePortfolioUnited.pidColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property bid() As Long
-            Get
-                Return CType(Me(Me.tablePortfolioUnited.bidColumn),Long)
-            End Get
-            Set
-                Me(Me.tablePortfolioUnited.bidColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property ric() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tablePortfolioUnited.ricColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'ric' в таблице 'PortfolioUnited' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablePortfolioUnited.ricColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property descr() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tablePortfolioUnited.descrColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'descr' в таблице 'PortfolioUnited' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablePortfolioUnited.descrColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property payments() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tablePortfolioUnited.paymentsColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'payments' в таблице 'PortfolioUnited' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablePortfolioUnited.paymentsColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property rates() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tablePortfolioUnited.ratesColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'rates' в таблице 'PortfolioUnited' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablePortfolioUnited.ratesColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property bondshortname() As Object
-            Get
-                Try 
-                    Return CType(Me(Me.tablePortfolioUnited.bondshortnameColumn),Object)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'bondshortname' в таблице 'PortfolioUnited' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablePortfolioUnited.bondshortnameColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property dsply_name() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tablePortfolioUnited.dsply_nameColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'dsply_name' в таблице 'PortfolioUnited' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablePortfolioUnited.dsply_nameColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property include() As Boolean
-            Get
-                Try 
-                    Return CType(Me(Me.tablePortfolioUnited.includeColumn),Boolean)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'include' в таблице 'PortfolioUnited' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablePortfolioUnited.includeColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property color() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tablePortfolioUnited.colorColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'color' в таблице 'PortfolioUnited' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablePortfolioUnited.colorColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property whereFrom() As Object
-            Get
-                Try 
-                    Return CType(Me(Me.tablePortfolioUnited.whereFromColumn),Object)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'whereFrom' в таблице 'PortfolioUnited' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablePortfolioUnited.whereFromColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property fromID() As Long
-            Get
-                Return CType(Me(Me.tablePortfolioUnited.fromIDColumn),Long)
-            End Get
-            Set
-                Me(Me.tablePortfolioUnited.fromIDColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function IsricNull() As Boolean
-            Return Me.IsNull(Me.tablePortfolioUnited.ricColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub SetricNull()
-            Me(Me.tablePortfolioUnited.ricColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function IsdescrNull() As Boolean
-            Return Me.IsNull(Me.tablePortfolioUnited.descrColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub SetdescrNull()
-            Me(Me.tablePortfolioUnited.descrColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function IspaymentsNull() As Boolean
-            Return Me.IsNull(Me.tablePortfolioUnited.paymentsColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub SetpaymentsNull()
-            Me(Me.tablePortfolioUnited.paymentsColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function IsratesNull() As Boolean
-            Return Me.IsNull(Me.tablePortfolioUnited.ratesColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub SetratesNull()
-            Me(Me.tablePortfolioUnited.ratesColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function IsbondshortnameNull() As Boolean
-            Return Me.IsNull(Me.tablePortfolioUnited.bondshortnameColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub SetbondshortnameNull()
-            Me(Me.tablePortfolioUnited.bondshortnameColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function Isdsply_nameNull() As Boolean
-            Return Me.IsNull(Me.tablePortfolioUnited.dsply_nameColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Setdsply_nameNull()
-            Me(Me.tablePortfolioUnited.dsply_nameColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function IsincludeNull() As Boolean
-            Return Me.IsNull(Me.tablePortfolioUnited.includeColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub SetincludeNull()
-            Me(Me.tablePortfolioUnited.includeColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function IscolorNull() As Boolean
-            Return Me.IsNull(Me.tablePortfolioUnited.colorColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub SetcolorNull()
-            Me(Me.tablePortfolioUnited.colorColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function IswhereFromNull() As Boolean
-            Return Me.IsNull(Me.tablePortfolioUnited.whereFromColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub SetwhereFromNull()
-            Me(Me.tablePortfolioUnited.whereFromColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
     
@@ -11443,66 +10414,6 @@ Partial Public Class BondsDataSet
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property bid_field() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tablehawser.bid_fieldColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'bid_field' в таблице 'hawser' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablehawser.bid_fieldColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property last_field() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tablehawser.last_fieldColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'last_field' в таблице 'hawser' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablehawser.last_fieldColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property ask_field() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tablehawser.ask_fieldColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'ask_field' в таблице 'hawser' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablehawser.ask_fieldColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property hist_field() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tablehawser.hist_fieldColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'hist_field' в таблице 'hawser' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablehawser.hist_fieldColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public Property curve() As Boolean
             Get
                 Try 
@@ -11513,6 +10424,21 @@ Partial Public Class BondsDataSet
             End Get
             Set
                 Me(Me.tablehawser.curveColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property id_field_set() As Long
+            Get
+                Try 
+                    Return CType(Me(Me.tablehawser.id_field_setColumn),Long)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'id_field_set' в таблице 'hawser' равно DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tablehawser.id_field_setColumn) = value
             End Set
         End Property
         
@@ -11542,54 +10468,6 @@ Partial Public Class BondsDataSet
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function Isbid_fieldNull() As Boolean
-            Return Me.IsNull(Me.tablehawser.bid_fieldColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Setbid_fieldNull()
-            Me(Me.tablehawser.bid_fieldColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function Islast_fieldNull() As Boolean
-            Return Me.IsNull(Me.tablehawser.last_fieldColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Setlast_fieldNull()
-            Me(Me.tablehawser.last_fieldColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function Isask_fieldNull() As Boolean
-            Return Me.IsNull(Me.tablehawser.ask_fieldColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Setask_fieldNull()
-            Me(Me.tablehawser.ask_fieldColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function Ishist_fieldNull() As Boolean
-            Return Me.IsNull(Me.tablehawser.hist_fieldColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Sethist_fieldNull()
-            Me(Me.tablehawser.hist_fieldColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public Function IscurveNull() As Boolean
             Return Me.IsNull(Me.tablehawser.curveColumn)
         End Function
@@ -11598,6 +10476,18 @@ Partial Public Class BondsDataSet
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public Sub SetcurveNull()
             Me(Me.tablehawser.curveColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function Isid_field_setNull() As Boolean
+            Return Me.IsNull(Me.tablehawser.id_field_setColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub Setid_field_setNull()
+            Me(Me.tablehawser.id_field_setColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
     
@@ -11755,233 +10645,6 @@ Partial Public Class BondsDataSet
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public Sub Setbond_ricNull()
             Me(Me.tablehawser_to_bond.bond_ricColumn) = Global.System.Convert.DBNull
-        End Sub
-    End Class
-    
-    '''<summary>
-    '''Represents strongly named DataRow class.
-    '''</summary>
-    Partial Public Class _portfolioByBondsRow
-        Inherits Global.System.Data.DataRow
-        
-        Private table_portfolioByBonds As _portfolioByBondsDataTable
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Friend Sub New(ByVal rb As Global.System.Data.DataRowBuilder)
-            MyBase.New(rb)
-            Me.table_portfolioByBonds = CType(Me.Table,_portfolioByBondsDataTable)
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property pid() As Long
-            Get
-                Return CType(Me(Me.table_portfolioByBonds.pidColumn),Long)
-            End Get
-            Set
-                Me(Me.table_portfolioByBonds.pidColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property bid() As Long
-            Get
-                Return CType(Me(Me.table_portfolioByBonds.bidColumn),Long)
-            End Get
-            Set
-                Me(Me.table_portfolioByBonds.bidColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property ric() As String
-            Get
-                Try 
-                    Return CType(Me(Me.table_portfolioByBonds.ricColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'ric' в таблице '_portfolioByBonds' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.table_portfolioByBonds.ricColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property descr() As String
-            Get
-                Try 
-                    Return CType(Me(Me.table_portfolioByBonds.descrColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'descr' в таблице '_portfolioByBonds' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.table_portfolioByBonds.descrColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property payments() As String
-            Get
-                Try 
-                    Return CType(Me(Me.table_portfolioByBonds.paymentsColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'payments' в таблице '_portfolioByBonds' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.table_portfolioByBonds.paymentsColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property rates() As String
-            Get
-                Try 
-                    Return CType(Me(Me.table_portfolioByBonds.ratesColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'rates' в таблице '_portfolioByBonds' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.table_portfolioByBonds.ratesColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property bondshortname() As Object
-            Get
-                Try 
-                    Return CType(Me(Me.table_portfolioByBonds.bondshortnameColumn),Object)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'bondshortname' в таблице '_portfolioByBonds' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.table_portfolioByBonds.bondshortnameColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property dsply_name() As String
-            Get
-                Try 
-                    Return CType(Me(Me.table_portfolioByBonds.dsply_nameColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'dsply_name' в таблице '_portfolioByBonds' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.table_portfolioByBonds.dsply_nameColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property include() As Boolean
-            Get
-                Try 
-                    Return CType(Me(Me.table_portfolioByBonds.includeColumn),Boolean)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'include' в таблице '_portfolioByBonds' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.table_portfolioByBonds.includeColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function IsricNull() As Boolean
-            Return Me.IsNull(Me.table_portfolioByBonds.ricColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub SetricNull()
-            Me(Me.table_portfolioByBonds.ricColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function IsdescrNull() As Boolean
-            Return Me.IsNull(Me.table_portfolioByBonds.descrColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub SetdescrNull()
-            Me(Me.table_portfolioByBonds.descrColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function IspaymentsNull() As Boolean
-            Return Me.IsNull(Me.table_portfolioByBonds.paymentsColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub SetpaymentsNull()
-            Me(Me.table_portfolioByBonds.paymentsColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function IsratesNull() As Boolean
-            Return Me.IsNull(Me.table_portfolioByBonds.ratesColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub SetratesNull()
-            Me(Me.table_portfolioByBonds.ratesColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function IsbondshortnameNull() As Boolean
-            Return Me.IsNull(Me.table_portfolioByBonds.bondshortnameColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub SetbondshortnameNull()
-            Me(Me.table_portfolioByBonds.bondshortnameColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function Isdsply_nameNull() As Boolean
-            Return Me.IsNull(Me.table_portfolioByBonds.dsply_nameColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Setdsply_nameNull()
-            Me(Me.table_portfolioByBonds.dsply_nameColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function IsincludeNull() As Boolean
-            Return Me.IsNull(Me.table_portfolioByBonds.includeColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub SetincludeNull()
-            Me(Me.table_portfolioByBonds.includeColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
     
@@ -12682,114 +11345,6 @@ Partial Public Class BondsDataSet
     '''<summary>
     '''Represents strongly named DataRow class.
     '''</summary>
-    Partial Public Class portfolio_to_bondRow
-        Inherits Global.System.Data.DataRow
-        
-        Private tableportfolio_to_bond As portfolio_to_bondDataTable
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Friend Sub New(ByVal rb As Global.System.Data.DataRowBuilder)
-            MyBase.New(rb)
-            Me.tableportfolio_to_bond = CType(Me.Table,portfolio_to_bondDataTable)
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property id() As Long
-            Get
-                Return CType(Me(Me.tableportfolio_to_bond.idColumn),Long)
-            End Get
-            Set
-                Me(Me.tableportfolio_to_bond.idColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property id_portfolio() As Long
-            Get
-                Try 
-                    Return CType(Me(Me.tableportfolio_to_bond.id_portfolioColumn),Long)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'id_portfolio' в таблице 'portfolio_to_bond' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tableportfolio_to_bond.id_portfolioColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property include() As Boolean
-            Get
-                Try 
-                    Return CType(Me(Me.tableportfolio_to_bond.includeColumn),Boolean)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'include' в таблице 'portfolio_to_bond' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tableportfolio_to_bond.includeColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property bond_ric() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tableportfolio_to_bond.bond_ricColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'bond_ric' в таблице 'portfolio_to_bond' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tableportfolio_to_bond.bond_ricColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function Isid_portfolioNull() As Boolean
-            Return Me.IsNull(Me.tableportfolio_to_bond.id_portfolioColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Setid_portfolioNull()
-            Me(Me.tableportfolio_to_bond.id_portfolioColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function IsincludeNull() As Boolean
-            Return Me.IsNull(Me.tableportfolio_to_bond.includeColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub SetincludeNull()
-            Me(Me.tableportfolio_to_bond.includeColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function Isbond_ricNull() As Boolean
-            Return Me.IsNull(Me.tableportfolio_to_bond.bond_ricColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Setbond_ricNull()
-            Me(Me.tableportfolio_to_bond.bond_ricColumn) = Global.System.Convert.DBNull
-        End Sub
-    End Class
-    
-    '''<summary>
-    '''Represents strongly named DataRow class.
-    '''</summary>
     Partial Public Class portfolio_to_chainRow
         Inherits Global.System.Data.DataRow
         
@@ -13058,66 +11613,6 @@ Partial Public Class BondsDataSet
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property bid_field() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tablePortfolioSources.bid_fieldColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'bid_field' в таблице 'PortfolioSources' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablePortfolioSources.bid_fieldColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property ask_field() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tablePortfolioSources.ask_fieldColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'ask_field' в таблице 'PortfolioSources' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablePortfolioSources.ask_fieldColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property last_field() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tablePortfolioSources.last_fieldColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'last_field' в таблице 'PortfolioSources' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablePortfolioSources.last_fieldColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property hist_field() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tablePortfolioSources.hist_fieldColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'hist_field' в таблице 'PortfolioSources' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablePortfolioSources.hist_fieldColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public Property portfolio_name() As String
             Get
                 Try 
@@ -13128,21 +11623,6 @@ Partial Public Class BondsDataSet
             End Get
             Set
                 Me(Me.tablePortfolioSources.portfolio_nameColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property ric_structure() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tablePortfolioSources.ric_structureColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'ric_structure' в таблице 'PortfolioSources' равно DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tablePortfolioSources.ric_structureColumn) = value
             End Set
         End Property
         
@@ -13193,6 +11673,21 @@ Partial Public Class BondsDataSet
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property id_field_set() As Integer
+            Get
+                Try 
+                    Return CType(Me(Me.tablePortfolioSources.id_field_setColumn),Integer)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'id_field_set' в таблице 'PortfolioSources' равно DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tablePortfolioSources.id_field_setColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public Function IswhereFromNull() As Boolean
             Return Me.IsNull(Me.tablePortfolioSources.whereFromColumn)
         End Function
@@ -13205,54 +11700,6 @@ Partial Public Class BondsDataSet
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function Isbid_fieldNull() As Boolean
-            Return Me.IsNull(Me.tablePortfolioSources.bid_fieldColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Setbid_fieldNull()
-            Me(Me.tablePortfolioSources.bid_fieldColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function Isask_fieldNull() As Boolean
-            Return Me.IsNull(Me.tablePortfolioSources.ask_fieldColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Setask_fieldNull()
-            Me(Me.tablePortfolioSources.ask_fieldColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function Islast_fieldNull() As Boolean
-            Return Me.IsNull(Me.tablePortfolioSources.last_fieldColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Setlast_fieldNull()
-            Me(Me.tablePortfolioSources.last_fieldColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function Ishist_fieldNull() As Boolean
-            Return Me.IsNull(Me.tablePortfolioSources.hist_fieldColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Sethist_fieldNull()
-            Me(Me.tablePortfolioSources.hist_fieldColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public Function Isportfolio_nameNull() As Boolean
             Return Me.IsNull(Me.tablePortfolioSources.portfolio_nameColumn)
         End Function
@@ -13261,18 +11708,6 @@ Partial Public Class BondsDataSet
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public Sub Setportfolio_nameNull()
             Me(Me.tablePortfolioSources.portfolio_nameColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function Isric_structureNull() As Boolean
-            Return Me.IsNull(Me.tablePortfolioSources.ric_structureColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Setric_structureNull()
-            Me(Me.tablePortfolioSources.ric_structureColumn) = Global.System.Convert.DBNull
         End Sub
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
@@ -13309,6 +11744,18 @@ Partial Public Class BondsDataSet
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public Sub SetcolorNull()
             Me(Me.tablePortfolioSources.colorColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function Isid_field_setNull() As Boolean
+            Return Me.IsNull(Me.tablePortfolioSources.id_field_setColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub Setid_field_setNull()
+            Me(Me.tablePortfolioSources.id_field_setColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
     
@@ -13423,26 +11870,26 @@ Partial Public Class BondsDataSet
     '''<summary>
     '''Represents strongly named DataRow class.
     '''</summary>
-    Partial Public Class fields_layoutRow
+    Partial Public Class field_layoutRow
         Inherits Global.System.Data.DataRow
         
-        Private tablefields_layout As fields_layoutDataTable
+        Private tablefield_layout As field_layoutDataTable
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Friend Sub New(ByVal rb As Global.System.Data.DataRowBuilder)
             MyBase.New(rb)
-            Me.tablefields_layout = CType(Me.Table,fields_layoutDataTable)
+            Me.tablefield_layout = CType(Me.Table,field_layoutDataTable)
         End Sub
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public Property id() As Long
             Get
-                Return CType(Me(Me.tablefields_layout.idColumn),Long)
+                Return CType(Me(Me.tablefield_layout.idColumn),Long)
             End Get
             Set
-                Me(Me.tablefields_layout.idColumn) = value
+                Me(Me.tablefield_layout.idColumn) = value
             End Set
         End Property
         
@@ -13450,10 +11897,14 @@ Partial Public Class BondsDataSet
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public Property bid_field() As String
             Get
-                Return CType(Me(Me.tablefields_layout.bid_fieldColumn),String)
+                Try 
+                    Return CType(Me(Me.tablefield_layout.bid_fieldColumn),String)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'bid_field' в таблице 'field_layout' равно DBNull.", e)
+                End Try
             End Get
             Set
-                Me(Me.tablefields_layout.bid_fieldColumn) = value
+                Me(Me.tablefield_layout.bid_fieldColumn) = value
             End Set
         End Property
         
@@ -13461,10 +11912,14 @@ Partial Public Class BondsDataSet
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public Property ask_field() As String
             Get
-                Return CType(Me(Me.tablefields_layout.ask_fieldColumn),String)
+                Try 
+                    Return CType(Me(Me.tablefield_layout.ask_fieldColumn),String)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'ask_field' в таблице 'field_layout' равно DBNull.", e)
+                End Try
             End Get
             Set
-                Me(Me.tablefields_layout.ask_fieldColumn) = value
+                Me(Me.tablefield_layout.ask_fieldColumn) = value
             End Set
         End Property
         
@@ -13472,21 +11927,14 @@ Partial Public Class BondsDataSet
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public Property last_field() As String
             Get
-                Return CType(Me(Me.tablefields_layout.last_fieldColumn),String)
+                Try 
+                    Return CType(Me(Me.tablefield_layout.last_fieldColumn),String)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'last_field' в таблице 'field_layout' равно DBNull.", e)
+                End Try
             End Get
             Set
-                Me(Me.tablefields_layout.last_fieldColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property hist_field() As String
-            Get
-                Return CType(Me(Me.tablefields_layout.hist_fieldColumn),String)
-            End Get
-            Set
-                Me(Me.tablefields_layout.hist_fieldColumn) = value
+                Me(Me.tablefield_layout.last_fieldColumn) = value
             End Set
         End Property
         
@@ -13495,13 +11943,28 @@ Partial Public Class BondsDataSet
         Public Property vwap_field() As String
             Get
                 Try 
-                    Return CType(Me(Me.tablefields_layout.vwap_fieldColumn),String)
+                    Return CType(Me(Me.tablefield_layout.vwap_fieldColumn),String)
                 Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'vwap_field' в таблице 'fields_layout' равно DBNull.", e)
+                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'vwap_field' в таблице 'field_layout' равно DBNull.", e)
                 End Try
             End Get
             Set
-                Me(Me.tablefields_layout.vwap_fieldColumn) = value
+                Me(Me.tablefield_layout.vwap_fieldColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property timestamp_field() As String
+            Get
+                Try 
+                    Return CType(Me(Me.tablefield_layout.timestamp_fieldColumn),String)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'timestamp_field' в таблице 'field_layout' равно DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tablefield_layout.timestamp_fieldColumn) = value
             End Set
         End Property
         
@@ -13510,13 +11973,166 @@ Partial Public Class BondsDataSet
         Public Property volume_field() As String
             Get
                 Try 
-                    Return CType(Me(Me.tablefields_layout.volume_fieldColumn),String)
+                    Return CType(Me(Me.tablefield_layout.volume_fieldColumn),String)
                 Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'volume_field' в таблице 'fields_layout' равно DBNull.", e)
+                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'volume_field' в таблице 'field_layout' равно DBNull.", e)
                 End Try
             End Get
             Set
-                Me(Me.tablefields_layout.volume_fieldColumn) = value
+                Me(Me.tablefield_layout.volume_fieldColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property field_set_id() As Long
+            Get
+                Try 
+                    Return CType(Me(Me.tablefield_layout.field_set_idColumn),Long)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'field_set_id' в таблице 'field_layout' равно DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tablefield_layout.field_set_idColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property is_realtime() As Long
+            Get
+                Try 
+                    Return CType(Me(Me.tablefield_layout.is_realtimeColumn),Long)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'is_realtime' в таблице 'field_layout' равно DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tablefield_layout.is_realtimeColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function Isbid_fieldNull() As Boolean
+            Return Me.IsNull(Me.tablefield_layout.bid_fieldColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub Setbid_fieldNull()
+            Me(Me.tablefield_layout.bid_fieldColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function Isask_fieldNull() As Boolean
+            Return Me.IsNull(Me.tablefield_layout.ask_fieldColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub Setask_fieldNull()
+            Me(Me.tablefield_layout.ask_fieldColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function Islast_fieldNull() As Boolean
+            Return Me.IsNull(Me.tablefield_layout.last_fieldColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub Setlast_fieldNull()
+            Me(Me.tablefield_layout.last_fieldColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function Isvwap_fieldNull() As Boolean
+            Return Me.IsNull(Me.tablefield_layout.vwap_fieldColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub Setvwap_fieldNull()
+            Me(Me.tablefield_layout.vwap_fieldColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function Istimestamp_fieldNull() As Boolean
+            Return Me.IsNull(Me.tablefield_layout.timestamp_fieldColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub Settimestamp_fieldNull()
+            Me(Me.tablefield_layout.timestamp_fieldColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function Isvolume_fieldNull() As Boolean
+            Return Me.IsNull(Me.tablefield_layout.volume_fieldColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub Setvolume_fieldNull()
+            Me(Me.tablefield_layout.volume_fieldColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function Isfield_set_idNull() As Boolean
+            Return Me.IsNull(Me.tablefield_layout.field_set_idColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub Setfield_set_idNull()
+            Me(Me.tablefield_layout.field_set_idColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function Isis_realtimeNull() As Boolean
+            Return Me.IsNull(Me.tablefield_layout.is_realtimeColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub Setis_realtimeNull()
+            Me(Me.tablefield_layout.is_realtimeColumn) = Global.System.Convert.DBNull
+        End Sub
+    End Class
+    
+    '''<summary>
+    '''Represents strongly named DataRow class.
+    '''</summary>
+    Partial Public Class field_setRow
+        Inherits Global.System.Data.DataRow
+        
+        Private tablefield_set As field_setDataTable
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Friend Sub New(ByVal rb As Global.System.Data.DataRowBuilder)
+            MyBase.New(rb)
+            Me.tablefield_set = CType(Me.Table,field_setDataTable)
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property id() As Long
+            Get
+                Return CType(Me(Me.tablefield_set.idColumn),Long)
+            End Get
+            Set
+                Me(Me.tablefield_set.idColumn) = value
             End Set
         End Property
         
@@ -13525,50 +12141,383 @@ Partial Public Class BondsDataSet
         Public Property name() As String
             Get
                 Try 
-                    Return CType(Me(Me.tablefields_layout.nameColumn),String)
+                    Return CType(Me(Me.tablefield_set.nameColumn),String)
                 Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'name' в таблице 'fields_layout' равно DBNull.", e)
+                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'name' в таблице 'field_set' равно DBNull.", e)
                 End Try
             End Get
             Set
-                Me(Me.tablefields_layout.nameColumn) = value
+                Me(Me.tablefield_set.nameColumn) = value
             End Set
         End Property
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function Isvwap_fieldNull() As Boolean
-            Return Me.IsNull(Me.tablefields_layout.vwap_fieldColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Setvwap_fieldNull()
-            Me(Me.tablefields_layout.vwap_fieldColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Function Isvolume_fieldNull() As Boolean
-            Return Me.IsNull(Me.tablefields_layout.volume_fieldColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub Setvolume_fieldNull()
-            Me(Me.tablefields_layout.volume_fieldColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public Function IsnameNull() As Boolean
-            Return Me.IsNull(Me.tablefields_layout.nameColumn)
+            Return Me.IsNull(Me.tablefield_set.nameColumn)
         End Function
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public Sub SetnameNull()
-            Me(Me.tablefields_layout.nameColumn) = Global.System.Convert.DBNull
+            Me(Me.tablefield_set.nameColumn) = Global.System.Convert.DBNull
+        End Sub
+    End Class
+    
+    '''<summary>
+    '''Represents strongly named DataRow class.
+    '''</summary>
+    Partial Public Class PortfolioUnitedRow
+        Inherits Global.System.Data.DataRow
+        
+        Private tablePortfolioUnited As PortfolioUnitedDataTable
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Friend Sub New(ByVal rb As Global.System.Data.DataRowBuilder)
+            MyBase.New(rb)
+            Me.tablePortfolioUnited = CType(Me.Table,PortfolioUnitedDataTable)
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property pid() As Long
+            Get
+                Return CType(Me(Me.tablePortfolioUnited.pidColumn),Long)
+            End Get
+            Set
+                Me(Me.tablePortfolioUnited.pidColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property bid() As Long
+            Get
+                Return CType(Me(Me.tablePortfolioUnited.bidColumn),Long)
+            End Get
+            Set
+                Me(Me.tablePortfolioUnited.bidColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property ric() As String
+            Get
+                Try 
+                    Return CType(Me(Me.tablePortfolioUnited.ricColumn),String)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'ric' в таблице 'PortfolioUnited' равно DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tablePortfolioUnited.ricColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property payments() As String
+            Get
+                Try 
+                    Return CType(Me(Me.tablePortfolioUnited.paymentsColumn),String)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'payments' в таблице 'PortfolioUnited' равно DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tablePortfolioUnited.paymentsColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property rates() As String
+            Get
+                Try 
+                    Return CType(Me(Me.tablePortfolioUnited.ratesColumn),String)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'rates' в таблице 'PortfolioUnited' равно DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tablePortfolioUnited.ratesColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property bondshortname() As Object
+            Get
+                Try 
+                    Return CType(Me(Me.tablePortfolioUnited.bondshortnameColumn),Object)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'bondshortname' в таблице 'PortfolioUnited' равно DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tablePortfolioUnited.bondshortnameColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property dsply_name() As String
+            Get
+                Try 
+                    Return CType(Me(Me.tablePortfolioUnited.dsply_nameColumn),String)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'dsply_name' в таблице 'PortfolioUnited' равно DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tablePortfolioUnited.dsply_nameColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property include() As Boolean
+            Get
+                Try 
+                    Return CType(Me(Me.tablePortfolioUnited.includeColumn),Boolean)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'include' в таблице 'PortfolioUnited' равно DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tablePortfolioUnited.includeColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property color() As String
+            Get
+                Try 
+                    Return CType(Me(Me.tablePortfolioUnited.colorColumn),String)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'color' в таблице 'PortfolioUnited' равно DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tablePortfolioUnited.colorColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property whereFrom() As Object
+            Get
+                Try 
+                    Return CType(Me(Me.tablePortfolioUnited.whereFromColumn),Object)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'whereFrom' в таблице 'PortfolioUnited' равно DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tablePortfolioUnited.whereFromColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property fromID() As Long
+            Get
+                Return CType(Me(Me.tablePortfolioUnited.fromIDColumn),Long)
+            End Get
+            Set
+                Me(Me.tablePortfolioUnited.fromIDColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property portfolio_name() As String
+            Get
+                Try 
+                    Return CType(Me(Me.tablePortfolioUnited.portfolio_nameColumn),String)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'portfolio_name' в таблице 'PortfolioUnited' равно DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tablePortfolioUnited.portfolio_nameColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property whereFromName() As String
+            Get
+                Try 
+                    Return CType(Me(Me.tablePortfolioUnited.whereFromNameColumn),String)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'whereFromName' в таблице 'PortfolioUnited' равно DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tablePortfolioUnited.whereFromNameColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property whereFromDescr() As String
+            Get
+                Try 
+                    Return CType(Me(Me.tablePortfolioUnited.whereFromDescrColumn),String)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("Значение для столбца 'whereFromDescr' в таблице 'PortfolioUnited' равно DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tablePortfolioUnited.whereFromDescrColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property id_field_set() As Long
+            Get
+                Return CType(Me(Me.tablePortfolioUnited.id_field_setColumn),Long)
+            End Get
+            Set
+                Me(Me.tablePortfolioUnited.id_field_setColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function IsricNull() As Boolean
+            Return Me.IsNull(Me.tablePortfolioUnited.ricColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub SetricNull()
+            Me(Me.tablePortfolioUnited.ricColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function IspaymentsNull() As Boolean
+            Return Me.IsNull(Me.tablePortfolioUnited.paymentsColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub SetpaymentsNull()
+            Me(Me.tablePortfolioUnited.paymentsColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function IsratesNull() As Boolean
+            Return Me.IsNull(Me.tablePortfolioUnited.ratesColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub SetratesNull()
+            Me(Me.tablePortfolioUnited.ratesColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function IsbondshortnameNull() As Boolean
+            Return Me.IsNull(Me.tablePortfolioUnited.bondshortnameColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub SetbondshortnameNull()
+            Me(Me.tablePortfolioUnited.bondshortnameColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function Isdsply_nameNull() As Boolean
+            Return Me.IsNull(Me.tablePortfolioUnited.dsply_nameColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub Setdsply_nameNull()
+            Me(Me.tablePortfolioUnited.dsply_nameColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function IsincludeNull() As Boolean
+            Return Me.IsNull(Me.tablePortfolioUnited.includeColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub SetincludeNull()
+            Me(Me.tablePortfolioUnited.includeColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function IscolorNull() As Boolean
+            Return Me.IsNull(Me.tablePortfolioUnited.colorColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub SetcolorNull()
+            Me(Me.tablePortfolioUnited.colorColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function IswhereFromNull() As Boolean
+            Return Me.IsNull(Me.tablePortfolioUnited.whereFromColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub SetwhereFromNull()
+            Me(Me.tablePortfolioUnited.whereFromColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function Isportfolio_nameNull() As Boolean
+            Return Me.IsNull(Me.tablePortfolioUnited.portfolio_nameColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub Setportfolio_nameNull()
+            Me(Me.tablePortfolioUnited.portfolio_nameColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function IswhereFromNameNull() As Boolean
+            Return Me.IsNull(Me.tablePortfolioUnited.whereFromNameColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub SetwhereFromNameNull()
+            Me(Me.tablePortfolioUnited.whereFromNameColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function IswhereFromDescrNull() As Boolean
+            Return Me.IsNull(Me.tablePortfolioUnited.whereFromDescrColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub SetwhereFromDescrNull()
+            Me(Me.tablePortfolioUnited.whereFromDescrColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
     
@@ -13828,42 +12777,6 @@ Partial Public Class BondsDataSet
     '''Row event argument class
     '''</summary>
     <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-    Public Class PortfolioUnitedRowChangeEvent
-        Inherits Global.System.EventArgs
-        
-        Private eventRow As PortfolioUnitedRow
-        
-        Private eventAction As Global.System.Data.DataRowAction
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub New(ByVal row As PortfolioUnitedRow, ByVal action As Global.System.Data.DataRowAction)
-            MyBase.New
-            Me.eventRow = row
-            Me.eventAction = action
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property Row() As PortfolioUnitedRow
-            Get
-                Return Me.eventRow
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property Action() As Global.System.Data.DataRowAction
-            Get
-                Return Me.eventAction
-            End Get
-        End Property
-    End Class
-    
-    '''<summary>
-    '''Row event argument class
-    '''</summary>
-    <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
     Public Class settingsRowChangeEvent
         Inherits Global.System.EventArgs
         
@@ -14044,42 +12957,6 @@ Partial Public Class BondsDataSet
     '''Row event argument class
     '''</summary>
     <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-    Public Class _portfolioByBondsRowChangeEvent
-        Inherits Global.System.EventArgs
-        
-        Private eventRow As _portfolioByBondsRow
-        
-        Private eventAction As Global.System.Data.DataRowAction
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub New(ByVal row As _portfolioByBondsRow, ByVal action As Global.System.Data.DataRowAction)
-            MyBase.New
-            Me.eventRow = row
-            Me.eventAction = action
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property Row() As _portfolioByBondsRow
-            Get
-                Return Me.eventRow
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property Action() As Global.System.Data.DataRowAction
-            Get
-                Return Me.eventAction
-            End Get
-        End Property
-    End Class
-    
-    '''<summary>
-    '''Row event argument class
-    '''</summary>
-    <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
     Public Class _portfolioByChainRowChangeEvent
         Inherits Global.System.EventArgs
         
@@ -14206,42 +13083,6 @@ Partial Public Class BondsDataSet
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public ReadOnly Property Row() As HawsersInPortfolioRow
-            Get
-                Return Me.eventRow
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property Action() As Global.System.Data.DataRowAction
-            Get
-                Return Me.eventAction
-            End Get
-        End Property
-    End Class
-    
-    '''<summary>
-    '''Row event argument class
-    '''</summary>
-    <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-    Public Class portfolio_to_bondRowChangeEvent
-        Inherits Global.System.EventArgs
-        
-        Private eventRow As portfolio_to_bondRow
-        
-        Private eventAction As Global.System.Data.DataRowAction
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub New(ByVal row As portfolio_to_bondRow, ByVal action As Global.System.Data.DataRowAction)
-            MyBase.New
-            Me.eventRow = row
-            Me.eventAction = action
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property Row() As portfolio_to_bondRow
             Get
                 Return Me.eventRow
             End Get
@@ -14440,16 +13281,16 @@ Partial Public Class BondsDataSet
     '''Row event argument class
     '''</summary>
     <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-    Public Class fields_layoutRowChangeEvent
+    Public Class field_layoutRowChangeEvent
         Inherits Global.System.EventArgs
         
-        Private eventRow As fields_layoutRow
+        Private eventRow As field_layoutRow
         
         Private eventAction As Global.System.Data.DataRowAction
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub New(ByVal row As fields_layoutRow, ByVal action As Global.System.Data.DataRowAction)
+        Public Sub New(ByVal row As field_layoutRow, ByVal action As Global.System.Data.DataRowAction)
             MyBase.New
             Me.eventRow = row
             Me.eventAction = action
@@ -14457,7 +13298,79 @@ Partial Public Class BondsDataSet
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public ReadOnly Property Row() As fields_layoutRow
+        Public ReadOnly Property Row() As field_layoutRow
+            Get
+                Return Me.eventRow
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property Action() As Global.System.Data.DataRowAction
+            Get
+                Return Me.eventAction
+            End Get
+        End Property
+    End Class
+    
+    '''<summary>
+    '''Row event argument class
+    '''</summary>
+    <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+    Public Class field_setRowChangeEvent
+        Inherits Global.System.EventArgs
+        
+        Private eventRow As field_setRow
+        
+        Private eventAction As Global.System.Data.DataRowAction
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub New(ByVal row As field_setRow, ByVal action As Global.System.Data.DataRowAction)
+            MyBase.New
+            Me.eventRow = row
+            Me.eventAction = action
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property Row() As field_setRow
+            Get
+                Return Me.eventRow
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property Action() As Global.System.Data.DataRowAction
+            Get
+                Return Me.eventAction
+            End Get
+        End Property
+    End Class
+    
+    '''<summary>
+    '''Row event argument class
+    '''</summary>
+    <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+    Public Class PortfolioUnitedRowChangeEvent
+        Inherits Global.System.EventArgs
+        
+        Private eventRow As PortfolioUnitedRow
+        
+        Private eventAction As Global.System.Data.DataRowAction
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub New(ByVal row As PortfolioUnitedRow, ByVal action As Global.System.Data.DataRowAction)
+            MyBase.New
+            Me.eventRow = row
+            Me.eventAction = action
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property Row() As PortfolioUnitedRow
             Get
                 Return Me.eventRow
             End Get
@@ -17205,14 +16118,8 @@ Namespace BondsDataSetTableAdapters
             tableMapping.ColumnMappings.Add("chain_name", "chain_name")
             tableMapping.ColumnMappings.Add("descr", "descr")
             tableMapping.ColumnMappings.Add("curve", "curve")
-            tableMapping.ColumnMappings.Add("sort_num", "sort_num")
-            tableMapping.ColumnMappings.Add("is_necessary", "is_necessary")
-            tableMapping.ColumnMappings.Add("type", "type")
             tableMapping.ColumnMappings.Add("color", "color")
-            tableMapping.ColumnMappings.Add("bid_field", "bid_field")
-            tableMapping.ColumnMappings.Add("ask_field", "ask_field")
-            tableMapping.ColumnMappings.Add("last_field", "last_field")
-            tableMapping.ColumnMappings.Add("hist_field", "hist_field")
+            tableMapping.ColumnMappings.Add("id_field_set", "id_field_set")
             Me._adapter.TableMappings.Add(tableMapping)
             Me._adapter.DeleteCommand = New Global.System.Data.SQLite.SQLiteCommand()
             Me._adapter.DeleteCommand.Connection = Me.Connection
@@ -17220,16 +16127,9 @@ Namespace BondsDataSetTableAdapters
                 "ND ((@IsNull_chain_name = 1 AND [chain_name] IS NULL) OR ([chain_name] = @Origin"& _ 
                 "al_chain_name)) AND ((@IsNull_descr = 1 AND [descr] IS NULL) OR ([descr] = @Orig"& _ 
                 "inal_descr)) AND ((@IsNull_curve = 1 AND [curve] IS NULL) OR ([curve] = @Origina"& _ 
-                "l_curve)) AND ((@IsNull_sort_num = 1 AND [sort_num] IS NULL) OR ([sort_num] = @O"& _ 
-                "riginal_sort_num)) AND ((@IsNull_is_necessary = 1 AND [is_necessary] IS NULL) OR"& _ 
-                " ([is_necessary] = @Original_is_necessary)) AND ((@IsNull_type = 1 AND [type] IS"& _ 
-                " NULL) OR ([type] = @Original_type)) AND ((@IsNull_color = 1 AND [color] IS NULL"& _ 
-                ") OR ([color] = @Original_color)) AND ((@IsNull_bid_field = 1 AND [bid_field] IS"& _ 
-                " NULL) OR ([bid_field] = @Original_bid_field)) AND ((@IsNull_ask_field = 1 AND ["& _ 
-                "ask_field] IS NULL) OR ([ask_field] = @Original_ask_field)) AND ((@IsNull_last_f"& _ 
-                "ield = 1 AND [last_field] IS NULL) OR ([last_field] = @Original_last_field)) AND"& _ 
-                " ((@IsNull_hist_field = 1 AND [hist_field] IS NULL) OR ([hist_field] = @Original"& _ 
-                "_hist_field)))"
+                "l_curve)) AND ((@IsNull_color = 1 AND [color] IS NULL) OR ([color] = @Original_c"& _ 
+                "olor)) AND ((@IsNull_id_field_set = 1 AND [id_field_set] IS NULL) OR ([id_field_"& _ 
+                "set] = @Original_id_field_set)))"
             Me._adapter.DeleteCommand.CommandType = Global.System.Data.CommandType.Text
             Dim param As Global.System.Data.SQLite.SQLiteParameter = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@Original_id"
@@ -17282,50 +16182,6 @@ Namespace BondsDataSetTableAdapters
             param.SourceVersion = Global.System.Data.DataRowVersion.Original
             Me._adapter.DeleteCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_sort_num"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "sort_num"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_sort_num"
-            param.DbType = Global.System.Data.DbType.Int64
-            param.DbType = Global.System.Data.DbType.Int64
-            param.SourceColumn = "sort_num"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_is_necessary"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "is_necessary"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_is_necessary"
-            param.DbType = Global.System.Data.DbType.[Boolean]
-            param.DbType = Global.System.Data.DbType.[Boolean]
-            param.SourceColumn = "is_necessary"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_type"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "type"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_type"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "type"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@IsNull_color"
             param.DbType = Global.System.Data.DbType.Int32
             param.DbType = Global.System.Data.DbType.Int32
@@ -17340,68 +16196,32 @@ Namespace BondsDataSetTableAdapters
             param.SourceVersion = Global.System.Data.DataRowVersion.Original
             Me._adapter.DeleteCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_bid_field"
+            param.ParameterName = "@IsNull_id_field_set"
             param.DbType = Global.System.Data.DbType.Int32
             param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "bid_field"
+            param.SourceColumn = "id_field_set"
             param.SourceVersion = Global.System.Data.DataRowVersion.Original
             param.SourceColumnNullMapping = true
             Me._adapter.DeleteCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_bid_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "bid_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_ask_field"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "ask_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_ask_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "ask_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_last_field"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "last_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_last_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "last_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_hist_field"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "hist_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_hist_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "hist_field"
+            param.ParameterName = "@Original_id_field_set"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "id_field_set"
             param.SourceVersion = Global.System.Data.DataRowVersion.Original
             Me._adapter.DeleteCommand.Parameters.Add(param)
             Me._adapter.InsertCommand = New Global.System.Data.SQLite.SQLiteCommand()
             Me._adapter.InsertCommand.Connection = Me.Connection
-            Me._adapter.InsertCommand.CommandText = "INSERT INTO [main].[sqlite_default_schema].[chain] ([chain_name], [descr], [curve"& _ 
-                "], [sort_num], [is_necessary], [type], [color], [bid_field], [ask_field], [last_"& _ 
-                "field], [hist_field]) VALUES (@chain_name, @descr, @curve, @sort_num, @is_necess"& _ 
-                "ary, @type, @color, @bid_field, @ask_field, @last_field, @hist_field)"
+            Me._adapter.InsertCommand.CommandText = "INSERT INTO [main].[sqlite_default_schema].[chain] ([id], [chain_name], [descr], "& _ 
+                "[curve], [color], [id_field_set]) VALUES (@id, @chain_name, @descr, @curve, @col"& _ 
+                "or, @id_field_set)"
             Me._adapter.InsertCommand.CommandType = Global.System.Data.CommandType.Text
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@id"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "id"
+            Me._adapter.InsertCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@chain_name"
             param.DbType = Global.System.Data.DbType.[String]
@@ -17419,67 +16239,33 @@ Namespace BondsDataSetTableAdapters
             param.SourceColumn = "curve"
             Me._adapter.InsertCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@sort_num"
-            param.DbType = Global.System.Data.DbType.Int64
-            param.DbType = Global.System.Data.DbType.Int64
-            param.SourceColumn = "sort_num"
-            Me._adapter.InsertCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@is_necessary"
-            param.DbType = Global.System.Data.DbType.[Boolean]
-            param.DbType = Global.System.Data.DbType.[Boolean]
-            param.SourceColumn = "is_necessary"
-            Me._adapter.InsertCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@type"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "type"
-            Me._adapter.InsertCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@color"
             param.DbType = Global.System.Data.DbType.[String]
             param.SourceColumn = "color"
             Me._adapter.InsertCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@bid_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "bid_field"
-            Me._adapter.InsertCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@ask_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "ask_field"
-            Me._adapter.InsertCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@last_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "last_field"
-            Me._adapter.InsertCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@hist_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "hist_field"
+            param.ParameterName = "@id_field_set"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "id_field_set"
             Me._adapter.InsertCommand.Parameters.Add(param)
             Me._adapter.UpdateCommand = New Global.System.Data.SQLite.SQLiteCommand()
             Me._adapter.UpdateCommand.Connection = Me.Connection
-            Me._adapter.UpdateCommand.CommandText = "UPDATE [main].[sqlite_default_schema].[chain] SET [chain_name] = @chain_name, [de"& _ 
-                "scr] = @descr, [curve] = @curve, [sort_num] = @sort_num, [is_necessary] = @is_ne"& _ 
-                "cessary, [type] = @type, [color] = @color, [bid_field] = @bid_field, [ask_field]"& _ 
-                " = @ask_field, [last_field] = @last_field, [hist_field] = @hist_field WHERE (([i"& _ 
-                "d] = @Original_id) AND ((@IsNull_chain_name = 1 AND [chain_name] IS NULL) OR ([c"& _ 
-                "hain_name] = @Original_chain_name)) AND ((@IsNull_descr = 1 AND [descr] IS NULL)"& _ 
-                " OR ([descr] = @Original_descr)) AND ((@IsNull_curve = 1 AND [curve] IS NULL) OR"& _ 
-                " ([curve] = @Original_curve)) AND ((@IsNull_sort_num = 1 AND [sort_num] IS NULL)"& _ 
-                " OR ([sort_num] = @Original_sort_num)) AND ((@IsNull_is_necessary = 1 AND [is_ne"& _ 
-                "cessary] IS NULL) OR ([is_necessary] = @Original_is_necessary)) AND ((@IsNull_ty"& _ 
-                "pe = 1 AND [type] IS NULL) OR ([type] = @Original_type)) AND ((@IsNull_color = 1"& _ 
-                " AND [color] IS NULL) OR ([color] = @Original_color)) AND ((@IsNull_bid_field = "& _ 
-                "1 AND [bid_field] IS NULL) OR ([bid_field] = @Original_bid_field)) AND ((@IsNull"& _ 
-                "_ask_field = 1 AND [ask_field] IS NULL) OR ([ask_field] = @Original_ask_field)) "& _ 
-                "AND ((@IsNull_last_field = 1 AND [last_field] IS NULL) OR ([last_field] = @Origi"& _ 
-                "nal_last_field)) AND ((@IsNull_hist_field = 1 AND [hist_field] IS NULL) OR ([his"& _ 
-                "t_field] = @Original_hist_field)))"
+            Me._adapter.UpdateCommand.CommandText = "UPDATE [main].[sqlite_default_schema].[chain] SET [id] = @id, [chain_name] = @cha"& _ 
+                "in_name, [descr] = @descr, [curve] = @curve, [color] = @color, [id_field_set] = "& _ 
+                "@id_field_set WHERE (([id] = @Original_id) AND ((@IsNull_chain_name = 1 AND [cha"& _ 
+                "in_name] IS NULL) OR ([chain_name] = @Original_chain_name)) AND ((@IsNull_descr "& _ 
+                "= 1 AND [descr] IS NULL) OR ([descr] = @Original_descr)) AND ((@IsNull_curve = 1"& _ 
+                " AND [curve] IS NULL) OR ([curve] = @Original_curve)) AND ((@IsNull_color = 1 AN"& _ 
+                "D [color] IS NULL) OR ([color] = @Original_color)) AND ((@IsNull_id_field_set = "& _ 
+                "1 AND [id_field_set] IS NULL) OR ([id_field_set] = @Original_id_field_set)))"
             Me._adapter.UpdateCommand.CommandType = Global.System.Data.CommandType.Text
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@id"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "id"
+            Me._adapter.UpdateCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@chain_name"
             param.DbType = Global.System.Data.DbType.[String]
@@ -17497,46 +16283,15 @@ Namespace BondsDataSetTableAdapters
             param.SourceColumn = "curve"
             Me._adapter.UpdateCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@sort_num"
-            param.DbType = Global.System.Data.DbType.Int64
-            param.DbType = Global.System.Data.DbType.Int64
-            param.SourceColumn = "sort_num"
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@is_necessary"
-            param.DbType = Global.System.Data.DbType.[Boolean]
-            param.DbType = Global.System.Data.DbType.[Boolean]
-            param.SourceColumn = "is_necessary"
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@type"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "type"
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@color"
             param.DbType = Global.System.Data.DbType.[String]
             param.SourceColumn = "color"
             Me._adapter.UpdateCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@bid_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "bid_field"
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@ask_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "ask_field"
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@last_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "last_field"
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@hist_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "hist_field"
+            param.ParameterName = "@id_field_set"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "id_field_set"
             Me._adapter.UpdateCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@Original_id"
@@ -17589,50 +16344,6 @@ Namespace BondsDataSetTableAdapters
             param.SourceVersion = Global.System.Data.DataRowVersion.Original
             Me._adapter.UpdateCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_sort_num"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "sort_num"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_sort_num"
-            param.DbType = Global.System.Data.DbType.Int64
-            param.DbType = Global.System.Data.DbType.Int64
-            param.SourceColumn = "sort_num"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_is_necessary"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "is_necessary"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_is_necessary"
-            param.DbType = Global.System.Data.DbType.[Boolean]
-            param.DbType = Global.System.Data.DbType.[Boolean]
-            param.SourceColumn = "is_necessary"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_type"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "type"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_type"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "type"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@IsNull_color"
             param.DbType = Global.System.Data.DbType.Int32
             param.DbType = Global.System.Data.DbType.Int32
@@ -17647,59 +16358,18 @@ Namespace BondsDataSetTableAdapters
             param.SourceVersion = Global.System.Data.DataRowVersion.Original
             Me._adapter.UpdateCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_bid_field"
+            param.ParameterName = "@IsNull_id_field_set"
             param.DbType = Global.System.Data.DbType.Int32
             param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "bid_field"
+            param.SourceColumn = "id_field_set"
             param.SourceVersion = Global.System.Data.DataRowVersion.Original
             param.SourceColumnNullMapping = true
             Me._adapter.UpdateCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_bid_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "bid_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_ask_field"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "ask_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_ask_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "ask_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_last_field"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "last_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_last_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "last_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_hist_field"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "hist_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_hist_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "hist_field"
+            param.ParameterName = "@Original_id_field_set"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "id_field_set"
             param.SourceVersion = Global.System.Data.DataRowVersion.Original
             Me._adapter.UpdateCommand.Parameters.Add(param)
         End Sub
@@ -17717,13 +16387,12 @@ Namespace BondsDataSetTableAdapters
             Me._commandCollection = New Global.System.Data.SQLite.SQLiteCommand(4) {}
             Me._commandCollection(0) = New Global.System.Data.SQLite.SQLiteCommand()
             Me._commandCollection(0).Connection = Me.Connection
-            Me._commandCollection(0).CommandText = "SELECT     id, chain_name, descr, curve, sort_num, is_necessary, type, color, bid"& _ 
-                "_field, ask_field, last_field, hist_field"&Global.Microsoft.VisualBasic.ChrW(13)&Global.Microsoft.VisualBasic.ChrW(10)&"FROM         chain"
+            Me._commandCollection(0).CommandText = "SELECT     id, chain_name, descr, curve, color, id_field_set"&Global.Microsoft.VisualBasic.ChrW(13)&Global.Microsoft.VisualBasic.ChrW(10)&"FROM         chain"
             Me._commandCollection(0).CommandType = Global.System.Data.CommandType.Text
             Me._commandCollection(1) = New Global.System.Data.SQLite.SQLiteCommand()
             Me._commandCollection(1).Connection = Me.Connection
-            Me._commandCollection(1).CommandText = "SELECT ask_field, bid_field, chain_name, color, curve, descr, hist_field, id, is_"& _ 
-                "necessary, last_field, sort_num, type FROM chain WHERE (chain_name = @Param1)"
+            Me._commandCollection(1).CommandText = "SELECT chain_name, color, curve, descr, id, id_field_set FROM chain WHERE (chain_"& _ 
+                "name = @Param1)"
             Me._commandCollection(1).CommandType = Global.System.Data.CommandType.Text
             Dim param As Global.System.Data.SQLite.SQLiteParameter = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@Param1"
@@ -17733,9 +16402,8 @@ Namespace BondsDataSetTableAdapters
             Me._commandCollection(1).Parameters.Add(param)
             Me._commandCollection(2) = New Global.System.Data.SQLite.SQLiteCommand()
             Me._commandCollection(2).Connection = Me.Connection
-            Me._commandCollection(2).CommandText = "INSERT INTO chain"&Global.Microsoft.VisualBasic.ChrW(13)&Global.Microsoft.VisualBasic.ChrW(10)&"                      (chain_name, descr, color, bid_field, as"& _ 
-                "k_field, last_field, hist_field, curve)"&Global.Microsoft.VisualBasic.ChrW(13)&Global.Microsoft.VisualBasic.ChrW(10)&"VALUES     (@chain_name, @descr, @color"& _ 
-                ", @bid, @ask, @last, @hist, @crv)"
+            Me._commandCollection(2).CommandText = "INSERT INTO chain"&Global.Microsoft.VisualBasic.ChrW(13)&Global.Microsoft.VisualBasic.ChrW(10)&"                      (chain_name, descr, color, curve, id_fie"& _ 
+                "ld_set)"&Global.Microsoft.VisualBasic.ChrW(13)&Global.Microsoft.VisualBasic.ChrW(10)&"VALUES     (@chain_name, @descr, @color, @crv, @id_field_set)"
             Me._commandCollection(2).CommandType = Global.System.Data.CommandType.Text
             param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@chain_name"
@@ -17756,35 +16424,18 @@ Namespace BondsDataSetTableAdapters
             param.SourceColumn = "color"
             Me._commandCollection(2).Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@bid"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.Size = 2147483647
-            param.SourceColumn = "bid_field"
-            Me._commandCollection(2).Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@ask"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.Size = 2147483647
-            param.SourceColumn = "ask_field"
-            Me._commandCollection(2).Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@last"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.Size = 2147483647
-            param.SourceColumn = "last_field"
-            Me._commandCollection(2).Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@hist"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.Size = 2147483647
-            param.SourceColumn = "hist_field"
-            Me._commandCollection(2).Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@crv"
             param.DbType = Global.System.Data.DbType.[Boolean]
             param.DbType = Global.System.Data.DbType.[Boolean]
             param.Size = 1
             param.SourceColumn = "curve"
+            Me._commandCollection(2).Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@id_field_set"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.Size = 8
+            param.SourceColumn = "id_field_set"
             Me._commandCollection(2).Parameters.Add(param)
             Me._commandCollection(3) = New Global.System.Data.SQLite.SQLiteCommand()
             Me._commandCollection(3).Connection = Me.Connection
@@ -17801,8 +16452,8 @@ Namespace BondsDataSetTableAdapters
             Me._commandCollection(4) = New Global.System.Data.SQLite.SQLiteCommand()
             Me._commandCollection(4).Connection = Me.Connection
             Me._commandCollection(4).CommandText = "UPDATE    chain"&Global.Microsoft.VisualBasic.ChrW(13)&Global.Microsoft.VisualBasic.ChrW(10)&"SET              chain_name = @chain_name, descr = @descr, color"& _ 
-                " = @color, bid_field = @bid, ask_field = @ask, last_field = @last, hist_field = "& _ 
-                "@hist, "&Global.Microsoft.VisualBasic.ChrW(13)&Global.Microsoft.VisualBasic.ChrW(10)&"                      curve = @crv"&Global.Microsoft.VisualBasic.ChrW(13)&Global.Microsoft.VisualBasic.ChrW(10)&"WHERE     (id = @Original_id)"
+                " = @color, curve = @crv, id_field_set = @id_field_set"&Global.Microsoft.VisualBasic.ChrW(13)&Global.Microsoft.VisualBasic.ChrW(10)&"WHERE     (id = @Original"& _ 
+                "_id)"
             Me._commandCollection(4).CommandType = Global.System.Data.CommandType.Text
             param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@chain_name"
@@ -17823,30 +16474,6 @@ Namespace BondsDataSetTableAdapters
             param.SourceColumn = "color"
             Me._commandCollection(4).Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@bid"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.Size = 2147483647
-            param.SourceColumn = "bid_field"
-            Me._commandCollection(4).Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@ask"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.Size = 2147483647
-            param.SourceColumn = "ask_field"
-            Me._commandCollection(4).Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@last"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.Size = 2147483647
-            param.SourceColumn = "last_field"
-            Me._commandCollection(4).Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@hist"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.Size = 2147483647
-            param.SourceColumn = "hist_field"
-            Me._commandCollection(4).Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@crv"
             param.DbType = Global.System.Data.DbType.[Boolean]
             param.DbType = Global.System.Data.DbType.[Boolean]
@@ -17854,12 +16481,18 @@ Namespace BondsDataSetTableAdapters
             param.SourceColumn = "curve"
             Me._commandCollection(4).Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@id_field_set"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.Size = 8
+            param.SourceColumn = "id_field_set"
+            Me._commandCollection(4).Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@Original_id"
             param.DbType = Global.System.Data.DbType.Int64
             param.DbType = Global.System.Data.DbType.Int64
             param.Size = 8
             param.SourceColumn = "id"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
             Me._commandCollection(4).Parameters.Add(param)
         End Sub
         
@@ -17935,7 +16568,7 @@ Namespace BondsDataSetTableAdapters
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
          Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
          Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Delete, true)>  _
-        Public Overloads Overridable Function Delete(ByVal Original_id As Long, ByVal Original_chain_name As String, ByVal Original_descr As String, ByVal Original_curve As Global.System.Nullable(Of Boolean), ByVal Original_sort_num As Global.System.Nullable(Of Long), ByVal Original_is_necessary As Global.System.Nullable(Of Boolean), ByVal Original_type As String, ByVal Original_color As String, ByVal Original_bid_field As String, ByVal Original_ask_field As String, ByVal Original_last_field As String, ByVal Original_hist_field As String) As Integer
+        Public Overloads Overridable Function Delete(ByVal Original_id As Long, ByVal Original_chain_name As String, ByVal Original_descr As String, ByVal Original_curve As Global.System.Nullable(Of Boolean), ByVal Original_color As String, ByVal Original_id_field_set As Global.System.Nullable(Of Long)) As Integer
             Me.Adapter.DeleteCommand.Parameters(0).Value = CType(Original_id,Long)
             If (Original_chain_name Is Nothing) Then
                 Me.Adapter.DeleteCommand.Parameters(1).Value = CType(1,Object)
@@ -17958,61 +16591,19 @@ Namespace BondsDataSetTableAdapters
                 Me.Adapter.DeleteCommand.Parameters(5).Value = CType(1,Object)
                 Me.Adapter.DeleteCommand.Parameters(6).Value = Global.System.DBNull.Value
             End If
-            If (Original_sort_num.HasValue = true) Then
-                Me.Adapter.DeleteCommand.Parameters(7).Value = CType(0,Object)
-                Me.Adapter.DeleteCommand.Parameters(8).Value = CType(Original_sort_num.Value,Long)
-            Else
+            If (Original_color Is Nothing) Then
                 Me.Adapter.DeleteCommand.Parameters(7).Value = CType(1,Object)
                 Me.Adapter.DeleteCommand.Parameters(8).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.DeleteCommand.Parameters(7).Value = CType(0,Object)
+                Me.Adapter.DeleteCommand.Parameters(8).Value = CType(Original_color,String)
             End If
-            If (Original_is_necessary.HasValue = true) Then
+            If (Original_id_field_set.HasValue = true) Then
                 Me.Adapter.DeleteCommand.Parameters(9).Value = CType(0,Object)
-                Me.Adapter.DeleteCommand.Parameters(10).Value = CType(Original_is_necessary.Value,Boolean)
+                Me.Adapter.DeleteCommand.Parameters(10).Value = CType(Original_id_field_set.Value,Long)
             Else
                 Me.Adapter.DeleteCommand.Parameters(9).Value = CType(1,Object)
                 Me.Adapter.DeleteCommand.Parameters(10).Value = Global.System.DBNull.Value
-            End If
-            If (Original_type Is Nothing) Then
-                Me.Adapter.DeleteCommand.Parameters(11).Value = CType(1,Object)
-                Me.Adapter.DeleteCommand.Parameters(12).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.DeleteCommand.Parameters(11).Value = CType(0,Object)
-                Me.Adapter.DeleteCommand.Parameters(12).Value = CType(Original_type,String)
-            End If
-            If (Original_color Is Nothing) Then
-                Me.Adapter.DeleteCommand.Parameters(13).Value = CType(1,Object)
-                Me.Adapter.DeleteCommand.Parameters(14).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.DeleteCommand.Parameters(13).Value = CType(0,Object)
-                Me.Adapter.DeleteCommand.Parameters(14).Value = CType(Original_color,String)
-            End If
-            If (Original_bid_field Is Nothing) Then
-                Me.Adapter.DeleteCommand.Parameters(15).Value = CType(1,Object)
-                Me.Adapter.DeleteCommand.Parameters(16).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.DeleteCommand.Parameters(15).Value = CType(0,Object)
-                Me.Adapter.DeleteCommand.Parameters(16).Value = CType(Original_bid_field,String)
-            End If
-            If (Original_ask_field Is Nothing) Then
-                Me.Adapter.DeleteCommand.Parameters(17).Value = CType(1,Object)
-                Me.Adapter.DeleteCommand.Parameters(18).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.DeleteCommand.Parameters(17).Value = CType(0,Object)
-                Me.Adapter.DeleteCommand.Parameters(18).Value = CType(Original_ask_field,String)
-            End If
-            If (Original_last_field Is Nothing) Then
-                Me.Adapter.DeleteCommand.Parameters(19).Value = CType(1,Object)
-                Me.Adapter.DeleteCommand.Parameters(20).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.DeleteCommand.Parameters(19).Value = CType(0,Object)
-                Me.Adapter.DeleteCommand.Parameters(20).Value = CType(Original_last_field,String)
-            End If
-            If (Original_hist_field Is Nothing) Then
-                Me.Adapter.DeleteCommand.Parameters(21).Value = CType(1,Object)
-                Me.Adapter.DeleteCommand.Parameters(22).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.DeleteCommand.Parameters(21).Value = CType(0,Object)
-                Me.Adapter.DeleteCommand.Parameters(22).Value = CType(Original_hist_field,String)
             End If
             Dim previousConnectionState As Global.System.Data.ConnectionState = Me.Adapter.DeleteCommand.Connection.State
             If ((Me.Adapter.DeleteCommand.Connection.State And Global.System.Data.ConnectionState.Open)  _
@@ -18033,61 +16624,32 @@ Namespace BondsDataSetTableAdapters
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
          Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
          Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Insert, true)>  _
-        Public Overloads Overridable Function Insert(ByVal chain_name As String, ByVal descr As String, ByVal curve As Global.System.Nullable(Of Boolean), ByVal sort_num As Global.System.Nullable(Of Long), ByVal is_necessary As Global.System.Nullable(Of Boolean), ByVal type As String, ByVal color As String, ByVal bid_field As String, ByVal ask_field As String, ByVal last_field As String, ByVal hist_field As String) As Integer
+        Public Overloads Overridable Function Insert(ByVal id As Long, ByVal chain_name As String, ByVal descr As String, ByVal curve As Global.System.Nullable(Of Boolean), ByVal color As String, ByVal id_field_set As Global.System.Nullable(Of Long)) As Integer
+            Me.Adapter.InsertCommand.Parameters(0).Value = CType(id,Long)
             If (chain_name Is Nothing) Then
-                Me.Adapter.InsertCommand.Parameters(0).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.InsertCommand.Parameters(0).Value = CType(chain_name,String)
-            End If
-            If (descr Is Nothing) Then
                 Me.Adapter.InsertCommand.Parameters(1).Value = Global.System.DBNull.Value
             Else
-                Me.Adapter.InsertCommand.Parameters(1).Value = CType(descr,String)
+                Me.Adapter.InsertCommand.Parameters(1).Value = CType(chain_name,String)
+            End If
+            If (descr Is Nothing) Then
+                Me.Adapter.InsertCommand.Parameters(2).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.InsertCommand.Parameters(2).Value = CType(descr,String)
             End If
             If (curve.HasValue = true) Then
-                Me.Adapter.InsertCommand.Parameters(2).Value = CType(curve.Value,Boolean)
-            Else
-                Me.Adapter.InsertCommand.Parameters(2).Value = Global.System.DBNull.Value
-            End If
-            If (sort_num.HasValue = true) Then
-                Me.Adapter.InsertCommand.Parameters(3).Value = CType(sort_num.Value,Long)
+                Me.Adapter.InsertCommand.Parameters(3).Value = CType(curve.Value,Boolean)
             Else
                 Me.Adapter.InsertCommand.Parameters(3).Value = Global.System.DBNull.Value
             End If
-            If (is_necessary.HasValue = true) Then
-                Me.Adapter.InsertCommand.Parameters(4).Value = CType(is_necessary.Value,Boolean)
-            Else
-                Me.Adapter.InsertCommand.Parameters(4).Value = Global.System.DBNull.Value
-            End If
-            If (type Is Nothing) Then
-                Me.Adapter.InsertCommand.Parameters(5).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.InsertCommand.Parameters(5).Value = CType(type,String)
-            End If
             If (color Is Nothing) Then
-                Me.Adapter.InsertCommand.Parameters(6).Value = Global.System.DBNull.Value
+                Me.Adapter.InsertCommand.Parameters(4).Value = Global.System.DBNull.Value
             Else
-                Me.Adapter.InsertCommand.Parameters(6).Value = CType(color,String)
+                Me.Adapter.InsertCommand.Parameters(4).Value = CType(color,String)
             End If
-            If (bid_field Is Nothing) Then
-                Me.Adapter.InsertCommand.Parameters(7).Value = Global.System.DBNull.Value
+            If (id_field_set.HasValue = true) Then
+                Me.Adapter.InsertCommand.Parameters(5).Value = CType(id_field_set.Value,Long)
             Else
-                Me.Adapter.InsertCommand.Parameters(7).Value = CType(bid_field,String)
-            End If
-            If (ask_field Is Nothing) Then
-                Me.Adapter.InsertCommand.Parameters(8).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.InsertCommand.Parameters(8).Value = CType(ask_field,String)
-            End If
-            If (last_field Is Nothing) Then
-                Me.Adapter.InsertCommand.Parameters(9).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.InsertCommand.Parameters(9).Value = CType(last_field,String)
-            End If
-            If (hist_field Is Nothing) Then
-                Me.Adapter.InsertCommand.Parameters(10).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.InsertCommand.Parameters(10).Value = CType(hist_field,String)
+                Me.Adapter.InsertCommand.Parameters(5).Value = Global.System.DBNull.Value
             End If
             Dim previousConnectionState As Global.System.Data.ConnectionState = Me.Adapter.InsertCommand.Connection.State
             If ((Me.Adapter.InsertCommand.Connection.State And Global.System.Data.ConnectionState.Open)  _
@@ -18108,162 +16670,68 @@ Namespace BondsDataSetTableAdapters
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
          Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
          Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Update, true)>  _
-        Public Overloads Overridable Function Update( _
-                    ByVal chain_name As String,  _
-                    ByVal descr As String,  _
-                    ByVal curve As Global.System.Nullable(Of Boolean),  _
-                    ByVal sort_num As Global.System.Nullable(Of Long),  _
-                    ByVal is_necessary As Global.System.Nullable(Of Boolean),  _
-                    ByVal type As String,  _
-                    ByVal color As String,  _
-                    ByVal bid_field As String,  _
-                    ByVal ask_field As String,  _
-                    ByVal last_field As String,  _
-                    ByVal hist_field As String,  _
-                    ByVal Original_id As Long,  _
-                    ByVal Original_chain_name As String,  _
-                    ByVal Original_descr As String,  _
-                    ByVal Original_curve As Global.System.Nullable(Of Boolean),  _
-                    ByVal Original_sort_num As Global.System.Nullable(Of Long),  _
-                    ByVal Original_is_necessary As Global.System.Nullable(Of Boolean),  _
-                    ByVal Original_type As String,  _
-                    ByVal Original_color As String,  _
-                    ByVal Original_bid_field As String,  _
-                    ByVal Original_ask_field As String,  _
-                    ByVal Original_last_field As String,  _
-                    ByVal Original_hist_field As String) As Integer
+        Public Overloads Overridable Function Update(ByVal id As Long, ByVal chain_name As String, ByVal descr As String, ByVal curve As Global.System.Nullable(Of Boolean), ByVal color As String, ByVal id_field_set As Global.System.Nullable(Of Long), ByVal Original_id As Long, ByVal Original_chain_name As String, ByVal Original_descr As String, ByVal Original_curve As Global.System.Nullable(Of Boolean), ByVal Original_color As String, ByVal Original_id_field_set As Global.System.Nullable(Of Long)) As Integer
+            Me.Adapter.UpdateCommand.Parameters(0).Value = CType(id,Long)
             If (chain_name Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(0).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(0).Value = CType(chain_name,String)
-            End If
-            If (descr Is Nothing) Then
                 Me.Adapter.UpdateCommand.Parameters(1).Value = Global.System.DBNull.Value
             Else
-                Me.Adapter.UpdateCommand.Parameters(1).Value = CType(descr,String)
+                Me.Adapter.UpdateCommand.Parameters(1).Value = CType(chain_name,String)
+            End If
+            If (descr Is Nothing) Then
+                Me.Adapter.UpdateCommand.Parameters(2).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.UpdateCommand.Parameters(2).Value = CType(descr,String)
             End If
             If (curve.HasValue = true) Then
-                Me.Adapter.UpdateCommand.Parameters(2).Value = CType(curve.Value,Boolean)
-            Else
-                Me.Adapter.UpdateCommand.Parameters(2).Value = Global.System.DBNull.Value
-            End If
-            If (sort_num.HasValue = true) Then
-                Me.Adapter.UpdateCommand.Parameters(3).Value = CType(sort_num.Value,Long)
+                Me.Adapter.UpdateCommand.Parameters(3).Value = CType(curve.Value,Boolean)
             Else
                 Me.Adapter.UpdateCommand.Parameters(3).Value = Global.System.DBNull.Value
             End If
-            If (is_necessary.HasValue = true) Then
-                Me.Adapter.UpdateCommand.Parameters(4).Value = CType(is_necessary.Value,Boolean)
-            Else
-                Me.Adapter.UpdateCommand.Parameters(4).Value = Global.System.DBNull.Value
-            End If
-            If (type Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(5).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(5).Value = CType(type,String)
-            End If
             If (color Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(6).Value = Global.System.DBNull.Value
+                Me.Adapter.UpdateCommand.Parameters(4).Value = Global.System.DBNull.Value
             Else
-                Me.Adapter.UpdateCommand.Parameters(6).Value = CType(color,String)
+                Me.Adapter.UpdateCommand.Parameters(4).Value = CType(color,String)
             End If
-            If (bid_field Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(7).Value = Global.System.DBNull.Value
+            If (id_field_set.HasValue = true) Then
+                Me.Adapter.UpdateCommand.Parameters(5).Value = CType(id_field_set.Value,Long)
             Else
-                Me.Adapter.UpdateCommand.Parameters(7).Value = CType(bid_field,String)
+                Me.Adapter.UpdateCommand.Parameters(5).Value = Global.System.DBNull.Value
             End If
-            If (ask_field Is Nothing) Then
+            Me.Adapter.UpdateCommand.Parameters(6).Value = CType(Original_id,Long)
+            If (Original_chain_name Is Nothing) Then
+                Me.Adapter.UpdateCommand.Parameters(7).Value = CType(1,Object)
                 Me.Adapter.UpdateCommand.Parameters(8).Value = Global.System.DBNull.Value
             Else
-                Me.Adapter.UpdateCommand.Parameters(8).Value = CType(ask_field,String)
-            End If
-            If (last_field Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(9).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(9).Value = CType(last_field,String)
-            End If
-            If (hist_field Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(10).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(10).Value = CType(hist_field,String)
-            End If
-            Me.Adapter.UpdateCommand.Parameters(11).Value = CType(Original_id,Long)
-            If (Original_chain_name Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(12).Value = CType(1,Object)
-                Me.Adapter.UpdateCommand.Parameters(13).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(12).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(13).Value = CType(Original_chain_name,String)
+                Me.Adapter.UpdateCommand.Parameters(7).Value = CType(0,Object)
+                Me.Adapter.UpdateCommand.Parameters(8).Value = CType(Original_chain_name,String)
             End If
             If (Original_descr Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(14).Value = CType(1,Object)
-                Me.Adapter.UpdateCommand.Parameters(15).Value = Global.System.DBNull.Value
+                Me.Adapter.UpdateCommand.Parameters(9).Value = CType(1,Object)
+                Me.Adapter.UpdateCommand.Parameters(10).Value = Global.System.DBNull.Value
             Else
-                Me.Adapter.UpdateCommand.Parameters(14).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(15).Value = CType(Original_descr,String)
+                Me.Adapter.UpdateCommand.Parameters(9).Value = CType(0,Object)
+                Me.Adapter.UpdateCommand.Parameters(10).Value = CType(Original_descr,String)
             End If
             If (Original_curve.HasValue = true) Then
-                Me.Adapter.UpdateCommand.Parameters(16).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(17).Value = CType(Original_curve.Value,Boolean)
+                Me.Adapter.UpdateCommand.Parameters(11).Value = CType(0,Object)
+                Me.Adapter.UpdateCommand.Parameters(12).Value = CType(Original_curve.Value,Boolean)
             Else
-                Me.Adapter.UpdateCommand.Parameters(16).Value = CType(1,Object)
-                Me.Adapter.UpdateCommand.Parameters(17).Value = Global.System.DBNull.Value
-            End If
-            If (Original_sort_num.HasValue = true) Then
-                Me.Adapter.UpdateCommand.Parameters(18).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(19).Value = CType(Original_sort_num.Value,Long)
-            Else
-                Me.Adapter.UpdateCommand.Parameters(18).Value = CType(1,Object)
-                Me.Adapter.UpdateCommand.Parameters(19).Value = Global.System.DBNull.Value
-            End If
-            If (Original_is_necessary.HasValue = true) Then
-                Me.Adapter.UpdateCommand.Parameters(20).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(21).Value = CType(Original_is_necessary.Value,Boolean)
-            Else
-                Me.Adapter.UpdateCommand.Parameters(20).Value = CType(1,Object)
-                Me.Adapter.UpdateCommand.Parameters(21).Value = Global.System.DBNull.Value
-            End If
-            If (Original_type Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(22).Value = CType(1,Object)
-                Me.Adapter.UpdateCommand.Parameters(23).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(22).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(23).Value = CType(Original_type,String)
+                Me.Adapter.UpdateCommand.Parameters(11).Value = CType(1,Object)
+                Me.Adapter.UpdateCommand.Parameters(12).Value = Global.System.DBNull.Value
             End If
             If (Original_color Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(24).Value = CType(1,Object)
-                Me.Adapter.UpdateCommand.Parameters(25).Value = Global.System.DBNull.Value
+                Me.Adapter.UpdateCommand.Parameters(13).Value = CType(1,Object)
+                Me.Adapter.UpdateCommand.Parameters(14).Value = Global.System.DBNull.Value
             Else
-                Me.Adapter.UpdateCommand.Parameters(24).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(25).Value = CType(Original_color,String)
+                Me.Adapter.UpdateCommand.Parameters(13).Value = CType(0,Object)
+                Me.Adapter.UpdateCommand.Parameters(14).Value = CType(Original_color,String)
             End If
-            If (Original_bid_field Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(26).Value = CType(1,Object)
-                Me.Adapter.UpdateCommand.Parameters(27).Value = Global.System.DBNull.Value
+            If (Original_id_field_set.HasValue = true) Then
+                Me.Adapter.UpdateCommand.Parameters(15).Value = CType(0,Object)
+                Me.Adapter.UpdateCommand.Parameters(16).Value = CType(Original_id_field_set.Value,Long)
             Else
-                Me.Adapter.UpdateCommand.Parameters(26).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(27).Value = CType(Original_bid_field,String)
-            End If
-            If (Original_ask_field Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(28).Value = CType(1,Object)
-                Me.Adapter.UpdateCommand.Parameters(29).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(28).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(29).Value = CType(Original_ask_field,String)
-            End If
-            If (Original_last_field Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(30).Value = CType(1,Object)
-                Me.Adapter.UpdateCommand.Parameters(31).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(30).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(31).Value = CType(Original_last_field,String)
-            End If
-            If (Original_hist_field Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(32).Value = CType(1,Object)
-                Me.Adapter.UpdateCommand.Parameters(33).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(32).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(33).Value = CType(Original_hist_field,String)
+                Me.Adapter.UpdateCommand.Parameters(15).Value = CType(1,Object)
+                Me.Adapter.UpdateCommand.Parameters(16).Value = Global.System.DBNull.Value
             End If
             Dim previousConnectionState As Global.System.Data.ConnectionState = Me.Adapter.UpdateCommand.Connection.State
             If ((Me.Adapter.UpdateCommand.Connection.State And Global.System.Data.ConnectionState.Open)  _
@@ -18282,8 +16750,16 @@ Namespace BondsDataSetTableAdapters
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
+         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
+         Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Update, true)>  _
+        Public Overloads Overridable Function Update(ByVal chain_name As String, ByVal descr As String, ByVal curve As Global.System.Nullable(Of Boolean), ByVal color As String, ByVal id_field_set As Global.System.Nullable(Of Long), ByVal Original_id As Long, ByVal Original_chain_name As String, ByVal Original_descr As String, ByVal Original_curve As Global.System.Nullable(Of Boolean), ByVal Original_color As String, ByVal Original_id_field_set As Global.System.Nullable(Of Long)) As Integer
+            Return Me.Update(Original_id, chain_name, descr, curve, color, id_field_set, Original_id, Original_chain_name, Original_descr, Original_curve, Original_color, Original_id_field_set)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
          Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")>  _
-        Public Overloads Overridable Function InsertNew(ByVal chain_name As String, ByVal descr As String, ByVal color As String, ByVal bid As String, ByVal ask As String, ByVal last As String, ByVal hist As String, ByVal crv As Global.System.Nullable(Of Boolean)) As Integer
+        Public Overloads Overridable Function InsertNew(ByVal chain_name As String, ByVal descr As String, ByVal color As String, ByVal crv As Global.System.Nullable(Of Boolean), ByVal id_field_set As Global.System.Nullable(Of Long)) As Object
             Dim command As Global.System.Data.SQLite.SQLiteCommand = Me.CommandCollection(2)
             If (chain_name Is Nothing) Then
                 command.Parameters(0).Value = Global.System.DBNull.Value
@@ -18300,45 +16776,35 @@ Namespace BondsDataSetTableAdapters
             Else
                 command.Parameters(2).Value = CType(color,String)
             End If
-            If (bid Is Nothing) Then
-                command.Parameters(3).Value = Global.System.DBNull.Value
-            Else
-                command.Parameters(3).Value = CType(bid,String)
-            End If
-            If (ask Is Nothing) Then
-                command.Parameters(4).Value = Global.System.DBNull.Value
-            Else
-                command.Parameters(4).Value = CType(ask,String)
-            End If
-            If (last Is Nothing) Then
-                command.Parameters(5).Value = Global.System.DBNull.Value
-            Else
-                command.Parameters(5).Value = CType(last,String)
-            End If
-            If (hist Is Nothing) Then
-                command.Parameters(6).Value = Global.System.DBNull.Value
-            Else
-                command.Parameters(6).Value = CType(hist,String)
-            End If
             If (crv.HasValue = true) Then
-                command.Parameters(7).Value = CType(crv.Value,Boolean)
+                command.Parameters(3).Value = CType(crv.Value,Boolean)
             Else
-                command.Parameters(7).Value = Global.System.DBNull.Value
+                command.Parameters(3).Value = Global.System.DBNull.Value
+            End If
+            If (id_field_set.HasValue = true) Then
+                command.Parameters(4).Value = CType(id_field_set.Value,Long)
+            Else
+                command.Parameters(4).Value = Global.System.DBNull.Value
             End If
             Dim previousConnectionState As Global.System.Data.ConnectionState = command.Connection.State
             If ((command.Connection.State And Global.System.Data.ConnectionState.Open)  _
                         <> Global.System.Data.ConnectionState.Open) Then
                 command.Connection.Open
             End If
-            Dim returnValue As Integer
+            Dim returnValue As Object
             Try 
-                returnValue = command.ExecuteNonQuery
+                returnValue = command.ExecuteScalar
             Finally
                 If (previousConnectionState = Global.System.Data.ConnectionState.Closed) Then
                     command.Connection.Close
                 End If
             End Try
-            Return returnValue
+            If ((returnValue Is Nothing)  _
+                        OrElse (returnValue.GetType Is GetType(Global.System.DBNull))) Then
+                Return Nothing
+            Else
+                Return CType(returnValue,Object)
+            End If
         End Function
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
@@ -18367,7 +16833,7 @@ Namespace BondsDataSetTableAdapters
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
          Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")>  _
-        Public Overloads Overridable Function UpdateItem(ByVal chain_name As String, ByVal descr As String, ByVal color As String, ByVal bid As String, ByVal ask As String, ByVal last As String, ByVal hist As String, ByVal crv As Global.System.Nullable(Of Boolean), ByVal Original_id As Long) As Integer
+        Public Overloads Overridable Function UpdateItem(ByVal chain_name As String, ByVal descr As String, ByVal color As String, ByVal crv As Global.System.Nullable(Of Boolean), ByVal id_field_set As Global.System.Nullable(Of Long), ByVal Original_id As Long) As Object
             Dim command As Global.System.Data.SQLite.SQLiteCommand = Me.CommandCollection(4)
             If (chain_name Is Nothing) Then
                 command.Parameters(0).Value = Global.System.DBNull.Value
@@ -18384,46 +16850,36 @@ Namespace BondsDataSetTableAdapters
             Else
                 command.Parameters(2).Value = CType(color,String)
             End If
-            If (bid Is Nothing) Then
-                command.Parameters(3).Value = Global.System.DBNull.Value
-            Else
-                command.Parameters(3).Value = CType(bid,String)
-            End If
-            If (ask Is Nothing) Then
-                command.Parameters(4).Value = Global.System.DBNull.Value
-            Else
-                command.Parameters(4).Value = CType(ask,String)
-            End If
-            If (last Is Nothing) Then
-                command.Parameters(5).Value = Global.System.DBNull.Value
-            Else
-                command.Parameters(5).Value = CType(last,String)
-            End If
-            If (hist Is Nothing) Then
-                command.Parameters(6).Value = Global.System.DBNull.Value
-            Else
-                command.Parameters(6).Value = CType(hist,String)
-            End If
             If (crv.HasValue = true) Then
-                command.Parameters(7).Value = CType(crv.Value,Boolean)
+                command.Parameters(3).Value = CType(crv.Value,Boolean)
             Else
-                command.Parameters(7).Value = Global.System.DBNull.Value
+                command.Parameters(3).Value = Global.System.DBNull.Value
             End If
-            command.Parameters(8).Value = CType(Original_id,Long)
+            If (id_field_set.HasValue = true) Then
+                command.Parameters(4).Value = CType(id_field_set.Value,Long)
+            Else
+                command.Parameters(4).Value = Global.System.DBNull.Value
+            End If
+            command.Parameters(5).Value = CType(Original_id,Long)
             Dim previousConnectionState As Global.System.Data.ConnectionState = command.Connection.State
             If ((command.Connection.State And Global.System.Data.ConnectionState.Open)  _
                         <> Global.System.Data.ConnectionState.Open) Then
                 command.Connection.Open
             End If
-            Dim returnValue As Integer
+            Dim returnValue As Object
             Try 
-                returnValue = command.ExecuteNonQuery
+                returnValue = command.ExecuteScalar
             Finally
                 If (previousConnectionState = Global.System.Data.ConnectionState.Closed) Then
                     command.Connection.Close
                 End If
             End Try
-            Return returnValue
+            If ((returnValue Is Nothing)  _
+                        OrElse (returnValue.GetType Is GetType(Global.System.DBNull))) Then
+                Return Nothing
+            Else
+                Return CType(returnValue,Object)
+            End If
         End Function
     End Class
     
@@ -19799,191 +18255,6 @@ Namespace BondsDataSetTableAdapters
      Global.System.ComponentModel.DesignerAttribute("Microsoft.VSDesigner.DataSource.Design.TableAdapterDesigner, Microsoft.VSDesigner"& _ 
         ", Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"),  _
      Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")>  _
-    Partial Public Class PortfolioUnitedTableAdapter
-        Inherits Global.System.ComponentModel.Component
-        
-        Private WithEvents _adapter As Global.System.Data.SQLite.SQLiteDataAdapter
-        
-        Private _connection As Global.System.Data.SQLite.SQLiteConnection
-        
-        Private _transaction As Global.System.Data.SQLite.SQLiteTransaction
-        
-        Private _commandCollection() As Global.System.Data.SQLite.SQLiteCommand
-        
-        Private _clearBeforeFill As Boolean
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub New()
-            MyBase.New
-            Me.ClearBeforeFill = true
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Friend ReadOnly Property Adapter() As Global.System.Data.SQLite.SQLiteDataAdapter
-            Get
-                If (Me._adapter Is Nothing) Then
-                    Me.InitAdapter
-                End If
-                Return Me._adapter
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Friend Property Connection() As Global.System.Data.SQLite.SQLiteConnection
-            Get
-                If (Me._connection Is Nothing) Then
-                    Me.InitConnection
-                End If
-                Return Me._connection
-            End Get
-            Set
-                Me._connection = value
-                If (Not (Me.Adapter.InsertCommand) Is Nothing) Then
-                    Me.Adapter.InsertCommand.Connection = value
-                End If
-                If (Not (Me.Adapter.DeleteCommand) Is Nothing) Then
-                    Me.Adapter.DeleteCommand.Connection = value
-                End If
-                If (Not (Me.Adapter.UpdateCommand) Is Nothing) Then
-                    Me.Adapter.UpdateCommand.Connection = value
-                End If
-                Dim i As Integer = 0
-                Do While (i < Me.CommandCollection.Length)
-                    If (Not (Me.CommandCollection(i)) Is Nothing) Then
-                        CType(Me.CommandCollection(i),Global.System.Data.SQLite.SQLiteCommand).Connection = value
-                    End If
-                    i = (i + 1)
-                Loop
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Friend Property Transaction() As Global.System.Data.SQLite.SQLiteTransaction
-            Get
-                Return Me._transaction
-            End Get
-            Set
-                Me._transaction = value
-                Dim i As Integer = 0
-                Do While (i < Me.CommandCollection.Length)
-                    Me.CommandCollection(i).Transaction = Me._transaction
-                    i = (i + 1)
-                Loop
-                If ((Not (Me.Adapter) Is Nothing)  _
-                            AndAlso (Not (Me.Adapter.DeleteCommand) Is Nothing)) Then
-                    Me.Adapter.DeleteCommand.Transaction = Me._transaction
-                End If
-                If ((Not (Me.Adapter) Is Nothing)  _
-                            AndAlso (Not (Me.Adapter.InsertCommand) Is Nothing)) Then
-                    Me.Adapter.InsertCommand.Transaction = Me._transaction
-                End If
-                If ((Not (Me.Adapter) Is Nothing)  _
-                            AndAlso (Not (Me.Adapter.UpdateCommand) Is Nothing)) Then
-                    Me.Adapter.UpdateCommand.Transaction = Me._transaction
-                End If
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected ReadOnly Property CommandCollection() As Global.System.Data.SQLite.SQLiteCommand()
-            Get
-                If (Me._commandCollection Is Nothing) Then
-                    Me.InitCommandCollection
-                End If
-                Return Me._commandCollection
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property ClearBeforeFill() As Boolean
-            Get
-                Return Me._clearBeforeFill
-            End Get
-            Set
-                Me._clearBeforeFill = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Private Sub InitAdapter()
-            Me._adapter = New Global.System.Data.SQLite.SQLiteDataAdapter()
-            Dim tableMapping As Global.System.Data.Common.DataTableMapping = New Global.System.Data.Common.DataTableMapping()
-            tableMapping.SourceTable = "Table"
-            tableMapping.DataSetTable = "PortfolioUnited"
-            tableMapping.ColumnMappings.Add("pid", "pid")
-            tableMapping.ColumnMappings.Add("bid", "bid")
-            tableMapping.ColumnMappings.Add("ric", "ric")
-            tableMapping.ColumnMappings.Add("descr", "descr")
-            tableMapping.ColumnMappings.Add("payments", "payments")
-            tableMapping.ColumnMappings.Add("rates", "rates")
-            tableMapping.ColumnMappings.Add("bondshortname", "bondshortname")
-            tableMapping.ColumnMappings.Add("dsply_name", "dsply_name")
-            tableMapping.ColumnMappings.Add("include", "include")
-            tableMapping.ColumnMappings.Add("color", "color")
-            tableMapping.ColumnMappings.Add("whereFrom", "whereFrom")
-            tableMapping.ColumnMappings.Add("fromID", "fromID")
-            Me._adapter.TableMappings.Add(tableMapping)
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Private Sub InitConnection()
-            Me._connection = New Global.System.Data.SQLite.SQLiteConnection()
-            Me._connection.ConnectionString = Global.YieldMap.My.Settings.Default.bondsConnectionString
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Private Sub InitCommandCollection()
-            Me._commandCollection = New Global.System.Data.SQLite.SQLiteCommand(0) {}
-            Me._commandCollection(0) = New Global.System.Data.SQLite.SQLiteCommand()
-            Me._commandCollection(0).Connection = Me.Connection
-            Me._commandCollection(0).CommandText = "SELECT [pid], [bid], [ric], [descr], [payments], [rates], [bondshortname], [dsply"& _ 
-                "_name], [include], [color], [whereFrom], fromID FROM [PortfolioUnited]"
-            Me._commandCollection(0).CommandType = Global.System.Data.CommandType.Text
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
-         Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Fill, true)>  _
-        Public Overloads Overridable Function Fill(ByVal dataTable As BondsDataSet.PortfolioUnitedDataTable) As Integer
-            Me.Adapter.SelectCommand = Me.CommandCollection(0)
-            If (Me.ClearBeforeFill = true) Then
-                dataTable.Clear
-            End If
-            Dim returnValue As Integer = Me.Adapter.Fill(dataTable)
-            Return returnValue
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
-         Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.[Select], true)>  _
-        Public Overloads Overridable Function GetData() As BondsDataSet.PortfolioUnitedDataTable
-            Me.Adapter.SelectCommand = Me.CommandCollection(0)
-            Dim dataTable As BondsDataSet.PortfolioUnitedDataTable = New BondsDataSet.PortfolioUnitedDataTable()
-            Me.Adapter.Fill(dataTable)
-            Return dataTable
-        End Function
-    End Class
-    
-    '''<summary>
-    '''Represents the connection and commands used to retrieve and save data.
-    '''</summary>
-    <Global.System.ComponentModel.DesignerCategoryAttribute("code"),  _
-     Global.System.ComponentModel.ToolboxItem(true),  _
-     Global.System.ComponentModel.DataObjectAttribute(true),  _
-     Global.System.ComponentModel.DesignerAttribute("Microsoft.VSDesigner.DataSource.Design.TableAdapterDesigner, Microsoft.VSDesigner"& _ 
-        ", Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"),  _
-     Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")>  _
     Partial Public Class settingsTableAdapter
         Inherits Global.System.ComponentModel.Component
         
@@ -20552,23 +18823,17 @@ Namespace BondsDataSetTableAdapters
             tableMapping.ColumnMappings.Add("id", "id")
             tableMapping.ColumnMappings.Add("hawser_name", "hawser_name")
             tableMapping.ColumnMappings.Add("color", "color")
-            tableMapping.ColumnMappings.Add("bid_field", "bid_field")
-            tableMapping.ColumnMappings.Add("last_field", "last_field")
-            tableMapping.ColumnMappings.Add("ask_field", "ask_field")
-            tableMapping.ColumnMappings.Add("hist_field", "hist_field")
             tableMapping.ColumnMappings.Add("curve", "curve")
+            tableMapping.ColumnMappings.Add("id_field_set", "id_field_set")
             Me._adapter.TableMappings.Add(tableMapping)
             Me._adapter.DeleteCommand = New Global.System.Data.SQLite.SQLiteCommand()
             Me._adapter.DeleteCommand.Connection = Me.Connection
             Me._adapter.DeleteCommand.CommandText = "DELETE FROM [main].[sqlite_default_schema].[hawser] WHERE (([id] = @Original_id) "& _ 
                 "AND ((@IsNull_hawser_name = 1 AND [hawser_name] IS NULL) OR ([hawser_name] = @Or"& _ 
                 "iginal_hawser_name)) AND ((@IsNull_color = 1 AND [color] IS NULL) OR ([color] = "& _ 
-                "@Original_color)) AND ((@IsNull_bid_field = 1 AND [bid_field] IS NULL) OR ([bid_"& _ 
-                "field] = @Original_bid_field)) AND ((@IsNull_last_field = 1 AND [last_field] IS "& _ 
-                "NULL) OR ([last_field] = @Original_last_field)) AND ((@IsNull_ask_field = 1 AND "& _ 
-                "[ask_field] IS NULL) OR ([ask_field] = @Original_ask_field)) AND ((@IsNull_hist_"& _ 
-                "field = 1 AND [hist_field] IS NULL) OR ([hist_field] = @Original_hist_field)) AN"& _ 
-                "D ((@IsNull_curve = 1 AND [curve] IS NULL) OR ([curve] = @Original_curve)))"
+                "@Original_color)) AND ((@IsNull_curve = 1 AND [curve] IS NULL) OR ([curve] = @Or"& _ 
+                "iginal_curve)) AND ((@IsNull_id_field_set = 1 AND [id_field_set] IS NULL) OR ([i"& _ 
+                "d_field_set] = @Original_id_field_set)))"
             Me._adapter.DeleteCommand.CommandType = Global.System.Data.CommandType.Text
             Dim param As Global.System.Data.SQLite.SQLiteParameter = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@Original_id"
@@ -20606,62 +18871,6 @@ Namespace BondsDataSetTableAdapters
             param.SourceVersion = Global.System.Data.DataRowVersion.Original
             Me._adapter.DeleteCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_bid_field"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "bid_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_bid_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "bid_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_last_field"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "last_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_last_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "last_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_ask_field"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "ask_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_ask_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "ask_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_hist_field"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "hist_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_hist_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "hist_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@IsNull_curve"
             param.DbType = Global.System.Data.DbType.Int32
             param.DbType = Global.System.Data.DbType.Int32
@@ -20676,12 +18885,33 @@ Namespace BondsDataSetTableAdapters
             param.SourceColumn = "curve"
             param.SourceVersion = Global.System.Data.DataRowVersion.Original
             Me._adapter.DeleteCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@IsNull_id_field_set"
+            param.DbType = Global.System.Data.DbType.Int32
+            param.DbType = Global.System.Data.DbType.Int32
+            param.SourceColumn = "id_field_set"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            param.SourceColumnNullMapping = true
+            Me._adapter.DeleteCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@Original_id_field_set"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "id_field_set"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            Me._adapter.DeleteCommand.Parameters.Add(param)
             Me._adapter.InsertCommand = New Global.System.Data.SQLite.SQLiteCommand()
             Me._adapter.InsertCommand.Connection = Me.Connection
-            Me._adapter.InsertCommand.CommandText = "INSERT INTO [main].[sqlite_default_schema].[hawser] ([hawser_name], [color], [bid"& _ 
-                "_field], [last_field], [ask_field], [hist_field], [curve]) VALUES (@hawser_name,"& _ 
-                " @color, @bid_field, @last_field, @ask_field, @hist_field, @curve)"
+            Me._adapter.InsertCommand.CommandText = "INSERT INTO [main].[sqlite_default_schema].[hawser] ([id], [hawser_name], [color]"& _ 
+                ", [curve], [id_field_set]) VALUES (@id, @hawser_name, @color, @curve, @id_field_"& _ 
+                "set)"
             Me._adapter.InsertCommand.CommandType = Global.System.Data.CommandType.Text
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@id"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "id"
+            Me._adapter.InsertCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@hawser_name"
             param.DbType = Global.System.Data.DbType.[String]
@@ -20693,46 +18923,33 @@ Namespace BondsDataSetTableAdapters
             param.SourceColumn = "color"
             Me._adapter.InsertCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@bid_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "bid_field"
-            Me._adapter.InsertCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@last_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "last_field"
-            Me._adapter.InsertCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@ask_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "ask_field"
-            Me._adapter.InsertCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@hist_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "hist_field"
-            Me._adapter.InsertCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@curve"
             param.DbType = Global.System.Data.DbType.[Boolean]
             param.DbType = Global.System.Data.DbType.[Boolean]
             param.SourceColumn = "curve"
+            Me._adapter.InsertCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@id_field_set"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "id_field_set"
             Me._adapter.InsertCommand.Parameters.Add(param)
             Me._adapter.UpdateCommand = New Global.System.Data.SQLite.SQLiteCommand()
             Me._adapter.UpdateCommand.Connection = Me.Connection
-            Me._adapter.UpdateCommand.CommandText = "UPDATE [main].[sqlite_default_schema].[hawser] SET [hawser_name] = @hawser_name, "& _ 
-                "[color] = @color, [bid_field] = @bid_field, [last_field] = @last_field, [ask_fie"& _ 
-                "ld] = @ask_field, [hist_field] = @hist_field, [curve] = @curve WHERE (([id] = @O"& _ 
-                "riginal_id) AND ((@IsNull_hawser_name = 1 AND [hawser_name] IS NULL) OR ([hawser"& _ 
-                "_name] = @Original_hawser_name)) AND ((@IsNull_color = 1 AND [color] IS NULL) OR"& _ 
-                " ([color] = @Original_color)) AND ((@IsNull_bid_field = 1 AND [bid_field] IS NUL"& _ 
-                "L) OR ([bid_field] = @Original_bid_field)) AND ((@IsNull_last_field = 1 AND [las"& _ 
-                "t_field] IS NULL) OR ([last_field] = @Original_last_field)) AND ((@IsNull_ask_fi"& _ 
-                "eld = 1 AND [ask_field] IS NULL) OR ([ask_field] = @Original_ask_field)) AND ((@"& _ 
-                "IsNull_hist_field = 1 AND [hist_field] IS NULL) OR ([hist_field] = @Original_his"& _ 
-                "t_field)) AND ((@IsNull_curve = 1 AND [curve] IS NULL) OR ([curve] = @Original_c"& _ 
-                "urve)))"
+            Me._adapter.UpdateCommand.CommandText = "UPDATE [main].[sqlite_default_schema].[hawser] SET [id] = @id, [hawser_name] = @h"& _ 
+                "awser_name, [color] = @color, [curve] = @curve, [id_field_set] = @id_field_set W"& _ 
+                "HERE (([id] = @Original_id) AND ((@IsNull_hawser_name = 1 AND [hawser_name] IS N"& _ 
+                "ULL) OR ([hawser_name] = @Original_hawser_name)) AND ((@IsNull_color = 1 AND [co"& _ 
+                "lor] IS NULL) OR ([color] = @Original_color)) AND ((@IsNull_curve = 1 AND [curve"& _ 
+                "] IS NULL) OR ([curve] = @Original_curve)) AND ((@IsNull_id_field_set = 1 AND [i"& _ 
+                "d_field_set] IS NULL) OR ([id_field_set] = @Original_id_field_set)))"
             Me._adapter.UpdateCommand.CommandType = Global.System.Data.CommandType.Text
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@id"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "id"
+            Me._adapter.UpdateCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@hawser_name"
             param.DbType = Global.System.Data.DbType.[String]
@@ -20744,30 +18961,16 @@ Namespace BondsDataSetTableAdapters
             param.SourceColumn = "color"
             Me._adapter.UpdateCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@bid_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "bid_field"
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@last_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "last_field"
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@ask_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "ask_field"
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@hist_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "hist_field"
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@curve"
             param.DbType = Global.System.Data.DbType.[Boolean]
             param.DbType = Global.System.Data.DbType.[Boolean]
             param.SourceColumn = "curve"
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@id_field_set"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "id_field_set"
             Me._adapter.UpdateCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@Original_id"
@@ -20805,62 +19008,6 @@ Namespace BondsDataSetTableAdapters
             param.SourceVersion = Global.System.Data.DataRowVersion.Original
             Me._adapter.UpdateCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_bid_field"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "bid_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_bid_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "bid_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_last_field"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "last_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_last_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "last_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_ask_field"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "ask_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_ask_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "ask_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_hist_field"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "hist_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_hist_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "hist_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@IsNull_curve"
             param.DbType = Global.System.Data.DbType.Int32
             param.DbType = Global.System.Data.DbType.Int32
@@ -20873,6 +19020,21 @@ Namespace BondsDataSetTableAdapters
             param.DbType = Global.System.Data.DbType.[Boolean]
             param.DbType = Global.System.Data.DbType.[Boolean]
             param.SourceColumn = "curve"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@IsNull_id_field_set"
+            param.DbType = Global.System.Data.DbType.Int32
+            param.DbType = Global.System.Data.DbType.Int32
+            param.SourceColumn = "id_field_set"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            param.SourceColumnNullMapping = true
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@Original_id_field_set"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "id_field_set"
             param.SourceVersion = Global.System.Data.DataRowVersion.Original
             Me._adapter.UpdateCommand.Parameters.Add(param)
         End Sub
@@ -20890,8 +19052,7 @@ Namespace BondsDataSetTableAdapters
             Me._commandCollection = New Global.System.Data.SQLite.SQLiteCommand(3) {}
             Me._commandCollection(0) = New Global.System.Data.SQLite.SQLiteCommand()
             Me._commandCollection(0).Connection = Me.Connection
-            Me._commandCollection(0).CommandText = "SELECT     id, hawser_name, color, bid_field, last_field, ask_field, hist_field, "& _ 
-                "curve"&Global.Microsoft.VisualBasic.ChrW(13)&Global.Microsoft.VisualBasic.ChrW(10)&"FROM         hawser"
+            Me._commandCollection(0).CommandText = "SELECT     id, hawser_name, color, curve, id_field_set"&Global.Microsoft.VisualBasic.ChrW(13)&Global.Microsoft.VisualBasic.ChrW(10)&"FROM         hawser"
             Me._commandCollection(0).CommandType = Global.System.Data.CommandType.Text
             Me._commandCollection(1) = New Global.System.Data.SQLite.SQLiteCommand()
             Me._commandCollection(1).Connection = Me.Connection
@@ -20907,9 +19068,8 @@ Namespace BondsDataSetTableAdapters
             Me._commandCollection(1).Parameters.Add(param)
             Me._commandCollection(2) = New Global.System.Data.SQLite.SQLiteCommand()
             Me._commandCollection(2).Connection = Me.Connection
-            Me._commandCollection(2).CommandText = "INSERT INTO hawser"&Global.Microsoft.VisualBasic.ChrW(13)&Global.Microsoft.VisualBasic.ChrW(10)&"                      (hawser_name, color, bid_field, ask_fie"& _ 
-                "ld, last_field, hist_field, curve)"&Global.Microsoft.VisualBasic.ChrW(13)&Global.Microsoft.VisualBasic.ChrW(10)&"VALUES     (@hawser_name, @color, @bid, @ask"& _ 
-                ", @last, @hist, @crv)"
+            Me._commandCollection(2).CommandText = "INSERT INTO hawser"&Global.Microsoft.VisualBasic.ChrW(13)&Global.Microsoft.VisualBasic.ChrW(10)&"                      (hawser_name, color, curve, id_field_se"& _ 
+                "t)"&Global.Microsoft.VisualBasic.ChrW(13)&Global.Microsoft.VisualBasic.ChrW(10)&"VALUES     (@hawser_name, @color, @crv, @id_field_set)"
             Me._commandCollection(2).CommandType = Global.System.Data.CommandType.Text
             param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@hawser_name"
@@ -20924,40 +19084,23 @@ Namespace BondsDataSetTableAdapters
             param.SourceColumn = "color"
             Me._commandCollection(2).Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@bid"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.Size = 2147483647
-            param.SourceColumn = "bid_field"
-            Me._commandCollection(2).Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@ask"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.Size = 2147483647
-            param.SourceColumn = "ask_field"
-            Me._commandCollection(2).Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@last"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.Size = 2147483647
-            param.SourceColumn = "last_field"
-            Me._commandCollection(2).Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@hist"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.Size = 2147483647
-            param.SourceColumn = "hist_field"
-            Me._commandCollection(2).Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@crv"
+            param.DbType = Global.System.Data.DbType.[Boolean]
             param.DbType = Global.System.Data.DbType.[Boolean]
             param.Size = 1
             param.SourceColumn = "curve"
             Me._commandCollection(2).Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@id_field_set"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.Size = 8
+            param.SourceColumn = "id_field_set"
+            Me._commandCollection(2).Parameters.Add(param)
             Me._commandCollection(3) = New Global.System.Data.SQLite.SQLiteCommand()
             Me._commandCollection(3).Connection = Me.Connection
-            Me._commandCollection(3).CommandText = "UPDATE    hawser"&Global.Microsoft.VisualBasic.ChrW(13)&Global.Microsoft.VisualBasic.ChrW(10)&"SET              hawser_name = @hawser_name, color = @color, bi"& _ 
-                "d_field = @bid, ask_field = @ask, last_field = @last, hist_field = @hist, curve "& _ 
-                "= @crv"&Global.Microsoft.VisualBasic.ChrW(13)&Global.Microsoft.VisualBasic.ChrW(10)&"WHERE     (id = @Original_id)"
+            Me._commandCollection(3).CommandText = "UPDATE    hawser"&Global.Microsoft.VisualBasic.ChrW(13)&Global.Microsoft.VisualBasic.ChrW(10)&"SET              hawser_name = @hawser_name, color = @color, cu"& _ 
+                "rve = @crv, id_field_set = @id_field_set"&Global.Microsoft.VisualBasic.ChrW(13)&Global.Microsoft.VisualBasic.ChrW(10)&"WHERE     (id = @Original_id)"
             Me._commandCollection(3).CommandType = Global.System.Data.CommandType.Text
             param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@hawser_name"
@@ -20972,34 +19115,18 @@ Namespace BondsDataSetTableAdapters
             param.SourceColumn = "color"
             Me._commandCollection(3).Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@bid"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.Size = 2147483647
-            param.SourceColumn = "bid_field"
-            Me._commandCollection(3).Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@ask"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.Size = 2147483647
-            param.SourceColumn = "ask_field"
-            Me._commandCollection(3).Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@last"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.Size = 2147483647
-            param.SourceColumn = "last_field"
-            Me._commandCollection(3).Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@hist"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.Size = 2147483647
-            param.SourceColumn = "hist_field"
-            Me._commandCollection(3).Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@crv"
+            param.DbType = Global.System.Data.DbType.[Boolean]
             param.DbType = Global.System.Data.DbType.[Boolean]
             param.Size = 1
             param.SourceColumn = "curve"
+            Me._commandCollection(3).Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@id_field_set"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.Size = 8
+            param.SourceColumn = "id_field_set"
             Me._commandCollection(3).Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@Original_id"
@@ -21007,7 +19134,6 @@ Namespace BondsDataSetTableAdapters
             param.DbType = Global.System.Data.DbType.Int64
             param.Size = 8
             param.SourceColumn = "id"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
             Me._commandCollection(3).Parameters.Add(param)
         End Sub
         
@@ -21067,7 +19193,7 @@ Namespace BondsDataSetTableAdapters
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
          Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
          Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Delete, true)>  _
-        Public Overloads Overridable Function Delete(ByVal Original_id As Long, ByVal Original_hawser_name As String, ByVal Original_color As String, ByVal Original_bid_field As String, ByVal Original_last_field As String, ByVal Original_ask_field As String, ByVal Original_hist_field As String, ByVal Original_curve As Global.System.Nullable(Of Boolean)) As Integer
+        Public Overloads Overridable Function Delete(ByVal Original_id As Long, ByVal Original_hawser_name As String, ByVal Original_color As String, ByVal Original_curve As Global.System.Nullable(Of Boolean), ByVal Original_id_field_set As Global.System.Nullable(Of Long)) As Integer
             Me.Adapter.DeleteCommand.Parameters(0).Value = CType(Original_id,Long)
             If (Original_hawser_name Is Nothing) Then
                 Me.Adapter.DeleteCommand.Parameters(1).Value = CType(1,Object)
@@ -21083,40 +19209,19 @@ Namespace BondsDataSetTableAdapters
                 Me.Adapter.DeleteCommand.Parameters(3).Value = CType(0,Object)
                 Me.Adapter.DeleteCommand.Parameters(4).Value = CType(Original_color,String)
             End If
-            If (Original_bid_field Is Nothing) Then
+            If (Original_curve.HasValue = true) Then
+                Me.Adapter.DeleteCommand.Parameters(5).Value = CType(0,Object)
+                Me.Adapter.DeleteCommand.Parameters(6).Value = CType(Original_curve.Value,Boolean)
+            Else
                 Me.Adapter.DeleteCommand.Parameters(5).Value = CType(1,Object)
                 Me.Adapter.DeleteCommand.Parameters(6).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.DeleteCommand.Parameters(5).Value = CType(0,Object)
-                Me.Adapter.DeleteCommand.Parameters(6).Value = CType(Original_bid_field,String)
             End If
-            If (Original_last_field Is Nothing) Then
+            If (Original_id_field_set.HasValue = true) Then
+                Me.Adapter.DeleteCommand.Parameters(7).Value = CType(0,Object)
+                Me.Adapter.DeleteCommand.Parameters(8).Value = CType(Original_id_field_set.Value,Long)
+            Else
                 Me.Adapter.DeleteCommand.Parameters(7).Value = CType(1,Object)
                 Me.Adapter.DeleteCommand.Parameters(8).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.DeleteCommand.Parameters(7).Value = CType(0,Object)
-                Me.Adapter.DeleteCommand.Parameters(8).Value = CType(Original_last_field,String)
-            End If
-            If (Original_ask_field Is Nothing) Then
-                Me.Adapter.DeleteCommand.Parameters(9).Value = CType(1,Object)
-                Me.Adapter.DeleteCommand.Parameters(10).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.DeleteCommand.Parameters(9).Value = CType(0,Object)
-                Me.Adapter.DeleteCommand.Parameters(10).Value = CType(Original_ask_field,String)
-            End If
-            If (Original_hist_field Is Nothing) Then
-                Me.Adapter.DeleteCommand.Parameters(11).Value = CType(1,Object)
-                Me.Adapter.DeleteCommand.Parameters(12).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.DeleteCommand.Parameters(11).Value = CType(0,Object)
-                Me.Adapter.DeleteCommand.Parameters(12).Value = CType(Original_hist_field,String)
-            End If
-            If (Original_curve.HasValue = true) Then
-                Me.Adapter.DeleteCommand.Parameters(13).Value = CType(0,Object)
-                Me.Adapter.DeleteCommand.Parameters(14).Value = CType(Original_curve.Value,Boolean)
-            Else
-                Me.Adapter.DeleteCommand.Parameters(13).Value = CType(1,Object)
-                Me.Adapter.DeleteCommand.Parameters(14).Value = Global.System.DBNull.Value
             End If
             Dim previousConnectionState As Global.System.Data.ConnectionState = Me.Adapter.DeleteCommand.Connection.State
             If ((Me.Adapter.DeleteCommand.Connection.State And Global.System.Data.ConnectionState.Open)  _
@@ -21137,41 +19242,27 @@ Namespace BondsDataSetTableAdapters
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
          Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
          Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Insert, true)>  _
-        Public Overloads Overridable Function Insert(ByVal hawser_name As String, ByVal color As String, ByVal bid_field As String, ByVal last_field As String, ByVal ask_field As String, ByVal hist_field As String, ByVal curve As Global.System.Nullable(Of Boolean)) As Integer
+        Public Overloads Overridable Function Insert(ByVal id As Long, ByVal hawser_name As String, ByVal color As String, ByVal curve As Global.System.Nullable(Of Boolean), ByVal id_field_set As Global.System.Nullable(Of Long)) As Integer
+            Me.Adapter.InsertCommand.Parameters(0).Value = CType(id,Long)
             If (hawser_name Is Nothing) Then
-                Me.Adapter.InsertCommand.Parameters(0).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.InsertCommand.Parameters(0).Value = CType(hawser_name,String)
-            End If
-            If (color Is Nothing) Then
                 Me.Adapter.InsertCommand.Parameters(1).Value = Global.System.DBNull.Value
             Else
-                Me.Adapter.InsertCommand.Parameters(1).Value = CType(color,String)
+                Me.Adapter.InsertCommand.Parameters(1).Value = CType(hawser_name,String)
             End If
-            If (bid_field Is Nothing) Then
+            If (color Is Nothing) Then
                 Me.Adapter.InsertCommand.Parameters(2).Value = Global.System.DBNull.Value
             Else
-                Me.Adapter.InsertCommand.Parameters(2).Value = CType(bid_field,String)
-            End If
-            If (last_field Is Nothing) Then
-                Me.Adapter.InsertCommand.Parameters(3).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.InsertCommand.Parameters(3).Value = CType(last_field,String)
-            End If
-            If (ask_field Is Nothing) Then
-                Me.Adapter.InsertCommand.Parameters(4).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.InsertCommand.Parameters(4).Value = CType(ask_field,String)
-            End If
-            If (hist_field Is Nothing) Then
-                Me.Adapter.InsertCommand.Parameters(5).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.InsertCommand.Parameters(5).Value = CType(hist_field,String)
+                Me.Adapter.InsertCommand.Parameters(2).Value = CType(color,String)
             End If
             If (curve.HasValue = true) Then
-                Me.Adapter.InsertCommand.Parameters(6).Value = CType(curve.Value,Boolean)
+                Me.Adapter.InsertCommand.Parameters(3).Value = CType(curve.Value,Boolean)
             Else
-                Me.Adapter.InsertCommand.Parameters(6).Value = Global.System.DBNull.Value
+                Me.Adapter.InsertCommand.Parameters(3).Value = Global.System.DBNull.Value
+            End If
+            If (id_field_set.HasValue = true) Then
+                Me.Adapter.InsertCommand.Parameters(4).Value = CType(id_field_set.Value,Long)
+            Else
+                Me.Adapter.InsertCommand.Parameters(4).Value = Global.System.DBNull.Value
             End If
             Dim previousConnectionState As Global.System.Data.ConnectionState = Me.Adapter.InsertCommand.Connection.State
             If ((Me.Adapter.InsertCommand.Connection.State And Global.System.Data.ConnectionState.Open)  _
@@ -21192,91 +19283,56 @@ Namespace BondsDataSetTableAdapters
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
          Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
          Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Update, true)>  _
-        Public Overloads Overridable Function Update(ByVal hawser_name As String, ByVal color As String, ByVal bid_field As String, ByVal last_field As String, ByVal ask_field As String, ByVal hist_field As String, ByVal curve As Global.System.Nullable(Of Boolean), ByVal Original_id As Long, ByVal Original_hawser_name As String, ByVal Original_color As String, ByVal Original_bid_field As String, ByVal Original_last_field As String, ByVal Original_ask_field As String, ByVal Original_hist_field As String, ByVal Original_curve As Global.System.Nullable(Of Boolean)) As Integer
+        Public Overloads Overridable Function Update(ByVal id As Long, ByVal hawser_name As String, ByVal color As String, ByVal curve As Global.System.Nullable(Of Boolean), ByVal id_field_set As Global.System.Nullable(Of Long), ByVal Original_id As Long, ByVal Original_hawser_name As String, ByVal Original_color As String, ByVal Original_curve As Global.System.Nullable(Of Boolean), ByVal Original_id_field_set As Global.System.Nullable(Of Long)) As Integer
+            Me.Adapter.UpdateCommand.Parameters(0).Value = CType(id,Long)
             If (hawser_name Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(0).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(0).Value = CType(hawser_name,String)
-            End If
-            If (color Is Nothing) Then
                 Me.Adapter.UpdateCommand.Parameters(1).Value = Global.System.DBNull.Value
             Else
-                Me.Adapter.UpdateCommand.Parameters(1).Value = CType(color,String)
+                Me.Adapter.UpdateCommand.Parameters(1).Value = CType(hawser_name,String)
             End If
-            If (bid_field Is Nothing) Then
+            If (color Is Nothing) Then
                 Me.Adapter.UpdateCommand.Parameters(2).Value = Global.System.DBNull.Value
             Else
-                Me.Adapter.UpdateCommand.Parameters(2).Value = CType(bid_field,String)
-            End If
-            If (last_field Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(3).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(3).Value = CType(last_field,String)
-            End If
-            If (ask_field Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(4).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(4).Value = CType(ask_field,String)
-            End If
-            If (hist_field Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(5).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(5).Value = CType(hist_field,String)
+                Me.Adapter.UpdateCommand.Parameters(2).Value = CType(color,String)
             End If
             If (curve.HasValue = true) Then
-                Me.Adapter.UpdateCommand.Parameters(6).Value = CType(curve.Value,Boolean)
+                Me.Adapter.UpdateCommand.Parameters(3).Value = CType(curve.Value,Boolean)
             Else
-                Me.Adapter.UpdateCommand.Parameters(6).Value = Global.System.DBNull.Value
+                Me.Adapter.UpdateCommand.Parameters(3).Value = Global.System.DBNull.Value
             End If
-            Me.Adapter.UpdateCommand.Parameters(7).Value = CType(Original_id,Long)
+            If (id_field_set.HasValue = true) Then
+                Me.Adapter.UpdateCommand.Parameters(4).Value = CType(id_field_set.Value,Long)
+            Else
+                Me.Adapter.UpdateCommand.Parameters(4).Value = Global.System.DBNull.Value
+            End If
+            Me.Adapter.UpdateCommand.Parameters(5).Value = CType(Original_id,Long)
             If (Original_hawser_name Is Nothing) Then
+                Me.Adapter.UpdateCommand.Parameters(6).Value = CType(1,Object)
+                Me.Adapter.UpdateCommand.Parameters(7).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.UpdateCommand.Parameters(6).Value = CType(0,Object)
+                Me.Adapter.UpdateCommand.Parameters(7).Value = CType(Original_hawser_name,String)
+            End If
+            If (Original_color Is Nothing) Then
                 Me.Adapter.UpdateCommand.Parameters(8).Value = CType(1,Object)
                 Me.Adapter.UpdateCommand.Parameters(9).Value = Global.System.DBNull.Value
             Else
                 Me.Adapter.UpdateCommand.Parameters(8).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(9).Value = CType(Original_hawser_name,String)
-            End If
-            If (Original_color Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(10).Value = CType(1,Object)
-                Me.Adapter.UpdateCommand.Parameters(11).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(10).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(11).Value = CType(Original_color,String)
-            End If
-            If (Original_bid_field Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(12).Value = CType(1,Object)
-                Me.Adapter.UpdateCommand.Parameters(13).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(12).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(13).Value = CType(Original_bid_field,String)
-            End If
-            If (Original_last_field Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(14).Value = CType(1,Object)
-                Me.Adapter.UpdateCommand.Parameters(15).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(14).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(15).Value = CType(Original_last_field,String)
-            End If
-            If (Original_ask_field Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(16).Value = CType(1,Object)
-                Me.Adapter.UpdateCommand.Parameters(17).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(16).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(17).Value = CType(Original_ask_field,String)
-            End If
-            If (Original_hist_field Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(18).Value = CType(1,Object)
-                Me.Adapter.UpdateCommand.Parameters(19).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(18).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(19).Value = CType(Original_hist_field,String)
+                Me.Adapter.UpdateCommand.Parameters(9).Value = CType(Original_color,String)
             End If
             If (Original_curve.HasValue = true) Then
-                Me.Adapter.UpdateCommand.Parameters(20).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(21).Value = CType(Original_curve.Value,Boolean)
+                Me.Adapter.UpdateCommand.Parameters(10).Value = CType(0,Object)
+                Me.Adapter.UpdateCommand.Parameters(11).Value = CType(Original_curve.Value,Boolean)
             Else
-                Me.Adapter.UpdateCommand.Parameters(20).Value = CType(1,Object)
-                Me.Adapter.UpdateCommand.Parameters(21).Value = Global.System.DBNull.Value
+                Me.Adapter.UpdateCommand.Parameters(10).Value = CType(1,Object)
+                Me.Adapter.UpdateCommand.Parameters(11).Value = Global.System.DBNull.Value
+            End If
+            If (Original_id_field_set.HasValue = true) Then
+                Me.Adapter.UpdateCommand.Parameters(12).Value = CType(0,Object)
+                Me.Adapter.UpdateCommand.Parameters(13).Value = CType(Original_id_field_set.Value,Long)
+            Else
+                Me.Adapter.UpdateCommand.Parameters(12).Value = CType(1,Object)
+                Me.Adapter.UpdateCommand.Parameters(13).Value = Global.System.DBNull.Value
             End If
             Dim previousConnectionState As Global.System.Data.ConnectionState = Me.Adapter.UpdateCommand.Connection.State
             If ((Me.Adapter.UpdateCommand.Connection.State And Global.System.Data.ConnectionState.Open)  _
@@ -21291,6 +19347,14 @@ Namespace BondsDataSetTableAdapters
                     Me.Adapter.UpdateCommand.Connection.Close
                 End If
             End Try
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
+         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
+         Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Update, true)>  _
+        Public Overloads Overridable Function Update(ByVal hawser_name As String, ByVal color As String, ByVal curve As Global.System.Nullable(Of Boolean), ByVal id_field_set As Global.System.Nullable(Of Long), ByVal Original_id As Long, ByVal Original_hawser_name As String, ByVal Original_color As String, ByVal Original_curve As Global.System.Nullable(Of Boolean), ByVal Original_id_field_set As Global.System.Nullable(Of Long)) As Integer
+            Return Me.Update(Original_id, hawser_name, color, curve, id_field_set, Original_id, Original_hawser_name, Original_color, Original_curve, Original_id_field_set)
         End Function
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
@@ -21319,7 +19383,7 @@ Namespace BondsDataSetTableAdapters
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
          Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")>  _
-        Public Overloads Overridable Function InsertNew(ByVal hawser_name As String, ByVal color As String, ByVal bid As String, ByVal ask As String, ByVal last As String, ByVal hist As String, ByVal crv As Global.System.Nullable(Of Boolean)) As Integer
+        Public Overloads Overridable Function InsertNew(ByVal hawser_name As String, ByVal color As String, ByVal crv As Global.System.Nullable(Of Boolean), ByVal id_field_set As Global.System.Nullable(Of Long)) As Object
             Dim command As Global.System.Data.SQLite.SQLiteCommand = Me.CommandCollection(2)
             If (hawser_name Is Nothing) Then
                 command.Parameters(0).Value = Global.System.DBNull.Value
@@ -21331,51 +19395,41 @@ Namespace BondsDataSetTableAdapters
             Else
                 command.Parameters(1).Value = CType(color,String)
             End If
-            If (bid Is Nothing) Then
-                command.Parameters(2).Value = Global.System.DBNull.Value
-            Else
-                command.Parameters(2).Value = CType(bid,String)
-            End If
-            If (ask Is Nothing) Then
-                command.Parameters(3).Value = Global.System.DBNull.Value
-            Else
-                command.Parameters(3).Value = CType(ask,String)
-            End If
-            If (last Is Nothing) Then
-                command.Parameters(4).Value = Global.System.DBNull.Value
-            Else
-                command.Parameters(4).Value = CType(last,String)
-            End If
-            If (hist Is Nothing) Then
-                command.Parameters(5).Value = Global.System.DBNull.Value
-            Else
-                command.Parameters(5).Value = CType(hist,String)
-            End If
             If (crv.HasValue = true) Then
-                command.Parameters(6).Value = CType(crv.Value,Boolean)
+                command.Parameters(2).Value = CType(crv.Value,Boolean)
             Else
-                command.Parameters(6).Value = Global.System.DBNull.Value
+                command.Parameters(2).Value = Global.System.DBNull.Value
+            End If
+            If (id_field_set.HasValue = true) Then
+                command.Parameters(3).Value = CType(id_field_set.Value,Long)
+            Else
+                command.Parameters(3).Value = Global.System.DBNull.Value
             End If
             Dim previousConnectionState As Global.System.Data.ConnectionState = command.Connection.State
             If ((command.Connection.State And Global.System.Data.ConnectionState.Open)  _
                         <> Global.System.Data.ConnectionState.Open) Then
                 command.Connection.Open
             End If
-            Dim returnValue As Integer
+            Dim returnValue As Object
             Try 
-                returnValue = command.ExecuteNonQuery
+                returnValue = command.ExecuteScalar
             Finally
                 If (previousConnectionState = Global.System.Data.ConnectionState.Closed) Then
                     command.Connection.Close
                 End If
             End Try
-            Return returnValue
+            If ((returnValue Is Nothing)  _
+                        OrElse (returnValue.GetType Is GetType(Global.System.DBNull))) Then
+                Return Nothing
+            Else
+                Return CType(returnValue,Object)
+            End If
         End Function
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
          Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")>  _
-        Public Overloads Overridable Function RenameById(ByVal hawser_name As String, ByVal color As String, ByVal bid As String, ByVal ask As String, ByVal last As String, ByVal hist As String, ByVal crv As Global.System.Nullable(Of Boolean), ByVal Original_id As Long) As Integer
+        Public Overloads Overridable Function RenameById(ByVal hawser_name As String, ByVal color As String, ByVal crv As Global.System.Nullable(Of Boolean), ByVal id_field_set As Global.System.Nullable(Of Long), ByVal Original_id As Long) As Object
             Dim command As Global.System.Data.SQLite.SQLiteCommand = Me.CommandCollection(3)
             If (hawser_name Is Nothing) Then
                 command.Parameters(0).Value = Global.System.DBNull.Value
@@ -21387,46 +19441,36 @@ Namespace BondsDataSetTableAdapters
             Else
                 command.Parameters(1).Value = CType(color,String)
             End If
-            If (bid Is Nothing) Then
-                command.Parameters(2).Value = Global.System.DBNull.Value
-            Else
-                command.Parameters(2).Value = CType(bid,String)
-            End If
-            If (ask Is Nothing) Then
-                command.Parameters(3).Value = Global.System.DBNull.Value
-            Else
-                command.Parameters(3).Value = CType(ask,String)
-            End If
-            If (last Is Nothing) Then
-                command.Parameters(4).Value = Global.System.DBNull.Value
-            Else
-                command.Parameters(4).Value = CType(last,String)
-            End If
-            If (hist Is Nothing) Then
-                command.Parameters(5).Value = Global.System.DBNull.Value
-            Else
-                command.Parameters(5).Value = CType(hist,String)
-            End If
             If (crv.HasValue = true) Then
-                command.Parameters(6).Value = CType(crv.Value,Boolean)
+                command.Parameters(2).Value = CType(crv.Value,Boolean)
             Else
-                command.Parameters(6).Value = Global.System.DBNull.Value
+                command.Parameters(2).Value = Global.System.DBNull.Value
             End If
-            command.Parameters(7).Value = CType(Original_id,Long)
+            If (id_field_set.HasValue = true) Then
+                command.Parameters(3).Value = CType(id_field_set.Value,Long)
+            Else
+                command.Parameters(3).Value = Global.System.DBNull.Value
+            End If
+            command.Parameters(4).Value = CType(Original_id,Long)
             Dim previousConnectionState As Global.System.Data.ConnectionState = command.Connection.State
             If ((command.Connection.State And Global.System.Data.ConnectionState.Open)  _
                         <> Global.System.Data.ConnectionState.Open) Then
                 command.Connection.Open
             End If
-            Dim returnValue As Integer
+            Dim returnValue As Object
             Try 
-                returnValue = command.ExecuteNonQuery
+                returnValue = command.ExecuteScalar
             Finally
                 If (previousConnectionState = Global.System.Data.ConnectionState.Closed) Then
                     command.Connection.Close
                 End If
             End Try
-            Return returnValue
+            If ((returnValue Is Nothing)  _
+                        OrElse (returnValue.GetType Is GetType(Global.System.DBNull))) Then
+                Return Nothing
+            Else
+                Return CType(returnValue,Object)
+            End If
         End Function
     End Class
     
@@ -22241,188 +20285,6 @@ Namespace BondsDataSetTableAdapters
      Global.System.ComponentModel.DesignerAttribute("Microsoft.VSDesigner.DataSource.Design.TableAdapterDesigner, Microsoft.VSDesigner"& _ 
         ", Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"),  _
      Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")>  _
-    Partial Public Class _portfolioByBondsTableAdapter
-        Inherits Global.System.ComponentModel.Component
-        
-        Private WithEvents _adapter As Global.System.Data.SQLite.SQLiteDataAdapter
-        
-        Private _connection As Global.System.Data.SQLite.SQLiteConnection
-        
-        Private _transaction As Global.System.Data.SQLite.SQLiteTransaction
-        
-        Private _commandCollection() As Global.System.Data.SQLite.SQLiteCommand
-        
-        Private _clearBeforeFill As Boolean
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub New()
-            MyBase.New
-            Me.ClearBeforeFill = true
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Friend ReadOnly Property Adapter() As Global.System.Data.SQLite.SQLiteDataAdapter
-            Get
-                If (Me._adapter Is Nothing) Then
-                    Me.InitAdapter
-                End If
-                Return Me._adapter
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Friend Property Connection() As Global.System.Data.SQLite.SQLiteConnection
-            Get
-                If (Me._connection Is Nothing) Then
-                    Me.InitConnection
-                End If
-                Return Me._connection
-            End Get
-            Set
-                Me._connection = value
-                If (Not (Me.Adapter.InsertCommand) Is Nothing) Then
-                    Me.Adapter.InsertCommand.Connection = value
-                End If
-                If (Not (Me.Adapter.DeleteCommand) Is Nothing) Then
-                    Me.Adapter.DeleteCommand.Connection = value
-                End If
-                If (Not (Me.Adapter.UpdateCommand) Is Nothing) Then
-                    Me.Adapter.UpdateCommand.Connection = value
-                End If
-                Dim i As Integer = 0
-                Do While (i < Me.CommandCollection.Length)
-                    If (Not (Me.CommandCollection(i)) Is Nothing) Then
-                        CType(Me.CommandCollection(i),Global.System.Data.SQLite.SQLiteCommand).Connection = value
-                    End If
-                    i = (i + 1)
-                Loop
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Friend Property Transaction() As Global.System.Data.SQLite.SQLiteTransaction
-            Get
-                Return Me._transaction
-            End Get
-            Set
-                Me._transaction = value
-                Dim i As Integer = 0
-                Do While (i < Me.CommandCollection.Length)
-                    Me.CommandCollection(i).Transaction = Me._transaction
-                    i = (i + 1)
-                Loop
-                If ((Not (Me.Adapter) Is Nothing)  _
-                            AndAlso (Not (Me.Adapter.DeleteCommand) Is Nothing)) Then
-                    Me.Adapter.DeleteCommand.Transaction = Me._transaction
-                End If
-                If ((Not (Me.Adapter) Is Nothing)  _
-                            AndAlso (Not (Me.Adapter.InsertCommand) Is Nothing)) Then
-                    Me.Adapter.InsertCommand.Transaction = Me._transaction
-                End If
-                If ((Not (Me.Adapter) Is Nothing)  _
-                            AndAlso (Not (Me.Adapter.UpdateCommand) Is Nothing)) Then
-                    Me.Adapter.UpdateCommand.Transaction = Me._transaction
-                End If
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected ReadOnly Property CommandCollection() As Global.System.Data.SQLite.SQLiteCommand()
-            Get
-                If (Me._commandCollection Is Nothing) Then
-                    Me.InitCommandCollection
-                End If
-                Return Me._commandCollection
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property ClearBeforeFill() As Boolean
-            Get
-                Return Me._clearBeforeFill
-            End Get
-            Set
-                Me._clearBeforeFill = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Private Sub InitAdapter()
-            Me._adapter = New Global.System.Data.SQLite.SQLiteDataAdapter()
-            Dim tableMapping As Global.System.Data.Common.DataTableMapping = New Global.System.Data.Common.DataTableMapping()
-            tableMapping.SourceTable = "Table"
-            tableMapping.DataSetTable = "_portfolioByBonds"
-            tableMapping.ColumnMappings.Add("[pid]", "pid")
-            tableMapping.ColumnMappings.Add("[bid]", "bid")
-            tableMapping.ColumnMappings.Add("[ric]", "ric")
-            tableMapping.ColumnMappings.Add("[descr]", "descr")
-            tableMapping.ColumnMappings.Add("[payments]", "payments")
-            tableMapping.ColumnMappings.Add("[rates]", "rates")
-            tableMapping.ColumnMappings.Add("[bondshortname]", "bondshortname")
-            tableMapping.ColumnMappings.Add("[dsply_name]", "dsply_name")
-            tableMapping.ColumnMappings.Add("[include]", "include")
-            Me._adapter.TableMappings.Add(tableMapping)
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Private Sub InitConnection()
-            Me._connection = New Global.System.Data.SQLite.SQLiteConnection()
-            Me._connection.ConnectionString = Global.YieldMap.My.Settings.Default.bondsConnectionString
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Private Sub InitCommandCollection()
-            Me._commandCollection = New Global.System.Data.SQLite.SQLiteCommand(0) {}
-            Me._commandCollection(0) = New Global.System.Data.SQLite.SQLiteCommand()
-            Me._commandCollection(0).Connection = Me.Connection
-            Me._commandCollection(0).CommandText = "SELECT [pid], [bid], [ric], [descr], [payments], [rates], [bondshortname], [dsply"& _ 
-                "_name], [include] FROM [_portfolioByBonds]"
-            Me._commandCollection(0).CommandType = Global.System.Data.CommandType.Text
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
-         Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Fill, true)>  _
-        Public Overloads Overridable Function Fill(ByVal dataTable As BondsDataSet._portfolioByBondsDataTable) As Integer
-            Me.Adapter.SelectCommand = Me.CommandCollection(0)
-            If (Me.ClearBeforeFill = true) Then
-                dataTable.Clear
-            End If
-            Dim returnValue As Integer = Me.Adapter.Fill(dataTable)
-            Return returnValue
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
-         Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.[Select], true)>  _
-        Public Overloads Overridable Function GetData() As BondsDataSet._portfolioByBondsDataTable
-            Me.Adapter.SelectCommand = Me.CommandCollection(0)
-            Dim dataTable As BondsDataSet._portfolioByBondsDataTable = New BondsDataSet._portfolioByBondsDataTable()
-            Me.Adapter.Fill(dataTable)
-            Return dataTable
-        End Function
-    End Class
-    
-    '''<summary>
-    '''Represents the connection and commands used to retrieve and save data.
-    '''</summary>
-    <Global.System.ComponentModel.DesignerCategoryAttribute("code"),  _
-     Global.System.ComponentModel.ToolboxItem(true),  _
-     Global.System.ComponentModel.DataObjectAttribute(true),  _
-     Global.System.ComponentModel.DesignerAttribute("Microsoft.VSDesigner.DataSource.Design.TableAdapterDesigner, Microsoft.VSDesigner"& _ 
-        ", Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"),  _
-     Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")>  _
     Partial Public Class _portfolioByChainTableAdapter
         Inherits Global.System.ComponentModel.Component
         
@@ -23129,673 +20991,6 @@ Namespace BondsDataSetTableAdapters
             Dim dataTable As BondsDataSet.HawsersInPortfolioDataTable = New BondsDataSet.HawsersInPortfolioDataTable()
             Me.Adapter.Fill(dataTable)
             Return dataTable
-        End Function
-    End Class
-    
-    '''<summary>
-    '''Represents the connection and commands used to retrieve and save data.
-    '''</summary>
-    <Global.System.ComponentModel.DesignerCategoryAttribute("code"),  _
-     Global.System.ComponentModel.ToolboxItem(true),  _
-     Global.System.ComponentModel.DataObjectAttribute(true),  _
-     Global.System.ComponentModel.DesignerAttribute("Microsoft.VSDesigner.DataSource.Design.TableAdapterDesigner, Microsoft.VSDesigner"& _ 
-        ", Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"),  _
-     Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")>  _
-    Partial Public Class portfolio_to_bondTableAdapter
-        Inherits Global.System.ComponentModel.Component
-        
-        Private WithEvents _adapter As Global.System.Data.SQLite.SQLiteDataAdapter
-        
-        Private _connection As Global.System.Data.SQLite.SQLiteConnection
-        
-        Private _transaction As Global.System.Data.SQLite.SQLiteTransaction
-        
-        Private _commandCollection() As Global.System.Data.SQLite.SQLiteCommand
-        
-        Private _clearBeforeFill As Boolean
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Sub New()
-            MyBase.New
-            Me.ClearBeforeFill = true
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected Friend ReadOnly Property Adapter() As Global.System.Data.SQLite.SQLiteDataAdapter
-            Get
-                If (Me._adapter Is Nothing) Then
-                    Me.InitAdapter
-                End If
-                Return Me._adapter
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Friend Property Connection() As Global.System.Data.SQLite.SQLiteConnection
-            Get
-                If (Me._connection Is Nothing) Then
-                    Me.InitConnection
-                End If
-                Return Me._connection
-            End Get
-            Set
-                Me._connection = value
-                If (Not (Me.Adapter.InsertCommand) Is Nothing) Then
-                    Me.Adapter.InsertCommand.Connection = value
-                End If
-                If (Not (Me.Adapter.DeleteCommand) Is Nothing) Then
-                    Me.Adapter.DeleteCommand.Connection = value
-                End If
-                If (Not (Me.Adapter.UpdateCommand) Is Nothing) Then
-                    Me.Adapter.UpdateCommand.Connection = value
-                End If
-                Dim i As Integer = 0
-                Do While (i < Me.CommandCollection.Length)
-                    If (Not (Me.CommandCollection(i)) Is Nothing) Then
-                        CType(Me.CommandCollection(i),Global.System.Data.SQLite.SQLiteCommand).Connection = value
-                    End If
-                    i = (i + 1)
-                Loop
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Friend Property Transaction() As Global.System.Data.SQLite.SQLiteTransaction
-            Get
-                Return Me._transaction
-            End Get
-            Set
-                Me._transaction = value
-                Dim i As Integer = 0
-                Do While (i < Me.CommandCollection.Length)
-                    Me.CommandCollection(i).Transaction = Me._transaction
-                    i = (i + 1)
-                Loop
-                If ((Not (Me.Adapter) Is Nothing)  _
-                            AndAlso (Not (Me.Adapter.DeleteCommand) Is Nothing)) Then
-                    Me.Adapter.DeleteCommand.Transaction = Me._transaction
-                End If
-                If ((Not (Me.Adapter) Is Nothing)  _
-                            AndAlso (Not (Me.Adapter.InsertCommand) Is Nothing)) Then
-                    Me.Adapter.InsertCommand.Transaction = Me._transaction
-                End If
-                If ((Not (Me.Adapter) Is Nothing)  _
-                            AndAlso (Not (Me.Adapter.UpdateCommand) Is Nothing)) Then
-                    Me.Adapter.UpdateCommand.Transaction = Me._transaction
-                End If
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Protected ReadOnly Property CommandCollection() As Global.System.Data.SQLite.SQLiteCommand()
-            Get
-                If (Me._commandCollection Is Nothing) Then
-                    Me.InitCommandCollection
-                End If
-                Return Me._commandCollection
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Property ClearBeforeFill() As Boolean
-            Get
-                Return Me._clearBeforeFill
-            End Get
-            Set
-                Me._clearBeforeFill = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Private Sub InitAdapter()
-            Me._adapter = New Global.System.Data.SQLite.SQLiteDataAdapter()
-            Dim tableMapping As Global.System.Data.Common.DataTableMapping = New Global.System.Data.Common.DataTableMapping()
-            tableMapping.SourceTable = "Table"
-            tableMapping.DataSetTable = "portfolio_to_bond"
-            tableMapping.ColumnMappings.Add("id", "id")
-            tableMapping.ColumnMappings.Add("id_portfolio", "id_portfolio")
-            tableMapping.ColumnMappings.Add("include", "include")
-            tableMapping.ColumnMappings.Add("bond_ric", "bond_ric")
-            Me._adapter.TableMappings.Add(tableMapping)
-            Me._adapter.DeleteCommand = New Global.System.Data.SQLite.SQLiteCommand()
-            Me._adapter.DeleteCommand.Connection = Me.Connection
-            Me._adapter.DeleteCommand.CommandText = "DELETE FROM [main].[sqlite_default_schema].[portfolio_to_bond] WHERE (([id] = @Or"& _ 
-                "iginal_id) AND ((@IsNull_id_portfolio = 1 AND [id_portfolio] IS NULL) OR ([id_po"& _ 
-                "rtfolio] = @Original_id_portfolio)) AND ((@IsNull_include = 1 AND [include] IS N"& _ 
-                "ULL) OR ([include] = @Original_include)) AND ((@IsNull_bond_ric = 1 AND [bond_ri"& _ 
-                "c] IS NULL) OR ([bond_ric] = @Original_bond_ric)))"
-            Me._adapter.DeleteCommand.CommandType = Global.System.Data.CommandType.Text
-            Dim param As Global.System.Data.SQLite.SQLiteParameter = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_id"
-            param.DbType = Global.System.Data.DbType.Int64
-            param.DbType = Global.System.Data.DbType.Int64
-            param.SourceColumn = "id"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_id_portfolio"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "id_portfolio"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_id_portfolio"
-            param.DbType = Global.System.Data.DbType.Int64
-            param.DbType = Global.System.Data.DbType.Int64
-            param.SourceColumn = "id_portfolio"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_include"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "include"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_include"
-            param.DbType = Global.System.Data.DbType.[Boolean]
-            param.DbType = Global.System.Data.DbType.[Boolean]
-            param.SourceColumn = "include"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_bond_ric"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "bond_ric"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_bond_ric"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "bond_ric"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            Me._adapter.InsertCommand = New Global.System.Data.SQLite.SQLiteCommand()
-            Me._adapter.InsertCommand.Connection = Me.Connection
-            Me._adapter.InsertCommand.CommandText = "INSERT INTO [main].[sqlite_default_schema].[portfolio_to_bond] ([id], [id_portfol"& _ 
-                "io], [include], [bond_ric]) VALUES (@id, @id_portfolio, @include, @bond_ric)"
-            Me._adapter.InsertCommand.CommandType = Global.System.Data.CommandType.Text
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@id"
-            param.DbType = Global.System.Data.DbType.Int64
-            param.DbType = Global.System.Data.DbType.Int64
-            param.SourceColumn = "id"
-            Me._adapter.InsertCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@id_portfolio"
-            param.DbType = Global.System.Data.DbType.Int64
-            param.DbType = Global.System.Data.DbType.Int64
-            param.SourceColumn = "id_portfolio"
-            Me._adapter.InsertCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@include"
-            param.DbType = Global.System.Data.DbType.[Boolean]
-            param.DbType = Global.System.Data.DbType.[Boolean]
-            param.SourceColumn = "include"
-            Me._adapter.InsertCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@bond_ric"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "bond_ric"
-            Me._adapter.InsertCommand.Parameters.Add(param)
-            Me._adapter.UpdateCommand = New Global.System.Data.SQLite.SQLiteCommand()
-            Me._adapter.UpdateCommand.Connection = Me.Connection
-            Me._adapter.UpdateCommand.CommandText = "UPDATE [main].[sqlite_default_schema].[portfolio_to_bond] SET [id] = @id, [id_por"& _ 
-                "tfolio] = @id_portfolio, [include] = @include, [bond_ric] = @bond_ric WHERE (([i"& _ 
-                "d] = @Original_id) AND ((@IsNull_id_portfolio = 1 AND [id_portfolio] IS NULL) OR"& _ 
-                " ([id_portfolio] = @Original_id_portfolio)) AND ((@IsNull_include = 1 AND [inclu"& _ 
-                "de] IS NULL) OR ([include] = @Original_include)) AND ((@IsNull_bond_ric = 1 AND "& _ 
-                "[bond_ric] IS NULL) OR ([bond_ric] = @Original_bond_ric)))"
-            Me._adapter.UpdateCommand.CommandType = Global.System.Data.CommandType.Text
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@id"
-            param.DbType = Global.System.Data.DbType.Int64
-            param.DbType = Global.System.Data.DbType.Int64
-            param.SourceColumn = "id"
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@id_portfolio"
-            param.DbType = Global.System.Data.DbType.Int64
-            param.DbType = Global.System.Data.DbType.Int64
-            param.SourceColumn = "id_portfolio"
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@include"
-            param.DbType = Global.System.Data.DbType.[Boolean]
-            param.DbType = Global.System.Data.DbType.[Boolean]
-            param.SourceColumn = "include"
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@bond_ric"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "bond_ric"
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_id"
-            param.DbType = Global.System.Data.DbType.Int64
-            param.DbType = Global.System.Data.DbType.Int64
-            param.SourceColumn = "id"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_id_portfolio"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "id_portfolio"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_id_portfolio"
-            param.DbType = Global.System.Data.DbType.Int64
-            param.DbType = Global.System.Data.DbType.Int64
-            param.SourceColumn = "id_portfolio"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_include"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "include"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_include"
-            param.DbType = Global.System.Data.DbType.[Boolean]
-            param.DbType = Global.System.Data.DbType.[Boolean]
-            param.SourceColumn = "include"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_bond_ric"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "bond_ric"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_bond_ric"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "bond_ric"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Private Sub InitConnection()
-            Me._connection = New Global.System.Data.SQLite.SQLiteConnection()
-            Me._connection.ConnectionString = Global.YieldMap.My.Settings.Default.bondsConnectionString
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Private Sub InitCommandCollection()
-            Me._commandCollection = New Global.System.Data.SQLite.SQLiteCommand(3) {}
-            Me._commandCollection(0) = New Global.System.Data.SQLite.SQLiteCommand()
-            Me._commandCollection(0).Connection = Me.Connection
-            Me._commandCollection(0).CommandText = "SELECT [id], [id_portfolio], [include], [bond_ric] FROM [portfolio_to_bond]"
-            Me._commandCollection(0).CommandType = Global.System.Data.CommandType.Text
-            Me._commandCollection(1) = New Global.System.Data.SQLite.SQLiteCommand()
-            Me._commandCollection(1).Connection = Me.Connection
-            Me._commandCollection(1).CommandText = "DELETE FROM  [portfolio_to_bond] WHERE ([id] = @Original_id)"
-            Me._commandCollection(1).CommandType = Global.System.Data.CommandType.Text
-            Dim param As Global.System.Data.SQLite.SQLiteParameter = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_id"
-            param.DbType = Global.System.Data.DbType.Int64
-            param.DbType = Global.System.Data.DbType.Int64
-            param.Size = 8
-            param.SourceColumn = "id"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._commandCollection(1).Parameters.Add(param)
-            Me._commandCollection(2) = New Global.System.Data.SQLite.SQLiteCommand()
-            Me._commandCollection(2).Connection = Me.Connection
-            Me._commandCollection(2).CommandText = "INSERT INTO [portfolio_to_bond] ( [id_portfolio], [bond_ric], [include]) VALUES ("& _ 
-                " @id_portfolio, @bond_ric, @include)"
-            Me._commandCollection(2).CommandType = Global.System.Data.CommandType.Text
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@id_portfolio"
-            param.DbType = Global.System.Data.DbType.Int64
-            param.DbType = Global.System.Data.DbType.Int64
-            param.Size = 8
-            param.SourceColumn = "id_portfolio"
-            Me._commandCollection(2).Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@bond_ric"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.Size = 2147483647
-            param.SourceColumn = "bond_ric"
-            Me._commandCollection(2).Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@include"
-            param.DbType = Global.System.Data.DbType.[Boolean]
-            param.DbType = Global.System.Data.DbType.[Boolean]
-            param.Size = 1
-            param.SourceColumn = "include"
-            Me._commandCollection(2).Parameters.Add(param)
-            Me._commandCollection(3) = New Global.System.Data.SQLite.SQLiteCommand()
-            Me._commandCollection(3).Connection = Me.Connection
-            Me._commandCollection(3).CommandText = "DELETE FROM [portfolio_to_bond] WHERE ([bond_ric] = @Original_bond_ric) AND  ([id"& _ 
-                "_portfolio] = @Original_id_portfolio) "
-            Me._commandCollection(3).CommandType = Global.System.Data.CommandType.Text
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_bond_ric"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.Size = 2147483647
-            param.SourceColumn = "bond_ric"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._commandCollection(3).Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_id_portfolio"
-            param.DbType = Global.System.Data.DbType.Int64
-            param.DbType = Global.System.Data.DbType.Int64
-            param.Size = 8
-            param.SourceColumn = "id_portfolio"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._commandCollection(3).Parameters.Add(param)
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
-         Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Fill, true)>  _
-        Public Overloads Overridable Function Fill(ByVal dataTable As BondsDataSet.portfolio_to_bondDataTable) As Integer
-            Me.Adapter.SelectCommand = Me.CommandCollection(0)
-            If (Me.ClearBeforeFill = true) Then
-                dataTable.Clear
-            End If
-            Dim returnValue As Integer = Me.Adapter.Fill(dataTable)
-            Return returnValue
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
-         Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.[Select], true)>  _
-        Public Overloads Overridable Function GetData() As BondsDataSet.portfolio_to_bondDataTable
-            Me.Adapter.SelectCommand = Me.CommandCollection(0)
-            Dim dataTable As BondsDataSet.portfolio_to_bondDataTable = New BondsDataSet.portfolio_to_bondDataTable()
-            Me.Adapter.Fill(dataTable)
-            Return dataTable
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")>  _
-        Public Overloads Overridable Function Update(ByVal dataTable As BondsDataSet.portfolio_to_bondDataTable) As Integer
-            Return Me.Adapter.Update(dataTable)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")>  _
-        Public Overloads Overridable Function Update(ByVal dataSet As BondsDataSet) As Integer
-            Return Me.Adapter.Update(dataSet, "portfolio_to_bond")
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")>  _
-        Public Overloads Overridable Function Update(ByVal dataRow As Global.System.Data.DataRow) As Integer
-            Return Me.Adapter.Update(New Global.System.Data.DataRow() {dataRow})
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")>  _
-        Public Overloads Overridable Function Update(ByVal dataRows() As Global.System.Data.DataRow) As Integer
-            Return Me.Adapter.Update(dataRows)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
-         Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Delete, true)>  _
-        Public Overloads Overridable Function Delete(ByVal Original_id As Long, ByVal Original_id_portfolio As Global.System.Nullable(Of Long), ByVal Original_include As Global.System.Nullable(Of Boolean), ByVal Original_bond_ric As String) As Integer
-            Me.Adapter.DeleteCommand.Parameters(0).Value = CType(Original_id,Long)
-            If (Original_id_portfolio.HasValue = true) Then
-                Me.Adapter.DeleteCommand.Parameters(1).Value = CType(0,Object)
-                Me.Adapter.DeleteCommand.Parameters(2).Value = CType(Original_id_portfolio.Value,Long)
-            Else
-                Me.Adapter.DeleteCommand.Parameters(1).Value = CType(1,Object)
-                Me.Adapter.DeleteCommand.Parameters(2).Value = Global.System.DBNull.Value
-            End If
-            If (Original_include.HasValue = true) Then
-                Me.Adapter.DeleteCommand.Parameters(3).Value = CType(0,Object)
-                Me.Adapter.DeleteCommand.Parameters(4).Value = CType(Original_include.Value,Boolean)
-            Else
-                Me.Adapter.DeleteCommand.Parameters(3).Value = CType(1,Object)
-                Me.Adapter.DeleteCommand.Parameters(4).Value = Global.System.DBNull.Value
-            End If
-            If (Original_bond_ric Is Nothing) Then
-                Me.Adapter.DeleteCommand.Parameters(5).Value = CType(1,Object)
-                Me.Adapter.DeleteCommand.Parameters(6).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.DeleteCommand.Parameters(5).Value = CType(0,Object)
-                Me.Adapter.DeleteCommand.Parameters(6).Value = CType(Original_bond_ric,String)
-            End If
-            Dim previousConnectionState As Global.System.Data.ConnectionState = Me.Adapter.DeleteCommand.Connection.State
-            If ((Me.Adapter.DeleteCommand.Connection.State And Global.System.Data.ConnectionState.Open)  _
-                        <> Global.System.Data.ConnectionState.Open) Then
-                Me.Adapter.DeleteCommand.Connection.Open
-            End If
-            Try 
-                Dim returnValue As Integer = Me.Adapter.DeleteCommand.ExecuteNonQuery
-                Return returnValue
-            Finally
-                If (previousConnectionState = Global.System.Data.ConnectionState.Closed) Then
-                    Me.Adapter.DeleteCommand.Connection.Close
-                End If
-            End Try
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
-         Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Insert, true)>  _
-        Public Overloads Overridable Function Insert(ByVal id As Long, ByVal id_portfolio As Global.System.Nullable(Of Long), ByVal include As Global.System.Nullable(Of Boolean), ByVal bond_ric As String) As Integer
-            Me.Adapter.InsertCommand.Parameters(0).Value = CType(id,Long)
-            If (id_portfolio.HasValue = true) Then
-                Me.Adapter.InsertCommand.Parameters(1).Value = CType(id_portfolio.Value,Long)
-            Else
-                Me.Adapter.InsertCommand.Parameters(1).Value = Global.System.DBNull.Value
-            End If
-            If (include.HasValue = true) Then
-                Me.Adapter.InsertCommand.Parameters(2).Value = CType(include.Value,Boolean)
-            Else
-                Me.Adapter.InsertCommand.Parameters(2).Value = Global.System.DBNull.Value
-            End If
-            If (bond_ric Is Nothing) Then
-                Me.Adapter.InsertCommand.Parameters(3).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.InsertCommand.Parameters(3).Value = CType(bond_ric,String)
-            End If
-            Dim previousConnectionState As Global.System.Data.ConnectionState = Me.Adapter.InsertCommand.Connection.State
-            If ((Me.Adapter.InsertCommand.Connection.State And Global.System.Data.ConnectionState.Open)  _
-                        <> Global.System.Data.ConnectionState.Open) Then
-                Me.Adapter.InsertCommand.Connection.Open
-            End If
-            Try 
-                Dim returnValue As Integer = Me.Adapter.InsertCommand.ExecuteNonQuery
-                Return returnValue
-            Finally
-                If (previousConnectionState = Global.System.Data.ConnectionState.Closed) Then
-                    Me.Adapter.InsertCommand.Connection.Close
-                End If
-            End Try
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
-         Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Update, true)>  _
-        Public Overloads Overridable Function Update(ByVal id As Long, ByVal id_portfolio As Global.System.Nullable(Of Long), ByVal include As Global.System.Nullable(Of Boolean), ByVal bond_ric As String, ByVal Original_id As Long, ByVal Original_id_portfolio As Global.System.Nullable(Of Long), ByVal Original_include As Global.System.Nullable(Of Boolean), ByVal Original_bond_ric As String) As Integer
-            Me.Adapter.UpdateCommand.Parameters(0).Value = CType(id,Long)
-            If (id_portfolio.HasValue = true) Then
-                Me.Adapter.UpdateCommand.Parameters(1).Value = CType(id_portfolio.Value,Long)
-            Else
-                Me.Adapter.UpdateCommand.Parameters(1).Value = Global.System.DBNull.Value
-            End If
-            If (include.HasValue = true) Then
-                Me.Adapter.UpdateCommand.Parameters(2).Value = CType(include.Value,Boolean)
-            Else
-                Me.Adapter.UpdateCommand.Parameters(2).Value = Global.System.DBNull.Value
-            End If
-            If (bond_ric Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(3).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(3).Value = CType(bond_ric,String)
-            End If
-            Me.Adapter.UpdateCommand.Parameters(4).Value = CType(Original_id,Long)
-            If (Original_id_portfolio.HasValue = true) Then
-                Me.Adapter.UpdateCommand.Parameters(5).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(6).Value = CType(Original_id_portfolio.Value,Long)
-            Else
-                Me.Adapter.UpdateCommand.Parameters(5).Value = CType(1,Object)
-                Me.Adapter.UpdateCommand.Parameters(6).Value = Global.System.DBNull.Value
-            End If
-            If (Original_include.HasValue = true) Then
-                Me.Adapter.UpdateCommand.Parameters(7).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(8).Value = CType(Original_include.Value,Boolean)
-            Else
-                Me.Adapter.UpdateCommand.Parameters(7).Value = CType(1,Object)
-                Me.Adapter.UpdateCommand.Parameters(8).Value = Global.System.DBNull.Value
-            End If
-            If (Original_bond_ric Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(9).Value = CType(1,Object)
-                Me.Adapter.UpdateCommand.Parameters(10).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(9).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(10).Value = CType(Original_bond_ric,String)
-            End If
-            Dim previousConnectionState As Global.System.Data.ConnectionState = Me.Adapter.UpdateCommand.Connection.State
-            If ((Me.Adapter.UpdateCommand.Connection.State And Global.System.Data.ConnectionState.Open)  _
-                        <> Global.System.Data.ConnectionState.Open) Then
-                Me.Adapter.UpdateCommand.Connection.Open
-            End If
-            Try 
-                Dim returnValue As Integer = Me.Adapter.UpdateCommand.ExecuteNonQuery
-                Return returnValue
-            Finally
-                If (previousConnectionState = Global.System.Data.ConnectionState.Closed) Then
-                    Me.Adapter.UpdateCommand.Connection.Close
-                End If
-            End Try
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
-         Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Update, true)>  _
-        Public Overloads Overridable Function Update(ByVal id_portfolio As Global.System.Nullable(Of Long), ByVal include As Global.System.Nullable(Of Boolean), ByVal bond_ric As String, ByVal Original_id As Long, ByVal Original_id_portfolio As Global.System.Nullable(Of Long), ByVal Original_include As Global.System.Nullable(Of Boolean), ByVal Original_bond_ric As String) As Integer
-            Return Me.Update(Original_id, id_portfolio, include, bond_ric, Original_id, Original_id_portfolio, Original_include, Original_bond_ric)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
-         Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Delete, false)>  _
-        Public Overloads Overridable Function DeleteLinkByPortfolio(ByVal Original_id As Long) As Integer
-            Dim command As Global.System.Data.SQLite.SQLiteCommand = Me.CommandCollection(1)
-            command.Parameters(0).Value = CType(Original_id,Long)
-            Dim previousConnectionState As Global.System.Data.ConnectionState = command.Connection.State
-            If ((command.Connection.State And Global.System.Data.ConnectionState.Open)  _
-                        <> Global.System.Data.ConnectionState.Open) Then
-                command.Connection.Open
-            End If
-            Dim returnValue As Integer
-            Try 
-                returnValue = command.ExecuteNonQuery
-            Finally
-                If (previousConnectionState = Global.System.Data.ConnectionState.Closed) Then
-                    command.Connection.Close
-                End If
-            End Try
-            Return returnValue
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
-         Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Insert, false)>  _
-        Public Overloads Overridable Function InsertLink(ByVal id_portfolio As Global.System.Nullable(Of Long), ByVal bond_ric As String, ByVal include As Global.System.Nullable(Of Boolean)) As Integer
-            Dim command As Global.System.Data.SQLite.SQLiteCommand = Me.CommandCollection(2)
-            If (id_portfolio.HasValue = true) Then
-                command.Parameters(0).Value = CType(id_portfolio.Value,Long)
-            Else
-                command.Parameters(0).Value = Global.System.DBNull.Value
-            End If
-            If (bond_ric Is Nothing) Then
-                command.Parameters(1).Value = Global.System.DBNull.Value
-            Else
-                command.Parameters(1).Value = CType(bond_ric,String)
-            End If
-            If (include.HasValue = true) Then
-                command.Parameters(2).Value = CType(include.Value,Boolean)
-            Else
-                command.Parameters(2).Value = Global.System.DBNull.Value
-            End If
-            Dim previousConnectionState As Global.System.Data.ConnectionState = command.Connection.State
-            If ((command.Connection.State And Global.System.Data.ConnectionState.Open)  _
-                        <> Global.System.Data.ConnectionState.Open) Then
-                command.Connection.Open
-            End If
-            Dim returnValue As Integer
-            Try 
-                returnValue = command.ExecuteNonQuery
-            Finally
-                If (previousConnectionState = Global.System.Data.ConnectionState.Closed) Then
-                    command.Connection.Close
-                End If
-            End Try
-            Return returnValue
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
-         Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Delete, false)>  _
-        Public Overloads Overridable Function RemoveLink(ByVal Original_bond_ric As String, ByVal Original_id_portfolio As Global.System.Nullable(Of Long)) As Integer
-            Dim command As Global.System.Data.SQLite.SQLiteCommand = Me.CommandCollection(3)
-            If (Original_bond_ric Is Nothing) Then
-                command.Parameters(0).Value = Global.System.DBNull.Value
-            Else
-                command.Parameters(0).Value = CType(Original_bond_ric,String)
-            End If
-            If (Original_id_portfolio.HasValue = true) Then
-                command.Parameters(1).Value = CType(Original_id_portfolio.Value,Long)
-            Else
-                command.Parameters(1).Value = Global.System.DBNull.Value
-            End If
-            Dim previousConnectionState As Global.System.Data.ConnectionState = command.Connection.State
-            If ((command.Connection.State And Global.System.Data.ConnectionState.Open)  _
-                        <> Global.System.Data.ConnectionState.Open) Then
-                command.Connection.Open
-            End If
-            Dim returnValue As Integer
-            Try 
-                returnValue = command.ExecuteNonQuery
-            Finally
-                If (previousConnectionState = Global.System.Data.ConnectionState.Closed) Then
-                    command.Connection.Close
-                End If
-            End Try
-            Return returnValue
         End Function
     End Class
     
@@ -25276,15 +22471,11 @@ Namespace BondsDataSetTableAdapters
             tableMapping.ColumnMappings.Add("[portfolioID]", "portfolioID")
             tableMapping.ColumnMappings.Add("[whereFrom]", "whereFrom")
             tableMapping.ColumnMappings.Add("[fromID]", "fromID")
-            tableMapping.ColumnMappings.Add("bid_field", "bid_field")
-            tableMapping.ColumnMappings.Add("ask_field", "ask_field")
-            tableMapping.ColumnMappings.Add("last_field", "last_field")
-            tableMapping.ColumnMappings.Add("hist_field", "hist_field")
             tableMapping.ColumnMappings.Add("portfolio_name", "portfolio_name")
-            tableMapping.ColumnMappings.Add("ric_structure", "ric_structure")
             tableMapping.ColumnMappings.Add("whereFromName", "whereFromName")
             tableMapping.ColumnMappings.Add("whereFromDescr", "whereFromDescr")
             tableMapping.ColumnMappings.Add("color", "color")
+            tableMapping.ColumnMappings.Add("id_field_set", "id_field_set")
             Me._adapter.TableMappings.Add(tableMapping)
         End Sub
         
@@ -25301,9 +22492,8 @@ Namespace BondsDataSetTableAdapters
             Me._commandCollection = New Global.System.Data.SQLite.SQLiteCommand(0) {}
             Me._commandCollection(0) = New Global.System.Data.SQLite.SQLiteCommand()
             Me._commandCollection(0).Connection = Me.Connection
-            Me._commandCollection(0).CommandText = "SELECT [portfolioID], [whereFrom], [fromID], bid_field, ask_field, last_field, hi"& _ 
-                "st_field, portfolio_name, ric_structure, whereFromName, whereFromDescr, color FR"& _ 
-                "OM [PortfolioSources]"
+            Me._commandCollection(0).CommandText = "SELECT portfolioID, whereFrom, fromID, portfolio_name, whereFromName, whereFromDe" & _
+                "scr, color, id_field_set FROM PortfolioSources"
             Me._commandCollection(0).CommandType = Global.System.Data.CommandType.Text
         End Sub
         
@@ -25689,7 +22879,7 @@ Namespace BondsDataSetTableAdapters
      Global.System.ComponentModel.DesignerAttribute("Microsoft.VSDesigner.DataSource.Design.TableAdapterDesigner, Microsoft.VSDesigner"& _ 
         ", Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"),  _
      Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")>  _
-    Partial Public Class fields_layoutTableAdapter
+    Partial Public Class field_layoutTableAdapter
         Inherits Global.System.ComponentModel.Component
         
         Private WithEvents _adapter As Global.System.Data.SQLite.SQLiteDataAdapter
@@ -25806,25 +22996,31 @@ Namespace BondsDataSetTableAdapters
             Me._adapter = New Global.System.Data.SQLite.SQLiteDataAdapter()
             Dim tableMapping As Global.System.Data.Common.DataTableMapping = New Global.System.Data.Common.DataTableMapping()
             tableMapping.SourceTable = "Table"
-            tableMapping.DataSetTable = "fields_layout"
+            tableMapping.DataSetTable = "field_layout"
             tableMapping.ColumnMappings.Add("id", "id")
             tableMapping.ColumnMappings.Add("bid_field", "bid_field")
             tableMapping.ColumnMappings.Add("ask_field", "ask_field")
             tableMapping.ColumnMappings.Add("last_field", "last_field")
-            tableMapping.ColumnMappings.Add("hist_field", "hist_field")
             tableMapping.ColumnMappings.Add("vwap_field", "vwap_field")
+            tableMapping.ColumnMappings.Add("timestamp_field", "timestamp_field")
             tableMapping.ColumnMappings.Add("volume_field", "volume_field")
-            tableMapping.ColumnMappings.Add("name", "name")
+            tableMapping.ColumnMappings.Add("field_set_id", "field_set_id")
+            tableMapping.ColumnMappings.Add("is_realtime", "is_realtime")
             Me._adapter.TableMappings.Add(tableMapping)
             Me._adapter.DeleteCommand = New Global.System.Data.SQLite.SQLiteCommand()
             Me._adapter.DeleteCommand.Connection = Me.Connection
-            Me._adapter.DeleteCommand.CommandText = "DELETE FROM [main].[sqlite_default_schema].[fields_layout] WHERE (([id] = @Origin"& _ 
-                "al_id) AND ([bid_field] = @Original_bid_field) AND ([ask_field] = @Original_ask_"& _ 
-                "field) AND ([last_field] = @Original_last_field) AND ([hist_field] = @Original_h"& _ 
-                "ist_field) AND ((@IsNull_vwap_field = 1 AND [vwap_field] IS NULL) OR ([vwap_fiel"& _ 
-                "d] = @Original_vwap_field)) AND ((@IsNull_volume_field = 1 AND [volume_field] IS"& _ 
-                " NULL) OR ([volume_field] = @Original_volume_field)) AND ((@IsNull_name = 1 AND "& _ 
-                "[name] IS NULL) OR ([name] = @Original_name)))"
+            Me._adapter.DeleteCommand.CommandText = "DELETE FROM [main].[sqlite_default_schema].[field_layout] WHERE (([id] = @Origina"& _ 
+                "l_id) AND ((@IsNull_bid_field = 1 AND [bid_field] IS NULL) OR ([bid_field] = @Or"& _ 
+                "iginal_bid_field)) AND ((@IsNull_ask_field = 1 AND [ask_field] IS NULL) OR ([ask"& _ 
+                "_field] = @Original_ask_field)) AND ((@IsNull_last_field = 1 AND [last_field] IS"& _ 
+                " NULL) OR ([last_field] = @Original_last_field)) AND ((@IsNull_vwap_field = 1 AN"& _ 
+                "D [vwap_field] IS NULL) OR ([vwap_field] = @Original_vwap_field)) AND ((@IsNull_"& _ 
+                "timestamp_field = 1 AND [timestamp_field] IS NULL) OR ([timestamp_field] = @Orig"& _ 
+                "inal_timestamp_field)) AND ((@IsNull_volume_field = 1 AND [volume_field] IS NULL"& _ 
+                ") OR ([volume_field] = @Original_volume_field)) AND ((@IsNull_field_set_id = 1 A"& _ 
+                "ND [field_set_id] IS NULL) OR ([field_set_id] = @Original_field_set_id)) AND ((@"& _ 
+                "IsNull_is_realtime = 1 AND [is_realtime] IS NULL) OR ([is_realtime] = @Original_"& _ 
+                "is_realtime)))"
             Me._adapter.DeleteCommand.CommandType = Global.System.Data.CommandType.Text
             Dim param As Global.System.Data.SQLite.SQLiteParameter = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@Original_id"
@@ -25834,10 +23030,26 @@ Namespace BondsDataSetTableAdapters
             param.SourceVersion = Global.System.Data.DataRowVersion.Original
             Me._adapter.DeleteCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@IsNull_bid_field"
+            param.DbType = Global.System.Data.DbType.Int32
+            param.DbType = Global.System.Data.DbType.Int32
+            param.SourceColumn = "bid_field"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            param.SourceColumnNullMapping = true
+            Me._adapter.DeleteCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@Original_bid_field"
             param.DbType = Global.System.Data.DbType.[String]
             param.SourceColumn = "bid_field"
             param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            Me._adapter.DeleteCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@IsNull_ask_field"
+            param.DbType = Global.System.Data.DbType.Int32
+            param.DbType = Global.System.Data.DbType.Int32
+            param.SourceColumn = "ask_field"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            param.SourceColumnNullMapping = true
             Me._adapter.DeleteCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@Original_ask_field"
@@ -25846,15 +23058,17 @@ Namespace BondsDataSetTableAdapters
             param.SourceVersion = Global.System.Data.DataRowVersion.Original
             Me._adapter.DeleteCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@IsNull_last_field"
+            param.DbType = Global.System.Data.DbType.Int32
+            param.DbType = Global.System.Data.DbType.Int32
+            param.SourceColumn = "last_field"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            param.SourceColumnNullMapping = true
+            Me._adapter.DeleteCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@Original_last_field"
             param.DbType = Global.System.Data.DbType.[String]
             param.SourceColumn = "last_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.DeleteCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_hist_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "hist_field"
             param.SourceVersion = Global.System.Data.DataRowVersion.Original
             Me._adapter.DeleteCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
@@ -25872,6 +23086,20 @@ Namespace BondsDataSetTableAdapters
             param.SourceVersion = Global.System.Data.DataRowVersion.Original
             Me._adapter.DeleteCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@IsNull_timestamp_field"
+            param.DbType = Global.System.Data.DbType.Int32
+            param.DbType = Global.System.Data.DbType.Int32
+            param.SourceColumn = "timestamp_field"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            param.SourceColumnNullMapping = true
+            Me._adapter.DeleteCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@Original_timestamp_field"
+            param.DbType = Global.System.Data.DbType.[String]
+            param.SourceColumn = "timestamp_field"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            Me._adapter.DeleteCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@IsNull_volume_field"
             param.DbType = Global.System.Data.DbType.Int32
             param.DbType = Global.System.Data.DbType.Int32
@@ -25883,6 +23111,752 @@ Namespace BondsDataSetTableAdapters
             param.ParameterName = "@Original_volume_field"
             param.DbType = Global.System.Data.DbType.[String]
             param.SourceColumn = "volume_field"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            Me._adapter.DeleteCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@IsNull_field_set_id"
+            param.DbType = Global.System.Data.DbType.Int32
+            param.DbType = Global.System.Data.DbType.Int32
+            param.SourceColumn = "field_set_id"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            param.SourceColumnNullMapping = true
+            Me._adapter.DeleteCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@Original_field_set_id"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "field_set_id"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            Me._adapter.DeleteCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@IsNull_is_realtime"
+            param.DbType = Global.System.Data.DbType.Int32
+            param.DbType = Global.System.Data.DbType.Int32
+            param.SourceColumn = "is_realtime"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            param.SourceColumnNullMapping = true
+            Me._adapter.DeleteCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@Original_is_realtime"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "is_realtime"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            Me._adapter.DeleteCommand.Parameters.Add(param)
+            Me._adapter.InsertCommand = New Global.System.Data.SQLite.SQLiteCommand()
+            Me._adapter.InsertCommand.Connection = Me.Connection
+            Me._adapter.InsertCommand.CommandText = "INSERT INTO [main].[sqlite_default_schema].[field_layout] ([bid_field], [ask_fiel"& _ 
+                "d], [last_field], [vwap_field], [timestamp_field], [volume_field], [field_set_id"& _ 
+                "], [is_realtime]) VALUES (@bid_field, @ask_field, @last_field, @vwap_field, @tim"& _ 
+                "estamp_field, @volume_field, @field_set_id, @is_realtime)"
+            Me._adapter.InsertCommand.CommandType = Global.System.Data.CommandType.Text
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@bid_field"
+            param.DbType = Global.System.Data.DbType.[String]
+            param.SourceColumn = "bid_field"
+            Me._adapter.InsertCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@ask_field"
+            param.DbType = Global.System.Data.DbType.[String]
+            param.SourceColumn = "ask_field"
+            Me._adapter.InsertCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@last_field"
+            param.DbType = Global.System.Data.DbType.[String]
+            param.SourceColumn = "last_field"
+            Me._adapter.InsertCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@vwap_field"
+            param.DbType = Global.System.Data.DbType.[String]
+            param.SourceColumn = "vwap_field"
+            Me._adapter.InsertCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@timestamp_field"
+            param.DbType = Global.System.Data.DbType.[String]
+            param.SourceColumn = "timestamp_field"
+            Me._adapter.InsertCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@volume_field"
+            param.DbType = Global.System.Data.DbType.[String]
+            param.SourceColumn = "volume_field"
+            Me._adapter.InsertCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@field_set_id"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "field_set_id"
+            Me._adapter.InsertCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@is_realtime"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "is_realtime"
+            Me._adapter.InsertCommand.Parameters.Add(param)
+            Me._adapter.UpdateCommand = New Global.System.Data.SQLite.SQLiteCommand()
+            Me._adapter.UpdateCommand.Connection = Me.Connection
+            Me._adapter.UpdateCommand.CommandText = "UPDATE [main].[sqlite_default_schema].[field_layout] SET [bid_field] = @bid_field"& _ 
+                ", [ask_field] = @ask_field, [last_field] = @last_field, [vwap_field] = @vwap_fie"& _ 
+                "ld, [timestamp_field] = @timestamp_field, [volume_field] = @volume_field, [field"& _ 
+                "_set_id] = @field_set_id, [is_realtime] = @is_realtime WHERE (([id] = @Original_"& _ 
+                "id) AND ((@IsNull_bid_field = 1 AND [bid_field] IS NULL) OR ([bid_field] = @Orig"& _ 
+                "inal_bid_field)) AND ((@IsNull_ask_field = 1 AND [ask_field] IS NULL) OR ([ask_f"& _ 
+                "ield] = @Original_ask_field)) AND ((@IsNull_last_field = 1 AND [last_field] IS N"& _ 
+                "ULL) OR ([last_field] = @Original_last_field)) AND ((@IsNull_vwap_field = 1 AND "& _ 
+                "[vwap_field] IS NULL) OR ([vwap_field] = @Original_vwap_field)) AND ((@IsNull_ti"& _ 
+                "mestamp_field = 1 AND [timestamp_field] IS NULL) OR ([timestamp_field] = @Origin"& _ 
+                "al_timestamp_field)) AND ((@IsNull_volume_field = 1 AND [volume_field] IS NULL) "& _ 
+                "OR ([volume_field] = @Original_volume_field)) AND ((@IsNull_field_set_id = 1 AND"& _ 
+                " [field_set_id] IS NULL) OR ([field_set_id] = @Original_field_set_id)) AND ((@Is"& _ 
+                "Null_is_realtime = 1 AND [is_realtime] IS NULL) OR ([is_realtime] = @Original_is"& _ 
+                "_realtime)))"
+            Me._adapter.UpdateCommand.CommandType = Global.System.Data.CommandType.Text
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@bid_field"
+            param.DbType = Global.System.Data.DbType.[String]
+            param.SourceColumn = "bid_field"
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@ask_field"
+            param.DbType = Global.System.Data.DbType.[String]
+            param.SourceColumn = "ask_field"
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@last_field"
+            param.DbType = Global.System.Data.DbType.[String]
+            param.SourceColumn = "last_field"
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@vwap_field"
+            param.DbType = Global.System.Data.DbType.[String]
+            param.SourceColumn = "vwap_field"
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@timestamp_field"
+            param.DbType = Global.System.Data.DbType.[String]
+            param.SourceColumn = "timestamp_field"
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@volume_field"
+            param.DbType = Global.System.Data.DbType.[String]
+            param.SourceColumn = "volume_field"
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@field_set_id"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "field_set_id"
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@is_realtime"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "is_realtime"
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@Original_id"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "id"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@IsNull_bid_field"
+            param.DbType = Global.System.Data.DbType.Int32
+            param.DbType = Global.System.Data.DbType.Int32
+            param.SourceColumn = "bid_field"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            param.SourceColumnNullMapping = true
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@Original_bid_field"
+            param.DbType = Global.System.Data.DbType.[String]
+            param.SourceColumn = "bid_field"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@IsNull_ask_field"
+            param.DbType = Global.System.Data.DbType.Int32
+            param.DbType = Global.System.Data.DbType.Int32
+            param.SourceColumn = "ask_field"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            param.SourceColumnNullMapping = true
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@Original_ask_field"
+            param.DbType = Global.System.Data.DbType.[String]
+            param.SourceColumn = "ask_field"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@IsNull_last_field"
+            param.DbType = Global.System.Data.DbType.Int32
+            param.DbType = Global.System.Data.DbType.Int32
+            param.SourceColumn = "last_field"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            param.SourceColumnNullMapping = true
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@Original_last_field"
+            param.DbType = Global.System.Data.DbType.[String]
+            param.SourceColumn = "last_field"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@IsNull_vwap_field"
+            param.DbType = Global.System.Data.DbType.Int32
+            param.DbType = Global.System.Data.DbType.Int32
+            param.SourceColumn = "vwap_field"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            param.SourceColumnNullMapping = true
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@Original_vwap_field"
+            param.DbType = Global.System.Data.DbType.[String]
+            param.SourceColumn = "vwap_field"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@IsNull_timestamp_field"
+            param.DbType = Global.System.Data.DbType.Int32
+            param.DbType = Global.System.Data.DbType.Int32
+            param.SourceColumn = "timestamp_field"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            param.SourceColumnNullMapping = true
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@Original_timestamp_field"
+            param.DbType = Global.System.Data.DbType.[String]
+            param.SourceColumn = "timestamp_field"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@IsNull_volume_field"
+            param.DbType = Global.System.Data.DbType.Int32
+            param.DbType = Global.System.Data.DbType.Int32
+            param.SourceColumn = "volume_field"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            param.SourceColumnNullMapping = true
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@Original_volume_field"
+            param.DbType = Global.System.Data.DbType.[String]
+            param.SourceColumn = "volume_field"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@IsNull_field_set_id"
+            param.DbType = Global.System.Data.DbType.Int32
+            param.DbType = Global.System.Data.DbType.Int32
+            param.SourceColumn = "field_set_id"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            param.SourceColumnNullMapping = true
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@Original_field_set_id"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "field_set_id"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@IsNull_is_realtime"
+            param.DbType = Global.System.Data.DbType.Int32
+            param.DbType = Global.System.Data.DbType.Int32
+            param.SourceColumn = "is_realtime"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            param.SourceColumnNullMapping = true
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+            param = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@Original_is_realtime"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "is_realtime"
+            param.SourceVersion = Global.System.Data.DataRowVersion.Original
+            Me._adapter.UpdateCommand.Parameters.Add(param)
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Private Sub InitConnection()
+            Me._connection = New Global.System.Data.SQLite.SQLiteConnection()
+            Me._connection.ConnectionString = Global.YieldMap.My.Settings.Default.bondsConnectionString
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Private Sub InitCommandCollection()
+            Me._commandCollection = New Global.System.Data.SQLite.SQLiteCommand(0) {}
+            Me._commandCollection(0) = New Global.System.Data.SQLite.SQLiteCommand()
+            Me._commandCollection(0).Connection = Me.Connection
+            Me._commandCollection(0).CommandText = "SELECT [id], [bid_field], [ask_field], [last_field], [vwap_field], [timestamp_fie"& _ 
+                "ld], [volume_field], [field_set_id], [is_realtime] FROM [field_layout]"
+            Me._commandCollection(0).CommandType = Global.System.Data.CommandType.Text
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
+         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
+         Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Fill, true)>  _
+        Public Overloads Overridable Function Fill(ByVal dataTable As BondsDataSet.field_layoutDataTable) As Integer
+            Me.Adapter.SelectCommand = Me.CommandCollection(0)
+            If (Me.ClearBeforeFill = true) Then
+                dataTable.Clear
+            End If
+            Dim returnValue As Integer = Me.Adapter.Fill(dataTable)
+            Return returnValue
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
+         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
+         Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.[Select], true)>  _
+        Public Overloads Overridable Function GetData() As BondsDataSet.field_layoutDataTable
+            Me.Adapter.SelectCommand = Me.CommandCollection(0)
+            Dim dataTable As BondsDataSet.field_layoutDataTable = New BondsDataSet.field_layoutDataTable()
+            Me.Adapter.Fill(dataTable)
+            Return dataTable
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
+         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")>  _
+        Public Overloads Overridable Function Update(ByVal dataTable As BondsDataSet.field_layoutDataTable) As Integer
+            Return Me.Adapter.Update(dataTable)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
+         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")>  _
+        Public Overloads Overridable Function Update(ByVal dataSet As BondsDataSet) As Integer
+            Return Me.Adapter.Update(dataSet, "field_layout")
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
+         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")>  _
+        Public Overloads Overridable Function Update(ByVal dataRow As Global.System.Data.DataRow) As Integer
+            Return Me.Adapter.Update(New Global.System.Data.DataRow() {dataRow})
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
+         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")>  _
+        Public Overloads Overridable Function Update(ByVal dataRows() As Global.System.Data.DataRow) As Integer
+            Return Me.Adapter.Update(dataRows)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
+         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
+         Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Delete, true)>  _
+        Public Overloads Overridable Function Delete(ByVal Original_id As Long, ByVal Original_bid_field As String, ByVal Original_ask_field As String, ByVal Original_last_field As String, ByVal Original_vwap_field As String, ByVal Original_timestamp_field As String, ByVal Original_volume_field As String, ByVal Original_field_set_id As Global.System.Nullable(Of Long), ByVal Original_is_realtime As Global.System.Nullable(Of Long)) As Integer
+            Me.Adapter.DeleteCommand.Parameters(0).Value = CType(Original_id,Long)
+            If (Original_bid_field Is Nothing) Then
+                Me.Adapter.DeleteCommand.Parameters(1).Value = CType(1,Object)
+                Me.Adapter.DeleteCommand.Parameters(2).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.DeleteCommand.Parameters(1).Value = CType(0,Object)
+                Me.Adapter.DeleteCommand.Parameters(2).Value = CType(Original_bid_field,String)
+            End If
+            If (Original_ask_field Is Nothing) Then
+                Me.Adapter.DeleteCommand.Parameters(3).Value = CType(1,Object)
+                Me.Adapter.DeleteCommand.Parameters(4).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.DeleteCommand.Parameters(3).Value = CType(0,Object)
+                Me.Adapter.DeleteCommand.Parameters(4).Value = CType(Original_ask_field,String)
+            End If
+            If (Original_last_field Is Nothing) Then
+                Me.Adapter.DeleteCommand.Parameters(5).Value = CType(1,Object)
+                Me.Adapter.DeleteCommand.Parameters(6).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.DeleteCommand.Parameters(5).Value = CType(0,Object)
+                Me.Adapter.DeleteCommand.Parameters(6).Value = CType(Original_last_field,String)
+            End If
+            If (Original_vwap_field Is Nothing) Then
+                Me.Adapter.DeleteCommand.Parameters(7).Value = CType(1,Object)
+                Me.Adapter.DeleteCommand.Parameters(8).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.DeleteCommand.Parameters(7).Value = CType(0,Object)
+                Me.Adapter.DeleteCommand.Parameters(8).Value = CType(Original_vwap_field,String)
+            End If
+            If (Original_timestamp_field Is Nothing) Then
+                Me.Adapter.DeleteCommand.Parameters(9).Value = CType(1,Object)
+                Me.Adapter.DeleteCommand.Parameters(10).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.DeleteCommand.Parameters(9).Value = CType(0,Object)
+                Me.Adapter.DeleteCommand.Parameters(10).Value = CType(Original_timestamp_field,String)
+            End If
+            If (Original_volume_field Is Nothing) Then
+                Me.Adapter.DeleteCommand.Parameters(11).Value = CType(1,Object)
+                Me.Adapter.DeleteCommand.Parameters(12).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.DeleteCommand.Parameters(11).Value = CType(0,Object)
+                Me.Adapter.DeleteCommand.Parameters(12).Value = CType(Original_volume_field,String)
+            End If
+            If (Original_field_set_id.HasValue = true) Then
+                Me.Adapter.DeleteCommand.Parameters(13).Value = CType(0,Object)
+                Me.Adapter.DeleteCommand.Parameters(14).Value = CType(Original_field_set_id.Value,Long)
+            Else
+                Me.Adapter.DeleteCommand.Parameters(13).Value = CType(1,Object)
+                Me.Adapter.DeleteCommand.Parameters(14).Value = Global.System.DBNull.Value
+            End If
+            If (Original_is_realtime.HasValue = true) Then
+                Me.Adapter.DeleteCommand.Parameters(15).Value = CType(0,Object)
+                Me.Adapter.DeleteCommand.Parameters(16).Value = CType(Original_is_realtime.Value,Long)
+            Else
+                Me.Adapter.DeleteCommand.Parameters(15).Value = CType(1,Object)
+                Me.Adapter.DeleteCommand.Parameters(16).Value = Global.System.DBNull.Value
+            End If
+            Dim previousConnectionState As Global.System.Data.ConnectionState = Me.Adapter.DeleteCommand.Connection.State
+            If ((Me.Adapter.DeleteCommand.Connection.State And Global.System.Data.ConnectionState.Open)  _
+                        <> Global.System.Data.ConnectionState.Open) Then
+                Me.Adapter.DeleteCommand.Connection.Open
+            End If
+            Try 
+                Dim returnValue As Integer = Me.Adapter.DeleteCommand.ExecuteNonQuery
+                Return returnValue
+            Finally
+                If (previousConnectionState = Global.System.Data.ConnectionState.Closed) Then
+                    Me.Adapter.DeleteCommand.Connection.Close
+                End If
+            End Try
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
+         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
+         Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Insert, true)>  _
+        Public Overloads Overridable Function Insert(ByVal bid_field As String, ByVal ask_field As String, ByVal last_field As String, ByVal vwap_field As String, ByVal timestamp_field As String, ByVal volume_field As String, ByVal field_set_id As Global.System.Nullable(Of Long), ByVal is_realtime As Global.System.Nullable(Of Long)) As Integer
+            If (bid_field Is Nothing) Then
+                Me.Adapter.InsertCommand.Parameters(0).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.InsertCommand.Parameters(0).Value = CType(bid_field,String)
+            End If
+            If (ask_field Is Nothing) Then
+                Me.Adapter.InsertCommand.Parameters(1).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.InsertCommand.Parameters(1).Value = CType(ask_field,String)
+            End If
+            If (last_field Is Nothing) Then
+                Me.Adapter.InsertCommand.Parameters(2).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.InsertCommand.Parameters(2).Value = CType(last_field,String)
+            End If
+            If (vwap_field Is Nothing) Then
+                Me.Adapter.InsertCommand.Parameters(3).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.InsertCommand.Parameters(3).Value = CType(vwap_field,String)
+            End If
+            If (timestamp_field Is Nothing) Then
+                Me.Adapter.InsertCommand.Parameters(4).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.InsertCommand.Parameters(4).Value = CType(timestamp_field,String)
+            End If
+            If (volume_field Is Nothing) Then
+                Me.Adapter.InsertCommand.Parameters(5).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.InsertCommand.Parameters(5).Value = CType(volume_field,String)
+            End If
+            If (field_set_id.HasValue = true) Then
+                Me.Adapter.InsertCommand.Parameters(6).Value = CType(field_set_id.Value,Long)
+            Else
+                Me.Adapter.InsertCommand.Parameters(6).Value = Global.System.DBNull.Value
+            End If
+            If (is_realtime.HasValue = true) Then
+                Me.Adapter.InsertCommand.Parameters(7).Value = CType(is_realtime.Value,Long)
+            Else
+                Me.Adapter.InsertCommand.Parameters(7).Value = Global.System.DBNull.Value
+            End If
+            Dim previousConnectionState As Global.System.Data.ConnectionState = Me.Adapter.InsertCommand.Connection.State
+            If ((Me.Adapter.InsertCommand.Connection.State And Global.System.Data.ConnectionState.Open)  _
+                        <> Global.System.Data.ConnectionState.Open) Then
+                Me.Adapter.InsertCommand.Connection.Open
+            End If
+            Try 
+                Dim returnValue As Integer = Me.Adapter.InsertCommand.ExecuteNonQuery
+                Return returnValue
+            Finally
+                If (previousConnectionState = Global.System.Data.ConnectionState.Closed) Then
+                    Me.Adapter.InsertCommand.Connection.Close
+                End If
+            End Try
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
+         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
+         Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Update, true)>  _
+        Public Overloads Overridable Function Update( _
+                    ByVal bid_field As String,  _
+                    ByVal ask_field As String,  _
+                    ByVal last_field As String,  _
+                    ByVal vwap_field As String,  _
+                    ByVal timestamp_field As String,  _
+                    ByVal volume_field As String,  _
+                    ByVal field_set_id As Global.System.Nullable(Of Long),  _
+                    ByVal is_realtime As Global.System.Nullable(Of Long),  _
+                    ByVal Original_id As Long,  _
+                    ByVal Original_bid_field As String,  _
+                    ByVal Original_ask_field As String,  _
+                    ByVal Original_last_field As String,  _
+                    ByVal Original_vwap_field As String,  _
+                    ByVal Original_timestamp_field As String,  _
+                    ByVal Original_volume_field As String,  _
+                    ByVal Original_field_set_id As Global.System.Nullable(Of Long),  _
+                    ByVal Original_is_realtime As Global.System.Nullable(Of Long)) As Integer
+            If (bid_field Is Nothing) Then
+                Me.Adapter.UpdateCommand.Parameters(0).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.UpdateCommand.Parameters(0).Value = CType(bid_field,String)
+            End If
+            If (ask_field Is Nothing) Then
+                Me.Adapter.UpdateCommand.Parameters(1).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.UpdateCommand.Parameters(1).Value = CType(ask_field,String)
+            End If
+            If (last_field Is Nothing) Then
+                Me.Adapter.UpdateCommand.Parameters(2).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.UpdateCommand.Parameters(2).Value = CType(last_field,String)
+            End If
+            If (vwap_field Is Nothing) Then
+                Me.Adapter.UpdateCommand.Parameters(3).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.UpdateCommand.Parameters(3).Value = CType(vwap_field,String)
+            End If
+            If (timestamp_field Is Nothing) Then
+                Me.Adapter.UpdateCommand.Parameters(4).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.UpdateCommand.Parameters(4).Value = CType(timestamp_field,String)
+            End If
+            If (volume_field Is Nothing) Then
+                Me.Adapter.UpdateCommand.Parameters(5).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.UpdateCommand.Parameters(5).Value = CType(volume_field,String)
+            End If
+            If (field_set_id.HasValue = true) Then
+                Me.Adapter.UpdateCommand.Parameters(6).Value = CType(field_set_id.Value,Long)
+            Else
+                Me.Adapter.UpdateCommand.Parameters(6).Value = Global.System.DBNull.Value
+            End If
+            If (is_realtime.HasValue = true) Then
+                Me.Adapter.UpdateCommand.Parameters(7).Value = CType(is_realtime.Value,Long)
+            Else
+                Me.Adapter.UpdateCommand.Parameters(7).Value = Global.System.DBNull.Value
+            End If
+            Me.Adapter.UpdateCommand.Parameters(8).Value = CType(Original_id,Long)
+            If (Original_bid_field Is Nothing) Then
+                Me.Adapter.UpdateCommand.Parameters(9).Value = CType(1,Object)
+                Me.Adapter.UpdateCommand.Parameters(10).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.UpdateCommand.Parameters(9).Value = CType(0,Object)
+                Me.Adapter.UpdateCommand.Parameters(10).Value = CType(Original_bid_field,String)
+            End If
+            If (Original_ask_field Is Nothing) Then
+                Me.Adapter.UpdateCommand.Parameters(11).Value = CType(1,Object)
+                Me.Adapter.UpdateCommand.Parameters(12).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.UpdateCommand.Parameters(11).Value = CType(0,Object)
+                Me.Adapter.UpdateCommand.Parameters(12).Value = CType(Original_ask_field,String)
+            End If
+            If (Original_last_field Is Nothing) Then
+                Me.Adapter.UpdateCommand.Parameters(13).Value = CType(1,Object)
+                Me.Adapter.UpdateCommand.Parameters(14).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.UpdateCommand.Parameters(13).Value = CType(0,Object)
+                Me.Adapter.UpdateCommand.Parameters(14).Value = CType(Original_last_field,String)
+            End If
+            If (Original_vwap_field Is Nothing) Then
+                Me.Adapter.UpdateCommand.Parameters(15).Value = CType(1,Object)
+                Me.Adapter.UpdateCommand.Parameters(16).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.UpdateCommand.Parameters(15).Value = CType(0,Object)
+                Me.Adapter.UpdateCommand.Parameters(16).Value = CType(Original_vwap_field,String)
+            End If
+            If (Original_timestamp_field Is Nothing) Then
+                Me.Adapter.UpdateCommand.Parameters(17).Value = CType(1,Object)
+                Me.Adapter.UpdateCommand.Parameters(18).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.UpdateCommand.Parameters(17).Value = CType(0,Object)
+                Me.Adapter.UpdateCommand.Parameters(18).Value = CType(Original_timestamp_field,String)
+            End If
+            If (Original_volume_field Is Nothing) Then
+                Me.Adapter.UpdateCommand.Parameters(19).Value = CType(1,Object)
+                Me.Adapter.UpdateCommand.Parameters(20).Value = Global.System.DBNull.Value
+            Else
+                Me.Adapter.UpdateCommand.Parameters(19).Value = CType(0,Object)
+                Me.Adapter.UpdateCommand.Parameters(20).Value = CType(Original_volume_field,String)
+            End If
+            If (Original_field_set_id.HasValue = true) Then
+                Me.Adapter.UpdateCommand.Parameters(21).Value = CType(0,Object)
+                Me.Adapter.UpdateCommand.Parameters(22).Value = CType(Original_field_set_id.Value,Long)
+            Else
+                Me.Adapter.UpdateCommand.Parameters(21).Value = CType(1,Object)
+                Me.Adapter.UpdateCommand.Parameters(22).Value = Global.System.DBNull.Value
+            End If
+            If (Original_is_realtime.HasValue = true) Then
+                Me.Adapter.UpdateCommand.Parameters(23).Value = CType(0,Object)
+                Me.Adapter.UpdateCommand.Parameters(24).Value = CType(Original_is_realtime.Value,Long)
+            Else
+                Me.Adapter.UpdateCommand.Parameters(23).Value = CType(1,Object)
+                Me.Adapter.UpdateCommand.Parameters(24).Value = Global.System.DBNull.Value
+            End If
+            Dim previousConnectionState As Global.System.Data.ConnectionState = Me.Adapter.UpdateCommand.Connection.State
+            If ((Me.Adapter.UpdateCommand.Connection.State And Global.System.Data.ConnectionState.Open)  _
+                        <> Global.System.Data.ConnectionState.Open) Then
+                Me.Adapter.UpdateCommand.Connection.Open
+            End If
+            Try 
+                Dim returnValue As Integer = Me.Adapter.UpdateCommand.ExecuteNonQuery
+                Return returnValue
+            Finally
+                If (previousConnectionState = Global.System.Data.ConnectionState.Closed) Then
+                    Me.Adapter.UpdateCommand.Connection.Close
+                End If
+            End Try
+        End Function
+    End Class
+    
+    '''<summary>
+    '''Represents the connection and commands used to retrieve and save data.
+    '''</summary>
+    <Global.System.ComponentModel.DesignerCategoryAttribute("code"),  _
+     Global.System.ComponentModel.ToolboxItem(true),  _
+     Global.System.ComponentModel.DataObjectAttribute(true),  _
+     Global.System.ComponentModel.DesignerAttribute("Microsoft.VSDesigner.DataSource.Design.TableAdapterDesigner, Microsoft.VSDesigner"& _ 
+        ", Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"),  _
+     Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")>  _
+    Partial Public Class field_setTableAdapter
+        Inherits Global.System.ComponentModel.Component
+        
+        Private WithEvents _adapter As Global.System.Data.SQLite.SQLiteDataAdapter
+        
+        Private _connection As Global.System.Data.SQLite.SQLiteConnection
+        
+        Private _transaction As Global.System.Data.SQLite.SQLiteTransaction
+        
+        Private _commandCollection() As Global.System.Data.SQLite.SQLiteCommand
+        
+        Private _clearBeforeFill As Boolean
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub New()
+            MyBase.New
+            Me.ClearBeforeFill = true
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Protected Friend ReadOnly Property Adapter() As Global.System.Data.SQLite.SQLiteDataAdapter
+            Get
+                If (Me._adapter Is Nothing) Then
+                    Me.InitAdapter
+                End If
+                Return Me._adapter
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Friend Property Connection() As Global.System.Data.SQLite.SQLiteConnection
+            Get
+                If (Me._connection Is Nothing) Then
+                    Me.InitConnection
+                End If
+                Return Me._connection
+            End Get
+            Set
+                Me._connection = value
+                If (Not (Me.Adapter.InsertCommand) Is Nothing) Then
+                    Me.Adapter.InsertCommand.Connection = value
+                End If
+                If (Not (Me.Adapter.DeleteCommand) Is Nothing) Then
+                    Me.Adapter.DeleteCommand.Connection = value
+                End If
+                If (Not (Me.Adapter.UpdateCommand) Is Nothing) Then
+                    Me.Adapter.UpdateCommand.Connection = value
+                End If
+                Dim i As Integer = 0
+                Do While (i < Me.CommandCollection.Length)
+                    If (Not (Me.CommandCollection(i)) Is Nothing) Then
+                        CType(Me.CommandCollection(i),Global.System.Data.SQLite.SQLiteCommand).Connection = value
+                    End If
+                    i = (i + 1)
+                Loop
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Friend Property Transaction() As Global.System.Data.SQLite.SQLiteTransaction
+            Get
+                Return Me._transaction
+            End Get
+            Set
+                Me._transaction = value
+                Dim i As Integer = 0
+                Do While (i < Me.CommandCollection.Length)
+                    Me.CommandCollection(i).Transaction = Me._transaction
+                    i = (i + 1)
+                Loop
+                If ((Not (Me.Adapter) Is Nothing)  _
+                            AndAlso (Not (Me.Adapter.DeleteCommand) Is Nothing)) Then
+                    Me.Adapter.DeleteCommand.Transaction = Me._transaction
+                End If
+                If ((Not (Me.Adapter) Is Nothing)  _
+                            AndAlso (Not (Me.Adapter.InsertCommand) Is Nothing)) Then
+                    Me.Adapter.InsertCommand.Transaction = Me._transaction
+                End If
+                If ((Not (Me.Adapter) Is Nothing)  _
+                            AndAlso (Not (Me.Adapter.UpdateCommand) Is Nothing)) Then
+                    Me.Adapter.UpdateCommand.Transaction = Me._transaction
+                End If
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Protected ReadOnly Property CommandCollection() As Global.System.Data.SQLite.SQLiteCommand()
+            Get
+                If (Me._commandCollection Is Nothing) Then
+                    Me.InitCommandCollection
+                End If
+                Return Me._commandCollection
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property ClearBeforeFill() As Boolean
+            Get
+                Return Me._clearBeforeFill
+            End Get
+            Set
+                Me._clearBeforeFill = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Private Sub InitAdapter()
+            Me._adapter = New Global.System.Data.SQLite.SQLiteDataAdapter()
+            Dim tableMapping As Global.System.Data.Common.DataTableMapping = New Global.System.Data.Common.DataTableMapping()
+            tableMapping.SourceTable = "Table"
+            tableMapping.DataSetTable = "field_set"
+            tableMapping.ColumnMappings.Add("id", "id")
+            tableMapping.ColumnMappings.Add("name", "name")
+            Me._adapter.TableMappings.Add(tableMapping)
+            Me._adapter.DeleteCommand = New Global.System.Data.SQLite.SQLiteCommand()
+            Me._adapter.DeleteCommand.Connection = Me.Connection
+            Me._adapter.DeleteCommand.CommandText = "DELETE FROM [main].[sqlite_default_schema].[field_set] WHERE (([id] = @Original_i"& _ 
+                "d) AND ((@IsNull_name = 1 AND [name] IS NULL) OR ([name] = @Original_name)))"
+            Me._adapter.DeleteCommand.CommandType = Global.System.Data.CommandType.Text
+            Dim param As Global.System.Data.SQLite.SQLiteParameter = New Global.System.Data.SQLite.SQLiteParameter()
+            param.ParameterName = "@Original_id"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "id"
             param.SourceVersion = Global.System.Data.DataRowVersion.Original
             Me._adapter.DeleteCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
@@ -25901,40 +23875,14 @@ Namespace BondsDataSetTableAdapters
             Me._adapter.DeleteCommand.Parameters.Add(param)
             Me._adapter.InsertCommand = New Global.System.Data.SQLite.SQLiteCommand()
             Me._adapter.InsertCommand.Connection = Me.Connection
-            Me._adapter.InsertCommand.CommandText = "INSERT INTO [main].[sqlite_default_schema].[fields_layout] ([bid_field], [ask_fie"& _ 
-                "ld], [last_field], [hist_field], [vwap_field], [volume_field], [name]) VALUES (@"& _ 
-                "bid_field, @ask_field, @last_field, @hist_field, @vwap_field, @volume_field, @na"& _ 
-                "me)"
+            Me._adapter.InsertCommand.CommandText = "INSERT INTO [main].[sqlite_default_schema].[field_set] ([id], [name]) VALUES (@id"& _ 
+                ", @name)"
             Me._adapter.InsertCommand.CommandType = Global.System.Data.CommandType.Text
             param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@bid_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "bid_field"
-            Me._adapter.InsertCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@ask_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "ask_field"
-            Me._adapter.InsertCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@last_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "last_field"
-            Me._adapter.InsertCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@hist_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "hist_field"
-            Me._adapter.InsertCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@vwap_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "vwap_field"
-            Me._adapter.InsertCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@volume_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "volume_field"
+            param.ParameterName = "@id"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "id"
             Me._adapter.InsertCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@name"
@@ -25943,45 +23891,15 @@ Namespace BondsDataSetTableAdapters
             Me._adapter.InsertCommand.Parameters.Add(param)
             Me._adapter.UpdateCommand = New Global.System.Data.SQLite.SQLiteCommand()
             Me._adapter.UpdateCommand.Connection = Me.Connection
-            Me._adapter.UpdateCommand.CommandText = "UPDATE [main].[sqlite_default_schema].[fields_layout] SET [bid_field] = @bid_fiel"& _ 
-                "d, [ask_field] = @ask_field, [last_field] = @last_field, [hist_field] = @hist_fi"& _ 
-                "eld, [vwap_field] = @vwap_field, [volume_field] = @volume_field, [name] = @name "& _ 
-                "WHERE (([id] = @Original_id) AND ([bid_field] = @Original_bid_field) AND ([ask_f"& _ 
-                "ield] = @Original_ask_field) AND ([last_field] = @Original_last_field) AND ([his"& _ 
-                "t_field] = @Original_hist_field) AND ((@IsNull_vwap_field = 1 AND [vwap_field] I"& _ 
-                "S NULL) OR ([vwap_field] = @Original_vwap_field)) AND ((@IsNull_volume_field = 1"& _ 
-                " AND [volume_field] IS NULL) OR ([volume_field] = @Original_volume_field)) AND ("& _ 
-                "(@IsNull_name = 1 AND [name] IS NULL) OR ([name] = @Original_name)))"
+            Me._adapter.UpdateCommand.CommandText = "UPDATE [main].[sqlite_default_schema].[field_set] SET [id] = @id, [name] = @name "& _ 
+                "WHERE (([id] = @Original_id) AND ((@IsNull_name = 1 AND [name] IS NULL) OR ([nam"& _ 
+                "e] = @Original_name)))"
             Me._adapter.UpdateCommand.CommandType = Global.System.Data.CommandType.Text
             param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@bid_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "bid_field"
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@ask_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "ask_field"
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@last_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "last_field"
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@hist_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "hist_field"
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@vwap_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "vwap_field"
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@volume_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "volume_field"
+            param.ParameterName = "@id"
+            param.DbType = Global.System.Data.DbType.Int64
+            param.DbType = Global.System.Data.DbType.Int64
+            param.SourceColumn = "id"
             Me._adapter.UpdateCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
             param.ParameterName = "@name"
@@ -25993,58 +23911,6 @@ Namespace BondsDataSetTableAdapters
             param.DbType = Global.System.Data.DbType.Int64
             param.DbType = Global.System.Data.DbType.Int64
             param.SourceColumn = "id"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_bid_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "bid_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_ask_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "ask_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_last_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "last_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_hist_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "hist_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_vwap_field"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "vwap_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_vwap_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "vwap_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@IsNull_volume_field"
-            param.DbType = Global.System.Data.DbType.Int32
-            param.DbType = Global.System.Data.DbType.Int32
-            param.SourceColumn = "volume_field"
-            param.SourceVersion = Global.System.Data.DataRowVersion.Original
-            param.SourceColumnNullMapping = true
-            Me._adapter.UpdateCommand.Parameters.Add(param)
-            param = New Global.System.Data.SQLite.SQLiteParameter()
-            param.ParameterName = "@Original_volume_field"
-            param.DbType = Global.System.Data.DbType.[String]
-            param.SourceColumn = "volume_field"
             param.SourceVersion = Global.System.Data.DataRowVersion.Original
             Me._adapter.UpdateCommand.Parameters.Add(param)
             param = New Global.System.Data.SQLite.SQLiteParameter()
@@ -26076,8 +23942,7 @@ Namespace BondsDataSetTableAdapters
             Me._commandCollection = New Global.System.Data.SQLite.SQLiteCommand(0) {}
             Me._commandCollection(0) = New Global.System.Data.SQLite.SQLiteCommand()
             Me._commandCollection(0).Connection = Me.Connection
-            Me._commandCollection(0).CommandText = "SELECT [id], [bid_field], [ask_field], [last_field], [hist_field], [vwap_field], "& _ 
-                "[volume_field], [name] FROM [fields_layout]"
+            Me._commandCollection(0).CommandText = "SELECT [id], [name] FROM [field_set]"
             Me._commandCollection(0).CommandType = Global.System.Data.CommandType.Text
         End Sub
         
@@ -26085,7 +23950,7 @@ Namespace BondsDataSetTableAdapters
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
          Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
          Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Fill, true)>  _
-        Public Overloads Overridable Function Fill(ByVal dataTable As BondsDataSet.fields_layoutDataTable) As Integer
+        Public Overloads Overridable Function Fill(ByVal dataTable As BondsDataSet.field_setDataTable) As Integer
             Me.Adapter.SelectCommand = Me.CommandCollection(0)
             If (Me.ClearBeforeFill = true) Then
                 dataTable.Clear
@@ -26098,9 +23963,9 @@ Namespace BondsDataSetTableAdapters
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
          Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
          Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.[Select], true)>  _
-        Public Overloads Overridable Function GetData() As BondsDataSet.fields_layoutDataTable
+        Public Overloads Overridable Function GetData() As BondsDataSet.field_setDataTable
             Me.Adapter.SelectCommand = Me.CommandCollection(0)
-            Dim dataTable As BondsDataSet.fields_layoutDataTable = New BondsDataSet.fields_layoutDataTable()
+            Dim dataTable As BondsDataSet.field_setDataTable = New BondsDataSet.field_setDataTable()
             Me.Adapter.Fill(dataTable)
             Return dataTable
         End Function
@@ -26108,7 +23973,7 @@ Namespace BondsDataSetTableAdapters
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
          Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")>  _
-        Public Overloads Overridable Function Update(ByVal dataTable As BondsDataSet.fields_layoutDataTable) As Integer
+        Public Overloads Overridable Function Update(ByVal dataTable As BondsDataSet.field_setDataTable) As Integer
             Return Me.Adapter.Update(dataTable)
         End Function
         
@@ -26116,7 +23981,7 @@ Namespace BondsDataSetTableAdapters
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
          Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")>  _
         Public Overloads Overridable Function Update(ByVal dataSet As BondsDataSet) As Integer
-            Return Me.Adapter.Update(dataSet, "fields_layout")
+            Return Me.Adapter.Update(dataSet, "field_set")
         End Function
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
@@ -26137,48 +24002,14 @@ Namespace BondsDataSetTableAdapters
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
          Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
          Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Delete, true)>  _
-        Public Overloads Overridable Function Delete(ByVal Original_id As Long, ByVal Original_bid_field As String, ByVal Original_ask_field As String, ByVal Original_last_field As String, ByVal Original_hist_field As String, ByVal Original_vwap_field As String, ByVal Original_volume_field As String, ByVal Original_name As String) As Integer
+        Public Overloads Overridable Function Delete(ByVal Original_id As Long, ByVal Original_name As String) As Integer
             Me.Adapter.DeleteCommand.Parameters(0).Value = CType(Original_id,Long)
-            If (Original_bid_field Is Nothing) Then
-                Throw New Global.System.ArgumentNullException("Original_bid_field")
-            Else
-                Me.Adapter.DeleteCommand.Parameters(1).Value = CType(Original_bid_field,String)
-            End If
-            If (Original_ask_field Is Nothing) Then
-                Throw New Global.System.ArgumentNullException("Original_ask_field")
-            Else
-                Me.Adapter.DeleteCommand.Parameters(2).Value = CType(Original_ask_field,String)
-            End If
-            If (Original_last_field Is Nothing) Then
-                Throw New Global.System.ArgumentNullException("Original_last_field")
-            Else
-                Me.Adapter.DeleteCommand.Parameters(3).Value = CType(Original_last_field,String)
-            End If
-            If (Original_hist_field Is Nothing) Then
-                Throw New Global.System.ArgumentNullException("Original_hist_field")
-            Else
-                Me.Adapter.DeleteCommand.Parameters(4).Value = CType(Original_hist_field,String)
-            End If
-            If (Original_vwap_field Is Nothing) Then
-                Me.Adapter.DeleteCommand.Parameters(5).Value = CType(1,Object)
-                Me.Adapter.DeleteCommand.Parameters(6).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.DeleteCommand.Parameters(5).Value = CType(0,Object)
-                Me.Adapter.DeleteCommand.Parameters(6).Value = CType(Original_vwap_field,String)
-            End If
-            If (Original_volume_field Is Nothing) Then
-                Me.Adapter.DeleteCommand.Parameters(7).Value = CType(1,Object)
-                Me.Adapter.DeleteCommand.Parameters(8).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.DeleteCommand.Parameters(7).Value = CType(0,Object)
-                Me.Adapter.DeleteCommand.Parameters(8).Value = CType(Original_volume_field,String)
-            End If
             If (Original_name Is Nothing) Then
-                Me.Adapter.DeleteCommand.Parameters(9).Value = CType(1,Object)
-                Me.Adapter.DeleteCommand.Parameters(10).Value = Global.System.DBNull.Value
+                Me.Adapter.DeleteCommand.Parameters(1).Value = CType(1,Object)
+                Me.Adapter.DeleteCommand.Parameters(2).Value = Global.System.DBNull.Value
             Else
-                Me.Adapter.DeleteCommand.Parameters(9).Value = CType(0,Object)
-                Me.Adapter.DeleteCommand.Parameters(10).Value = CType(Original_name,String)
+                Me.Adapter.DeleteCommand.Parameters(1).Value = CType(0,Object)
+                Me.Adapter.DeleteCommand.Parameters(2).Value = CType(Original_name,String)
             End If
             Dim previousConnectionState As Global.System.Data.ConnectionState = Me.Adapter.DeleteCommand.Connection.State
             If ((Me.Adapter.DeleteCommand.Connection.State And Global.System.Data.ConnectionState.Open)  _
@@ -26199,41 +24030,12 @@ Namespace BondsDataSetTableAdapters
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
          Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
          Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Insert, true)>  _
-        Public Overloads Overridable Function Insert(ByVal bid_field As String, ByVal ask_field As String, ByVal last_field As String, ByVal hist_field As String, ByVal vwap_field As String, ByVal volume_field As String, ByVal name As String) As Integer
-            If (bid_field Is Nothing) Then
-                Throw New Global.System.ArgumentNullException("bid_field")
-            Else
-                Me.Adapter.InsertCommand.Parameters(0).Value = CType(bid_field,String)
-            End If
-            If (ask_field Is Nothing) Then
-                Throw New Global.System.ArgumentNullException("ask_field")
-            Else
-                Me.Adapter.InsertCommand.Parameters(1).Value = CType(ask_field,String)
-            End If
-            If (last_field Is Nothing) Then
-                Throw New Global.System.ArgumentNullException("last_field")
-            Else
-                Me.Adapter.InsertCommand.Parameters(2).Value = CType(last_field,String)
-            End If
-            If (hist_field Is Nothing) Then
-                Throw New Global.System.ArgumentNullException("hist_field")
-            Else
-                Me.Adapter.InsertCommand.Parameters(3).Value = CType(hist_field,String)
-            End If
-            If (vwap_field Is Nothing) Then
-                Me.Adapter.InsertCommand.Parameters(4).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.InsertCommand.Parameters(4).Value = CType(vwap_field,String)
-            End If
-            If (volume_field Is Nothing) Then
-                Me.Adapter.InsertCommand.Parameters(5).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.InsertCommand.Parameters(5).Value = CType(volume_field,String)
-            End If
+        Public Overloads Overridable Function Insert(ByVal id As Long, ByVal name As String) As Integer
+            Me.Adapter.InsertCommand.Parameters(0).Value = CType(id,Long)
             If (name Is Nothing) Then
-                Me.Adapter.InsertCommand.Parameters(6).Value = Global.System.DBNull.Value
+                Me.Adapter.InsertCommand.Parameters(1).Value = Global.System.DBNull.Value
             Else
-                Me.Adapter.InsertCommand.Parameters(6).Value = CType(name,String)
+                Me.Adapter.InsertCommand.Parameters(1).Value = CType(name,String)
             End If
             Dim previousConnectionState As Global.System.Data.ConnectionState = Me.Adapter.InsertCommand.Connection.State
             If ((Me.Adapter.InsertCommand.Connection.State And Global.System.Data.ConnectionState.Open)  _
@@ -26254,83 +24056,20 @@ Namespace BondsDataSetTableAdapters
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
          Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
          Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Update, true)>  _
-        Public Overloads Overridable Function Update(ByVal bid_field As String, ByVal ask_field As String, ByVal last_field As String, ByVal hist_field As String, ByVal vwap_field As String, ByVal volume_field As String, ByVal name As String, ByVal Original_id As Long, ByVal Original_bid_field As String, ByVal Original_ask_field As String, ByVal Original_last_field As String, ByVal Original_hist_field As String, ByVal Original_vwap_field As String, ByVal Original_volume_field As String, ByVal Original_name As String) As Integer
-            If (bid_field Is Nothing) Then
-                Throw New Global.System.ArgumentNullException("bid_field")
+        Public Overloads Overridable Function Update(ByVal id As Long, ByVal name As String, ByVal Original_id As Long, ByVal Original_name As String) As Integer
+            Me.Adapter.UpdateCommand.Parameters(0).Value = CType(id,Long)
+            If (name Is Nothing) Then
+                Me.Adapter.UpdateCommand.Parameters(1).Value = Global.System.DBNull.Value
             Else
-                Me.Adapter.UpdateCommand.Parameters(0).Value = CType(bid_field,String)
+                Me.Adapter.UpdateCommand.Parameters(1).Value = CType(name,String)
             End If
-            If (ask_field Is Nothing) Then
-                Throw New Global.System.ArgumentNullException("ask_field")
-            Else
-                Me.Adapter.UpdateCommand.Parameters(1).Value = CType(ask_field,String)
-            End If
-            If (last_field Is Nothing) Then
-                Throw New Global.System.ArgumentNullException("last_field")
-            Else
-                Me.Adapter.UpdateCommand.Parameters(2).Value = CType(last_field,String)
-            End If
-            If (hist_field Is Nothing) Then
-                Throw New Global.System.ArgumentNullException("hist_field")
-            Else
-                Me.Adapter.UpdateCommand.Parameters(3).Value = CType(hist_field,String)
-            End If
-            If (vwap_field Is Nothing) Then
+            Me.Adapter.UpdateCommand.Parameters(2).Value = CType(Original_id,Long)
+            If (Original_name Is Nothing) Then
+                Me.Adapter.UpdateCommand.Parameters(3).Value = CType(1,Object)
                 Me.Adapter.UpdateCommand.Parameters(4).Value = Global.System.DBNull.Value
             Else
-                Me.Adapter.UpdateCommand.Parameters(4).Value = CType(vwap_field,String)
-            End If
-            If (volume_field Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(5).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(5).Value = CType(volume_field,String)
-            End If
-            If (name Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(6).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(6).Value = CType(name,String)
-            End If
-            Me.Adapter.UpdateCommand.Parameters(7).Value = CType(Original_id,Long)
-            If (Original_bid_field Is Nothing) Then
-                Throw New Global.System.ArgumentNullException("Original_bid_field")
-            Else
-                Me.Adapter.UpdateCommand.Parameters(8).Value = CType(Original_bid_field,String)
-            End If
-            If (Original_ask_field Is Nothing) Then
-                Throw New Global.System.ArgumentNullException("Original_ask_field")
-            Else
-                Me.Adapter.UpdateCommand.Parameters(9).Value = CType(Original_ask_field,String)
-            End If
-            If (Original_last_field Is Nothing) Then
-                Throw New Global.System.ArgumentNullException("Original_last_field")
-            Else
-                Me.Adapter.UpdateCommand.Parameters(10).Value = CType(Original_last_field,String)
-            End If
-            If (Original_hist_field Is Nothing) Then
-                Throw New Global.System.ArgumentNullException("Original_hist_field")
-            Else
-                Me.Adapter.UpdateCommand.Parameters(11).Value = CType(Original_hist_field,String)
-            End If
-            If (Original_vwap_field Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(12).Value = CType(1,Object)
-                Me.Adapter.UpdateCommand.Parameters(13).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(12).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(13).Value = CType(Original_vwap_field,String)
-            End If
-            If (Original_volume_field Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(14).Value = CType(1,Object)
-                Me.Adapter.UpdateCommand.Parameters(15).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(14).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(15).Value = CType(Original_volume_field,String)
-            End If
-            If (Original_name Is Nothing) Then
-                Me.Adapter.UpdateCommand.Parameters(16).Value = CType(1,Object)
-                Me.Adapter.UpdateCommand.Parameters(17).Value = Global.System.DBNull.Value
-            Else
-                Me.Adapter.UpdateCommand.Parameters(16).Value = CType(0,Object)
-                Me.Adapter.UpdateCommand.Parameters(17).Value = CType(Original_name,String)
+                Me.Adapter.UpdateCommand.Parameters(3).Value = CType(0,Object)
+                Me.Adapter.UpdateCommand.Parameters(4).Value = CType(Original_name,String)
             End If
             Dim previousConnectionState As Global.System.Data.ConnectionState = Me.Adapter.UpdateCommand.Connection.State
             If ((Me.Adapter.UpdateCommand.Connection.State And Global.System.Data.ConnectionState.Open)  _
@@ -26345,6 +24084,203 @@ Namespace BondsDataSetTableAdapters
                     Me.Adapter.UpdateCommand.Connection.Close
                 End If
             End Try
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
+         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
+         Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Update, true)>  _
+        Public Overloads Overridable Function Update(ByVal name As String, ByVal Original_id As Long, ByVal Original_name As String) As Integer
+            Return Me.Update(Original_id, name, Original_id, Original_name)
+        End Function
+    End Class
+    
+    '''<summary>
+    '''Represents the connection and commands used to retrieve and save data.
+    '''</summary>
+    <Global.System.ComponentModel.DesignerCategoryAttribute("code"),  _
+     Global.System.ComponentModel.ToolboxItem(true),  _
+     Global.System.ComponentModel.DataObjectAttribute(true),  _
+     Global.System.ComponentModel.DesignerAttribute("Microsoft.VSDesigner.DataSource.Design.TableAdapterDesigner, Microsoft.VSDesigner"& _ 
+        ", Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"),  _
+     Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter")>  _
+    Partial Public Class PortfolioUnitedTableAdapter
+        Inherits Global.System.ComponentModel.Component
+        
+        Private WithEvents _adapter As Global.System.Data.SQLite.SQLiteDataAdapter
+        
+        Private _connection As Global.System.Data.SQLite.SQLiteConnection
+        
+        Private _transaction As Global.System.Data.SQLite.SQLiteTransaction
+        
+        Private _commandCollection() As Global.System.Data.SQLite.SQLiteCommand
+        
+        Private _clearBeforeFill As Boolean
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub New()
+            MyBase.New
+            Me.ClearBeforeFill = true
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Protected Friend ReadOnly Property Adapter() As Global.System.Data.SQLite.SQLiteDataAdapter
+            Get
+                If (Me._adapter Is Nothing) Then
+                    Me.InitAdapter
+                End If
+                Return Me._adapter
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Friend Property Connection() As Global.System.Data.SQLite.SQLiteConnection
+            Get
+                If (Me._connection Is Nothing) Then
+                    Me.InitConnection
+                End If
+                Return Me._connection
+            End Get
+            Set
+                Me._connection = value
+                If (Not (Me.Adapter.InsertCommand) Is Nothing) Then
+                    Me.Adapter.InsertCommand.Connection = value
+                End If
+                If (Not (Me.Adapter.DeleteCommand) Is Nothing) Then
+                    Me.Adapter.DeleteCommand.Connection = value
+                End If
+                If (Not (Me.Adapter.UpdateCommand) Is Nothing) Then
+                    Me.Adapter.UpdateCommand.Connection = value
+                End If
+                Dim i As Integer = 0
+                Do While (i < Me.CommandCollection.Length)
+                    If (Not (Me.CommandCollection(i)) Is Nothing) Then
+                        CType(Me.CommandCollection(i),Global.System.Data.SQLite.SQLiteCommand).Connection = value
+                    End If
+                    i = (i + 1)
+                Loop
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Friend Property Transaction() As Global.System.Data.SQLite.SQLiteTransaction
+            Get
+                Return Me._transaction
+            End Get
+            Set
+                Me._transaction = value
+                Dim i As Integer = 0
+                Do While (i < Me.CommandCollection.Length)
+                    Me.CommandCollection(i).Transaction = Me._transaction
+                    i = (i + 1)
+                Loop
+                If ((Not (Me.Adapter) Is Nothing)  _
+                            AndAlso (Not (Me.Adapter.DeleteCommand) Is Nothing)) Then
+                    Me.Adapter.DeleteCommand.Transaction = Me._transaction
+                End If
+                If ((Not (Me.Adapter) Is Nothing)  _
+                            AndAlso (Not (Me.Adapter.InsertCommand) Is Nothing)) Then
+                    Me.Adapter.InsertCommand.Transaction = Me._transaction
+                End If
+                If ((Not (Me.Adapter) Is Nothing)  _
+                            AndAlso (Not (Me.Adapter.UpdateCommand) Is Nothing)) Then
+                    Me.Adapter.UpdateCommand.Transaction = Me._transaction
+                End If
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Protected ReadOnly Property CommandCollection() As Global.System.Data.SQLite.SQLiteCommand()
+            Get
+                If (Me._commandCollection Is Nothing) Then
+                    Me.InitCommandCollection
+                End If
+                Return Me._commandCollection
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property ClearBeforeFill() As Boolean
+            Get
+                Return Me._clearBeforeFill
+            End Get
+            Set
+                Me._clearBeforeFill = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Private Sub InitAdapter()
+            Me._adapter = New Global.System.Data.SQLite.SQLiteDataAdapter()
+            Dim tableMapping As Global.System.Data.Common.DataTableMapping = New Global.System.Data.Common.DataTableMapping()
+            tableMapping.SourceTable = "Table"
+            tableMapping.DataSetTable = "PortfolioUnited"
+            tableMapping.ColumnMappings.Add("pid", "pid")
+            tableMapping.ColumnMappings.Add("bid", "bid")
+            tableMapping.ColumnMappings.Add("ric", "ric")
+            tableMapping.ColumnMappings.Add("payments", "payments")
+            tableMapping.ColumnMappings.Add("rates", "rates")
+            tableMapping.ColumnMappings.Add("bondshortname", "bondshortname")
+            tableMapping.ColumnMappings.Add("dsply_name", "dsply_name")
+            tableMapping.ColumnMappings.Add("include", "include")
+            tableMapping.ColumnMappings.Add("color", "color")
+            tableMapping.ColumnMappings.Add("whereFrom", "whereFrom")
+            tableMapping.ColumnMappings.Add("fromID", "fromID")
+            tableMapping.ColumnMappings.Add("portfolio_name", "portfolio_name")
+            tableMapping.ColumnMappings.Add("whereFromName", "whereFromName")
+            tableMapping.ColumnMappings.Add("whereFromDescr", "whereFromDescr")
+            tableMapping.ColumnMappings.Add("id_field_set", "id_field_set")
+            Me._adapter.TableMappings.Add(tableMapping)
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Private Sub InitConnection()
+            Me._connection = New Global.System.Data.SQLite.SQLiteConnection()
+            Me._connection.ConnectionString = Global.YieldMap.My.Settings.Default.bondsConnectionString
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Private Sub InitCommandCollection()
+            Me._commandCollection = New Global.System.Data.SQLite.SQLiteCommand(0) {}
+            Me._commandCollection(0) = New Global.System.Data.SQLite.SQLiteCommand()
+            Me._commandCollection(0).Connection = Me.Connection
+            Me._commandCollection(0).CommandText = "SELECT [pid], [bid], [ric], [payments], [rates], [bondshortname], [dsply_name], ["& _ 
+                "include], [color], [whereFrom], [fromID], [portfolio_name], [whereFromName], [wh"& _ 
+                "ereFromDescr], [id_field_set] FROM [PortfolioUnited]"
+            Me._commandCollection(0).CommandType = Global.System.Data.CommandType.Text
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
+         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
+         Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.Fill, true)>  _
+        Public Overloads Overridable Function Fill(ByVal dataTable As BondsDataSet.PortfolioUnitedDataTable) As Integer
+            Me.Adapter.SelectCommand = Me.CommandCollection(0)
+            If (Me.ClearBeforeFill = true) Then
+                dataTable.Clear
+            End If
+            Dim returnValue As Integer = Me.Adapter.Fill(dataTable)
+            Return returnValue
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
+         Global.System.ComponentModel.Design.HelpKeywordAttribute("vs.data.TableAdapter"),  _
+         Global.System.ComponentModel.DataObjectMethodAttribute(Global.System.ComponentModel.DataObjectMethodType.[Select], true)>  _
+        Public Overloads Overridable Function GetData() As BondsDataSet.PortfolioUnitedDataTable
+            Me.Adapter.SelectCommand = Me.CommandCollection(0)
+            Dim dataTable As BondsDataSet.PortfolioUnitedDataTable = New BondsDataSet.PortfolioUnitedDataTable()
+            Me.Adapter.Fill(dataTable)
+            Return dataTable
         End Function
     End Class
     
@@ -26381,13 +24317,13 @@ Namespace BondsDataSetTableAdapters
         
         Private _hawser_to_bondTableAdapter As hawser_to_bondTableAdapter
         
-        Private _portfolio_to_bondTableAdapter As portfolio_to_bondTableAdapter
-        
         Private _portfolio_to_chainTableAdapter As portfolio_to_chainTableAdapter
         
         Private _portfolio_to_hawserTableAdapter As portfolio_to_hawserTableAdapter
         
-        Private _fields_layoutTableAdapter As fields_layoutTableAdapter
+        Private _field_layoutTableAdapter As field_layoutTableAdapter
+        
+        Private _field_setTableAdapter As field_setTableAdapter
         
         Private _backupDataSetBeforeUpdate As Boolean
         
@@ -26549,20 +24485,6 @@ Namespace BondsDataSetTableAdapters
          Global.System.ComponentModel.EditorAttribute("Microsoft.VSDesigner.DataSource.Design.TableAdapterManagerPropertyEditor, Microso"& _ 
             "ft.VSDesigner, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3"& _ 
             "a", "System.Drawing.Design.UITypeEditor")>  _
-        Public Property portfolio_to_bondTableAdapter() As portfolio_to_bondTableAdapter
-            Get
-                Return Me._portfolio_to_bondTableAdapter
-            End Get
-            Set
-                Me._portfolio_to_bondTableAdapter = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
-         Global.System.ComponentModel.EditorAttribute("Microsoft.VSDesigner.DataSource.Design.TableAdapterManagerPropertyEditor, Microso"& _ 
-            "ft.VSDesigner, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3"& _ 
-            "a", "System.Drawing.Design.UITypeEditor")>  _
         Public Property portfolio_to_chainTableAdapter() As portfolio_to_chainTableAdapter
             Get
                 Return Me._portfolio_to_chainTableAdapter
@@ -26591,12 +24513,26 @@ Namespace BondsDataSetTableAdapters
          Global.System.ComponentModel.EditorAttribute("Microsoft.VSDesigner.DataSource.Design.TableAdapterManagerPropertyEditor, Microso"& _ 
             "ft.VSDesigner, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3"& _ 
             "a", "System.Drawing.Design.UITypeEditor")>  _
-        Public Property fields_layoutTableAdapter() As fields_layoutTableAdapter
+        Public Property field_layoutTableAdapter() As field_layoutTableAdapter
             Get
-                Return Me._fields_layoutTableAdapter
+                Return Me._field_layoutTableAdapter
             End Get
             Set
-                Me._fields_layoutTableAdapter = value
+                Me._field_layoutTableAdapter = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
+         Global.System.ComponentModel.EditorAttribute("Microsoft.VSDesigner.DataSource.Design.TableAdapterManagerPropertyEditor, Microso"& _ 
+            "ft.VSDesigner, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3"& _ 
+            "a", "System.Drawing.Design.UITypeEditor")>  _
+        Public Property field_setTableAdapter() As field_setTableAdapter
+            Get
+                Return Me._field_setTableAdapter
+            End Get
+            Set
+                Me._field_setTableAdapter = value
             End Set
         End Property
         
@@ -26659,10 +24595,6 @@ Namespace BondsDataSetTableAdapters
                             AndAlso (Not (Me._hawser_to_bondTableAdapter.Connection) Is Nothing)) Then
                     Return Me._hawser_to_bondTableAdapter.Connection
                 End If
-                If ((Not (Me._portfolio_to_bondTableAdapter) Is Nothing)  _
-                            AndAlso (Not (Me._portfolio_to_bondTableAdapter.Connection) Is Nothing)) Then
-                    Return Me._portfolio_to_bondTableAdapter.Connection
-                End If
                 If ((Not (Me._portfolio_to_chainTableAdapter) Is Nothing)  _
                             AndAlso (Not (Me._portfolio_to_chainTableAdapter.Connection) Is Nothing)) Then
                     Return Me._portfolio_to_chainTableAdapter.Connection
@@ -26671,9 +24603,13 @@ Namespace BondsDataSetTableAdapters
                             AndAlso (Not (Me._portfolio_to_hawserTableAdapter.Connection) Is Nothing)) Then
                     Return Me._portfolio_to_hawserTableAdapter.Connection
                 End If
-                If ((Not (Me._fields_layoutTableAdapter) Is Nothing)  _
-                            AndAlso (Not (Me._fields_layoutTableAdapter.Connection) Is Nothing)) Then
-                    Return Me._fields_layoutTableAdapter.Connection
+                If ((Not (Me._field_layoutTableAdapter) Is Nothing)  _
+                            AndAlso (Not (Me._field_layoutTableAdapter.Connection) Is Nothing)) Then
+                    Return Me._field_layoutTableAdapter.Connection
+                End If
+                If ((Not (Me._field_setTableAdapter) Is Nothing)  _
+                            AndAlso (Not (Me._field_setTableAdapter.Connection) Is Nothing)) Then
+                    Return Me._field_setTableAdapter.Connection
                 End If
                 Return Nothing
             End Get
@@ -26718,16 +24654,16 @@ Namespace BondsDataSetTableAdapters
                 If (Not (Me._hawser_to_bondTableAdapter) Is Nothing) Then
                     count = (count + 1)
                 End If
-                If (Not (Me._portfolio_to_bondTableAdapter) Is Nothing) Then
-                    count = (count + 1)
-                End If
                 If (Not (Me._portfolio_to_chainTableAdapter) Is Nothing) Then
                     count = (count + 1)
                 End If
                 If (Not (Me._portfolio_to_hawserTableAdapter) Is Nothing) Then
                     count = (count + 1)
                 End If
-                If (Not (Me._fields_layoutTableAdapter) Is Nothing) Then
+                If (Not (Me._field_layoutTableAdapter) Is Nothing) Then
+                    count = (count + 1)
+                End If
+                If (Not (Me._field_setTableAdapter) Is Nothing) Then
                     count = (count + 1)
                 End If
                 Return count
@@ -26741,24 +24677,6 @@ Namespace BondsDataSetTableAdapters
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Private Function UpdateUpdatedRows(ByVal dataSet As BondsDataSet, ByVal allChangedRows As Global.System.Collections.Generic.List(Of Global.System.Data.DataRow), ByVal allAddedRows As Global.System.Collections.Generic.List(Of Global.System.Data.DataRow)) As Integer
             Dim result As Integer = 0
-            If (Not (Me._portfolio_to_bondTableAdapter) Is Nothing) Then
-                Dim updatedRows() As Global.System.Data.DataRow = dataSet.portfolio_to_bond.Select(Nothing, Nothing, Global.System.Data.DataViewRowState.ModifiedCurrent)
-                updatedRows = Me.GetRealUpdatedRows(updatedRows, allAddedRows)
-                If ((Not (updatedRows) Is Nothing)  _
-                            AndAlso (0 < updatedRows.Length)) Then
-                    result = (result + Me._portfolio_to_bondTableAdapter.Update(updatedRows))
-                    allChangedRows.AddRange(updatedRows)
-                End If
-            End If
-            If (Not (Me._fields_layoutTableAdapter) Is Nothing) Then
-                Dim updatedRows() As Global.System.Data.DataRow = dataSet.fields_layout.Select(Nothing, Nothing, Global.System.Data.DataViewRowState.ModifiedCurrent)
-                updatedRows = Me.GetRealUpdatedRows(updatedRows, allAddedRows)
-                If ((Not (updatedRows) Is Nothing)  _
-                            AndAlso (0 < updatedRows.Length)) Then
-                    result = (result + Me._fields_layoutTableAdapter.Update(updatedRows))
-                    allChangedRows.AddRange(updatedRows)
-                End If
-            End If
             If (Not (Me._portfolio_to_chainTableAdapter) Is Nothing) Then
                 Dim updatedRows() As Global.System.Data.DataRow = dataSet.portfolio_to_chain.Select(Nothing, Nothing, Global.System.Data.DataViewRowState.ModifiedCurrent)
                 updatedRows = Me.GetRealUpdatedRows(updatedRows, allAddedRows)
@@ -26777,12 +24695,21 @@ Namespace BondsDataSetTableAdapters
                     allChangedRows.AddRange(updatedRows)
                 End If
             End If
-            If (Not (Me._hawser_to_bondTableAdapter) Is Nothing) Then
-                Dim updatedRows() As Global.System.Data.DataRow = dataSet.hawser_to_bond.Select(Nothing, Nothing, Global.System.Data.DataViewRowState.ModifiedCurrent)
+            If (Not (Me._field_layoutTableAdapter) Is Nothing) Then
+                Dim updatedRows() As Global.System.Data.DataRow = dataSet.field_layout.Select(Nothing, Nothing, Global.System.Data.DataViewRowState.ModifiedCurrent)
                 updatedRows = Me.GetRealUpdatedRows(updatedRows, allAddedRows)
                 If ((Not (updatedRows) Is Nothing)  _
                             AndAlso (0 < updatedRows.Length)) Then
-                    result = (result + Me._hawser_to_bondTableAdapter.Update(updatedRows))
+                    result = (result + Me._field_layoutTableAdapter.Update(updatedRows))
+                    allChangedRows.AddRange(updatedRows)
+                End If
+            End If
+            If (Not (Me._field_setTableAdapter) Is Nothing) Then
+                Dim updatedRows() As Global.System.Data.DataRow = dataSet.field_set.Select(Nothing, Nothing, Global.System.Data.DataViewRowState.ModifiedCurrent)
+                updatedRows = Me.GetRealUpdatedRows(updatedRows, allAddedRows)
+                If ((Not (updatedRows) Is Nothing)  _
+                            AndAlso (0 < updatedRows.Length)) Then
+                    result = (result + Me._field_setTableAdapter.Update(updatedRows))
                     allChangedRows.AddRange(updatedRows)
                 End If
             End If
@@ -26849,6 +24776,15 @@ Namespace BondsDataSetTableAdapters
                     allChangedRows.AddRange(updatedRows)
                 End If
             End If
+            If (Not (Me._hawser_to_bondTableAdapter) Is Nothing) Then
+                Dim updatedRows() As Global.System.Data.DataRow = dataSet.hawser_to_bond.Select(Nothing, Nothing, Global.System.Data.DataViewRowState.ModifiedCurrent)
+                updatedRows = Me.GetRealUpdatedRows(updatedRows, allAddedRows)
+                If ((Not (updatedRows) Is Nothing)  _
+                            AndAlso (0 < updatedRows.Length)) Then
+                    result = (result + Me._hawser_to_bondTableAdapter.Update(updatedRows))
+                    allChangedRows.AddRange(updatedRows)
+                End If
+            End If
             If (Not (Me._issuerTableAdapter) Is Nothing) Then
                 Dim updatedRows() As Global.System.Data.DataRow = dataSet.issuer.Select(Nothing, Nothing, Global.System.Data.DataViewRowState.ModifiedCurrent)
                 updatedRows = Me.GetRealUpdatedRows(updatedRows, allAddedRows)
@@ -26877,22 +24813,6 @@ Namespace BondsDataSetTableAdapters
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Private Function UpdateInsertedRows(ByVal dataSet As BondsDataSet, ByVal allAddedRows As Global.System.Collections.Generic.List(Of Global.System.Data.DataRow)) As Integer
             Dim result As Integer = 0
-            If (Not (Me._portfolio_to_bondTableAdapter) Is Nothing) Then
-                Dim addedRows() As Global.System.Data.DataRow = dataSet.portfolio_to_bond.Select(Nothing, Nothing, Global.System.Data.DataViewRowState.Added)
-                If ((Not (addedRows) Is Nothing)  _
-                            AndAlso (0 < addedRows.Length)) Then
-                    result = (result + Me._portfolio_to_bondTableAdapter.Update(addedRows))
-                    allAddedRows.AddRange(addedRows)
-                End If
-            End If
-            If (Not (Me._fields_layoutTableAdapter) Is Nothing) Then
-                Dim addedRows() As Global.System.Data.DataRow = dataSet.fields_layout.Select(Nothing, Nothing, Global.System.Data.DataViewRowState.Added)
-                If ((Not (addedRows) Is Nothing)  _
-                            AndAlso (0 < addedRows.Length)) Then
-                    result = (result + Me._fields_layoutTableAdapter.Update(addedRows))
-                    allAddedRows.AddRange(addedRows)
-                End If
-            End If
             If (Not (Me._portfolio_to_chainTableAdapter) Is Nothing) Then
                 Dim addedRows() As Global.System.Data.DataRow = dataSet.portfolio_to_chain.Select(Nothing, Nothing, Global.System.Data.DataViewRowState.Added)
                 If ((Not (addedRows) Is Nothing)  _
@@ -26909,11 +24829,19 @@ Namespace BondsDataSetTableAdapters
                     allAddedRows.AddRange(addedRows)
                 End If
             End If
-            If (Not (Me._hawser_to_bondTableAdapter) Is Nothing) Then
-                Dim addedRows() As Global.System.Data.DataRow = dataSet.hawser_to_bond.Select(Nothing, Nothing, Global.System.Data.DataViewRowState.Added)
+            If (Not (Me._field_layoutTableAdapter) Is Nothing) Then
+                Dim addedRows() As Global.System.Data.DataRow = dataSet.field_layout.Select(Nothing, Nothing, Global.System.Data.DataViewRowState.Added)
                 If ((Not (addedRows) Is Nothing)  _
                             AndAlso (0 < addedRows.Length)) Then
-                    result = (result + Me._hawser_to_bondTableAdapter.Update(addedRows))
+                    result = (result + Me._field_layoutTableAdapter.Update(addedRows))
+                    allAddedRows.AddRange(addedRows)
+                End If
+            End If
+            If (Not (Me._field_setTableAdapter) Is Nothing) Then
+                Dim addedRows() As Global.System.Data.DataRow = dataSet.field_set.Select(Nothing, Nothing, Global.System.Data.DataViewRowState.Added)
+                If ((Not (addedRows) Is Nothing)  _
+                            AndAlso (0 < addedRows.Length)) Then
+                    result = (result + Me._field_setTableAdapter.Update(addedRows))
                     allAddedRows.AddRange(addedRows)
                 End If
             End If
@@ -26973,6 +24901,14 @@ Namespace BondsDataSetTableAdapters
                     allAddedRows.AddRange(addedRows)
                 End If
             End If
+            If (Not (Me._hawser_to_bondTableAdapter) Is Nothing) Then
+                Dim addedRows() As Global.System.Data.DataRow = dataSet.hawser_to_bond.Select(Nothing, Nothing, Global.System.Data.DataViewRowState.Added)
+                If ((Not (addedRows) Is Nothing)  _
+                            AndAlso (0 < addedRows.Length)) Then
+                    result = (result + Me._hawser_to_bondTableAdapter.Update(addedRows))
+                    allAddedRows.AddRange(addedRows)
+                End If
+            End If
             If (Not (Me._issuerTableAdapter) Is Nothing) Then
                 Dim addedRows() As Global.System.Data.DataRow = dataSet.issuer.Select(Nothing, Nothing, Global.System.Data.DataViewRowState.Added)
                 If ((Not (addedRows) Is Nothing)  _
@@ -27012,6 +24948,14 @@ Namespace BondsDataSetTableAdapters
                 If ((Not (deletedRows) Is Nothing)  _
                             AndAlso (0 < deletedRows.Length)) Then
                     result = (result + Me._issuerTableAdapter.Update(deletedRows))
+                    allChangedRows.AddRange(deletedRows)
+                End If
+            End If
+            If (Not (Me._hawser_to_bondTableAdapter) Is Nothing) Then
+                Dim deletedRows() As Global.System.Data.DataRow = dataSet.hawser_to_bond.Select(Nothing, Nothing, Global.System.Data.DataViewRowState.Deleted)
+                If ((Not (deletedRows) Is Nothing)  _
+                            AndAlso (0 < deletedRows.Length)) Then
+                    result = (result + Me._hawser_to_bondTableAdapter.Update(deletedRows))
                     allChangedRows.AddRange(deletedRows)
                 End If
             End If
@@ -27071,11 +25015,19 @@ Namespace BondsDataSetTableAdapters
                     allChangedRows.AddRange(deletedRows)
                 End If
             End If
-            If (Not (Me._hawser_to_bondTableAdapter) Is Nothing) Then
-                Dim deletedRows() As Global.System.Data.DataRow = dataSet.hawser_to_bond.Select(Nothing, Nothing, Global.System.Data.DataViewRowState.Deleted)
+            If (Not (Me._field_setTableAdapter) Is Nothing) Then
+                Dim deletedRows() As Global.System.Data.DataRow = dataSet.field_set.Select(Nothing, Nothing, Global.System.Data.DataViewRowState.Deleted)
                 If ((Not (deletedRows) Is Nothing)  _
                             AndAlso (0 < deletedRows.Length)) Then
-                    result = (result + Me._hawser_to_bondTableAdapter.Update(deletedRows))
+                    result = (result + Me._field_setTableAdapter.Update(deletedRows))
+                    allChangedRows.AddRange(deletedRows)
+                End If
+            End If
+            If (Not (Me._field_layoutTableAdapter) Is Nothing) Then
+                Dim deletedRows() As Global.System.Data.DataRow = dataSet.field_layout.Select(Nothing, Nothing, Global.System.Data.DataViewRowState.Deleted)
+                If ((Not (deletedRows) Is Nothing)  _
+                            AndAlso (0 < deletedRows.Length)) Then
+                    result = (result + Me._field_layoutTableAdapter.Update(deletedRows))
                     allChangedRows.AddRange(deletedRows)
                 End If
             End If
@@ -27092,22 +25044,6 @@ Namespace BondsDataSetTableAdapters
                 If ((Not (deletedRows) Is Nothing)  _
                             AndAlso (0 < deletedRows.Length)) Then
                     result = (result + Me._portfolio_to_chainTableAdapter.Update(deletedRows))
-                    allChangedRows.AddRange(deletedRows)
-                End If
-            End If
-            If (Not (Me._fields_layoutTableAdapter) Is Nothing) Then
-                Dim deletedRows() As Global.System.Data.DataRow = dataSet.fields_layout.Select(Nothing, Nothing, Global.System.Data.DataViewRowState.Deleted)
-                If ((Not (deletedRows) Is Nothing)  _
-                            AndAlso (0 < deletedRows.Length)) Then
-                    result = (result + Me._fields_layoutTableAdapter.Update(deletedRows))
-                    allChangedRows.AddRange(deletedRows)
-                End If
-            End If
-            If (Not (Me._portfolio_to_bondTableAdapter) Is Nothing) Then
-                Dim deletedRows() As Global.System.Data.DataRow = dataSet.portfolio_to_bond.Select(Nothing, Nothing, Global.System.Data.DataViewRowState.Deleted)
-                If ((Not (deletedRows) Is Nothing)  _
-                            AndAlso (0 < deletedRows.Length)) Then
-                    result = (result + Me._portfolio_to_bondTableAdapter.Update(deletedRows))
                     allChangedRows.AddRange(deletedRows)
                 End If
             End If
@@ -27202,11 +25138,6 @@ Namespace BondsDataSetTableAdapters
                 Throw New Global.System.ArgumentException("Все адаптеры таблицы, управляемые диспетчером адаптера таблицы TableAdapterManage"& _ 
                         "r, должны использовать одинаковую строку подключения.")
             End If
-            If ((Not (Me._portfolio_to_bondTableAdapter) Is Nothing)  _
-                        AndAlso (Me.MatchTableAdapterConnection(Me._portfolio_to_bondTableAdapter.Connection) = false)) Then
-                Throw New Global.System.ArgumentException("Все адаптеры таблицы, управляемые диспетчером адаптера таблицы TableAdapterManage"& _ 
-                        "r, должны использовать одинаковую строку подключения.")
-            End If
             If ((Not (Me._portfolio_to_chainTableAdapter) Is Nothing)  _
                         AndAlso (Me.MatchTableAdapterConnection(Me._portfolio_to_chainTableAdapter.Connection) = false)) Then
                 Throw New Global.System.ArgumentException("Все адаптеры таблицы, управляемые диспетчером адаптера таблицы TableAdapterManage"& _ 
@@ -27217,8 +25148,13 @@ Namespace BondsDataSetTableAdapters
                 Throw New Global.System.ArgumentException("Все адаптеры таблицы, управляемые диспетчером адаптера таблицы TableAdapterManage"& _ 
                         "r, должны использовать одинаковую строку подключения.")
             End If
-            If ((Not (Me._fields_layoutTableAdapter) Is Nothing)  _
-                        AndAlso (Me.MatchTableAdapterConnection(Me._fields_layoutTableAdapter.Connection) = false)) Then
+            If ((Not (Me._field_layoutTableAdapter) Is Nothing)  _
+                        AndAlso (Me.MatchTableAdapterConnection(Me._field_layoutTableAdapter.Connection) = false)) Then
+                Throw New Global.System.ArgumentException("Все адаптеры таблицы, управляемые диспетчером адаптера таблицы TableAdapterManage"& _ 
+                        "r, должны использовать одинаковую строку подключения.")
+            End If
+            If ((Not (Me._field_setTableAdapter) Is Nothing)  _
+                        AndAlso (Me.MatchTableAdapterConnection(Me._field_setTableAdapter.Connection) = false)) Then
                 Throw New Global.System.ArgumentException("Все адаптеры таблицы, управляемые диспетчером адаптера таблицы TableAdapterManage"& _ 
                         "r, должны использовать одинаковую строку подключения.")
             End If
@@ -27344,15 +25280,6 @@ Namespace BondsDataSetTableAdapters
                         adaptersWithAcceptChangesDuringUpdate.Add(Me._hawser_to_bondTableAdapter.Adapter)
                     End If
                 End If
-                If (Not (Me._portfolio_to_bondTableAdapter) Is Nothing) Then
-                    revertConnections.Add(Me._portfolio_to_bondTableAdapter, Me._portfolio_to_bondTableAdapter.Connection)
-                    Me._portfolio_to_bondTableAdapter.Connection = CType(workConnection,Global.System.Data.SQLite.SQLiteConnection)
-                    Me._portfolio_to_bondTableAdapter.Transaction = CType(workTransaction,Global.System.Data.SQLite.SQLiteTransaction)
-                    If Me._portfolio_to_bondTableAdapter.Adapter.AcceptChangesDuringUpdate Then
-                        Me._portfolio_to_bondTableAdapter.Adapter.AcceptChangesDuringUpdate = false
-                        adaptersWithAcceptChangesDuringUpdate.Add(Me._portfolio_to_bondTableAdapter.Adapter)
-                    End If
-                End If
                 If (Not (Me._portfolio_to_chainTableAdapter) Is Nothing) Then
                     revertConnections.Add(Me._portfolio_to_chainTableAdapter, Me._portfolio_to_chainTableAdapter.Connection)
                     Me._portfolio_to_chainTableAdapter.Connection = CType(workConnection,Global.System.Data.SQLite.SQLiteConnection)
@@ -27371,13 +25298,22 @@ Namespace BondsDataSetTableAdapters
                         adaptersWithAcceptChangesDuringUpdate.Add(Me._portfolio_to_hawserTableAdapter.Adapter)
                     End If
                 End If
-                If (Not (Me._fields_layoutTableAdapter) Is Nothing) Then
-                    revertConnections.Add(Me._fields_layoutTableAdapter, Me._fields_layoutTableAdapter.Connection)
-                    Me._fields_layoutTableAdapter.Connection = CType(workConnection,Global.System.Data.SQLite.SQLiteConnection)
-                    Me._fields_layoutTableAdapter.Transaction = CType(workTransaction,Global.System.Data.SQLite.SQLiteTransaction)
-                    If Me._fields_layoutTableAdapter.Adapter.AcceptChangesDuringUpdate Then
-                        Me._fields_layoutTableAdapter.Adapter.AcceptChangesDuringUpdate = false
-                        adaptersWithAcceptChangesDuringUpdate.Add(Me._fields_layoutTableAdapter.Adapter)
+                If (Not (Me._field_layoutTableAdapter) Is Nothing) Then
+                    revertConnections.Add(Me._field_layoutTableAdapter, Me._field_layoutTableAdapter.Connection)
+                    Me._field_layoutTableAdapter.Connection = CType(workConnection,Global.System.Data.SQLite.SQLiteConnection)
+                    Me._field_layoutTableAdapter.Transaction = CType(workTransaction,Global.System.Data.SQLite.SQLiteTransaction)
+                    If Me._field_layoutTableAdapter.Adapter.AcceptChangesDuringUpdate Then
+                        Me._field_layoutTableAdapter.Adapter.AcceptChangesDuringUpdate = false
+                        adaptersWithAcceptChangesDuringUpdate.Add(Me._field_layoutTableAdapter.Adapter)
+                    End If
+                End If
+                If (Not (Me._field_setTableAdapter) Is Nothing) Then
+                    revertConnections.Add(Me._field_setTableAdapter, Me._field_setTableAdapter.Connection)
+                    Me._field_setTableAdapter.Connection = CType(workConnection,Global.System.Data.SQLite.SQLiteConnection)
+                    Me._field_setTableAdapter.Transaction = CType(workTransaction,Global.System.Data.SQLite.SQLiteTransaction)
+                    If Me._field_setTableAdapter.Adapter.AcceptChangesDuringUpdate Then
+                        Me._field_setTableAdapter.Adapter.AcceptChangesDuringUpdate = false
+                        adaptersWithAcceptChangesDuringUpdate.Add(Me._field_setTableAdapter.Adapter)
                     End If
                 End If
                 '
@@ -27480,10 +25416,6 @@ Namespace BondsDataSetTableAdapters
                     Me._hawser_to_bondTableAdapter.Connection = CType(revertConnections(Me._hawser_to_bondTableAdapter),Global.System.Data.SQLite.SQLiteConnection)
                     Me._hawser_to_bondTableAdapter.Transaction = Nothing
                 End If
-                If (Not (Me._portfolio_to_bondTableAdapter) Is Nothing) Then
-                    Me._portfolio_to_bondTableAdapter.Connection = CType(revertConnections(Me._portfolio_to_bondTableAdapter),Global.System.Data.SQLite.SQLiteConnection)
-                    Me._portfolio_to_bondTableAdapter.Transaction = Nothing
-                End If
                 If (Not (Me._portfolio_to_chainTableAdapter) Is Nothing) Then
                     Me._portfolio_to_chainTableAdapter.Connection = CType(revertConnections(Me._portfolio_to_chainTableAdapter),Global.System.Data.SQLite.SQLiteConnection)
                     Me._portfolio_to_chainTableAdapter.Transaction = Nothing
@@ -27492,9 +25424,13 @@ Namespace BondsDataSetTableAdapters
                     Me._portfolio_to_hawserTableAdapter.Connection = CType(revertConnections(Me._portfolio_to_hawserTableAdapter),Global.System.Data.SQLite.SQLiteConnection)
                     Me._portfolio_to_hawserTableAdapter.Transaction = Nothing
                 End If
-                If (Not (Me._fields_layoutTableAdapter) Is Nothing) Then
-                    Me._fields_layoutTableAdapter.Connection = CType(revertConnections(Me._fields_layoutTableAdapter),Global.System.Data.SQLite.SQLiteConnection)
-                    Me._fields_layoutTableAdapter.Transaction = Nothing
+                If (Not (Me._field_layoutTableAdapter) Is Nothing) Then
+                    Me._field_layoutTableAdapter.Connection = CType(revertConnections(Me._field_layoutTableAdapter),Global.System.Data.SQLite.SQLiteConnection)
+                    Me._field_layoutTableAdapter.Transaction = Nothing
+                End If
+                If (Not (Me._field_setTableAdapter) Is Nothing) Then
+                    Me._field_setTableAdapter.Connection = CType(revertConnections(Me._field_setTableAdapter),Global.System.Data.SQLite.SQLiteConnection)
+                    Me._field_setTableAdapter.Transaction = Nothing
                 End If
                 If (0 < adaptersWithAcceptChangesDuringUpdate.Count) Then
                     Dim adapters((adaptersWithAcceptChangesDuringUpdate.Count) - 1) As Global.System.Data.Common.DataAdapter

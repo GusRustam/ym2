@@ -34,21 +34,13 @@
             Me.IncludeDataGridViewCheckBoxColumn3 = New System.Windows.Forms.DataGridViewCheckBoxColumn()
             Me.PortfolioUnitedBindingSource = New System.Windows.Forms.BindingSource(Me.components)
             Me.BondsDataSet = New YieldMap.BondsDataSet()
-            Me.RemoveBondButton = New System.Windows.Forms.Button()
-            Me.AddBondButton = New System.Windows.Forms.Button()
             Me.RemoveHawserButton = New System.Windows.Forms.Button()
             Me.AddHawserButton = New System.Windows.Forms.Button()
             Me.RemoveChainButton = New System.Windows.Forms.Button()
             Me.AddChainButton = New System.Windows.Forms.Button()
-            Me.Label5 = New System.Windows.Forms.Label()
             Me.Label4 = New System.Windows.Forms.Label()
             Me.ConstPortLabel = New System.Windows.Forms.Label()
             Me.Label3 = New System.Windows.Forms.Label()
-            Me.PortBondDGV = New System.Windows.Forms.DataGridView()
-            Me.pid = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.ric = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.IncludeDataGridViewCheckBoxColumn2 = New System.Windows.Forms.DataGridViewCheckBoxColumn()
-            Me.PortfolioByBondsBindingSource = New System.Windows.Forms.BindingSource(Me.components)
             Me.PortUserListDGV = New System.Windows.Forms.DataGridView()
             Me.PidDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.hid = New System.Windows.Forms.DataGridViewTextBoxColumn()
@@ -75,10 +67,6 @@
             Me.IdDataGridViewTextBoxColumn1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.HawsernameDataGridViewTextBoxColumn1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.ColorDataGridViewTextBoxColumn1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.ColumnHawserBid = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.ColumnHawserAsk = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.ColumnHawserLast = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.ColumnHawserHist = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.ColumnListCurve = New System.Windows.Forms.DataGridViewCheckBoxColumn()
             Me.HawserBindingSource = New System.Windows.Forms.BindingSource(Me.components)
             Me.ConstituentsDGW = New System.Windows.Forms.DataGridView()
@@ -101,10 +89,6 @@
             Me.ChainnameDataGridViewTextBoxColumn2 = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.DescrDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.ColorDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.ColumnChainBid = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.ColumnChainAsk = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.ColumnChainLast = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.ColumnChainHist = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.ColumnChainCurve = New System.Windows.Forms.DataGridViewCheckBoxColumn()
             Me.ChainBindingSource = New System.Windows.Forms.BindingSource(Me.components)
             Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
@@ -112,6 +96,7 @@
             Me.EditChain = New System.Windows.Forms.Button()
             Me.RemoveChain = New System.Windows.Forms.Button()
             Me.TabPage2 = New System.Windows.Forms.TabPage()
+            Me.MessageListBox = New System.Windows.Forms.ListBox()
             Me.ReloadBondsButton = New System.Windows.Forms.Button()
             Me.DbUpdatedLabel = New System.Windows.Forms.Label()
             Me.Label1 = New System.Windows.Forms.Label()
@@ -128,7 +113,6 @@
             Me.HawserTableAdapter = New YieldMap.BondsDataSetTableAdapters.hawserTableAdapter()
             Me.HawserDataTableAdapter = New YieldMap.BondsDataSetTableAdapters.HawserDataTableAdapter()
             Me.PortfolioTableAdapter = New YieldMap.BondsDataSetTableAdapters.portfolioTableAdapter()
-            Me._portfolioByBondsTableAdapter = New YieldMap.BondsDataSetTableAdapters._portfolioByBondsTableAdapter()
             Me.ChainsInPortfolioTableAdapter = New YieldMap.BondsDataSetTableAdapters.ChainsInPortfolioTableAdapter()
             Me.HawsersInPortfolioTableAdapter = New YieldMap.BondsDataSetTableAdapters.HawsersInPortfolioTableAdapter()
             Me.PortfolioUnitedTableAdapter = New YieldMap.BondsDataSetTableAdapters.PortfolioUnitedTableAdapter()
@@ -137,14 +121,11 @@
             Me.DataGridViewTextBoxColumn9 = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.DataGridViewTextBoxColumn10 = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.ChainTableAdapter = New YieldMap.BondsDataSetTableAdapters.chainTableAdapter()
-            Me.MessageListBox = New System.Windows.Forms.ListBox()
             Me.MainTabControl.SuspendLayout()
             Me.PorfolioPage.SuspendLayout()
             CType(Me.PorfolioElementsDGV, System.ComponentModel.ISupportInitialize).BeginInit()
             CType(Me.PortfolioUnitedBindingSource, System.ComponentModel.ISupportInitialize).BeginInit()
             CType(Me.BondsDataSet, System.ComponentModel.ISupportInitialize).BeginInit()
-            CType(Me.PortBondDGV, System.ComponentModel.ISupportInitialize).BeginInit()
-            CType(Me.PortfolioByBondsBindingSource, System.ComponentModel.ISupportInitialize).BeginInit()
             CType(Me.PortUserListDGV, System.ComponentModel.ISupportInitialize).BeginInit()
             CType(Me.HawsersInPortfolioBindingSource, System.ComponentModel.ISupportInitialize).BeginInit()
             CType(Me.PortChainsDGV, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -181,17 +162,13 @@
             'PorfolioPage
             '
             Me.PorfolioPage.Controls.Add(Me.PorfolioElementsDGV)
-            Me.PorfolioPage.Controls.Add(Me.RemoveBondButton)
-            Me.PorfolioPage.Controls.Add(Me.AddBondButton)
             Me.PorfolioPage.Controls.Add(Me.RemoveHawserButton)
             Me.PorfolioPage.Controls.Add(Me.AddHawserButton)
             Me.PorfolioPage.Controls.Add(Me.RemoveChainButton)
             Me.PorfolioPage.Controls.Add(Me.AddChainButton)
-            Me.PorfolioPage.Controls.Add(Me.Label5)
             Me.PorfolioPage.Controls.Add(Me.Label4)
             Me.PorfolioPage.Controls.Add(Me.ConstPortLabel)
             Me.PorfolioPage.Controls.Add(Me.Label3)
-            Me.PorfolioPage.Controls.Add(Me.PortBondDGV)
             Me.PorfolioPage.Controls.Add(Me.PortUserListDGV)
             Me.PorfolioPage.Controls.Add(Me.PortChainsDGV)
             Me.PorfolioPage.Controls.Add(Me.Label2)
@@ -276,28 +253,10 @@
             Me.BondsDataSet.EnforceConstraints = False
             Me.BondsDataSet.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema
             '
-            'RemoveBondButton
-            '
-            Me.RemoveBondButton.Image = Global.YieldMap.My.Resources.Resources.delete
-            Me.RemoveBondButton.Location = New System.Drawing.Point(541, 470)
-            Me.RemoveBondButton.Name = "RemoveBondButton"
-            Me.RemoveBondButton.Size = New System.Drawing.Size(35, 28)
-            Me.RemoveBondButton.TabIndex = 13
-            Me.RemoveBondButton.UseVisualStyleBackColor = True
-            '
-            'AddBondButton
-            '
-            Me.AddBondButton.Image = Global.YieldMap.My.Resources.Resources.add
-            Me.AddBondButton.Location = New System.Drawing.Point(541, 436)
-            Me.AddBondButton.Name = "AddBondButton"
-            Me.AddBondButton.Size = New System.Drawing.Size(35, 28)
-            Me.AddBondButton.TabIndex = 13
-            Me.AddBondButton.UseVisualStyleBackColor = True
-            '
             'RemoveHawserButton
             '
             Me.RemoveHawserButton.Image = Global.YieldMap.My.Resources.Resources.delete
-            Me.RemoveHawserButton.Location = New System.Drawing.Point(541, 303)
+            Me.RemoveHawserButton.Location = New System.Drawing.Point(540, 274)
             Me.RemoveHawserButton.Name = "RemoveHawserButton"
             Me.RemoveHawserButton.Size = New System.Drawing.Size(35, 28)
             Me.RemoveHawserButton.TabIndex = 13
@@ -306,7 +265,7 @@
             'AddHawserButton
             '
             Me.AddHawserButton.Image = Global.YieldMap.My.Resources.Resources.add
-            Me.AddHawserButton.Location = New System.Drawing.Point(541, 269)
+            Me.AddHawserButton.Location = New System.Drawing.Point(540, 240)
             Me.AddHawserButton.Name = "AddHawserButton"
             Me.AddHawserButton.Size = New System.Drawing.Size(35, 28)
             Me.AddHawserButton.TabIndex = 13
@@ -315,7 +274,7 @@
             'RemoveChainButton
             '
             Me.RemoveChainButton.Image = Global.YieldMap.My.Resources.Resources.delete
-            Me.RemoveChainButton.Location = New System.Drawing.Point(541, 136)
+            Me.RemoveChainButton.Location = New System.Drawing.Point(540, 107)
             Me.RemoveChainButton.Name = "RemoveChainButton"
             Me.RemoveChainButton.Size = New System.Drawing.Size(35, 28)
             Me.RemoveChainButton.TabIndex = 13
@@ -324,20 +283,11 @@
             'AddChainButton
             '
             Me.AddChainButton.Image = Global.YieldMap.My.Resources.Resources.add
-            Me.AddChainButton.Location = New System.Drawing.Point(541, 102)
+            Me.AddChainButton.Location = New System.Drawing.Point(540, 73)
             Me.AddChainButton.Name = "AddChainButton"
             Me.AddChainButton.Size = New System.Drawing.Size(35, 28)
             Me.AddChainButton.TabIndex = 13
             Me.AddChainButton.UseVisualStyleBackColor = True
-            '
-            'Label5
-            '
-            Me.Label5.AutoSize = True
-            Me.Label5.Location = New System.Drawing.Point(228, 343)
-            Me.Label5.Name = "Label5"
-            Me.Label5.Size = New System.Drawing.Size(84, 13)
-            Me.Label5.TabIndex = 12
-            Me.Label5.Text = "Individual bonds"
             '
             'Label4
             '
@@ -365,51 +315,6 @@
             Me.Label3.Size = New System.Drawing.Size(39, 13)
             Me.Label3.TabIndex = 12
             Me.Label3.Text = "Chains"
-            '
-            'PortBondDGV
-            '
-            Me.PortBondDGV.AllowUserToAddRows = False
-            Me.PortBondDGV.AllowUserToDeleteRows = False
-            Me.PortBondDGV.AutoGenerateColumns = False
-            Me.PortBondDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-            Me.PortBondDGV.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.pid, Me.ric, Me.IncludeDataGridViewCheckBoxColumn2})
-            Me.PortBondDGV.DataSource = Me.PortfolioByBondsBindingSource
-            Me.PortBondDGV.Location = New System.Drawing.Point(231, 360)
-            Me.PortBondDGV.Name = "PortBondDGV"
-            Me.PortBondDGV.ReadOnly = True
-            Me.PortBondDGV.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-            Me.PortBondDGV.Size = New System.Drawing.Size(303, 138)
-            Me.PortBondDGV.TabIndex = 11
-            '
-            'pid
-            '
-            Me.pid.DataPropertyName = "pid"
-            Me.pid.HeaderText = "pid"
-            Me.pid.Name = "pid"
-            Me.pid.ReadOnly = True
-            Me.pid.Visible = False
-            '
-            'ric
-            '
-            Me.ric.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill
-            Me.ric.DataPropertyName = "ric"
-            Me.ric.HeaderText = "Name"
-            Me.ric.Name = "ric"
-            Me.ric.ReadOnly = True
-            '
-            'IncludeDataGridViewCheckBoxColumn2
-            '
-            Me.IncludeDataGridViewCheckBoxColumn2.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.IncludeDataGridViewCheckBoxColumn2.DataPropertyName = "include"
-            Me.IncludeDataGridViewCheckBoxColumn2.HeaderText = "Included"
-            Me.IncludeDataGridViewCheckBoxColumn2.Name = "IncludeDataGridViewCheckBoxColumn2"
-            Me.IncludeDataGridViewCheckBoxColumn2.ReadOnly = True
-            Me.IncludeDataGridViewCheckBoxColumn2.Width = 54
-            '
-            'PortfolioByBondsBindingSource
-            '
-            Me.PortfolioByBondsBindingSource.DataMember = "_portfolioByBonds"
-            Me.PortfolioByBondsBindingSource.DataSource = Me.BondsDataSet
             '
             'PortUserListDGV
             '
@@ -624,7 +529,7 @@
             Me.ListOfList.AllowUserToDeleteRows = False
             Me.ListOfList.AutoGenerateColumns = False
             Me.ListOfList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-            Me.ListOfList.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.IdDataGridViewTextBoxColumn1, Me.HawsernameDataGridViewTextBoxColumn1, Me.ColorDataGridViewTextBoxColumn1, Me.ColumnHawserBid, Me.ColumnHawserAsk, Me.ColumnHawserLast, Me.ColumnHawserHist, Me.ColumnListCurve})
+            Me.ListOfList.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.IdDataGridViewTextBoxColumn1, Me.HawsernameDataGridViewTextBoxColumn1, Me.ColorDataGridViewTextBoxColumn1, Me.ColumnListCurve})
             Me.ListOfList.DataSource = Me.HawserBindingSource
             Me.ListOfList.Dock = System.Windows.Forms.DockStyle.Fill
             Me.ListOfList.Location = New System.Drawing.Point(3, 3)
@@ -659,42 +564,6 @@
             Me.ColorDataGridViewTextBoxColumn1.Name = "ColorDataGridViewTextBoxColumn1"
             Me.ColorDataGridViewTextBoxColumn1.ReadOnly = True
             Me.ColorDataGridViewTextBoxColumn1.Width = 56
-            '
-            'ColumnHawserBid
-            '
-            Me.ColumnHawserBid.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.ColumnHawserBid.DataPropertyName = "bid_field"
-            Me.ColumnHawserBid.HeaderText = "Bid"
-            Me.ColumnHawserBid.Name = "ColumnHawserBid"
-            Me.ColumnHawserBid.ReadOnly = True
-            Me.ColumnHawserBid.Width = 47
-            '
-            'ColumnHawserAsk
-            '
-            Me.ColumnHawserAsk.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.ColumnHawserAsk.DataPropertyName = "ask_field"
-            Me.ColumnHawserAsk.HeaderText = "Ask"
-            Me.ColumnHawserAsk.Name = "ColumnHawserAsk"
-            Me.ColumnHawserAsk.ReadOnly = True
-            Me.ColumnHawserAsk.Width = 50
-            '
-            'ColumnHawserLast
-            '
-            Me.ColumnHawserLast.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.ColumnHawserLast.DataPropertyName = "last_field"
-            Me.ColumnHawserLast.HeaderText = "Last"
-            Me.ColumnHawserLast.Name = "ColumnHawserLast"
-            Me.ColumnHawserLast.ReadOnly = True
-            Me.ColumnHawserLast.Width = 52
-            '
-            'ColumnHawserHist
-            '
-            Me.ColumnHawserHist.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.ColumnHawserHist.DataPropertyName = "hist_field"
-            Me.ColumnHawserHist.HeaderText = "History"
-            Me.ColumnHawserHist.Name = "ColumnHawserHist"
-            Me.ColumnHawserHist.ReadOnly = True
-            Me.ColumnHawserHist.Width = 64
             '
             'ColumnListCurve
             '
@@ -844,8 +713,9 @@
             '
             'TableLayoutPanel1
             '
-            Me.TableLayoutPanel1.ColumnCount = 1
-            Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+            Me.TableLayoutPanel1.ColumnCount = 2
+            Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 60.0!))
+            Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 40.0!))
             Me.TableLayoutPanel1.Controls.Add(Me.ChainsDGV, 0, 0)
             Me.TableLayoutPanel1.Controls.Add(Me.FlowLayoutPanel1, 0, 1)
             Me.TableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
@@ -863,14 +733,14 @@
             Me.ChainsDGV.AllowUserToDeleteRows = False
             Me.ChainsDGV.AutoGenerateColumns = False
             Me.ChainsDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-            Me.ChainsDGV.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.IdDataGridViewTextBoxColumn, Me.ChainnameDataGridViewTextBoxColumn2, Me.DescrDataGridViewTextBoxColumn, Me.ColorDataGridViewTextBoxColumn, Me.ColumnChainBid, Me.ColumnChainAsk, Me.ColumnChainLast, Me.ColumnChainHist, Me.ColumnChainCurve})
+            Me.ChainsDGV.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.IdDataGridViewTextBoxColumn, Me.ChainnameDataGridViewTextBoxColumn2, Me.DescrDataGridViewTextBoxColumn, Me.ColorDataGridViewTextBoxColumn, Me.ColumnChainCurve})
             Me.ChainsDGV.DataSource = Me.ChainBindingSource
             Me.ChainsDGV.Dock = System.Windows.Forms.DockStyle.Fill
             Me.ChainsDGV.Location = New System.Drawing.Point(3, 3)
             Me.ChainsDGV.Name = "ChainsDGV"
             Me.ChainsDGV.ReadOnly = True
             Me.ChainsDGV.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-            Me.ChainsDGV.Size = New System.Drawing.Size(893, 508)
+            Me.ChainsDGV.Size = New System.Drawing.Size(533, 508)
             Me.ChainsDGV.TabIndex = 1
             '
             'IdDataGridViewTextBoxColumn
@@ -908,42 +778,6 @@
             Me.ColorDataGridViewTextBoxColumn.Resizable = System.Windows.Forms.DataGridViewTriState.[True]
             Me.ColorDataGridViewTextBoxColumn.Width = 56
             '
-            'ColumnChainBid
-            '
-            Me.ColumnChainBid.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.ColumnChainBid.DataPropertyName = "bid_field"
-            Me.ColumnChainBid.HeaderText = "Bid"
-            Me.ColumnChainBid.Name = "ColumnChainBid"
-            Me.ColumnChainBid.ReadOnly = True
-            Me.ColumnChainBid.Width = 47
-            '
-            'ColumnChainAsk
-            '
-            Me.ColumnChainAsk.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.ColumnChainAsk.DataPropertyName = "ask_field"
-            Me.ColumnChainAsk.HeaderText = "Ask"
-            Me.ColumnChainAsk.Name = "ColumnChainAsk"
-            Me.ColumnChainAsk.ReadOnly = True
-            Me.ColumnChainAsk.Width = 50
-            '
-            'ColumnChainLast
-            '
-            Me.ColumnChainLast.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.ColumnChainLast.DataPropertyName = "last_field"
-            Me.ColumnChainLast.HeaderText = "Last"
-            Me.ColumnChainLast.Name = "ColumnChainLast"
-            Me.ColumnChainLast.ReadOnly = True
-            Me.ColumnChainLast.Width = 52
-            '
-            'ColumnChainHist
-            '
-            Me.ColumnChainHist.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.ColumnChainHist.DataPropertyName = "hist_field"
-            Me.ColumnChainHist.HeaderText = "History"
-            Me.ColumnChainHist.Name = "ColumnChainHist"
-            Me.ColumnChainHist.ReadOnly = True
-            Me.ColumnChainHist.Width = 64
-            '
             'ColumnChainCurve
             '
             Me.ColumnChainCurve.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
@@ -967,7 +801,7 @@
             Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 514)
             Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(0)
             Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-            Me.FlowLayoutPanel1.Size = New System.Drawing.Size(899, 25)
+            Me.FlowLayoutPanel1.Size = New System.Drawing.Size(539, 25)
             Me.FlowLayoutPanel1.TabIndex = 2
             '
             'AddChain
@@ -1016,6 +850,14 @@
             Me.TabPage2.TabIndex = 5
             Me.TabPage2.Text = "Database"
             Me.TabPage2.UseVisualStyleBackColor = True
+            '
+            'MessageListBox
+            '
+            Me.MessageListBox.FormattingEnabled = True
+            Me.MessageListBox.Location = New System.Drawing.Point(10, 30)
+            Me.MessageListBox.Name = "MessageListBox"
+            Me.MessageListBox.Size = New System.Drawing.Size(431, 134)
+            Me.MessageListBox.TabIndex = 3
             '
             'ReloadBondsButton
             '
@@ -1131,10 +973,6 @@
             '
             Me.PortfolioTableAdapter.ClearBeforeFill = True
             '
-            '_portfolioByBondsTableAdapter
-            '
-            Me._portfolioByBondsTableAdapter.ClearBeforeFill = True
-            '
             'ChainsInPortfolioTableAdapter
             '
             Me.ChainsInPortfolioTableAdapter.ClearBeforeFill = True
@@ -1177,14 +1015,6 @@
             '
             Me.ChainTableAdapter.ClearBeforeFill = True
             '
-            'MessageListBox
-            '
-            Me.MessageListBox.FormattingEnabled = True
-            Me.MessageListBox.Location = New System.Drawing.Point(10, 30)
-            Me.MessageListBox.Name = "MessageListBox"
-            Me.MessageListBox.Size = New System.Drawing.Size(431, 134)
-            Me.MessageListBox.TabIndex = 3
-            '
             'DataBaseManagerForm
             '
             Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1204,8 +1034,6 @@
             CType(Me.PorfolioElementsDGV, System.ComponentModel.ISupportInitialize).EndInit()
             CType(Me.PortfolioUnitedBindingSource, System.ComponentModel.ISupportInitialize).EndInit()
             CType(Me.BondsDataSet, System.ComponentModel.ISupportInitialize).EndInit()
-            CType(Me.PortBondDGV, System.ComponentModel.ISupportInitialize).EndInit()
-            CType(Me.PortfolioByBondsBindingSource, System.ComponentModel.ISupportInitialize).EndInit()
             CType(Me.PortUserListDGV, System.ComponentModel.ISupportInitialize).EndInit()
             CType(Me.HawsersInPortfolioBindingSource, System.ComponentModel.ISupportInitialize).EndInit()
             CType(Me.PortChainsDGV, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1249,24 +1077,18 @@
         Friend WithEvents AddPortfolioButton As System.Windows.Forms.Button
         Friend WithEvents DeletePortfolioButton As System.Windows.Forms.Button
         Friend WithEvents PortfoliosListBox As System.Windows.Forms.ListBox
-        Friend WithEvents PortBondDGV As System.Windows.Forms.DataGridView
         Friend WithEvents PortUserListDGV As System.Windows.Forms.DataGridView
         Friend WithEvents PortChainsDGV As System.Windows.Forms.DataGridView
-        Friend WithEvents Label5 As System.Windows.Forms.Label
         Friend WithEvents Label4 As System.Windows.Forms.Label
         Friend WithEvents ConstPortLabel As System.Windows.Forms.Label
         Friend WithEvents Label3 As System.Windows.Forms.Label
         Friend WithEvents PortfolioBindingSource As System.Windows.Forms.BindingSource
         Friend WithEvents PortfolioTableAdapter As YieldMap.BondsDataSetTableAdapters.portfolioTableAdapter
-        Friend WithEvents PortfolioByBondsBindingSource As System.Windows.Forms.BindingSource
-        Friend WithEvents _portfolioByBondsTableAdapter As YieldMap.BondsDataSetTableAdapters._portfolioByBondsTableAdapter
         Friend WithEvents ChainsInPortfolioBindingSource As System.Windows.Forms.BindingSource
         Friend WithEvents ChainsInPortfolioTableAdapter As YieldMap.BondsDataSetTableAdapters.ChainsInPortfolioTableAdapter
         Friend WithEvents BidDataGridViewTextBoxColumn2 As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents HawsersInPortfolioBindingSource As System.Windows.Forms.BindingSource
         Friend WithEvents HawsersInPortfolioTableAdapter As YieldMap.BondsDataSetTableAdapters.HawsersInPortfolioTableAdapter
-        Friend WithEvents RemoveBondButton As System.Windows.Forms.Button
-        Friend WithEvents AddBondButton As System.Windows.Forms.Button
         Friend WithEvents RemoveHawserButton As System.Windows.Forms.Button
         Friend WithEvents AddHawserButton As System.Windows.Forms.Button
         Friend WithEvents RemoveChainButton As System.Windows.Forms.Button
@@ -1305,9 +1127,6 @@
         Friend WithEvents RICDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents BondidDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents BondDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
-        Friend WithEvents pid As System.Windows.Forms.DataGridViewTextBoxColumn
-        Friend WithEvents ric As System.Windows.Forms.DataGridViewTextBoxColumn
-        Friend WithEvents IncludeDataGridViewCheckBoxColumn2 As System.Windows.Forms.DataGridViewCheckBoxColumn
         Friend WithEvents PidDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents hid As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents HawsernameDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
@@ -1323,27 +1142,19 @@
         Friend WithEvents BondshortnameDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents DataGridViewTextBoxColumn12 As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents IncludeDataGridViewCheckBoxColumn3 As System.Windows.Forms.DataGridViewCheckBoxColumn
-        Friend WithEvents IdDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
-        Friend WithEvents ChainnameDataGridViewTextBoxColumn2 As System.Windows.Forms.DataGridViewTextBoxColumn
-        Friend WithEvents DescrDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
-        Friend WithEvents ColorDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
-        Friend WithEvents ColumnChainBid As System.Windows.Forms.DataGridViewTextBoxColumn
-        Friend WithEvents ColumnChainAsk As System.Windows.Forms.DataGridViewTextBoxColumn
-        Friend WithEvents ColumnChainLast As System.Windows.Forms.DataGridViewTextBoxColumn
-        Friend WithEvents ColumnChainHist As System.Windows.Forms.DataGridViewTextBoxColumn
-        Friend WithEvents ColumnChainCurve As System.Windows.Forms.DataGridViewCheckBoxColumn
-        Friend WithEvents IdDataGridViewTextBoxColumn1 As System.Windows.Forms.DataGridViewTextBoxColumn
-        Friend WithEvents HawsernameDataGridViewTextBoxColumn1 As System.Windows.Forms.DataGridViewTextBoxColumn
-        Friend WithEvents ColorDataGridViewTextBoxColumn1 As System.Windows.Forms.DataGridViewTextBoxColumn
-        Friend WithEvents ColumnHawserBid As System.Windows.Forms.DataGridViewTextBoxColumn
-        Friend WithEvents ColumnHawserAsk As System.Windows.Forms.DataGridViewTextBoxColumn
-        Friend WithEvents ColumnHawserLast As System.Windows.Forms.DataGridViewTextBoxColumn
-        Friend WithEvents ColumnHawserHist As System.Windows.Forms.DataGridViewTextBoxColumn
-        Friend WithEvents ColumnListCurve As System.Windows.Forms.DataGridViewCheckBoxColumn
         Friend WithEvents TabPage2 As System.Windows.Forms.TabPage
         Friend WithEvents ReloadBondsButton As System.Windows.Forms.Button
         Friend WithEvents DbUpdatedLabel As System.Windows.Forms.Label
         Friend WithEvents Label1 As System.Windows.Forms.Label
         Friend WithEvents MessageListBox As System.Windows.Forms.ListBox
+        Friend WithEvents IdDataGridViewTextBoxColumn1 As System.Windows.Forms.DataGridViewTextBoxColumn
+        Friend WithEvents HawsernameDataGridViewTextBoxColumn1 As System.Windows.Forms.DataGridViewTextBoxColumn
+        Friend WithEvents ColorDataGridViewTextBoxColumn1 As System.Windows.Forms.DataGridViewTextBoxColumn
+        Friend WithEvents ColumnListCurve As System.Windows.Forms.DataGridViewCheckBoxColumn
+        Friend WithEvents IdDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
+        Friend WithEvents ChainnameDataGridViewTextBoxColumn2 As System.Windows.Forms.DataGridViewTextBoxColumn
+        Friend WithEvents DescrDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
+        Friend WithEvents ColorDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
+        Friend WithEvents ColumnChainCurve As System.Windows.Forms.DataGridViewCheckBoxColumn
     End Class
 End Namespace

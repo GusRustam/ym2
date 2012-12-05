@@ -20,16 +20,10 @@ Namespace Forms.ChartForm
             Private ReadOnly _id As Long
             Private ReadOnly _name As String
 
-            Public Sub New(data As BondsDataSet.fields_layoutRow)
+            Public Sub New(data As BondsDataSet.field_setRow)
                 _id = data.id
                 _name = data.name
             End Sub
-
-            Public ReadOnly Property Name As String
-                Get
-                    Return _name
-                End Get
-            End Property
 
             Public ReadOnly Property ID As Long
                 Get
@@ -38,7 +32,7 @@ Namespace Forms.ChartForm
             End Property
 
             Public Overrides Function ToString() As String
-                Return Name
+                Return _name
             End Function
         End Class
 
@@ -62,7 +56,7 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub ManualRicFormLoad(sender As Object, e As EventArgs) Handles Me.Load
-            Dim layoutTA As New fields_layoutTableAdapter
+            Dim layoutTA As New field_setTableAdapter
             For Each row In layoutTA.GetData()
                 LayoutComboBox.Items.Add(New IdValue(row))
             Next

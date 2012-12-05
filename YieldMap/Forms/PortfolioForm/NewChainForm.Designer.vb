@@ -23,11 +23,11 @@
         'Не изменяйте ее в редакторе исходного кода.
         <System.Diagnostics.DebuggerStepThrough()> _
         Private Sub InitializeComponent()
+            Me.components = New System.ComponentModel.Container()
             Me.TheLayout = New System.Windows.Forms.TableLayoutPanel()
-            Me.CloseTextBox = New System.Windows.Forms.TextBox()
-            Me.LastTextBox = New System.Windows.Forms.TextBox()
-            Me.AskTextBox = New System.Windows.Forms.TextBox()
-            Me.BidTextBox = New System.Windows.Forms.TextBox()
+            Me.FieldLayoutComboBox = New System.Windows.Forms.ComboBox()
+            Me.FieldsetBindingSource = New System.Windows.Forms.BindingSource(Me.components)
+            Me.BondsDataSet = New YieldMap.BondsDataSet()
             Me.RICLabel = New System.Windows.Forms.Label()
             Me.Label2 = New System.Windows.Forms.Label()
             Me.Label3 = New System.Windows.Forms.Label()
@@ -37,12 +37,12 @@
             Me.OkButton = New System.Windows.Forms.Button()
             Me.CancelButton = New System.Windows.Forms.Button()
             Me.Label1 = New System.Windows.Forms.Label()
-            Me.Label4 = New System.Windows.Forms.Label()
-            Me.Label5 = New System.Windows.Forms.Label()
-            Me.Label6 = New System.Windows.Forms.Label()
-            Me.TheColorDialog = New System.Windows.Forms.ColorDialog()
             Me.CurveCheckBox = New System.Windows.Forms.CheckBox()
+            Me.TheColorDialog = New System.Windows.Forms.ColorDialog()
+            Me.Field_setTableAdapter = New YieldMap.BondsDataSetTableAdapters.field_setTableAdapter()
             Me.TheLayout.SuspendLayout()
+            CType(Me.FieldsetBindingSource, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.BondsDataSet, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.SuspendLayout()
             '
             'TheLayout
@@ -50,70 +50,52 @@
             Me.TheLayout.ColumnCount = 2
             Me.TheLayout.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200.0!))
             Me.TheLayout.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-            Me.TheLayout.Controls.Add(Me.CloseTextBox, 1, 6)
-            Me.TheLayout.Controls.Add(Me.LastTextBox, 1, 5)
-            Me.TheLayout.Controls.Add(Me.AskTextBox, 1, 4)
-            Me.TheLayout.Controls.Add(Me.BidTextBox, 1, 3)
+            Me.TheLayout.Controls.Add(Me.FieldLayoutComboBox, 1, 3)
             Me.TheLayout.Controls.Add(Me.RICLabel, 0, 0)
             Me.TheLayout.Controls.Add(Me.Label2, 0, 1)
             Me.TheLayout.Controls.Add(Me.Label3, 0, 2)
             Me.TheLayout.Controls.Add(Me.ColorsComboBox, 1, 2)
             Me.TheLayout.Controls.Add(Me.RICTextBox, 1, 0)
             Me.TheLayout.Controls.Add(Me.DescrTextBox, 1, 1)
-            Me.TheLayout.Controls.Add(Me.OkButton, 0, 8)
-            Me.TheLayout.Controls.Add(Me.CancelButton, 1, 8)
+            Me.TheLayout.Controls.Add(Me.OkButton, 0, 5)
+            Me.TheLayout.Controls.Add(Me.CancelButton, 1, 5)
             Me.TheLayout.Controls.Add(Me.Label1, 0, 3)
-            Me.TheLayout.Controls.Add(Me.Label4, 0, 4)
-            Me.TheLayout.Controls.Add(Me.Label5, 0, 5)
-            Me.TheLayout.Controls.Add(Me.Label6, 0, 6)
-            Me.TheLayout.Controls.Add(Me.CurveCheckBox, 1, 7)
+            Me.TheLayout.Controls.Add(Me.CurveCheckBox, 1, 4)
             Me.TheLayout.Dock = System.Windows.Forms.DockStyle.Fill
             Me.TheLayout.Location = New System.Drawing.Point(0, 0)
             Me.TheLayout.Name = "TheLayout"
-            Me.TheLayout.RowCount = 9
+            Me.TheLayout.RowCount = 6
             Me.TheLayout.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25.0!))
             Me.TheLayout.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25.0!))
             Me.TheLayout.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25.0!))
             Me.TheLayout.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25.0!))
             Me.TheLayout.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25.0!))
             Me.TheLayout.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25.0!))
-            Me.TheLayout.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25.0!))
-            Me.TheLayout.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25.0!))
-            Me.TheLayout.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25.0!))
-            Me.TheLayout.Size = New System.Drawing.Size(616, 234)
+            Me.TheLayout.Size = New System.Drawing.Size(616, 157)
             Me.TheLayout.TabIndex = 0
             '
-            'CloseTextBox
+            'FieldLayoutComboBox
             '
-            Me.CloseTextBox.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.CloseTextBox.Location = New System.Drawing.Point(203, 153)
-            Me.CloseTextBox.Name = "CloseTextBox"
-            Me.CloseTextBox.Size = New System.Drawing.Size(410, 20)
-            Me.CloseTextBox.TabIndex = 8
+            Me.FieldLayoutComboBox.DataSource = Me.FieldsetBindingSource
+            Me.FieldLayoutComboBox.DisplayMember = "name"
+            Me.FieldLayoutComboBox.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.FieldLayoutComboBox.FormattingEnabled = True
+            Me.FieldLayoutComboBox.Location = New System.Drawing.Point(203, 78)
+            Me.FieldLayoutComboBox.Name = "FieldLayoutComboBox"
+            Me.FieldLayoutComboBox.Size = New System.Drawing.Size(410, 21)
+            Me.FieldLayoutComboBox.TabIndex = 10
+            Me.FieldLayoutComboBox.ValueMember = "id"
             '
-            'LastTextBox
+            'FieldsetBindingSource
             '
-            Me.LastTextBox.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.LastTextBox.Location = New System.Drawing.Point(203, 128)
-            Me.LastTextBox.Name = "LastTextBox"
-            Me.LastTextBox.Size = New System.Drawing.Size(410, 20)
-            Me.LastTextBox.TabIndex = 7
+            Me.FieldsetBindingSource.DataMember = "field_set"
+            Me.FieldsetBindingSource.DataSource = Me.BondsDataSet
             '
-            'AskTextBox
+            'BondsDataSet
             '
-            Me.AskTextBox.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.AskTextBox.Location = New System.Drawing.Point(203, 103)
-            Me.AskTextBox.Name = "AskTextBox"
-            Me.AskTextBox.Size = New System.Drawing.Size(410, 20)
-            Me.AskTextBox.TabIndex = 6
-            '
-            'BidTextBox
-            '
-            Me.BidTextBox.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.BidTextBox.Location = New System.Drawing.Point(203, 78)
-            Me.BidTextBox.Name = "BidTextBox"
-            Me.BidTextBox.Size = New System.Drawing.Size(410, 20)
-            Me.BidTextBox.TabIndex = 5
+            Me.BondsDataSet.DataSetName = "BondsDataSet"
+            Me.BondsDataSet.EnforceConstraints = False
+            Me.BondsDataSet.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema
             '
             'RICLabel
             '
@@ -178,7 +160,7 @@
             '
             Me.OkButton.Anchor = System.Windows.Forms.AnchorStyles.Left
             Me.OkButton.DialogResult = System.Windows.Forms.DialogResult.OK
-            Me.OkButton.Location = New System.Drawing.Point(3, 205)
+            Me.OkButton.Location = New System.Drawing.Point(3, 129)
             Me.OkButton.Margin = New System.Windows.Forms.Padding(3, 0, 0, 0)
             Me.OkButton.Name = "OkButton"
             Me.OkButton.Padding = New System.Windows.Forms.Padding(3, 0, 0, 0)
@@ -191,7 +173,7 @@
             '
             Me.CancelButton.Anchor = System.Windows.Forms.AnchorStyles.Right
             Me.CancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel
-            Me.CancelButton.Location = New System.Drawing.Point(538, 205)
+            Me.CancelButton.Location = New System.Drawing.Point(538, 129)
             Me.CancelButton.Margin = New System.Windows.Forms.Padding(0, 0, 3, 0)
             Me.CancelButton.Name = "CancelButton"
             Me.CancelButton.Size = New System.Drawing.Size(75, 23)
@@ -206,64 +188,37 @@
             Me.Label1.Location = New System.Drawing.Point(3, 81)
             Me.Label1.Margin = New System.Windows.Forms.Padding(3)
             Me.Label1.Name = "Label1"
-            Me.Label1.Size = New System.Drawing.Size(22, 13)
+            Me.Label1.Size = New System.Drawing.Size(60, 13)
             Me.Label1.TabIndex = 0
-            Me.Label1.Text = "Bid"
-            '
-            'Label4
-            '
-            Me.Label4.Anchor = System.Windows.Forms.AnchorStyles.Left
-            Me.Label4.AutoSize = True
-            Me.Label4.Location = New System.Drawing.Point(3, 106)
-            Me.Label4.Margin = New System.Windows.Forms.Padding(3)
-            Me.Label4.Name = "Label4"
-            Me.Label4.Size = New System.Drawing.Size(25, 13)
-            Me.Label4.TabIndex = 0
-            Me.Label4.Text = "Ask"
-            '
-            'Label5
-            '
-            Me.Label5.Anchor = System.Windows.Forms.AnchorStyles.Left
-            Me.Label5.AutoSize = True
-            Me.Label5.Location = New System.Drawing.Point(3, 131)
-            Me.Label5.Margin = New System.Windows.Forms.Padding(3)
-            Me.Label5.Name = "Label5"
-            Me.Label5.Size = New System.Drawing.Size(27, 13)
-            Me.Label5.TabIndex = 0
-            Me.Label5.Text = "Last"
-            '
-            'Label6
-            '
-            Me.Label6.Anchor = System.Windows.Forms.AnchorStyles.Left
-            Me.Label6.AutoSize = True
-            Me.Label6.Location = New System.Drawing.Point(3, 156)
-            Me.Label6.Margin = New System.Windows.Forms.Padding(3)
-            Me.Label6.Name = "Label6"
-            Me.Label6.Size = New System.Drawing.Size(33, 13)
-            Me.Label6.TabIndex = 0
-            Me.Label6.Text = "Close"
+            Me.Label1.Text = "Field layout"
             '
             'CurveCheckBox
             '
             Me.CurveCheckBox.AutoSize = True
-            Me.CurveCheckBox.Location = New System.Drawing.Point(203, 178)
+            Me.CurveCheckBox.Location = New System.Drawing.Point(203, 103)
             Me.CurveCheckBox.Name = "CurveCheckBox"
             Me.CurveCheckBox.Size = New System.Drawing.Size(157, 17)
             Me.CurveCheckBox.TabIndex = 9
             Me.CurveCheckBox.Text = "Can be used to plot a curve"
             Me.CurveCheckBox.UseVisualStyleBackColor = True
             '
+            'Field_setTableAdapter
+            '
+            Me.Field_setTableAdapter.ClearBeforeFill = True
+            '
             'NewChainForm
             '
             Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
             Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-            Me.ClientSize = New System.Drawing.Size(616, 234)
+            Me.ClientSize = New System.Drawing.Size(616, 157)
             Me.Controls.Add(Me.TheLayout)
             Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
             Me.Name = "NewChainForm"
             Me.Text = "Chain"
             Me.TheLayout.ResumeLayout(False)
             Me.TheLayout.PerformLayout()
+            CType(Me.FieldsetBindingSource, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.BondsDataSet, System.ComponentModel.ISupportInitialize).EndInit()
             Me.ResumeLayout(False)
 
         End Sub
@@ -277,14 +232,11 @@
         Friend WithEvents DescrTextBox As System.Windows.Forms.TextBox
         Friend WithEvents OkButton As System.Windows.Forms.Button
         Friend WithEvents CancelButton As System.Windows.Forms.Button
-        Friend WithEvents CloseTextBox As System.Windows.Forms.TextBox
-        Friend WithEvents LastTextBox As System.Windows.Forms.TextBox
-        Friend WithEvents AskTextBox As System.Windows.Forms.TextBox
-        Friend WithEvents BidTextBox As System.Windows.Forms.TextBox
         Friend WithEvents Label1 As System.Windows.Forms.Label
-        Friend WithEvents Label4 As System.Windows.Forms.Label
-        Friend WithEvents Label5 As System.Windows.Forms.Label
-        Friend WithEvents Label6 As System.Windows.Forms.Label
         Friend WithEvents CurveCheckBox As System.Windows.Forms.CheckBox
+        Friend WithEvents FieldLayoutComboBox As System.Windows.Forms.ComboBox
+        Friend WithEvents BondsDataSet As YieldMap.BondsDataSet
+        Friend WithEvents FieldsetBindingSource As System.Windows.Forms.BindingSource
+        Friend WithEvents Field_setTableAdapter As YieldMap.BondsDataSetTableAdapters.field_setTableAdapter
     End Class
 End Namespace
