@@ -112,7 +112,7 @@ Namespace Forms.ChartForm
             If bidAskSeries IsNot Nothing Then TheChart.Series.Remove(bidAskSeries)
         End Sub
 
-        Private Sub PlotBidAsk(ByVal bond As VisualizableBond)
+        Private Sub PlotBidAsk(ByVal bond As Bond)
             If Not ShowBidAsk Then Return
             If Not (bond.QuotesAndYields.ContainsKey(QuoteSource.Bid.ToString.ToUpper()) Or bond.QuotesAndYields.ContainsKey(QuoteSource.Ask.ToString.ToUpper())) Then Return
             Dim bidAskSeries = TheChart.Series.FindByName("BidAskSeries")
@@ -212,7 +212,7 @@ Namespace Forms.ChartForm
                                      From pnt In srs.Points
                                      Where pnt.YValues.Any And (_spreadBenchmarks.CurrentType <> SpreadType.Yield OrElse pnt.YValues.First > 0)
                                      Select pnt.YValues.First).Min
-                    
+
 
                     If Not lstMin.Any Then
                         Logger.Warn("Nothing to use as minimum")
@@ -288,7 +288,7 @@ Namespace Forms.ChartForm
 
                     seriesDescr.ResetSelection()
                     srs.Points.ToList.ForEach(Sub(point)
-                                                  Dim tg = CType(point.Tag, VisualizableBond)
+                                                  Dim tg = CType(point.Tag, Bond)
                                                   point.Color = If(tg.QuotesAndYields(tg.SelectedQuote).YieldSource = YieldSource.Historical, Color.LightGray, Color.White)
                                               End Sub)
                 End Sub)

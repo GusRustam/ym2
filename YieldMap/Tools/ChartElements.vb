@@ -30,16 +30,16 @@ Namespace Tools
 #End Region
 
 #Region "II. Groups and ansamble"
-    Public Class VisualizableAnsamble
-        Private ReadOnly _groups As New List(Of VisualizableGroup)
+    Public Class Ansamble
+        Private ReadOnly _groups As New List(Of Group)
 
         Private ReadOnly _spreadBmk As SpreadContainer
 
-        Public Event AllQuotes As Action(Of List(Of VisualizableBond))
-        Public Event RemovedItem As Action(Of VisualizableGroup, String)
-        Public Event Quote As Action(Of VisualizableBond, String)
-        Public Event Volume As Action(Of VisualizableBond)
-        Public Event Clear As Action(Of VisualizableGroup)
+        Public Event AllQuotes As Action(Of List(Of Bond))
+        Public Event RemovedItem As Action(Of Group, String)
+        Public Event Quote As Action(Of Bond, String)
+        Public Event Volume As Action(Of Bond)
+        Public Event Clear As Action(Of Group)
 
         Public ReadOnly Property SpreadBmk() As SpreadContainer
             Get
@@ -54,7 +54,7 @@ Namespace Tools
         ''' <returns>FIRST group which contains specified element</returns>
         ''' <remarks>There might be several groups which contain that element, 
         ''' but they are arranged according to VisualizableGroup sorting rules</remarks>
-        Public Function GetInstrumentGroup(ByVal instrument As String) As VisualizableGroup
+        Public Function GetInstrumentGroup(ByVal instrument As String) As Group
             Dim grp = _groups.Where(Function(group) group.HasRic(instrument)).ToList()
             grp.Sort()
             Return grp.First
@@ -84,7 +84,7 @@ Namespace Tools
             _groups.ForEach(Sub(grp) grp.StartLoadingLiveData())
         End Sub
 
-        Public Sub AddGroup(ByVal group As VisualizableGroup)
+        Public Sub AddGroup(ByVal group As Group)
             _groups.Add(group)
             AddHandler group.Quote, AddressOf OnBondQuote
             AddHandler group.RemovedItem, AddressOf OnRemovedItem
@@ -93,23 +93,23 @@ Namespace Tools
             AddHandler group.Clear, AddressOf OnGroupClear
         End Sub
 
-        Private Sub OnRemovedItem(ByVal grp As VisualizableGroup, ByVal ric As String)
+        Private Sub OnRemovedItem(ByVal grp As Group, ByVal ric As String)
             RaiseEvent RemovedItem(grp, ric)
         End Sub
 
-        Private Sub OnBondAllQuotes(ByVal obj As List(Of VisualizableBond))
+        Private Sub OnBondAllQuotes(ByVal obj As List(Of Bond))
             RaiseEvent AllQuotes(obj)
         End Sub
 
-        Private Sub OnGroupClear(ByVal obj As VisualizableGroup)
+        Private Sub OnGroupClear(ByVal obj As Group)
             RaiseEvent Clear(obj)
         End Sub
 
-        Private Sub OnBondVolume(ByVal obj As VisualizableBond)
+        Private Sub OnBondVolume(ByVal obj As Bond)
             RaiseEvent Volume(obj)
         End Sub
 
-        Private Sub OnBondQuote(bond As VisualizableBond, field As String)
+        Private Sub OnBondQuote(bond As Bond, field As String)
             RaiseEvent Quote(bond, field)
         End Sub
 
@@ -117,7 +117,7 @@ Namespace Tools
             _spreadBmk = bmk
         End Sub
 
-        Public Function GetGroup(ByVal seriesName As String) As VisualizableGroup
+        Public Function GetGroup(ByVal seriesName As String) As Group
             Return _groups.First(Function(grp) grp.SeriesName = seriesName)
         End Function
 
@@ -149,20 +149,20 @@ Namespace Tools
         End Sub
     End Class
 
-    Public Class VisualizableBond
+    Public Class Bond
         Private _selectedQuote As String
-        Private ReadOnly _parentGroup As VisualizableGroup
+        Private ReadOnly _parentGroup As Group
         Private ReadOnly _metaData As DataBaseBondDescription
         Private ReadOnly _quotesAndYields As New Dictionary(Of String, BondPointDescription)
         Public TodayVolume As Double
 
-        Sub New(ByVal parentGroup As VisualizableGroup, ByVal selectedQuote As String, ByVal metaData As DataBaseBondDescription)
+        Sub New(ByVal parentGroup As Group, ByVal selectedQuote As String, ByVal metaData As DataBaseBondDescription)
             _parentGroup = parentGroup
             Me.SelectedQuote = selectedQuote
             _metaData = metaData
         End Sub
 
-        Public ReadOnly Property ParentGroup As VisualizableGroup
+        Public ReadOnly Property ParentGroup As Group
             Get
                 Return _parentGroup
             End Get
@@ -206,17 +206,17 @@ Namespace Tools
     ''' Represents separate series on the chart
     ''' </summary>
     ''' <remarks></remarks>
-    Public Class VisualizableGroup
-        Implements IComparable(Of VisualizableGroup)
-        Private Shared ReadOnly Logger As Logger = GetLogger(GetType(VisualizableGroup))
+    Public Class Group
+        Implements IComparable(Of Group)
+        Private Shared ReadOnly Logger As Logger = GetLogger(GetType(Group))
 
-        Private ReadOnly _ansamble As VisualizableAnsamble
+        Private ReadOnly _ansamble As Ansamble
 
-        Public Event Quote As Action(Of VisualizableBond, String)
-        Public Event RemovedItem As Action(Of VisualizableGroup, String)
-        Public Event Clear As Action(Of VisualizableGroup)
-        Public Event Volume As Action(Of VisualizableBond)
-        Public Event AllQuotes As Action(Of List(Of VisualizableBond))
+        Public Event Quote As Action(Of Bond, String)
+        Public Event RemovedItem As Action(Of Group, String)
+        Public Event Clear As Action(Of Group)
+        Public Event Volume As Action(Of Bond)
+        Public Event AllQuotes As Action(Of List(Of Bond))
 
         Public Group As GroupType
         Public SeriesName As String
@@ -231,7 +231,9 @@ Namespace Tools
         Public RicStructure As String
         Public Brokers As New List(Of String)
 
-        Private ReadOnly _elements As New Dictionary(Of String, VisualizableBond) 'ric -> datapoint
+        Public Fields As New NamedFieldGroup
+
+        Private ReadOnly _elements As New Dictionary(Of String, Bond) 'ric -> datapoint
         Public PortfolioID As Long
         Private _color As String
 
@@ -246,13 +248,13 @@ Namespace Tools
             End Set
         End Property
 
-        Public ReadOnly Property Ansamble() As VisualizableAnsamble
+        Public ReadOnly Property Ansamble() As Ansamble
             Get
                 Return _ansamble
             End Get
         End Property
 
-        Public Function CompareTo(ByVal other As VisualizableGroup) As Integer Implements IComparable(Of VisualizableGroup).CompareTo
+        Public Function CompareTo(ByVal other As Group) As Integer Implements IComparable(Of Group).CompareTo
             Return Group.CompareTo(other.Group)
         End Function
 
@@ -320,7 +322,7 @@ Namespace Tools
             Next
         End Sub
 
-        Private Sub HandleQuote(ByRef bondDataPoint As VisualizableBond, ByVal fieldName As String, ByVal fieldVal As Double?, ByVal calcDate As Date)
+        Private Sub HandleQuote(ByRef bondDataPoint As Bond, ByVal fieldName As String, ByVal fieldVal As Double?, ByVal calcDate As Date)
             Dim calculation As New BondPointDescription
             calculation.Price = fieldVal
             calculation.YieldSource = If(calcDate = Date.Today, YieldSource.Realtime, YieldSource.Historical)
@@ -391,14 +393,14 @@ Namespace Tools
         End Function
 
         Public Sub AddElement(ByVal ric As String, ByVal descr As DataBaseBondDescription)
-            _elements.Add(ric, New VisualizableBond(Me, LastField, descr))
+            _elements.Add(ric, New Bond(Me, LastField, descr))
         End Sub
 
-        Public Sub New(ansamble As VisualizableAnsamble)
+        Public Sub New(ansamble As Ansamble)
             _ansamble = ansamble
         End Sub
 
-        Public Function GetElement(ByVal ric As String) As VisualizableBond
+        Public Function GetElement(ByVal ric As String) As Bond
             Return _elements(ric)
         End Function
 

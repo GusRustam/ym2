@@ -20,7 +20,7 @@ Namespace Forms.ChartForm
         Private ReadOnly _moneyMarketCurves As New List(Of SwapCurve)
 
         Private WithEvents _spreadBenchmarks As New SpreadContainer
-        Private WithEvents _ansamble As New VisualizableAnsamble(_spreadBenchmarks)
+        Private WithEvents _ansamble As New Ansamble(_spreadBenchmarks)
 
         Public Delegate Sub PointUpdateDelegate(ByVal ric As String, ByVal yield As Double, ByVal duration As Double, ByVal lastPrice As Double)
         Public Event PointUpdated As PointUpdateDelegate
@@ -83,13 +83,13 @@ Namespace Forms.ChartForm
                 Dim portfolioUnitedDataTable = (New PortfolioUnitedTableAdapter).GetData()
                 For Each port In (From p In portfolioSources Where p.portfolioID = currentPortID Select p)
                     Dim groupType As GroupType
-                    Dim group As VisualizableGroup
+                    Dim group As Group
                     If groupType.TryParse(port.whereFrom, groupType) Then
                         Dim fieldSetId = port.id_field_set
                         Dim fields = (New field_layoutTableAdapter).GetData().Where(Function(row) row.field_set_id = fieldSetId)
                         Dim realTime = fields.First(Function(row) row.is_realtime = 1)
                         Dim history = fields.First(Function(row) row.is_realtime = 0)
-                        group = New VisualizableGroup(_ansamble) With {
+                        group = New Group(_ansamble) With {
                             .Group = groupType,
                             .SeriesName = port.whereFromDescr,
                             .PortfolioID = port.fromID,
@@ -182,8 +182,8 @@ Namespace Forms.ChartForm
                 Try
                     If htr.ChartElementType = ChartElementType.DataPoint Then
                         Dim point As DataPoint = CType(htr.Object, DataPoint)
-                        If TypeOf point.Tag Is VisualizableBond Then
-                            Dim bondDataPoint = CType(point.Tag, VisualizableBond)
+                        If TypeOf point.Tag Is Bond Then
+                            Dim bondDataPoint = CType(point.Tag, Bond)
                             With BondCMS
                                 .Tag = bondDataPoint.MetaData.RIC
                                 .Show(TheChart, mouseEvent.Location)
@@ -247,8 +247,8 @@ Namespace Forms.ChartForm
                     hasShown = True
                     Dim point As DataPoint = CType(htr.Object, DataPoint)
 
-                    If TypeOf point.Tag Is VisualizableBond And Not point.IsEmpty Then
-                        Dim bondData = CType(point.Tag, VisualizableBond)
+                    If TypeOf point.Tag Is Bond And Not point.IsEmpty Then
+                        Dim bondData = CType(point.Tag, Bond)
                         DscrLabel.Text = bondData.MetaData.ShortName
                         Dim calculatedYield = bondData.QuotesAndYields(bondData.SelectedQuote)
 
@@ -331,7 +331,7 @@ Namespace Forms.ChartForm
 
                     seriesDescr.ResetSelection()
                     srs.Points.ToList.ForEach(Sub(point)
-                                                  Dim tg = CType(point.Tag, VisualizableBond)
+                                                  Dim tg = CType(point.Tag, Bond)
                                                   point.Color = If(tg.QuotesAndYields(tg.SelectedQuote).YieldSource = YieldSource.Historical, Color.LightGray, Color.White)
                                               End Sub)
                     If seriesDescr.Name = curveName AndAlso pointIndex IsNot Nothing Then
@@ -536,7 +536,7 @@ Namespace Forms.ChartForm
             Logger.Trace("ShowLabelsTSBClick")
             For Each series In From srs In TheChart.Series Where TypeOf srs.Tag Is BondSetSeries
                 Dim points = series.Points
-                For Each dataPoint In From pnt In points Where TypeOf pnt.Tag Is VisualizableBond Select {pnt, CType(pnt.Tag, VisualizableBond)}
+                For Each dataPoint In From pnt In points Where TypeOf pnt.Tag Is Bond Select {pnt, CType(pnt.Tag, Bond)}
                     dataPoint(0).Label = If(ShowLabelsTSB.Checked, dataPoint(1).Metadata.ShortName, "")
                 Next
             Next
@@ -887,22 +887,37 @@ Namespace Forms.ChartForm
 
             askForm.ShowDialog(Me)
             If askForm.SelectedRic <> "" Then
-                Dim group = New VisualizableGroup(_ansamble)
+                Dim group = New Group(_ansamble)
                 Dim descr As DataBaseBondDescription
 
                 Dim layout As New field_layoutTableAdapter
                 Dim setInfo = layout.GetData().Where(Function(row) row.id = askForm.LayoutId)
-                Dim realTime = setInfo.First(Function(row) row.is_realtime = 1)
-                Dim history = setInfo.First(Function(row) row.is_realtime = 0)
 
-                group.AskField = realTime.ask_field
-                group.BidField = realTime.bid_field
-                group.LastField = realTime.last_field
-                group.HistField = history.last_field
-                group.VWAPField = realTime.vwap_field
-                group.VolumeField = realTime.volume_field
+                Dim rw = setInfo.First(Function(row) row.is_realtime = 1)
+                group.AskField = rw.ask_field
+                group.BidField = rw.bid_field
+                group.LastField = rw.last_field
+                group.VWAPField = rw.vwap_field
+                group.VolumeField = rw.volume_field
+
+                group.Fields.FieldName(FieldTime.RealTime, FieldType.Bid) = rw.bid_field
+                group.Fields.FieldName(FieldTime.RealTime, FieldType.Ask) = rw.ask_field
+                group.Fields.FieldName(FieldTime.RealTime, FieldType.Last) = rw.last_field
+                group.Fields.FieldName(FieldTime.RealTime, FieldType.VWAP) = rw.vwap_field
+                group.Fields.FieldName(FieldTime.RealTime, FieldType.TimeStamp) = rw.timestamp_field
+                group.Fields.FieldName(FieldTime.RealTime, FieldType.Volume) = rw.volume_field
+
+                rw = setInfo.First(Function(row) row.is_realtime = 0)
+                group.HistField = rw.last_field
+
+                group.Fields.FieldName(FieldTime.Historical, FieldType.Bid) = rw.bid_field
+                group.Fields.FieldName(FieldTime.Historical, FieldType.Ask) = rw.ask_field
+                group.Fields.FieldName(FieldTime.Historical, FieldType.Last) = rw.last_field
+                group.Fields.FieldName(FieldTime.Historical, FieldType.VWAP) = rw.vwap_field
+                group.Fields.FieldName(FieldTime.Historical, FieldType.TimeStamp) = rw.timestamp_field
+                group.Fields.FieldName(FieldTime.Historical, FieldType.Volume) = rw.volume_field
+
                 group.Color = "Red"
-
                 descr = DbInitializer.GetBondInfo(askForm.SelectedRic)
                 If descr IsNot Nothing Then
                     group.SeriesName = descr.ShortName
@@ -937,7 +952,7 @@ Namespace Forms.ChartForm
 #End Region
 
 #Region "e) Assembly and curves events"
-        Private Sub OnGroupClear(ByVal group As VisualizableGroup) Handles _ansamble.Clear
+        Private Sub OnGroupClear(ByVal group As Group) Handles _ansamble.Clear
             Logger.Trace("OnGroupClear()")
             GuiAsync(
                 Sub()
@@ -956,13 +971,13 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
-        Private Sub OnBondAllQuotes(ByVal data As List(Of VisualizableBond)) Handles _ansamble.AllQuotes
+        Private Sub OnBondAllQuotes(ByVal data As List(Of Bond)) Handles _ansamble.AllQuotes
             Logger.Trace("OnBondAllQuotes()")
             data.Where(Function(elem) elem.QuotesAndYields.ContainsKey(elem.SelectedQuote)).ToList.ForEach(Sub(elem) OnBondQuote(elem, elem.SelectedQuote, True))
             SetChartMinMax()
         End Sub
 
-        Private Sub OnBondQuote(ByVal descr As VisualizableBond, ByVal fieldName As String, Optional ByVal raw As Boolean = False) Handles _ansamble.Quote
+        Private Sub OnBondQuote(ByVal descr As Bond, ByVal fieldName As String, Optional ByVal raw As Boolean = False) Handles _ansamble.Quote
             Logger.Trace("OnBondQuote({0}, {1})", descr.MetaData.ShortName, descr.ParentGroup.SeriesName)
             GuiAsync(
                 Sub()
@@ -1003,10 +1018,10 @@ Namespace Forms.ChartForm
                     ' creating data point
                     Dim point As DataPoint
                     Dim yValue = _spreadBenchmarks.GetActualQuote(calc)
-                    Dim haveSuchPoint = series.Points.Any(Function(pnt) CType(pnt.Tag, VisualizableBond).MetaData.RIC = ric)
+                    Dim haveSuchPoint = series.Points.Any(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric)
 
                     If haveSuchPoint Then
-                        point = series.Points.First(Function(pnt) CType(pnt.Tag, VisualizableBond).MetaData.RIC = ric)
+                        point = series.Points.First(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric)
                         If yValue IsNot Nothing Then
                             point.XValue = calc.Duration
                             If yValue.Value <> point.YValues.First Then
@@ -1032,14 +1047,14 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
-        Private Sub OnRemovedItem(group As VisualizableGroup, ric As String) Handles _ansamble.RemovedItem
+        Private Sub OnRemovedItem(group As Group, ric As String) Handles _ansamble.RemovedItem
             Logger.Trace("OnRemovedItem({0})", ric)
             GuiAsync(
                 Sub()
                     Dim series As Series = TheChart.Series.FindByName(group.SeriesName)
                     If series IsNot Nothing Then
-                        While series.Points.Any(Function(pnt) CType(pnt.Tag, VisualizableBond).MetaData.RIC = ric)
-                            series.Points.Remove(series.Points.First(Function(pnt) CType(pnt.Tag, VisualizableBond).MetaData.RIC = ric))
+                        While series.Points.Any(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric)
+                            series.Points.Remove(series.Points.First(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric))
                         End While
                     End If
                     If series.Points.Count = 0 Then _ansamble.RemoveGroup(group.Id)

@@ -56,7 +56,7 @@ Namespace Tools.RDataTool
             End If
         End Sub
 
-        Private Sub OnUpdateHandler(ByVal datastatus As DEX2_DataStatus, ByVal [error] As Object) Handles _myRData.OnUpdate
+        Private Sub OnUpdate(ByVal datastatus As DEX2_DataStatus, ByVal [error] As Object) Handles _myRData.OnUpdate
             Logger.Debug("OnUpdateHandler()")
             If datastatus = DEX2_DataStatus.DE_DS_FULL Then
                 _dataEventHanler(_myRData.Data, Nothing)

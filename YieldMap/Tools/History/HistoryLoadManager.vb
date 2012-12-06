@@ -133,7 +133,7 @@ Namespace Tools.History
         End Property
 
         Public Delegate Sub NewDataDelegate(ByVal hst As HistoryLoadManager, ByVal ric As String, ByVal datastatus As RT_DataStatus, ByVal data As Dictionary(Of Date, HistoricalItem))
-        Public Event NewData As NewDataDelegate
+        Public Event HistoricalData As NewDataDelegate
 
         Public Sub New(ByVal descr As HistoryTaskDescr, ByVal handler As NewDataDelegate)
             Logger.Debug("New(descr)")
@@ -162,8 +162,10 @@ Namespace Tools.History
                     .Source = "IDN"
                     .ItemName = descr.Item
                     .RequestHistory(descr.Fields.Aggregate(Function(str, elem) str + ", " + elem))
-                    AddHandler NewData, handler
+                    AddHandler HistoricalData, handler
                     .ErrorMode = AdxErrorMode.EXCEPTION
+                    'todo здесь собственно можно сделать код для синхронизации как у ChainHandler
+
                     If .Data IsNot Nothing Then
                         ParseData()
                     Else
@@ -186,7 +188,7 @@ Namespace Tools.History
                         ParseData()
                     Else
                         Logger.Warn("Data Status is {0}; will omit the data. Error message is {1}", datastatus, _historyManager.ErrorString)
-                        RaiseEvent NewData(Me, _ric, datastatus, Nothing)
+                        RaiseEvent HistoricalData(Me, _ric, datastatus, Nothing)
                     End If
                 End Sub
             )
@@ -242,12 +244,12 @@ Namespace Tools.History
                 Else
                     Logger.Warn("Will return nothing for {0}", _ric)
                 End If
-                RaiseEvent NewData(Me, _ric, _historyManager.DataStatus, res)
+                RaiseEvent HistoricalData(Me, _ric, _historyManager.DataStatus, res)
 
             Catch ex As Exception
                 Logger.ErrorException("Failed to parse historical data", ex)
                 Logger.Error("Exception = {0}", ex.ToString())
-                RaiseEvent NewData(Me, _ric, _historyManager.DataStatus, Nothing)
+                RaiseEvent HistoricalData(Me, _ric, _historyManager.DataStatus, Nothing)
             Finally
                 _finished = True
                 Try

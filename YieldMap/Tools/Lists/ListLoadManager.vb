@@ -91,7 +91,7 @@ Namespace Tools.Lists
         Private Sub OnTimeHandler() Handles _listManager.OnTime
             Logger.Trace("OnTimeHandler()")
             Dim taskRicFieldValue As New Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double))) 'Task -> RIC -> Field -> Value
-
+            'todo тут и разбираться, есть ли такой рик или нет. Если нет, надо об этом явно сообщать
             Try
                 Dim items As Array = _listManager.ListItems(RT_ItemRowView.RT_IRV_UPDATED, RT_ItemColumnView.RT_ICV_STATUS)
                 For k = items.GetLowerBound(0) To items.GetUpperBound(0)

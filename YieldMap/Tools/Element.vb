@@ -56,7 +56,7 @@ Namespace Tools
     Public Class BondPointDescription
         Inherits BasePointDescription
 
-        Public ParentBond As VisualizableBond
+        Public ParentBond As Bond
 
         Public Yld As New YieldStructure
         Public Convexity As Double
