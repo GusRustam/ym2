@@ -36,11 +36,17 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub RefreshGrid()
-            If IssuerCB.Enabled And IssuerCB.SelectedIndex >= 0 Then
-                BondDescriptionsBindingSource.Filter = String.Format("issuer_id = {0:D}", CType(IssuerCB.SelectedItem, DataRowView)("id"))
-            Else
-                BondDescriptionsBindingSource.Filter = ""
+            Dim strFitler As String = ""
+            If IssuerCB.Enabled And IssuerCB.Text <> "" Then
+                strFitler = String.Format("issname LIKE '{0}%'", IssuerCB.Text)
             End If
+
+            If RICTextBox.Text <> "" Then
+                strFitler = If(strFitler <> "", strFitler & " AND ", "") & String.Format("ric LIKE '{0}%'", RICTextBox.Text)
+            End If
+
+            BondDescriptionsBindingSource.Filter = strFitler
+
             AddHandler BondDescriptionsTableAdapter.Adapter.FillError, AddressOf Commons.SkipInvalidRows
             BondDescriptionsTableAdapter.Fill(BondsDataSet.BondDescriptions)
             RemoveHandler BondDescriptionsTableAdapter.Adapter.FillError, AddressOf Commons.SkipInvalidRows
@@ -62,6 +68,19 @@ Namespace Forms.PortfolioForm
 
         Private Sub IncludeCBCheckedChanged(sender As System.Object, e As EventArgs) Handles IncludeCB.CheckedChanged
             IncludeCB.Text = IIf(IncludeCB.Checked, "Include", "Exclude")
+        End Sub
+
+        Private Sub BondListDGV_ColumnHeaderMouseClick(ByVal sender As Object, ByVal e As DataGridViewCellMouseEventArgs) Handles BondListDGV.ColumnHeaderMouseClick
+
+        End Sub
+
+        Private Sub RICTextBox_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RICTextBox.TextChanged
+            RefreshGrid()
+        End Sub
+
+        Private Sub ShowAllCB_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ShowAllCB.TextChanged, IssuerCB.TextChanged
+            RefreshGrid()
+
         End Sub
     End Class
 End Namespace

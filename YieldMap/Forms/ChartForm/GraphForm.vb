@@ -4,6 +4,7 @@ Imports System.Windows.Forms.DataVisualization.Charting
 Imports System.Drawing
 Imports AdfinXAnalyticsFunctions
 Imports System.ComponentModel
+Imports YieldMap.Forms.PortfolioForm
 Imports YieldMap.Curves
 Imports YieldMap.My.Resources
 Imports YieldMap.Commons
@@ -506,7 +507,7 @@ Namespace Forms.ChartForm
             _moneyMarketCurves.Add(rubCCS)
         End Sub
 
-        Private Sub RubIRSTSMIClick(sender As Object, e As EventArgs) Handles RubIRSTSMI.Click
+        Private Sub RubIRS_TSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RubIRSTSMI.Click
             Logger.Debug("RubIRSTSMIClick()")
             Dim rubIRS = New RubIRS(_spreadBenchmarks)
             AddHandler rubIRS.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
@@ -877,7 +878,8 @@ Namespace Forms.ChartForm
             '_historicalCurves.RemoveCurve(HistoryCMS.Tag)
         End Sub
 
-        Private Sub EnterRICTSMIClick(sender As Object, e As EventArgs) Handles EnterRICTSMI.Click
+        Private Sub EnterRIC_TSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles EnterRICTSMI.Click
+            Return
             Dim askForm As New ManualRicForm()
             AddHandler askForm.Activated,
                 Sub(snd As Object, evnt As EventArgs)
@@ -897,25 +899,11 @@ Namespace Forms.ChartForm
                 group.AskField = rw.ask_field
                 group.BidField = rw.bid_field
                 group.LastField = rw.last_field
-                group.VWAPField = rw.vwap_field
+                group.VwapField = rw.vwap_field
                 group.VolumeField = rw.volume_field
-
-                group.Fields.FieldName(FieldTime.RealTime, FieldType.Bid) = rw.bid_field
-                group.Fields.FieldName(FieldTime.RealTime, FieldType.Ask) = rw.ask_field
-                group.Fields.FieldName(FieldTime.RealTime, FieldType.Last) = rw.last_field
-                group.Fields.FieldName(FieldTime.RealTime, FieldType.VWAP) = rw.vwap_field
-                group.Fields.FieldName(FieldTime.RealTime, FieldType.TimeStamp) = rw.timestamp_field
-                group.Fields.FieldName(FieldTime.RealTime, FieldType.Volume) = rw.volume_field
 
                 rw = setInfo.First(Function(row) row.is_realtime = 0)
                 group.HistField = rw.last_field
-
-                group.Fields.FieldName(FieldTime.Historical, FieldType.Bid) = rw.bid_field
-                group.Fields.FieldName(FieldTime.Historical, FieldType.Ask) = rw.ask_field
-                group.Fields.FieldName(FieldTime.Historical, FieldType.Last) = rw.last_field
-                group.Fields.FieldName(FieldTime.Historical, FieldType.VWAP) = rw.vwap_field
-                group.Fields.FieldName(FieldTime.Historical, FieldType.TimeStamp) = rw.timestamp_field
-                group.Fields.FieldName(FieldTime.Historical, FieldType.Volume) = rw.volume_field
 
                 group.Color = "Red"
                 descr = DbInitializer.GetBondInfo(askForm.SelectedRic)
@@ -946,7 +934,7 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub SelectFromAListTSMIClick(sender As Object, e As EventArgs) Handles SelectFromAListTSMI.Click
+        Private Sub SelectFromAListTSMIClick(ByVal sender As Object, ByVal e As EventArgs)
 
         End Sub
 #End Region
@@ -1163,5 +1151,41 @@ Namespace Forms.ChartForm
         'End Sub
 #End Region
 #End Region
+
+        Private Sub SelectFromAListTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SelectFromAListTSMI.Click
+            Dim bondSelector As New BondSelectorForm
+            If bondSelector.ShowDialog() = DialogResult.OK Then
+                bondSelector.SelectedRICs.ForEach(
+                    Sub(aRic)
+                        ' todo what group???
+                        Dim group = New Group(_ansamble)
+                        Dim descr As DataBaseBondDescription
+
+                        Dim layout As New field_layoutTableAdapter
+                        'Dim setInfo = layout.GetData().Where(Function(row) row.id = bondSelector.LayoutId)
+
+                        'Dim rw = setInfo.First(Function(row) row.is_realtime = 1)
+                        'group.AskField = rw.ask_field
+                        'group.BidField = rw.bid_field
+                        'group.LastField = rw.last_field
+                        'group.VwapField = rw.vwap_field
+                        'group.VolumeField = rw.volume_field
+
+                        'rw = setInfo.First(Function(row) row.is_realtime = 0)
+                        'group.HistField = rw.last_field
+
+                        'group.Color = "Red"
+                        'descr = DbInitializer.GetBondInfo(askForm.SelectedRic)
+                        'If descr IsNot Nothing Then
+                        '    group.SeriesName = descr.ShortName
+                        '    group.AddElement(askForm.SelectedRic, descr)
+                        '    group.StartLoadingLiveData()
+                        '    _ansamble.AddGroup(group)
+                        'Else
+
+                        'End If
+                    End Sub)
+            End If
+        End Sub
     End Class
 End Namespace

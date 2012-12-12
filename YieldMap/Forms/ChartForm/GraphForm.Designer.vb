@@ -24,8 +24,8 @@
         <System.Diagnostics.DebuggerStepThrough()> _
         Private Sub InitializeComponent()
             Me.components = New System.ComponentModel.Container()
-            Dim ChartArea2 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-            Dim Legend2 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+            Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+            Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
             Me.TheStatusStrip = New System.Windows.Forms.StatusStrip()
             Me.StatusMessage = New System.Windows.Forms.ToolStripStatusLabel()
             Me.TheToolStrip = New System.Windows.Forms.ToolStrip()
@@ -91,7 +91,6 @@
             Me.ClipboardSeparator = New System.Windows.Forms.ToolStripSeparator()
             Me.AddBondToChartTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.EnterRICTSMI = New System.Windows.Forms.ToolStripMenuItem()
-            Me.SelectFromAListTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.HistoryCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.RemoveHistoryTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.MoneyCurveCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
@@ -115,6 +114,7 @@
             Me.YAxisCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.BondSetCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.RemoveFromChartTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.SelectFromAListTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.TheStatusStrip.SuspendLayout()
             Me.TheToolStrip.SuspendLayout()
             Me.BondCMS.SuspendLayout()
@@ -339,8 +339,8 @@
             'MainTableLayout
             '
             Me.MainTableLayout.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                Or System.Windows.Forms.AnchorStyles.Left) _
-                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                        Or System.Windows.Forms.AnchorStyles.Left) _
+                        Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
             Me.MainTableLayout.ColumnCount = 1
             Me.MainTableLayout.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
             Me.MainTableLayout.Controls.Add(Me.ItemDescriptionPanel, 0, 0)
@@ -356,8 +356,8 @@
             'ItemDescriptionPanel
             '
             Me.ItemDescriptionPanel.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                Or System.Windows.Forms.AnchorStyles.Left) _
-                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                        Or System.Windows.Forms.AnchorStyles.Left) _
+                        Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
             Me.ItemDescriptionPanel.AutoSize = True
             Me.ItemDescriptionPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
             Me.ItemDescriptionPanel.BackColor = System.Drawing.SystemColors.Control
@@ -716,12 +716,12 @@
             '
             'TheChart
             '
-            ChartArea2.Name = "ChartArea1"
-            Me.TheChart.ChartAreas.Add(ChartArea2)
+            ChartArea1.Name = "ChartArea1"
+            Me.TheChart.ChartAreas.Add(ChartArea1)
             Me.TheChart.Dock = System.Windows.Forms.DockStyle.Fill
-            Legend2.Enabled = False
-            Legend2.Name = "Legend1"
-            Me.TheChart.Legends.Add(Legend2)
+            Legend1.Enabled = False
+            Legend1.Name = "Legend1"
+            Me.TheChart.Legends.Add(Legend1)
             Me.TheChart.Location = New System.Drawing.Point(0, 0)
             Me.TheChart.Name = "TheChart"
             Me.TheChart.Size = New System.Drawing.Size(778, 417)
@@ -739,9 +739,9 @@
             '
             'ChartCMS
             '
-            Me.ChartCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToClipboardTSMI, Me.ClipboardSeparator, Me.AddBondToChartTSMI})
+            Me.ChartCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToClipboardTSMI, Me.ClipboardSeparator, Me.AddBondToChartTSMI, Me.SelectFromAListTSMI})
             Me.ChartCMS.Name = "ChartCMS"
-            Me.ChartCMS.Size = New System.Drawing.Size(185, 76)
+            Me.ChartCMS.Size = New System.Drawing.Size(185, 98)
             '
             'CopyToClipboardTSMI
             '
@@ -756,22 +756,17 @@
             '
             'AddBondToChartTSMI
             '
-            Me.AddBondToChartTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.EnterRICTSMI, Me.SelectFromAListTSMI})
+            Me.AddBondToChartTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.EnterRICTSMI})
             Me.AddBondToChartTSMI.Name = "AddBondToChartTSMI"
             Me.AddBondToChartTSMI.Size = New System.Drawing.Size(184, 22)
             Me.AddBondToChartTSMI.Text = "Add bond onto chart"
+            Me.AddBondToChartTSMI.Visible = False
             '
             'EnterRICTSMI
             '
             Me.EnterRICTSMI.Name = "EnterRICTSMI"
-            Me.EnterRICTSMI.Size = New System.Drawing.Size(176, 22)
+            Me.EnterRICTSMI.Size = New System.Drawing.Size(152, 22)
             Me.EnterRICTSMI.Text = "Enter RIC..."
-            '
-            'SelectFromAListTSMI
-            '
-            Me.SelectFromAListTSMI.Name = "SelectFromAListTSMI"
-            Me.SelectFromAListTSMI.Size = New System.Drawing.Size(176, 22)
-            Me.SelectFromAListTSMI.Text = "Select from a list..."
             '
             'HistoryCMS
             '
@@ -908,6 +903,12 @@
             Me.RemoveFromChartTSMI.Name = "RemoveFromChartTSMI"
             Me.RemoveFromChartTSMI.Size = New System.Drawing.Size(177, 22)
             Me.RemoveFromChartTSMI.Text = "Remove from chart"
+            '
+            'SelectFromAListTSMI
+            '
+            Me.SelectFromAListTSMI.Name = "SelectFromAListTSMI"
+            Me.SelectFromAListTSMI.Size = New System.Drawing.Size(184, 22)
+            Me.SelectFromAListTSMI.Text = "Add bond..."
             '
             'GraphForm
             '

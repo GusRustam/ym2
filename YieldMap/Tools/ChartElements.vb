@@ -189,7 +189,9 @@ Namespace Tools
             End Get
         End Property
 
-        Public Sub RecalculateByType(type As SpreadType)
+        'Public ReadOnly Fields As New ValuedFieldGroup
+         
+        Public Sub RecalculateByType(ByVal type As SpreadType)
             If _quotesAndYields.ContainsKey(_selectedQuote) Then
                 _parentGroup.Ansamble.SpreadBmk.CalcAllSpreads(_quotesAndYields(_selectedQuote), _metaData, type)
             End If
@@ -226,12 +228,12 @@ Namespace Tools
         Public LastField As String
         Public HistField As String
         Public VolumeField As String = "CF_VOLUME"
-        Public VWAPField As String = "VWAP"
+        Public VwapField As String = "VWAP"
         Public Currency As String
         Public RicStructure As String
         Public Brokers As New List(Of String)
 
-        Public Fields As New NamedFieldGroup
+        'Public Fields As New NamedFieldGroup
 
         Private ReadOnly _elements As New Dictionary(Of String, Bond) 'ric -> datapoint
         Public PortfolioID As Long

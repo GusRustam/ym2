@@ -70,7 +70,7 @@ Namespace Tools.Lists
             End Try
         End Function
 
-        Public Sub New()
+        Public Sub New() 'todo when eikon gets killed this throws an unhandled exception
             Logger.Debug("New()")
             With _listManager
                 .Source = "IDN"

@@ -45,6 +45,8 @@
             Me.OkButton = New System.Windows.Forms.Button()
             Me.Button2 = New System.Windows.Forms.Button()
             Me.IncludeCB = New System.Windows.Forms.CheckBox()
+            Me.Label2 = New System.Windows.Forms.Label()
+            Me.RICTextBox = New System.Windows.Forms.TextBox()
             CType(Me.IssuerBindingSource, System.ComponentModel.ISupportInitialize).BeginInit()
             CType(Me.BondsDataSet, System.ComponentModel.ISupportInitialize).BeginInit()
             CType(Me.BondListDGV, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -74,7 +76,7 @@
             '
             'IssuerCB
             '
-            Me.IssuerCB.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
+            Me.IssuerCB.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest
             Me.IssuerCB.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource
             Me.IssuerCB.DataSource = Me.IssuerBindingSource
             Me.IssuerCB.DisplayMember = "shortname"
@@ -105,11 +107,11 @@
             Me.BondListDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
             Me.BondListDGV.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.BondshortnameDataGridViewTextBoxColumn, Me.RicDataGridViewTextBoxColumn, Me.issname, Me.issue_size, Me.coupon, Me.MaturitydateDataGridViewTextBoxColumn, Me.IssueridDataGridViewTextBoxColumn})
             Me.BondListDGV.DataSource = Me.BondDescriptionsBindingSource
-            Me.BondListDGV.Location = New System.Drawing.Point(16, 39)
+            Me.BondListDGV.Location = New System.Drawing.Point(16, 79)
             Me.BondListDGV.Name = "BondListDGV"
             Me.BondListDGV.ReadOnly = True
             Me.BondListDGV.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-            Me.BondListDGV.Size = New System.Drawing.Size(710, 409)
+            Me.BondListDGV.Size = New System.Drawing.Size(710, 410)
             Me.BondListDGV.TabIndex = 6
             '
             'BondshortnameDataGridViewTextBoxColumn
@@ -193,7 +195,7 @@
             'OkButton
             '
             Me.OkButton.DialogResult = System.Windows.Forms.DialogResult.OK
-            Me.OkButton.Location = New System.Drawing.Point(447, 455)
+            Me.OkButton.Location = New System.Drawing.Point(447, 495)
             Me.OkButton.Name = "OkButton"
             Me.OkButton.Size = New System.Drawing.Size(127, 23)
             Me.OkButton.TabIndex = 7
@@ -203,7 +205,7 @@
             'Button2
             '
             Me.Button2.DialogResult = System.Windows.Forms.DialogResult.Cancel
-            Me.Button2.Location = New System.Drawing.Point(599, 455)
+            Me.Button2.Location = New System.Drawing.Point(599, 495)
             Me.Button2.Name = "Button2"
             Me.Button2.Size = New System.Drawing.Size(127, 23)
             Me.Button2.TabIndex = 7
@@ -215,25 +217,44 @@
             Me.IncludeCB.AutoSize = True
             Me.IncludeCB.Checked = True
             Me.IncludeCB.CheckState = System.Windows.Forms.CheckState.Checked
-            Me.IncludeCB.Location = New System.Drawing.Point(16, 455)
+            Me.IncludeCB.Location = New System.Drawing.Point(16, 495)
             Me.IncludeCB.Name = "IncludeCB"
             Me.IncludeCB.Size = New System.Drawing.Size(61, 17)
             Me.IncludeCB.TabIndex = 8
             Me.IncludeCB.Text = "Include"
             Me.IncludeCB.UseVisualStyleBackColor = True
             '
+            'Label2
+            '
+            Me.Label2.AutoSize = True
+            Me.Label2.Location = New System.Drawing.Point(13, 46)
+            Me.Label2.Name = "Label2"
+            Me.Label2.Size = New System.Drawing.Size(25, 13)
+            Me.Label2.TabIndex = 4
+            Me.Label2.Text = "RIC"
+            '
+            'RICTextBox
+            '
+            Me.RICTextBox.Location = New System.Drawing.Point(54, 43)
+            Me.RICTextBox.Name = "RICTextBox"
+            Me.RICTextBox.Size = New System.Drawing.Size(171, 20)
+            Me.RICTextBox.TabIndex = 9
+            '
             'BondSelectorForm
             '
             Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
             Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-            Me.ClientSize = New System.Drawing.Size(738, 505)
+            Me.ClientSize = New System.Drawing.Size(738, 526)
+            Me.Controls.Add(Me.RICTextBox)
             Me.Controls.Add(Me.IncludeCB)
             Me.Controls.Add(Me.Button2)
             Me.Controls.Add(Me.OkButton)
             Me.Controls.Add(Me.BondListDGV)
             Me.Controls.Add(Me.ShowAllCB)
+            Me.Controls.Add(Me.Label2)
             Me.Controls.Add(Me.Label1)
             Me.Controls.Add(Me.IssuerCB)
+            Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
             Me.Name = "BondSelectorForm"
             Me.Text = "Select a bond"
             CType(Me.IssuerBindingSource, System.ComponentModel.ISupportInitialize).EndInit()
@@ -263,5 +284,7 @@
         Friend WithEvents coupon As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents MaturitydateDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents IssueridDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
+        Friend WithEvents Label2 As System.Windows.Forms.Label
+        Friend WithEvents RICTextBox As System.Windows.Forms.TextBox
     End Class
 End Namespace

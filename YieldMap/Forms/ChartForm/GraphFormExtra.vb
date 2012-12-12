@@ -232,8 +232,8 @@ Namespace Forms.ChartForm
 
                     If newMax > newMin Then
                         Dim theMin As Double, theMax As Double
-                        If minMin.HasValue Then theMin = Math.Max(minMin.Value, newMin)
-                        If maxMax.HasValue Then theMax = Math.Min(maxMax.Value, newMax)
+                        theMin = If(minMin.HasValue, Math.Max(minMin.Value, newMin), newMin)
+                        theMax = If(maxMax.HasValue, Math.Min(maxMax.Value, newMax), newMax)
 
                         Dim pow = If(_spreadBenchmarks.CurrentType = SpreadType.Yield, 3, 0)
                         theMax = Math.Ceiling(theMax * (10 ^ pow)) / (10 ^ pow)

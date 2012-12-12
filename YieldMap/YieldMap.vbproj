@@ -263,7 +263,6 @@
     <Compile Include="Tools\Chains\ChainLoadManager.vb" />
     <Compile Include="Tools\Element.vb" />
     <Compile Include="Tools\Estimation\LinearRegression.vb" />
-    <Compile Include="Tools\FieldDescription.vb" />
     <Compile Include="Tools\History\HistoryLoadManager.vb" />
     <Compile Include="Tools\Lists\ListLoadManager.vb" />
     <Compile Include="Tools\RDataTool\BondsDataLoader.vb" />
