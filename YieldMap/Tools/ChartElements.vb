@@ -121,6 +121,11 @@ Namespace Tools
             Return _groups.First(Function(grp) grp.SeriesName = seriesName)
         End Function
 
+
+        Public Function GetGroup(ByVal id As Guid) As Group
+            Return _groups.First(Function(grp) grp.Id = id.ToString())
+        End Function
+
         Public Sub RecalculateByType(ByVal type As SpreadType)
             _groups.ForEach(Sub(group) group.RecalculateByType(type))
         End Sub
@@ -147,6 +152,12 @@ Namespace Tools
                 g.RemoveRIC(ric)
             End While
         End Sub
+
+        Public Function GetGroupList() As Dictionary(Of Guid, String)
+            Dim res As New Dictionary(Of Guid, String)
+            _groups.ForEach(Sub(grp) res.Add(Guid.Parse(grp.Id), grp.SeriesName))
+            Return res
+        End Function
     End Class
 
     Public Class Bond
@@ -266,17 +277,27 @@ Namespace Tools
             RaiseEvent Clear(Me)
         End Sub
 
-        Public Sub StartLoadingLiveData()
+        Public Sub AddLoadingLiveData(ByVal rics As List(Of String))
             Dim descr = New ListTaskDescr() With {
-                    .Items = _elements.Keys.ToList(),
-                    .Fields = {BidField, AskField, LastField, VolumeField, VWAPField}.ToList(),
+                    .Items = rics,
+                    .Fields = {BidField, AskField, LastField, VolumeField, VwapField}.ToList(),
                     .Name = Id,
                     .Descr = SeriesName}
 
             _quoteLoader.StartNewTask(descr)
         End Sub
 
-        Private Sub QuoteLoaderOnNewData(data As Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double)))) Handles _quoteLoader.OnNewData
+        Public Sub StartLoadingLiveData()
+            Dim descr = New ListTaskDescr() With {
+                    .Items = _elements.Keys.ToList(),
+                    .Fields = {BidField, AskField, LastField, VolumeField, VwapField}.ToList(),
+                    .Name = Id,
+                    .Descr = SeriesName}
+
+            _quoteLoader.StartNewTask(descr)
+        End Sub
+
+        Private Sub QuoteLoaderOnNewData(ByVal data As Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double)))) Handles _quoteLoader.OnNewData
             Logger.Trace("QuoteLoaderOnNewData()")
             ' data is a collection of Task -> RIC -> Field -> Value
             ' I must calculate all yields and spreads and fire an event
@@ -302,7 +323,7 @@ Namespace Tools
                         RaiseEvent Volume(bondDataPoint)
                     End If
 
-                    For Each fieldName In {BidField, AskField, LastField, VWAPField}
+                    For Each fieldName In {BidField, AskField, LastField, VwapField}
                         If fieldsAndValues.ContainsKey(fieldName) AndAlso fieldsAndValues(fieldName) > 0 Then
                             Dim fieldValue = fieldsAndValues(fieldName)
                             Try
@@ -338,8 +359,8 @@ Namespace Tools
             If bondDataPoint.SelectedQuote = fieldName Then RaiseEvent Quote(bondDataPoint, fieldName)
         End Sub
 
-        Private Sub DoLoadHistory(ByVal bondDataPoint As DataBaseBondDescription, fieldName As String)
-            If Not {LastField, VWAPField}.Contains(fieldName) Then Exit Sub
+        Private Sub DoLoadHistory(ByVal bondDataPoint As DataBaseBondDescription, ByVal fieldName As String)
+            If Not {LastField, VwapField}.Contains(fieldName) Then Exit Sub
             Logger.Debug("Will load {0}", bondDataPoint.RIC)
 
             Dim historyTaskDescr = New HistoryTaskDescr() With {
@@ -385,7 +406,7 @@ Namespace Tools
                 End If
 
                 If maxElem.VWAP > 0 Then
-                    HandleQuote(bondDataPoint, VWAPField, maxElem.Close, maxdate)
+                    HandleQuote(bondDataPoint, VwapField, maxElem.Close, maxdate)
                 End If
             End If
         End Sub
@@ -398,7 +419,7 @@ Namespace Tools
             _elements.Add(ric, New Bond(Me, LastField, descr))
         End Sub
 
-        Public Sub New(ansamble As Ansamble)
+        Public Sub New(ByVal ansamble As Ansamble)
             _ansamble = ansamble
         End Sub
 
@@ -406,7 +427,7 @@ Namespace Tools
             Return _elements(ric)
         End Function
 
-        Public Sub RecalculateByType(type As SpreadType)
+        Public Sub RecalculateByType(ByVal type As SpreadType)
             _elements.Keys.ToList().ForEach(
                 Sub(ric)
                     Dim elem = _elements(ric)

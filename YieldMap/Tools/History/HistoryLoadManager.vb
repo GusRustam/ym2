@@ -249,7 +249,7 @@ Namespace Tools.History
             Catch ex As Exception
                 Logger.ErrorException("Failed to parse historical data", ex)
                 Logger.Error("Exception = {0}", ex.ToString())
-                RaiseEvent HistoricalData(Me, _ric, _historyManager.DataStatus, Nothing)
+                RaiseEvent HistoricalData(Me, _ric, _historyManager.DataStatus, Nothing) ' todo when  i kill program this bullshit fails
             Finally
                 _finished = True
                 Try

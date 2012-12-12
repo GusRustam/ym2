@@ -150,6 +150,12 @@
     <Compile Include="Forms\ChartForm\ChartSettingsForm.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\ChartForm\GroupSelectForm.Designer.vb">
+      <DependentUpon>GroupSelectForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ChartForm\GroupSelectForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\MainForm\AboutForm.Designer.vb">
       <DependentUpon>AboutForm.vb</DependentUpon>
     </Compile>
@@ -272,6 +278,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Forms\ChartForm\ChartSettingsForm.resx">
       <DependentUpon>ChartSettingsForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ChartForm\GroupSelectForm.resx">
+      <DependentUpon>GroupSelectForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\MainForm\AboutForm.resx">
       <DependentUpon>AboutForm.vb</DependentUpon>

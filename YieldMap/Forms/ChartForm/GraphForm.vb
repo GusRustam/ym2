@@ -1154,37 +1154,49 @@ Namespace Forms.ChartForm
 
         Private Sub SelectFromAListTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SelectFromAListTSMI.Click
             Dim bondSelector As New BondSelectorForm
-            If bondSelector.ShowDialog() = DialogResult.OK Then
-                bondSelector.SelectedRICs.ForEach(
-                    Sub(aRic)
-                        ' todo what group???
-                        Dim group = New Group(_ansamble)
-                        Dim descr As DataBaseBondDescription
+            If bondSelector.ShowDialog() = DialogResult.OK AndAlso bondSelector.SelectedRICs.Any Then
+                Dim groupSelector As New GroupSelectForm
+                groupSelector.InitGroupList(_ansamble.GetGroupList())
+                If groupSelector.ShowDialog() = DialogResult.OK Then
+                    Dim grp As Group
+                    If groupSelector.UseNew Then
+                        grp = New Group(_ansamble)
+                        grp.Color = groupSelector.NewColor.ToString()
+                        grp.SeriesName = groupSelector.NewName
 
                         Dim layout As New field_layoutTableAdapter
-                        'Dim setInfo = layout.GetData().Where(Function(row) row.id = bondSelector.LayoutId)
+                        Dim setInfo = layout.GetData().Where(Function(row) row.field_set_id = groupSelector.LayoutId)
+                        Dim rw = setInfo.First(Function(row) row.is_realtime = 1)
 
-                        'Dim rw = setInfo.First(Function(row) row.is_realtime = 1)
-                        'group.AskField = rw.ask_field
-                        'group.BidField = rw.bid_field
-                        'group.LastField = rw.last_field
-                        'group.VwapField = rw.vwap_field
-                        'group.VolumeField = rw.volume_field
+                        grp.AskField = rw.ask_field
+                        grp.BidField = rw.bid_field
+                        grp.LastField = rw.last_field
+                        grp.VwapField = rw.vwap_field
+                        grp.VolumeField = rw.volume_field
 
-                        'rw = setInfo.First(Function(row) row.is_realtime = 0)
-                        'group.HistField = rw.last_field
+                        rw = setInfo.First(Function(row) row.is_realtime = 0)
+                        grp.HistField = rw.last_field
 
-                        'group.Color = "Red"
-                        'descr = DbInitializer.GetBondInfo(askForm.SelectedRic)
-                        'If descr IsNot Nothing Then
-                        '    group.SeriesName = descr.ShortName
-                        '    group.AddElement(askForm.SelectedRic, descr)
-                        '    group.StartLoadingLiveData()
-                        '    _ansamble.AddGroup(group)
-                        'Else
+                        _ansamble.AddGroup(grp)
+                    Else
+                        grp = _ansamble.GetGroup(groupSelector.ExistingGroupId)
+                    End If
 
-                        'End If
-                    End Sub)
+                    bondSelector.SelectedRICs.ForEach(
+                        Sub(aRic)
+                            Dim descr = DbInitializer.GetBondInfo(aRic)
+                            If descr IsNot Nothing Then
+                                grp.AddElement(aRic, descr) ' todo <---
+                            End If
+
+                        End Sub)
+
+                    grp.AddLoadingLiveData(bondSelector.SelectedRICs) ' todo <---
+
+                    ' todo stupid structure. In one place i add elements and in another place i start loading them
+                    ' todo and there s a stupid structure in list loader with tasks. delete it, it only makes mess
+                End If
+
             End If
         End Sub
     End Class

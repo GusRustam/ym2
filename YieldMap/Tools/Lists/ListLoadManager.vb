@@ -105,8 +105,6 @@ Namespace Tools.Lists
                                 Dim val = fields.GetValue(i, 1)
                                 If IsNumeric(val) Then
                                     InsertIntoTRFV(taskRicFieldValue, task, aItemName, fields.GetValue(i, 0), CDbl(val))
-                                    'Else
-                                    '    InsertIntoTRFV(taskRicFieldValue, task, aItemName, fields.GetValue(i, 0), Nothing)
                                 End If
                             Next i
                         Next
@@ -143,5 +141,16 @@ Namespace Tools.Lists
             _activeTasks(taskName).Items.Remove(ric)
             If _activeTasks(taskName).Items.Count = 0 Then _activeTasks.Remove(taskName)
         End Sub
+
+        'Public Sub AddItems(ByVal rics As List(Of String), ByVal fields As List(Of String))
+        '    Dim ric = rics.Aggregate(Function(str, elem) str & "," & elem)
+        '    Dim fld = fields.Aggregate(Function(str, elem) str & "," & elem)
+        '    Logger.Debug("AddItems({0})", ric)
+        '    _listManager.RegisterItems(ric, fld)
+        '    If Not _activeTasks.ContainsKey(taskName) Then Return
+
+        '    _activeTasks(taskName).Items.Remove(ric)
+        '    If _activeTasks(taskName).Items.Count = 0 Then _activeTasks.Remove(taskName)
+        'End Sub
     End Class
 End Namespace

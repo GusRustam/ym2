@@ -56,6 +56,7 @@ Namespace Forms.PortfolioForm
             IssuerCB.Enabled = Not ShowAllCB.Checked
             RefreshList()
             RefreshGrid()
+            If IssuerCB.Enabled Then IssuerCB.Focus()
         End Sub
 
         Private Sub IssuerCBSelectedIndexChanged(sender As System.Object, e As EventArgs) Handles IssuerCB.SelectedIndexChanged
