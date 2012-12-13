@@ -164,7 +164,6 @@ Namespace Tools.History
                     .RequestHistory(descr.Fields.Aggregate(Function(str, elem) str + ", " + elem))
                     AddHandler HistoricalData, handler
                     .ErrorMode = AdxErrorMode.EXCEPTION
-                    'todo здесь собственно можно сделать код для синхронизации как у ChainHandler
 
                     If .Data IsNot Nothing Then
                         ParseData()
@@ -187,7 +186,7 @@ Namespace Tools.History
                     If datastatus = RT_DataStatus.RT_DS_FULL Then
                         ParseData()
                     Else
-                        Logger.Warn("Data Status is {0}; will omit the data. Error message is {1}", datastatus, _historyManager.ErrorString)
+                        Logger.Warn(String.Format("{2}: Data Status is {0}; will omit the data. Error message is {1}", datastatus, _historyManager.ErrorString, _ric))
                         RaiseEvent HistoricalData(Me, _ric, datastatus, Nothing)
                     End If
                 End Sub

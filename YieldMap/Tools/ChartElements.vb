@@ -340,7 +340,7 @@ Namespace Tools
                                 Logger.Warn("Exception = {0}", ex.ToString())
                             End Try
                         Else
-                            If {LastField, VwapField}.Contains(fieldName) And Not bondDataPoint.QuotesAndYields.ContainsKey(fieldName) Then
+                            If fieldName = _elements(instrument).SelectedQuote And Not bondDataPoint.QuotesAndYields.ContainsKey(fieldName) Then
                                 DoLoadHistory(bondDataPoint.MetaData, fieldName)
                             End If
                         End If
@@ -370,21 +370,17 @@ Namespace Tools
             If Not {LastField, VwapField}.Contains(fieldName) Then Exit Sub
             Logger.Debug("Will load {0}", bondDataPoint.RIC)
 
-            Dim historyTaskDescr = New HistoryTaskDescr() With {
-                    .Item = bondDataPoint.RIC,
-                    .StartDate = DateTime.Today.AddDays(-10),
-                    .EndDate = DateTime.Today,
-                    .Fields = {"DATE", "CLOSE", "VWAP"}.ToList,
-                    .Frequency = "D",
-                    .InterestingFields = {"DATE", "CLOSE", "VWAP"}.ToList()
-            }
-            Dim hst = New HistoryLoadManager(Eikon.SDK.CreateAdxRtHistory())
-            hst.StartTask(historyTaskDescr, AddressOf OnHistoricalQuotes)
+            Dim hst = New HistoryLoadManager_v2()
+            AddHandler hst.HistoricalData, AddressOf OnHistoricalQuotes
+            hst.StartTask(bondDataPoint.RIC, "DATE,CLOSE,VWAP", DateTime.Today.AddDays(-10), DateTime.Today)
         End Sub
 
-        Private Sub OnHistoricalQuotes(ByVal hst As HistoryLoadManager, ByVal ric As String, ByVal datastatus As RT_DataStatus, ByVal data As Dictionary(Of Date, HistoricalItem))
+        Private Sub OnHistoricalQuotes(ByVal ric As String, ByVal status As LoaderStatus, ByVal hstatus As HistoryStatus, ByVal data As Dictionary(Of Date, HistoricalItem))
             Logger.Trace("OnHistoricalQuotes({0})", ric)
-            If datastatus = RT_DataStatus.RT_DS_FULL Then
+            If Not status.Finished Or status.Err Then
+                Logger.Warn(String.Format("{0} not finished or error!!!, hstatus = {1}, reason = {2}", ric, hstatus, status.Reason))
+            End If
+            If hstatus = HistoryStatus.Full Then
                 If data Is Nothing OrElse data.Count <= 0 Then
                     Logger.Info("No data on {0} arrived", ric)
                     Return
