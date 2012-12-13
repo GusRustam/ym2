@@ -111,7 +111,7 @@ Namespace Forms.ChartForm
                             Sub(ric)
                                 Dim descr = DbInitializer.GetBondInfo(ric)
                                 If descr IsNot Nothing Then
-                                    group.AddElement(ric, descr)
+                                    group.AddRic(ric, descr)
                                 Else
                                     Logger.Error("No description for bond {0} found", ric)
                                 End If
@@ -909,8 +909,8 @@ Namespace Forms.ChartForm
                 descr = DbInitializer.GetBondInfo(askForm.SelectedRic)
                 If descr IsNot Nothing Then
                     group.SeriesName = descr.ShortName
-                    group.AddElement(askForm.SelectedRic, descr)
-                    group.StartLoadingLiveData()
+                    group.AddRic(askForm.SelectedRic, descr)
+                    ' group.StartLoadingLiveData() ' todo 
                     _ansamble.AddGroup(group)
                 Else
                     Dim handled As Boolean = False
@@ -925,8 +925,8 @@ Namespace Forms.ChartForm
                                 If handled Then Return
                                 handled = True
                                 group.SeriesName = dscr.ShortName
-                                group.AddElement(selectedRic, dscr)
-                                group.StartLoadingLiveData()
+                                group.AddRic(selectedRic, dscr)
+                                ' group.StartLoadingLiveData()
                                 _ansamble.AddGroup(group)
                             End If
                         End Sub)
@@ -1186,15 +1186,10 @@ Namespace Forms.ChartForm
                         Sub(aRic)
                             Dim descr = DbInitializer.GetBondInfo(aRic)
                             If descr IsNot Nothing Then
-                                grp.AddElement(aRic, descr) ' todo <---
+                                grp.AddRic(aRic, descr)
                             End If
-
                         End Sub)
-
-                    grp.AddLoadingLiveData(bondSelector.SelectedRICs) ' todo <---
-
-                    ' todo stupid structure. In one place i add elements and in another place i start loading them
-                    ' todo and there s a stupid structure in list loader with tasks. delete it, it only makes mess
+                    grp.StartRics(bondSelector.SelectedRICs)
                 End If
 
             End If

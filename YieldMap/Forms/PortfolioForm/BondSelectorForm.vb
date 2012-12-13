@@ -52,18 +52,18 @@ Namespace Forms.PortfolioForm
             RemoveHandler BondDescriptionsTableAdapter.Adapter.FillError, AddressOf Commons.SkipInvalidRows
         End Sub
 
-        Private Sub ShowAllCBCheckedChanged(sender As System.Object, e As EventArgs) Handles ShowAllCB.CheckedChanged
+        Private Sub ShowAllCBCheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles ShowAllCB.CheckedChanged
             IssuerCB.Enabled = Not ShowAllCB.Checked
             RefreshList()
             RefreshGrid()
             If IssuerCB.Enabled Then IssuerCB.Focus()
         End Sub
 
-        Private Sub IssuerCBSelectedIndexChanged(sender As System.Object, e As EventArgs) Handles IssuerCB.SelectedIndexChanged
+        Private Sub IssuerCBSelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs) Handles IssuerCB.SelectedIndexChanged
             RefreshGrid()
         End Sub
 
-        Private Sub OkButtonClick(sender As System.Object, e As EventArgs) Handles OkButton.Click
+        Private Sub OkButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles OkButton.Click
             _selectedRICs = (From aRow As DataGridViewRow In BondListDGV.SelectedRows Select CStr(aRow.Cells(1).Value)).ToList
         End Sub
 

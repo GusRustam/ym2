@@ -271,6 +271,7 @@
     <Compile Include="Tools\Estimation\LinearRegression.vb" />
     <Compile Include="Tools\History\HistoryLoadManager.vb" />
     <Compile Include="Tools\Lists\ListLoadManager.vb" />
+    <Compile Include="Tools\Lists\ListLoadManager_v2.vb" />
     <Compile Include="Tools\RDataTool\BondsDataLoader.vb" />
     <Compile Include="Tools\RDataTool\RDataLoadManager.vb" />
     <Compile Include="Tools\YieldCalc.vb" />

@@ -76,12 +76,12 @@ Namespace Tools
             _groups.Clear()
         End Sub
 
-        Public Function ContainsRIC(ByVal instrument As String) As Boolean
+        Public Function ContainsRic(ByVal instrument As String) As Boolean
             Return _groups.Any(Function(group) group.HasRic(instrument))
         End Function
 
         Public Sub StartLoadingLiveData()
-            _groups.ForEach(Sub(grp) grp.StartLoadingLiveData())
+            _groups.ForEach(Sub(grp) grp.StartAll())
         End Sub
 
         Public Sub AddGroup(ByVal group As Group)
@@ -109,11 +109,11 @@ Namespace Tools
             RaiseEvent Volume(obj)
         End Sub
 
-        Private Sub OnBondQuote(bond As Bond, field As String)
+        Private Sub OnBondQuote(ByVal bond As Bond, ByVal field As String)
             RaiseEvent Quote(bond, field)
         End Sub
 
-        Public Sub New(bmk As SpreadContainer)
+        Public Sub New(ByVal bmk As SpreadContainer)
             _spreadBmk = bmk
         End Sub
 
@@ -183,7 +183,7 @@ Namespace Tools
             Get
                 Return _selectedQuote
             End Get
-            Set(value As String)
+            Set(ByVal value As String)
                 _selectedQuote = value
             End Set
         End Property
@@ -201,7 +201,7 @@ Namespace Tools
         End Property
 
         'Public ReadOnly Fields As New ValuedFieldGroup
-         
+
         Public Sub RecalculateByType(ByVal type As SpreadType)
             If _quotesAndYields.ContainsKey(_selectedQuote) Then
                 _parentGroup.Ansamble.SpreadBmk.CalcAllSpreads(_quotesAndYields(_selectedQuote), _metaData, type)
@@ -230,6 +230,8 @@ Namespace Tools
         Public Event Clear As Action(Of Group)
         Public Event Volume As Action(Of Bond)
         Public Event AllQuotes As Action(Of List(Of Bond))
+        Public Event LoadCriticalError As Action
+        Public Event LoadError As Action(Of WrongItemsInfo)
 
         Public Group As GroupType
         Public SeriesName As String
@@ -250,7 +252,7 @@ Namespace Tools
         Public PortfolioID As Long
         Private _color As String
 
-        Private WithEvents _quoteLoader As New ListLoadManager
+        Private WithEvents _quoteLoader As New ListLoadManager_v2
 
         Public Property Color() As String
             Get
@@ -272,39 +274,44 @@ Namespace Tools
         End Function
 
         Public Sub Cleanup()
-            _quoteLoader.DiscardTask(Id)
+            _quoteLoader.CancelAll()
             _elements.Clear()
             RaiseEvent Clear(Me)
         End Sub
 
-        Public Sub AddLoadingLiveData(ByVal rics As List(Of String))
-            Dim descr = New ListTaskDescr() With {
-                    .Items = rics,
-                    .Fields = {BidField, AskField, LastField, VolumeField, VwapField}.ToList(),
-                    .Name = Id,
-                    .Descr = SeriesName}
-
-            _quoteLoader.StartNewTask(descr)
+        Public Sub StartRics(ByVal rics As List(Of String))
+            Dim res = _quoteLoader.AddItems(rics, {BidField, AskField, LastField, VolumeField, VwapField}.ToList())
+            If res Is Nothing Then
+                RaiseEvent LoadCriticalError()
+            Else
+                If res.WrongFields.Any Or res.WrongItems.Any Then
+                    RaiseEvent LoadError(res)
+                End If
+            End If
         End Sub
 
-        Public Sub StartLoadingLiveData()
-            Dim descr = New ListTaskDescr() With {
-                    .Items = _elements.Keys.ToList(),
-                    .Fields = {BidField, AskField, LastField, VolumeField, VwapField}.ToList(),
-                    .Name = Id,
-                    .Descr = SeriesName}
-
-            _quoteLoader.StartNewTask(descr)
+        Public Sub StartAll()
+            StartRics(_elements.Keys.ToList())
         End Sub
 
-        Private Sub QuoteLoaderOnNewData(ByVal data As Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double)))) Handles _quoteLoader.OnNewData
+        Private Sub OnQuotes(ByVal data As Dictionary(Of String, Dictionary(Of String, Double)), ByVal errorInfo As WrongItemsInfo) Handles _quoteLoader.OnNewData
             Logger.Trace("QuoteLoaderOnNewData()")
-            ' data is a collection of Task -> RIC -> Field -> Value
-            ' I must calculate all yields and spreads and fire an event
-            If Not data.Keys.Contains(Id) Then Return
-            Dim quotes = data(Id)
-
-            For Each instrAndFields As KeyValuePair(Of String, Dictionary(Of String, Double)) In quotes
+            If errorInfo IsNot Nothing Then
+                If errorInfo.WrongFields.Any Then
+                    ' todo what? mark field as dead one for the corresponding bond
+                End If
+                If errorInfo.WrongItems.Any Then
+                    If errorInfo.WrongItems.ContainsKey(ItemInfo.InvalidItems) Then
+                        errorInfo.WrongItems(ItemInfo.InvalidItems).ForEach(
+                            Sub(tuple)
+                                Dim ric = tuple.Item1
+                                Dim status = tuple.Item2
+                                ' todo what? mark bond as dead
+                            End Sub)
+                    End If
+                End If
+            End If
+            For Each instrAndFields As KeyValuePair(Of String, Dictionary(Of String, Double)) In data
                 Try
                     Dim instrument As String = instrAndFields.Key
                     Dim fieldsAndValues As Dictionary(Of String, Double) = instrAndFields.Value
@@ -333,7 +340,7 @@ Namespace Tools
                                 Logger.Warn("Exception = {0}", ex.ToString())
                             End Try
                         Else
-                            If Not bondDataPoint.QuotesAndYields.ContainsKey(fieldName) Then
+                            If {LastField, VwapField}.Contains(fieldName) And Not bondDataPoint.QuotesAndYields.ContainsKey(fieldName) Then
                                 DoLoadHistory(bondDataPoint.MetaData, fieldName)
                             End If
                         End If
@@ -415,7 +422,7 @@ Namespace Tools
             Return _elements.Any(Function(elem) elem.Key = instrument)
         End Function
 
-        Public Sub AddElement(ByVal ric As String, ByVal descr As DataBaseBondDescription)
+        Public Sub AddRic(ByVal ric As String, ByVal descr As DataBaseBondDescription)
             _elements.Add(ric, New Bond(Me, LastField, descr))
         End Sub
 
@@ -448,8 +455,8 @@ Namespace Tools
                 End Sub)
         End Sub
 
-        Public Sub RemoveRIC(ByVal ric As String)
-            _quoteLoader.DiscardItem(Id, ric)
+        Public Sub RemoveRic(ByVal ric As String)
+            _quoteLoader.CancelItem(ric)
             While _elements.Any(Function(elem) elem.Key = ric)
                 _elements.Remove(ric)
             End While
