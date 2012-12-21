@@ -418,6 +418,7 @@ Namespace Forms.ChartForm
                 GuiAsync(
                     Sub()
                         If points.Any() Then
+                            Dim id = Guid.NewGuid()
                             Dim theSeries = New Series() With {
                                 .Name = bondDataPoint.Label,
                                 .legendText = bondDataPoint.Label & " history",
@@ -427,7 +428,8 @@ Namespace Forms.ChartForm
                                 .markerBorderColor = Color.FromName(elem.ParentGroup.Color),
                                 .borderWidth = 1,
                                 .markerStyle = MarkerStyle.Circle,
-                                .markerSize = 4
+                                .markerSize = 4,
+                                .Tag = id
                             }
                             TheChart.Series.Add(theSeries)
                             points.ForEach(
@@ -436,10 +438,11 @@ Namespace Forms.ChartForm
                                                  .Tag = New HistoryPoint With {
                                                      .Ric = bondDataPoint.RIC,
                                                      .Descr = tpl.Item1,
-                                                     .Meta = tpl.Item2
+                                                     .Meta = tpl.Item2,
+                                                     .SeriesId = id
                                                  }
                                         }
-                                    theSeries.Points.Add(point)
+                                    theSeries.Points.Add(Point)
                                 End Sub)
                         End If
 

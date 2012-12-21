@@ -650,6 +650,8 @@ Namespace Tools
         Public Ric As String
         Public Descr As HistPointDescription
         Public Meta As DataBaseBondDescription
+        Public SeriesId As Guid
+           
     End Class
 #End Region
 

@@ -210,7 +210,7 @@ Namespace Forms.ChartForm
 
                         ElseIf TypeOf point.Tag Is HistoryPoint Then
                             Dim histDataPoint = CType(point.Tag, HistoryPoint)
-                            HistoryCMS.Tag = histDataPoint.RIC
+                            HistoryCMS.Tag = histDataPoint
                             HistoryCMS.Show(TheChart, mouseEvent.Location)
                         End If
                     ElseIf htr.ChartElementType = ChartElementType.PlottingArea Or htr.ChartElementType = ChartElementType.Gridlines Then
@@ -873,7 +873,14 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub RemoveHistoryTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RemoveHistoryTSMI.Click
-            '_historicalCurves.RemoveCurve(HistoryCMS.Tag)
+            Try
+                Dim tg = CType(HistoryCMS.Tag, HistoryPoint)
+                Dim histSeries = TheChart.Series.First(Function(srs) TypeOf srs.Tag Is Guid AndAlso CType(srs.Tag, Guid) = tg.SeriesId)
+                TheChart.Series.Remove(histSeries)
+            Catch ex As Exception
+                Logger.ErrorException("Failed to remove historical series", ex)
+                Logger.Error("Exception = {0}", ex.ToString())
+            End Try
         End Sub
 
         Private Sub EnterRIC_TSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles EnterRICTSMI.Click
