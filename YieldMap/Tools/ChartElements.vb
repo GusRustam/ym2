@@ -260,6 +260,11 @@ Namespace Tools
         'Public Fields As New NamedFieldGroup
 
         Private ReadOnly _elements As New Dictionary(Of String, Bond) 'ric -> datapoint
+        Public ReadOnly Property Elements() As Dictionary(Of String, Bond)
+            Get
+                Return _elements
+            End Get
+        End Property
         Public PortfolioID As Long
         Private _color As String
 

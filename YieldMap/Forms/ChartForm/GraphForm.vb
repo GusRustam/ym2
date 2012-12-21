@@ -4,6 +4,7 @@ Imports System.Windows.Forms.DataVisualization.Charting
 Imports System.Drawing
 Imports AdfinXAnalyticsFunctions
 Imports System.ComponentModel
+Imports YieldMap.Forms.TableForm
 Imports YieldMap.Tools.History
 Imports YieldMap.Forms.PortfolioForm
 Imports YieldMap.Curves
@@ -642,35 +643,38 @@ Namespace Forms.ChartForm
             aForm.ShowDialog()
         End Sub
 
-        'Private Sub AsTableTSBClick(sender As Object, e As EventArgs) Handles AsTableTSB.Click
-        '    Dim bondsToShow = _ansamble.Groups.SelectMany(
-        '        Function(grp)
-        '            Return grp.Elements.Keys.ToList.Select(
-        '                Function(key)
-        '                    Dim res As New BondDescr
-        '                    Dim point = grp.Elements(key)
-        '                    If point.Yld.ToWhat Is Nothing Then Return Nothing
-
-        '                    res.RIC = point.RIC
-        '                    res.Name = point.ShortName
-        '                    res.Price = point.CalcPrice
-        '                    res.Quote = IIf(point.YieldAtDate <> Date.Today, QuoteType.Close, QuoteType.Last)
-        '                    res.QuoteDate = point.YieldAtDate
-        '                    res.State = BondDescr.StateType.Ok
-        '                    res.ToWhat = point.Yld.ToWhat
-        '                    res.BondYield = point.Yld.Yield
-        '                    res.CalcMode = BondDescr.CalculationMode.SystemPrice
-        '                    res.Convexity = point.Convexity
-        '                    res.Duration = point.Duration
-        '                    res.Live = point.YieldAtDate = Date.Today
-        '                    res.Maturity = point.Maturity
-        '                    res.Coupon = point.Coupon
-        '                    Return res
-        '                End Function)
-        '        End Function).Where(Function(elem) elem IsNot Nothing).ToList()
-        '    _tableForm.Bonds = bondsToShow
-        '    _tableForm.ShowDialog()
-        'End Sub
+        Private Sub AsTableTSBClick(ByVal sender As Object, ByVal e As EventArgs) Handles AsTableTSB.Click
+            Dim bondsToShow As New List(Of BondDescr)
+            _ansamble.Groups.ForEach(
+                Sub(group)
+                    group.Elements.Keys.ToList().ForEach(
+                        Sub(elem)
+                            Dim res As New BondDescr
+                            Dim point = group.Elements(elem)
+                            res.RIC = point.MetaData.RIC
+                            res.Name = point.MetaData.ShortName
+                            res.Maturity = point.MetaData.Maturity
+                            res.Coupon = point.MetaData.Coupon
+                            If point.QuotesAndYields.ContainsKey(point.SelectedQuote) Then
+                                Dim quote = point.QuotesAndYields(point.SelectedQuote)
+                                res.Price = quote.Price
+                                res.Quote = IIf(quote.YieldAtDate <> Date.Today, QuoteType.Close, QuoteType.Last)
+                                res.QuoteDate = quote.YieldAtDate
+                                res.State = BondDescr.StateType.Ok
+                                res.ToWhat = quote.Yld.ToWhat
+                                res.BondYield = quote.Yld.Yield
+                                res.CalcMode = BondDescr.CalculationMode.SystemPrice
+                                res.Convexity = quote.Convexity
+                                res.Duration = quote.Duration
+                                res.Live = quote.YieldAtDate = Date.Today
+                            End If
+                            bondsToShow.Add(res)
+                        End Sub)
+                End Sub)
+            _tableForm.Bonds = bondsToShow
+            _tableForm.ShowDialog()
+            
+        End Sub
 
         Private Sub LinkSpreadLabelLinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles SpreadLinkLabel.LinkClicked
             ShowCurveCMS("PointSpread",
@@ -1118,85 +1122,6 @@ Namespace Forms.ChartForm
                 _ansamble.RecalculateByType(newType)
             End If
         End Sub
-
-        'Public Sub OnHistoricalCurveData(ByVal hst As HistoryLoadManager, ByVal ric As String, ByVal datastatus As RT_DataStatus,
-        '                                 ByVal data As Dictionary(Of Date, HistoricalItem))
-        '    Logger.Debug("OnHistoricalCurveData")
-        '    If data Is Nothing Then
-        '        StatusMessage.Text = String.Format("No historical data on {0} available", _ansamble.GetBondDescription(ric).ShortName)
-        '        Return
-        '    End If
-        '    GuiAsync(
-        '        Sub()
-        '            Try
-        '                Dim series As Series = TheChart.Series.FindByName(ric + "_HIST_CURVE")
-        '                If series Is Nothing Then
-        '                    series = New Series(ric + "_HIST_CURVE") With {
-        '                        .YValuesPerPoint = 1,
-        '                        .ChartType = SeriesChartType.Line,
-        '                        .borderWidth = 1,
-        '                        .borderDashStyle = ChartDashStyle.Dash,
-        '                        .borderColor = Color.Green,
-        '                        .Tag = New HistCurveSeries() With {.Name = ric},
-        '                        .IsVisibleInLegend = False
-        '                    }
-        '                End If
-
-        '                For Each yieldDur As Tuple(Of Double, DataPointDescr) In _
-        '                    From bondHistoryDescr In data
-        '                    Where bondHistoryDescr.Value.Close > 0
-        '                    Select New Tuple(Of Double, DataPointDescr)(bondHistoryDescr.Value.Close, CalcYield(bondHistoryDescr.Value.Close, bondHistoryDescr.Key, _ansamble.GetBondDescription(ric)))
-
-        '                    Dim point As New DataPoint
-        '                    Dim duration = yieldDur.Item2.Duration
-        '                    Dim convex = yieldDur.Item2.Convexity
-        '                    Dim pvbp = yieldDur.Item2.PVBP
-        '                    Dim bestYield = yieldDur.Item2.Yld
-        '                    Dim thePrice = yieldDur.Item1
-
-        '                    Dim theTag = New HistCurvePointDescr With {
-        '                        .Duration = duration,
-        '                        .Convexity = convex,
-        '                        .Yld = bestYield,
-        '                        .PVBP = pvbp,
-        '                        .RIC = ric,
-        '                        .HistCurveName = ric + "_HIST_CURVE",
-        '                        .Price = thePrice,
-        '                        .BondTag = _ansamble.GetBondDescription(ric)
-        '                    }
-
-        '                    Dim yValue = _spreadBenchmarks.CalculateSpreads(theTag)
-        '                    If yValue IsNot Nothing Then
-        '                        With point
-        '                            .YValues = {yValue}
-        '                            .XValue = duration
-        '                            .MarkerStyle = bestYield.ToWhat.MarkerStyle
-        '                            .MarkerBorderWidth = 1
-        '                            .Tag = theTag
-        '                            .IsEmpty = Not theTag.IsValid
-        '                        End With
-        '                        series.Points.Add(point)
-        '                    End If
-        '                Next
-        '                If series.Points.Count > 0 Then TheChart.Series.Add(series)
-        '            Catch ex As Exception
-        '                Logger.WarnException("Failed to plot a chart", ex)
-        '            End Try
-        '        End Sub)
-        '    If datastatus <> RT_DataStatus.RT_DS_PARTIAL Then
-        '        RemoveHandler hst.NewData, AddressOf OnHistoricalCurveData
-        '    End If
-        'End Sub
-
-        'Private Sub OnCurveRemoved(ByVal theName As String)
-        '    Dim item = TheChart.Series.FindByName(theName + "_HIST_CURVE")
-        '    If item IsNot Nothing Then
-        '        item.Points.Clear()
-        '        TheChart.Series.Remove(item)
-        '    Else
-        '        Logger.Warn("Failed to remove historical series {0}", theName)
-        '    End If
-        'End Sub
 #End Region
 #End Region
 
