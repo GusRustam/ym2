@@ -4,6 +4,7 @@ Imports System.Windows.Forms.DataVisualization.Charting
 Imports System.Drawing
 Imports AdfinXAnalyticsFunctions
 Imports System.ComponentModel
+Imports YieldMap.Tools.History
 Imports YieldMap.Forms.PortfolioForm
 Imports YieldMap.Curves
 Imports YieldMap.My.Resources
@@ -170,7 +171,6 @@ Namespace Forms.ChartForm
                 ChartCMS.Show(MainPanel, mouseEvent.Location)
             End If
         End Sub
-
 #End Region
 
 #Region "b) Chart events"
@@ -208,10 +208,10 @@ Namespace Forms.ChartForm
                             MoneyCurveCMS.Tag = curve.GetName()
                             ShowCurveParameters(curve)
 
-                            'ElseIf TypeOf point.Tag Is HistCurvePointDescr Then
-                            '    Dim histDataPoint = CType(point.Tag, HistCurvePointDescr)
-                            '    HistoryCMS.Tag = histDataPoint.RIC
-                            '    HistoryCMS.Show(TheChart, mouseEvent.Location)
+                        ElseIf TypeOf point.Tag Is HistoryPoint Then
+                            Dim histDataPoint = CType(point.Tag, HistoryPoint)
+                            HistoryCMS.Tag = histDataPoint.RIC
+                            HistoryCMS.Show(TheChart, mouseEvent.Location)
                         End If
                     ElseIf htr.ChartElementType = ChartElementType.PlottingArea Or htr.ChartElementType = ChartElementType.Gridlines Then
                         ChartCMS.Show(TheChart, mouseEvent.Location)
@@ -288,12 +288,17 @@ Namespace Forms.ChartForm
 
                         DatLabel.Text = ""
 
-                        'ElseIf TypeOf point.Tag Is HistCurvePointDescr Then
-                        '    Dim historyDataPoint = CType(point.Tag, HistCurvePointDescr)
-                        '    DscrLabel.Text = historyDataPoint.BondTag.ShortName
-                        '    DatLabel.Text = String.Format("{0:dd/MM/yyyy}", historyDataPoint.YieldAtDate)
-                        '    ConvLabel.Text = String.Format("{0:F2}", historyDataPoint.Convexity)
+                    ElseIf TypeOf point.Tag Is HistoryPoint Then
+                        DurLabel.Text = String.Format("{0:F2}", point.XValue)
+                        YldLabel.Text = String.Format("{0:P2}", point.YValues(0))
 
+                        Dim historyDataPoint = CType(point.Tag, HistoryPoint)
+                        DscrLabel.Text = historyDataPoint.Meta.ShortName
+                        DatLabel.Text = String.Format("{0:dd/MM/yyyy}", historyDataPoint.Descr.YieldAtDate)
+                        ConvLabel.Text = String.Format("{0:F2}", historyDataPoint.Descr.Convexity)
+                        MatLabel.Text = String.Format("{0:dd/MM/yyyy}", historyDataPoint.Meta.Maturity)
+                        CpnLabel.Text = String.Format("{0:F2}%", historyDataPoint.Meta.Coupon)
+                        PVBPLabel.Text = String.Format("{0:F4}", historyDataPoint.Descr.PVBP)
                     Else
                         hasShown = False
                     End If
@@ -858,23 +863,16 @@ Namespace Forms.ChartForm
         Private Sub ShowHistoryTSMIClick(sender As Object, e As EventArgs) Handles ShowHistoryTSMI.Click
             Logger.Trace("ShowHistQuotesTSMIClick")
             Try
-                '1) Load history for 10 days
-                '_historicalCurves.AddCurve(BondCMS.Tag,
-                '                           New HistoryTaskDescr() With {
-                '                                .Item = BondCMS.Tag,
-                '                                .EndDate = DateTime.Today,
-                '                                .StartDate = DateTime.Today.AddDays(-90),
-                '                                .Fields = {"DATE", "CLOSE"}.ToList(),
-                '                                .Frequency = "D",
-                '                                .InterestingFields = {"DATE", "CLOSE"}.ToList()
-                '                            })
+                Dim historyLoader As New HistoryLoadManager_v2
+                AddHandler historyLoader.HistoricalData, AddressOf OnHistoricalData
+                historyLoader.StartTask(BondCMS.Tag, "DATE, CLOSE", DateTime.Today.AddDays(-90), DateTime.Today, timeOut:=15)
             Catch ex As Exception
                 Logger.ErrorException("Got exception", ex)
                 Logger.Error("Exception = {0}", ex.ToString())
             End Try
         End Sub
 
-        Private Sub RemoveHistoryTSMIClick(sender As Object, e As EventArgs) Handles RemoveHistoryTSMI.Click
+        Private Sub RemoveHistoryTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RemoveHistoryTSMI.Click
             '_historicalCurves.RemoveCurve(HistoryCMS.Tag)
         End Sub
 
@@ -936,6 +934,49 @@ Namespace Forms.ChartForm
 
         Private Sub SelectFromAListTSMIClick(ByVal sender As Object, ByVal e As EventArgs)
 
+        End Sub
+
+        Private Sub SelectFromAListTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SelectFromAListTSMI.Click
+            Dim bondSelector As New BondSelectorForm
+            If bondSelector.ShowDialog() = DialogResult.OK AndAlso bondSelector.SelectedRICs.Any Then
+                Dim groupSelector As New GroupSelectForm
+                groupSelector.InitGroupList(_ansamble.GetGroupList())
+                If groupSelector.ShowDialog() = DialogResult.OK Then
+                    Dim grp As Group
+                    If groupSelector.UseNew Then
+                        grp = New Group(_ansamble)
+                        grp.Color = groupSelector.NewColor.ToString()
+                        grp.SeriesName = groupSelector.NewName
+
+                        Dim layout As New field_layoutTableAdapter
+                        Dim setInfo = layout.GetData().Where(Function(row) row.field_set_id = groupSelector.LayoutId)
+                        Dim rw = setInfo.First(Function(row) row.is_realtime = 1)
+
+                        grp.AskField = rw.ask_field
+                        grp.BidField = rw.bid_field
+                        grp.LastField = rw.last_field
+                        grp.VwapField = rw.vwap_field
+                        grp.VolumeField = rw.volume_field
+
+                        rw = setInfo.First(Function(row) row.is_realtime = 0)
+                        grp.HistField = rw.last_field
+
+                        _ansamble.AddGroup(grp)
+                    Else
+                        grp = _ansamble.GetGroup(groupSelector.ExistingGroupId)
+                    End If
+
+                    bondSelector.SelectedRICs.ForEach(
+                        Sub(aRic)
+                            Dim descr = DbInitializer.GetBondInfo(aRic)
+                            If descr IsNot Nothing Then
+                                grp.AddRic(aRic, descr)
+                            End If
+                        End Sub)
+                    grp.StartRics(bondSelector.SelectedRICs)
+                End If
+
+            End If
         End Sub
 #End Region
 
@@ -1035,7 +1076,7 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
-        Private Sub OnRemovedItem(group As Group, ric As String) Handles _ansamble.RemovedItem
+        Private Sub OnRemovedItem(ByVal group As Group, ByVal ric As String) Handles _ansamble.RemovedItem
             Logger.Trace("OnRemovedItem({0})", ric)
             GuiAsync(
                 Sub()
@@ -1050,19 +1091,19 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
-        Private Sub OnBenchmarkRemoved(type As SpreadType) Handles _spreadBenchmarks.BenchmarkRemoved
+        Private Sub OnBenchmarkRemoved(ByVal type As SpreadType) Handles _spreadBenchmarks.BenchmarkRemoved
             Logger.Trace("OnBenchmarkRemoved({0})", type)
             _moneyMarketCurves.ForEach(Sub(curve) curve.CleanupByType(type))
             _ansamble.CleanupByType(type)
         End Sub
 
-        Private Sub OnBenchmarkUpdated(type As SpreadType) Handles _spreadBenchmarks.BenchmarkUpdated
+        Private Sub OnBenchmarkUpdated(ByVal type As SpreadType) Handles _spreadBenchmarks.BenchmarkUpdated
             Logger.Trace("OnBenchmarkUpdated({0})", type)
             _moneyMarketCurves.ForEach(Sub(curve) curve.RecalculateByType(type))
             _ansamble.RecalculateByType(type)
         End Sub
 
-        Private Sub OnTypeSelected(newType As SpreadType, oldType As SpreadType) Handles _spreadBenchmarks.TypeSelected
+        Private Sub OnTypeSelected(ByVal newType As SpreadType, ByVal oldType As SpreadType) Handles _spreadBenchmarks.TypeSelected
             Logger.Trace("OnTypeSelected({0}, {1})", newType, oldType)
             If newType <> oldType Then
                 SetYAxisMode(newType.ToString())
@@ -1152,47 +1193,5 @@ Namespace Forms.ChartForm
 #End Region
 #End Region
 
-        Private Sub SelectFromAListTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SelectFromAListTSMI.Click
-            Dim bondSelector As New BondSelectorForm
-            If bondSelector.ShowDialog() = DialogResult.OK AndAlso bondSelector.SelectedRICs.Any Then
-                Dim groupSelector As New GroupSelectForm
-                groupSelector.InitGroupList(_ansamble.GetGroupList())
-                If groupSelector.ShowDialog() = DialogResult.OK Then
-                    Dim grp As Group
-                    If groupSelector.UseNew Then
-                        grp = New Group(_ansamble)
-                        grp.Color = groupSelector.NewColor.ToString()
-                        grp.SeriesName = groupSelector.NewName
-
-                        Dim layout As New field_layoutTableAdapter
-                        Dim setInfo = layout.GetData().Where(Function(row) row.field_set_id = groupSelector.LayoutId)
-                        Dim rw = setInfo.First(Function(row) row.is_realtime = 1)
-
-                        grp.AskField = rw.ask_field
-                        grp.BidField = rw.bid_field
-                        grp.LastField = rw.last_field
-                        grp.VwapField = rw.vwap_field
-                        grp.VolumeField = rw.volume_field
-
-                        rw = setInfo.First(Function(row) row.is_realtime = 0)
-                        grp.HistField = rw.last_field
-
-                        _ansamble.AddGroup(grp)
-                    Else
-                        grp = _ansamble.GetGroup(groupSelector.ExistingGroupId)
-                    End If
-
-                    bondSelector.SelectedRICs.ForEach(
-                        Sub(aRic)
-                            Dim descr = DbInitializer.GetBondInfo(aRic)
-                            If descr IsNot Nothing Then
-                                grp.AddRic(aRic, descr)
-                            End If
-                        End Sub)
-                    grp.StartRics(bondSelector.SelectedRICs)
-                End If
-
-            End If
-        End Sub
     End Class
 End Namespace

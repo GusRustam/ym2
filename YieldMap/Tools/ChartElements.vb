@@ -33,6 +33,12 @@ Namespace Tools
     Public Class Ansamble
         Private ReadOnly _groups As New List(Of Group)
 
+        Public ReadOnly Property Groups As List(Of Group)
+            Get
+                Return _groups
+            End Get
+        End Property
+
         Private ReadOnly _spreadBmk As SpreadContainer
 
         Public Event AllQuotes As Action(Of List(Of Bond))
@@ -47,22 +53,7 @@ Namespace Tools
             End Get
         End Property
 
-        ''' <summary>
-        ''' Get a group containing specified bond 
-        ''' </summary>
-        ''' <param name="instrument">RIC of bond</param>
-        ''' <returns>FIRST group which contains specified element</returns>
-        ''' <remarks>There might be several groups which contain that element, 
-        ''' but they are arranged according to VisualizableGroup sorting rules</remarks>
-        Public Function GetInstrumentGroup(ByVal instrument As String) As Group
-            Dim grp = _groups.Where(Function(group) group.HasRic(instrument)).ToList()
-            grp.Sort()
-            Return grp.First
-        End Function
 
-        Public Function GetSeriesName(ByVal instrument As String) As String
-            Return GetInstrumentGroup(instrument).SeriesName
-        End Function
 
         Public Function GetColor(ByVal instrument As String) As Color
             Return Color.FromName(GetInstrumentGroup(instrument).Color)
@@ -76,9 +67,6 @@ Namespace Tools
             _groups.Clear()
         End Sub
 
-        Public Function ContainsRic(ByVal instrument As String) As Boolean
-            Return _groups.Any(Function(group) group.HasRic(instrument))
-        End Function
 
         Public Sub StartLoadingLiveData()
             _groups.ForEach(Sub(grp) grp.StartAll())
@@ -117,14 +105,50 @@ Namespace Tools
             _spreadBmk = bmk
         End Sub
 
+#Region "Groups - these are methods that must be encapsulateds"
+        ' todo these are methods that must be encapsulated
+        Public Sub RemovePoint(ByVal ric As String)
+            While _groups.Any(Function(grp) grp.HasRic(ric))
+                Dim g = _groups.First(Function(grp) grp.HasRic(ric))
+                g.RemoveRic(ric)
+            End While
+        End Sub
+
         Public Function GetGroup(ByVal seriesName As String) As Group
             Return _groups.First(Function(grp) grp.SeriesName = seriesName)
         End Function
 
+        Public Function GetGroupList() As Dictionary(Of Guid, String)
+            Dim res As New Dictionary(Of Guid, String)
+            _groups.ForEach(Sub(grp) res.Add(Guid.Parse(grp.Id), grp.SeriesName))
+            Return res
+        End Function
 
         Public Function GetGroup(ByVal id As Guid) As Group
             Return _groups.First(Function(grp) grp.Id = id.ToString())
         End Function
+
+        Public Function ContainsRic(ByVal instrument As String) As Boolean
+            Return _groups.Any(Function(group) group.HasRic(instrument))
+        End Function
+
+        ''' <summary>
+        ''' Get a group containing specified bond 
+        ''' </summary>
+        ''' <param name="instrument">RIC of bond</param>
+        ''' <returns>FIRST group which contains specified element</returns>
+        ''' <remarks>There might be several groups which contain that element, 
+        ''' but they are arranged according to VisualizableGroup sorting rules</remarks>
+        Public Function GetInstrumentGroup(ByVal instrument As String) As Group
+            Dim grp = _groups.Where(Function(group) group.HasRic(instrument)).ToList()
+            grp.Sort()
+            Return grp.First
+        End Function
+
+        Public Function GetSeriesName(ByVal instrument As String) As String
+            Return GetInstrumentGroup(instrument).SeriesName
+        End Function
+#End Region
 
         Public Sub RecalculateByType(ByVal type As SpreadType)
             _groups.ForEach(Sub(group) group.RecalculateByType(type))
@@ -145,19 +169,6 @@ Namespace Tools
                 _groups.Remove(g)
             End While
         End Sub
-
-        Public Sub RemovePoint(ByVal ric As String)
-            While _groups.Any(Function(grp) grp.HasRic(ric))
-                Dim g = _groups.First(Function(grp) grp.HasRic(ric))
-                g.RemoveRIC(ric)
-            End While
-        End Sub
-
-        Public Function GetGroupList() As Dictionary(Of Guid, String)
-            Dim res As New Dictionary(Of Guid, String)
-            _groups.ForEach(Sub(grp) res.Add(Guid.Parse(grp.Id), grp.SeriesName))
-            Return res
-        End Function
     End Class
 
     Public Class Bond
@@ -635,24 +646,11 @@ Namespace Tools
 #End Region
 
 #Region "IV. Points descriptions"
-    'Friend Class HistCurvePointDescr
-    '    Inherits DataPointDescr
-
-    '    Public Overrides ReadOnly Property IsValid() As Boolean
-    '        Get
-    '            Return True
-    '        End Get
-    '    End Property
-
-    '    Public HistCurveName As String
-    '    Public RIC As String
-    '    Public BondTag As BondPointDescr
-    '    Public Price As Double
-
-    '    Public Overrides Function ToString() As String
-    '        Return RIC
-    '    End Function
-    'End Class
+    Friend Class HistoryPoint
+        Public Ric As String
+        Public Descr As HistPointDescription
+        Public Meta As DataBaseBondDescription
+    End Class
 #End Region
 
 #Region "V. Curves descriptions"

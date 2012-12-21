@@ -1,4 +1,5 @@
 ﻿Imports System.Windows.Forms.DataVisualization.Charting
+Imports YieldMap.Tools.History
 Imports YieldMap.Tools.Estimation
 Imports YieldMap.Curves
 Imports YieldMap.Tools
@@ -383,6 +384,67 @@ Namespace Forms.ChartForm
                             })
                         End Sub)
                 End Sub)
+        End Sub
+
+        Public Sub OnHistoricalData(ByVal ric As String, ByVal status As LoaderStatus, ByVal hstatus As HistoryStatus, ByVal data As Dictionary(Of Date, HistoricalItem))
+            Logger.Trace("OnHistoricalQuotes({0})", ric)
+            If status.Err Then
+                MessageBox.Show("Failed to load history for ric " & ric, "Error")
+                Return
+            End If
+            If hstatus = HistoryStatus.Full Then
+                If data Is Nothing OrElse data.Count <= 0 Then
+                    Logger.Info("No data on {0} arrived", ric)
+                    Return
+                End If
+
+                Dim elem = _ansamble.GetInstrumentGroup(ric).GetElement(ric)
+                Dim bondDataPoint = elem.MetaData ' todo that's awful
+                Dim points As New List(Of Tuple(Of HistPointDescription, DataBaseBondDescription))
+                For Each dt In data.Keys
+                    Try
+                        Dim calc As New HistPointDescription
+                        If data(dt).Close > 0 Then
+                            calc.Price = data(dt).Close
+
+                            CalculateYields(dt, bondDataPoint, calc)
+                            points.Add(Tuple.Create(calc, bondDataPoint))
+                        End If
+                    Catch ex As Exception
+                        Logger.ErrorException("Failed to calculate yield at historical date", ex)
+                        Logger.Error("Exception = {0}", ex.ToString())
+                    End Try
+                Next
+                GuiAsync(
+                    Sub()
+                        If points.Any() Then
+                            Dim theSeries = New Series() With {
+                                .Name = bondDataPoint.Label,
+                                .legendText = bondDataPoint.Label & " history",
+                                .ChartType = SeriesChartType.Line,
+                                .color = Color.FromName(elem.ParentGroup.Color),
+                                .markerColor = Color.Wheat,
+                                .markerBorderColor = Color.FromName(elem.ParentGroup.Color),
+                                .borderWidth = 1,
+                                .markerStyle = MarkerStyle.Circle,
+                                .markerSize = 4
+                            }
+                            TheChart.Series.Add(theSeries)
+                            points.ForEach(
+                                Sub(tpl)
+                                    Dim point = New DataPoint(tpl.Item1.Duration, tpl.Item1.GetYield.Value) With {
+                                                 .Tag = New HistoryPoint With {
+                                                     .Ric = bondDataPoint.RIC,
+                                                     .Descr = tpl.Item1,
+                                                     .Meta = tpl.Item2
+                                                 }
+                                        }
+                                    theSeries.Points.Add(point)
+                                End Sub)
+                        End If
+
+                    End Sub)
+            End If
         End Sub
     End Class
 End Namespace

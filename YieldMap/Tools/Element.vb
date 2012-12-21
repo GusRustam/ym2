@@ -68,6 +68,10 @@ Namespace Tools
         End Function
     End Class
 
+    Public Class HistPointDescription
+        Inherits BondPointDescription
+    End Class
+
     Public Class DataBaseBondDescription
         Private ReadOnly _ric As String
         Private ReadOnly _shortName As String

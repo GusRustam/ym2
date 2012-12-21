@@ -76,7 +76,7 @@ Namespace Tools.History
             End Select
         End Function
 
-        Public Sub StartTask(ByVal item As String, ByVal fields As String, ByVal since As Date, ByVal till As Date, Optional ByVal frequency As String = "D")
+        Public Sub StartTask(ByVal item As String, ByVal fields As String, ByVal since As Date, ByVal till As Date, Optional ByVal frequency As String = "D", Optional ByVal timeOut As Integer = 30)
             Logger.Warn("StartTask({0})", item)
             Try
                 Err = False
@@ -97,7 +97,7 @@ Namespace Tools.History
                         Dim waiterAndRunnerThread = New Thread(New ThreadStart(
                                Sub()
                                    Logger.Trace("{0} waiter started", item)
-                                   Thread.Sleep(TimeSpan.FromSeconds(30))
+                                   Thread.Sleep(TimeSpan.FromSeconds(timeOut))
                                    If Not Finished Then
                                        Logger.Warn("{0} waiter finihed with error", item)
                                        Err = True
