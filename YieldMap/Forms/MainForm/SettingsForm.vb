@@ -32,13 +32,52 @@ Namespace Forms.MainForm
 
             MainWindowCheckBox.Checked = ShowMainToolBar
             ChartWindowCheckBox.Checked = ShowChartToolBar
+
+            Dim selectedFields = BondSelectorVisibleColumns.Split(",")
+            ColumnsCLB.Items.Clear()
+            For Each nd As NameDescr In NameDescr.AllNames
+                Dim idx = ColumnsCLB.Items.Add(nd)
+                If selectedFields.Contains(nd.Field) Then
+                    ColumnsCLB.SetItemCheckState(idx, CheckState.Checked)
+                End If
+            Next
+            If selectedFields.Contains("ALL") Then
+                AllColumnsCB.Checked = True
+                SetAllCheckState()
+            End If
         End Sub
 
-        Private Sub CancelButtonClick(sender As System.Object, e As EventArgs) Handles TheCancelButton.Click
+        Private Sub CancelButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles TheCancelButton.Click
             Close()
         End Sub
 
-        Private Sub SaveSettingsButtonClick(sender As System.Object, e As EventArgs) Handles SaveSettingsButton.Click
+        Private Class NameDescr
+            Public Shared ReadOnly AllNames = {New NameDescr("Bond name", "bondshortname"),
+                               New NameDescr("Description", "descr"),
+                               New NameDescr("RIC", "ric"),
+                               New NameDescr("Issuer", "issname"),
+                               New NameDescr("Issue date", "issuedate"),
+                               New NameDescr("Issue size", "issue_size"),
+                               New NameDescr("Maturity", "maturitydate"),
+                               New NameDescr("Coupon", "coupon"),
+                               New NameDescr("Currency", "currency"),
+                               New NameDescr("Next put", "nextputdate"),
+                               New NameDescr("Next call", "nextcalldate")}
+
+            Private ReadOnly _descr As String
+            Public ReadOnly Field As String
+
+            Private Sub New(ByVal descr As String, ByVal field As String)
+                _descr = descr
+                Me.Field = field
+            End Sub
+
+            Public Overrides Function ToString() As String
+                Return _descr
+            End Function
+        End Class
+
+        Private Sub SaveSettingsButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles SaveSettingsButton.Click
             If LogTraceRadioButton.Checked Then
                 LoggingLevel = LogLevel.Trace
             ElseIf LogDebugRadioButton.Checked Then
@@ -71,6 +110,22 @@ Namespace Forms.MainForm
             ShowMainToolBar = MainWindowCheckBox.Checked
             ShowChartToolBar = ChartWindowCheckBox.Checked
 
+            Dim columnsString As String = ""
+
+            If AllColumnsCB.CheckState = CheckState.Checked Then
+                columnsString = "ALL"
+            Else
+                For i = 0 To ColumnsCLB.Items.Count - 1
+                    If ColumnsCLB.GetItemCheckState(i) = CheckState.Checked Then
+                        columnsString = columnsString & CType(ColumnsCLB.Items(i), NameDescr).Field & ","
+                    End If
+                Next
+            End If
+            If AllColumnsCB.CheckState <> CheckState.Checked And columnsString <> "" Then
+                columnsString = columnsString.Substring(0, columnsString.Length() - 1)
+            End If
+            BondSelectorVisibleColumns = columnsString
+
             Close()
         End Sub
 
@@ -87,5 +142,40 @@ Namespace Forms.MainForm
             End If
             Return result
         End Function
+
+        Private Sub AllColumnsCB_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles AllColumnsCB.Click
+            SetAllCheckState()
+        End Sub
+
+        Private Sub SetAllCheckState()
+
+            If AllColumnsCB.CheckState <> CheckState.Indeterminate Then
+                For i As Integer = 0 To ColumnsCLB.Items.Count - 1
+                    ColumnsCLB.SetItemCheckState(i, AllColumnsCB.CheckState)
+                Next
+            End If
+        End Sub
+
+        Private Sub ColumnsCLB_SelectedValueChanged(ByVal sender As Object, ByVal e As EventArgs) Handles ColumnsCLB.SelectedValueChanged
+            RefreshAllBox()
+        End Sub
+
+        Private Sub RefreshAllBox()
+            Dim allSelected = True
+            Dim noneSelected = True
+            For i As Integer = 0 To ColumnsCLB.Items.Count - 1
+                Dim cs = ColumnsCLB.GetItemCheckState(i)
+                allSelected = allSelected And (cs = CheckState.Checked)
+                noneSelected = noneSelected And (cs <> CheckState.Checked)
+                If Not allSelected And Not noneSelected Then Exit For
+            Next
+            If allSelected Then
+                AllColumnsCB.CheckState = CheckState.Checked
+            ElseIf noneSelected Then
+                AllColumnsCB.Checked = CheckState.Unchecked
+            Else
+                AllColumnsCB.CheckState = CheckState.Indeterminate
+            End If
+        End Sub
     End Class
 End Namespace

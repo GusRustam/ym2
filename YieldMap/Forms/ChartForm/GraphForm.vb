@@ -658,7 +658,7 @@ Namespace Forms.ChartForm
                             If point.QuotesAndYields.ContainsKey(point.SelectedQuote) Then
                                 Dim quote = point.QuotesAndYields(point.SelectedQuote)
                                 res.Price = quote.Price
-                                res.Quote = IIf(quote.YieldAtDate <> Date.Today, QuoteType.Close, QuoteType.Last)
+                                res.Quote = point.SelectedQuote
                                 res.QuoteDate = quote.YieldAtDate
                                 res.State = BondDescr.StateType.Ok
                                 res.ToWhat = quote.Yld.ToWhat

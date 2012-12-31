@@ -26,67 +26,44 @@
             Me.components = New System.ComponentModel.Container()
             Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
             Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-            Me.ShowAllCB = New System.Windows.Forms.CheckBox()
-            Me.Label1 = New System.Windows.Forms.Label()
-            Me.IssuerCB = New System.Windows.Forms.ComboBox()
             Me.IssuerBindingSource = New System.Windows.Forms.BindingSource(Me.components)
             Me.BondsDataSet = New YieldMap.BondsDataSet()
-            Me.BondListDGV = New System.Windows.Forms.DataGridView()
-            Me.BondshortnameDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.RicDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.issname = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.issue_size = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.coupon = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.MaturitydateDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.IssueridDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.BondDescriptionsBindingSource = New System.Windows.Forms.BindingSource(Me.components)
             Me.IssuerTableAdapter = New YieldMap.BondsDataSetTableAdapters.issuerTableAdapter()
             Me.BondDescriptionsTableAdapter = New YieldMap.BondsDataSetTableAdapters.BondDescriptionsTableAdapter()
-            Me.OkButton = New System.Windows.Forms.Button()
+            Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
+            Me.BondListDGV = New System.Windows.Forms.DataGridView()
+            Me.TableLayoutPanel2 = New System.Windows.Forms.TableLayoutPanel()
             Me.Button2 = New System.Windows.Forms.Button()
+            Me.OkButton = New System.Windows.Forms.Button()
             Me.IncludeCB = New System.Windows.Forms.CheckBox()
-            Me.Label2 = New System.Windows.Forms.Label()
+            Me.TableLayoutPanel3 = New System.Windows.Forms.TableLayoutPanel()
+            Me.IssuerTextBox = New System.Windows.Forms.TextBox()
+            Me.Label1 = New System.Windows.Forms.Label()
             Me.RICTextBox = New System.Windows.Forms.TextBox()
+            Me.Label2 = New System.Windows.Forms.Label()
+            Me.SelectColumnsCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
+            Me.SelectColumnsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.BondshortnameDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.ColumnDescr = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.RicDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.ColumnCurrency = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.issname = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.ColumnIssued = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.issue_size = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.coupon = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.MaturitydateDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.ColumnNextPutDate = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.ColumnNextCallDate = New System.Windows.Forms.DataGridViewTextBoxColumn()
             CType(Me.IssuerBindingSource, System.ComponentModel.ISupportInitialize).BeginInit()
             CType(Me.BondsDataSet, System.ComponentModel.ISupportInitialize).BeginInit()
-            CType(Me.BondListDGV, System.ComponentModel.ISupportInitialize).BeginInit()
             CType(Me.BondDescriptionsBindingSource, System.ComponentModel.ISupportInitialize).BeginInit()
+            Me.TableLayoutPanel1.SuspendLayout()
+            CType(Me.BondListDGV, System.ComponentModel.ISupportInitialize).BeginInit()
+            Me.TableLayoutPanel2.SuspendLayout()
+            Me.TableLayoutPanel3.SuspendLayout()
+            Me.SelectColumnsCMS.SuspendLayout()
             Me.SuspendLayout()
-            '
-            'ShowAllCB
-            '
-            Me.ShowAllCB.AutoSize = True
-            Me.ShowAllCB.Checked = True
-            Me.ShowAllCB.CheckState = System.Windows.Forms.CheckState.Checked
-            Me.ShowAllCB.Location = New System.Drawing.Point(241, 14)
-            Me.ShowAllCB.Name = "ShowAllCB"
-            Me.ShowAllCB.Size = New System.Drawing.Size(73, 17)
-            Me.ShowAllCB.TabIndex = 5
-            Me.ShowAllCB.Text = "any issuer"
-            Me.ShowAllCB.UseVisualStyleBackColor = True
-            '
-            'Label1
-            '
-            Me.Label1.AutoSize = True
-            Me.Label1.Location = New System.Drawing.Point(13, 15)
-            Me.Label1.Name = "Label1"
-            Me.Label1.Size = New System.Drawing.Size(35, 13)
-            Me.Label1.TabIndex = 4
-            Me.Label1.Text = "Issuer"
-            '
-            'IssuerCB
-            '
-            Me.IssuerCB.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest
-            Me.IssuerCB.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource
-            Me.IssuerCB.DataSource = Me.IssuerBindingSource
-            Me.IssuerCB.DisplayMember = "shortname"
-            Me.IssuerCB.Enabled = False
-            Me.IssuerCB.FormattingEnabled = True
-            Me.IssuerCB.Location = New System.Drawing.Point(54, 12)
-            Me.IssuerCB.Name = "IssuerCB"
-            Me.IssuerCB.Size = New System.Drawing.Size(171, 21)
-            Me.IssuerCB.TabIndex = 3
-            Me.IssuerCB.ValueMember = "id"
             '
             'IssuerBindingSource
             '
@@ -99,28 +76,192 @@
             Me.BondsDataSet.EnforceConstraints = False
             Me.BondsDataSet.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema
             '
+            'BondDescriptionsBindingSource
+            '
+            Me.BondDescriptionsBindingSource.DataMember = "BondDescriptions"
+            Me.BondDescriptionsBindingSource.DataSource = Me.BondsDataSet
+            '
+            'IssuerTableAdapter
+            '
+            Me.IssuerTableAdapter.ClearBeforeFill = True
+            '
+            'BondDescriptionsTableAdapter
+            '
+            Me.BondDescriptionsTableAdapter.ClearBeforeFill = True
+            '
+            'TableLayoutPanel1
+            '
+            Me.TableLayoutPanel1.ColumnCount = 1
+            Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+            Me.TableLayoutPanel1.Controls.Add(Me.BondListDGV, 0, 1)
+            Me.TableLayoutPanel1.Controls.Add(Me.TableLayoutPanel2, 0, 2)
+            Me.TableLayoutPanel1.Controls.Add(Me.TableLayoutPanel3, 0, 0)
+            Me.TableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.TableLayoutPanel1.Location = New System.Drawing.Point(0, 0)
+            Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
+            Me.TableLayoutPanel1.RowCount = 3
+            Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50.0!))
+            Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+            Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25.0!))
+            Me.TableLayoutPanel1.Size = New System.Drawing.Size(738, 526)
+            Me.TableLayoutPanel1.TabIndex = 10
+            '
             'BondListDGV
             '
             Me.BondListDGV.AllowUserToAddRows = False
             Me.BondListDGV.AllowUserToDeleteRows = False
             Me.BondListDGV.AutoGenerateColumns = False
             Me.BondListDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-            Me.BondListDGV.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.BondshortnameDataGridViewTextBoxColumn, Me.RicDataGridViewTextBoxColumn, Me.issname, Me.issue_size, Me.coupon, Me.MaturitydateDataGridViewTextBoxColumn, Me.IssueridDataGridViewTextBoxColumn})
+            Me.BondListDGV.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.BondshortnameDataGridViewTextBoxColumn, Me.ColumnDescr, Me.RicDataGridViewTextBoxColumn, Me.ColumnCurrency, Me.issname, Me.ColumnIssued, Me.issue_size, Me.coupon, Me.MaturitydateDataGridViewTextBoxColumn, Me.ColumnNextPutDate, Me.ColumnNextCallDate})
             Me.BondListDGV.DataSource = Me.BondDescriptionsBindingSource
-            Me.BondListDGV.Location = New System.Drawing.Point(16, 79)
+            Me.BondListDGV.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.BondListDGV.Location = New System.Drawing.Point(3, 53)
             Me.BondListDGV.Name = "BondListDGV"
             Me.BondListDGV.ReadOnly = True
             Me.BondListDGV.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-            Me.BondListDGV.Size = New System.Drawing.Size(710, 410)
-            Me.BondListDGV.TabIndex = 6
+            Me.BondListDGV.Size = New System.Drawing.Size(732, 445)
+            Me.BondListDGV.TabIndex = 7
+            '
+            'TableLayoutPanel2
+            '
+            Me.TableLayoutPanel2.ColumnCount = 3
+            Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
+            Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
+            Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
+            Me.TableLayoutPanel2.Controls.Add(Me.Button2, 0, 0)
+            Me.TableLayoutPanel2.Controls.Add(Me.OkButton, 0, 0)
+            Me.TableLayoutPanel2.Controls.Add(Me.IncludeCB, 0, 0)
+            Me.TableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.TableLayoutPanel2.Location = New System.Drawing.Point(0, 501)
+            Me.TableLayoutPanel2.Margin = New System.Windows.Forms.Padding(0)
+            Me.TableLayoutPanel2.Name = "TableLayoutPanel2"
+            Me.TableLayoutPanel2.RowCount = 1
+            Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+            Me.TableLayoutPanel2.Size = New System.Drawing.Size(738, 25)
+            Me.TableLayoutPanel2.TabIndex = 8
+            '
+            'Button2
+            '
+            Me.Button2.DialogResult = System.Windows.Forms.DialogResult.Cancel
+            Me.Button2.Dock = System.Windows.Forms.DockStyle.Right
+            Me.Button2.Location = New System.Drawing.Point(611, 0)
+            Me.Button2.Margin = New System.Windows.Forms.Padding(0)
+            Me.Button2.Name = "Button2"
+            Me.Button2.Size = New System.Drawing.Size(127, 25)
+            Me.Button2.TabIndex = 11
+            Me.Button2.Text = "Cancel"
+            Me.Button2.UseVisualStyleBackColor = True
+            '
+            'OkButton
+            '
+            Me.OkButton.DialogResult = System.Windows.Forms.DialogResult.OK
+            Me.OkButton.Dock = System.Windows.Forms.DockStyle.Right
+            Me.OkButton.Location = New System.Drawing.Point(365, 0)
+            Me.OkButton.Margin = New System.Windows.Forms.Padding(0)
+            Me.OkButton.Name = "OkButton"
+            Me.OkButton.Size = New System.Drawing.Size(127, 25)
+            Me.OkButton.TabIndex = 10
+            Me.OkButton.Text = "Add selected"
+            Me.OkButton.UseVisualStyleBackColor = True
+            '
+            'IncludeCB
+            '
+            Me.IncludeCB.AutoSize = True
+            Me.IncludeCB.Checked = True
+            Me.IncludeCB.CheckState = System.Windows.Forms.CheckState.Checked
+            Me.IncludeCB.Location = New System.Drawing.Point(3, 3)
+            Me.IncludeCB.Name = "IncludeCB"
+            Me.IncludeCB.Size = New System.Drawing.Size(61, 17)
+            Me.IncludeCB.TabIndex = 9
+            Me.IncludeCB.Text = "Include"
+            Me.IncludeCB.UseVisualStyleBackColor = True
+            '
+            'TableLayoutPanel3
+            '
+            Me.TableLayoutPanel3.ColumnCount = 4
+            Me.TableLayoutPanel3.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50.0!))
+            Me.TableLayoutPanel3.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
+            Me.TableLayoutPanel3.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
+            Me.TableLayoutPanel3.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
+            Me.TableLayoutPanel3.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+            Me.TableLayoutPanel3.Controls.Add(Me.IssuerTextBox, 1, 0)
+            Me.TableLayoutPanel3.Controls.Add(Me.Label1, 0, 0)
+            Me.TableLayoutPanel3.Controls.Add(Me.RICTextBox, 0, 1)
+            Me.TableLayoutPanel3.Controls.Add(Me.Label2, 0, 1)
+            Me.TableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.TableLayoutPanel3.Location = New System.Drawing.Point(0, 0)
+            Me.TableLayoutPanel3.Margin = New System.Windows.Forms.Padding(0)
+            Me.TableLayoutPanel3.Name = "TableLayoutPanel3"
+            Me.TableLayoutPanel3.RowCount = 2
+            Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+            Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+            Me.TableLayoutPanel3.Size = New System.Drawing.Size(738, 50)
+            Me.TableLayoutPanel3.TabIndex = 9
+            '
+            'IssuerTextBox
+            '
+            Me.IssuerTextBox.Dock = System.Windows.Forms.DockStyle.Top
+            Me.IssuerTextBox.Location = New System.Drawing.Point(53, 3)
+            Me.IssuerTextBox.Name = "IssuerTextBox"
+            Me.IssuerTextBox.Size = New System.Drawing.Size(223, 20)
+            Me.IssuerTextBox.TabIndex = 11
+            '
+            'Label1
+            '
+            Me.Label1.AutoSize = True
+            Me.Label1.Location = New System.Drawing.Point(3, 3)
+            Me.Label1.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
+            Me.Label1.Name = "Label1"
+            Me.Label1.Size = New System.Drawing.Size(35, 13)
+            Me.Label1.TabIndex = 5
+            Me.Label1.Text = "Issuer"
+            '
+            'RICTextBox
+            '
+            Me.RICTextBox.Dock = System.Windows.Forms.DockStyle.Top
+            Me.RICTextBox.Location = New System.Drawing.Point(53, 28)
+            Me.RICTextBox.Name = "RICTextBox"
+            Me.RICTextBox.Size = New System.Drawing.Size(223, 20)
+            Me.RICTextBox.TabIndex = 10
+            '
+            'Label2
+            '
+            Me.Label2.AutoSize = True
+            Me.Label2.Location = New System.Drawing.Point(3, 28)
+            Me.Label2.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
+            Me.Label2.Name = "Label2"
+            Me.Label2.Size = New System.Drawing.Size(25, 13)
+            Me.Label2.TabIndex = 7
+            Me.Label2.Text = "RIC"
+            '
+            'SelectColumnsCMS
+            '
+            Me.SelectColumnsCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SelectColumnsToolStripMenuItem})
+            Me.SelectColumnsCMS.Name = "SelectColumnsCMS"
+            Me.SelectColumnsCMS.Size = New System.Drawing.Size(168, 48)
+            '
+            'SelectColumnsToolStripMenuItem
+            '
+            Me.SelectColumnsToolStripMenuItem.Name = "SelectColumnsToolStripMenuItem"
+            Me.SelectColumnsToolStripMenuItem.Size = New System.Drawing.Size(167, 22)
+            Me.SelectColumnsToolStripMenuItem.Text = "Select columns..."
             '
             'BondshortnameDataGridViewTextBoxColumn
             '
-            Me.BondshortnameDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill
+            Me.BondshortnameDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
             Me.BondshortnameDataGridViewTextBoxColumn.DataPropertyName = "bondshortname"
             Me.BondshortnameDataGridViewTextBoxColumn.HeaderText = "Bond"
             Me.BondshortnameDataGridViewTextBoxColumn.Name = "BondshortnameDataGridViewTextBoxColumn"
             Me.BondshortnameDataGridViewTextBoxColumn.ReadOnly = True
+            Me.BondshortnameDataGridViewTextBoxColumn.Width = 57
+            '
+            'ColumnDescr
+            '
+            Me.ColumnDescr.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill
+            Me.ColumnDescr.DataPropertyName = "descr"
+            Me.ColumnDescr.HeaderText = "Description"
+            Me.ColumnDescr.Name = "ColumnDescr"
+            Me.ColumnDescr.ReadOnly = True
             '
             'RicDataGridViewTextBoxColumn
             '
@@ -131,13 +272,31 @@
             Me.RicDataGridViewTextBoxColumn.ReadOnly = True
             Me.RicDataGridViewTextBoxColumn.Width = 50
             '
+            'ColumnCurrency
+            '
+            Me.ColumnCurrency.DataPropertyName = "currency"
+            Me.ColumnCurrency.HeaderText = "Currency"
+            Me.ColumnCurrency.Name = "ColumnCurrency"
+            Me.ColumnCurrency.ReadOnly = True
+            '
             'issname
             '
-            Me.issname.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill
+            Me.issname.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
             Me.issname.DataPropertyName = "issname"
             Me.issname.HeaderText = "Issuer"
             Me.issname.Name = "issname"
             Me.issname.ReadOnly = True
+            Me.issname.Width = 60
+            '
+            'ColumnIssued
+            '
+            Me.ColumnIssued.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
+            Me.ColumnIssued.DataPropertyName = "issuedate"
+            Me.ColumnIssued.HeaderText = "Issued"
+            Me.ColumnIssued.Name = "ColumnIssued"
+            Me.ColumnIssued.ReadOnly = True
+            Me.ColumnIssued.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic
+            Me.ColumnIssued.Width = 63
             '
             'issue_size
             '
@@ -169,122 +328,72 @@
             Me.MaturitydateDataGridViewTextBoxColumn.HeaderText = "Maturity"
             Me.MaturitydateDataGridViewTextBoxColumn.Name = "MaturitydateDataGridViewTextBoxColumn"
             Me.MaturitydateDataGridViewTextBoxColumn.ReadOnly = True
+            Me.MaturitydateDataGridViewTextBoxColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic
             Me.MaturitydateDataGridViewTextBoxColumn.Width = 69
             '
-            'IssueridDataGridViewTextBoxColumn
+            'ColumnNextPutDate
             '
-            Me.IssueridDataGridViewTextBoxColumn.DataPropertyName = "issuer_id"
-            Me.IssueridDataGridViewTextBoxColumn.HeaderText = "issuer_id"
-            Me.IssueridDataGridViewTextBoxColumn.Name = "IssueridDataGridViewTextBoxColumn"
-            Me.IssueridDataGridViewTextBoxColumn.ReadOnly = True
-            Me.IssueridDataGridViewTextBoxColumn.Visible = False
+            Me.ColumnNextPutDate.DataPropertyName = "nextputdate"
+            Me.ColumnNextPutDate.HeaderText = "Next Put"
+            Me.ColumnNextPutDate.Name = "ColumnNextPutDate"
+            Me.ColumnNextPutDate.ReadOnly = True
             '
-            'BondDescriptionsBindingSource
+            'ColumnNextCallDate
             '
-            Me.BondDescriptionsBindingSource.DataMember = "BondDescriptions"
-            Me.BondDescriptionsBindingSource.DataSource = Me.BondsDataSet
-            '
-            'IssuerTableAdapter
-            '
-            Me.IssuerTableAdapter.ClearBeforeFill = True
-            '
-            'BondDescriptionsTableAdapter
-            '
-            Me.BondDescriptionsTableAdapter.ClearBeforeFill = True
-            '
-            'OkButton
-            '
-            Me.OkButton.DialogResult = System.Windows.Forms.DialogResult.OK
-            Me.OkButton.Location = New System.Drawing.Point(447, 495)
-            Me.OkButton.Name = "OkButton"
-            Me.OkButton.Size = New System.Drawing.Size(127, 23)
-            Me.OkButton.TabIndex = 7
-            Me.OkButton.Text = "Add selected"
-            Me.OkButton.UseVisualStyleBackColor = True
-            '
-            'Button2
-            '
-            Me.Button2.DialogResult = System.Windows.Forms.DialogResult.Cancel
-            Me.Button2.Location = New System.Drawing.Point(599, 495)
-            Me.Button2.Name = "Button2"
-            Me.Button2.Size = New System.Drawing.Size(127, 23)
-            Me.Button2.TabIndex = 7
-            Me.Button2.Text = "Cancel"
-            Me.Button2.UseVisualStyleBackColor = True
-            '
-            'IncludeCB
-            '
-            Me.IncludeCB.AutoSize = True
-            Me.IncludeCB.Checked = True
-            Me.IncludeCB.CheckState = System.Windows.Forms.CheckState.Checked
-            Me.IncludeCB.Location = New System.Drawing.Point(16, 495)
-            Me.IncludeCB.Name = "IncludeCB"
-            Me.IncludeCB.Size = New System.Drawing.Size(61, 17)
-            Me.IncludeCB.TabIndex = 8
-            Me.IncludeCB.Text = "Include"
-            Me.IncludeCB.UseVisualStyleBackColor = True
-            '
-            'Label2
-            '
-            Me.Label2.AutoSize = True
-            Me.Label2.Location = New System.Drawing.Point(13, 46)
-            Me.Label2.Name = "Label2"
-            Me.Label2.Size = New System.Drawing.Size(25, 13)
-            Me.Label2.TabIndex = 4
-            Me.Label2.Text = "RIC"
-            '
-            'RICTextBox
-            '
-            Me.RICTextBox.Location = New System.Drawing.Point(54, 43)
-            Me.RICTextBox.Name = "RICTextBox"
-            Me.RICTextBox.Size = New System.Drawing.Size(171, 20)
-            Me.RICTextBox.TabIndex = 9
+            Me.ColumnNextCallDate.DataPropertyName = "nextcalldate"
+            Me.ColumnNextCallDate.HeaderText = "Next Call"
+            Me.ColumnNextCallDate.Name = "ColumnNextCallDate"
+            Me.ColumnNextCallDate.ReadOnly = True
             '
             'BondSelectorForm
             '
             Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
             Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
             Me.ClientSize = New System.Drawing.Size(738, 526)
-            Me.Controls.Add(Me.RICTextBox)
-            Me.Controls.Add(Me.IncludeCB)
-            Me.Controls.Add(Me.Button2)
-            Me.Controls.Add(Me.OkButton)
-            Me.Controls.Add(Me.BondListDGV)
-            Me.Controls.Add(Me.ShowAllCB)
-            Me.Controls.Add(Me.Label2)
-            Me.Controls.Add(Me.Label1)
-            Me.Controls.Add(Me.IssuerCB)
-            Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
+            Me.Controls.Add(Me.TableLayoutPanel1)
             Me.Name = "BondSelectorForm"
             Me.Text = "Select a bond"
             CType(Me.IssuerBindingSource, System.ComponentModel.ISupportInitialize).EndInit()
             CType(Me.BondsDataSet, System.ComponentModel.ISupportInitialize).EndInit()
-            CType(Me.BondListDGV, System.ComponentModel.ISupportInitialize).EndInit()
             CType(Me.BondDescriptionsBindingSource, System.ComponentModel.ISupportInitialize).EndInit()
+            Me.TableLayoutPanel1.ResumeLayout(False)
+            CType(Me.BondListDGV, System.ComponentModel.ISupportInitialize).EndInit()
+            Me.TableLayoutPanel2.ResumeLayout(False)
+            Me.TableLayoutPanel2.PerformLayout()
+            Me.TableLayoutPanel3.ResumeLayout(False)
+            Me.TableLayoutPanel3.PerformLayout()
+            Me.SelectColumnsCMS.ResumeLayout(False)
             Me.ResumeLayout(False)
-            Me.PerformLayout()
 
         End Sub
-        Friend WithEvents ShowAllCB As System.Windows.Forms.CheckBox
-        Friend WithEvents Label1 As System.Windows.Forms.Label
-        Friend WithEvents IssuerCB As System.Windows.Forms.ComboBox
-        Friend WithEvents BondListDGV As System.Windows.Forms.DataGridView
         Friend WithEvents BondsDataSet As YieldMap.BondsDataSet
         Friend WithEvents IssuerBindingSource As System.Windows.Forms.BindingSource
         Friend WithEvents IssuerTableAdapter As YieldMap.BondsDataSetTableAdapters.issuerTableAdapter
         Friend WithEvents BondDescriptionsBindingSource As System.Windows.Forms.BindingSource
         Friend WithEvents BondDescriptionsTableAdapter As YieldMap.BondsDataSetTableAdapters.BondDescriptionsTableAdapter
-        Friend WithEvents OkButton As System.Windows.Forms.Button
+        Friend WithEvents TableLayoutPanel1 As System.Windows.Forms.TableLayoutPanel
+        Friend WithEvents BondListDGV As System.Windows.Forms.DataGridView
+        Friend WithEvents TableLayoutPanel2 As System.Windows.Forms.TableLayoutPanel
         Friend WithEvents Button2 As System.Windows.Forms.Button
+        Friend WithEvents OkButton As System.Windows.Forms.Button
         Friend WithEvents IncludeCB As System.Windows.Forms.CheckBox
+        Friend WithEvents TableLayoutPanel3 As System.Windows.Forms.TableLayoutPanel
+        Friend WithEvents IssuerTextBox As System.Windows.Forms.TextBox
+        Friend WithEvents Label1 As System.Windows.Forms.Label
+        Friend WithEvents RICTextBox As System.Windows.Forms.TextBox
+        Friend WithEvents Label2 As System.Windows.Forms.Label
+        Friend WithEvents SelectColumnsCMS As System.Windows.Forms.ContextMenuStrip
+        Friend WithEvents SelectColumnsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents BondshortnameDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
+        Friend WithEvents ColumnDescr As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents RicDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
+        Friend WithEvents ColumnCurrency As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents issname As System.Windows.Forms.DataGridViewTextBoxColumn
+        Friend WithEvents ColumnIssued As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents issue_size As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents coupon As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents MaturitydateDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
-        Friend WithEvents IssueridDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
-        Friend WithEvents Label2 As System.Windows.Forms.Label
-        Friend WithEvents RICTextBox As System.Windows.Forms.TextBox
+        Friend WithEvents ColumnNextPutDate As System.Windows.Forms.DataGridViewTextBoxColumn
+        Friend WithEvents ColumnNextCallDate As System.Windows.Forms.DataGridViewTextBoxColumn
     End Class
 End Namespace

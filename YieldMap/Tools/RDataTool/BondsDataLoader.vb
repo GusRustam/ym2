@@ -80,6 +80,7 @@ Namespace Tools.RDataTool
         <BondField("EJV.C.IssueDate")> Public IssueDate As String
         <BondField("EJV.C.MaturityDate")> Public MaturityDate As String
         <BondField("EJV.C.NextPutDate")> Public NextPutDate As String
+        <BondField("EJV.C.NextCallDate")> Public NextCallDate As String
         <BondField("EJV.C.IssuerCountry")> Public Country As String
         <BondField("EJV.C.Currency")> Public Currency As String
         <BondField("EJV.C.IsStraight")> Public IsStraight As String

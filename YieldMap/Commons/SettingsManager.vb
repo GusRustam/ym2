@@ -187,6 +187,17 @@ Namespace Commons
         Public DbFileName As String = "bonds.sqlite"
         Public ZipFileName As String = String.Format("attachments_{0:ddMMyyyy}.zip", Date.Today)
 
+        Private _bondSelectorVisibleColumns As String = "ALL"
+        Public Property BondSelectorVisibleColumns As String
+            Get
+                Return _bondSelectorVisibleColumns
+            End Get
+            Set(ByVal value As String)
+                Branch.SetValue("bondSelectorVisibleColumns", value.ToString())
+                _bondSelectorVisibleColumns = value
+            End Set
+        End Property
+
         Sub New()
             Dim val As Object
 
@@ -202,10 +213,10 @@ Namespace Commons
             val = Branch.GetValue("showMainToolBar") : If val IsNot Nothing Then _showMainToolBar = Boolean.Parse(val)
             val = Branch.GetValue("showChartToolBar") : If val IsNot Nothing Then _showChartToolBar = Boolean.Parse(val)
 
-            val = Branch.GetValue("defaultField") : If val IsNot Nothing Then _defaultField = val.ToString().ToUpper()
+            val = Branch.GetValue("bondSelectorVisibleColumns") : If val IsNot Nothing Then _bondSelectorVisibleColumns = val.ToString()
 
             val = Branch.GetValue("logLevel"): If val IsNot Nothing Then _logLevel = LogLevel.FromString(val)
-            val = Branch.GetValue("refreshInterval"): If val IsNot Nothing Then _refreshInterval = CInt(val)
+            val = Branch.GetValue("refreshInterval") : If val IsNot Nothing Then _refreshInterval = CInt(val)
         End Sub
     End Module
 End Namespace

@@ -366,7 +366,7 @@ Namespace Commons
 
                     insertCommand = subList.Aggregate("INSERT INTO Bond(ric, payments, rates, descr, series, issuer_id, " +
                                                       "currency_id, ir_fixing_ric, issuedate, maturitydate, " +
-                                                      "nextputdate, is_straight, is_putable, is_floater, " +
+                                                      "nextputdate, nextcalldate, is_straight, is_putable, is_floater, " +
                                                       "is_convertible, issue_size, coupon) VALUES",
                                                       Function(current, item)
                                                           Dim description = item("Description").Replace("''", """").Replace("'", """")
@@ -393,9 +393,9 @@ Namespace Commons
                                                               theCoupon = 0
                                                           End Try
 
-                                                          Return current + String.Format("('{0}', '{1}', '{2}', '{3}', '{4}', {5}, {6}, '{7}', '{8}', '{9}', '{10}', {11}, {12}, {13}, {14}, {15}, '{16}'), ",
+                                                          Return current + String.Format("('{0}', '{1}', '{2}', '{3}', '{4}', {5}, {6}, '{7}', '{8}', '{9}', '{10}', '{17}', {11}, {12}, {13}, {14}, {15}, '{16}'), ",
                                                                                          item("Ric"), item("Payments"), item("Rates"), description, item("Series"), issuerId, currencyId, item("IndexRIC"),
-                                                                                         item("IssueDate"), item("MaturityDate"), item("NextPutDate"), isStraight, isPutable, isFloater, isConvertible, issueSize, theCoupon)
+                                                                                         item("IssueDate"), item("MaturityDate"), item("NextPutDate"), isStraight, isPutable, isFloater, isConvertible, issueSize, theCoupon, item("NextCallDate"))
                                                       End Function)
 
 

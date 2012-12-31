@@ -696,7 +696,7 @@ WHERE     (id = @Original_id)</CommandText>
               <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.BondDescriptions" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
-                    <CommandText>SELECT        ric, descr, payments, rates, maturitydate, bondshortname, is_putable, issuedate, coupon, issuer_id, issname, issue_size
+                    <CommandText>SELECT        ric, descr, payments, rates, maturitydate, bondshortname, is_putable, issuedate, coupon, issuer_id, issname, issue_size, matsort, isssort, currency, nextputdate, nextcalldate, nextputsort, nextcallsort
 FROM            BondDescriptions
 ORDER BY bondshortname</CommandText>
                     <Parameters />
@@ -717,6 +717,13 @@ ORDER BY bondshortname</CommandText>
               <Mapping SourceColumn="issuer_id" DataSetColumn="issuer_id" />
               <Mapping SourceColumn="issname" DataSetColumn="issname" />
               <Mapping SourceColumn="issue_size" DataSetColumn="issue_size" />
+              <Mapping SourceColumn="matsort" DataSetColumn="matsort" />
+              <Mapping SourceColumn="isssort" DataSetColumn="isssort" />
+              <Mapping SourceColumn="currency" DataSetColumn="currency" />
+              <Mapping SourceColumn="nextputdate" DataSetColumn="nextputdate" />
+              <Mapping SourceColumn="nextcalldate" DataSetColumn="nextcalldate" />
+              <Mapping SourceColumn="nextputsort" DataSetColumn="nextputsort" />
+              <Mapping SourceColumn="nextcallsort" DataSetColumn="nextcallsort" />
             </Mappings>
             <Sources />
           </TableAdapter>
@@ -1757,6 +1764,31 @@ WHERE     (id = @Original_id)</CommandText>
                 </xs:simpleType>
               </xs:element>
               <xs:element name="issue_size" msprop:Generator_ColumnVarNameInTable="columnissue_size" msprop:Generator_ColumnPropNameInRow="issue_size" msprop:Generator_ColumnPropNameInTable="issue_sizeColumn" msprop:Generator_UserColumnName="issue_size" type="xs:double" minOccurs="0" />
+              <xs:element name="matsort" msprop:Generator_ColumnVarNameInTable="columnmatsort" msprop:Generator_ColumnPropNameInRow="matsort" msprop:Generator_ColumnPropNameInTable="matsortColumn" msprop:Generator_UserColumnName="matsort" type="xs:anyType" minOccurs="0" />
+              <xs:element name="isssort" msprop:Generator_ColumnVarNameInTable="columnisssort" msprop:Generator_ColumnPropNameInRow="isssort" msprop:Generator_ColumnPropNameInTable="isssortColumn" msprop:Generator_UserColumnName="isssort" type="xs:anyType" minOccurs="0" />
+              <xs:element name="currency" msprop:Generator_ColumnVarNameInTable="columncurrency" msprop:Generator_ColumnPropNameInRow="currency" msprop:Generator_ColumnPropNameInTable="currencyColumn" msprop:Generator_UserColumnName="currency" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="nextputdate" msprop:Generator_ColumnVarNameInTable="columnnextputdate" msprop:Generator_ColumnPropNameInRow="nextputdate" msprop:Generator_ColumnPropNameInTable="nextputdateColumn" msprop:Generator_UserColumnName="nextputdate" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="nextcalldate" msprop:Generator_ColumnVarNameInTable="columnnextcalldate" msprop:Generator_ColumnPropNameInRow="nextcalldate" msprop:Generator_ColumnPropNameInTable="nextcalldateColumn" msprop:Generator_UserColumnName="nextcalldate" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="nextputsort" msdata:DataType="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" msprop:Generator_ColumnVarNameInTable="columnnextputsort" msprop:Generator_ColumnPropNameInRow="nextputsort" msprop:Generator_ColumnPropNameInTable="nextputsortColumn" msprop:Generator_UserColumnName="nextputsort" type="xs:anyType" minOccurs="0" />
+              <xs:element name="nextcallsort" msdata:DataType="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" msprop:Generator_ColumnVarNameInTable="columnnextcallsort" msprop:Generator_ColumnPropNameInRow="nextcallsort" msprop:Generator_ColumnPropNameInTable="nextcallsortColumn" msprop:Generator_UserColumnName="nextcallsort" type="xs:anyType" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

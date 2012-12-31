@@ -5,95 +5,6 @@ Imports NLog
 Imports YieldMap.Tools
 
 Namespace Forms.TableForm
-    <TypeConverter(GetType(QuoteType))>
-    Public Class QuoteType
-        Inherits TypeConverter
-
-        Private ReadOnly _name As String
-        Private ReadOnly _live As Boolean
-        Public Shared Bid As New QuoteType("Bid", True)
-        Public Shared Ask As New QuoteType("Ask", True)
-        Public Shared Last As New QuoteType("Last", True)
-        Public Shared Close As New QuoteType("Close", False)
-
-        Public Shared Function TryParse(ByVal name As String, ByRef toWhat As Object) As Boolean
-            If name = Close.Name Then
-                toWhat = Close
-                Return True
-            End If
-            If name = Bid.Name Then
-                toWhat = Bid
-                Return True
-            End If
-            If name = Ask.Name Then
-                toWhat = Ask
-                Return True
-            End If
-            If name = Last.Name Then
-                toWhat = Last
-                Return True
-            End If
-            toWhat = Nothing
-            Return False
-        End Function
-
-        Public Shared Function Parse(ByVal name As String) As QuoteType
-            If name = Close.Name Then Return Close
-            If name = Bid.Name Then Return Bid
-            If name = Ask.Name Then Return Ask
-            If name = Last.Name Then Return Last
-            Return Nothing
-        End Function
-
-        Public Shared Narrowing Operator CType(x As String) As QuoteType
-            Dim res As New QuoteType
-            If TryParse(x, res) Then
-                Return res
-            Else
-                Return Nothing
-            End If
-        End Operator
-
-        Public Overrides Function Equals(ByVal obj As Object) As Boolean
-            If Not TypeOf obj Is QuoteType Then Return False
-            Dim q = CType(obj, QuoteType)
-            Return q.Name = Name
-        End Function
-
-        Public Overrides Function ToString() As String
-            Return _name
-        End Function
-
-        Private Sub New(ByVal name As String, ByVal live As Boolean)
-            _name = name
-            _live = live
-        End Sub
-
-        Public Sub New()
-        End Sub
-
-        Public ReadOnly Property Name As String
-            Get
-                Return _name
-            End Get
-        End Property
-
-        Public ReadOnly Property Live As Boolean
-            Get
-                Return _live
-            End Get
-        End Property
-
-        Public Shared Function GetValues(live As Boolean) As Array
-            Return IIf(live, {Bid, Ask, Last}.ToArray(), {Close}.ToArray())
-        End Function
-
-        Public Overrides Function ConvertFrom(ByVal context As ITypeDescriptorContext, ByVal culture As CultureInfo, ByVal value As Object) As Object
-            If TypeOf value Is String Then Return CType(value.ToString(), QuoteType)
-            Return Nothing
-        End Function
-    End Class
-
     Class BondDescrComparer
         Implements IComparer(Of BondDescr)
 
@@ -162,7 +73,7 @@ Namespace Forms.TableForm
         Private _convexity As Double
         Private _toWhat As YieldToWhat
         Private _price As Double
-        Private _quote As QuoteType
+        Private _quote As String
         Private _state As StateType
         Private _live As Boolean
         Private _calcMode As CalculationMode
@@ -181,11 +92,10 @@ Namespace Forms.TableForm
             _quoteDate = Date.Today
             _live = True
             _toWhat = YieldToWhat.Maturity
-            _quote = QuoteType.Last
             _state = StateType.Editing
         End Sub
 
-        Public Sub New(ByVal ric As String, ByVal name As String, ByVal maturity As Date, ByVal bondYield As Double, ByVal duration As Double, ByVal convxity As Double, ByVal toWhat As YieldToWhat, ByVal price As Double, ByVal quote As QuoteType, ByVal status As StateType, ByVal live As Boolean, ByVal calcMode As CalculationMode, ByVal quoteDate As Date)
+        Public Sub New(ByVal ric As String, ByVal name As String, ByVal maturity As Date, ByVal bondYield As Double, ByVal duration As Double, ByVal convxity As Double, ByVal toWhat As YieldToWhat, ByVal price As Double, ByVal quote As String, ByVal status As StateType, ByVal live As Boolean, ByVal calcMode As CalculationMode, ByVal quoteDate As Date)
             _ric = ric
             _name = name
             _maturity = maturity
@@ -202,7 +112,7 @@ Namespace Forms.TableForm
         End Sub
 
         ' this constructor uses only important data
-        Public Sub New(ByVal ric As String, ByVal name As String, ByVal toWhat As YieldToWhat, ByVal quote As QuoteType, ByVal live As Boolean, ByVal calcMode As CalculationMode, ByVal quoteDate As Date)
+        Public Sub New(ByVal ric As String, ByVal name As String, ByVal toWhat As YieldToWhat, ByVal quote As String, ByVal live As Boolean, ByVal calcMode As CalculationMode, ByVal quoteDate As Date)
             _ric = ric
             _name = name
             _toWhat = toWhat
@@ -338,11 +248,11 @@ Namespace Forms.TableForm
             End Set
         End Property
 
-        Public Property Quote As QuoteType
+        Public Property Quote As String
             Get
                 Return _quote
             End Get
-            Set(value As QuoteType)
+            Set(ByVal value As String)
                 Logger.Trace("Quote <- {0}", value.ToString())
                 _quote = value
                 If Not Active Then Return
@@ -460,7 +370,7 @@ Namespace Forms.TableForm
                 Dim name = data(1).Split(":")(1)
                 Dim calcModeStr = CalculationMode.Parse(GetType(CalculationMode), data(2).Split(":")(1))
                 Dim live = Boolean.Parse(data(3).Split(":")(1))
-                Dim quote = QuoteType.Parse(data(4).Split(":")(1))
+                Dim quote = data(4).Split(":")(1)
                 Dim quoteDateStr = Date.Parse(data(5).Split(":")(1))
                 Dim toWhatStr = YieldToWhat.Parse(data(6).Split(":")(1))
                 Dim descr = New BondDescr(ric, name, toWhatStr, quote, live, calcModeStr, quoteDateStr)
