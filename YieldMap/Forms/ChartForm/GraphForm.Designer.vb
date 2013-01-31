@@ -24,8 +24,8 @@
         <System.Diagnostics.DebuggerStepThrough()> _
         Private Sub InitializeComponent()
             Me.components = New System.ComponentModel.Container()
-            Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-            Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+            Dim ChartArea2 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+            Dim Legend2 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
             Me.TheStatusStrip = New System.Windows.Forms.StatusStrip()
             Me.StatusMessage = New System.Windows.Forms.ToolStripStatusLabel()
             Me.TheToolStrip = New System.Windows.Forms.ToolStrip()
@@ -51,6 +51,12 @@
             Me.ExtInfoTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.ShowHistoryTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
+            Me.ToolStripMenuItem2 = New System.Windows.Forms.ToolStripMenuItem()
+            Me.IssuerNameSeriesTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.ShortNameTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.DescriptionTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.SeriesOnlyTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.ToolStripSeparator5 = New System.Windows.Forms.ToolStripSeparator()
             Me.BondDescriptionTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.RelatedQuoteTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.RelatedChartTSMI = New System.Windows.Forms.ToolStripMenuItem()
@@ -91,6 +97,7 @@
             Me.ClipboardSeparator = New System.Windows.Forms.ToolStripSeparator()
             Me.AddBondToChartTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.EnterRICTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.SelectFromAListTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.HistoryCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.RemoveHistoryTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.MoneyCurveCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
@@ -114,7 +121,11 @@
             Me.YAxisCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.BondSetCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.RemoveFromChartTSMI = New System.Windows.Forms.ToolStripMenuItem()
-            Me.SelectFromAListTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.ToolStripSeparator7 = New System.Windows.Forms.ToolStripSeparator()
+            Me.LabelToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.SeriesIssuerNameAndSeriesTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.SeriesDescriptionTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.SeriesSeriesOnlyTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.TheStatusStrip.SuspendLayout()
             Me.TheToolStrip.SuspendLayout()
             Me.BondCMS.SuspendLayout()
@@ -199,32 +210,32 @@
             'BondCurvesTSMI
             '
             Me.BondCurvesTSMI.Name = "BondCurvesTSMI"
-            Me.BondCurvesTSMI.Size = New System.Drawing.Size(144, 22)
+            Me.BondCurvesTSMI.Size = New System.Drawing.Size(133, 22)
             Me.BondCurvesTSMI.Text = "Bond curves"
             '
             'ToolStripMenuItem1
             '
             Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RubIRSTSMI, Me.RubCCSTSMI, Me.NDFTSMI})
             Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(144, 22)
+            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(133, 22)
             Me.ToolStripMenuItem1.Text = "IR curves"
             '
             'RubIRSTSMI
             '
             Me.RubIRSTSMI.Name = "RubIRSTSMI"
-            Me.RubIRSTSMI.Size = New System.Drawing.Size(127, 22)
+            Me.RubIRSTSMI.Size = New System.Drawing.Size(116, 22)
             Me.RubIRSTSMI.Text = "Rub IRS"
             '
             'RubCCSTSMI
             '
             Me.RubCCSTSMI.Name = "RubCCSTSMI"
-            Me.RubCCSTSMI.Size = New System.Drawing.Size(127, 22)
+            Me.RubCCSTSMI.Size = New System.Drawing.Size(116, 22)
             Me.RubCCSTSMI.Text = "Rub CCS"
             '
             'NDFTSMI
             '
             Me.NDFTSMI.Name = "NDFTSMI"
-            Me.NDFTSMI.Size = New System.Drawing.Size(127, 22)
+            Me.NDFTSMI.Size = New System.Drawing.Size(116, 22)
             Me.NDFTSMI.Text = "NDF"
             '
             'ToolStripSeparator2
@@ -280,60 +291,97 @@
             '
             'BondCMS
             '
-            Me.BondCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainInfoLine1TSMI, Me.ExtInfoTSMI, Me.ShowHistoryTSMI, Me.ToolStripSeparator1, Me.BondDescriptionTSMI, Me.RelatedQuoteTSMI, Me.RelatedChartTSMI, Me.ToolStripSeparator4, Me.RemovePointTSMI})
+            Me.BondCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainInfoLine1TSMI, Me.ExtInfoTSMI, Me.ShowHistoryTSMI, Me.ToolStripSeparator1, Me.ToolStripMenuItem2, Me.ToolStripSeparator5, Me.BondDescriptionTSMI, Me.RelatedQuoteTSMI, Me.RelatedChartTSMI, Me.ToolStripSeparator4, Me.RemovePointTSMI})
             Me.BondCMS.Name = "BondContextMenuStrip"
-            Me.BondCMS.Size = New System.Drawing.Size(178, 170)
+            Me.BondCMS.Size = New System.Drawing.Size(167, 198)
             '
             'MainInfoLine1TSMI
             '
             Me.MainInfoLine1TSMI.Name = "MainInfoLine1TSMI"
-            Me.MainInfoLine1TSMI.Size = New System.Drawing.Size(177, 22)
+            Me.MainInfoLine1TSMI.Size = New System.Drawing.Size(166, 22)
             Me.MainInfoLine1TSMI.Text = "Description"
             '
             'ExtInfoTSMI
             '
             Me.ExtInfoTSMI.Name = "ExtInfoTSMI"
-            Me.ExtInfoTSMI.Size = New System.Drawing.Size(177, 22)
+            Me.ExtInfoTSMI.Size = New System.Drawing.Size(166, 22)
             Me.ExtInfoTSMI.Text = "Quotes"
             '
             'ShowHistoryTSMI
             '
             Me.ShowHistoryTSMI.Name = "ShowHistoryTSMI"
-            Me.ShowHistoryTSMI.Size = New System.Drawing.Size(177, 22)
+            Me.ShowHistoryTSMI.Size = New System.Drawing.Size(166, 22)
             Me.ShowHistoryTSMI.Text = "Show history"
             '
             'ToolStripSeparator1
             '
             Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-            Me.ToolStripSeparator1.Size = New System.Drawing.Size(174, 6)
+            Me.ToolStripSeparator1.Size = New System.Drawing.Size(163, 6)
+            '
+            'ToolStripMenuItem2
+            '
+            Me.ToolStripMenuItem2.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.IssuerNameSeriesTSMI, Me.ShortNameTSMI, Me.DescriptionTSMI, Me.SeriesOnlyTSMI})
+            Me.ToolStripMenuItem2.Name = "ToolStripMenuItem2"
+            Me.ToolStripMenuItem2.Size = New System.Drawing.Size(166, 22)
+            Me.ToolStripMenuItem2.Text = "Labels"
+            '
+            'IssuerNameSeriesTSMI
+            '
+            Me.IssuerNameSeriesTSMI.Name = "IssuerNameSeriesTSMI"
+            Me.IssuerNameSeriesTSMI.Size = New System.Drawing.Size(177, 22)
+            Me.IssuerNameSeriesTSMI.Text = "Issuer Name + Series"
+            '
+            'ShortNameTSMI
+            '
+            Me.ShortNameTSMI.Name = "ShortNameTSMI"
+            Me.ShortNameTSMI.Size = New System.Drawing.Size(177, 22)
+            Me.ShortNameTSMI.Text = "Short Name"
+            Me.ShortNameTSMI.Visible = False
+            '
+            'DescriptionTSMI
+            '
+            Me.DescriptionTSMI.Name = "DescriptionTSMI"
+            Me.DescriptionTSMI.Size = New System.Drawing.Size(177, 22)
+            Me.DescriptionTSMI.Text = "Description"
+            '
+            'SeriesOnlyTSMI
+            '
+            Me.SeriesOnlyTSMI.Name = "SeriesOnlyTSMI"
+            Me.SeriesOnlyTSMI.Size = New System.Drawing.Size(177, 22)
+            Me.SeriesOnlyTSMI.Text = "Series Only"
+            '
+            'ToolStripSeparator5
+            '
+            Me.ToolStripSeparator5.Name = "ToolStripSeparator5"
+            Me.ToolStripSeparator5.Size = New System.Drawing.Size(163, 6)
             '
             'BondDescriptionTSMI
             '
             Me.BondDescriptionTSMI.Name = "BondDescriptionTSMI"
-            Me.BondDescriptionTSMI.Size = New System.Drawing.Size(177, 22)
+            Me.BondDescriptionTSMI.Size = New System.Drawing.Size(166, 22)
             Me.BondDescriptionTSMI.Text = "Bond description"
             '
             'RelatedQuoteTSMI
             '
             Me.RelatedQuoteTSMI.Name = "RelatedQuoteTSMI"
-            Me.RelatedQuoteTSMI.Size = New System.Drawing.Size(177, 22)
+            Me.RelatedQuoteTSMI.Size = New System.Drawing.Size(166, 22)
             Me.RelatedQuoteTSMI.Text = "Related quote"
             '
             'RelatedChartTSMI
             '
             Me.RelatedChartTSMI.Name = "RelatedChartTSMI"
-            Me.RelatedChartTSMI.Size = New System.Drawing.Size(177, 22)
+            Me.RelatedChartTSMI.Size = New System.Drawing.Size(166, 22)
             Me.RelatedChartTSMI.Text = "Related chart"
             '
             'ToolStripSeparator4
             '
             Me.ToolStripSeparator4.Name = "ToolStripSeparator4"
-            Me.ToolStripSeparator4.Size = New System.Drawing.Size(174, 6)
+            Me.ToolStripSeparator4.Size = New System.Drawing.Size(163, 6)
             '
             'RemovePointTSMI
             '
             Me.RemovePointTSMI.Name = "RemovePointTSMI"
-            Me.RemovePointTSMI.Size = New System.Drawing.Size(177, 22)
+            Me.RemovePointTSMI.Size = New System.Drawing.Size(166, 22)
             Me.RemovePointTSMI.Text = "Remove from chart"
             '
             'MainTableLayout
@@ -716,12 +764,12 @@
             '
             'TheChart
             '
-            ChartArea1.Name = "ChartArea1"
-            Me.TheChart.ChartAreas.Add(ChartArea1)
+            ChartArea2.Name = "ChartArea1"
+            Me.TheChart.ChartAreas.Add(ChartArea2)
             Me.TheChart.Dock = System.Windows.Forms.DockStyle.Fill
-            Legend1.Enabled = False
-            Legend1.Name = "Legend1"
-            Me.TheChart.Legends.Add(Legend1)
+            Legend2.Enabled = False
+            Legend2.Name = "Legend1"
+            Me.TheChart.Legends.Add(Legend2)
             Me.TheChart.Location = New System.Drawing.Point(0, 0)
             Me.TheChart.Name = "TheChart"
             Me.TheChart.Size = New System.Drawing.Size(778, 417)
@@ -741,109 +789,115 @@
             '
             Me.ChartCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToClipboardTSMI, Me.ClipboardSeparator, Me.AddBondToChartTSMI, Me.SelectFromAListTSMI})
             Me.ChartCMS.Name = "ChartCMS"
-            Me.ChartCMS.Size = New System.Drawing.Size(185, 98)
+            Me.ChartCMS.Size = New System.Drawing.Size(174, 76)
             '
             'CopyToClipboardTSMI
             '
             Me.CopyToClipboardTSMI.Name = "CopyToClipboardTSMI"
-            Me.CopyToClipboardTSMI.Size = New System.Drawing.Size(184, 22)
+            Me.CopyToClipboardTSMI.Size = New System.Drawing.Size(173, 22)
             Me.CopyToClipboardTSMI.Text = "Copy to clipboard"
             '
             'ClipboardSeparator
             '
             Me.ClipboardSeparator.Name = "ClipboardSeparator"
-            Me.ClipboardSeparator.Size = New System.Drawing.Size(181, 6)
+            Me.ClipboardSeparator.Size = New System.Drawing.Size(170, 6)
             '
             'AddBondToChartTSMI
             '
             Me.AddBondToChartTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.EnterRICTSMI})
             Me.AddBondToChartTSMI.Name = "AddBondToChartTSMI"
-            Me.AddBondToChartTSMI.Size = New System.Drawing.Size(184, 22)
+            Me.AddBondToChartTSMI.Size = New System.Drawing.Size(173, 22)
             Me.AddBondToChartTSMI.Text = "Add bond onto chart"
             Me.AddBondToChartTSMI.Visible = False
             '
             'EnterRICTSMI
             '
             Me.EnterRICTSMI.Name = "EnterRICTSMI"
-            Me.EnterRICTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.EnterRICTSMI.Size = New System.Drawing.Size(133, 22)
             Me.EnterRICTSMI.Text = "Enter RIC..."
+            '
+            'SelectFromAListTSMI
+            '
+            Me.SelectFromAListTSMI.Name = "SelectFromAListTSMI"
+            Me.SelectFromAListTSMI.Size = New System.Drawing.Size(173, 22)
+            Me.SelectFromAListTSMI.Text = "Add bond..."
             '
             'HistoryCMS
             '
             Me.HistoryCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RemoveHistoryTSMI})
             Me.HistoryCMS.Name = "HistoryCMS"
-            Me.HistoryCMS.Size = New System.Drawing.Size(161, 26)
+            Me.HistoryCMS.Size = New System.Drawing.Size(150, 26)
             '
             'RemoveHistoryTSMI
             '
             Me.RemoveHistoryTSMI.Name = "RemoveHistoryTSMI"
-            Me.RemoveHistoryTSMI.Size = New System.Drawing.Size(160, 22)
+            Me.RemoveHistoryTSMI.Size = New System.Drawing.Size(149, 22)
             Me.RemoveHistoryTSMI.Text = "Remove history"
             '
             'MoneyCurveCMS
             '
             Me.MoneyCurveCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MMNameTSMI, Me.ShowCurveItemsTSMI, Me.DeleteMMCurveTSMI, Me.ToolStripSeparator10, Me.BrokerTSMI, Me.QuoteTSMI, Me.FitTSMI, Me.BootstrapTSMI, Me.ToolStripSeparator11, Me.SelDateTSMI})
             Me.MoneyCurveCMS.Name = "MoneyCurveCMS"
-            Me.MoneyCurveCMS.Size = New System.Drawing.Size(152, 192)
+            Me.MoneyCurveCMS.Size = New System.Drawing.Size(141, 192)
             '
             'MMNameTSMI
             '
             Me.MMNameTSMI.Enabled = False
             Me.MMNameTSMI.Name = "MMNameTSMI"
-            Me.MMNameTSMI.Size = New System.Drawing.Size(151, 22)
+            Me.MMNameTSMI.Size = New System.Drawing.Size(140, 22)
             Me.MMNameTSMI.Text = "Name"
             '
             'ShowCurveItemsTSMI
             '
             Me.ShowCurveItemsTSMI.Name = "ShowCurveItemsTSMI"
-            Me.ShowCurveItemsTSMI.Size = New System.Drawing.Size(151, 22)
+            Me.ShowCurveItemsTSMI.Size = New System.Drawing.Size(140, 22)
             Me.ShowCurveItemsTSMI.Text = "Show items..."
             '
             'DeleteMMCurveTSMI
             '
             Me.DeleteMMCurveTSMI.Name = "DeleteMMCurveTSMI"
-            Me.DeleteMMCurveTSMI.Size = New System.Drawing.Size(151, 22)
+            Me.DeleteMMCurveTSMI.Size = New System.Drawing.Size(140, 22)
             Me.DeleteMMCurveTSMI.Text = "Delete curve"
             '
             'ToolStripSeparator10
             '
             Me.ToolStripSeparator10.Name = "ToolStripSeparator10"
-            Me.ToolStripSeparator10.Size = New System.Drawing.Size(148, 6)
+            Me.ToolStripSeparator10.Size = New System.Drawing.Size(137, 6)
             '
             'BrokerTSMI
             '
             Me.BrokerTSMI.Name = "BrokerTSMI"
-            Me.BrokerTSMI.Size = New System.Drawing.Size(151, 22)
+            Me.BrokerTSMI.Size = New System.Drawing.Size(140, 22)
             Me.BrokerTSMI.Text = "Broker"
             '
             'QuoteTSMI
             '
             Me.QuoteTSMI.Name = "QuoteTSMI"
-            Me.QuoteTSMI.Size = New System.Drawing.Size(151, 22)
+            Me.QuoteTSMI.Size = New System.Drawing.Size(140, 22)
             Me.QuoteTSMI.Text = "Quote"
             '
             'FitTSMI
             '
             Me.FitTSMI.Name = "FitTSMI"
-            Me.FitTSMI.Size = New System.Drawing.Size(151, 22)
+            Me.FitTSMI.Size = New System.Drawing.Size(140, 22)
             Me.FitTSMI.Text = "Interpolation"
             '
             'BootstrapTSMI
             '
             Me.BootstrapTSMI.CheckOnClick = True
             Me.BootstrapTSMI.Name = "BootstrapTSMI"
-            Me.BootstrapTSMI.Size = New System.Drawing.Size(151, 22)
+            Me.BootstrapTSMI.Size = New System.Drawing.Size(140, 22)
             Me.BootstrapTSMI.Text = "Bootstrap"
             '
             'ToolStripSeparator11
             '
             Me.ToolStripSeparator11.Name = "ToolStripSeparator11"
-            Me.ToolStripSeparator11.Size = New System.Drawing.Size(148, 6)
+            Me.ToolStripSeparator11.Size = New System.Drawing.Size(137, 6)
             '
             'SelDateTSMI
             '
             Me.SelDateTSMI.Name = "SelDateTSMI"
-            Me.SelDateTSMI.Size = New System.Drawing.Size(151, 22)
+            Me.SelDateTSMI.Size = New System.Drawing.Size(140, 22)
             Me.SelDateTSMI.Text = "Select date..."
             '
             'SpreadCMS
@@ -855,36 +909,36 @@
             '
             Me.DurConvCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ModifiedTSMI, Me.MacaleyTSMI, Me.EffectiveTSMI})
             Me.DurConvCMS.Name = "DurConvCMS"
-            Me.DurConvCMS.Size = New System.Drawing.Size(129, 70)
+            Me.DurConvCMS.Size = New System.Drawing.Size(118, 70)
             '
             'ModifiedTSMI
             '
             Me.ModifiedTSMI.Name = "ModifiedTSMI"
-            Me.ModifiedTSMI.Size = New System.Drawing.Size(128, 22)
+            Me.ModifiedTSMI.Size = New System.Drawing.Size(117, 22)
             Me.ModifiedTSMI.Text = "Modified"
             '
             'MacaleyTSMI
             '
             Me.MacaleyTSMI.Name = "MacaleyTSMI"
-            Me.MacaleyTSMI.Size = New System.Drawing.Size(128, 22)
+            Me.MacaleyTSMI.Size = New System.Drawing.Size(117, 22)
             Me.MacaleyTSMI.Text = "Macaley"
             '
             'EffectiveTSMI
             '
             Me.EffectiveTSMI.Name = "EffectiveTSMI"
-            Me.EffectiveTSMI.Size = New System.Drawing.Size(128, 22)
+            Me.EffectiveTSMI.Size = New System.Drawing.Size(117, 22)
             Me.EffectiveTSMI.Text = "Effective"
             '
             'BidAskCMS
             '
             Me.BidAskCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RemoveBidAskTSMI})
             Me.BidAskCMS.Name = "BidAskCMS"
-            Me.BidAskCMS.Size = New System.Drawing.Size(162, 26)
+            Me.BidAskCMS.Size = New System.Drawing.Size(151, 26)
             '
             'RemoveBidAskTSMI
             '
             Me.RemoveBidAskTSMI.Name = "RemoveBidAskTSMI"
-            Me.RemoveBidAskTSMI.Size = New System.Drawing.Size(161, 22)
+            Me.RemoveBidAskTSMI.Size = New System.Drawing.Size(150, 22)
             Me.RemoveBidAskTSMI.Text = "Remove bid-ask"
             '
             'YAxisCMS
@@ -894,21 +948,45 @@
             '
             'BondSetCMS
             '
-            Me.BondSetCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RemoveFromChartTSMI})
+            Me.BondSetCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RemoveFromChartTSMI, Me.ToolStripSeparator7, Me.LabelToolStripMenuItem})
             Me.BondSetCMS.Name = "BondSetCMS"
-            Me.BondSetCMS.Size = New System.Drawing.Size(178, 26)
+            Me.BondSetCMS.Size = New System.Drawing.Size(167, 76)
             '
             'RemoveFromChartTSMI
             '
             Me.RemoveFromChartTSMI.Name = "RemoveFromChartTSMI"
-            Me.RemoveFromChartTSMI.Size = New System.Drawing.Size(177, 22)
+            Me.RemoveFromChartTSMI.Size = New System.Drawing.Size(166, 22)
             Me.RemoveFromChartTSMI.Text = "Remove from chart"
             '
-            'SelectFromAListTSMI
+            'ToolStripSeparator7
             '
-            Me.SelectFromAListTSMI.Name = "SelectFromAListTSMI"
-            Me.SelectFromAListTSMI.Size = New System.Drawing.Size(184, 22)
-            Me.SelectFromAListTSMI.Text = "Add bond..."
+            Me.ToolStripSeparator7.Name = "ToolStripSeparator7"
+            Me.ToolStripSeparator7.Size = New System.Drawing.Size(163, 6)
+            '
+            'LabelToolStripMenuItem
+            '
+            Me.LabelToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SeriesIssuerNameAndSeriesTSMI, Me.SeriesDescriptionTSMI, Me.SeriesSeriesOnlyTSMI})
+            Me.LabelToolStripMenuItem.Name = "LabelToolStripMenuItem"
+            Me.LabelToolStripMenuItem.Size = New System.Drawing.Size(166, 22)
+            Me.LabelToolStripMenuItem.Text = "Labels"
+            '
+            'SeriesIssuerNameAndSeriesTSMI
+            '
+            Me.SeriesIssuerNameAndSeriesTSMI.Name = "SeriesIssuerNameAndSeriesTSMI"
+            Me.SeriesIssuerNameAndSeriesTSMI.Size = New System.Drawing.Size(177, 22)
+            Me.SeriesIssuerNameAndSeriesTSMI.Text = "Issuer Name + Series"
+            '
+            'SeriesDescriptionTSMI
+            '
+            Me.SeriesDescriptionTSMI.Name = "SeriesDescriptionTSMI"
+            Me.SeriesDescriptionTSMI.Size = New System.Drawing.Size(177, 22)
+            Me.SeriesDescriptionTSMI.Text = "Description"
+            '
+            'SeriesSeriesOnlyTSMI
+            '
+            Me.SeriesSeriesOnlyTSMI.Name = "SeriesSeriesOnlyTSMI"
+            Me.SeriesSeriesOnlyTSMI.Size = New System.Drawing.Size(177, 22)
+            Me.SeriesSeriesOnlyTSMI.Text = "Series Only"
             '
             'GraphForm
             '
@@ -1033,5 +1111,16 @@
         Friend WithEvents AddBondToChartTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents EnterRICTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents SelectFromAListTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents ToolStripMenuItem2 As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents IssuerNameSeriesTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents ShortNameTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents DescriptionTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents SeriesOnlyTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents ToolStripSeparator5 As System.Windows.Forms.ToolStripSeparator
+        Friend WithEvents ToolStripSeparator7 As System.Windows.Forms.ToolStripSeparator
+        Friend WithEvents LabelToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents SeriesIssuerNameAndSeriesTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents SeriesDescriptionTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents SeriesSeriesOnlyTSMI As System.Windows.Forms.ToolStripMenuItem
     End Class
 End Namespace

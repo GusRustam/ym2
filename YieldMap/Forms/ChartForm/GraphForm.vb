@@ -19,23 +19,21 @@ Namespace Forms.ChartForm
         Private Shared ReadOnly Logger As Logger = GetLogger(GetType(GraphForm))
         Private WithEvents _tableForm As TableForm.TableForm = New TableForm.TableForm()
 
-        'Private ReadOnly _historicalCurves As New HistoricalCurvesContainer(AddressOf OnHistoricalCurveData, AddressOf OnCurveRemoved)
         Private ReadOnly _moneyMarketCurves As New List(Of SwapCurve)
-
         Private WithEvents _spreadBenchmarks As New SpreadContainer
         Private WithEvents _ansamble As New Ansamble(_spreadBenchmarks)
 
         Public Delegate Sub PointUpdateDelegate(ByVal ric As String, ByVal yield As Double, ByVal duration As Double, ByVal lastPrice As Double)
-        Public Event PointUpdated As PointUpdateDelegate
+        'Public Event PointUpdated As PointUpdateDelegate
 
 #Region "I) Dependent forms"
-        Private Sub TableFormShown(sender As Object, e As EventArgs) Handles _tableForm.Shown
-            AddHandler PointUpdated, AddressOf _tableForm.OnPointUpdated
-        End Sub
+        'Private Sub TableFormShown(sender As Object, e As EventArgs) Handles _tableForm.Shown
+        '    AddHandler PointUpdated, AddressOf _tableForm.OnPointUpdated
+        'End Sub
 
-        Private Sub TableFormFormClosing(sender As Object, e As FormClosingEventArgs) Handles _tableForm.FormClosing
-            RemoveHandler PointUpdated, AddressOf _tableForm.OnPointUpdated
-        End Sub
+        'Private Sub TableFormFormClosing(sender As Object, e As FormClosingEventArgs) Handles _tableForm.FormClosing
+        '    RemoveHandler PointUpdated, AddressOf _tableForm.OnPointUpdated
+        'End Sub
 #End Region
 
 #Region "II) Form state manipulation"
@@ -100,10 +98,24 @@ Namespace Forms.ChartForm
                             .AskField = realTime.ask_field,
                             .LastField = realTime.last_field,
                             .HistField = history.last_field,
+                            .VolumeField = realTime.volume_field,
+                            .VwapField = realTime.vwap_field,
                             .Brokers = {"MM", ""}.ToList(),
                             .Currency = "",
                             .Color = port.color
                         }
+
+                        ' TODO THAT'S BULLSHIT BUT CURRENTLY NECESSARY BULLSHIT
+                        Dim selectedField As String
+                        If group.LastField.Trim() <> "" Then
+                            selectedField = group.LastField
+                        ElseIf group.VwapField.Trim() <> "" Then
+                            selectedField = group.VwapField
+                        ElseIf group.BidField.Trim() <> "" Then
+                            selectedField = group.BidField
+                        Else
+                            selectedField = group.AskField
+                        End If
 
                         Dim pD = From elem In portfolioUnitedDataTable Where elem.pid = currentPortID And elem.fromID = group.PortfolioID
                         Dim ars = (From row In pD Where row.include Select row.ric).ToList
@@ -113,7 +125,7 @@ Namespace Forms.ChartForm
                             Sub(ric)
                                 Dim descr = DbInitializer.GetBondInfo(ric)
                                 If descr IsNot Nothing Then
-                                    group.AddRic(ric, descr)
+                                    group.AddRic(ric, descr, selectedField)
                                 Else
                                     Logger.Error("No description for bond {0} found", ric)
                                 End If
@@ -218,8 +230,10 @@ Namespace Forms.ChartForm
                         ChartCMS.Show(TheChart, mouseEvent.Location)
                     ElseIf htr.ChartElementType = ChartElementType.LegendItem Then
                         Dim item = CType(htr.Object, LegendItem)
-                        BondSetCMS.Tag = item.Tag
-                        BondSetCMS.Show(TheChart, mouseEvent.Location)
+                        If _ansamble.HasGroupById(item.Tag) Then
+                            BondSetCMS.Tag = item.Tag
+                            BondSetCMS.Show(TheChart, mouseEvent.Location)
+                        End If
                     End If
                 Catch ex As Exception
                     Logger.WarnException("Something went wrong", ex)
@@ -544,7 +558,14 @@ Namespace Forms.ChartForm
             For Each series In From srs In TheChart.Series Where TypeOf srs.Tag Is BondSetSeries
                 Dim points = series.Points
                 For Each dataPoint In From pnt In points Where TypeOf pnt.Tag Is Bond Select {pnt, CType(pnt.Tag, Bond)}
-                    dataPoint(0).Label = If(ShowLabelsTSB.Checked, dataPoint(1).Metadata.ShortName, "")
+                    Dim lab As String
+                    Select Case dataPoint(1).LabelMode
+                        Case LabelMode.IssuerAndSeries : lab = dataPoint(1).Metadata.Label1
+                        Case LabelMode.ShortName : lab = dataPoint(1).Metadata.Label2
+                        Case LabelMode.Description : lab = dataPoint(1).Metadata.Label3
+                        Case LabelMode.SeriesOnly : lab = dataPoint(1).Metadata.Label4
+                    End Select
+                    dataPoint(0).Label = If(ShowLabelsTSB.Checked, lab, "")
                 Next
             Next
         End Sub
@@ -856,8 +877,12 @@ Namespace Forms.ChartForm
             SetChartMinMax()
         End Sub
 
-        Private Sub RemoveFromChartTSMIClick(sender As Object, e As EventArgs) Handles RemoveFromChartTSMI.Click
-            _ansamble.RemoveGroup(BondSetCMS.Tag)
+        Private Sub RemoveFromChartTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RemoveFromChartTSMI.Click
+            If _ansamble.HasGroupById(BondSetCMS.Tag) Then
+                _ansamble.RemoveGroup(BondSetCMS.Tag)
+                'Else
+                '    _ansamble.RemoveCurve(BondSetCMS.Tag)
+            End If
         End Sub
 
         Private Sub RemovePointTSMIClick(sender As Object, e As EventArgs) Handles RemovePointTSMI.Click
@@ -889,58 +914,58 @@ Namespace Forms.ChartForm
 
         Private Sub EnterRIC_TSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles EnterRICTSMI.Click
             Return
-            Dim askForm As New ManualRicForm()
-            AddHandler askForm.Activated,
-                Sub(snd As Object, evnt As EventArgs)
-                    askForm.Left = Left + (Width - askForm.Width) / 2
-                    askForm.Top = Top + (Height - askForm.Height) / 2
-                End Sub
+            'Dim askForm As New ManualRicForm()
+            'AddHandler askForm.Activated,
+            '    Sub(snd As Object, evnt As EventArgs)
+            '        askForm.Left = Left + (Width - askForm.Width) / 2
+            '        askForm.Top = Top + (Height - askForm.Height) / 2
+            '    End Sub
 
-            askForm.ShowDialog(Me)
-            If askForm.SelectedRic <> "" Then
-                Dim group = New Group(_ansamble)
-                Dim descr As DataBaseBondDescription
+            'askForm.ShowDialog(Me)
+            'If askForm.SelectedRic <> "" Then
+            '    Dim group = New Group(_ansamble)
+            '    Dim descr As DataBaseBondDescription
 
-                Dim layout As New field_layoutTableAdapter
-                Dim setInfo = layout.GetData().Where(Function(row) row.id = askForm.LayoutId)
+            '    Dim layout As New field_layoutTableAdapter
+            '    Dim setInfo = layout.GetData().Where(Function(row) row.id = askForm.LayoutId)
 
-                Dim rw = setInfo.First(Function(row) row.is_realtime = 1)
-                group.AskField = rw.ask_field
-                group.BidField = rw.bid_field
-                group.LastField = rw.last_field
-                group.VwapField = rw.vwap_field
-                group.VolumeField = rw.volume_field
+            '    Dim rw = setInfo.First(Function(row) row.is_realtime = 1)
+            '    group.AskField = rw.ask_field
+            '    group.BidField = rw.bid_field
+            '    group.LastField = rw.last_field
+            '    group.VwapField = rw.vwap_field
+            '    group.VolumeField = rw.volume_field
 
-                rw = setInfo.First(Function(row) row.is_realtime = 0)
-                group.HistField = rw.last_field
+            '    rw = setInfo.First(Function(row) row.is_realtime = 0)
+            '    group.HistField = rw.last_field
 
-                group.Color = "Red"
-                descr = DbInitializer.GetBondInfo(askForm.SelectedRic)
-                If descr IsNot Nothing Then
-                    group.SeriesName = descr.ShortName
-                    group.AddRic(askForm.SelectedRic, descr)
-                    ' group.StartLoadingLiveData() ' todo 
-                    _ansamble.AddGroup(group)
-                Else
-                    Dim handled As Boolean = False
-                    Dim selectedRic As String = askForm.SelectedRic
-                    DbInitializer.RequestBondInfo(
-                        askForm.SelectedRic,
-                        Sub(dscr As DataBaseBondDescription)
-                            If dscr Is Nothing Then
-                                MsgBox("No bond found (RIC " & selectedRic & ")", MsgBoxStyle.Exclamation)
-                                _ansamble.RemoveGroup(group.Id)
-                            Else
-                                If handled Then Return
-                                handled = True
-                                group.SeriesName = dscr.ShortName
-                                group.AddRic(selectedRic, dscr)
-                                ' group.StartLoadingLiveData()
-                                _ansamble.AddGroup(group)
-                            End If
-                        End Sub)
-                End If
-            End If
+            '    group.Color = "Red"
+            '    descr = DbInitializer.GetBondInfo(askForm.SelectedRic)
+            '    If descr IsNot Nothing Then
+            '        group.SeriesName = descr.ShortName
+            '        group.AddRic(askForm.SelectedRic, descr)
+            '        ' group.StartLoadingLiveData() ' todo 
+            '        _ansamble.AddGroup(group)
+            '    Else
+            '        Dim handled As Boolean = False
+            '        Dim selectedRic As String = askForm.SelectedRic
+            '        DbInitializer.RequestBondInfo(
+            '            askForm.SelectedRic,
+            '            Sub(dscr As DataBaseBondDescription)
+            '                If dscr Is Nothing Then
+            '                    MsgBox("No bond found (RIC " & selectedRic & ")", MsgBoxStyle.Exclamation)
+            '                    _ansamble.RemoveGroup(group.Id)
+            '                Else
+            '                    If handled Then Return
+            '                    handled = True
+            '                    group.SeriesName = dscr.ShortName
+            '                    group.AddRic(selectedRic, dscr)
+            '                    ' group.StartLoadingLiveData()
+            '                    _ansamble.AddGroup(group)
+            '                End If
+            '            End Sub)
+            '    End If
+            'End If
         End Sub
 
         Private Sub SelectFromAListTSMIClick(ByVal sender As Object, ByVal e As EventArgs)
@@ -977,11 +1002,23 @@ Namespace Forms.ChartForm
                         grp = _ansamble.GetGroup(groupSelector.ExistingGroupId)
                     End If
 
+                    ' TODO BULLSHIT AGAIN!!!
+                    Dim selectedField As String
+                    If grp.LastField.Trim() <> "" Then
+                        selectedField = grp.LastField
+                    ElseIf grp.VwapField.Trim() <> "" Then
+                        selectedField = grp.VwapField
+                    ElseIf grp.BidField.Trim() <> "" Then
+                        selectedField = grp.BidField
+                    Else
+                        selectedField = grp.AskField
+                    End If
+
                     bondSelector.SelectedRICs.ForEach(
                         Sub(aRic)
                             Dim descr = DbInitializer.GetBondInfo(aRic)
                             If descr IsNot Nothing Then
-                                grp.AddRic(aRic, descr)
+                                grp.AddRic(aRic, descr, selectedField)
                             End If
                         End Sub)
                     grp.StartRics(bondSelector.SelectedRICs)
@@ -1125,5 +1162,83 @@ Namespace Forms.ChartForm
 #End Region
 #End Region
 
+        Private Sub SetLabel(ByVal ric As String, ByVal mode As LabelMode)
+            Try
+                Dim group = _ansamble.GetInstrumentGroup(ric)
+                Dim bond = group.GetElement(ric)
+
+                bond.LabelMode = mode
+
+                Dim lab As String
+                Select Case bond.LabelMode
+                    Case LabelMode.IssuerAndSeries : lab = bond.MetaData.Label1
+                    Case LabelMode.ShortName : lab = bond.MetaData.Label2
+                    Case LabelMode.Description : lab = bond.MetaData.Label3
+                    Case LabelMode.SeriesOnly : lab = bond.MetaData.Label4
+                End Select
+                If ShowLabelsTSB.Checked Then
+                    TheChart.Series.FindByName(group.SeriesName).Points.First(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric).Label = lab
+                End If
+            Catch ex As Exception
+                Logger.WarnException("Failed to set label mode", ex)
+                Logger.Warn("Exception = {0}", ex)
+            End Try
+        End Sub
+
+        Private Sub IssuerNameSeriesTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles IssuerNameSeriesTSMI.Click
+            SetLabel(BondCMS.Tag, LabelMode.IssuerAndSeries)
+        End Sub
+
+        Private Sub ShortNameTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles ShortNameTSMI.Click
+            SetLabel(BondCMS.Tag, LabelMode.ShortName)
+        End Sub
+
+        Private Sub DescriptionTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles DescriptionTSMI.Click
+            SetLabel(BondCMS.Tag, LabelMode.Description)
+        End Sub
+
+        Private Sub SeriesOnlyTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SeriesOnlyTSMI.Click
+            SetLabel(BondCMS.Tag, LabelMode.SeriesOnly)
+        End Sub
+
+        Private Sub SetSeriesLabel(ByVal id As String, ByVal mode As LabelMode)
+            Try
+                Dim group = _ansamble.GetGroupById(id)
+                group.Elements.Values.ToList.ForEach(Sub(bond) bond.LabelMode = mode)
+                If ShowLabelsTSB.Checked Then
+                    TheChart.Series.FindByName(group.SeriesName).Points.ToList.ForEach(
+                        Sub(pnt)
+                            Try
+                                Dim md = CType(pnt.Tag, Bond).MetaData
+                                Dim lab As String
+                                Select Case mode
+                                    Case LabelMode.IssuerAndSeries : lab = md.Label1
+                                    Case LabelMode.ShortName : lab = md.Label2
+                                    Case LabelMode.Description : lab = md.Label3
+                                    Case LabelMode.SeriesOnly : lab = md.Label4
+                                End Select
+                                pnt.Label = lab
+
+                            Catch ex As Exception
+                                Logger.WarnException("Failed to set label mode for point " & pnt.Tag, ex)
+                                Logger.Warn("Exception = {0}", ex)
+                            End Try
+                        End Sub)
+                End If
+            Catch ex As Exception
+            End Try
+        End Sub
+
+        Private Sub SeriesIssuerNameAndSeriesTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SeriesIssuerNameAndSeriesTSMI.Click
+            SetSeriesLabel(BondSetCMS.Tag, LabelMode.IssuerAndSeries)
+        End Sub
+
+        Private Sub SeriesSeriesOnlyTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SeriesSeriesOnlyTSMI.Click
+            SetSeriesLabel(BondSetCMS.Tag, LabelMode.SeriesOnly)
+        End Sub
+
+        Private Sub SeriesDescriptionTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SeriesDescriptionTSMI.Click
+            SetSeriesLabel(BondSetCMS.Tag, LabelMode.Description)
+        End Sub
     End Class
 End Namespace

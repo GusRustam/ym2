@@ -20,7 +20,7 @@ Namespace Tools.RDataTool
         Private _cookie As Integer
         Private WithEvents _myRData As RData
 
-        Private Sub Load(data As RQuery, ByVal dataEventHanler As DataEventRawHanler)
+        Private Function Load(ByVal data As RQuery, ByVal dataEventHanler As DataEventRawHanler) As Boolean
             _dataEventHanler = dataEventHanler
 
             Try
@@ -47,14 +47,21 @@ Namespace Tools.RDataTool
             End Try
 
             If _myDex2Mgr IsNot Nothing Then
-                _myRData = _myDex2Mgr.CreateRData(_cookie)
-                _myRData.InstrumentIDList = data.Items
-                _myRData.FieldList = data.Fields
-                _myRData.RequestParam = data.Params
-                _myRData.DisplayParam = "RH:In CH:Fd"
-                _myRData.Subscribe(False)
+                Try
+                    _myRData = _myDex2Mgr.CreateRData(_cookie)
+                    _myRData.InstrumentIDList = data.Items
+                    _myRData.FieldList = data.Fields
+                    _myRData.RequestParam = data.Params
+                    _myRData.DisplayParam = "RH:In CH:Fd"
+                    _myRData.Subscribe(False)
+                    Return True
+                Catch ex As Exception
+                    Logger.ErrorException("Failed to create Dex2", ex)
+                    Logger.Error("Exception = {0}", ex)
+                End Try
             End If
-        End Sub
+            Return False
+        End Function
 
         Private Sub OnUpdate(ByVal datastatus As DEX2_DataStatus, ByVal [error] As Object) Handles _myRData.OnUpdate
             Logger.Debug("OnUpdateHandler()")

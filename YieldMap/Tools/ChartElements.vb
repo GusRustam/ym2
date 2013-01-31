@@ -1,6 +1,5 @@
 ﻿Imports System.Drawing
 Imports System.Reflection
-Imports AdfinXRtLib
 Imports NLog
 Imports YieldMap.Tools.History
 Imports YieldMap.Tools.Lists
@@ -114,8 +113,8 @@ Namespace Tools
             End While
         End Sub
 
-        Public Function GetGroup(ByVal seriesName As String) As Group
-            Return _groups.First(Function(grp) grp.SeriesName = seriesName)
+        Public Function GetGroupById(ByVal id As String) As Group
+            Return _groups.First(Function(grp) grp.Id = id)
         End Function
 
         Public Function GetGroupList() As Dictionary(Of Guid, String)
@@ -169,6 +168,10 @@ Namespace Tools
                 _groups.Remove(g)
             End While
         End Sub
+
+        Public Function HasGroupById(ByVal id As String) As Boolean
+            Return _groups.Any(Function(grp) grp.Id = id)
+        End Function
     End Class
 
     Public Class Bond
@@ -177,6 +180,16 @@ Namespace Tools
         Private ReadOnly _metaData As DataBaseBondDescription
         Private ReadOnly _quotesAndYields As New Dictionary(Of String, BondPointDescription)
         Public TodayVolume As Double
+
+        Private _labelMode As LabelMode = LabelMode.IssuerAndSeries
+        Public Property LabelMode As LabelMode
+            Get
+                Return _labelMode
+            End Get
+            Set(ByVal value As LabelMode)
+                _labelMode = value
+            End Set
+        End Property
 
         Sub New(ByVal parentGroup As Group, ByVal selectedQuote As String, ByVal metaData As DataBaseBondDescription)
             _parentGroup = parentGroup
@@ -226,6 +239,13 @@ Namespace Tools
         End Sub
     End Class
 
+    Public Enum LabelMode
+        IssuerAndSeries
+        ShortName
+        Description
+        SeriesOnly
+    End Enum
+
     ''' <summary>
     ''' Represents separate series on the chart
     ''' </summary>
@@ -251,13 +271,11 @@ Namespace Tools
         Public AskField As String
         Public LastField As String
         Public HistField As String
-        Public VolumeField As String = "CF_VOLUME"
-        Public VwapField As String = "VWAP"
+        Public VolumeField As String
+        Public VwapField As String
         Public Currency As String
         Public RicStructure As String
         Public Brokers As New List(Of String)
-
-        'Public Fields As New NamedFieldGroup
 
         Private ReadOnly _elements As New Dictionary(Of String, Bond) 'ric -> datapoint
         Public ReadOnly Property Elements() As Dictionary(Of String, Bond)
@@ -265,6 +283,7 @@ Namespace Tools
                 Return _elements
             End Get
         End Property
+
         Public PortfolioID As Long
         Private _color As String
 
@@ -296,7 +315,7 @@ Namespace Tools
         End Sub
 
         Public Sub StartRics(ByVal rics As List(Of String))
-            Dim res = _quoteLoader.AddItems(rics, {BidField, AskField, LastField, VolumeField, VwapField}.ToList())
+            Dim res = _quoteLoader.AddItems(rics, GetAllKnownFields())
             If res Is Nothing Then
                 RaiseEvent LoadCriticalError()
             Else
@@ -305,6 +324,16 @@ Namespace Tools
                 End If
             End If
         End Sub
+
+        Private Function GetAllKnownFields() As List(Of String)
+            Return {BidField, AskField, LastField, VolumeField, VwapField}.
+                Where(Function(fldName) fldName IsNot Nothing AndAlso fldName.Trim() <> "").ToList()
+        End Function
+
+        Private Function GetKnownPriceFields() As List(Of String)
+            Return {BidField, AskField, LastField, VwapField}.
+                Where(Function(fldName) fldName IsNot Nothing AndAlso fldName.Trim() <> "").ToList()
+        End Function
 
         Public Sub StartAll()
             StartRics(_elements.Keys.ToList())
@@ -346,7 +375,7 @@ Namespace Tools
                         RaiseEvent Volume(bondDataPoint)
                     End If
 
-                    For Each fieldName In {BidField, AskField, LastField, VwapField}
+                    For Each fieldName In GetKnownPriceFields()
                         If fieldsAndValues.ContainsKey(fieldName) AndAlso fieldsAndValues(fieldName) > 0 Then
                             Dim fieldValue = fieldsAndValues(fieldName)
                             Try
@@ -434,8 +463,8 @@ Namespace Tools
             Return _elements.Any(Function(elem) elem.Key = instrument)
         End Function
 
-        Public Sub AddRic(ByVal ric As String, ByVal descr As DataBaseBondDescription)
-            _elements.Add(ric, New Bond(Me, LastField, descr))
+        Public Sub AddRic(ByVal ric As String, ByVal descr As DataBaseBondDescription, ByVal quote As String)
+            _elements.Add(ric, New Bond(Me, quote, descr))
         End Sub
 
         Public Sub New(ByVal ansamble As Ansamble)

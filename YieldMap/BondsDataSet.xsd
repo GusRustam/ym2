@@ -2,9 +2,10 @@
 <xs:schema id="BondsDataSet" targetNamespace="http://tempuri.org/BondsDataSet.xsd" xmlns:mstns="http://tempuri.org/BondsDataSet.xsd" xmlns="http://tempuri.org/BondsDataSet.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
   <xs:annotation>
     <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
-      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="1" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
         <Connections>
           <Connection AppSettingsObjectName="Settings" AppSettingsPropertyName="bondsConnectionString" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="bondsConnectionString (Settings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.YieldMap.My.Settings.GlobalReference.Default.bondsConnectionString" Provider="System.Data.SQLite" />
+          <Connection AppSettingsObjectName="Settings" AppSettingsPropertyName="bondsConnectionString1" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="bondsConnectionString1 (Settings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.YieldMap.My.Settings.GlobalReference.Default.bondsConnectionString1" Provider="System.Data.SQLite" />
         </Connections>
         <Tables>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="bondTableAdapter" GeneratorDataComponentClassName="bondTableAdapter" Name="bond" UserDataComponentName="bondTableAdapter">
@@ -696,7 +697,7 @@ WHERE     (id = @Original_id)</CommandText>
               <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.BondDescriptions" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
                 <SelectCommand>
                   <DbCommand CommandType="Text" ModifiedByUser="true">
-                    <CommandText>SELECT        ric, descr, payments, rates, maturitydate, bondshortname, is_putable, issuedate, coupon, issuer_id, issname, issue_size, matsort, isssort, currency, nextputdate, nextcalldate, nextputsort, nextcallsort
+                    <CommandText>SELECT        ric, descr, payments, rates, maturitydate, bondshortname, is_putable, issuedate, coupon, issuer_id, issname, issue_size, matsort, isssort, currency, nextputdate, nextcalldate, nextputsort, nextcallsort, label1, label2, label3, label4
 FROM            BondDescriptions
 ORDER BY bondshortname</CommandText>
                     <Parameters />
@@ -724,6 +725,10 @@ ORDER BY bondshortname</CommandText>
               <Mapping SourceColumn="nextcalldate" DataSetColumn="nextcalldate" />
               <Mapping SourceColumn="nextputsort" DataSetColumn="nextputsort" />
               <Mapping SourceColumn="nextcallsort" DataSetColumn="nextcallsort" />
+              <Mapping SourceColumn="label1" DataSetColumn="label1" />
+              <Mapping SourceColumn="label2" DataSetColumn="label2" />
+              <Mapping SourceColumn="label3" DataSetColumn="label3" />
+              <Mapping SourceColumn="label4" DataSetColumn="label4" />
             </Mappings>
             <Sources />
           </TableAdapter>
@@ -1255,29 +1260,6 @@ WHERE     (id = @Original_id)</CommandText>
               </DbSource>
             </Sources>
           </TableAdapter>
-          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="PortfolioSourcesTableAdapter" GeneratorDataComponentClassName="PortfolioSourcesTableAdapter" Name="PortfolioSources" UserDataComponentName="PortfolioSourcesTableAdapter">
-            <MainSource>
-              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.PortfolioSources" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
-                <SelectCommand>
-                  <DbCommand CommandType="Text" ModifiedByUser="true">
-                    <CommandText>SELECT portfolioID, whereFrom, fromID, portfolio_name, whereFromName, whereFromDescr, color FROM PortfolioSources</CommandText>
-                    <Parameters />
-                  </DbCommand>
-                </SelectCommand>
-              </DbSource>
-            </MainSource>
-            <Mappings>
-              <Mapping SourceColumn="[portfolioID]" DataSetColumn="portfolioID" />
-              <Mapping SourceColumn="[whereFrom]" DataSetColumn="whereFrom" />
-              <Mapping SourceColumn="[fromID]" DataSetColumn="fromID" />
-              <Mapping SourceColumn="portfolio_name" DataSetColumn="portfolio_name" />
-              <Mapping SourceColumn="whereFromName" DataSetColumn="whereFromName" />
-              <Mapping SourceColumn="whereFromDescr" DataSetColumn="whereFromDescr" />
-              <Mapping SourceColumn="color" DataSetColumn="color" />
-              <Mapping SourceColumn="id_field_set" DataSetColumn="id_field_set" />
-            </Mappings>
-            <Sources />
-          </TableAdapter>
           <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="_ricsInChainTableAdapter" GeneratorDataComponentClassName="_ricsInChainTableAdapter" Name="_ricsInChain" UserDataComponentName="_ricsInChainTableAdapter">
             <MainSource>
               <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main._ricsInChain" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
@@ -1481,6 +1463,29 @@ WHERE     (id = @Original_id)</CommandText>
               <Mapping SourceColumn="portfolio_name" DataSetColumn="portfolio_name" />
               <Mapping SourceColumn="whereFromName" DataSetColumn="whereFromName" />
               <Mapping SourceColumn="whereFromDescr" DataSetColumn="whereFromDescr" />
+              <Mapping SourceColumn="id_field_set" DataSetColumn="id_field_set" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="PortfolioSourcesTableAdapter" GeneratorDataComponentClassName="PortfolioSourcesTableAdapter" Name="PortfolioSources" UserDataComponentName="PortfolioSourcesTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="bondsConnectionString (Settings)" DbObjectName="main.PortfolioSources" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="true" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="false">
+                    <CommandText>SELECT [portfolioID], [whereFrom], [fromID], [portfolio_name], [whereFromName], [whereFromDescr], [color], [id_field_set] FROM [PortfolioSources]</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="portfolioID" DataSetColumn="portfolioID" />
+              <Mapping SourceColumn="whereFrom" DataSetColumn="whereFrom" />
+              <Mapping SourceColumn="fromID" DataSetColumn="fromID" />
+              <Mapping SourceColumn="portfolio_name" DataSetColumn="portfolio_name" />
+              <Mapping SourceColumn="whereFromName" DataSetColumn="whereFromName" />
+              <Mapping SourceColumn="whereFromDescr" DataSetColumn="whereFromDescr" />
+              <Mapping SourceColumn="color" DataSetColumn="color" />
               <Mapping SourceColumn="id_field_set" DataSetColumn="id_field_set" />
             </Mappings>
             <Sources />
@@ -1787,8 +1792,30 @@ WHERE     (id = @Original_id)</CommandText>
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
-              <xs:element name="nextputsort" msdata:DataType="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" msprop:Generator_ColumnVarNameInTable="columnnextputsort" msprop:Generator_ColumnPropNameInRow="nextputsort" msprop:Generator_ColumnPropNameInTable="nextputsortColumn" msprop:Generator_UserColumnName="nextputsort" type="xs:anyType" minOccurs="0" />
-              <xs:element name="nextcallsort" msdata:DataType="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" msprop:Generator_ColumnVarNameInTable="columnnextcallsort" msprop:Generator_ColumnPropNameInRow="nextcallsort" msprop:Generator_ColumnPropNameInTable="nextcallsortColumn" msprop:Generator_UserColumnName="nextcallsort" type="xs:anyType" minOccurs="0" />
+              <xs:element name="nextputsort" msprop:Generator_ColumnVarNameInTable="columnnextputsort" msprop:Generator_ColumnPropNameInRow="nextputsort" msprop:Generator_ColumnPropNameInTable="nextputsortColumn" msprop:Generator_UserColumnName="nextputsort" type="xs:anyType" minOccurs="0" />
+              <xs:element name="nextcallsort" msprop:Generator_ColumnVarNameInTable="columnnextcallsort" msprop:Generator_ColumnPropNameInRow="nextcallsort" msprop:Generator_ColumnPropNameInTable="nextcallsortColumn" msprop:Generator_UserColumnName="nextcallsort" type="xs:anyType" minOccurs="0" />
+              <xs:element name="label1" msdata:DataType="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" msprop:Generator_ColumnVarNameInTable="columnlabel1" msprop:Generator_ColumnPropNameInRow="label1" msprop:Generator_ColumnPropNameInTable="label1Column" msprop:Generator_UserColumnName="label1" type="xs:anyType" minOccurs="0" />
+              <xs:element name="label2" msprop:Generator_ColumnVarNameInTable="columnlabel2" msprop:Generator_ColumnPropNameInRow="label2" msprop:Generator_ColumnPropNameInTable="label2Column" msprop:Generator_UserColumnName="label2" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="label3" msprop:Generator_ColumnVarNameInTable="columnlabel3" msprop:Generator_ColumnPropNameInRow="label3" msprop:Generator_ColumnPropNameInTable="label3Column" msprop:Generator_UserColumnName="label3" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="label4" msprop:Generator_ColumnVarNameInTable="columnlabel4" msprop:Generator_ColumnPropNameInRow="label4" msprop:Generator_ColumnPropNameInTable="label4Column" msprop:Generator_UserColumnName="label4" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
             </xs:sequence>
           </xs:complexType>
         </xs:element>
@@ -2002,44 +2029,6 @@ WHERE     (id = @Original_id)</CommandText>
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="PortfolioSources" msprop:Generator_TableClassName="PortfolioSourcesDataTable" msprop:Generator_TableVarName="tablePortfolioSources" msprop:Generator_TablePropName="PortfolioSources" msprop:Generator_RowDeletingName="PortfolioSourcesRowDeleting" msprop:Generator_UserTableName="PortfolioSources" msprop:Generator_RowChangingName="PortfolioSourcesRowChanging" msprop:Generator_RowEvHandlerName="PortfolioSourcesRowChangeEventHandler" msprop:Generator_RowDeletedName="PortfolioSourcesRowDeleted" msprop:Generator_RowEvArgName="PortfolioSourcesRowChangeEvent" msprop:Generator_RowChangedName="PortfolioSourcesRowChanged" msprop:Generator_RowClassName="PortfolioSourcesRow">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="portfolioID" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_ColumnVarNameInTable="columnportfolioID" msprop:Generator_ColumnPropNameInRow="portfolioID" msprop:Generator_ColumnPropNameInTable="portfolioIDColumn" msprop:Generator_UserColumnName="portfolioID" type="xs:long" />
-              <xs:element name="whereFrom" msprop:Generator_ColumnVarNameInTable="columnwhereFrom" msprop:Generator_ColumnPropNameInRow="whereFrom" msprop:Generator_ColumnPropNameInTable="whereFromColumn" msprop:Generator_UserColumnName="whereFrom" type="xs:anyType" minOccurs="0" />
-              <xs:element name="fromID" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_ColumnVarNameInTable="columnfromID" msprop:Generator_ColumnPropNameInRow="fromID" msprop:Generator_ColumnPropNameInTable="fromIDColumn" msprop:Generator_UserColumnName="fromID" type="xs:long" />
-              <xs:element name="portfolio_name" msprop:Generator_ColumnVarNameInTable="columnportfolio_name" msprop:Generator_ColumnPropNameInRow="portfolio_name" msprop:Generator_ColumnPropNameInTable="portfolio_nameColumn" msprop:Generator_UserColumnName="portfolio_name" minOccurs="0">
-                <xs:simpleType>
-                  <xs:restriction base="xs:string">
-                    <xs:maxLength value="2147483647" />
-                  </xs:restriction>
-                </xs:simpleType>
-              </xs:element>
-              <xs:element name="whereFromName" msprop:Generator_ColumnVarNameInTable="columnwhereFromName" msprop:Generator_ColumnPropNameInRow="whereFromName" msprop:Generator_ColumnPropNameInTable="whereFromNameColumn" msprop:Generator_UserColumnName="whereFromName" minOccurs="0">
-                <xs:simpleType>
-                  <xs:restriction base="xs:string">
-                    <xs:maxLength value="2147483647" />
-                  </xs:restriction>
-                </xs:simpleType>
-              </xs:element>
-              <xs:element name="whereFromDescr" msprop:Generator_ColumnVarNameInTable="columnwhereFromDescr" msprop:Generator_ColumnPropNameInRow="whereFromDescr" msprop:Generator_ColumnPropNameInTable="whereFromDescrColumn" msprop:Generator_UserColumnName="whereFromDescr" minOccurs="0">
-                <xs:simpleType>
-                  <xs:restriction base="xs:string">
-                    <xs:maxLength value="2147483647" />
-                  </xs:restriction>
-                </xs:simpleType>
-              </xs:element>
-              <xs:element name="color" msprop:Generator_ColumnVarNameInTable="columncolor" msprop:Generator_ColumnPropNameInRow="color" msprop:Generator_ColumnPropNameInTable="colorColumn" msprop:Generator_UserColumnName="color" minOccurs="0">
-                <xs:simpleType>
-                  <xs:restriction base="xs:string">
-                    <xs:maxLength value="2147483647" />
-                  </xs:restriction>
-                </xs:simpleType>
-              </xs:element>
-              <xs:element name="id_field_set" msprop:Generator_ColumnVarNameInTable="columnid_field_set" msprop:Generator_ColumnPropNameInRow="id_field_set" msprop:Generator_ColumnPropNameInTable="id_field_setColumn" msprop:Generator_UserColumnName="id_field_set" type="xs:int" minOccurs="0" />
-            </xs:sequence>
-          </xs:complexType>
-        </xs:element>
         <xs:element name="_ricsInChain" msprop:Generator_TableClassName="_ricsInChainDataTable" msprop:Generator_TableVarName="table_ricsInChain" msprop:Generator_TablePropName="_ricsInChain" msprop:Generator_RowDeletingName="_ricsInChainRowDeleting" msprop:Generator_UserTableName="_ricsInChain" msprop:Generator_RowChangingName="_ricsInChainRowChanging" msprop:Generator_RowEvHandlerName="_ricsInChainRowChangeEventHandler" msprop:Generator_RowDeletedName="_ricsInChainRowDeleted" msprop:Generator_RowEvArgName="_ricsInChainRowChangeEvent" msprop:Generator_RowChangedName="_ricsInChainRowChanged" msprop:Generator_RowClassName="_ricsInChainRow">
           <xs:complexType>
             <xs:sequence>
@@ -2202,6 +2191,44 @@ WHERE     (id = @Original_id)</CommandText>
             </xs:sequence>
           </xs:complexType>
         </xs:element>
+        <xs:element name="PortfolioSources" msprop:Generator_TableClassName="PortfolioSourcesDataTable" msprop:Generator_TableVarName="tablePortfolioSources" msprop:Generator_TablePropName="PortfolioSources" msprop:Generator_RowDeletingName="PortfolioSourcesRowDeleting" msprop:Generator_UserTableName="PortfolioSources" msprop:Generator_RowChangingName="PortfolioSourcesRowChanging" msprop:Generator_RowEvHandlerName="PortfolioSourcesRowChangeEventHandler" msprop:Generator_RowDeletedName="PortfolioSourcesRowDeleted" msprop:Generator_RowEvArgName="PortfolioSourcesRowChangeEvent" msprop:Generator_RowChangedName="PortfolioSourcesRowChanged" msprop:Generator_RowClassName="PortfolioSourcesRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="portfolioID" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_ColumnVarNameInTable="columnportfolioID" msprop:Generator_ColumnPropNameInRow="portfolioID" msprop:Generator_ColumnPropNameInTable="portfolioIDColumn" msprop:Generator_UserColumnName="portfolioID" type="xs:long" />
+              <xs:element name="whereFrom" msprop:Generator_ColumnVarNameInTable="columnwhereFrom" msprop:Generator_ColumnPropNameInRow="whereFrom" msprop:Generator_ColumnPropNameInTable="whereFromColumn" msprop:Generator_UserColumnName="whereFrom" type="xs:anyType" minOccurs="0" />
+              <xs:element name="fromID" msprop:Generator_ColumnVarNameInTable="columnfromID" msprop:Generator_ColumnPropNameInRow="fromID" msprop:Generator_ColumnPropNameInTable="fromIDColumn" msprop:Generator_UserColumnName="fromID" type="xs:long" />
+              <xs:element name="portfolio_name" msprop:Generator_ColumnVarNameInTable="columnportfolio_name" msprop:Generator_ColumnPropNameInRow="portfolio_name" msprop:Generator_ColumnPropNameInTable="portfolio_nameColumn" msprop:Generator_UserColumnName="portfolio_name" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="whereFromName" msprop:Generator_ColumnVarNameInTable="columnwhereFromName" msprop:Generator_ColumnPropNameInRow="whereFromName" msprop:Generator_ColumnPropNameInTable="whereFromNameColumn" msprop:Generator_UserColumnName="whereFromName" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="whereFromDescr" msprop:Generator_ColumnVarNameInTable="columnwhereFromDescr" msprop:Generator_ColumnPropNameInRow="whereFromDescr" msprop:Generator_ColumnPropNameInTable="whereFromDescrColumn" msprop:Generator_UserColumnName="whereFromDescr" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="color" msprop:Generator_ColumnVarNameInTable="columncolor" msprop:Generator_ColumnPropNameInRow="color" msprop:Generator_ColumnPropNameInTable="colorColumn" msprop:Generator_UserColumnName="color" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="2147483647" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="id_field_set" msprop:Generator_ColumnVarNameInTable="columnid_field_set" msprop:Generator_ColumnPropNameInRow="id_field_set" msprop:Generator_ColumnPropNameInTable="id_field_setColumn" msprop:Generator_UserColumnName="id_field_set" type="xs:long" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
       </xs:choice>
     </xs:complexType>
     <xs:unique name="Constraint1" msdata:PrimaryKey="true">
@@ -2253,11 +2280,6 @@ WHERE     (id = @Original_id)</CommandText>
       <xs:selector xpath=".//mstns:portfolio_to_hawser" />
       <xs:field xpath="mstns:id" />
     </xs:unique>
-    <xs:unique name="PortfolioSources_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
-      <xs:selector xpath=".//mstns:PortfolioSources" />
-      <xs:field xpath="mstns:portfolioID" />
-      <xs:field xpath="mstns:fromID" />
-    </xs:unique>
     <xs:unique name="field_layout_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
       <xs:selector xpath=".//mstns:field_layout" />
       <xs:field xpath="mstns:id" />
@@ -2265,6 +2287,12 @@ WHERE     (id = @Original_id)</CommandText>
     <xs:unique name="field_set_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
       <xs:selector xpath=".//mstns:field_set" />
       <xs:field xpath="mstns:id" />
+    </xs:unique>
+    <xs:unique name="PortfolioSources_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:PortfolioSources" />
+      <xs:field xpath="mstns:portfolioID" />
+      <xs:field xpath="mstns:fromID" />
+      <xs:field xpath="mstns:id_field_set" />
     </xs:unique>
   </xs:element>
 </xs:schema>

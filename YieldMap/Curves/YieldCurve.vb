@@ -35,17 +35,26 @@ Namespace Curves
             _fullname = fullname
             _color = Color.FromName(clr)
 
-            rics.ForEach(Sub(ric)
-                             Dim meta = DbInitializer.GetBondInfo(ric)
-                             If meta IsNot Nothing Then
-                                 _meta.Add(ric, meta)
-                             Else
-                                 Logger.Error("No description for ric {0} found", ric)
-                             End If
-                         End Sub)
+            rics.ForEach(
+                Sub(ric)
+                    Dim meta = DbInitializer.GetBondInfo(ric)
+                    If meta IsNot Nothing Then
+                        _meta.Add(ric, meta)
+                    Else
+                        Logger.Error("No description for ric {0} found", ric)
+                    End If
+                End Sub)
+
             _fieldNames = fieldNames
             _date = Date.Today
-            _quote = fieldNames(QuoteSource.Last)
+            ' TODO: REASONABLE QUOTE SELECTION!!!! EACH ENTITY MUST HAVE EXPLICITLY SET DEFAULT FIELD!!!!!!!
+            If fieldNames(QuoteSource.Last).Trim() <> "" Then
+                _quote = fieldNames(QuoteSource.Last)
+            ElseIf fieldNames(QuoteSource.Bid).Trim() <> "" Then
+                _quote = fieldNames(QuoteSource.Bid)
+            Else
+                _quote = fieldNames(QuoteSource.Ask)
+            End If
         End Sub
 
         Protected Overrides Sub StartRealTime()

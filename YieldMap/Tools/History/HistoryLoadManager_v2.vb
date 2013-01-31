@@ -194,11 +194,16 @@ Namespace Tools.History
                 Logger.Error("Exception = {0}", ex.ToString())
                 Err = True
                 Finished = True
-                If _historyManager IsNot Nothing Then
-                    RaiseEvent HistoricalData(_ric, New LoaderStatus(Finished, Err, LoaderErrReason.Exception), ParseDataStatus(_historyManager.DataStatus), Nothing) ' todo when  i kill program this bullshit fails
-                Else
-                    RaiseEvent HistoricalData(_ric, New LoaderStatus(Finished, Err, LoaderErrReason.Exception), HistoryStatus.None, Nothing) ' todo when  i kill program this bullshit fails
-                End If
+                Try
+                    If _historyManager IsNot Nothing Then
+                        RaiseEvent HistoricalData(_ric, New LoaderStatus(Finished, Err, LoaderErrReason.Exception), ParseDataStatus(_historyManager.DataStatus), Nothing) ' todo when  i kill program this bullshit fails
+                    Else
+                        RaiseEvent HistoricalData(_ric, New LoaderStatus(Finished, Err, LoaderErrReason.Exception), HistoryStatus.None, Nothing) ' todo when  i kill program this bullshit fails
+                    End If
+                Catch ex1 As Exception
+                    Logger.ErrorException("Failed to stop task", ex)
+                    Logger.Error("Exception = {0}", ex.ToString())
+                End Try
             Finally
                 Try
                     RemoveHandler _historyManager.OnUpdate, AddressOf OnNewData

@@ -30,7 +30,8 @@ Namespace Commons
                         Dim bondDescr = bondStructures.Data(ric)
                         action(New DataBaseBondDescription(ric, bondDescr.ShortName & " " & bondDescr.Series, bondDescr.ShortName & " " & bondDescr.Series,
                                                    bondDescr.MaturityDate, bondDescr.Coupon, bondDescr.Payments,
-                                                   bondDescr.Rates, bondDescr.IssueDate))
+                                                   bondDescr.Rates, bondDescr.IssueDate,
+                                                   bondDescr.ShortName & " " & bondDescr.Series, bondDescr.ShortName, bondDescr.Description, bondDescr.Series))
                     Else
                         Logger.Warn("No data arrived! Message is [{0}]", err)
                         action(Nothing)
@@ -43,7 +44,7 @@ Namespace Commons
                 Dim bondDescr = _bondDescriptions.First(Function(row) row.ric = ric)
                 Return New DataBaseBondDescription(ric, bondDescr.bondshortname, bondDescr.bondshortname,
                                                    bondDescr.maturitydate, bondDescr.coupon, bondDescr.payments,
-                                                   bondDescr.rates, bondDescr.issuedate)
+                                                   bondDescr.rates, bondDescr.issuedate, bondDescr.label1, bondDescr.label2, bondDescr.label3, bondDescr.label4)
             Else
                 Return Nothing
             End If
@@ -56,7 +57,6 @@ Namespace Commons
             RemoveHandler bh.Adapter.FillError, AddressOf SkipInvalidRows
         End Sub
 #End Region
-
 
 #Region "I. Loading chains"
         Public Sub UpdateDatabase(Optional ByVal force As Boolean = False)
@@ -367,9 +367,10 @@ Namespace Commons
                     insertCommand = subList.Aggregate("INSERT INTO Bond(ric, payments, rates, descr, series, issuer_id, " +
                                                       "currency_id, ir_fixing_ric, issuedate, maturitydate, " +
                                                       "nextputdate, nextcalldate, is_straight, is_putable, is_floater, " +
-                                                      "is_convertible, issue_size, coupon) VALUES",
+                                                      "is_convertible, issue_size, coupon, dsply_name) VALUES",
                                                       Function(current, item)
                                                           Dim description = item("Description").Replace("''", """").Replace("'", """")
+                                                          Dim shortName = item("ShortName").Replace("''", """").Replace("'", """")
 
                                                           Dim issuerId = GetItemId(issuers, "ticker", item("Ticker"))
                                                           Dim currencyId = GetItemId(currency, "Currency", item("Currency"))
@@ -380,22 +381,30 @@ Namespace Commons
                                                           Dim isConvertible = IIf(item("IsConvertible").ToUpper = "Y", 1, 0)
 
                                                           Dim issueSize As Long
-                                                          Try
+                                                          'Try
+                                                          If IsNumeric(item("OriginalAmountIssued")) Then
                                                               issueSize = CLng(item("OriginalAmountIssued"))
-                                                          Catch ex As Exception
+                                                          Else
                                                               issueSize = -1
-                                                          End Try
+                                                          End If
+                                                          'Catch ex As Exception
+                                                          'issueSize = -1
+                                                          'End Try
 
                                                           Dim theCoupon As Double
-                                                          Try
+                                                          If IsNumeric(item("coupon")) Then
+                                                              'Try
                                                               theCoupon = CSng(item("coupon"))
-                                                          Catch ex As Exception
-                                                              theCoupon = 0
-                                                          End Try
+                                                              'Catch ex As Exception
+                                                          Else
 
-                                                          Return current + String.Format("('{0}', '{1}', '{2}', '{3}', '{4}', {5}, {6}, '{7}', '{8}', '{9}', '{10}', '{17}', {11}, {12}, {13}, {14}, {15}, '{16}'), ",
+                                                              theCoupon = 0
+                                                              'End Try
+                                                          End If
+
+                                                          Return current + String.Format("('{0}', '{1}', '{2}', '{3}', '{4}', {5}, {6}, '{7}', '{8}', '{9}', '{10}', '{17}', {11}, {12}, {13}, {14}, {15}, '{16}', '{18}'), ",
                                                                                          item("Ric"), item("Payments"), item("Rates"), description, item("Series"), issuerId, currencyId, item("IndexRIC"),
-                                                                                         item("IssueDate"), item("MaturityDate"), item("NextPutDate"), isStraight, isPutable, isFloater, isConvertible, issueSize, theCoupon, item("NextCallDate"))
+                                                                                         item("IssueDate"), item("MaturityDate"), item("NextPutDate"), isStraight, isPutable, isFloater, isConvertible, issueSize, theCoupon, item("NextCallDate"), shortName)
                                                       End Function)
 
 

@@ -84,7 +84,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DotNumerics">
-      <HintPath>..\..\..\..\DotNumerics V1.1 Dec-15-2009\Source\DotNumerics\bin\Release\DotNumerics.dll</HintPath>
+      <HintPath>..\..\..\..\Repository (.Net)\DotNumerics V1.1 Dec-15-2009\Binaries\Release\DotNumerics.dll</HintPath>
     </Reference>
     <Reference Include="Ionic.Zip">
       <HintPath>..\packages\DotNetZip.1.9.1.8\lib\net20\Ionic.Zip.dll</HintPath>
@@ -132,6 +132,9 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BondsDataSet.vb">
+      <DependentUpon>BondsDataSet.xsd</DependentUpon>
+    </Compile>
     <Compile Include="Commons\Common.vb" />
     <Compile Include="Commons\DbInitializer.vb" />
     <Compile Include="Commons\Eikon.vb" />

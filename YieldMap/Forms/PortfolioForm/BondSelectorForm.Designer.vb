@@ -44,6 +44,7 @@
             Me.Label2 = New System.Windows.Forms.Label()
             Me.SelectColumnsCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.SelectColumnsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me._ricCol = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.BondshortnameDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.ColumnDescr = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.RicDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
@@ -112,7 +113,7 @@
             Me.BondListDGV.AllowUserToDeleteRows = False
             Me.BondListDGV.AutoGenerateColumns = False
             Me.BondListDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-            Me.BondListDGV.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.BondshortnameDataGridViewTextBoxColumn, Me.ColumnDescr, Me.RicDataGridViewTextBoxColumn, Me.ColumnCurrency, Me.issname, Me.ColumnIssued, Me.issue_size, Me.coupon, Me.MaturitydateDataGridViewTextBoxColumn, Me.ColumnNextPutDate, Me.ColumnNextCallDate})
+            Me.BondListDGV.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me._ricCol, Me.BondshortnameDataGridViewTextBoxColumn, Me.ColumnDescr, Me.RicDataGridViewTextBoxColumn, Me.ColumnCurrency, Me.issname, Me.ColumnIssued, Me.issue_size, Me.coupon, Me.MaturitydateDataGridViewTextBoxColumn, Me.ColumnNextPutDate, Me.ColumnNextCallDate})
             Me.BondListDGV.DataSource = Me.BondDescriptionsBindingSource
             Me.BondListDGV.Dock = System.Windows.Forms.DockStyle.Fill
             Me.BondListDGV.Location = New System.Drawing.Point(3, 53)
@@ -245,6 +246,14 @@
             Me.SelectColumnsToolStripMenuItem.Name = "SelectColumnsToolStripMenuItem"
             Me.SelectColumnsToolStripMenuItem.Size = New System.Drawing.Size(167, 22)
             Me.SelectColumnsToolStripMenuItem.Text = "Select columns..."
+            '
+            '_ricCol
+            '
+            Me._ricCol.DataPropertyName = "ric"
+            Me._ricCol.HeaderText = "XXX"
+            Me._ricCol.Name = "_ricCol"
+            Me._ricCol.ReadOnly = True
+            Me._ricCol.Visible = False
             '
             'BondshortnameDataGridViewTextBoxColumn
             '
@@ -384,6 +393,7 @@
         Friend WithEvents Label2 As System.Windows.Forms.Label
         Friend WithEvents SelectColumnsCMS As System.Windows.Forms.ContextMenuStrip
         Friend WithEvents SelectColumnsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents _ricCol As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents BondshortnameDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents ColumnDescr As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents RicDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn

@@ -58,6 +58,8 @@
             Me.MainWindowCheckBox = New System.Windows.Forms.CheckBox()
             Me.MainLoadColumnsPage = New System.Windows.Forms.TabPage()
             Me.Panel4 = New System.Windows.Forms.Panel()
+            Me.AllColumnsCB = New System.Windows.Forms.CheckBox()
+            Me.Label14 = New System.Windows.Forms.Label()
             Me.ColumnsCLB = New System.Windows.Forms.CheckedListBox()
             Me.MainLogPage = New System.Windows.Forms.TabPage()
             Me.Label1 = New System.Windows.Forms.Label()
@@ -69,8 +71,6 @@
             Me.LogErrRadioButton = New System.Windows.Forms.RadioButton()
             Me.LogNoneRadioButton = New System.Windows.Forms.RadioButton()
             Me.TheCancelButton = New System.Windows.Forms.Button()
-            Me.AllColumnsCB = New System.Windows.Forms.CheckBox()
-            Me.Label14 = New System.Windows.Forms.Label()
             Me.MainTableLayoutPanel.SuspendLayout()
             Me.MainTabControl.SuspendLayout()
             Me.MainChartPage.SuspendLayout()
@@ -138,9 +138,9 @@
             'ViewportPanel
             '
             Me.ViewportPanel.ColumnCount = 3
-            Me.ViewportPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25.0!))
-            Me.ViewportPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25.0!))
-            Me.ViewportPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25.0!))
+            Me.ViewportPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
+            Me.ViewportPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
+            Me.ViewportPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
             Me.ViewportPanel.Controls.Add(Me.Label5, 0, 4)
             Me.ViewportPanel.Controls.Add(Me.Label4, 0, 3)
             Me.ViewportPanel.Controls.Add(Me.UseVWAPRadioButton, 2, 2)
@@ -158,8 +158,8 @@
             Me.ViewportPanel.Name = "ViewportPanel"
             Me.ViewportPanel.RowCount = 6
             Me.ViewportPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-            Me.ViewportPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-            Me.ViewportPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+            Me.ViewportPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 2.0!))
+            Me.ViewportPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 2.0!))
             Me.ViewportPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
             Me.ViewportPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
             Me.ViewportPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
@@ -171,7 +171,7 @@
             Me.Label5.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                         Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
             Me.Label5.AutoSize = True
-            Me.Label5.Location = New System.Drawing.Point(6, 86)
+            Me.Label5.Location = New System.Drawing.Point(6, 50)
             Me.Label5.Margin = New System.Windows.Forms.Padding(6, 6, 0, 0)
             Me.Label5.Name = "Label5"
             Me.Label5.Size = New System.Drawing.Size(71, 14)
@@ -183,7 +183,7 @@
             Me.Label4.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                         Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
             Me.Label4.AutoSize = True
-            Me.Label4.Location = New System.Drawing.Point(6, 66)
+            Me.Label4.Location = New System.Drawing.Point(6, 30)
             Me.Label4.Margin = New System.Windows.Forms.Padding(6, 6, 0, 0)
             Me.Label4.Name = "Label4"
             Me.Label4.Size = New System.Drawing.Size(135, 14)
@@ -195,40 +195,43 @@
             Me.UseVWAPRadioButton.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                         Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
             Me.UseVWAPRadioButton.AutoSize = True
-            Me.UseVWAPRadioButton.Location = New System.Drawing.Point(388, 40)
+            Me.UseVWAPRadioButton.Location = New System.Drawing.Point(386, 22)
             Me.UseVWAPRadioButton.Margin = New System.Windows.Forms.Padding(0)
             Me.UseVWAPRadioButton.Name = "UseVWAPRadioButton"
-            Me.UseVWAPRadioButton.Size = New System.Drawing.Size(83, 20)
+            Me.UseVWAPRadioButton.Size = New System.Drawing.Size(83, 2)
             Me.UseVWAPRadioButton.TabIndex = 5
             Me.UseVWAPRadioButton.TabStop = True
             Me.UseVWAPRadioButton.Text = "VWAP price"
             Me.UseVWAPRadioButton.UseVisualStyleBackColor = True
+            Me.UseVWAPRadioButton.Visible = False
             '
             'UseLastRadioButton
             '
             Me.UseLastRadioButton.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                         Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
             Me.UseLastRadioButton.AutoSize = True
-            Me.UseLastRadioButton.Location = New System.Drawing.Point(194, 40)
+            Me.UseLastRadioButton.Location = New System.Drawing.Point(193, 22)
             Me.UseLastRadioButton.Margin = New System.Windows.Forms.Padding(0)
             Me.UseLastRadioButton.Name = "UseLastRadioButton"
-            Me.UseLastRadioButton.Size = New System.Drawing.Size(98, 20)
+            Me.UseLastRadioButton.Size = New System.Drawing.Size(98, 2)
             Me.UseLastRadioButton.TabIndex = 4
             Me.UseLastRadioButton.TabStop = True
             Me.UseLastRadioButton.Text = "Last trade price"
             Me.UseLastRadioButton.UseVisualStyleBackColor = True
+            Me.UseLastRadioButton.Visible = False
             '
             'Label3
             '
             Me.Label3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                         Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
             Me.Label3.AutoSize = True
-            Me.Label3.Location = New System.Drawing.Point(0, 40)
+            Me.Label3.Location = New System.Drawing.Point(0, 22)
             Me.Label3.Margin = New System.Windows.Forms.Padding(0)
             Me.Label3.Name = "Label3"
-            Me.Label3.Size = New System.Drawing.Size(113, 20)
+            Me.Label3.Size = New System.Drawing.Size(113, 2)
             Me.Label3.TabIndex = 3
             Me.Label3.Text = "Field to use by default:"
+            Me.Label3.Visible = False
             '
             'ShowPointSizeCheckBox
             '
@@ -239,10 +242,11 @@
             Me.ShowPointSizeCheckBox.Location = New System.Drawing.Point(0, 20)
             Me.ShowPointSizeCheckBox.Margin = New System.Windows.Forms.Padding(0)
             Me.ShowPointSizeCheckBox.Name = "ShowPointSizeCheckBox"
-            Me.ShowPointSizeCheckBox.Size = New System.Drawing.Size(257, 20)
+            Me.ShowPointSizeCheckBox.Size = New System.Drawing.Size(257, 2)
             Me.ShowPointSizeCheckBox.TabIndex = 2
             Me.ShowPointSizeCheckBox.Text = "Set point size depending on today's trade volume"
             Me.ShowPointSizeCheckBox.UseVisualStyleBackColor = True
+            Me.ShowPointSizeCheckBox.Visible = False
             '
             'ShowBidAskCheckBox
             '
@@ -265,9 +269,9 @@
             Me.Panel1.Controls.Add(Me.Label9)
             Me.Panel1.Controls.Add(Me.Label8)
             Me.Panel1.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.Panel1.Location = New System.Drawing.Point(3, 103)
+            Me.Panel1.Location = New System.Drawing.Point(3, 67)
             Me.Panel1.Name = "Panel1"
-            Me.Panel1.Size = New System.Drawing.Size(188, 99)
+            Me.Panel1.Size = New System.Drawing.Size(187, 135)
             Me.Panel1.TabIndex = 8
             '
             'MaxYieldTextBox
@@ -311,9 +315,9 @@
             Me.Panel2.Controls.Add(Me.Label10)
             Me.Panel2.Controls.Add(Me.Label11)
             Me.Panel2.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.Panel2.Location = New System.Drawing.Point(197, 103)
+            Me.Panel2.Location = New System.Drawing.Point(196, 67)
             Me.Panel2.Name = "Panel2"
-            Me.Panel2.Size = New System.Drawing.Size(188, 99)
+            Me.Panel2.Size = New System.Drawing.Size(187, 135)
             Me.Panel2.TabIndex = 9
             '
             'MaxSpreadTextBox
@@ -355,7 +359,7 @@
             Me.Label6.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                         Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
             Me.Label6.AutoSize = True
-            Me.Label6.Location = New System.Drawing.Point(200, 86)
+            Me.Label6.Location = New System.Drawing.Point(199, 50)
             Me.Label6.Margin = New System.Windows.Forms.Padding(6, 6, 0, 0)
             Me.Label6.Name = "Label6"
             Me.Label6.Size = New System.Drawing.Size(129, 14)
@@ -367,7 +371,7 @@
             Me.Label7.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                         Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
             Me.Label7.AutoSize = True
-            Me.Label7.Location = New System.Drawing.Point(394, 86)
+            Me.Label7.Location = New System.Drawing.Point(392, 50)
             Me.Label7.Margin = New System.Windows.Forms.Padding(6, 6, 0, 0)
             Me.Label7.Name = "Label7"
             Me.Label7.Size = New System.Drawing.Size(105, 14)
@@ -381,9 +385,9 @@
             Me.Panel3.Controls.Add(Me.Label12)
             Me.Panel3.Controls.Add(Me.Label13)
             Me.Panel3.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.Panel3.Location = New System.Drawing.Point(391, 103)
+            Me.Panel3.Location = New System.Drawing.Point(389, 67)
             Me.Panel3.Name = "Panel3"
-            Me.Panel3.Size = New System.Drawing.Size(188, 99)
+            Me.Panel3.Size = New System.Drawing.Size(190, 135)
             Me.Panel3.TabIndex = 11
             '
             'MaxDurTextBox
@@ -484,6 +488,26 @@
             Me.Panel4.Name = "Panel4"
             Me.Panel4.Size = New System.Drawing.Size(582, 205)
             Me.Panel4.TabIndex = 0
+            '
+            'AllColumnsCB
+            '
+            Me.AllColumnsCB.AutoSize = True
+            Me.AllColumnsCB.Location = New System.Drawing.Point(2, 22)
+            Me.AllColumnsCB.Name = "AllColumnsCB"
+            Me.AllColumnsCB.Size = New System.Drawing.Size(79, 17)
+            Me.AllColumnsCB.TabIndex = 2
+            Me.AllColumnsCB.Text = "All columns"
+            Me.AllColumnsCB.UseVisualStyleBackColor = True
+            '
+            'Label14
+            '
+            Me.Label14.AutoSize = True
+            Me.Label14.Location = New System.Drawing.Point(2, 3)
+            Me.Label14.Margin = New System.Windows.Forms.Padding(3)
+            Me.Label14.Name = "Label14"
+            Me.Label14.Size = New System.Drawing.Size(142, 13)
+            Me.Label14.TabIndex = 1
+            Me.Label14.Text = "In bond selection form show:"
             '
             'ColumnsCLB
             '
@@ -603,26 +627,6 @@
             Me.TheCancelButton.TabIndex = 7
             Me.TheCancelButton.Text = "Cancel"
             Me.TheCancelButton.UseVisualStyleBackColor = True
-            '
-            'AllColumnsCB
-            '
-            Me.AllColumnsCB.AutoSize = True
-            Me.AllColumnsCB.Location = New System.Drawing.Point(2, 22)
-            Me.AllColumnsCB.Name = "AllColumnsCB"
-            Me.AllColumnsCB.Size = New System.Drawing.Size(79, 17)
-            Me.AllColumnsCB.TabIndex = 2
-            Me.AllColumnsCB.Text = "All columns"
-            Me.AllColumnsCB.UseVisualStyleBackColor = True
-            '
-            'Label14
-            '
-            Me.Label14.AutoSize = True
-            Me.Label14.Location = New System.Drawing.Point(2, 3)
-            Me.Label14.Margin = New System.Windows.Forms.Padding(3)
-            Me.Label14.Name = "Label14"
-            Me.Label14.Size = New System.Drawing.Size(142, 13)
-            Me.Label14.TabIndex = 1
-            Me.Label14.Text = "In bond selection form show:"
             '
             'SettingsForm
             '
