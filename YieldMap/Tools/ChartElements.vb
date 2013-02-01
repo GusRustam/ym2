@@ -207,8 +207,10 @@ Namespace Tools
             End Get
             Set(ByVal value As String)
                 _selectedQuote = value
+                ParentGroup.NotifyQuote(Me)
             End Set
         End Property
+
 
         Public ReadOnly Property MetaData As DataBaseBondDescription
             Get
@@ -233,6 +235,16 @@ Namespace Tools
                 _parentGroup.Ansamble.CleanupSpread(type, _quotesAndYields(_selectedQuote))
             End If
         End Sub
+
+        Function GetFieldByKey(ByVal key As String) As String
+            If ParentGroup.BidField = key Then Return "BID"
+            If ParentGroup.AskField = key Then Return "ASK"
+            If ParentGroup.LastField = key Then Return "LAST"
+            If ParentGroup.HistField = key Then Return "CLOSE"
+            If ParentGroup.VwapField = key Then Return "VWAP"
+            Return key
+        End Function
+
     End Class
 
     Public Enum LabelMode
@@ -498,6 +510,10 @@ Namespace Tools
                 _elements.Remove(ric)
             End While
             RaiseEvent RemovedItem(Me, ric)
+        End Sub
+
+        Public Sub NotifyQuote(ByVal bond As Bond)
+            RaiseEvent Quote(bond, bond.SelectedQuote)
         End Sub
     End Class
 #End Region

@@ -208,7 +208,12 @@ Namespace Forms.ChartForm
                             bondDataPoint.QuotesAndYields.Keys.ToList.ForEach(
                                 Sub(key)
                                     Dim x = bondDataPoint.QuotesAndYields(key)
-                                    ExtInfoTSMI.DropDownItems.Add(String.Format("{0}: {1:F4}, {2:P2} {3}, {4:F2}", key, x.Price, x.Yld.Yield, x.Yld.ToWhat.Abbr, x.Duration))
+                                    Dim newItem = ExtInfoTSMI.DropDownItems.Add(String.Format("{0}: {1:F4}, {2:P2} {3}, {4:F2}", bondDataPoint.GetFieldByKey(key), x.Price, x.Yld.Yield, x.Yld.ToWhat.Abbr, x.Duration))
+                                    If bondDataPoint.SelectedQuote = key Then CType(newItem, ToolStripMenuItem).Checked = True
+                                    AddHandler newItem.Click,
+                                        Sub(sender1 As Object, e1 As EventArgs)
+                                            bondDataPoint.SelectedQuote = key
+                                        End Sub
                                 End Sub)
                             ExtInfoTSMI.DropDownItems.Add("-")
                             ExtInfoTSMI.DropDownItems.Add(String.Format("Today volume: {0:N0}", bondDataPoint.TodayVolume))
@@ -247,7 +252,7 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub TheChartInvalidated(sender As Object, e As InvalidateEventArgs) Handles TheChart.Invalidated
+        Private Sub TheChartInvalidated(ByVal sender As Object, ByVal e As InvalidateEventArgs) Handles TheChart.Invalidated
             If TheChart.Series IsNot Nothing AndAlso TheChart.Series.Count = 0 AndAlso Not MainTableLayout.Controls.ContainsKey("InfoLabel") Then
                 TheChart.Visible = False
                 InfoLabel.Visible = True

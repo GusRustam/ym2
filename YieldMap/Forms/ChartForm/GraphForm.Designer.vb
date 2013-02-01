@@ -24,8 +24,8 @@
         <System.Diagnostics.DebuggerStepThrough()> _
         Private Sub InitializeComponent()
             Me.components = New System.ComponentModel.Container()
-            Dim ChartArea2 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-            Dim Legend2 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+            Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+            Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
             Me.TheStatusStrip = New System.Windows.Forms.StatusStrip()
             Me.StatusMessage = New System.Windows.Forms.ToolStripStatusLabel()
             Me.TheToolStrip = New System.Windows.Forms.ToolStrip()
@@ -291,7 +291,7 @@
             '
             'BondCMS
             '
-            Me.BondCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainInfoLine1TSMI, Me.ExtInfoTSMI, Me.ShowHistoryTSMI, Me.ToolStripSeparator1, Me.BondLabelsTSMI, Me.ToolStripSeparator5, Me.BondDescriptionTSMI, Me.RelatedQuoteTSMI, Me.RelatedChartTSMI, Me.ToolStripSeparator4, Me.RemovePointTSMI})
+            Me.BondCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainInfoLine1TSMI, Me.ExtInfoTSMI, Me.BondLabelsTSMI, Me.ToolStripSeparator5, Me.BondDescriptionTSMI, Me.RelatedQuoteTSMI, Me.RelatedChartTSMI, Me.ToolStripSeparator4, Me.ShowHistoryTSMI, Me.ToolStripSeparator1, Me.RemovePointTSMI})
             Me.BondCMS.Name = "BondContextMenuStrip"
             Me.BondCMS.Size = New System.Drawing.Size(167, 220)
             '
@@ -764,12 +764,12 @@
             '
             'TheChart
             '
-            ChartArea2.Name = "ChartArea1"
-            Me.TheChart.ChartAreas.Add(ChartArea2)
+            ChartArea1.Name = "ChartArea1"
+            Me.TheChart.ChartAreas.Add(ChartArea1)
             Me.TheChart.Dock = System.Windows.Forms.DockStyle.Fill
-            Legend2.Enabled = False
-            Legend2.Name = "Legend1"
-            Me.TheChart.Legends.Add(Legend2)
+            Legend1.Enabled = False
+            Legend1.Name = "Legend1"
+            Me.TheChart.Legends.Add(Legend1)
             Me.TheChart.Location = New System.Drawing.Point(0, 0)
             Me.TheChart.Name = "TheChart"
             Me.TheChart.Size = New System.Drawing.Size(778, 417)

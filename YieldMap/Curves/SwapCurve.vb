@@ -128,7 +128,7 @@ Namespace Curves
                 Dim len = xyPoints.Count() - 1
                 Dim res(0 To len, 1) As Object
                 For i = 0 To xyPoints.Count() - 1
-                    res(i, 0) = DateTime.Today.AddDays(TimeSpan.FromDays(xyPoints(i).X).Days)
+                    res(i, 0) = DateTime.Today.AddDays(TimeSpan.FromDays(xyPoints(i).X * 365).Days)
                     res(i, 1) = xyPoints(i).Y
                 Next
                 Return res
