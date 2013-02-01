@@ -462,6 +462,14 @@ Namespace Tools.Estimation
         Public X As Double
         Public Y As Double
 
+        Public Sub New(ByVal anX As Double, ByVal anY As Double)
+            X = anX
+            Y = anY
+        End Sub
+
+        Public Sub New()
+        End Sub
+
         Public Shared Function ConvertToXY(ByVal data As List(Of SwapPointDescription), ByVal type As SpreadType) As List(Of XY)
             Dim x As List(Of Double)
             Dim y As List(Of Double)

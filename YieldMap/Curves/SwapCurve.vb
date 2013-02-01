@@ -103,7 +103,7 @@ Namespace Curves
             Return GetName() = CType(obj, SwapCurve).GetName()
         End Function
 
-        Public Overridable Function ToArray() As Array
+        Public Function ToArray() As Array
             Dim list = Descrs.Values.Where(Function(elem) elem.Yield.HasValue).ToList()
             list.Sort()
             Dim len = list.Count - 1
@@ -115,9 +115,29 @@ Namespace Curves
             Return res
         End Function
 
+        Public Function ToFittedArray() As Array
+            Dim data As Array = ToArray()
+            Dim mode = GetFitMode()
+            If mode = estimationModel.LinInterp Then
+                Return data
+            Else
+                Dim points = GetCurveData(True)
+                Dim estimator = New Estimator(mode)
+
+                Dim xyPoints = estimator.Approximate(XY.ConvertToXY(points, SpreadType.Yield))
+                Dim len = xyPoints.Count() - 1
+                Dim res(0 To len, 1) As Object
+                For i = 0 To xyPoints.Count() - 1
+                    res(i, 0) = DateTime.Today.AddDays(TimeSpan.FromDays(xyPoints(i).X).Days)
+                    res(i, 1) = xyPoints(i).Y
+                Next
+                Return res
+            End If
+        End Function
+
 #Region "Loading data"
         '' LOAD SEPARATE RIC (HISTORICAL)
-        Protected Sub DoLoadRIC(ric As String, fields As List(Of String), aDate As Date)
+        Protected Sub DoLoadRIC(ByVal ric As String, ByVal fields As List(Of String), ByVal aDate As Date)
             Logger.Debug("DoLoadRIC({0})", ric)
 
             Dim descr = New HistoryTaskDescr() With {
@@ -161,11 +181,11 @@ Namespace Curves
         Public Event Recalculated As Action(Of SwapCurve)
         Public Event Faulted As Action(Of SwapCurve, Exception)
 
-        Protected Sub NotifyUpdated(theCurve As SwapCurve)
+        Protected Sub NotifyUpdated(ByVal theCurve As SwapCurve)
             RaiseEvent Updated(theCurve)
         End Sub
 
-        Protected Sub NotifyFaulted(theCurve As SwapCurve, theEx As Exception)
+        Protected Sub NotifyFaulted(ByVal theCurve As SwapCurve, ByVal theEx As Exception)
             RaiseEvent Faulted(theCurve, theEx)
         End Sub
 

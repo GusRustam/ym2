@@ -535,7 +535,7 @@ Namespace Tools
                     End If
                 End If
                 If type = SpreadType.PointSpread AndAlso Benchmarks.ContainsKey(SpreadType.PointSpread) Then
-                    CalcPntSprd(Benchmarks(SpreadType.PointSpread).ToArray(), descr)
+                    CalcPntSprd(Benchmarks(SpreadType.PointSpread).ToFittedArray(), descr)
                 End If
             Else
                 If data IsNot Nothing Then
@@ -549,7 +549,7 @@ Namespace Tools
                     End If
                 End If
                 If Benchmarks.ContainsKey(SpreadType.PointSpread) Then
-                    CalcPntSprd(Benchmarks(SpreadType.PointSpread).ToArray(), descr)
+                    CalcPntSprd(Benchmarks(SpreadType.PointSpread).ToFittedArray(), descr)
                 End If
             End If
         End Sub
