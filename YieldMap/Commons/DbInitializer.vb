@@ -1,4 +1,5 @@
 ﻿Imports System.Data.SQLite
+Imports System.Globalization
 Imports NLog
 Imports YieldMap.Tools
 Imports YieldMap.Tools.RDataTool
@@ -42,9 +43,12 @@ Namespace Commons
         Public Shared Function GetBondInfo(ByVal ric As String) As DataBaseBondDescription
             If _bondDescriptions.Any(Function(row) row.ric = ric) Then
                 Dim bondDescr = _bondDescriptions.First(Function(row) row.ric = ric)
+                Dim matdate = If(bondDescr.maturitydate <> "", Date.ParseExact(bondDescr.maturitydate, "dd/MM/yyyy", CultureInfo.InvariantCulture), "")
+                Dim issdate = If(bondDescr.issuedate <> "", Date.ParseExact(bondDescr.issuedate, "dd/MM/yyyy", CultureInfo.InvariantCulture), "")
                 Return New DataBaseBondDescription(ric, bondDescr.bondshortname, bondDescr.bondshortname,
-                                                   bondDescr.maturitydate, bondDescr.coupon, bondDescr.payments,
-                                                   bondDescr.rates, bondDescr.issuedate, bondDescr.label1, bondDescr.label2, bondDescr.label3, bondDescr.label4)
+                                                   matdate, bondDescr.coupon, bondDescr.payments,
+                                                   bondDescr.rates, issdate, bondDescr.label1, bondDescr.label2,
+                                                   bondDescr.label3, bondDescr.label4)
             Else
                 Return Nothing
             End If
@@ -369,6 +373,7 @@ Namespace Commons
                                                       "nextputdate, nextcalldate, is_straight, is_putable, is_floater, " +
                                                       "is_convertible, issue_size, coupon, dsply_name) VALUES",
                                                       Function(current, item)
+
                                                           Dim description = item("Description").Replace("''", """").Replace("'", """")
                                                           Dim shortName = item("ShortName").Replace("''", """").Replace("'", """")
 
@@ -391,20 +396,44 @@ Namespace Commons
                                                           'issueSize = -1
                                                           'End Try
 
+                                                          Dim issueDate = item("IssueDate")
+                                                          If IsDate(issueDate) Then
+                                                              issueDate = String.Format("{0:dd/MM/yyyy}", CDate(issueDate))
+                                                          Else
+                                                              issueDate = ""
+                                                          End If
+
+                                                          Dim matDate = item("MaturityDate")
+                                                          If IsDate(matDate) Then
+                                                              matDate = String.Format("{0:dd/MM/yyyy}", CDate(matDate))
+                                                          Else
+                                                              matDate = ""
+                                                          End If
+
+                                                          Dim nextPutDate = item("NextPutDate")
+                                                          If IsDate(nextPutDate) Then
+                                                              nextPutDate = String.Format("{0:dd/MM/yyyy}", CDate(nextPutDate))
+                                                          Else
+                                                              nextPutDate = ""
+                                                          End If
+
                                                           Dim theCoupon As Double
                                                           If IsNumeric(item("coupon")) Then
-                                                              'Try
                                                               theCoupon = CSng(item("coupon"))
-                                                              'Catch ex As Exception
                                                           Else
-
                                                               theCoupon = 0
-                                                              'End Try
+                                                          End If
+
+                                                          Dim nextCallDate = item("NextCallDate")
+                                                          If IsDate(nextCallDate) Then
+                                                              nextCallDate = String.Format("{0:dd/MM/yyyy}", CDate(nextCallDate))
+                                                          Else
+                                                              nextCallDate = ""
                                                           End If
 
                                                           Return current + String.Format("('{0}', '{1}', '{2}', '{3}', '{4}', {5}, {6}, '{7}', '{8}', '{9}', '{10}', '{17}', {11}, {12}, {13}, {14}, {15}, '{16}', '{18}'), ",
                                                                                          item("Ric"), item("Payments"), item("Rates"), description, item("Series"), issuerId, currencyId, item("IndexRIC"),
-                                                                                         item("IssueDate"), item("MaturityDate"), item("NextPutDate"), isStraight, isPutable, isFloater, isConvertible, issueSize, theCoupon, item("NextCallDate"), shortName)
+                                                                                         issueDate, matDate, nextPutDate, isStraight, isPutable, isFloater, isConvertible, issueSize, theCoupon, nextCallDate, shortName)
                                                       End Function)
 
 

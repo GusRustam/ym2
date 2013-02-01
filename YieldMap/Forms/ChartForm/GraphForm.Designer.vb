@@ -51,7 +51,7 @@
             Me.ExtInfoTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.ShowHistoryTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
-            Me.ToolStripMenuItem2 = New System.Windows.Forms.ToolStripMenuItem()
+            Me.BondLabelsTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.IssuerNameSeriesTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.ShortNameTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.DescriptionTSMI = New System.Windows.Forms.ToolStripMenuItem()
@@ -291,9 +291,9 @@
             '
             'BondCMS
             '
-            Me.BondCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainInfoLine1TSMI, Me.ExtInfoTSMI, Me.ShowHistoryTSMI, Me.ToolStripSeparator1, Me.ToolStripMenuItem2, Me.ToolStripSeparator5, Me.BondDescriptionTSMI, Me.RelatedQuoteTSMI, Me.RelatedChartTSMI, Me.ToolStripSeparator4, Me.RemovePointTSMI})
+            Me.BondCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainInfoLine1TSMI, Me.ExtInfoTSMI, Me.ShowHistoryTSMI, Me.ToolStripSeparator1, Me.BondLabelsTSMI, Me.ToolStripSeparator5, Me.BondDescriptionTSMI, Me.RelatedQuoteTSMI, Me.RelatedChartTSMI, Me.ToolStripSeparator4, Me.RemovePointTSMI})
             Me.BondCMS.Name = "BondContextMenuStrip"
-            Me.BondCMS.Size = New System.Drawing.Size(167, 198)
+            Me.BondCMS.Size = New System.Drawing.Size(167, 220)
             '
             'MainInfoLine1TSMI
             '
@@ -318,12 +318,12 @@
             Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
             Me.ToolStripSeparator1.Size = New System.Drawing.Size(163, 6)
             '
-            'ToolStripMenuItem2
+            'BondLabelsTSMI
             '
-            Me.ToolStripMenuItem2.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.IssuerNameSeriesTSMI, Me.ShortNameTSMI, Me.DescriptionTSMI, Me.SeriesOnlyTSMI})
-            Me.ToolStripMenuItem2.Name = "ToolStripMenuItem2"
-            Me.ToolStripMenuItem2.Size = New System.Drawing.Size(166, 22)
-            Me.ToolStripMenuItem2.Text = "Labels"
+            Me.BondLabelsTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.IssuerNameSeriesTSMI, Me.ShortNameTSMI, Me.DescriptionTSMI, Me.SeriesOnlyTSMI})
+            Me.BondLabelsTSMI.Name = "BondLabelsTSMI"
+            Me.BondLabelsTSMI.Size = New System.Drawing.Size(166, 22)
+            Me.BondLabelsTSMI.Text = "Labels"
             '
             'IssuerNameSeriesTSMI
             '
@@ -1111,7 +1111,7 @@
         Friend WithEvents AddBondToChartTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents EnterRICTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents SelectFromAListTSMI As System.Windows.Forms.ToolStripMenuItem
-        Friend WithEvents ToolStripMenuItem2 As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents BondLabelsTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents IssuerNameSeriesTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents ShortNameTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents DescriptionTSMI As System.Windows.Forms.ToolStripMenuItem

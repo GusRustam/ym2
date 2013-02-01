@@ -213,7 +213,10 @@ Namespace Forms.ChartForm
                             ExtInfoTSMI.DropDownItems.Add("-")
                             ExtInfoTSMI.DropDownItems.Add(String.Format("Today volume: {0:N0}", bondDataPoint.TodayVolume))
 
-
+                            IssuerNameSeriesTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.IssuerAndSeries)
+                            ShortNameTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.ShortName)
+                            DescriptionTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.Description)
+                            SeriesOnlyTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.SeriesOnly)
                         ElseIf TypeOf point.Tag Is SwapCurve Then
                             Dim curve = CType(point.Tag, SwapCurve)
                             MMNameTSMI.Text = curve.GetFullName()

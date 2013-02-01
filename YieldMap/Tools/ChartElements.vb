@@ -52,8 +52,6 @@ Namespace Tools
             End Get
         End Property
 
-
-
         Public Function GetColor(ByVal instrument As String) As Color
             Return Color.FromName(GetInstrumentGroup(instrument).Color)
         End Function
@@ -223,8 +221,6 @@ Namespace Tools
                 Return _quotesAndYields
             End Get
         End Property
-
-        'Public ReadOnly Fields As New ValuedFieldGroup
 
         Public Sub RecalculateByType(ByVal type As SpreadType)
             If _quotesAndYields.ContainsKey(_selectedQuote) Then
@@ -685,7 +681,6 @@ Namespace Tools
         Public Descr As HistPointDescription
         Public Meta As DataBaseBondDescription
         Public SeriesId As Guid
-           
     End Class
 #End Region
 
@@ -710,9 +705,6 @@ Namespace Tools
         Public Sub ResetSelection()
             _selectedPointIndex = Nothing
         End Sub
-    End Class
-
-    Friend Class HistCurveSeries
     End Class
 #End Region
 End Namespace
