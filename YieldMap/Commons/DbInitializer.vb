@@ -42,17 +42,22 @@ Namespace Commons
 
         Public Shared Function GetBondInfo(ByVal ric As String) As DataBaseBondDescription
             Logger.Trace("GetBondInfo({0})", ric)
-            If _bondDescriptions.Any(Function(row) row.ric = ric) Then
-                Dim bondDescr = _bondDescriptions.First(Function(row) row.ric = ric)
-                Dim matdate = If(bondDescr.maturitydate <> "", Date.ParseExact(bondDescr.maturitydate, "dd/MM/yyyy", CultureInfo.InvariantCulture), "")
-                Dim issdate = If(bondDescr.issuedate <> "", Date.ParseExact(bondDescr.issuedate, "dd/MM/yyyy", CultureInfo.InvariantCulture), "")
-                Return New DataBaseBondDescription(ric, bondDescr.bondshortname, bondDescr.bondshortname,
-                                                   matdate, bondDescr.coupon, bondDescr.payments,
-                                                   bondDescr.rates, issdate, bondDescr.label1, bondDescr.label2,
-                                                   bondDescr.label3, bondDescr.label4)
-            Else
-                Return Nothing
-            End If
+            Try
+                If _bondDescriptions.Any(Function(row) row.ric = ric) Then
+                    Dim bondDescr = _bondDescriptions.First(Function(row) row.ric = ric)
+                    Dim matdate = If(bondDescr.maturitydate <> "", Date.ParseExact(bondDescr.maturitydate, "dd/MM/yyyy", CultureInfo.InvariantCulture), "")
+                    Dim issdate = If(bondDescr.issuedate <> "", Date.ParseExact(bondDescr.issuedate, "dd/MM/yyyy", CultureInfo.InvariantCulture), "")
+                    Return New DataBaseBondDescription(ric, bondDescr.bondshortname, bondDescr.bondshortname,
+                                                       matdate, bondDescr.coupon, bondDescr.payments,
+                                                       bondDescr.rates, issdate, bondDescr.label1, bondDescr.label2,
+                                                       bondDescr.label3, bondDescr.label4)
+                Else
+                    Return Nothing
+                End If
+            Catch ex As Exception
+                Logger.ErrorException("Failed to add bond " & ric, ex)
+                Logger.Error("Exception = {0}", ex.ToString())
+            End Try
         End Function
 
         Private Shared Sub InitBondDescriber() Handles Me.Success

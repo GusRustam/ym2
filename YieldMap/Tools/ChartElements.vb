@@ -199,8 +199,8 @@ Namespace Tools
 
         Sub New(ByVal parentGroup As Group, ByVal selectedQuote As String, ByVal metaData As DataBaseBondDescription)
             _parentGroup = parentGroup
-            Me.SelectedQuote = selectedQuote
             _metaData = metaData
+            _selectedQuote = selectedQuote
         End Sub
 
         Public ReadOnly Property ParentGroup As Group
