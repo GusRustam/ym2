@@ -215,9 +215,24 @@ Namespace Forms.ChartForm
                                             bondDataPoint.SelectedQuote = key
                                         End Sub
                                 End Sub)
+
+                            Dim newItem1 As ToolStripMenuItem
+
                             ExtInfoTSMI.DropDownItems.Add("-")
                             ExtInfoTSMI.DropDownItems.Add(String.Format("Today volume: {0:N0}", bondDataPoint.TodayVolume))
+                            ExtInfoTSMI.DropDownItems.Add("-")
+                            newItem1 = ExtInfoTSMI.DropDownItems.Add("Set custom price...")
+                            AddHandler newItem1.Click,
+                                       Sub(sender1 As Object, e1 As EventArgs)
+                                           Dim res = InputBox("Enter price", "Custom bond price")
+                                           If IsNumeric(res) Then
+                                               bondDataPoint.SetCustomPrice(CDbl(res))
+                                               bondDataPoint.SelectedQuote = Group.CustomField
+                                           ElseIf res <> "" Then
+                                               MessageBox.Show("Invalid number")
+                                           End If
 
+                                       End Sub
                             IssuerNameSeriesTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.IssuerAndSeries)
                             ShortNameTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.ShortName)
                             DescriptionTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.Description)
@@ -1114,6 +1129,9 @@ Namespace Forms.ChartForm
                             End If
                             point.YValues = {yValue.Value}
                             point.Color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.LightGray)
+                            point.MarkerStyle = IIf(fieldName <> group.CustomField,
+                                               IIf(calc.Yld.ToWhat.Equals(YieldToWhat.Maturity), MarkerStyle.Circle, MarkerStyle.Triangle),
+                                               MarkerStyle.Square)
                             If ShowLabelsTSB.Checked Then point.Label = descr.MetaData.ShortName
                         Else
                             series.Points.Remove(point)
@@ -1123,7 +1141,10 @@ Namespace Forms.ChartForm
                             .Name = descr.MetaData.RIC,
                             .Tag = descr,
                             .ToolTip = descr.MetaData.ShortName,
-                            .Color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.LightGray)
+                            .Color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.LightGray),
+                            .MarkerStyle = IIf(fieldName <> group.CustomField,
+                                               IIf(calc.Yld.ToWhat.Equals(YieldToWhat.Maturity), MarkerStyle.Circle, MarkerStyle.Triangle),
+                                               MarkerStyle.Square)
                         }
                         If ShowLabelsTSB.Checked Then point.Label = descr.MetaData.ShortName
                         series.Points.Add(point)

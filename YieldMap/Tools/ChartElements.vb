@@ -172,6 +172,12 @@ Namespace Tools
         End Function
     End Class
 
+    Public Enum BondStatus
+        Ok
+        Empty
+        Err
+    End Enum
+
     Public Class Bond
         Private _selectedQuote As String
         Private ReadOnly _parentGroup As Group
@@ -180,6 +186,8 @@ Namespace Tools
         Public TodayVolume As Double
 
         Private _labelMode As LabelMode = LabelMode.IssuerAndSeries
+        Private _status As BondStatus = BondStatus.Empty
+
         Public Property LabelMode As LabelMode
             Get
                 Return _labelMode
@@ -224,6 +232,15 @@ Namespace Tools
             End Get
         End Property
 
+        Public Property Status() As BondStatus
+            Get
+                Return _status
+            End Get
+            Set(ByVal value As BondStatus)
+                _status = value
+            End Set
+        End Property
+
         Public Sub RecalculateByType(ByVal type As SpreadType)
             If _quotesAndYields.ContainsKey(_selectedQuote) Then
                 _parentGroup.Ansamble.SpreadBmk.CalcAllSpreads(_quotesAndYields(_selectedQuote), _metaData, type)
@@ -242,8 +259,13 @@ Namespace Tools
             If ParentGroup.LastField = key Then Return "LAST"
             If ParentGroup.HistField = key Then Return "CLOSE"
             If ParentGroup.VwapField = key Then Return "VWAP"
+            If Group.CustomField = key Then Return Group.CustomField
             Return key
         End Function
+
+        Public Sub SetCustomPrice(ByVal price As Double)
+            ParentGroup.SetCustomPrice(MetaData.RIC, price)
+        End Sub
 
     End Class
 
@@ -281,6 +303,7 @@ Namespace Tools
         Public HistField As String
         Public VolumeField As String
         Public VwapField As String
+        Public Const CustomField As String = "CUSTOM"
         Public Currency As String
         Public RicStructure As String
         Public Brokers As New List(Of String)
@@ -334,12 +357,12 @@ Namespace Tools
         End Sub
 
         Private Function GetAllKnownFields() As List(Of String)
-            Return {BidField, AskField, LastField, VolumeField, VwapField}.
+            Return {BidField, AskField, LastField, VolumeField, VwapField, CustomField}.
                 Where(Function(fldName) fldName IsNot Nothing AndAlso fldName.Trim() <> "").ToList()
         End Function
 
         Private Function GetKnownPriceFields() As List(Of String)
-            Return {BidField, AskField, LastField, VwapField}.
+            Return {BidField, AskField, LastField, VwapField, CustomField}.
                 Where(Function(fldName) fldName IsNot Nothing AndAlso fldName.Trim() <> "").ToList()
         End Function
 
@@ -347,23 +370,31 @@ Namespace Tools
             StartRics(_elements.Keys.ToList())
         End Sub
 
+        Public Sub SetCustomPrice(ByVal ric As String, ByVal price As Double)
+            Dim data = New Dictionary(Of String, Dictionary(Of String, Double))
+            Dim quote = New Dictionary(Of String, Double)
+            quote.Add(CustomField, price)
+            data.Add(ric, quote)
+            OnQuotes(data, Nothing)
+        End Sub
+
         Private Sub OnQuotes(ByVal data As Dictionary(Of String, Dictionary(Of String, Double)), ByVal errorInfo As WrongItemsInfo) Handles _quoteLoader.OnNewData
             Logger.Trace("QuoteLoaderOnNewData()")
-            If errorInfo IsNot Nothing Then
-                If errorInfo.WrongFields.Any Then
-                    ' todo what? mark field as dead one for the corresponding bond
-                End If
-                If errorInfo.WrongItems.Any Then
-                    If errorInfo.WrongItems.ContainsKey(ItemInfo.InvalidItems) Then
-                        errorInfo.WrongItems(ItemInfo.InvalidItems).ForEach(
-                            Sub(tuple)
-                                Dim ric = tuple.Item1
-                                Dim status = tuple.Item2
-                                ' todo what? mark bond as dead
-                            End Sub)
-                    End If
-                End If
-            End If
+            'If errorInfo IsNot Nothing Then
+            '    If errorInfo.WrongFields.Any Then
+            '        ' todo what? mark field as dead one for the corresponding bond
+            '    End If
+            '    If errorInfo.WrongItems.Any Then
+            '        If errorInfo.WrongItems.ContainsKey(ItemInfo.InvalidItems) Then
+            '            errorInfo.WrongItems(ItemInfo.InvalidItems).ForEach(
+            '                Sub(tuple)
+            '                    Dim ric = tuple.Item1
+            '                    Dim status = tuple.Item2
+            '                    ' todo what? mark bond as dead
+            '                End Sub)
+            '        End If
+            '    End If
+            'End If
             For Each instrAndFields As KeyValuePair(Of String, Dictionary(Of String, Double)) In data
                 Try
                     Dim instrument As String = instrAndFields.Key
@@ -388,9 +419,13 @@ Namespace Tools
                             Dim fieldValue = fieldsAndValues(fieldName)
                             Try
                                 HandleQuote(bondDataPoint, fieldName, fieldValue, Date.Today)
+                                bondDataPoint.Status = BondStatus.Ok
                             Catch ex As Exception
                                 Logger.WarnException("Failed to plot the point", ex)
                                 Logger.Warn("Exception = {0}", ex.ToString())
+                                If bondDataPoint.Status = BondStatus.Empty Then
+                                    bondDataPoint.Status = BondStatus.Err
+                                End If
                             End Try
                         Else
                             If fieldName = _elements(instrument).SelectedQuote And Not bondDataPoint.QuotesAndYields.ContainsKey(fieldName) Then

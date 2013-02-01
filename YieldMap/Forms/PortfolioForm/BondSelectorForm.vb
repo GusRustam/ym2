@@ -62,9 +62,9 @@ Namespace Forms.PortfolioForm
 
             BondDescriptionsBindingSource.Filter = strFitler
 
-            AddHandler BondDescriptionsTableAdapter.Adapter.FillError, AddressOf Commons.SkipInvalidRows
+            AddHandler BondDescriptionsTableAdapter.Adapter.FillError, AddressOf SkipInvalidRows
             BondDescriptionsTableAdapter.Fill(BondsDataSet.BondDescriptions)
-            RemoveHandler BondDescriptionsTableAdapter.Adapter.FillError, AddressOf Commons.SkipInvalidRows
+            RemoveHandler BondDescriptionsTableAdapter.Adapter.FillError, AddressOf SkipInvalidRows
         End Sub
 
         Private Sub OkButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles OkButton.Click
@@ -126,7 +126,7 @@ Namespace Forms.PortfolioForm
             Return anOrder
         End Function
 
-        Private Sub SelectColumnsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SelectColumnsToolStripMenuItem.Click
+        Private Sub SelectColumnsToolStripMenuItem_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SelectColumnsToolStripMenuItem.Click
             Dim sf As New SettingsForm
             sf.MainLoadColumnsPage.Select()
             sf.ShowDialog()
