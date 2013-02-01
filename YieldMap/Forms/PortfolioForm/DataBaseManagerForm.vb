@@ -103,14 +103,14 @@ Namespace Forms.PortfolioForm
             f.RICTextBox.Text = selectedRow.Cells(1).Value.ToString()
             f.ColorsComboBox.Text = selectedRow.Cells(2).Value.ToString()
             f.CurveCheckBox.Checked = CBool(selectedRow.Cells(3).Value)
-
+            f.fieldSetId = CLng(selectedRow.Cells(4).Value)
             If f.ShowDialog() = DialogResult.OK Then
                 Dim newName = f.RICTextBox.Text
                 Dim newColor = f.ColorsComboBox.Text
                 Dim crv = f.CurveCheckBox.Checked
                 Dim layoutId = f.FieldLayoutComboBox.SelectedValue
                 If newName <> "" Then
-                    _hawserTA.RenameById(newName, newColor, crv, CInt(selectedRow.Cells(0).Value), layoutId)
+                    _hawserTA.RenameById(newName, newColor, crv, layoutId, CInt(selectedRow.Cells(0).Value))
                     RefreshList()
                     RefreshGrid(-1)
                 End If
@@ -467,6 +467,7 @@ Namespace Forms.PortfolioForm
             f.RICTextBox.Text = theRic
             f.ColorsComboBox.Text = clr
             f.CurveCheckBox.Checked = crv
+            f.fieldSetId = CLng(selectedRow.Cells.Item(5).Value)
 
             If f.ShowDialog() = DialogResult.OK Then
                 theRic = f.RICTextBox.Text

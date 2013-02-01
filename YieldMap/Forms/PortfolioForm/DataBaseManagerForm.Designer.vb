@@ -29,7 +29,6 @@
             Me.PorfolioElementsDGV = New System.Windows.Forms.DataGridView()
             Me.PidDataGridViewTextBoxColumn3 = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.BidDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.BondshortnameDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.DataGridViewTextBoxColumn12 = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.IncludeDataGridViewCheckBoxColumn3 = New System.Windows.Forms.DataGridViewCheckBoxColumn()
             Me.PortfolioUnitedBindingSource = New System.Windows.Forms.BindingSource(Me.components)
@@ -64,16 +63,11 @@
             Me.UDL_Page = New System.Windows.Forms.TabPage()
             Me.TableLayoutPanel2 = New System.Windows.Forms.TableLayoutPanel()
             Me.ListOfList = New System.Windows.Forms.DataGridView()
-            Me.IdDataGridViewTextBoxColumn1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.HawsernameDataGridViewTextBoxColumn1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.ColorDataGridViewTextBoxColumn1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.ColumnListCurve = New System.Windows.Forms.DataGridViewCheckBoxColumn()
             Me.HawserBindingSource = New System.Windows.Forms.BindingSource(Me.components)
             Me.ConstituentsDGW = New System.Windows.Forms.DataGridView()
             Me.HawseridDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.RICDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.BondidDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.BondDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.HawserDataBindingSource = New System.Windows.Forms.BindingSource(Me.components)
             Me.FlowLayoutPanel2 = New System.Windows.Forms.FlowLayoutPanel()
             Me.AddListButton = New System.Windows.Forms.Button()
@@ -85,11 +79,6 @@
             Me.TabPage1 = New System.Windows.Forms.TabPage()
             Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
             Me.ChainsDGV = New System.Windows.Forms.DataGridView()
-            Me.IdDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.ChainnameDataGridViewTextBoxColumn2 = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.DescrDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.ColorDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
-            Me.ColumnChainCurve = New System.Windows.Forms.DataGridViewCheckBoxColumn()
             Me.ChainBindingSource = New System.Windows.Forms.BindingSource(Me.components)
             Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
             Me.AddChain = New System.Windows.Forms.Button()
@@ -121,6 +110,21 @@
             Me.DataGridViewTextBoxColumn9 = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.DataGridViewTextBoxColumn10 = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.ChainTableAdapter = New YieldMap.BondsDataSetTableAdapters.chainTableAdapter()
+            Me.IdDataGridViewTextBoxColumn1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.HawsernameDataGridViewTextBoxColumn1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.ColorDataGridViewTextBoxColumn1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.ColumnListCurve = New System.Windows.Forms.DataGridViewCheckBoxColumn()
+            Me.id_field_set = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.DataGridViewTextBoxColumn13 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.DataGridViewTextBoxColumn14 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.BondshortnameDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.BondDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.IdDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.ChainnameDataGridViewTextBoxColumn2 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.DescrDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.ColorDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.ColumnChainCurve = New System.Windows.Forms.DataGridViewCheckBoxColumn()
+            Me.DataGridViewTextBoxColumn15 = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.MainTabControl.SuspendLayout()
             Me.PorfolioPage.SuspendLayout()
             CType(Me.PorfolioElementsDGV, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -190,7 +194,7 @@
             Me.PorfolioElementsDGV.AllowUserToDeleteRows = False
             Me.PorfolioElementsDGV.AutoGenerateColumns = False
             Me.PorfolioElementsDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-            Me.PorfolioElementsDGV.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.PidDataGridViewTextBoxColumn3, Me.BidDataGridViewTextBoxColumn, Me.BondshortnameDataGridViewTextBoxColumn, Me.DataGridViewTextBoxColumn12, Me.IncludeDataGridViewCheckBoxColumn3})
+            Me.PorfolioElementsDGV.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.PidDataGridViewTextBoxColumn3, Me.BidDataGridViewTextBoxColumn, Me.DataGridViewTextBoxColumn12, Me.IncludeDataGridViewCheckBoxColumn3, Me.BondshortnameDataGridViewTextBoxColumn})
             Me.PorfolioElementsDGV.DataSource = Me.PortfolioUnitedBindingSource
             Me.PorfolioElementsDGV.Location = New System.Drawing.Point(593, 26)
             Me.PorfolioElementsDGV.Name = "PorfolioElementsDGV"
@@ -214,14 +218,6 @@
             Me.BidDataGridViewTextBoxColumn.Name = "BidDataGridViewTextBoxColumn"
             Me.BidDataGridViewTextBoxColumn.ReadOnly = True
             Me.BidDataGridViewTextBoxColumn.Visible = False
-            '
-            'BondshortnameDataGridViewTextBoxColumn
-            '
-            Me.BondshortnameDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill
-            Me.BondshortnameDataGridViewTextBoxColumn.DataPropertyName = "bondshortname"
-            Me.BondshortnameDataGridViewTextBoxColumn.HeaderText = "Bond"
-            Me.BondshortnameDataGridViewTextBoxColumn.Name = "BondshortnameDataGridViewTextBoxColumn"
-            Me.BondshortnameDataGridViewTextBoxColumn.ReadOnly = True
             '
             'DataGridViewTextBoxColumn12
             '
@@ -529,7 +525,7 @@
             Me.ListOfList.AllowUserToDeleteRows = False
             Me.ListOfList.AutoGenerateColumns = False
             Me.ListOfList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-            Me.ListOfList.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.IdDataGridViewTextBoxColumn1, Me.HawsernameDataGridViewTextBoxColumn1, Me.ColorDataGridViewTextBoxColumn1, Me.ColumnListCurve})
+            Me.ListOfList.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.IdDataGridViewTextBoxColumn1, Me.HawsernameDataGridViewTextBoxColumn1, Me.ColorDataGridViewTextBoxColumn1, Me.ColumnListCurve, Me.id_field_set})
             Me.ListOfList.DataSource = Me.HawserBindingSource
             Me.ListOfList.Dock = System.Windows.Forms.DockStyle.Fill
             Me.ListOfList.Location = New System.Drawing.Point(3, 3)
@@ -539,40 +535,6 @@
             Me.ListOfList.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
             Me.ListOfList.Size = New System.Drawing.Size(517, 497)
             Me.ListOfList.TabIndex = 6
-            '
-            'IdDataGridViewTextBoxColumn1
-            '
-            Me.IdDataGridViewTextBoxColumn1.DataPropertyName = "id"
-            Me.IdDataGridViewTextBoxColumn1.HeaderText = "id"
-            Me.IdDataGridViewTextBoxColumn1.Name = "IdDataGridViewTextBoxColumn1"
-            Me.IdDataGridViewTextBoxColumn1.ReadOnly = True
-            Me.IdDataGridViewTextBoxColumn1.Visible = False
-            '
-            'HawsernameDataGridViewTextBoxColumn1
-            '
-            Me.HawsernameDataGridViewTextBoxColumn1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill
-            Me.HawsernameDataGridViewTextBoxColumn1.DataPropertyName = "hawser_name"
-            Me.HawsernameDataGridViewTextBoxColumn1.HeaderText = "Name"
-            Me.HawsernameDataGridViewTextBoxColumn1.Name = "HawsernameDataGridViewTextBoxColumn1"
-            Me.HawsernameDataGridViewTextBoxColumn1.ReadOnly = True
-            '
-            'ColorDataGridViewTextBoxColumn1
-            '
-            Me.ColorDataGridViewTextBoxColumn1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.ColorDataGridViewTextBoxColumn1.DataPropertyName = "color"
-            Me.ColorDataGridViewTextBoxColumn1.HeaderText = "Color"
-            Me.ColorDataGridViewTextBoxColumn1.Name = "ColorDataGridViewTextBoxColumn1"
-            Me.ColorDataGridViewTextBoxColumn1.ReadOnly = True
-            Me.ColorDataGridViewTextBoxColumn1.Width = 56
-            '
-            'ColumnListCurve
-            '
-            Me.ColumnListCurve.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.ColumnListCurve.DataPropertyName = "curve"
-            Me.ColumnListCurve.HeaderText = "Curve"
-            Me.ColumnListCurve.Name = "ColumnListCurve"
-            Me.ColumnListCurve.ReadOnly = True
-            Me.ColumnListCurve.Width = 41
             '
             'HawserBindingSource
             '
@@ -618,14 +580,6 @@
             Me.BondidDataGridViewTextBoxColumn.Name = "BondidDataGridViewTextBoxColumn"
             Me.BondidDataGridViewTextBoxColumn.ReadOnly = True
             Me.BondidDataGridViewTextBoxColumn.Visible = False
-            '
-            'BondDataGridViewTextBoxColumn
-            '
-            Me.BondDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill
-            Me.BondDataGridViewTextBoxColumn.DataPropertyName = "Bond"
-            Me.BondDataGridViewTextBoxColumn.HeaderText = "Bond"
-            Me.BondDataGridViewTextBoxColumn.Name = "BondDataGridViewTextBoxColumn"
-            Me.BondDataGridViewTextBoxColumn.ReadOnly = True
             '
             'HawserDataBindingSource
             '
@@ -733,7 +687,7 @@
             Me.ChainsDGV.AllowUserToDeleteRows = False
             Me.ChainsDGV.AutoGenerateColumns = False
             Me.ChainsDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-            Me.ChainsDGV.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.IdDataGridViewTextBoxColumn, Me.ChainnameDataGridViewTextBoxColumn2, Me.DescrDataGridViewTextBoxColumn, Me.ColorDataGridViewTextBoxColumn, Me.ColumnChainCurve})
+            Me.ChainsDGV.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.IdDataGridViewTextBoxColumn, Me.ChainnameDataGridViewTextBoxColumn2, Me.DescrDataGridViewTextBoxColumn, Me.ColorDataGridViewTextBoxColumn, Me.ColumnChainCurve, Me.DataGridViewTextBoxColumn15})
             Me.ChainsDGV.DataSource = Me.ChainBindingSource
             Me.ChainsDGV.Dock = System.Windows.Forms.DockStyle.Fill
             Me.ChainsDGV.Location = New System.Drawing.Point(3, 3)
@@ -742,50 +696,6 @@
             Me.ChainsDGV.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
             Me.ChainsDGV.Size = New System.Drawing.Size(533, 508)
             Me.ChainsDGV.TabIndex = 1
-            '
-            'IdDataGridViewTextBoxColumn
-            '
-            Me.IdDataGridViewTextBoxColumn.DataPropertyName = "id"
-            Me.IdDataGridViewTextBoxColumn.HeaderText = "id"
-            Me.IdDataGridViewTextBoxColumn.Name = "IdDataGridViewTextBoxColumn"
-            Me.IdDataGridViewTextBoxColumn.ReadOnly = True
-            Me.IdDataGridViewTextBoxColumn.Visible = False
-            '
-            'ChainnameDataGridViewTextBoxColumn2
-            '
-            Me.ChainnameDataGridViewTextBoxColumn2.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.ChainnameDataGridViewTextBoxColumn2.DataPropertyName = "chain_name"
-            Me.ChainnameDataGridViewTextBoxColumn2.HeaderText = "RIC"
-            Me.ChainnameDataGridViewTextBoxColumn2.Name = "ChainnameDataGridViewTextBoxColumn2"
-            Me.ChainnameDataGridViewTextBoxColumn2.ReadOnly = True
-            Me.ChainnameDataGridViewTextBoxColumn2.Width = 50
-            '
-            'DescrDataGridViewTextBoxColumn
-            '
-            Me.DescrDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill
-            Me.DescrDataGridViewTextBoxColumn.DataPropertyName = "descr"
-            Me.DescrDataGridViewTextBoxColumn.HeaderText = "Description"
-            Me.DescrDataGridViewTextBoxColumn.Name = "DescrDataGridViewTextBoxColumn"
-            Me.DescrDataGridViewTextBoxColumn.ReadOnly = True
-            '
-            'ColorDataGridViewTextBoxColumn
-            '
-            Me.ColorDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.ColorDataGridViewTextBoxColumn.DataPropertyName = "color"
-            Me.ColorDataGridViewTextBoxColumn.HeaderText = "Color"
-            Me.ColorDataGridViewTextBoxColumn.Name = "ColorDataGridViewTextBoxColumn"
-            Me.ColorDataGridViewTextBoxColumn.ReadOnly = True
-            Me.ColorDataGridViewTextBoxColumn.Resizable = System.Windows.Forms.DataGridViewTriState.[True]
-            Me.ColorDataGridViewTextBoxColumn.Width = 56
-            '
-            'ColumnChainCurve
-            '
-            Me.ColumnChainCurve.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.ColumnChainCurve.DataPropertyName = "curve"
-            Me.ColumnChainCurve.HeaderText = "Curve"
-            Me.ColumnChainCurve.Name = "ColumnChainCurve"
-            Me.ColumnChainCurve.ReadOnly = True
-            Me.ColumnChainCurve.Width = 41
             '
             'ChainBindingSource
             '
@@ -1015,6 +925,132 @@
             '
             Me.ChainTableAdapter.ClearBeforeFill = True
             '
+            'IdDataGridViewTextBoxColumn1
+            '
+            Me.IdDataGridViewTextBoxColumn1.DataPropertyName = "id"
+            Me.IdDataGridViewTextBoxColumn1.HeaderText = "id"
+            Me.IdDataGridViewTextBoxColumn1.Name = "IdDataGridViewTextBoxColumn1"
+            Me.IdDataGridViewTextBoxColumn1.ReadOnly = True
+            Me.IdDataGridViewTextBoxColumn1.Visible = False
+            '
+            'HawsernameDataGridViewTextBoxColumn1
+            '
+            Me.HawsernameDataGridViewTextBoxColumn1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill
+            Me.HawsernameDataGridViewTextBoxColumn1.DataPropertyName = "hawser_name"
+            Me.HawsernameDataGridViewTextBoxColumn1.HeaderText = "Name"
+            Me.HawsernameDataGridViewTextBoxColumn1.Name = "HawsernameDataGridViewTextBoxColumn1"
+            Me.HawsernameDataGridViewTextBoxColumn1.ReadOnly = True
+            '
+            'ColorDataGridViewTextBoxColumn1
+            '
+            Me.ColorDataGridViewTextBoxColumn1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
+            Me.ColorDataGridViewTextBoxColumn1.DataPropertyName = "color"
+            Me.ColorDataGridViewTextBoxColumn1.HeaderText = "Color"
+            Me.ColorDataGridViewTextBoxColumn1.Name = "ColorDataGridViewTextBoxColumn1"
+            Me.ColorDataGridViewTextBoxColumn1.ReadOnly = True
+            Me.ColorDataGridViewTextBoxColumn1.Width = 56
+            '
+            'ColumnListCurve
+            '
+            Me.ColumnListCurve.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
+            Me.ColumnListCurve.DataPropertyName = "curve"
+            Me.ColumnListCurve.HeaderText = "Curve"
+            Me.ColumnListCurve.Name = "ColumnListCurve"
+            Me.ColumnListCurve.ReadOnly = True
+            Me.ColumnListCurve.Width = 41
+            '
+            'id_field_set
+            '
+            Me.id_field_set.DataPropertyName = "id_field_set"
+            Me.id_field_set.HeaderText = "id_field_set"
+            Me.id_field_set.Name = "id_field_set"
+            Me.id_field_set.ReadOnly = True
+            Me.id_field_set.Visible = False
+            '
+            'DataGridViewTextBoxColumn13
+            '
+            Me.DataGridViewTextBoxColumn13.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill
+            Me.DataGridViewTextBoxColumn13.DataPropertyName = "bondshortname"
+            Me.DataGridViewTextBoxColumn13.HeaderText = "Bond"
+            Me.DataGridViewTextBoxColumn13.Name = "DataGridViewTextBoxColumn13"
+            Me.DataGridViewTextBoxColumn13.ReadOnly = True
+            '
+            'DataGridViewTextBoxColumn14
+            '
+            Me.DataGridViewTextBoxColumn14.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill
+            Me.DataGridViewTextBoxColumn14.DataPropertyName = "Bond"
+            Me.DataGridViewTextBoxColumn14.HeaderText = "Bond"
+            Me.DataGridViewTextBoxColumn14.Name = "DataGridViewTextBoxColumn14"
+            Me.DataGridViewTextBoxColumn14.ReadOnly = True
+            '
+            'BondshortnameDataGridViewTextBoxColumn
+            '
+            Me.BondshortnameDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill
+            Me.BondshortnameDataGridViewTextBoxColumn.DataPropertyName = "bondshortname"
+            Me.BondshortnameDataGridViewTextBoxColumn.HeaderText = "Bond"
+            Me.BondshortnameDataGridViewTextBoxColumn.Name = "BondshortnameDataGridViewTextBoxColumn"
+            Me.BondshortnameDataGridViewTextBoxColumn.ReadOnly = True
+            '
+            'BondDataGridViewTextBoxColumn
+            '
+            Me.BondDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill
+            Me.BondDataGridViewTextBoxColumn.DataPropertyName = "Bond"
+            Me.BondDataGridViewTextBoxColumn.HeaderText = "Bond"
+            Me.BondDataGridViewTextBoxColumn.Name = "BondDataGridViewTextBoxColumn"
+            Me.BondDataGridViewTextBoxColumn.ReadOnly = True
+            '
+            'IdDataGridViewTextBoxColumn
+            '
+            Me.IdDataGridViewTextBoxColumn.DataPropertyName = "id"
+            Me.IdDataGridViewTextBoxColumn.HeaderText = "id"
+            Me.IdDataGridViewTextBoxColumn.Name = "IdDataGridViewTextBoxColumn"
+            Me.IdDataGridViewTextBoxColumn.ReadOnly = True
+            Me.IdDataGridViewTextBoxColumn.Visible = False
+            '
+            'ChainnameDataGridViewTextBoxColumn2
+            '
+            Me.ChainnameDataGridViewTextBoxColumn2.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
+            Me.ChainnameDataGridViewTextBoxColumn2.DataPropertyName = "chain_name"
+            Me.ChainnameDataGridViewTextBoxColumn2.HeaderText = "RIC"
+            Me.ChainnameDataGridViewTextBoxColumn2.Name = "ChainnameDataGridViewTextBoxColumn2"
+            Me.ChainnameDataGridViewTextBoxColumn2.ReadOnly = True
+            Me.ChainnameDataGridViewTextBoxColumn2.Width = 50
+            '
+            'DescrDataGridViewTextBoxColumn
+            '
+            Me.DescrDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill
+            Me.DescrDataGridViewTextBoxColumn.DataPropertyName = "descr"
+            Me.DescrDataGridViewTextBoxColumn.HeaderText = "Description"
+            Me.DescrDataGridViewTextBoxColumn.Name = "DescrDataGridViewTextBoxColumn"
+            Me.DescrDataGridViewTextBoxColumn.ReadOnly = True
+            '
+            'ColorDataGridViewTextBoxColumn
+            '
+            Me.ColorDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
+            Me.ColorDataGridViewTextBoxColumn.DataPropertyName = "color"
+            Me.ColorDataGridViewTextBoxColumn.HeaderText = "Color"
+            Me.ColorDataGridViewTextBoxColumn.Name = "ColorDataGridViewTextBoxColumn"
+            Me.ColorDataGridViewTextBoxColumn.ReadOnly = True
+            Me.ColorDataGridViewTextBoxColumn.Resizable = System.Windows.Forms.DataGridViewTriState.[True]
+            Me.ColorDataGridViewTextBoxColumn.Width = 56
+            '
+            'ColumnChainCurve
+            '
+            Me.ColumnChainCurve.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
+            Me.ColumnChainCurve.DataPropertyName = "curve"
+            Me.ColumnChainCurve.HeaderText = "Curve"
+            Me.ColumnChainCurve.Name = "ColumnChainCurve"
+            Me.ColumnChainCurve.ReadOnly = True
+            Me.ColumnChainCurve.Width = 41
+            '
+            'DataGridViewTextBoxColumn15
+            '
+            Me.DataGridViewTextBoxColumn15.DataPropertyName = "id_field_set"
+            Me.DataGridViewTextBoxColumn15.HeaderText = "id_field_set"
+            Me.DataGridViewTextBoxColumn15.Name = "DataGridViewTextBoxColumn15"
+            Me.DataGridViewTextBoxColumn15.ReadOnly = True
+            Me.DataGridViewTextBoxColumn15.Visible = False
+            '
             'DataBaseManagerForm
             '
             Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1151,10 +1187,14 @@
         Friend WithEvents HawsernameDataGridViewTextBoxColumn1 As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents ColorDataGridViewTextBoxColumn1 As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents ColumnListCurve As System.Windows.Forms.DataGridViewCheckBoxColumn
+        Friend WithEvents id_field_set As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents IdDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents ChainnameDataGridViewTextBoxColumn2 As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents DescrDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents ColorDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents ColumnChainCurve As System.Windows.Forms.DataGridViewCheckBoxColumn
+        Friend WithEvents DataGridViewTextBoxColumn15 As System.Windows.Forms.DataGridViewTextBoxColumn
+        Friend WithEvents DataGridViewTextBoxColumn13 As System.Windows.Forms.DataGridViewTextBoxColumn
+        Friend WithEvents DataGridViewTextBoxColumn14 As System.Windows.Forms.DataGridViewTextBoxColumn
     End Class
 End Namespace

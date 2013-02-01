@@ -54,7 +54,7 @@
             'ChainListBox
             '
             Me.ChainListBox.DataSource = Me.ChainBindingSource
-            Me.ChainListBox.DisplayMember = "chain_name"
+            Me.ChainListBox.DisplayMember = "descr"
             Me.ChainListBox.FormattingEnabled = True
             Me.ChainListBox.Location = New System.Drawing.Point(12, 23)
             Me.ChainListBox.Name = "ChainListBox"

@@ -4,10 +4,11 @@ Imports System.Windows.Forms
 
 Namespace Forms.PortfolioForm
     Public Class NewChainForm
-        Private Sub NewChainFormLoad(sender As Object, e As EventArgs) Handles Me.Load
+        Public fieldSetId As Long
+        Private Sub NewChainFormLoad(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
             Field_setTableAdapter.Fill(BondsDataSet.field_set)
             Dim colorsArr = [Enum].GetValues(GetType(KnownColor))
-
+            FieldLayoutComboBox.SelectedValue = fieldSetId
             Dim colors = New List(Of String)
             Array.ForEach(Of KnownColor)(colorsArr, Sub(color) colors.Add(color.ToString()))
             Dim props = GetType(SystemColors).GetProperties(BindingFlags.Static Or BindingFlags.Public)
@@ -18,7 +19,7 @@ Namespace Forms.PortfolioForm
             Next
         End Sub
 
-        Private Sub ColorsComboBoxDrawItem(sender As Object, e As DrawItemEventArgs) Handles ColorsComboBox.DrawItem
+        Private Sub ColorsComboBoxDrawItem(ByVal sender As Object, ByVal e As DrawItemEventArgs) Handles ColorsComboBox.DrawItem
             Dim g As Graphics = e.Graphics
             Dim r As Rectangle = e.Bounds
             If e.Index > 0 Then

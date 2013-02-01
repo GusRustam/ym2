@@ -33,7 +33,7 @@ echo --- %ACTION%ing Eikon libraries located at %THPATH%
 (regsvr32 /s %1 "%THPATH%\Adxfo.dll" && (echo AdFin Functions %ACTION%ed successfully)) || echo Failed to %ACTION% AdFin Functions
 (regsvr32 /s %1 "%THPATH%\rtx.dll"  && (echo AdFin RealTime %ACTION%ed successfully)) || echo Failed to %ACTION% AdFin RealTime
 (regsvr32 /s %1 "%THPATH%\Dex2.dll" && (echo Dex2 %ACTION%ed successfully)) || echo Failed to %ACTION% Dex2
-(regsvr32 /s %1 "%THPATH%\EikonDesktopSDK.dll" && (echo Desktop SDK %ACTION%ed successfully))  || echo Failed to %ACTION% Desktop SDK
+(regsvr32 /s %1 "%THPATH%\EikonDesktopDataAPI.dll" && (echo Desktop SDK %ACTION%ed successfully))  || echo Failed to %ACTION% Desktop SDK
 
 :ext
 ENDLOCAL

@@ -75,7 +75,7 @@ Namespace Forms.PortfolioForm
             IncludeCB.Text = IIf(IncludeCB.Checked, "Include", "Exclude")
         End Sub
 
-        Private Sub FilterTextChanged(ByVal sender As Object, ByVal e As EventArgs) Handles RICTextBox.TextAlignChanged, IssuerTextBox.TextChanged
+        Private Sub FilterTextChanged(ByVal sender As Object, ByVal e As EventArgs) Handles IssuerTextBox.TextChanged, RICTextBox.TextChanged
             RefreshGrid()
         End Sub
 

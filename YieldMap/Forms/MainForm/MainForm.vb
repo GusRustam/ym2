@@ -1,16 +1,16 @@
 ﻿Imports System.IO
+Imports EikonDesktopDataAPILib
 Imports YieldMap.Commons
 Imports YieldMap.My.Resources
 Imports YieldMap.Forms.ChartForm
 Imports YieldMap.Forms.PortfolioForm
-Imports EikonDesktopSDKLib
 Imports NLog
 
 Namespace Forms.MainForm
     Public Class MainForm
         Private Shared ReadOnly Logger As Logger = GetLogger(GetType(MainForm))
 
-        Private WithEvents _myEikonDesktopSdk As EikonDesktopSDK = Eikon.SDK
+        Private WithEvents _myEikonDesktopSdk As EikonDesktopDataAPI = Eikon.SDK
 
 
         Private _initialized As Boolean = False
@@ -118,12 +118,12 @@ Namespace Forms.MainForm
 #Region "II. Connecting to Eikon"
         Private Sub ConnectToEikon()
             Dim lResult = _myEikonDesktopSdk.Initialize()
-            If lResult <> EEikonSDKInitializeResult.Succeed Then
+            If lResult <> EEikonDataAPIInitializeResult.Succeed Then
                 Select Case lResult
-                    Case EEikonSDKInitializeResult.Error_Reinitialize
+                    Case EEikonDataAPIInitializeResult.Error_Reinitialize
                         StatusLabel.Text = Reinit_Eikon_forbidden
 
-                    Case EEikonSDKInitializeResult.Error_InitializeFail
+                    Case EEikonDataAPIInitializeResult.Error_InitializeFail
                         StatusLabel.Text = Init_Eikon_Fail
                 End Select
                 UpdateUserFormAccordingToConnectionStatus(EEikonStatus.Disconnected)

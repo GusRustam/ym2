@@ -1,13 +1,13 @@
-﻿Imports EikonDesktopSDKLib
+﻿Imports EikonDesktopDataAPILib
 
 Namespace Commons
 
     Public Class Eikon
-        Private _myEikonDesktopSdk As EikonDesktopSDK
+        Private _myEikonDesktopSdk As EikonDesktopDataAPI
         Private Shared _sdk As Eikon
 
         Private Sub New()
-            _myEikonDesktopSdk = New EikonDesktopSDK
+            _myEikonDesktopSdk = New EikonDesktopDataAPI
         End Sub
 
         Public Shared ReadOnly Property Instance As Eikon
@@ -17,7 +17,7 @@ Namespace Commons
             End Get
         End Property
 
-        Public Shared ReadOnly Property SDK As EikonDesktopSDK
+        Public Shared ReadOnly Property SDK As EikonDesktopDataAPI
             Get
                 Return Instance._myEikonDesktopSdk
             End Get

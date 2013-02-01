@@ -41,6 +41,7 @@ Namespace Commons
         End Sub
 
         Public Shared Function GetBondInfo(ByVal ric As String) As DataBaseBondDescription
+            Logger.Trace("GetBondInfo({0})", ric)
             If _bondDescriptions.Any(Function(row) row.ric = ric) Then
                 Dim bondDescr = _bondDescriptions.First(Function(row) row.ric = ric)
                 Dim matdate = If(bondDescr.maturitydate <> "", Date.ParseExact(bondDescr.maturitydate, "dd/MM/yyyy", CultureInfo.InvariantCulture), "")
