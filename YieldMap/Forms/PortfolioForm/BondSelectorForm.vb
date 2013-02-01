@@ -36,6 +36,7 @@ Namespace Forms.PortfolioForm
                     column.Visible = selectedFields.Contains(column.DataPropertyName)
                 Next
             End If
+            BondListDGV.Columns(0).Visible = False
         End Sub
 
         Private Sub RefreshList()

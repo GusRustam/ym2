@@ -33,17 +33,6 @@
             Me.BondDescriptionsTableAdapter = New YieldMap.BondsDataSetTableAdapters.BondDescriptionsTableAdapter()
             Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
             Me.BondListDGV = New System.Windows.Forms.DataGridView()
-            Me.TableLayoutPanel2 = New System.Windows.Forms.TableLayoutPanel()
-            Me.Button2 = New System.Windows.Forms.Button()
-            Me.OkButton = New System.Windows.Forms.Button()
-            Me.IncludeCB = New System.Windows.Forms.CheckBox()
-            Me.TableLayoutPanel3 = New System.Windows.Forms.TableLayoutPanel()
-            Me.IssuerTextBox = New System.Windows.Forms.TextBox()
-            Me.Label1 = New System.Windows.Forms.Label()
-            Me.RICTextBox = New System.Windows.Forms.TextBox()
-            Me.Label2 = New System.Windows.Forms.Label()
-            Me.SelectColumnsCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
-            Me.SelectColumnsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Me._ricCol = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.BondshortnameDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.ColumnDescr = New System.Windows.Forms.DataGridViewTextBoxColumn()
@@ -56,6 +45,17 @@
             Me.MaturitydateDataGridViewTextBoxColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.ColumnNextPutDate = New System.Windows.Forms.DataGridViewTextBoxColumn()
             Me.ColumnNextCallDate = New System.Windows.Forms.DataGridViewTextBoxColumn()
+            Me.TableLayoutPanel2 = New System.Windows.Forms.TableLayoutPanel()
+            Me.Button2 = New System.Windows.Forms.Button()
+            Me.OkButton = New System.Windows.Forms.Button()
+            Me.IncludeCB = New System.Windows.Forms.CheckBox()
+            Me.TableLayoutPanel3 = New System.Windows.Forms.TableLayoutPanel()
+            Me.IssuerTextBox = New System.Windows.Forms.TextBox()
+            Me.Label1 = New System.Windows.Forms.Label()
+            Me.RICTextBox = New System.Windows.Forms.TextBox()
+            Me.Label2 = New System.Windows.Forms.Label()
+            Me.SelectColumnsCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
+            Me.SelectColumnsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             CType(Me.IssuerBindingSource, System.ComponentModel.ISupportInitialize).BeginInit()
             CType(Me.BondsDataSet, System.ComponentModel.ISupportInitialize).BeginInit()
             CType(Me.BondDescriptionsBindingSource, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -122,6 +122,113 @@
             Me.BondListDGV.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
             Me.BondListDGV.Size = New System.Drawing.Size(732, 445)
             Me.BondListDGV.TabIndex = 7
+            '
+            '_ricCol
+            '
+            Me._ricCol.DataPropertyName = "ric"
+            Me._ricCol.HeaderText = "XXX"
+            Me._ricCol.Name = "_ricCol"
+            Me._ricCol.ReadOnly = True
+            Me._ricCol.Visible = False
+            '
+            'BondshortnameDataGridViewTextBoxColumn
+            '
+            Me.BondshortnameDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
+            Me.BondshortnameDataGridViewTextBoxColumn.DataPropertyName = "bondshortname"
+            Me.BondshortnameDataGridViewTextBoxColumn.HeaderText = "Bond"
+            Me.BondshortnameDataGridViewTextBoxColumn.Name = "BondshortnameDataGridViewTextBoxColumn"
+            Me.BondshortnameDataGridViewTextBoxColumn.ReadOnly = True
+            Me.BondshortnameDataGridViewTextBoxColumn.Width = 57
+            '
+            'ColumnDescr
+            '
+            Me.ColumnDescr.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill
+            Me.ColumnDescr.DataPropertyName = "descr"
+            Me.ColumnDescr.HeaderText = "Description"
+            Me.ColumnDescr.Name = "ColumnDescr"
+            Me.ColumnDescr.ReadOnly = True
+            '
+            'RicDataGridViewTextBoxColumn
+            '
+            Me.RicDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
+            Me.RicDataGridViewTextBoxColumn.DataPropertyName = "ric"
+            Me.RicDataGridViewTextBoxColumn.HeaderText = "RIC"
+            Me.RicDataGridViewTextBoxColumn.Name = "RicDataGridViewTextBoxColumn"
+            Me.RicDataGridViewTextBoxColumn.ReadOnly = True
+            Me.RicDataGridViewTextBoxColumn.Width = 50
+            '
+            'ColumnCurrency
+            '
+            Me.ColumnCurrency.DataPropertyName = "currency"
+            Me.ColumnCurrency.HeaderText = "Currency"
+            Me.ColumnCurrency.Name = "ColumnCurrency"
+            Me.ColumnCurrency.ReadOnly = True
+            '
+            'issname
+            '
+            Me.issname.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
+            Me.issname.DataPropertyName = "issname"
+            Me.issname.HeaderText = "Issuer"
+            Me.issname.Name = "issname"
+            Me.issname.ReadOnly = True
+            Me.issname.Width = 60
+            '
+            'ColumnIssued
+            '
+            Me.ColumnIssued.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
+            Me.ColumnIssued.DataPropertyName = "issuedate"
+            Me.ColumnIssued.HeaderText = "Issued"
+            Me.ColumnIssued.Name = "ColumnIssued"
+            Me.ColumnIssued.ReadOnly = True
+            Me.ColumnIssued.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic
+            Me.ColumnIssued.Width = 63
+            '
+            'issue_size
+            '
+            Me.issue_size.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
+            Me.issue_size.DataPropertyName = "issue_size"
+            DataGridViewCellStyle1.Format = "N0"
+            DataGridViewCellStyle1.NullValue = Nothing
+            Me.issue_size.DefaultCellStyle = DataGridViewCellStyle1
+            Me.issue_size.HeaderText = "Size"
+            Me.issue_size.Name = "issue_size"
+            Me.issue_size.ReadOnly = True
+            Me.issue_size.Width = 52
+            '
+            'coupon
+            '
+            Me.coupon.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
+            Me.coupon.DataPropertyName = "coupon"
+            DataGridViewCellStyle2.Format = "N2"
+            Me.coupon.DefaultCellStyle = DataGridViewCellStyle2
+            Me.coupon.HeaderText = "Coupon"
+            Me.coupon.Name = "coupon"
+            Me.coupon.ReadOnly = True
+            Me.coupon.Width = 69
+            '
+            'MaturitydateDataGridViewTextBoxColumn
+            '
+            Me.MaturitydateDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
+            Me.MaturitydateDataGridViewTextBoxColumn.DataPropertyName = "maturitydate"
+            Me.MaturitydateDataGridViewTextBoxColumn.HeaderText = "Maturity"
+            Me.MaturitydateDataGridViewTextBoxColumn.Name = "MaturitydateDataGridViewTextBoxColumn"
+            Me.MaturitydateDataGridViewTextBoxColumn.ReadOnly = True
+            Me.MaturitydateDataGridViewTextBoxColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic
+            Me.MaturitydateDataGridViewTextBoxColumn.Width = 69
+            '
+            'ColumnNextPutDate
+            '
+            Me.ColumnNextPutDate.DataPropertyName = "nextputdate"
+            Me.ColumnNextPutDate.HeaderText = "Next Put"
+            Me.ColumnNextPutDate.Name = "ColumnNextPutDate"
+            Me.ColumnNextPutDate.ReadOnly = True
+            '
+            'ColumnNextCallDate
+            '
+            Me.ColumnNextCallDate.DataPropertyName = "nextcalldate"
+            Me.ColumnNextCallDate.HeaderText = "Next Call"
+            Me.ColumnNextCallDate.Name = "ColumnNextCallDate"
+            Me.ColumnNextCallDate.ReadOnly = True
             '
             'TableLayoutPanel2
             '
@@ -246,113 +353,6 @@
             Me.SelectColumnsToolStripMenuItem.Name = "SelectColumnsToolStripMenuItem"
             Me.SelectColumnsToolStripMenuItem.Size = New System.Drawing.Size(167, 22)
             Me.SelectColumnsToolStripMenuItem.Text = "Select columns..."
-            '
-            '_ricCol
-            '
-            Me._ricCol.DataPropertyName = "ric"
-            Me._ricCol.HeaderText = "XXX"
-            Me._ricCol.Name = "_ricCol"
-            Me._ricCol.ReadOnly = True
-            Me._ricCol.Visible = False
-            '
-            'BondshortnameDataGridViewTextBoxColumn
-            '
-            Me.BondshortnameDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.BondshortnameDataGridViewTextBoxColumn.DataPropertyName = "bondshortname"
-            Me.BondshortnameDataGridViewTextBoxColumn.HeaderText = "Bond"
-            Me.BondshortnameDataGridViewTextBoxColumn.Name = "BondshortnameDataGridViewTextBoxColumn"
-            Me.BondshortnameDataGridViewTextBoxColumn.ReadOnly = True
-            Me.BondshortnameDataGridViewTextBoxColumn.Width = 57
-            '
-            'ColumnDescr
-            '
-            Me.ColumnDescr.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill
-            Me.ColumnDescr.DataPropertyName = "descr"
-            Me.ColumnDescr.HeaderText = "Description"
-            Me.ColumnDescr.Name = "ColumnDescr"
-            Me.ColumnDescr.ReadOnly = True
-            '
-            'RicDataGridViewTextBoxColumn
-            '
-            Me.RicDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.RicDataGridViewTextBoxColumn.DataPropertyName = "ric"
-            Me.RicDataGridViewTextBoxColumn.HeaderText = "RIC"
-            Me.RicDataGridViewTextBoxColumn.Name = "RicDataGridViewTextBoxColumn"
-            Me.RicDataGridViewTextBoxColumn.ReadOnly = True
-            Me.RicDataGridViewTextBoxColumn.Width = 50
-            '
-            'ColumnCurrency
-            '
-            Me.ColumnCurrency.DataPropertyName = "currency"
-            Me.ColumnCurrency.HeaderText = "Currency"
-            Me.ColumnCurrency.Name = "ColumnCurrency"
-            Me.ColumnCurrency.ReadOnly = True
-            '
-            'issname
-            '
-            Me.issname.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.issname.DataPropertyName = "issname"
-            Me.issname.HeaderText = "Issuer"
-            Me.issname.Name = "issname"
-            Me.issname.ReadOnly = True
-            Me.issname.Width = 60
-            '
-            'ColumnIssued
-            '
-            Me.ColumnIssued.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.ColumnIssued.DataPropertyName = "issuedate"
-            Me.ColumnIssued.HeaderText = "Issued"
-            Me.ColumnIssued.Name = "ColumnIssued"
-            Me.ColumnIssued.ReadOnly = True
-            Me.ColumnIssued.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic
-            Me.ColumnIssued.Width = 63
-            '
-            'issue_size
-            '
-            Me.issue_size.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.issue_size.DataPropertyName = "issue_size"
-            DataGridViewCellStyle1.Format = "N0"
-            DataGridViewCellStyle1.NullValue = Nothing
-            Me.issue_size.DefaultCellStyle = DataGridViewCellStyle1
-            Me.issue_size.HeaderText = "Size"
-            Me.issue_size.Name = "issue_size"
-            Me.issue_size.ReadOnly = True
-            Me.issue_size.Width = 52
-            '
-            'coupon
-            '
-            Me.coupon.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.coupon.DataPropertyName = "coupon"
-            DataGridViewCellStyle2.Format = "N2"
-            Me.coupon.DefaultCellStyle = DataGridViewCellStyle2
-            Me.coupon.HeaderText = "Coupon"
-            Me.coupon.Name = "coupon"
-            Me.coupon.ReadOnly = True
-            Me.coupon.Width = 69
-            '
-            'MaturitydateDataGridViewTextBoxColumn
-            '
-            Me.MaturitydateDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells
-            Me.MaturitydateDataGridViewTextBoxColumn.DataPropertyName = "maturitydate"
-            Me.MaturitydateDataGridViewTextBoxColumn.HeaderText = "Maturity"
-            Me.MaturitydateDataGridViewTextBoxColumn.Name = "MaturitydateDataGridViewTextBoxColumn"
-            Me.MaturitydateDataGridViewTextBoxColumn.ReadOnly = True
-            Me.MaturitydateDataGridViewTextBoxColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Programmatic
-            Me.MaturitydateDataGridViewTextBoxColumn.Width = 69
-            '
-            'ColumnNextPutDate
-            '
-            Me.ColumnNextPutDate.DataPropertyName = "nextputdate"
-            Me.ColumnNextPutDate.HeaderText = "Next Put"
-            Me.ColumnNextPutDate.Name = "ColumnNextPutDate"
-            Me.ColumnNextPutDate.ReadOnly = True
-            '
-            'ColumnNextCallDate
-            '
-            Me.ColumnNextCallDate.DataPropertyName = "nextcalldate"
-            Me.ColumnNextCallDate.HeaderText = "Next Call"
-            Me.ColumnNextCallDate.Name = "ColumnNextCallDate"
-            Me.ColumnNextCallDate.ReadOnly = True
             '
             'BondSelectorForm
             '
