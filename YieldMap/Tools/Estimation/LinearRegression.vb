@@ -20,6 +20,8 @@ Namespace Tools.Estimation
         Public Shared ReadOnly NSS As New EstimationModel(EstimationType.Estimation, "NSS", "Nelson-Siegel-Svensson", True)
         Public Shared ReadOnly LinInterp As New EstimationModel(EstimationType.Interpolation, "LinInterp", "Linear interpolation", True)
         Public Shared ReadOnly CubicSpline As New EstimationModel(EstimationType.Interpolation, "CubicSpline", "Cubic spline", True)
+        Public Shared ReadOnly Vasicek As New EstimationModel(EstimationType.Estimation, "Vasicek1", "Vasicek1", False)
+        Public Shared ReadOnly Vasicek1 As New EstimationModel(EstimationType.Estimation, "Vasicek", "Vasicek curve", True)
 
         Public Shared ReadOnly DefaultModel As EstimationModel = LinInterp
 
@@ -381,6 +383,122 @@ Namespace Tools.Estimation
             Return Commons.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = avgY * NSS(anX, minimum) / 10}).ToList()
         End Function
     End Class
+
+    Public Class VasicekEstimation1
+        Private _xv, _yv As List(Of Double)
+        Private Shared _r0 As Double
+        Private _n As Double
+
+        Private Shared Function Vasicek(ByVal t As Double, ByVal p() As Double) As Double
+            Dim a = p(0), b = p(1), sigma = p(2)
+            Dim e = (1 - Math.Exp(-a * t)) / a
+            Dim res = (_r0 * e - (b - (sigma ^ 2) / (2 * a)) * (e - t) + (sigma ^ 2) * (e ^ 2) / (4 * a)) / t
+            Return res
+        End Function
+
+        Private Function VasicekCost(ByVal p() As Double) As Double
+            Dim res As Double
+            For i = 0 To _n - 1
+                res += (Vasicek(_xv(i), p) - _yv(i)) ^ 2
+            Next
+            Return Math.Sqrt(res)
+        End Function
+
+        Public Function Fit(ByVal x As List(Of Double), ByVal y As List(Of Double)) As List(Of XY)
+            ' todo calculate point at x = 0 using best regression available
+            _r0 = x(0)
+            _xv = x
+            Dim avgY = y.Average()
+            _yv = y.Select(Function(yValue) 10 * yValue / avgY).ToList()
+            _n = x.Count()
+
+            Dim vars = New OptBoundVariable() {
+               New OptBoundVariable() With {.Name = "a", .LowerBound = 0.001, .InitialGuess = 1},
+               New OptBoundVariable() With {.Name = "b", .LowerBound = 0.001, .InitialGuess = 1},
+               New OptBoundVariable() With {.Name = "sigma", .LowerBound = 0.001, .InitialGuess = 1}
+            }
+
+            Dim simplex As New Simplex
+            Dim minimum = simplex.ComputeMin(AddressOf VasicekCost, vars)
+
+            Return Commons.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = avgY * Vasicek(anX, minimum) / 10}).ToList()
+        End Function
+    End Class
+
+
+    Public Class VasicekEstimation
+        Private _xv, _yv As List(Of Double)
+        Private Shared _r0 As Double
+        Private _n As Double
+
+        Private Shared Function Vasicek(ByVal t As Double, ByVal p() As Double) As Double
+            Dim a = p(0), b = p(1), sigma = p(2)
+            Dim e = (1 - Math.Exp(-a * t)) / a
+            Dim res = (_r0 * e - (b - (sigma ^ 2) / (2 * a)) * (e - t) + (sigma ^ 2) * (e ^ 2) / (4 * a)) / t
+            Return res
+        End Function
+
+        Private Function VasicekCost(ByVal p() As Double) As Double
+            Dim res As Double
+            For i = 0 To _n - 1
+                res += (Vasicek(_xv(i), p) - _yv(i)) ^ 2
+            Next
+            Return Math.Sqrt(res)
+        End Function
+
+        Private Function VasicekCg(ByVal p() As Double) As Double()
+            Dim res(3) As Double
+            For i = 0 To _n - 1
+                Dim delta = 2 * (Vasicek(_xv(i), p) - _yv(i))
+                res(0) += delta
+                res(1) += delta * VasicekCgDa(_xv(i), p)
+                res(2) += delta * VasicekCgDb(_xv(i), p)
+                res(3) += delta * VasicekCgDs(_xv(i), p)
+            Next
+            Return res
+        End Function
+
+        Private Shared Function VasicekCgDa(ByVal t As Double, ByVal p() As Double) As Double
+            Dim a = p(0), b = p(1), sigma = p(2)
+            Dim E = Math.Exp(1)
+            Dim res = (1 / (4 * a ^ 4 * t)) * ((-4 * a ^ 3 * E ^ (a * t) * (b - _r0) * t - 3 * (-1 + E ^ (a * t)) ^ 2 * sigma ^ 2 - 2 * a * (-1 + E ^ (a * t)) * (2 * E ^ (a * t) - t) * sigma ^ 2 + 2 * a ^ 2 * E ^ (a * t) * (2 * b * (-1 + E ^ (a * t)) - 2 * (-1 + E ^ (a * t)) * _r0 + (1 + E ^ (a * t)) * t * sigma ^ 2)) / E ^ (2 * a * t))
+            Return res
+        End Function
+
+        Private Shared Function VasicekCgDb(ByVal t As Double, ByVal p() As Double) As Double
+            Dim a = p(0)
+            Dim E = Math.Exp(1)
+            Dim res = ((-1 + E ^ ((-a) * t)) / a + t) / t
+            Return res
+        End Function
+
+        Private Shared Function VasicekCgDs(ByVal t As Double, ByVal p() As Double) As Double
+            Dim a = p(0), b = p(1), sigma = p(2)
+            Dim E = Math.Exp(1)
+            Dim res = -(((-1 + 2 * (1 + a) * E ^ (a * t) + E ^ (2 * a * t) * (-1 - 2 * a + 2 * a ^ 2 * t)) * sigma) / (E ^ (2 * a * t) * (2 * a ^ 3 * t)))
+            Return res
+        End Function
+
+        Public Function Fit(ByVal x As List(Of Double), ByVal y As List(Of Double)) As List(Of XY)
+            ' todo calculate point at x = 0 using best regression available
+            _r0 = x(0)
+            _xv = x
+            Dim avgY = y.Average()
+            _yv = y.Select(Function(yValue) 10 * yValue / avgY).ToList()
+            _n = x.Count()
+
+            Dim vars = New OptBoundVariable() {
+               New OptBoundVariable() With {.Name = "a", .LowerBound = 0.001, .InitialGuess = 1},
+               New OptBoundVariable() With {.Name = "b", .LowerBound = 0.001, .InitialGuess = 1},
+               New OptBoundVariable() With {.Name = "sigma", .LowerBound = 0.001, .InitialGuess = 1}
+            }
+
+            Dim lbfgsb As New TruncatedNewton
+            Dim minimum = lbfgsb.ComputeMin(AddressOf VasicekCost, AddressOf VasicekCg, vars)
+
+            Return Commons.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = avgY * Vasicek(anX, minimum) / 10}).ToList()
+        End Function
+    End Class
 #End Region
 
 #Region "Estimator itself"
@@ -438,6 +556,10 @@ Namespace Tools.Estimation
                     _regression = fits.First(Function(fit) Math.Abs(fit.SSE - minSSE) < Epsilon).Regression
                 ElseIf _estimationModel = EstimationModel.NSS Then
                     Return (New NelsonSiegelSvensson).Fit(x, y)
+                ElseIf _estimationModel = EstimationModel.Vasicek Then
+                    Return (New VasicekEstimation).Fit(x, y)
+                ElseIf _estimationModel = EstimationModel.Vasicek1 Then
+                    Return (New VasicekEstimation1).Fit(x, y)
                 Else
                     _regression.Fit(x, y)
                 End If

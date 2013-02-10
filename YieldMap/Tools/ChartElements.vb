@@ -241,6 +241,19 @@ Namespace Tools
             End Set
         End Property
 
+        Public ReadOnly Property Label() As String
+            Get
+                Dim lab As String
+                Select Case LabelMode
+                    Case LabelMode.IssuerAndSeries : lab = MetaData.Label1
+                    Case LabelMode.IssuerCpnMat : lab = MetaData.Label2
+                    Case LabelMode.Description : lab = MetaData.Label3
+                    Case LabelMode.SeriesOnly : lab = MetaData.Label4
+                End Select
+                Label = lab
+            End Get
+        End Property
+
         Public Sub RecalculateByType(ByVal type As SpreadType)
             If _quotesAndYields.ContainsKey(_selectedQuote) Then
                 _parentGroup.Ansamble.SpreadBmk.CalcAllSpreads(_quotesAndYields(_selectedQuote), _metaData, type)
@@ -271,7 +284,7 @@ Namespace Tools
 
     Public Enum LabelMode
         IssuerAndSeries
-        ShortName
+        IssuerCpnMat
         Description
         SeriesOnly
     End Enum

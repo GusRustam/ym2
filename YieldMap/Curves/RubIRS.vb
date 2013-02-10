@@ -181,6 +181,7 @@ Namespace Curves
                                     yld = CDbl(ricAndFieldValue.Value(IIf(_quote = "BID", "393", "275")))
                                     If yld > 0 Then
                                         Descrs(ric).Yield = yld / 100
+                                        Descrs(ric).Duration = duration
                                         NotifyUpdated(Me)
                                     End If
                                 Else

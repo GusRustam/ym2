@@ -40,13 +40,24 @@ Namespace Commons
                 End Sub
         End Sub
 
+        Private Shared Function ParseMyDate(ByVal dt As String) As Date
+            Dim day = CInt(dt.Substring(0, 2))
+            Dim month = CInt(dt.Substring(3, 2))
+            Dim year = CInt(dt.Substring(6))
+
+            Return New Date(year, month, day)
+        End Function
+
         Public Shared Function GetBondInfo(ByVal ric As String) As DataBaseBondDescription
             Logger.Trace("GetBondInfo({0})", ric)
             Try
                 If _bondDescriptions.Any(Function(row) row.ric = ric) Then
                     Dim bondDescr = _bondDescriptions.First(Function(row) row.ric = ric)
-                    Dim matdate = If(bondDescr.maturitydate <> "", Date.ParseExact(bondDescr.maturitydate, "dd/MM/yyyy", CultureInfo.InvariantCulture), "")
-                    Dim issdate = If(bondDescr.issuedate <> "", Date.ParseExact(bondDescr.issuedate, "dd/MM/yyyy", CultureInfo.InvariantCulture), "")
+
+                    Dim matDate As String, issDate As String
+
+                    matDate = If(bondDescr.maturitydate <> "", ParseMyDate(bondDescr.maturitydate), Date.Today())
+                    issDate = If(bondDescr.issuedate <> "", ParseMyDate(bondDescr.issuedate), Date.Today())
                     Return New DataBaseBondDescription(ric, bondDescr.bondshortname, bondDescr.bondshortname,
                                                        matdate, bondDescr.coupon, bondDescr.payments,
                                                        bondDescr.rates, issdate, bondDescr.label1, bondDescr.label2,
@@ -392,33 +403,31 @@ Namespace Commons
                                                           Dim isConvertible = IIf(item("IsConvertible").ToUpper = "Y", 1, 0)
 
                                                           Dim issueSize As Long
-                                                          'Try
+
                                                           If IsNumeric(item("OriginalAmountIssued")) Then
                                                               issueSize = CLng(item("OriginalAmountIssued"))
                                                           Else
                                                               issueSize = -1
                                                           End If
-                                                          'Catch ex As Exception
-                                                          'issueSize = -1
-                                                          'End Try
+
 
                                                           Dim issueDate = item("IssueDate")
                                                           If IsDate(issueDate) Then
-                                                              issueDate = String.Format("{0:dd/MM/yyyy}", CDate(issueDate))
+                                                              issueDate = String.Format("{0:dd\/MM\/yyyy}", CDate(issueDate))
                                                           Else
                                                               issueDate = ""
                                                           End If
 
                                                           Dim matDate = item("MaturityDate")
                                                           If IsDate(matDate) Then
-                                                              matDate = String.Format("{0:dd/MM/yyyy}", CDate(matDate))
+                                                              matDate = String.Format("{0:dd\/MM\/yyyy}", CDate(matDate))
                                                           Else
                                                               matDate = ""
                                                           End If
 
                                                           Dim nextPutDate = item("NextPutDate")
                                                           If IsDate(nextPutDate) Then
-                                                              nextPutDate = String.Format("{0:dd/MM/yyyy}", CDate(nextPutDate))
+                                                              nextPutDate = String.Format("{0:dd\/MM\/yyyy}", CDate(nextPutDate))
                                                           Else
                                                               nextPutDate = ""
                                                           End If
@@ -432,7 +441,7 @@ Namespace Commons
 
                                                           Dim nextCallDate = item("NextCallDate")
                                                           If IsDate(nextCallDate) Then
-                                                              nextCallDate = String.Format("{0:dd/MM/yyyy}", CDate(nextCallDate))
+                                                              nextCallDate = String.Format("{0:dd\/MM\/yyyy}", CDate(nextCallDate))
                                                           Else
                                                               nextCallDate = ""
                                                           End If

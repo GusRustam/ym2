@@ -234,7 +234,7 @@ Namespace Forms.ChartForm
 
                                        End Sub
                             IssuerNameSeriesTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.IssuerAndSeries)
-                            ShortNameTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.ShortName)
+                            ShortNameTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.IssuerCpnMat)
                             DescriptionTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.Description)
                             SeriesOnlyTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.SeriesOnly)
                         ElseIf TypeOf point.Tag Is SwapCurve Then
@@ -584,7 +584,7 @@ Namespace Forms.ChartForm
                     Dim lab As String
                     Select Case dataPoint(1).LabelMode
                         Case LabelMode.IssuerAndSeries : lab = dataPoint(1).Metadata.Label1
-                        Case LabelMode.ShortName : lab = dataPoint(1).Metadata.Label2
+                        Case LabelMode.IssuerCpnMat : lab = dataPoint(1).Metadata.Label2
                         Case LabelMode.Description : lab = dataPoint(1).Metadata.Label3
                         Case LabelMode.SeriesOnly : lab = dataPoint(1).Metadata.Label4
                     End Select
@@ -1132,7 +1132,8 @@ Namespace Forms.ChartForm
                             point.MarkerStyle = IIf(fieldName <> group.CustomField,
                                                IIf(calc.Yld.ToWhat.Equals(YieldToWhat.Maturity), MarkerStyle.Circle, MarkerStyle.Triangle),
                                                MarkerStyle.Square)
-                            If ShowLabelsTSB.Checked Then point.Label = descr.MetaData.ShortName
+                            If ShowLabelsTSB.Checked Then point.Label = descr.Label
+
                         Else
                             series.Points.Remove(point)
                         End If
@@ -1197,16 +1198,8 @@ Namespace Forms.ChartForm
                 Dim bond = group.GetElement(ric)
 
                 bond.LabelMode = mode
-
-                Dim lab As String
-                Select Case bond.LabelMode
-                    Case LabelMode.IssuerAndSeries : lab = bond.MetaData.Label1
-                    Case LabelMode.ShortName : lab = bond.MetaData.Label2
-                    Case LabelMode.Description : lab = bond.MetaData.Label3
-                    Case LabelMode.SeriesOnly : lab = bond.MetaData.Label4
-                End Select
                 If ShowLabelsTSB.Checked Then
-                    TheChart.Series.FindByName(group.SeriesName).Points.First(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric).Label = lab
+                    TheChart.Series.FindByName(group.SeriesName).Points.First(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric).Label = bond.Label
                 End If
             Catch ex As Exception
                 Logger.WarnException("Failed to set label mode", ex)
@@ -1219,7 +1212,7 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub ShortNameTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles ShortNameTSMI.Click
-            SetLabel(BondCMS.Tag, LabelMode.ShortName)
+            SetLabel(BondCMS.Tag, LabelMode.IssuerCpnMat)
         End Sub
 
         Private Sub DescriptionTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles DescriptionTSMI.Click
@@ -1238,16 +1231,9 @@ Namespace Forms.ChartForm
                     TheChart.Series.FindByName(group.SeriesName).Points.ToList.ForEach(
                         Sub(pnt)
                             Try
-                                Dim md = CType(pnt.Tag, Bond).MetaData
-                                Dim lab As String
-                                Select Case mode
-                                    Case LabelMode.IssuerAndSeries : lab = md.Label1
-                                    Case LabelMode.ShortName : lab = md.Label2
-                                    Case LabelMode.Description : lab = md.Label3
-                                    Case LabelMode.SeriesOnly : lab = md.Label4
-                                End Select
-                                pnt.Label = lab
-
+                                Dim bond = CType(pnt.Tag, Bond)
+                                bond.LabelMode = mode
+                                pnt.Label = bond.Label
                             Catch ex As Exception
                                 Logger.WarnException("Failed to set label mode for point " & pnt.Tag, ex)
                                 Logger.Warn("Exception = {0}", ex)
@@ -1268,6 +1254,10 @@ Namespace Forms.ChartForm
 
         Private Sub SeriesDescriptionTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SeriesDescriptionTSMI.Click
             SetSeriesLabel(BondSetCMS.Tag, LabelMode.Description)
+        End Sub
+
+        Private Sub IssuerCouponMaturityTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles IssuerCouponMaturityTSMI.Click
+            SetSeriesLabel(BondSetCMS.Tag, LabelMode.IssuerCpnMat)
         End Sub
     End Class
 End Namespace
