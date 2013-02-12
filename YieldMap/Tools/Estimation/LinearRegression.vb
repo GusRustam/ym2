@@ -467,7 +467,6 @@ Namespace Tools.Estimation
             Return Math.Sqrt(res)
         End Function
 
-
         Private Function CIRCostRel(ByVal p() As Double, ByRef f As Func(Of Double, Double))
             Dim res As Double
             For i = 0 To _n - 1
@@ -504,7 +503,6 @@ Namespace Tools.Estimation
             Else
                 Return Commons.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = ymin + (ymax - ymin) * CIR(anX, minByRange)}).ToList()
             End If
-
         End Function
     End Class
 

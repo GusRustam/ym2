@@ -658,18 +658,41 @@ Namespace Forms.ChartForm
             If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then RunCommand("reuters://REALTIME/verb=RelatedGraph/ric=" + BondCMS.Tag.ToString())
         End Sub
 
-        Private Sub ShowCurveItemsTSMIClick(sender As Object, e As EventArgs) Handles ShowCurveItemsTSMI.Click
-            Dim theCurve = _moneyMarketCurves.First(Function(curve) curve.GetName() = CStr(MoneyCurveCMS.Tag))
+
+
+        Private Sub ShowCurveItemsTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles ShowCurveItemsTSMI.Click
+            Dim aTable As DataGridView
+            Dim theCurve As SwapCurve
+            Dim aForm As Form
+
+            theCurve = _moneyMarketCurves.First(Function(curve) curve.GetName() = CStr(MoneyCurveCMS.Tag))
+
             Dim aCurve = theCurve.GetSnapshot()
 
-            Dim aForm = New Form With {
+            aForm = New Form With {
                 .Text = "Curve items",
                 .Width = 400,
                 .Height = 400,
                 .FormBorderStyle = FormBorderStyle.Sizable
             }
 
-            Dim aTable = New DataGridView
+            Dim tl As New TableLayoutPanel
+            tl.RowCount = 2
+            tl.RowStyles.Add(New RowStyle(SizeType.Absolute, 30))
+            tl.RowStyles.Add(New RowStyle(SizeType.AutoSize))
+            tl.Dock = DockStyle.Fill
+            aForm.Controls.Add(tl)
+
+            Dim aToolBar = New ToolStrip
+            aToolBar.Dock = DockStyle.Fill
+            Dim addButton = aToolBar.Items.Add("Add items...")
+            addButton.Enabled = TypeOf theCurve Is YieldCurve
+            Dim removeButton = aToolBar.Items.Add("Remove selected")
+            removeButton.Enabled = TypeOf theCurve Is YieldCurve
+
+            tl.Controls.Add(aToolBar, 0, 0)
+
+            aTable = New DataGridView
             aTable.AutoGenerateColumns = False
             aTable.AllowUserToAddRows = False
             aTable.AllowUserToDeleteRows = False
@@ -689,63 +712,136 @@ Namespace Forms.ChartForm
             aTable.Columns("Duration").DefaultCellStyle = New DataGridViewCellStyle() With {.Format = "N2"}
 
             aCurve.ForEach(Sub(item) aTable.Rows.Add(New Object() {item.Item1, item.Item2, item.Item3, item.Item4}))
-
-            aForm.Controls.Add(aTable)
             aTable.Dock = DockStyle.Fill
 
-            Dim remHandler =
-                Sub()
-                    Try
+            tl.Controls.Add(aTable, 0, 1)
 
-
-                        If aTable.SelectedRows.Count > 0 Then
-                            If aTable.SelectedRows.Count >= aTable.Rows.Count - 1 Then
-                                If MessageBox.Show("This will delete the curve. Would you like to continue?", "Remove the curve",
-                                                   MessageBoxButtons.YesNo, MessageBoxIcon.Question) = MsgBoxResult.Yes Then
-                                    ' todo curve MUST HAVE DELETE METHOD WHICH WILL CLEAN IT UP AND RAISE EVENT TO CLEAR CHART
-
-                                    ' deleting whole curve
-                                    Dim irsSeries = TheChart.Series.FindByName(theCurve.GetName())
-                                    If irsSeries IsNot Nothing Then TheChart.Series.Remove(irsSeries)
-                                    _moneyMarketCurves.Remove(theCurve)
-
-                                    theCurve.Cleanup()
-                                    SetChartMinMax()
-                                    aForm.Close()
-                                End If
-                            Else
-                                ' deleting selected items
-                                Dim toDelete As New List(Of String)
-                                For Each rw As DataGridViewRow In aTable.SelectedRows
-                                    toDelete.Add(rw.Cells("RIC").Value)
-                                Next
-                                If Not theCurve.RemoveItems(toDelete) Then
-                                    MessageBox.Show("Failed to delete selected items", "Remove items", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                                End If
-                                Dim crv = theCurve.GetSnapshot()
-                                aTable.Rows.Clear()
-                                crv.ForEach(Sub(item) aTable.Rows.Add(New Object() {item.Item1, item.Item2, item.Item3, item.Item4}))
-                            End If
-                        Else
-                            MessageBox.Show("No items selected", "Remove curve items", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                        End If
-                    Catch ex As Exception
-                        Logger.ErrorException("Failed to delete items from curve", ex)
-                        Logger.Error("Exception = {0}", ex)
-                    End Try
-                End Sub
+            Dim rmHandler = GetRemoveHandler(aForm, aTable, theCurve)
+            AddHandler removeButton.Click, rmHandler
+            AddHandler addButton.Click, GetAddHandler(theCurve)
 
             AddHandler aTable.RowHeaderMouseClick,
                 Sub(sender1 As Object, args As MouseEventArgs)
+                    If Not TypeOf theCurve Is YieldCurve Then Return
+
                     If args.Button = MouseButtons.Right Then
                         Dim cms As New ContextMenuStrip
                         Dim removeItemTSMI = cms.Items.Add("Remove item from curve")
-                        AddHandler removeItemTSMI.Click, remHandler
+                        AddHandler removeItemTSMI.Click, rmHandler
                         cms.Show(MousePosition)
                     End If
                 End Sub
             aForm.ShowDialog()
         End Sub
+
+        Private Function GetAddHandler(ByVal swapCurve As SwapCurve) As EventHandler
+            Return Sub()
+                       Dim aForm = New Form With {
+                            .Text = "Select one or more items to add",
+                            .Width = 400,
+                            .Height = 400,
+                            .FormBorderStyle = FormBorderStyle.Sizable
+                       }
+
+                       Dim tl As New TableLayoutPanel
+                       tl.RowCount = 2
+                       tl.RowStyles.Add(New RowStyle(SizeType.Percent, 100))
+                       tl.RowStyles.Add(New RowStyle(SizeType.Absolute, 30))
+                       tl.Dock = DockStyle.Fill
+                       tl.ColumnCount = 2
+                       tl.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 50))
+                       tl.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 50))
+                       aForm.Controls.Add(tl)
+
+                       Dim lst As New ListBox
+                       lst.SelectionMode = SelectionMode.MultiExtended
+
+                       Dim allItems = swapCurve.GetOriginalRICs()
+                       Dim existingItems = swapCurve.GetCurrentRICs()
+                       For Each item In existingItems
+                           allItems.Remove(item)
+                       Next
+                       For Each item In allItems
+                           lst.Items.Add(item)
+                       Next
+
+                       lst.Dock = DockStyle.Fill
+                       tl.Controls.Add(lst, 0, 0)
+                       tl.SetColumnSpan(lst, 2)
+
+                       Dim selectedItems As New List(Of String)
+
+                       Dim okButt As New Button
+                       okButt.Text = "OK"
+                       AddHandler okButt.Click,
+                           Sub()
+                               If lst.SelectedItems.Count = 0 Then
+                                   If MessageBox.Show("No items selected! Would you like to continure selecting items?", "Adding items into curve", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = MsgBoxResult.No Then
+                                       aForm.DialogResult = DialogResult.Cancel
+                                       aForm.Close()
+                                   End If
+                               Else
+                                   For Each item In lst.SelectedItems
+                                       selectedItems.Add(item)
+                                   Next
+                                   aForm.DialogResult = DialogResult.OK
+                                   aForm.Close()
+                               End If
+                           End Sub
+                       tl.Controls.Add(okButt, 0, 1)
+
+                       Dim cncButt As New Button
+                       cncButt.Text = "Cancel"
+                       cncButt.DialogResult = DialogResult.Cancel
+                       cncButt.Dock = DockStyle.Right
+                       tl.Controls.Add(cncButt, 1, 1)
+
+                       If aForm.ShowDialog() = DialogResult.OK Then
+                           swapCurve.AddItems(selectedItems)
+                       End If
+                   End Sub
+        End Function
+
+        Private Function GetRemoveHandler(ByVal aForm As Form, ByVal aTable As DataGridView, ByVal theCurve As SwapCurve) As EventHandler
+            Return Sub(sender As Object, args As EventArgs)
+                       Try
+                           If aTable.SelectedRows.Count > 0 Then
+                               If aTable.SelectedRows.Count >= aTable.Rows.Count - 1 Then
+                                   If MessageBox.Show("This will delete the curve. Would you like to continue?", "Remove the curve",
+                                                      MessageBoxButtons.YesNo, MessageBoxIcon.Question) = MsgBoxResult.Yes Then
+                                       ' todo curve MUST HAVE DELETE METHOD WHICH WILL CLEAN IT UP AND RAISE EVENT TO CLEAR CHART
+
+                                       ' deleting whole curve
+                                       Dim irsSeries = TheChart.Series.FindByName(theCurve.GetName())
+                                       If irsSeries IsNot Nothing Then TheChart.Series.Remove(irsSeries)
+                                       _moneyMarketCurves.Remove(theCurve)
+
+                                       theCurve.Cleanup()
+                                       SetChartMinMax()
+                                       aForm.Close()
+                                   End If
+                               Else
+                                   ' deleting selected items
+                                   Dim toDelete As New List(Of String)
+                                   For Each rw As DataGridViewRow In aTable.SelectedRows
+                                       toDelete.Add(rw.Cells("RIC").Value)
+                                   Next
+                                   If Not theCurve.RemoveItems(toDelete) Then
+                                       MessageBox.Show("Failed to delete selected items", "Remove items", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                                   End If
+                                   Dim crv = theCurve.GetSnapshot()
+                                   aTable.Rows.Clear()
+                                   crv.ForEach(Sub(item) aTable.Rows.Add(New Object() {item.Item1, item.Item2, item.Item3, item.Item4}))
+                               End If
+                           Else
+                               MessageBox.Show("No items selected", "Remove curve items", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                           End If
+                       Catch ex As Exception
+                           Logger.ErrorException("Failed to delete items from curve", ex)
+                           Logger.Error("Exception = {0}", ex)
+                       End Try
+                   End Sub
+        End Function
 
         Private Sub AsTableTSBClick(ByVal sender As Object, ByVal e As EventArgs) Handles AsTableTSB.Click
             Dim bondsToShow As New List(Of BondDescr)
@@ -777,20 +873,19 @@ Namespace Forms.ChartForm
                 End Sub)
             _tableForm.Bonds = bondsToShow
             _tableForm.ShowDialog()
-            
         End Sub
 
-        Private Sub LinkSpreadLabelLinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles SpreadLinkLabel.LinkClicked
+        Private Sub LinkSpreadLabelLinkClicked(ByVal sender As Object, ByVal e As LinkLabelLinkClickedEventArgs) Handles SpreadLinkLabel.LinkClicked
             ShowCurveCMS("PointSpread",
                 If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadType.PointSpread), _spreadBenchmarks.Benchmarks(SpreadType.PointSpread), Nothing))
         End Sub
 
-        Private Sub ZSpreadLinkLabelLinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles ZSpreadLinkLabel.LinkClicked
+        Private Sub ZSpreadLinkLabelLinkClicked(ByVal sender As Object, ByVal e As LinkLabelLinkClickedEventArgs) Handles ZSpreadLinkLabel.LinkClicked
             ShowCurveCMS("ZSpread",
                 If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadType.ZSpread), _spreadBenchmarks.Benchmarks(SpreadType.ZSpread), Nothing))
         End Sub
 
-        Private Sub ASWLinkLabelLinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles ASWLinkLabel.LinkClicked
+        Private Sub ASWLinkLabelLinkClicked(ByVal sender As Object, ByVal e As LinkLabelLinkClickedEventArgs) Handles ASWLinkLabel.LinkClicked
             Dim refCurve = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadType.ASWSpread), _spreadBenchmarks.Benchmarks(SpreadType.ASWSpread), Nothing)
             SpreadCMS.Items.Clear()
             SpreadCMS.Tag = "ASWSpread"
@@ -809,7 +904,7 @@ Namespace Forms.ChartForm
             SpreadCMS.Show(MousePosition)
         End Sub
 
-        Private Sub CurvesTSMIDropDownOpening(sender As Object, e As EventArgs) Handles CurvesTSMI.DropDownOpening
+        Private Sub CurvesTSMIDropDownOpening(ByVal sender As Object, ByVal e As EventArgs) Handles CurvesTSMI.DropDownOpening
             BondCurvesTSMI.DropDownItems.Clear()
             Dim chainTA As New chainTableAdapter
             Dim chainCurves = chainTA.GetData.Where(Function(row) row.curve).Select(
@@ -834,7 +929,7 @@ Namespace Forms.ChartForm
             DoAdd(hawserCurves)
         End Sub
 
-        Private Sub AddBondCurveTSMIClick(sender As Object, e As EventArgs)
+        Private Sub AddBondCurveTSMIClick(ByVal sender As Object, ByVal e As EventArgs)
             Logger.Info("AddBondCurveTSMIClick")
             Dim selectedItem = CType(CType(sender, ToolStripMenuItem).Tag, CurveDescr)
             Dim ricsInCurve As List(Of String)
@@ -877,10 +972,9 @@ Namespace Forms.ChartForm
 
             _moneyMarketCurves.Add(newCurve)
             newCurve.Subscribe()
-
         End Sub
 
-        Private Sub SelDateTSMIClick(sender As Object, e As EventArgs) Handles SelDateTSMI.Click
+        Private Sub SelDateTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles SelDateTSMI.Click
             Logger.Debug("SelDateTSMI_Click()")
             Dim datePicker = New DatePickerForm
             If datePicker.ShowDialog() = DialogResult.OK Then
@@ -894,7 +988,7 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub DeleteMmCurveTSMIClick(sender As Object, e As EventArgs) Handles DeleteMMCurveTSMI.Click
+        Private Sub DeleteMmCurveTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles DeleteMMCurveTSMI.Click
             Logger.Debug("DeleteMmCurveTSMIClick()")
             Dim curves = _moneyMarketCurves.Where(Function(item) item.GetName() = MoneyCurveCMS.Tag.ToString())
             If curves.Count = 0 Then
@@ -910,7 +1004,7 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub BootstrapTSMIClick(sender As Object, e As EventArgs) Handles BootstrapTSMI.Click
+        Private Sub BootstrapTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles BootstrapTSMI.Click
             Logger.Debug("BootstrapTSMIClick()")
             Dim snd = CType(sender, ToolStripMenuItem)
             Dim curve = _moneyMarketCurves.First(Function(item) item.GetName() = MoneyCurveCMS.Tag.ToString())
@@ -918,7 +1012,7 @@ Namespace Forms.ChartForm
             If curve.BootstrappingEnabled() Then curve.SetBootstrapped(snd.Checked)
         End Sub
 
-        Private Sub OnBrokerSelected(sender As Object, e As EventArgs)
+        Private Sub OnBrokerSelected(ByVal sender As Object, ByVal e As EventArgs)
             Logger.Debug("OnBrokerSelected()")
             Dim snd = CType(sender, ToolStripMenuItem)
             Dim curve = _moneyMarketCurves.First(Function(item) item.GetName() = MoneyCurveCMS.Tag.ToString())
@@ -927,7 +1021,7 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub OnQuoteSelected(sender As Object, e As EventArgs)
+        Private Sub OnQuoteSelected(ByVal sender As Object, ByVal e As EventArgs)
             Logger.Debug("OnQuoteSelected()")
             Dim snd = CType(sender, ToolStripMenuItem)
             Dim curve = _moneyMarketCurves.First(Function(item) item.GetName() = MoneyCurveCMS.Tag.ToString())
@@ -964,16 +1058,14 @@ Namespace Forms.ChartForm
         Private Sub RemoveFromChartTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RemoveFromChartTSMI.Click
             If _ansamble.HasGroupById(BondSetCMS.Tag) Then
                 _ansamble.RemoveGroup(BondSetCMS.Tag)
-                'Else
-                '    _ansamble.RemoveCurve(BondSetCMS.Tag)
             End If
         End Sub
 
-        Private Sub RemovePointTSMIClick(sender As Object, e As EventArgs) Handles RemovePointTSMI.Click
+        Private Sub RemovePointTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RemovePointTSMI.Click
             _ansamble.RemovePoint(BondCMS.Tag.ToString())
         End Sub
 
-        Private Sub ShowHistoryTSMIClick(sender As Object, e As EventArgs) Handles ShowHistoryTSMI.Click
+        Private Sub ShowHistoryTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles ShowHistoryTSMI.Click
             Logger.Trace("ShowHistQuotesTSMIClick")
             Try
                 Dim historyLoader As New HistoryLoadManager_v2

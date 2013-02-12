@@ -77,6 +77,10 @@ Namespace Curves
             Return False
         End Function
 
+        Public Overrides Sub AddItems(ByVal rics As List(Of String))
+            Return
+        End Sub
+
         ''' <summary>
         ''' Return full list of rics to be loaded
         ''' </summary>
@@ -159,6 +163,10 @@ Namespace Curves
                 Logger.Warn("No data!")
             End If
         End Sub
+
+        Public Overrides Function GetOriginalRICs() As List(Of String)
+            Return GetRICs("")
+        End Function
 
         Public Overrides Function GetCurrentRICs() As List(Of String)
             Return GetRICs(GetBroker())

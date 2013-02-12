@@ -90,9 +90,6 @@ Namespace Forms.ChartForm
                 CheckFit(EstimationModel.CubicSpline, fitModes, currFit, CubicSplineTSMI)
                 CheckFit(EstimationModel.Vasicek, fitModes, currFit, VasicekCurveTSMI)
                 CheckFit(EstimationModel.CoxIngersollRoss, fitModes, currFit, CIRCurveTSMI)
-                'FitTSMI.DropDownItems.Clear()
-                'Dim currFit = curve.GetFitMode()
-                'fitModes.ToList.ForEach(Sub(fit) AddItem(fit.FullName, (fit = currFit), FitTSMI, AddressOf OnFitSelected, fit.ItemName))
             End If
 
             If curve.BootstrappingEnabled Then
@@ -470,8 +467,7 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub CurveDeleted(ByVal obj As SwapCurve)
-            'If (_moneyMarketCurves.Contains(obj)) Then _moneyMarketCurves.Remove(obj)
+        Private Shared Sub CurveDeleted(ByVal obj As SwapCurve)
         End Sub
     End Class
 End Namespace

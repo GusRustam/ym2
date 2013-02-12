@@ -55,9 +55,11 @@ Namespace Curves
         Protected MustOverride Sub OnHistoricalData(ByVal hst As HistoryLoadManager, ByVal ric As String, ByVal datastatus As RT_DataStatus, ByVal data As Dictionary(Of Date, HistoricalItem))
 
         '' ============ ITEMS ============
+        Public MustOverride Function GetOriginalRICs() As List(Of String)
         Public MustOverride Function GetCurrentRICs() As List(Of String)
         Public MustOverride Function RemoveItem(ByVal ric As String) As Boolean
         Public MustOverride Function RemoveItems(ByVal ric As List(Of String)) As Boolean
+        Public MustOverride Sub AddItems(ByVal rics As List(Of String))
 
         Protected MustOverride Function GetRICs(ByVal broker As String) As List(Of String)
 
@@ -198,5 +200,6 @@ Namespace Curves
             RaiseEvent Recalculated(curve)
         End Sub
 #End Region
+
     End Class
 End Namespace

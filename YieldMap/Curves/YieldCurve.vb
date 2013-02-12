@@ -28,12 +28,17 @@ Namespace Curves
 
         Private ReadOnly _fieldNames As Dictionary(Of QuoteSource, String)
         Private _estimationModel As EstimationModel = EstimationModel.DefaultModel
+        Private ReadOnly _originalRics As List(Of String)
 
         Public Sub New(ByVal fullname As String, ByVal rics As List(Of String), ByVal clr As String, ByVal fieldNames As Dictionary(Of QuoteSource, String), ByVal bmk As SpreadContainer)
             MyBase.New(bmk)
             _name = Guid.NewGuid.ToString()
             _fullname = fullname
             _color = Color.FromName(clr)
+            _originalRics = New List(Of String)
+            For Each ric In rics
+                _originalRics.Add(ric)
+            Next
 
             rics.ForEach(
                 Sub(ric)
@@ -178,8 +183,16 @@ Namespace Curves
             End Try
         End Sub
 
+        Public Overrides Function GetOriginalRICs() As List(Of String)
+            Dim res As New List(Of String)
+            For Each ric In _originalRics
+                res.Add(ric)
+            Next
+            Return res
+        End Function
+
         Public Overrides Function GetCurrentRICs() As List(Of String)
-            Return Descrs.Keys.ToList()
+            Return _meta.Keys.ToList()
         End Function
 
         Public Overrides Function RemoveItem(ByVal ric As String) As Boolean
@@ -197,6 +210,21 @@ Namespace Curves
             NotifyUpdated(Me)
             Return True
         End Function
+
+        Public Overrides Sub AddItems(ByVal rics As List(Of String))
+            rics.ForEach(
+                Sub(ric)
+                    Dim meta = DbInitializer.GetBondInfo(ric)
+                    If meta IsNot Nothing Then
+                        _meta.Add(ric, meta)
+                    Else
+                        Logger.Error("No description for ric {0} found", ric)
+                    End If
+                End Sub)
+            Cleanup()
+            NotifyUpdated(Me)
+            Subscribe()
+        End Sub
 
         Public Overrides Sub Cleanup()
             _quoteLoader.DiscardTask(_name)
