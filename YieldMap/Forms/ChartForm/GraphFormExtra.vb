@@ -75,12 +75,24 @@ Namespace Forms.ChartForm
 
             Dim fitModes = curve.GetFitModes()
             If fitModes.Count() <= 1 Then
-                FitTSMI.Visible = False
+                FitTSMI.Enabled = False
             Else
-                FitTSMI.Visible = True
-                FitTSMI.DropDownItems.Clear()
+                FitTSMI.Enabled = True
                 Dim currFit = curve.GetFitMode()
-                fitModes.ToList.ForEach(Sub(fit) AddItem(fit.FullName, (fit = currFit), FitTSMI, AddressOf OnFitSelected, fit.ItemName))
+
+                CheckFit(EstimationModel.Lin, fitModes, currFit, LinearRegressionTSMI)
+                CheckFit(EstimationModel.Log, fitModes, currFit, LogarithmicRegressionTSMI)
+                CheckFit(EstimationModel.Inv, fitModes, currFit, InverseRegressionTSMI)
+                CheckFit(EstimationModel.Pow, fitModes, currFit, PowerRegressionTSMI)
+                CheckFit(EstimationModel.Poly6, fitModes, currFit, Poly6RegressionTSMI)
+                CheckFit(EstimationModel.NSS, fitModes, currFit, NelsonSiegelSvenssonTSMI)
+                CheckFit(EstimationModel.LinInterp, fitModes, currFit, LinearInterpolationTSMI)
+                CheckFit(EstimationModel.CubicSpline, fitModes, currFit, CubicSplineTSMI)
+                CheckFit(EstimationModel.Vasicek, fitModes, currFit, VasicekCurveTSMI)
+                CheckFit(EstimationModel.CoxIngersollRoss, fitModes, currFit, CIRCurveTSMI)
+                'FitTSMI.DropDownItems.Clear()
+                'Dim currFit = curve.GetFitMode()
+                'fitModes.ToList.ForEach(Sub(fit) AddItem(fit.FullName, (fit = currFit), FitTSMI, AddressOf OnFitSelected, fit.ItemName))
             End If
 
             If curve.BootstrappingEnabled Then
@@ -90,6 +102,14 @@ Namespace Forms.ChartForm
             Else
                 BootstrapTSMI.Enabled = False
                 BootstrapTSMI.Visible = False
+            End If
+        End Sub
+
+        Private Shared Sub CheckFit(ByVal fit As EstimationModel, ByVal modes As EstimationModel(), ByVal curModel As EstimationModel, ByVal item As ToolStripMenuItem)
+            If modes.Contains(fit) Then
+                item.Visible = True
+                item.Checked = (curModel = fit)
+                item.Tag = fit
             End If
         End Sub
 
@@ -448,6 +468,10 @@ Namespace Forms.ChartForm
 
                     End Sub)
             End If
+        End Sub
+
+        Private Sub CurveDeleted(ByVal obj As SwapCurve)
+            'If (_moneyMarketCurves.Contains(obj)) Then _moneyMarketCurves.Remove(obj)
         End Sub
     End Class
 End Namespace

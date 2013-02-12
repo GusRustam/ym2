@@ -20,8 +20,8 @@ Namespace Tools.Estimation
         Public Shared ReadOnly NSS As New EstimationModel(EstimationType.Estimation, "NSS", "Nelson-Siegel-Svensson", True)
         Public Shared ReadOnly LinInterp As New EstimationModel(EstimationType.Interpolation, "LinInterp", "Linear interpolation", True)
         Public Shared ReadOnly CubicSpline As New EstimationModel(EstimationType.Interpolation, "CubicSpline", "Cubic spline", True)
-        Public Shared ReadOnly Vasicek As New EstimationModel(EstimationType.Estimation, "Vasicek1", "Vasicek1", False)
-        Public Shared ReadOnly Vasicek1 As New EstimationModel(EstimationType.Estimation, "Vasicek", "Vasicek curve", True)
+        Public Shared ReadOnly Vasicek As New EstimationModel(EstimationType.Estimation, "Vasicek", "Vasicek curve", True)
+        Public Shared ReadOnly CoxIngersollRoss As New EstimationModel(EstimationType.Estimation, "CIR", "CIR curve", True)
 
         Public Shared ReadOnly DefaultModel As EstimationModel = LinInterp
 
@@ -112,7 +112,7 @@ Namespace Tools.Estimation
         Protected A As Double
         Protected B As Double
 
-        Public Overridable Function Fit(x As List(Of Double), y As List(Of Double)) As Double
+        Public Overridable Function Fit(ByVal x As List(Of Double), ByVal y As List(Of Double)) As Double
             Dim len As Integer = x.Count
 
             Dim ss As Double = len
@@ -146,7 +146,7 @@ Namespace Tools.Estimation
             Return Math.Sqrt(res)
         End Function
 
-        Public Overridable Function Estimate(x As Double) As Double
+        Public Overridable Function Estimate(ByVal x As Double) As Double
             Return A + B * x
         End Function
 
@@ -158,7 +158,7 @@ Namespace Tools.Estimation
     Public NotInheritable Class LogLinearRegression
         Inherits LinearRegression
 
-        Public Overrides Function Fit(x As List(Of Double), y As List(Of Double)) As Double
+        Public Overrides Function Fit(ByVal x As List(Of Double), ByVal y As List(Of Double)) As Double
             Dim logX As List(Of Double) = (From val In x Select Math.Log(1 + val)).ToList()
             MyBase.Fit(logX, y)
 
@@ -170,7 +170,7 @@ Namespace Tools.Estimation
             Return Math.Sqrt(res)
         End Function
 
-        Public Overrides Function Estimate(x As Double) As Double
+        Public Overrides Function Estimate(ByVal x As Double) As Double
             Return A + B * Math.Log(1 + x)
         End Function
 
@@ -182,7 +182,7 @@ Namespace Tools.Estimation
     Public NotInheritable Class PowerRegression
         Inherits LinearRegression
 
-        Public Overrides Function Fit(x As List(Of Double), y As List(Of Double)) As Double
+        Public Overrides Function Fit(ByVal x As List(Of Double), ByVal y As List(Of Double)) As Double
             Dim logY As List(Of Double) = (From val In y Select Math.Log(val)).ToList()
             MyBase.Fit(x, logY)
 
@@ -194,7 +194,7 @@ Namespace Tools.Estimation
             Return Math.Sqrt(res)
         End Function
 
-        Public Overrides Function Estimate(x As Double) As Double
+        Public Overrides Function Estimate(ByVal x As Double) As Double
             Return Math.Exp(A + B * x)
             ' y = a * b^x => ln(y) = ln(a) + ln(b)x = a' + b'x => y = exp(a'+b'x)
         End Function
@@ -207,7 +207,7 @@ Namespace Tools.Estimation
     Public NotInheritable Class InverseRegression
         Inherits LinearRegression
 
-        Public Overrides Function Fit(x As List(Of Double), y As List(Of Double)) As Double
+        Public Overrides Function Fit(ByVal x As List(Of Double), ByVal y As List(Of Double)) As Double
             Dim invY As List(Of Double) = (From val In y Select 1 / val).ToList()
             MyBase.Fit(x, invY)
 
@@ -219,7 +219,7 @@ Namespace Tools.Estimation
             Return Math.Sqrt(res)
         End Function
 
-        Public Overrides Function Estimate(x As Double) As Double
+        Public Overrides Function Estimate(ByVal x As Double) As Double
             Return 1 / (A + B * x)
         End Function
 
@@ -404,101 +404,110 @@ Namespace Tools.Estimation
             Return Math.Sqrt(res)
         End Function
 
-        Public Function Fit(ByVal x As List(Of Double), ByVal y As List(Of Double)) As List(Of XY)
-            ' todo calculate point at x = 0 using best regression available
-            _r0 = x(0)
-            _xv = x
-            Dim avgY = y.Average()
-            _yv = y.Select(Function(yValue) 10 * yValue / avgY).ToList()
-            _n = x.Count()
-
-            Dim vars = New OptBoundVariable() {
-               New OptBoundVariable() With {.Name = "a", .LowerBound = 0.001, .InitialGuess = 1},
-               New OptBoundVariable() With {.Name = "b", .LowerBound = 0.001, .InitialGuess = 1},
-               New OptBoundVariable() With {.Name = "sigma", .LowerBound = 0.001, .InitialGuess = 1}
-            }
-
-            Dim simplex As New Simplex
-            Dim minimum = simplex.ComputeMin(AddressOf VasicekCost, vars)
-
-            Return Commons.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = avgY * Vasicek(anX, minimum) / 10}).ToList()
-        End Function
-    End Class
-
-
-    Public Class VasicekEstimation
-        Private _xv, _yv As List(Of Double)
-        Private Shared _r0 As Double
-        Private _n As Double
-
-        Private Shared Function Vasicek(ByVal t As Double, ByVal p() As Double) As Double
-            Dim a = p(0), b = p(1), sigma = p(2)
-            Dim e = (1 - Math.Exp(-a * t)) / a
-            Dim res = (_r0 * e - (b - (sigma ^ 2) / (2 * a)) * (e - t) + (sigma ^ 2) * (e ^ 2) / (4 * a)) / t
-            Return res
-        End Function
-
-        Private Function VasicekCost(ByVal p() As Double) As Double
+        Private Function VasicekCostRel(ByVal p() As Double, ByRef f As Func(Of Double, Double))
             Dim res As Double
             For i = 0 To _n - 1
-                res += (Vasicek(_xv(i), p) - _yv(i)) ^ 2
+                res += (f(Vasicek(_xv(i), p)) - f(_yv(i))) ^ 2
             Next
             Return Math.Sqrt(res)
         End Function
 
-        Private Function VasicekCg(ByVal p() As Double) As Double()
-            Dim res(3) As Double
+        Public Function Fit(ByVal x As List(Of Double), ByVal y As List(Of Double)) As List(Of XY)
+            ' todo calculate point at x = 0 using best regression available
+            _r0 = x(0)
+            _xv = x
+            _n = x.Count()
+
+            Dim simplex As New Simplex
+            Dim vars = New OptBoundVariable() {
+                New OptBoundVariable() With {.Name = "a", .LowerBound = 0.001, .InitialGuess = 0.1},
+                New OptBoundVariable() With {.Name = "b", .LowerBound = 0.001, .InitialGuess = 0.1},
+                New OptBoundVariable() With {.Name = "sigma", .LowerBound = 0.001, .InitialGuess = 0.1}
+            }
+
+            Dim ymin = y.Min(), ymax = y.Max()
+            _yv = y.Select(Function(yValue) (yValue - ymin) / (ymax - ymin)).ToList()
+            Dim minByRange = Simplex.ComputeMin(AddressOf VasicekCost, vars)
+            Dim valByRange = VasicekCostRel(minByRange, Function(val) ymin + (ymax - ymin) * val)
+
+            Dim yavg = y.Average()
+            _yv = y.Select(Function(yValue) 10 * yValue / yavg).ToList()
+            Dim minByAvg = Simplex.ComputeMin(AddressOf VasicekCost, vars)
+            Dim valByAvg = VasicekCostRel(minByAvg, Function(val) yavg * val / 10)
+
+            If valByAvg < valByRange Then
+                Return Commons.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = yavg * Vasicek(anX, minByAvg) / 10}).ToList()
+            Else
+                Return Commons.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = ymin + (ymax - ymin) * Vasicek(anX, minByRange)}).ToList()
+            End If
+        End Function
+    End Class
+
+    Public Class CoxIngersollRossEstimation
+        Private _xv, _yv As List(Of Double)
+        Private Shared _r0 As Double
+        Private _n As Double
+
+        Private Shared Function CIR(ByVal t As Double, ByVal p() As Double) As Double
+            Dim a = p(0), b = p(1), sigma = p(2)
+            Dim gamma = Math.Sqrt(a ^ 2 + 2 * sigma ^ 2)
+            Dim e = Math.Exp(gamma * t) - 1
+
+            Dim bigB = 2 * e / ((gamma + a) * e + 2 * gamma)
+            Dim bigA = (2 * a * b / (sigma ^ 2)) * Math.Log((2 * gamma * Math.Exp((a + gamma) * t / 2)) / ((gamma + a) * e + 2 * gamma))
+            Dim res = (_r0 * bigB - bigA) / t
+            Return res
+        End Function
+
+        Private Function CIRCost(ByVal p() As Double) As Double
+            Dim res As Double
             For i = 0 To _n - 1
-                Dim delta = 2 * (Vasicek(_xv(i), p) - _yv(i))
-                res(0) += delta
-                res(1) += delta * VasicekCgDa(_xv(i), p)
-                res(2) += delta * VasicekCgDb(_xv(i), p)
-                res(3) += delta * VasicekCgDs(_xv(i), p)
+                res += (CIR(_xv(i), p) - _yv(i)) ^ 2
             Next
-            Return res
+            Return Math.Sqrt(res)
         End Function
 
-        Private Shared Function VasicekCgDa(ByVal t As Double, ByVal p() As Double) As Double
-            Dim a = p(0), b = p(1), sigma = p(2)
-            Dim E = Math.Exp(1)
-            Dim res = (1 / (4 * a ^ 4 * t)) * ((-4 * a ^ 3 * E ^ (a * t) * (b - _r0) * t - 3 * (-1 + E ^ (a * t)) ^ 2 * sigma ^ 2 - 2 * a * (-1 + E ^ (a * t)) * (2 * E ^ (a * t) - t) * sigma ^ 2 + 2 * a ^ 2 * E ^ (a * t) * (2 * b * (-1 + E ^ (a * t)) - 2 * (-1 + E ^ (a * t)) * _r0 + (1 + E ^ (a * t)) * t * sigma ^ 2)) / E ^ (2 * a * t))
-            Return res
-        End Function
 
-        Private Shared Function VasicekCgDb(ByVal t As Double, ByVal p() As Double) As Double
-            Dim a = p(0)
-            Dim E = Math.Exp(1)
-            Dim res = ((-1 + E ^ ((-a) * t)) / a + t) / t
-            Return res
-        End Function
-
-        Private Shared Function VasicekCgDs(ByVal t As Double, ByVal p() As Double) As Double
-            Dim a = p(0), b = p(1), sigma = p(2)
-            Dim E = Math.Exp(1)
-            Dim res = -(((-1 + 2 * (1 + a) * E ^ (a * t) + E ^ (2 * a * t) * (-1 - 2 * a + 2 * a ^ 2 * t)) * sigma) / (E ^ (2 * a * t) * (2 * a ^ 3 * t)))
-            Return res
+        Private Function CIRCostRel(ByVal p() As Double, ByRef f As Func(Of Double, Double))
+            Dim res As Double
+            For i = 0 To _n - 1
+                res += (f(CIR(_xv(i), p)) - f(_yv(i))) ^ 2
+            Next
+            Return Math.Sqrt(res)
         End Function
 
         Public Function Fit(ByVal x As List(Of Double), ByVal y As List(Of Double)) As List(Of XY)
             ' todo calculate point at x = 0 using best regression available
             _r0 = x(0)
             _xv = x
-            Dim avgY = y.Average()
-            _yv = y.Select(Function(yValue) 10 * yValue / avgY).ToList()
             _n = x.Count()
 
+            Dim simplex As New Simplex
             Dim vars = New OptBoundVariable() {
-               New OptBoundVariable() With {.Name = "a", .LowerBound = 0.001, .InitialGuess = 1},
-               New OptBoundVariable() With {.Name = "b", .LowerBound = 0.001, .InitialGuess = 1},
-               New OptBoundVariable() With {.Name = "sigma", .LowerBound = 0.001, .InitialGuess = 1}
+                New OptBoundVariable() With {.Name = "a", .LowerBound = 0.001, .InitialGuess = 0.1},
+                New OptBoundVariable() With {.Name = "b", .LowerBound = 0.001, .InitialGuess = 0.1},
+                New OptBoundVariable() With {.Name = "sigma", .LowerBound = 0.001, .InitialGuess = 0.1}
             }
 
-            Dim lbfgsb As New TruncatedNewton
-            Dim minimum = lbfgsb.ComputeMin(AddressOf VasicekCost, AddressOf VasicekCg, vars)
+            Dim ymin = y.Min(), ymax = y.Max()
+            _yv = y.Select(Function(yValue) (yValue - ymin) / (ymax - ymin)).ToList()
+            Dim minByRange = simplex.ComputeMin(AddressOf CIRCost, vars)
+            Dim valByRange = CIRCostRel(minByRange, Function(val) ymin + (ymax - ymin) * val)
+            
+            Dim yavg = y.Average()
+            _yv = y.Select(Function(yValue) 10 * yValue / yavg).ToList()
+            Dim minByAvg = simplex.ComputeMin(AddressOf CIRCost, vars)
+            Dim valByAvg = CIRCostRel(minByAvg, Function(val) 10 * val / yavg)
 
-            Return Commons.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = avgY * Vasicek(anX, minimum) / 10}).ToList()
+            If valByAvg < valByRange Then
+                Return Commons.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = 10 * CIR(anX, minByAvg) / yavg}).ToList()
+            Else
+                Return Commons.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = ymin + (ymax - ymin) * CIR(anX, minByRange)}).ToList()
+            End If
+
         End Function
     End Class
+
 #End Region
 
 #Region "Estimator itself"
@@ -556,9 +565,9 @@ Namespace Tools.Estimation
                     _regression = fits.First(Function(fit) Math.Abs(fit.SSE - minSSE) < Epsilon).Regression
                 ElseIf _estimationModel = EstimationModel.NSS Then
                     Return (New NelsonSiegelSvensson).Fit(x, y)
+                ElseIf _estimationModel = EstimationModel.CoxIngersollRoss Then
+                    Return (New CoxIngersollRossEstimation).Fit(x, y)
                 ElseIf _estimationModel = EstimationModel.Vasicek Then
-                    Return (New VasicekEstimation).Fit(x, y)
-                ElseIf _estimationModel = EstimationModel.Vasicek1 Then
                     Return (New VasicekEstimation1).Fit(x, y)
                 Else
                     _regression.Fit(x, y)

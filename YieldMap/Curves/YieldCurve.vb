@@ -178,6 +178,26 @@ Namespace Curves
             End Try
         End Sub
 
+        Public Overrides Function GetCurrentRICs() As List(Of String)
+            Return Descrs.Keys.ToList()
+        End Function
+
+        Public Overrides Function RemoveItem(ByVal ric As String) As Boolean
+            _meta.Remove(ric)
+            Descrs.Remove(ric)
+            NotifyUpdated(Me)
+            Return True
+        End Function
+
+        Public Overrides Function RemoveItems(ByVal rics As List(Of String)) As Boolean
+            For Each ric In rics
+                _meta.Remove(ric)
+                Descrs.Remove(ric)
+            Next
+            NotifyUpdated(Me)
+            Return True
+        End Function
+
         Public Overrides Sub Cleanup()
             _quoteLoader.DiscardTask(_name)
             MyBase.Cleanup()
@@ -199,7 +219,7 @@ Namespace Curves
             Return Descrs.Values.Select(Function(elem) New Tuple(Of String, String, Double?, Double)(elem.RIC, _meta(elem.RIC).ShortName, elem.Yield, elem.Duration)).ToList()
         End Function
 
-        Private Sub OnRealTimeData(data As Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double)))) Handles _quoteLoader.OnNewData
+        Private Sub OnRealTimeData(ByVal data As Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double)))) Handles _quoteLoader.OnNewData
             Logger.Debug("OnRealTimeData")
             Dim errorList As New List(Of Exception)
             For Each listAndRFV As KeyValuePair(Of String, Dictionary(Of String, Dictionary(Of String, Double))) In data
@@ -251,8 +271,8 @@ Namespace Curves
             Return EstimationModel.GetEnabledModels()
         End Function
 
-        Public Overrides Sub SetFitMode(ByVal fitMode As String)
-            _estimationModel = EstimationModel.FromName(fitMode)
+        Public Overrides Sub SetFitMode(ByVal fitMode As EstimationModel)
+            _estimationModel = fitMode ' EstimationModel.FromName(fitMode)
             NotifyUpdated(Me)
         End Sub
 
@@ -268,7 +288,7 @@ Namespace Curves
             Return _bootstrapped
         End Function
 
-        Public Overrides Sub SetBootstrapped(flag As Boolean)
+        Public Overrides Sub SetBootstrapped(ByVal flag As Boolean)
             _bootstrapped = flag
             NotifyUpdated(Me)
         End Sub

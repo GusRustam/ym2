@@ -543,6 +543,7 @@ Namespace Forms.ChartForm
             Dim rubCCS = New RubCCS(_spreadBenchmarks)
 
             AddHandler rubCCS.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
+            AddHandler rubCCS.Cleared, AddressOf CurveDeleted
             AddHandler rubCCS.Recalculated, AddressOf OnCurveRecalculated
             AddHandler rubCCS.Updated, AddressOf OnCurvePaint
 
@@ -554,6 +555,7 @@ Namespace Forms.ChartForm
             Logger.Debug("RubIRSTSMIClick()")
             Dim rubIRS = New RubIRS(_spreadBenchmarks)
             AddHandler rubIRS.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
+            AddHandler rubIRS.Cleared, AddressOf CurveDeleted
             AddHandler rubIRS.Recalculated, AddressOf OnCurveRecalculated
             AddHandler rubIRS.Updated, AddressOf OnCurvePaint
 
@@ -565,6 +567,7 @@ Namespace Forms.ChartForm
             Logger.Debug("NDFTSMI_Click()")
             Dim rubNDF = New RubNDF(_spreadBenchmarks)
             AddHandler rubNDF.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
+            AddHandler rubNDF.Cleared, AddressOf CurveDeleted
             AddHandler rubNDF.Recalculated, AddressOf OnCurveRecalculated
             AddHandler rubNDF.Updated, AddressOf OnCurvePaint
 
@@ -656,7 +659,8 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub ShowCurveItemsTSMIClick(sender As Object, e As EventArgs) Handles ShowCurveItemsTSMI.Click
-            Dim aCurve = _moneyMarketCurves.First(Function(curve) curve.GetName() = CStr(MoneyCurveCMS.Tag)).GetSnapshot()
+            Dim theCurve = _moneyMarketCurves.First(Function(curve) curve.GetName() = CStr(MoneyCurveCMS.Tag))
+            Dim aCurve = theCurve.GetSnapshot()
 
             Dim aForm = New Form With {
                 .Text = "Curve items",
@@ -667,6 +671,11 @@ Namespace Forms.ChartForm
 
             Dim aTable = New DataGridView
             aTable.AutoGenerateColumns = False
+            aTable.AllowUserToAddRows = False
+            aTable.AllowUserToDeleteRows = False
+            aTable.AllowUserToResizeRows = False
+            aTable.AllowDrop = False
+
             aTable.Columns.Add("RIC", "RIC")
             aTable.Columns.Add("Descr", "Descr")
             aTable.Columns.Add("Rate", "Rate")
@@ -684,6 +693,57 @@ Namespace Forms.ChartForm
             aForm.Controls.Add(aTable)
             aTable.Dock = DockStyle.Fill
 
+            Dim remHandler =
+                Sub()
+                    Try
+
+
+                        If aTable.SelectedRows.Count > 0 Then
+                            If aTable.SelectedRows.Count >= aTable.Rows.Count - 1 Then
+                                If MessageBox.Show("This will delete the curve. Would you like to continue?", "Remove the curve",
+                                                   MessageBoxButtons.YesNo, MessageBoxIcon.Question) = MsgBoxResult.Yes Then
+                                    ' todo curve MUST HAVE DELETE METHOD WHICH WILL CLEAN IT UP AND RAISE EVENT TO CLEAR CHART
+
+                                    ' deleting whole curve
+                                    Dim irsSeries = TheChart.Series.FindByName(theCurve.GetName())
+                                    If irsSeries IsNot Nothing Then TheChart.Series.Remove(irsSeries)
+                                    _moneyMarketCurves.Remove(theCurve)
+
+                                    theCurve.Cleanup()
+                                    SetChartMinMax()
+                                    aForm.Close()
+                                End If
+                            Else
+                                ' deleting selected items
+                                Dim toDelete As New List(Of String)
+                                For Each rw As DataGridViewRow In aTable.SelectedRows
+                                    toDelete.Add(rw.Cells("RIC").Value)
+                                Next
+                                If Not theCurve.RemoveItems(toDelete) Then
+                                    MessageBox.Show("Failed to delete selected items", "Remove items", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                                End If
+                                Dim crv = theCurve.GetSnapshot()
+                                aTable.Rows.Clear()
+                                crv.ForEach(Sub(item) aTable.Rows.Add(New Object() {item.Item1, item.Item2, item.Item3, item.Item4}))
+                            End If
+                        Else
+                            MessageBox.Show("No items selected", "Remove curve items", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        End If
+                    Catch ex As Exception
+                        Logger.ErrorException("Failed to delete items from curve", ex)
+                        Logger.Error("Exception = {0}", ex)
+                    End Try
+                End Sub
+
+            AddHandler aTable.RowHeaderMouseClick,
+                Sub(sender1 As Object, args As MouseEventArgs)
+                    If args.Button = MouseButtons.Right Then
+                        Dim cms As New ContextMenuStrip
+                        Dim removeItemTSMI = cms.Items.Add("Remove item from curve")
+                        AddHandler removeItemTSMI.Click, remHandler
+                        cms.Show(MousePosition)
+                    End If
+                End Sub
             aForm.ShowDialog()
         End Sub
 
@@ -810,6 +870,7 @@ Namespace Forms.ChartForm
             Dim newCurve = New YieldCurve(selectedItem.Name, ricsInCurve, selectedItem.Color, fieldNames, _spreadBenchmarks)
 
             AddHandler newCurve.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
+            AddHandler newCurve.Cleared, AddressOf CurveDeleted
             AddHandler newCurve.Recalculated, AddressOf OnCurveRecalculated
             AddHandler newCurve.Updated, AddressOf OnCurvePaint
             AddHandler newCurve.Faulted, AddressOf OnCurveFault
@@ -875,7 +936,7 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub OnFitSelected(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub OnFitSelected(ByVal sender As Object, ByVal e As EventArgs) Handles LinearRegressionTSMI.Click, LogarithmicRegressionTSMI.Click, InverseRegressionTSMI.Click, PowerRegressionTSMI.Click, Poly6RegressionTSMI.Click, NelsonSiegelSvenssonTSMI.Click, LinearInterpolationTSMI.Click, CubicSplineTSMI.Click, VasicekCurveTSMI.Click, CIRCurveTSMI.Click
             Logger.Debug("OnFitSelected()")
             Dim snd = CType(sender, ToolStripMenuItem)
             Dim curve = _moneyMarketCurves.First(Function(item) item.GetName() = MoneyCurveCMS.Tag.ToString())
@@ -933,66 +994,6 @@ Namespace Forms.ChartForm
                 Logger.ErrorException("Failed to remove historical series", ex)
                 Logger.Error("Exception = {0}", ex.ToString())
             End Try
-        End Sub
-
-        Private Sub EnterRIC_TSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles EnterRICTSMI.Click
-            Return
-            'Dim askForm As New ManualRicForm()
-            'AddHandler askForm.Activated,
-            '    Sub(snd As Object, evnt As EventArgs)
-            '        askForm.Left = Left + (Width - askForm.Width) / 2
-            '        askForm.Top = Top + (Height - askForm.Height) / 2
-            '    End Sub
-
-            'askForm.ShowDialog(Me)
-            'If askForm.SelectedRic <> "" Then
-            '    Dim group = New Group(_ansamble)
-            '    Dim descr As DataBaseBondDescription
-
-            '    Dim layout As New field_layoutTableAdapter
-            '    Dim setInfo = layout.GetData().Where(Function(row) row.id = askForm.LayoutId)
-
-            '    Dim rw = setInfo.First(Function(row) row.is_realtime = 1)
-            '    group.AskField = rw.ask_field
-            '    group.BidField = rw.bid_field
-            '    group.LastField = rw.last_field
-            '    group.VwapField = rw.vwap_field
-            '    group.VolumeField = rw.volume_field
-
-            '    rw = setInfo.First(Function(row) row.is_realtime = 0)
-            '    group.HistField = rw.last_field
-
-            '    group.Color = "Red"
-            '    descr = DbInitializer.GetBondInfo(askForm.SelectedRic)
-            '    If descr IsNot Nothing Then
-            '        group.SeriesName = descr.ShortName
-            '        group.AddRic(askForm.SelectedRic, descr)
-            '        ' group.StartLoadingLiveData() ' todo 
-            '        _ansamble.AddGroup(group)
-            '    Else
-            '        Dim handled As Boolean = False
-            '        Dim selectedRic As String = askForm.SelectedRic
-            '        DbInitializer.RequestBondInfo(
-            '            askForm.SelectedRic,
-            '            Sub(dscr As DataBaseBondDescription)
-            '                If dscr Is Nothing Then
-            '                    MsgBox("No bond found (RIC " & selectedRic & ")", MsgBoxStyle.Exclamation)
-            '                    _ansamble.RemoveGroup(group.Id)
-            '                Else
-            '                    If handled Then Return
-            '                    handled = True
-            '                    group.SeriesName = dscr.ShortName
-            '                    group.AddRic(selectedRic, dscr)
-            '                    ' group.StartLoadingLiveData()
-            '                    _ansamble.AddGroup(group)
-            '                End If
-            '            End Sub)
-            '    End If
-            'End If
-        End Sub
-
-        Private Sub SelectFromAListTSMIClick(ByVal sender As Object, ByVal e As EventArgs)
-
         End Sub
 
         Private Sub SelectFromAListTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SelectFromAListTSMI.Click

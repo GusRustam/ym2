@@ -69,13 +69,21 @@ Namespace Curves
             Return CInt(capture)
         End Function
 
+        Public Overrides Function RemoveItem(ByVal ric As String) As Boolean
+            Return False
+        End Function
+
+        Public Overrides Function RemoveItems(ByVal ric As List(Of String)) As Boolean
+            Return False
+        End Function
+
         ''' <summary>
         ''' Return full list of rics to be loaded
         ''' </summary>
         ''' <param name="broker">broker name</param>
         ''' <returns>a list of string</returns>
         ''' <remarks></remarks>
-        Protected Overrides Function GetRICs(broker As String) As List(Of String)
+        Protected Overrides Function GetRICs(ByVal broker As String) As List(Of String)
             Return AllowedTenors.Select(Function(item) String.Format("{0}{1}Y={2}", InstrumentName, item, broker)).ToList()
         End Function
 
@@ -151,6 +159,10 @@ Namespace Curves
                 Logger.Warn("No data!")
             End If
         End Sub
+
+        Public Overrides Function GetCurrentRICs() As List(Of String)
+            Return GetRICs(GetBroker())
+        End Function
 
         Public Overrides Sub Cleanup()
             _quoteLoader.DiscardTask(_name)
@@ -313,7 +325,7 @@ Namespace Curves
             Return {EstimationModel.DefaultModel}
         End Function
 
-        Public Overrides Sub SetFitMode(ByVal mode As String)
+        Public Overrides Sub SetFitMode(ByVal mode As EstimationModel)
         End Sub
 
         Public Overrides Function GetFitMode() As EstimationModel

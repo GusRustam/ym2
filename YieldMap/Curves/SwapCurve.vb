@@ -18,7 +18,7 @@ Namespace Curves
 
         '' ============ FITTING ============
         Public MustOverride Function GetFitModes() As EstimationModel()
-        Public MustOverride Sub SetFitMode(ByVal mode As String)
+        Public MustOverride Sub SetFitMode(ByVal mode As EstimationModel)
         Public MustOverride Function GetFitMode() As EstimationModel
 
         '' ============ BROKERS ============
@@ -53,6 +53,11 @@ Namespace Curves
         Protected MustOverride Sub StartRealTime()
         Protected MustOverride Sub LoadHistory()
         Protected MustOverride Sub OnHistoricalData(ByVal hst As HistoryLoadManager, ByVal ric As String, ByVal datastatus As RT_DataStatus, ByVal data As Dictionary(Of Date, HistoricalItem))
+
+        '' ============ ITEMS ============
+        Public MustOverride Function GetCurrentRICs() As List(Of String)
+        Public MustOverride Function RemoveItem(ByVal ric As String) As Boolean
+        Public MustOverride Function RemoveItems(ByVal ric As List(Of String)) As Boolean
 
         Protected MustOverride Function GetRICs(ByVal broker As String) As List(Of String)
 
