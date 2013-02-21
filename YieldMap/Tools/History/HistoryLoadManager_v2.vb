@@ -38,7 +38,7 @@ Namespace Tools.History
 
     Public Class HistoryLoadManager_v2
         Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(HistoryLoadManager_v2))
-        Private WithEvents _historyManager As AdxRtHistory = EikonSdk.SDK.CreateAdxRtHistory()
+        Private WithEvents _historyManager As AdxRtHistory = Eikon.SDK.CreateAdxRtHistory()
 
         Private _ric As String
         Private _error As Boolean

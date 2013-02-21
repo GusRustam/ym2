@@ -35,7 +35,7 @@ Namespace Tools.Lists
 
 
         Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(ListLoadManager_v2))
-        Private WithEvents _listManager As AdxRtList = EikonSdk.SDK.CreateAdxRtList()
+        Private WithEvents _listManager As AdxRtList = Eikon.SDK.CreateAdxRtList()
 
         Public Event OnNewData As Action(Of Dictionary(Of String, Dictionary(Of String, Double)), WrongItemsInfo)
 

@@ -113,7 +113,7 @@ Namespace Forms.MainForm
 #End Region
 
 #Region "II. Connecting to Eikon"
-        Private WithEvents _connector As New EikonConnector(EikonSdk.Sdk)
+        Private WithEvents _connector As New EikonConnector(Eikon.Sdk)
 
         Private Sub ConnectToEikon()
             _connector.ConnectToEikon()
@@ -147,7 +147,7 @@ Namespace Forms.MainForm
 
             AddHandler loader.Progress, Sub(message) GuiAsync(Sub() InitEventLabel.Text = message)
             If Not Settings.LastDbUpdate.HasValue OrElse Settings.LastDbUpdate < Today Then
-                loader.UpdateAllChains()
+                loader.Initialize()
             End If
         End Sub
 

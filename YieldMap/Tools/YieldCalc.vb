@@ -157,8 +157,8 @@ Namespace Tools
     ''' <remarks></remarks>
     Friend Module YieldCalc
         Private ReadOnly Logger As Logger = Logging.GetLogger(GetType(YieldCalc))
-        Private ReadOnly BondModule As AdxBondModule = EikonSdk.Sdk.CreateAdxBondModule()
-        Private ReadOnly SwapModule As AdxSwapModule = EikonSdk.Sdk.CreateAdxSwapModule()
+        Private ReadOnly BondModule As AdxBondModule = Eikon.Sdk.CreateAdxBondModule()
+        Private ReadOnly SwapModule As AdxSwapModule = Eikon.Sdk.CreateAdxSwapModule()
         Public Function QuoteDescription(price As Double, yield As Double, duration As Double, yieldToWhat As YieldToWhat) As String
             Return String.Format("P [{0:F4}], Y [{1:P2}] {2}, D [{3:F2}]",
                                  price, yield, yieldToWhat.Abbr, duration)
