@@ -2,6 +2,7 @@
 Imports MathNet.Numerics.Interpolation.Algorithms
 Imports MathNet.Numerics.LinearAlgebra.Double
 Imports System.Reflection
+Imports Uitls.Utils
 
 Namespace Tools.Estimation
     Public Enum EstimationType
@@ -284,7 +285,7 @@ Namespace Tools.Estimation
     Public Class CubicSpline
         Public Function Interpolate(ByVal xv As List(Of Double), ByVal yv As List(Of Double)) As List(Of XY)
             Dim spline As New CubicSplineInterpolation(xv, yv)
-            Return Commons.GetRange(xv.Min, xv.Max, 300).Select(Function(anX) New XY With {.X = anX, .Y = spline.Interpolate(anX)}).ToList()
+            Return GetRange(xv.Min, xv.Max, 300).Select(Function(anX) New XY With {.X = anX, .Y = spline.Interpolate(anX)}).ToList()
         End Function
     End Class
 
@@ -380,7 +381,7 @@ Namespace Tools.Estimation
             Dim lbfgsb As New L_BFGS_B
             Dim minimum = lbfgsb.ComputeMin(AddressOf NSSCost, AddressOf NSSCg, vars)
 
-            Return Commons.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = avgY * NSS(anX, minimum) / 10}).ToList()
+            Return GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = avgY * NSS(anX, minimum) / 10}).ToList()
         End Function
     End Class
 
@@ -436,9 +437,9 @@ Namespace Tools.Estimation
             Dim valByAvg = VasicekCostRel(minByAvg, Function(val) yavg * val / 10)
 
             If valByAvg < valByRange Then
-                Return Commons.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = yavg * Vasicek(anX, minByAvg) / 10}).ToList()
+                Return GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = yavg * Vasicek(anX, minByAvg) / 10}).ToList()
             Else
-                Return Commons.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = ymin + (ymax - ymin) * Vasicek(anX, minByRange)}).ToList()
+                Return GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = ymin + (ymax - ymin) * Vasicek(anX, minByRange)}).ToList()
             End If
         End Function
     End Class
@@ -499,9 +500,9 @@ Namespace Tools.Estimation
             Dim valByAvg = CIRCostRel(minByAvg, Function(val) 10 * val / yavg)
 
             If valByAvg < valByRange Then
-                Return Commons.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = 10 * CIR(anX, minByAvg) / yavg}).ToList()
+                Return GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = 10 * CIR(anX, minByAvg) / yavg}).ToList()
             Else
-                Return Commons.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = ymin + (ymax - ymin) * CIR(anX, minByRange)}).ToList()
+                Return GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = ymin + (ymax - ymin) * CIR(anX, minByRange)}).ToList()
             End If
         End Function
     End Class
@@ -571,7 +572,7 @@ Namespace Tools.Estimation
                     _regression.Fit(x, y)
                 End If
 
-                Return Commons.GetRange(x.Min, x.Max, 100).Select(Function(anX) New XY With {.X = anX, .Y = _regression.Estimate(anX)}).ToList()
+                Return GetRange(x.Min, x.Max, 100).Select(Function(anX) New XY With {.X = anX, .Y = _regression.Estimate(anX)}).ToList()
             Else
                 If _estimationModel = EstimationModel.CubicSpline Then
                     Return (New CubicSpline).Interpolate(x, y)

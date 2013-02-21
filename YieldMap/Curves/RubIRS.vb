@@ -2,6 +2,7 @@
 Imports AdfinXRtLib
 Imports System.Text.RegularExpressions
 Imports System.Drawing
+Imports Uitls
 Imports YieldMap.Tools.Estimation
 Imports YieldMap.Tools
 Imports YieldMap.Tools.History
@@ -25,7 +26,7 @@ Namespace Curves
         End Sub
 
         '' LOGGER
-        Private Shared ReadOnly Logger As Logger = Commons.GetLogger(GetType(RubIRS))
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(RubIRS))
 
         '' SWAP STRUCTURES
         Private Shared ReadOnly Struct =
@@ -310,7 +311,7 @@ Namespace Curves
             Dim termStructure As Array = curveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
             Dim result As New List(Of SwapPointDescription)
             For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
-                Dim dur = (Commons.FromExcelSerialDate(termStructure.GetValue(i, 1)) - _theDate).TotalDays / 365.0
+                Dim dur = (Utils.FromExcelSerialDate(termStructure.GetValue(i, 1)) - _theDate).TotalDays / 365.0
                 Dim yld = termStructure.GetValue(i, 2)
                 If dur > 0 And yld > 0 Then
                     Dim ric = Descrs.Where(Function(pair) Math.Abs(pair.Value.Duration - dur) < 0.00001).Select(Function(pair) pair.Value).ToList()
@@ -476,7 +477,7 @@ Namespace Curves
             Dim term = match.Groups("term").Value
             Dim dateModule As New AdxDateModule
             Dim aDate As Array = dateModule.DfAddPeriod("RUS", GetDate(), term, "")
-            Return dateModule.DfCountYears(GetDate(), Commons.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
+            Return dateModule.DfCountYears(GetDate(), Utils.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
         End Function
 
         Public Overrides Function BenchmarkEnabled() As Boolean

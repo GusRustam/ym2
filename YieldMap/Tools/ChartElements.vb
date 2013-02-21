@@ -1,5 +1,7 @@
 ﻿Imports System.Drawing
 Imports System.Reflection
+Imports DbManager.Bonds
+Imports DbManager
 Imports NLog
 Imports YieldMap.Tools.History
 Imports YieldMap.Tools.Lists
@@ -181,7 +183,7 @@ Namespace Tools
     Public Class Bond
         Private _selectedQuote As String
         Private ReadOnly _parentGroup As Group
-        Private ReadOnly _metaData As DataBaseBondDescription
+        Private ReadOnly _metaData As BondDescription
         Private ReadOnly _quotesAndYields As New Dictionary(Of String, BondPointDescription)
         Public TodayVolume As Double
 
@@ -197,7 +199,7 @@ Namespace Tools
             End Set
         End Property
 
-        Sub New(ByVal parentGroup As Group, ByVal selectedQuote As String, ByVal metaData As DataBaseBondDescription)
+        Sub New(ByVal parentGroup As Group, ByVal selectedQuote As String, ByVal metaData As BondDescription)
             _parentGroup = parentGroup
             _metaData = metaData
             _selectedQuote = selectedQuote
@@ -220,7 +222,7 @@ Namespace Tools
         End Property
 
 
-        Public ReadOnly Property MetaData As DataBaseBondDescription
+        Public ReadOnly Property MetaData As BondDescription
             Get
                 Return _metaData
             End Get
@@ -294,8 +296,8 @@ Namespace Tools
     ''' </summary>
     ''' <remarks></remarks>
     Public Class Group
-        Implements IComparable(Of Group)
-        Private Shared ReadOnly Logger As Logger = GetLogger(GetType(Group))
+        'Implements IComparable(Of Group)
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(Group))
 
         Private ReadOnly _ansamble As Ansamble
 
@@ -307,7 +309,7 @@ Namespace Tools
         Public Event LoadCriticalError As Action
         Public Event LoadError As Action(Of WrongItemsInfo)
 
-        Public Group As GroupType
+        'Public Group As GroupType
         Public SeriesName As String
         Public Id As String = Guid.NewGuid().ToString()
         Public BidField As String
@@ -348,9 +350,9 @@ Namespace Tools
             End Get
         End Property
 
-        Public Function CompareTo(ByVal other As Group) As Integer Implements IComparable(Of Group).CompareTo
-            Return Group.CompareTo(other.Group)
-        End Function
+        'Public Function CompareTo(ByVal other As Group) As Integer Implements IComparable(Of Group).CompareTo
+        '    Return Group.CompareTo(other.Group)
+        'End Function
 
         Public Sub Cleanup()
             _quoteLoader.CancelAll()
@@ -467,7 +469,7 @@ Namespace Tools
             If bondDataPoint.SelectedQuote = fieldName Then RaiseEvent Quote(bondDataPoint, fieldName)
         End Sub
 
-        Private Sub DoLoadHistory(ByVal bondDataPoint As DataBaseBondDescription, ByVal fieldName As String)
+        Private Sub DoLoadHistory(ByVal bondDataPoint As BondDescription, ByVal fieldName As String)
             If Not {LastField, VwapField}.Contains(fieldName) Then Exit Sub
             Logger.Debug("Will load {0}", bondDataPoint.RIC)
 
@@ -519,7 +521,7 @@ Namespace Tools
             Return _elements.Any(Function(elem) elem.Key = instrument)
         End Function
 
-        Public Sub AddRic(ByVal ric As String, ByVal descr As DataBaseBondDescription, ByVal quote As String)
+        Public Sub AddRic(ByVal ric As String, ByVal descr As BondDescription, ByVal quote As String)
             _elements.Add(ric, New Bond(Me, quote, descr))
         End Sub
 
@@ -586,7 +588,7 @@ Namespace Tools
             End Set
         End Property
 
-        Public Sub CalcAllSpreads(ByRef descr As BasePointDescription, Optional ByVal data As DataBaseBondDescription = Nothing, Optional ByVal type As SpreadType = Nothing)
+        Public Sub CalcAllSpreads(ByRef descr As BasePointDescription, Optional ByVal data As BondDescription = Nothing, Optional ByVal type As SpreadType = Nothing)
             If type IsNot Nothing Then
                 If data IsNot Nothing Then
                     If type = SpreadType.ZSpread AndAlso Benchmarks.ContainsKey(SpreadType.ZSpread) Then
@@ -743,7 +745,7 @@ Namespace Tools
     Friend Class HistoryPoint
         Public Ric As String
         Public Descr As HistPointDescription
-        Public Meta As DataBaseBondDescription
+        Public Meta As BondDescription
         Public SeriesId As Guid
     End Class
 #End Region

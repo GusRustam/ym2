@@ -1,13 +1,13 @@
 ﻿Imports System.Data
 Imports System.Windows.Forms
 Imports System.Drawing
+Imports DbManager
 Imports YieldMap.Commons
-Imports YieldMap.BondsDataSetTableAdapters
 Imports NLog
 
 Namespace Forms.PortfolioForm
     Public Class DataBaseManagerForm
-        Private Shared ReadOnly Logger As Logger = GetLogger(GetType(DataBaseManagerForm))
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(DataBaseManagerForm))
 
 #Region "Form-wide events"
         Private Sub UdlPageResize(sender As Object, e As EventArgs) Handles UDL_Page.Resize
@@ -40,7 +40,7 @@ Namespace Forms.PortfolioForm
             MessageListBox.Items.Clear()
             ReloadBondsButton.Enabled = AppMainForm.Initialized
             If Not AppMainForm.Initialized Then MessageListBox.Items.Add("You need to connect to Eikon in order to update database")
-            DbUpdatedLabel.Text = String.Format("{0:dd MMMM yyyy}", GetDbUpdateDate())
+            DbUpdatedLabel.Text = String.Format("{0:dd MMMM yyyy}", LastDbUpdate)
         End Sub
 #End Region
 
@@ -522,10 +522,10 @@ Namespace Forms.PortfolioForm
 
         Private Sub ReloadBondsButtonClick(sender As Object, e As EventArgs) Handles ReloadBondsButton.Click
             MessageListBox.Items.Clear()
-            Dim initR = New DbInitializer
+            Dim initR = BondsDatabaseManager.GetInstance
             AddHandler initR.Success, Sub()
                                           InformOnProgress("Database initialized successfully")
-                                          DbUpdatedLabel.Text = String.Format("{0:dd MMMM yyyy}", GetDbUpdateDate())
+                                          DbUpdatedLabel.Text = String.Format("{0:dd MMMM yyyy}", LastDbUpdate)
                                       End Sub
             AddHandler initR.Failure,
                 Sub(ex As Exception)
@@ -535,7 +535,7 @@ Namespace Forms.PortfolioForm
                     End If
                 End Sub
             AddHandler initR.Progress, AddressOf InformOnProgress
-            initR.UpdateDatabase(True)
+            initR.UpdateAllChains()
         End Sub
     End Class
 End Namespace

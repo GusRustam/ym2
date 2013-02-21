@@ -1,17 +1,15 @@
 ﻿Imports System.IO
-Imports EikonDesktopDataAPILib
+Imports DbManager.Bonds
+Imports ReutersData
 Imports YieldMap.Commons
 Imports YieldMap.My.Resources
 Imports YieldMap.Forms.ChartForm
-Imports YieldMap.Forms.PortfolioForm
 Imports NLog
+Imports Logging
 
 Namespace Forms.MainForm
     Public Class MainForm
         Private Shared ReadOnly Logger As Logger = GetLogger(GetType(MainForm))
-
-        Private WithEvents _myEikonDesktopSdk As EikonDesktopDataAPI = Eikon.SDK
-
 
         Private _initialized As Boolean = False
         Private ReadOnly _graphs As New List(Of GraphForm)
@@ -58,15 +56,15 @@ Namespace Forms.MainForm
 
         Private Sub MainFormLoad(sender As Object, e As EventArgs) Handles MyBase.Load
             Logger.Info("MainFormLoad")
-            MainToolStrip.Visible = ShowMainToolBar
-            ToolbarTSMI.Checked = ShowMainToolBar
+            MainToolStrip.Visible = Settings.ShowMainToolBar
+            ToolbarTSMI.Checked = Settings.ShowChartToolBar
         End Sub
 
 
         Private Shared Sub DatabaseButtonClick(sender As Object, e As EventArgs) Handles DatabaseButton.Click
-            Logger.Info("DatabaseButtonClick()")
-            Dim managerForm = New DataBaseManagerForm
-            managerForm.ShowDialog()
+            'Logger.Info("DatabaseButtonClick()")
+            'Dim managerForm = New DataBaseManagerForm
+            'managerForm.ShowDialog()
         End Sub
 
         Private Sub YieldMapButtonClick(sender As Object, e As EventArgs) Handles YieldMapButton.Click
@@ -98,7 +96,6 @@ Namespace Forms.MainForm
 
         Private Sub MainFormFormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
             CloseAllGraphForms()
-            Eikon.Instance.Clear()
         End Sub
 
         Private Shared Sub RaiseExcTSMIClick(sender As Object, e As EventArgs) Handles RaiseExcTSMI.Click
@@ -116,50 +113,10 @@ Namespace Forms.MainForm
 #End Region
 
 #Region "II. Connecting to Eikon"
+        Private WithEvents _connector As New EikonConnector(EikonSdk.Sdk)
+
         Private Sub ConnectToEikon()
-            Dim lResult = _myEikonDesktopSdk.Initialize()
-            If lResult <> EEikonDataAPIInitializeResult.Succeed Then
-                Select Case lResult
-                    Case EEikonDataAPIInitializeResult.Error_Reinitialize
-                        StatusLabel.Text = Reinit_Eikon_forbidden
-
-                    Case EEikonDataAPIInitializeResult.Error_InitializeFail
-                        StatusLabel.Text = Init_Eikon_Fail
-                End Select
-                UpdateUserFormAccordingToConnectionStatus(EEikonStatus.Disconnected)
-            End If
-        End Sub
-
-        Private Sub UpdateUserFormAccordingToConnectionStatus(ByVal eEikonStatus As EEikonStatus)
-            Select Case eEikonStatus
-                Case eEikonStatus.Connected
-                    ConnectTSMI.Enabled = False
-                    ConnectButton.Enabled = False
-                    StatusPicture.Image = Green
-                    StatusLabel.Text = Status_Connected
-
-                Case eEikonStatus.Disconnected
-                    ConnectTSMI.Enabled = True
-                    ConnectButton.Enabled = True
-                    YieldMapButton.Enabled = False
-                    StatusPicture.Image = Red
-                    StatusLabel.Text = Status_Disconnected
-                    CloseAllGraphForms()
-
-                Case eEikonStatus.LocalMode
-                    ConnectTSMI.Enabled = True
-                    ConnectButton.Enabled = True
-                    YieldMapButton.Enabled = False
-                    StatusPicture.Image = Orange
-                    StatusLabel.Text = Status_Local
-
-                Case eEikonStatus.Offline
-                    ConnectTSMI.Enabled = True
-                    ConnectButton.Enabled = True
-                    YieldMapButton.Enabled = False
-                    StatusPicture.Image = Red
-                    StatusLabel.Text = Status_Offline
-            End Select
+            _connector.ConnectToEikon()
         End Sub
 
         Private Sub CloseAllGraphForms()
@@ -168,24 +125,57 @@ Namespace Forms.MainForm
             End While
         End Sub
 
-        Public Sub OnStatusChanged(ByVal eStatus As EEikonStatus) Handles _myEikonDesktopSdk.OnStatusChanged
-            UpdateUserFormAccordingToConnectionStatus(eStatus)
-            If eStatus = EEikonStatus.Connected Then
-                Dim initR = New DbInitializer
-                AddHandler initR.Success, Sub()
-                                              Initialized = True
-                                              InitEventLabel.Text = DatabaseUpdatedSuccessfully
-                                          End Sub
-                AddHandler initR.Failure, Sub(ex As Exception)
-                                              Initialized = False
-                                              InitEventLabel.Text = FailedToUpdateDatabase
-                                              If MsgBox("Failed to initialize database. Would you like to report an error to the developer?", vbYesNo, "Database error") = vbYes Then
-                                                  SendErrorReport("Yield Map Database Error", "Exception: " + ex.ToString() + Environment.NewLine + Environment.NewLine + GetEnvironment())
-                                              End If
-                                          End Sub
-                AddHandler initR.Progress, Sub(message) GuiAsync(Sub() InitEventLabel.Text = message)
-                initR.UpdateDatabase()
+        Private Sub ConnectorConnected() Handles _connector.Connected
+            ConnectTSMI.Enabled = False
+            ConnectButton.Enabled = False
+            StatusPicture.Image = Green
+            StatusLabel.Text = Status_Connected
+
+            Dim loader = BondsLoader.GetInstance()
+            AddHandler loader.Success, Sub()
+                                           Initialized = True
+                                           InitEventLabel.Text = DatabaseUpdatedSuccessfully
+                                           Settings.LastDbUpdate = Today
+                                       End Sub
+            AddHandler loader.Failure, Sub(ex As Exception)
+                                           Initialized = False
+                                           InitEventLabel.Text = FailedToUpdateDatabase
+                                           If MsgBox("Failed to initialize database. Would you like to report an error to the developer?", vbYesNo, "Database error") = vbYes Then
+                                               SendErrorReport("Yield Map Database Error", "Exception: " + ex.ToString() + Environment.NewLine + Environment.NewLine + GetEnvironment())
+                                           End If
+                                       End Sub
+
+            AddHandler loader.Progress, Sub(message) GuiAsync(Sub() InitEventLabel.Text = message)
+            If Not Settings.LastDbUpdate.HasValue OrElse Settings.LastDbUpdate < Today Then
+                loader.UpdateAllChains()
             End If
+        End Sub
+
+        Private Sub ConnectorDisconnected() Handles _connector.Disconnected
+            ConnectTSMI.Enabled = True
+            ConnectButton.Enabled = True
+            YieldMapButton.Enabled = False
+            StatusPicture.Image = Red
+            StatusLabel.Text = Status_Disconnected
+            CloseAllGraphForms()
+
+        End Sub
+
+        Private Sub ConnectorLocalMode() Handles _connector.LocalMode
+            ConnectTSMI.Enabled = True
+            ConnectButton.Enabled = True
+            YieldMapButton.Enabled = False
+            StatusPicture.Image = Orange
+            StatusLabel.Text = Status_Local
+
+        End Sub
+
+        Private Sub ConnectorOffline() Handles _connector.Offline
+            ConnectTSMI.Enabled = True
+            ConnectButton.Enabled = True
+            YieldMapButton.Enabled = False
+            StatusPicture.Image = Red
+            StatusLabel.Text = Status_Offline
         End Sub
 #End Region
 
@@ -199,8 +189,8 @@ Namespace Forms.MainForm
         End Sub
 
         Private Shared Sub DatabaseManagerTSMIClick(sender As Object, e As EventArgs) Handles DatabaseManagerTSMI.Click
-            Dim managerForm = New DataBaseManagerForm
-            managerForm.ShowDialog()
+            'Dim managerForm = New DataBaseManagerForm
+            'managerForm.ShowDialog()
         End Sub
 
         Private Sub ExitTSMIClick(sender As Object, e As EventArgs) Handles ExitTSMI.Click
@@ -234,5 +224,7 @@ Namespace Forms.MainForm
             Dim sf As New SettingsForm
             sf.ShowDialog()
         End Sub
+
+
     End Class
 End Namespace

@@ -3,7 +3,7 @@ Imports YieldMap.Tools.History
 
 Namespace Curves
     Class HistoricalCurvesContainer
-        Private Shared ReadOnly Logger As Logger = Commons.GetLogger(GetType(HistoricalCurvesContainer))
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(HistoricalCurvesContainer))
         Public Event CurveRemoved As Action(Of String)
 
         Private ReadOnly _rics As New HashSet(Of String)

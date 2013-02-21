@@ -132,15 +132,8 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BondsDataSet.vb">
-      <DependentUpon>BondsDataSet.xsd</DependentUpon>
-    </Compile>
     <Compile Include="Commons\Common.vb" />
-    <Compile Include="Commons\DbInitializer.vb" />
-    <Compile Include="Commons\Eikon.vb" />
     <Compile Include="Commons\MAPI.vb" />
-    <Compile Include="Commons\SettingsManager.vb" />
-    <Compile Include="Commons\YieldMapLogger.vb" />
     <Compile Include="Curves\HistoricalCurve.vb" />
     <Compile Include="Curves\RubIRS.vb" />
     <Compile Include="Curves\SwapCurve.vb" />
@@ -151,30 +144,13 @@
     <Compile Include="Forms\ChartForm\ChartSettingsForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\ChartForm\GroupSelectForm.Designer.vb">
-      <DependentUpon>GroupSelectForm.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\ChartForm\GroupSelectForm.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Forms\MainForm\AboutForm.Designer.vb">
       <DependentUpon>AboutForm.vb</DependentUpon>
     </Compile>
     <Compile Include="Forms\MainForm\AboutForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="BondsDataSet.Designer.vb">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>BondsDataSet.xsd</DependentUpon>
-    </Compile>
     <Compile Include="Forms\ChartForm\GraphFormExtra.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\ChartForm\ManualRicForm.Designer.vb">
-      <DependentUpon>ManualRicForm.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\ChartForm\ManualRicForm.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Tools\ChartElements.vb" />
@@ -188,39 +164,6 @@
       <DependentUpon>DatePickerForm.vb</DependentUpon>
     </Compile>
     <Compile Include="Forms\DatePickerForm.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\PortfolioForm\BondSelectorForm.Designer.vb">
-      <DependentUpon>BondSelectorForm.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\PortfolioForm\BondSelectorForm.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\PortfolioForm\ChainSelectorForm.Designer.vb">
-      <DependentUpon>ChainSelectorForm.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\PortfolioForm\ChainSelectorForm.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\PortfolioForm\DataBaseManagerForm.Designer.vb">
-      <DependentUpon>DataBaseManagerForm.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\PortfolioForm\DataBaseManagerForm.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\PortfolioForm\HawserSelectorForm.Designer.vb">
-      <DependentUpon>HawserSelectorForm.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\PortfolioForm\HawserSelectorForm.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\PortfolioForm\NewChainForm.Designer.vb">
-      <DependentUpon>NewChainForm.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\PortfolioForm\NewChainForm.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\PortfolioForm\ProgressForm.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\MainForm\SettingsForm.Designer.vb">
@@ -265,25 +208,17 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Tools\BondPayments.vb" />
-    <Compile Include="Tools\Chains\ChainHandler.vb" />
-    <Compile Include="Tools\Chains\ChainLoadManager.vb" />
     <Compile Include="Tools\Element.vb" />
     <Compile Include="Tools\Estimation\LinearRegression.vb" />
     <Compile Include="Tools\History\HistoryLoadManager_v2.vb" />
     <Compile Include="Tools\History\HistoryLoadManager.vb" />
     <Compile Include="Tools\Lists\ListLoadManager.vb" />
     <Compile Include="Tools\Lists\ListLoadManager_v2.vb" />
-    <Compile Include="Tools\RDataTool\BondsDataLoader.vb" />
-    <Compile Include="Tools\RDataTool\RDataLoadManager.vb" />
     <Compile Include="Tools\YieldCalc.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\ChartForm\ChartSettingsForm.resx">
       <DependentUpon>ChartSettingsForm.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ChartForm\GroupSelectForm.resx">
-      <DependentUpon>GroupSelectForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\MainForm\AboutForm.resx">
       <DependentUpon>AboutForm.vb</DependentUpon>
@@ -291,26 +226,8 @@
     <EmbeddedResource Include="Forms\ChartForm\GraphForm.resx">
       <DependentUpon>GraphForm.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ChartForm\ManualRicForm.resx">
-      <DependentUpon>ManualRicForm.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\DatePickerForm.resx">
       <DependentUpon>DatePickerForm.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\PortfolioForm\BondSelectorForm.resx">
-      <DependentUpon>BondSelectorForm.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\PortfolioForm\ChainSelectorForm.resx">
-      <DependentUpon>ChainSelectorForm.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\PortfolioForm\DataBaseManagerForm.resx">
-      <DependentUpon>DataBaseManagerForm.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\PortfolioForm\HawserSelectorForm.resx">
-      <DependentUpon>HawserSelectorForm.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\PortfolioForm\NewChainForm.resx">
-      <DependentUpon>NewChainForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\MainForm\SettingsForm.resx">
       <DependentUpon>SettingsForm.vb</DependentUpon>
@@ -333,21 +250,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="bonds.sqlite">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="drivers_reset.bat" />
-    <None Include="BondsDataSet.xsc">
-      <DependentUpon>BondsDataSet.xsd</DependentUpon>
-    </None>
-    <None Include="BondsDataSet.xsd">
-      <SubType>Designer</SubType>
-      <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>BondsDataSet.Designer.vb</LastGenOutput>
-    </None>
-    <None Include="BondsDataSet.xss">
-      <DependentUpon>BondsDataSet.xsd</DependentUpon>
-    </None>
     <None Include="My Project\app.manifest" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
@@ -366,6 +269,10 @@
     <Content Include="App_Readme\MathNet.Numerics.copyright.txt" />
     <Content Include="App_Readme\MathNet.Numerics.readme.txt" />
     <None Include="Resources\about.png" />
+    <Content Include="bonds.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\add.png" />
     <Content Include="Resources\arrow_rotate_clockwise.png" />
     <Content Include="Resources\ChartBubbleLarge.png" />
@@ -380,6 +287,9 @@
     <Content Include="Resources\folder.png" />
     <Content Include="Resources\graph_edge_curved.png" />
     <None Include="Resources\logo.jpg" />
+    <Content Include="settings.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Yield Map Icon 2.ico" />
     <None Include="Resources\Green.png" />
     <None Include="Resources\JustTile.png" />
@@ -474,6 +384,31 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DbManager\Managers.vbproj">
+      <Project>{5178A2E3-0612-4749-B7E6-06C8BD131421}</Project>
+      <Name>Managers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Logging\Loggers.vbproj">
+      <Project>{B010EAB3-4503-4E36-B15D-36E3BF552DD3}</Project>
+      <Name>Loggers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ReutersData\ReutersData.vbproj">
+      <Project>{703E1833-D8F6-4FB3-83BA-BF30B50AB7C3}</Project>
+      <Name>ReutersData</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Settings\Settings.vbproj">
+      <Project>{05B05017-CA42-415D-AE0B-2E4F8D301871}</Project>
+      <Name>Settings</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Uitls\Uitls.vbproj">
+      <Project>{E4CE19AC-D60C-49F4-8358-9DACC4B9B35D}</Project>
+      <Name>Uitls</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Forms\PortfolioForm\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

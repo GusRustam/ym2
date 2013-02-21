@@ -31,7 +31,6 @@ Namespace Commons
             Return SendMail(strSubject, strBody, MAPI_LOGON_UI)
         End Function
 
-
         <DllImport("MAPI32.DLL")> _
         Private Shared Function MAPISendMail(ByVal sess As IntPtr,
              ByVal hwnd As IntPtr, ByVal message As MapiMessage,

@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<bonds>
+  <!-- Field sets -->
+  <field-sets>
+    <field-set id="MICEX">
+      <realtime>
+        <field type="BID">BID</field>
+        <field type="ASK">ASK</field>
+        <field type="LAST">LAST</field>
+        <field type="HIST">CF_CLOSE</field>
+        <field type="HIST_DATE">CF_DATE</field>
+        <field type="VWAP">VWAP</field>
+        <field type="VOLUME">CF_VOLUME</field>
+      </realtime>
+      <historical>
+        <field type="DATE">TIMESTAMP</field>
+        <field type="CLOSE">CLOSE</field>
+        <field type="VOLUME">CF_VOLUME</field>
+      </historical>
+    </field-set>
+    
+    <field-set id="Eurobonds">
+      <realtime>
+        <field type="BID">275</field>
+        <field type="ASK">393</field>
+      </realtime>
+      <historical>
+        <field type="DATE">TIMESTAMP</field>
+        <field type="CLOSE">CLOSE</field>
+      </historical>
+    </field-set>
+  </field-sets>
+  
+  <!-- Chains -->
+  <chains>
+    <chain ric="0#RUTSY=MM" field-set-id="MICEX" name="OFZ" color="Red"/>
+    <chain ric="0#RUMOSB=MM" field-set-id="MICEX" name="Moscow" color="Green" curve="True"/>
+    <chain ric="0#RUSOVB=MM" field-set-id="MICEX" name="Regional" color="Blue"/>
+    <chain ric="0#RUCORP=MM" field-set-id="MICEX" name="Corporate bonds" color="Cyan"/>
+    <chain ric="0#RFGOVBONDS=" field-set-id="Eurobonds" name="Russian eurobonds" color="DarkOlive" curve="True"/>
+  </chains>
+
+  <!-- Lists -->
+  <lists>
+    <list id="1" name="test" color="Violet" curve="No" field-set-id="MICEX">
+      <ric>AAA</ric>
+      <ric>BBB</ric>
+      <ric>CCC</ric>
+    </list>
+  </lists>
+  
+  <!-- Portfolios -->
+  <!-- todo conditions -->
+  <!-- todo include/exclude -->
+  <!-- portfolios trees -->
+  <portfolios>
+    <folder id="1" name="Specific"/>
+    <folder id="2" name="Russians">
+      <portfolio id="2" name="Mos">
+        <include what="chain" id="0#RUMOSB=MM" name="Moskau"/>
+      </portfolio>      
+    </folder>
+    <portfolio id="1" name="Main">
+      <include what="chain" id="0#RUTSY=MM" name="All OFZs" condition="isStraight And currentCoupon>10"/>
+      <exclude what="list" id="12"/>
+      <exclude what="ric" id="XXXXX"/>
+    </portfolio>
+  </portfolios>
+  
+  <!-- TODO Curves -->
+  <!-- TODO Synthetics curves -->
+</bonds>

@@ -44,7 +44,7 @@ Namespace Forms.TableForm
     End Class
 
     Public Class BondDescr
-        Private Shared ReadOnly Logger As Logger = Commons.GetLogger(GetType(BondDescr))
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(BondDescr))
 
         Public Event NeedLiveData As Action(Of BondDescr)
         Public Event NeedRIC As Action(Of BondDescr)
@@ -80,7 +80,7 @@ Namespace Forms.TableForm
         Private _quoteDate As Date
         Private _active As Boolean
 
-        Private _payments As BondPayments
+        'Private _payments As BondPayments
 
         'these are designed to avoid circular refernces between RIC and Name
         Private _needsName As Boolean

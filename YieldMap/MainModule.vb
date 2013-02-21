@@ -1,5 +1,4 @@
 ﻿Imports System.Threading
-Imports System.Runtime.InteropServices
 Imports YieldMap.Forms.MainForm
 Imports YieldMap.My.Resources
 Imports YieldMap.Forms
@@ -28,10 +27,10 @@ Module MainModule
 
         AddHandler AppDomain.CurrentDomain.UnhandledException, New UnhandledExceptionEventHandler(AddressOf DomainEventHandler)
 
-        ' Setting up db path
-        Dim installPath = Commons.GetMyPath()
-        AppDomain.CurrentDomain.SetData("DataDirectory", installPath)
-        My.Settings.Default("bondsConnectionString") = String.Format("data source=""{0}\bonds.sqlite""", installPath)
+        '' Setting up db path
+        'Dim installPath = Utils.GetMyPath()
+        'AppDomain.CurrentDomain.SetData("DataDirectory", installPath)
+        'My.Settings.Default("bondsConnectionString") = String.Format("data source=""{0}\bonds.sqlite""", installPath)
 
         _mainForm = New MainForm
         Application.Run(_mainForm)

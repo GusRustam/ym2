@@ -1,4 +1,6 @@
 ﻿Imports System.Windows.Forms.DataVisualization.Charting
+Imports DbManager.Bonds
+Imports DbManager
 Imports YieldMap.Tools.History
 Imports YieldMap.Tools.Estimation
 Imports YieldMap.Curves
@@ -125,13 +127,13 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub HideBidAsk()
-            If Not ShowBidAsk Then Return
+            If Not Settings.ShowBidAsk Then Return
             Dim bidAskSeries = TheChart.Series.FindByName("BidAskSeries")
             If bidAskSeries IsNot Nothing Then TheChart.Series.Remove(bidAskSeries)
         End Sub
 
         Private Sub PlotBidAsk(ByVal bond As Bond)
-            If Not ShowBidAsk Then Return
+            If Not Settings.ShowBidAsk Then Return
             If Not (bond.QuotesAndYields.ContainsKey(QuoteSource.Bid.ToString.ToUpper()) Or bond.QuotesAndYields.ContainsKey(QuoteSource.Ask.ToString.ToUpper())) Then Return
             Dim bidAskSeries = TheChart.Series.FindByName("BidAskSeries")
             Dim minX = TheChart.ChartAreas(0).AxisX.Minimum
@@ -241,11 +243,11 @@ Namespace Forms.ChartForm
 
                     Dim minMin As Double?, maxMax As Double?
                     If _spreadBenchmarks.CurrentType = SpreadType.Yield Then
-                        minMin = MinYield / 100
-                        maxMax = MaxYield / 100
+                        minMin = Settings.MinYield / 100
+                        maxMax = Settings.MaxYield / 100
                     Else
-                        minMin = MinSpread
-                        maxMax = MaxSpread
+                        minMin = Settings.MinSpread
+                        maxMax = Settings.MaxSpread
                     End If
 
                     If newMax > newMin Then
@@ -417,7 +419,7 @@ Namespace Forms.ChartForm
 
                 Dim elem = _ansamble.GetInstrumentGroup(ric).GetElement(ric)
                 Dim bondDataPoint = elem.MetaData ' todo that's awful
-                Dim points As New List(Of Tuple(Of HistPointDescription, DataBaseBondDescription))
+                Dim points As New List(Of Tuple(Of HistPointDescription, BondDescription))
                 For Each dt In data.Keys
                     Try
                         Dim calc As New HistPointDescription

@@ -7,7 +7,7 @@ Imports NLog
 
 Namespace Curves
     Public MustInherit Class SwapCurve
-        Private Shared ReadOnly Logger As Logger = Commons.GetLogger(GetType(SwapCurve))
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(SwapCurve))
 
 #Region "Interface"
         '' ============ BOOTSTRAPPING ============

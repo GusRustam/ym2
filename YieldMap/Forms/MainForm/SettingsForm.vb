@@ -1,11 +1,11 @@
 ﻿Imports System.Text.RegularExpressions
-Imports YieldMap.Commons
 Imports NLog
+Imports Settings
 
 Namespace Forms.MainForm
     Public Class SettingsForm
         Private Sub SettingsFormLoad(sender As System.Object, e As EventArgs) Handles MyBase.Load
-            Select Case LoggingLevel
+            Select Case SettingsManager.LogLevel
                 Case LogLevel.Trace : LogTraceRadioButton.Checked = True
                 Case LogLevel.Debug : LogDebugRadioButton.Checked = True
                 Case LogLevel.Info : LogInfoRadioButton.Checked = True
@@ -27,9 +27,7 @@ Namespace Forms.MainForm
             ShowBidAskCheckBox.Checked = ShowBidAsk
             ShowPointSizeCheckBox.Checked = ShowPointSize
 
-            UseLastRadioButton.Checked = (DefaultField = "LAST")
-            UseVWAPRadioButton.Checked = Not UseLastRadioButton.Checked
-
+            
             MainWindowCheckBox.Checked = ShowMainToolBar
             ChartWindowCheckBox.Checked = ShowChartToolBar
 
@@ -79,21 +77,21 @@ Namespace Forms.MainForm
 
         Private Sub SaveSettingsButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles SaveSettingsButton.Click
             If LogTraceRadioButton.Checked Then
-                LoggingLevel = LogLevel.Trace
+                SettingsManager.LogLevel = LogLevel.Trace
             ElseIf LogDebugRadioButton.Checked Then
-                LoggingLevel = LogLevel.Debug
+                SettingsManager.LogLevel = LogLevel.Debug
             ElseIf LogInfoRadioButton.Checked Then
-                LoggingLevel = LogLevel.Info
+                SettingsManager.LogLevel = LogLevel.Info
             ElseIf LogWarnRadioButton.Checked Then
-                LoggingLevel = LogLevel.Warn
+                SettingsManager.LogLevel = LogLevel.Warn
             ElseIf LogErrRadioButton.Checked Then
-                LoggingLevel = LogLevel.Error
+                SettingsManager.LogLevel = LogLevel.Error
             ElseIf LogNoneRadioButton.Checked Then
-                LoggingLevel = LogLevel.Off
+                SettingsManager.LogLevel = LogLevel.Off
             End If
 
-            ResetLoggers()
-            SettingsManager.LogLevel = LoggingLevel
+            Logging.ResetLoggers()
+            SettingsManager.LogLevel = SettingsManager.LogLevel
 
             MinYield = ParseDouble(MinYieldTextBox.Text)
             MaxYield = ParseDouble(MaxYieldTextBox.Text)
@@ -104,8 +102,6 @@ Namespace Forms.MainForm
 
             ShowBidAsk = ShowBidAskCheckBox.Checked
             ShowPointSize = ShowPointSizeCheckBox.Checked
-
-            DefaultField = If(UseLastRadioButton.Checked, "LAST", "VWAP")
 
             ShowMainToolBar = MainWindowCheckBox.Checked
             ShowChartToolBar = ChartWindowCheckBox.Checked

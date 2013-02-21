@@ -3,7 +3,7 @@ Imports NLog
 
 Namespace Forms.TableForm
     Public Class TableForm
-        Private Shared ReadOnly Logger As Logger = Commons.GetLogger(GetType(TableForm))
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(TableForm))
         Private _bonds As New List(Of BondDescr)
 
         Public Property Bonds As List(Of BondDescr)

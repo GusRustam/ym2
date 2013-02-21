@@ -1,6 +1,8 @@
 ﻿Imports AdfinXRtLib
 Imports System
+Imports DbManager
 Imports NLog
+Imports ReutersData
 Imports YieldMap.Commons
 
 Namespace Tools.Lists
@@ -32,8 +34,8 @@ Namespace Tools.Lists
         Implements IDisposable
 
 
-        Private Shared ReadOnly Logger As Logger = GetLogger(GetType(ListLoadManager_v2))
-        Private WithEvents _listManager As AdxRtList = Eikon.SDK.CreateAdxRtList()
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(ListLoadManager_v2))
+        Private WithEvents _listManager As AdxRtList = EikonSdk.SDK.CreateAdxRtList()
 
         Public Event OnNewData As Action(Of Dictionary(Of String, Dictionary(Of String, Double)), WrongItemsInfo)
 
@@ -82,7 +84,7 @@ Namespace Tools.Lists
             With _listManager
                 .Source = "IDN"
                 .DebugLevel = RT_DebugLevel.RT_DEBUG_IMMEDIATE
-                .Mode = String.Format("FRQ:{0}s", RefreshInterval)
+                .Mode = String.Format("FRQ:{0}s", 10)
                 .StartUpdates(RT_RunMode.RT_MODE_ONTIME_IF_UPDATED)
             End With
         End Sub

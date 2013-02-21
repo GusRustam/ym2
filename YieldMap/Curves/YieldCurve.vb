@@ -1,7 +1,9 @@
 ﻿Imports System
 Imports System.Drawing
 Imports AdfinXRtLib
-Imports YieldMap.Commons
+Imports DbManager.Bonds
+Imports DbManager
+Imports Uitls
 Imports YieldMap.Tools
 Imports YieldMap.Tools.History
 Imports YieldMap.Tools.Lists
@@ -13,14 +15,14 @@ Namespace Curves
     Class YieldCurve
         Inherits SwapCurve
 
-        Private Shared ReadOnly Logger As Logger = GetLogger(GetType(YieldCurve))
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(YieldCurve))
 
         Private WithEvents _quoteLoader As New ListLoadManager
 
         Private ReadOnly _name As String
         Private ReadOnly _fullname As String
         Private ReadOnly _color As Color
-        Private ReadOnly _meta As New Dictionary(Of String, DataBaseBondDescription)
+        Private ReadOnly _meta As New Dictionary(Of String, BondDescription)
 
         Private _date As Date
         Private _quote As String
@@ -42,7 +44,7 @@ Namespace Curves
 
             rics.ForEach(
                 Sub(ric)
-                    Dim meta = DbInitializer.GetBondInfo(ric)
+                    Dim meta = BondsData.Instance.GetBondInfo(ric)
                     If meta IsNot Nothing Then
                         _meta.Add(ric, meta)
                     Else
@@ -214,7 +216,7 @@ Namespace Curves
         Public Overrides Sub AddItems(ByVal rics As List(Of String))
             rics.ForEach(
                 Sub(ric)
-                    Dim meta = DbInitializer.GetBondInfo(ric)
+                    Dim meta = BondsData.Instance.GetBondInfo(ric)
                     If meta IsNot Nothing Then
                         _meta.Add(ric, meta)
                     Else
@@ -334,7 +336,7 @@ Namespace Curves
                     params(i, 0) = "B"
                     params(i, 1) = _date
                     params(i, 2) = meta.Maturity
-                    params(i, 3) = meta.PaymentStream.GetCouponByDate(_date)
+                    params(i, 3) = meta.GetCouponByDate(_date)
                     params(i, 4) = data(i).Price / 100.0
                     params(i, 5) = meta.PaymentStructure
                 Next
@@ -343,7 +345,7 @@ Namespace Curves
                 Dim termStructure As Array = curveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
                 Dim result As New List(Of SwapPointDescription)
                 For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
-                    Dim matDate = FromExcelSerialDate(termStructure.GetValue(i, 1))
+                    Dim matDate = Utils.FromExcelSerialDate(termStructure.GetValue(i, 1))
                     Dim dur = (matDate - _date).TotalDays / 365.0
                     Dim yld = termStructure.GetValue(i, 2)
                     If dur > 0 And yld > 0 Then

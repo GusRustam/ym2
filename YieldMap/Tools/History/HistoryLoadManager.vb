@@ -113,7 +113,7 @@ Namespace Tools.History
     End Class
 
     Public Class HistoryLoadManager
-        Private Shared ReadOnly Logger As Logger = GetLogger(GetType(HistoryLoadManager))
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(HistoryLoadManager))
         Private _historyManager As AdxRtHistory
 
         Private _ric As String

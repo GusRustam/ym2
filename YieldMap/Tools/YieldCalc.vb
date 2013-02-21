@@ -2,6 +2,10 @@
 Imports System.Globalization
 Imports AdfinXAnalyticsFunctions
 Imports System.ComponentModel
+Imports DbManager.Bonds
+Imports DbManager
+Imports ReutersData
+Imports Uitls
 Imports YieldMap.Commons
 Imports NLog
 Imports System.Text.RegularExpressions
@@ -152,15 +156,15 @@ Namespace Tools
     ''' </summary>
     ''' <remarks></remarks>
     Friend Module YieldCalc
-        Private ReadOnly Logger As Logger = GetLogger(GetType(YieldCalc))
-        Private ReadOnly BondModule As AdxBondModule = Eikon.SDK.CreateAdxBondModule()
-        Private ReadOnly SwapModule As AdxSwapModule = Eikon.SDK.CreateAdxSwapModule()
+        Private ReadOnly Logger As Logger = Logging.GetLogger(GetType(YieldCalc))
+        Private ReadOnly BondModule As AdxBondModule = EikonSdk.Sdk.CreateAdxBondModule()
+        Private ReadOnly SwapModule As AdxSwapModule = EikonSdk.Sdk.CreateAdxSwapModule()
         Public Function QuoteDescription(price As Double, yield As Double, duration As Double, yieldToWhat As YieldToWhat) As String
             Return String.Format("P [{0:F4}], Y [{1:P2}] {2}, D [{3:F2}]",
                                  price, yield, yieldToWhat.Abbr, duration)
         End Function
 
-        Public Sub CalcZSprd(ByVal rateArray As Array, ByRef descr As BasePointDescription, data As DataBaseBondDescription)
+        Public Sub CalcZSprd(ByVal rateArray As Array, ByRef descr As BasePointDescription, ByVal data As BondDescription)
             If descr.Price > 0 Then
                 Try
                     Dim settleDate = BondModule.BdSettle(DateTime.Today, data.PaymentStructure)
@@ -207,7 +211,7 @@ Namespace Tools
             descr.PointSpread = Nothing
         End Sub
 
-        Public Sub CalcASWSprd(ByVal rateArray As Array, ByVal floatLegStructure As String, ByVal floatingRate As Double, ByRef descr As BasePointDescription, data As DataBaseBondDescription)
+        Public Sub CalcASWSprd(ByVal rateArray As Array, ByVal floatLegStructure As String, ByVal floatingRate As Double, ByRef descr As BasePointDescription, ByVal data As BondDescription)
             If descr.Price > 0 Then
                 Try
                     Dim settleDate = BondModule.BdSettle(DateTime.Today, data.PaymentStructure)
@@ -223,10 +227,10 @@ Namespace Tools
             End If
         End Sub
 
-        Public Sub CalculateYields(ByVal dt As DateTime, ByVal descr As DataBaseBondDescription, ByRef calc As BasePointDescription)
+        Public Sub CalculateYields(ByVal dt As DateTime, ByVal descr As BondDescription, ByRef calc As BasePointDescription)
             Logger.Trace("CalculateYields({0}, {1})", calc.Price, descr.RIC)
 
-            Dim coupon = descr.PaymentStream.GetCouponByDate(dt)
+            Dim coupon = BondsData.Instance.GetBondPayments(descr.RIC).GetCoupon(dt)
             Dim settleDate = BondModule.BdSettle(dt, descr.PaymentStructure)
             Logger.Trace("Coupon: {0}, settleDate: {1}, maturity: {2}", coupon, settleDate, descr.Maturity)
             Dim bondYield As Array = BondModule.AdBondYield(settleDate, calc.Price / 100, descr.Maturity, coupon, descr.PaymentStructure, descr.RateStructure, "")
@@ -265,7 +269,7 @@ Namespace Tools
 
             For j = bondYield.GetLowerBound(0) To bondYield.GetUpperBound(0)
                 Dim yield = CSng(bondYield.GetValue(j, 1))
-                Dim itsDate = FromExcelSerialDate(bondYield.GetValue(j, 2))
+                Dim itsDate = Utils.FromExcelSerialDate(bondYield.GetValue(j, 2))
                 Logger.Trace("Parsing line: {0:P2} {1:dd-MMM-yy} {2} {3}", yield, itsDate, bondYield.GetValue(j, 3).ToString(), bondYield.GetValue(j, 4).ToString())
                 Dim toWhat As YieldToWhat
                 If Not YieldToWhat.TryParse(bondYield.GetValue(j, 4).ToString(), toWhat) Then

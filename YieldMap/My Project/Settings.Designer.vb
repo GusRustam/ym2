@@ -53,28 +53,6 @@ Namespace My
                 Return defaultInstance
             End Get
         End Property
-        
-        <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.SpecialSettingAttribute(Global.System.Configuration.SpecialSetting.ConnectionString),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("data source=""C:\Documents and Settings\Administrator\My Documents\Visual Studio 2"& _ 
-            "010\Projects\YieldMap\YieldMap\bonds.sqlite""")>  _
-        Public ReadOnly Property bondsConnectionString() As String
-            Get
-                Return CType(Me("bondsConnectionString"),String)
-            End Get
-        End Property
-        
-        <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.SpecialSettingAttribute(Global.System.Configuration.SpecialSetting.ConnectionString),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("data source=""C:\Documents and Settings\Administrator\My Documents\Visual Studio 2"& _ 
-            "010\Projects\YieldMap\YieldMap\bonds.sqlite""")>  _
-        Public ReadOnly Property bondsConnectionString1() As String
-            Get
-                Return CType(Me("bondsConnectionString1"),String)
-            End Get
-        End Property
     End Class
 End Namespace
 

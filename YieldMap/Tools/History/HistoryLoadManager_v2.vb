@@ -1,6 +1,9 @@
 ﻿Imports AdfinXRtLib
 Imports System.Globalization
 Imports System.Threading
+Imports DbManager
+Imports ReutersData
+Imports Uitls
 Imports YieldMap.Commons
 Imports NLog
 
@@ -34,8 +37,8 @@ Namespace Tools.History
     End Structure
 
     Public Class HistoryLoadManager_v2
-        Private Shared ReadOnly Logger As Logger = GetLogger(GetType(HistoryLoadManager_v2))
-        Private WithEvents _historyManager As AdxRtHistory = Eikon.SDK.CreateAdxRtHistory()
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(HistoryLoadManager_v2))
+        Private WithEvents _historyManager As AdxRtHistory = EikonSdk.SDK.CreateAdxRtHistory()
 
         Private _ric As String
         Private _error As Boolean
