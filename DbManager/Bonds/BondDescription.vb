@@ -24,6 +24,8 @@ Namespace Bonds
         Private ReadOnly _paymentStructure As String
         Private ReadOnly _rateStructure As String
         Private ReadOnly _issueDate As Date
+
+        ' todo user-defined labels, combined from fields and formatted as necessary (???)
         Private ReadOnly _label1 As String
         Private ReadOnly _label2 As String
         Private ReadOnly _label3 As String
