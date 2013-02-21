@@ -1,17 +1,10 @@
 ﻿Imports EikonDesktopDataAPILib
 
-Public Class EikonSdk
+Public Class Eikon
     Private Shared _myEikonDesktopSdk As New EikonDesktopDataAPI
-    'Private Shared ReadOnly _sdk As New EikonSdk
 
     Private Sub New()
     End Sub
-
-    'Public Shared ReadOnly Property Instance As EikonSdk
-    '    Get
-    '        Return _sdk
-    '    End Get
-    'End Property
 
     Public Shared ReadOnly Property Sdk As EikonDesktopDataAPI
         Get
@@ -56,5 +49,4 @@ Public Class EikonConnector
                 RaiseEvent Offline()
         End Select
     End Sub
-
 End Class

@@ -73,7 +73,7 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChainSync.vb" />
+    <Compile Include="Chain.vb" />
     <Compile Include="EikonSdk.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

@@ -26,7 +26,7 @@ Public Class Chain
     Sub LoadRics(ByVal ricName)
         Logger.Info("LoadRics({0})", ricName)
 
-        Dim chainMan As AdxRtChain = EikonSdk.Sdk.CreateAdxRtChain()
+        Dim chainMan As AdxRtChain = Eikon.Sdk.CreateAdxRtChain()
         chainMan.Source = ReutersDataSource
         chainMan.ItemName = ricName
         chainMan.Mode = _mode
