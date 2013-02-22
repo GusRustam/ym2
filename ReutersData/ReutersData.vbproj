@@ -50,8 +50,12 @@
       <HintPath>..\YieldMap\obj\x86\Debug\Interop.AdfinXRtLib.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Interop.Dex2Lib">
+      <HintPath>..\YieldMap\obj\x86\Debug\Interop.Dex2Lib.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="Interop.EikonDesktopDataAPILib">
-      <HintPath>..\DbManager\obj\Debug\Interop.EikonDesktopDataAPILib.dll</HintPath>
+      <HintPath>..\YieldMap\obj\x86\Debug\Interop.EikonDesktopDataAPILib.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="NLog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL" />
@@ -74,6 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Chain.vb" />
+    <Compile Include="Dex2.vb" />
     <Compile Include="EikonSdk.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

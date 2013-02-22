@@ -26,30 +26,39 @@ Public Class Chain
     Sub LoadRics(ByVal ricName)
         Logger.Info("LoadRics({0})", ricName)
 
-        Dim chainMan As AdxRtChain = Eikon.Sdk.CreateAdxRtChain()
-        chainMan.Source = ReutersDataSource
-        chainMan.ItemName = ricName
-        chainMan.Mode = _mode
+        Dim chainMan As AdxRtChain
+        Try
+            chainMan = Eikon.Sdk.CreateAdxRtChain()
+            chainMan.Source = ReutersDataSource
+            chainMan.ItemName = ricName
+            chainMan.Mode = _mode
+        Catch ex As Exception
+            Logger.ErrorException("Failed to init chain " + ricName + "data", ex)
+            Logger.Error("Exception = {0}", ex.ToString())
+            Exit Sub
+        End Try
+
         AddHandler chainMan.OnUpdate,
             Sub(datastatus As RT_DataStatus)
-                If datastatus = RT_DataStatus.RT_DS_FULL Then
-                    RaiseEvent Arrived(ricName)
-                    Try
+                Try
+                    If datastatus = RT_DataStatus.RT_DS_FULL Then
+                        RaiseEvent Arrived(ricName)
                         For i = chainMan.Data.GetLowerBound(0) To chainMan.Data.GetUpperBound(0)
                             _result(ricName).Add(chainMan.Data.GetValue(i).ToString())
                         Next
-                    Catch ex As Exception
-                        Dim a As Integer
-                        a = 1
-                    End Try
-                    _rics.TryTake(ricName)
-                ElseIf datastatus <> RT_DataStatus.RT_DS_PARTIAL Then
-                    _result(ricName) = Nothing
-                    _rics.TryTake(ricName)
-                End If
-                If Not _rics.Any Then
-                    RaiseEvent Chain(New Dictionary(Of String, List(Of String))(_result))
-                End If
+
+                        _rics.TryTake(ricName)
+                    ElseIf datastatus <> RT_DataStatus.RT_DS_PARTIAL Then
+                        _result(ricName) = Nothing
+                        _rics.TryTake(ricName)
+                    End If
+                    If Not _rics.Any Then
+                        RaiseEvent Chain(New Dictionary(Of String, List(Of String))(_result))
+                    End If
+                Catch ex As Exception
+                    Logger.ErrorException("Failed to parse chain " + ricName + "data", ex)
+                    Logger.Error("Exception = {0}", ex.ToString())
+                End Try
             End Sub
         chainMan.RequestChain()
     End Sub
