@@ -283,7 +283,7 @@
     <Content Include="Resources\folder.png" />
     <Content Include="Resources\graph_edge_curved.png" />
     <None Include="Resources\logo.jpg" />
-    <Content Include="settings.xml">
+    <Content Include="config.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Yield Map Icon 2.ico" />

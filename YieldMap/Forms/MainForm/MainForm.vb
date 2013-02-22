@@ -131,7 +131,7 @@ Namespace Forms.MainForm
             StatusPicture.Image = Green
             StatusLabel.Text = Status_Connected
 
-            Dim loader = BondsLoader.GetInstance()
+            Dim loader = BondsLoader.Instance()
             AddHandler loader.Success, Sub()
                                            Initialized = True
                                            InitEventLabel.Text = DatabaseUpdatedSuccessfully
