@@ -121,35 +121,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <COMReference Include="AdfinXRtLib">
-      <Guid>{057B7374-03DF-11D4-99C8-00105AF7EDAD}</Guid>
-      <VersionMajor>6</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="Dex2Lib">
-      <Guid>{89CB9AA2-9658-4D64-A86F-C6A4D89778BF}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>1</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="EikonDesktopDataAPILib">
-      <Guid>{CF3E8564-F9F5-4852-8297-BC0A2CFADFAD}</Guid>
-      <VersionMajor>7</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Logging\Loggers.vbproj">
       <Project>{B010EAB3-4503-4E36-B15D-36E3BF552DD3}</Project>
       <Name>Loggers</Name>

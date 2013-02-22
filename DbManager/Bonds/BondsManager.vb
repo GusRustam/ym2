@@ -1,10 +1,9 @@
-﻿Imports Dex2Lib
-Imports Logging
+﻿Imports Logging
 Imports NLog
 Imports ReutersData
+Imports Enumerable = System.Linq.Enumerable
 
 Namespace Bonds
-
     Public Interface IBondsData
         '' Returns BondDescription object which contains data on selected bond
         Function GetBondInfo(ByVal ric As String) As BondDescription
@@ -65,9 +64,6 @@ Namespace Bonds
         Event Success As Action
         Event NoBonds As action
         Event Failure As Action(Of Exception)
-        Event Initialzed As action
-
-        Property Initialized() As Boolean
 
         ''' Loads all data from configuration file and stores them into IMDB
         Sub Initialize()
@@ -87,6 +83,7 @@ Namespace Bonds
         Private WithEvents _chainLoader As New Chain
 
         Private Shared ReadOnly Logger As Logger = GetLogger(GetType(BondsLoader))
+
         Private Shared ReadOnly RicChain As New BondsDataSet.RicChainDataTable
         Private Shared ReadOnly CouponTable As New BondsDataSet.CouponDataTable
         Private Shared ReadOnly FrnTable As New BondsDataSet.FrnDataTable
@@ -94,114 +91,66 @@ Namespace Bonds
         Private Shared ReadOnly IssueRatingsTable As New BondsDataSet.IssueRatingDataTable
         Private Shared ReadOnly IssuerRatingsTable As New BondsDataSet.IssuerRatingDataTable
 
-        Private _rData As RData
         Private Shared _instance As BondsLoader
 
         Public Event Progress As Action(Of String) Implements IBondsLoader.Progress
         Public Event Success As Action Implements IBondsLoader.Success
         Public Event NoBonds As action Implements IBondsLoader.NoBonds
         Public Event Failure As Action(Of Exception) Implements IBondsLoader.Failure
-        Public Event Initialzed As Action Implements IBondsLoader.Initialzed
 
-        Private Structure FieldDescription
-            Public Field As String
-            Public FieldNum As Integer
-            Public ColumnName As String
-            Public ItsDate As Boolean
-            Public ItsBool As Boolean
-            Public ItsNum As Boolean
+        Private Shared ReadOnly QueryBondDescr As New Dex2Query({
+            New Dex2Field(0, BondsTable.ricColumn.ColumnName),
+            New Dex2Field("EJV.X.ADF_BondStructure", BondsTable.bondStructureColumn.ColumnName),
+            New Dex2Field("EJV.X.ADF_RateStructure", BondsTable.rateStructureColumn.ColumnName, ItsNum:=False),
+            New Dex2Field("EJV.C.Description", BondsTable.descriptionColumn.ColumnName),
+            New Dex2Field("EJV.C.OriginalAmountIssued", BondsTable.issueSizeColumn.ColumnName, ItsNum:=True),
+            New Dex2Field("EJV.C.IssuerName", BondsTable.issuerNameColumn.ColumnName),
+            New Dex2Field("EJV.C.BorrowerName", BondsTable.borrowerNameColumn.ColumnName),
+            New Dex2Field("EJV.X.ADF_Coupon", BondsTable.currentCouponColumn.ColumnName, ItsNum:=True),
+            New Dex2Field("EJV.C.IssueDate", BondsTable.issueDateColumn.ColumnName, ItsDate:=True),
+            New Dex2Field("EJV.C.MaturityDate", BondsTable.maturityDateColumn.ColumnName, ItsDate:=True),
+            New Dex2Field("EJV.C.Currency", BondsTable.currencyColumn.ColumnName),
+            New Dex2Field("EJV.C.ShortName", BondsTable.shortNameColumn.ColumnName),
+            New Dex2Field("EJV.C.IsCallable", BondsTable.isCallableColumn.ColumnName, ItsBool:=True),
+            New Dex2Field("EJV.C.IsPutable", BondsTable.isPutableColumn.ColumnName, ItsBool:=True),
+            New Dex2Field("EJV.C.IsFloater", BondsTable.isFloaterColumn.ColumnName, ItsBool:=True),
+            New Dex2Field("EJV.C.IsConvertible", BondsTable.isConvertibleColumn.ColumnName, ItsBool:=True),
+            New Dex2Field("EJV.C.IsStraight", BondsTable.isStraightColumn.ColumnName, ItsBool:=True),
+            New Dex2Field("EJV.C.Ticker", BondsTable.tickerColumn.ColumnName),
+            New Dex2Field("EJV.C.Series", BondsTable.seriesColumn.ColumnName),
+            New Dex2Field("EJV.C.BorrowerCntyCode", BondsTable.borrowerCountryColumn.ColumnName),
+            New Dex2Field("EJV.C.IssuerCountry", BondsTable.issuerCountryColumn.ColumnName)
+        }.ToList(), "RH:In")
 
-            Public Sub New(ByVal field As String, ByVal columnName As String, Optional ByVal itsDate As Boolean = False, Optional ByVal itsBool As Boolean = False, Optional ByVal itsNum As Boolean = False)
-                Me.Field = field
-                Me.ColumnName = columnName
-                Me.ItsDate = itsDate
-                Me.ItsBool = itsBool
-                Me.ItsNum = itsNum
-            End Sub
 
-            Public Sub New(ByVal fieldNum As Integer, ByVal columnName As String, Optional ByVal itsDate As Boolean = False, Optional ByVal itsBool As Boolean = False, Optional ByVal itsNum As Boolean = False)
-                Me.FieldNum = fieldNum
-                Me.ColumnName = columnName
-                Me.ItsDate = itsDate
-                Me.ItsBool = itsBool
-                Me.ItsNum = itsNum
-            End Sub
-        End Structure
+        Private Shared ReadOnly QueryIssueRating As New Dex2Query({
+            New Dex2Field(0, IssueRatingsTable.ricColumn.ColumnName),
+            New Dex2Field("EJV.GR.Rating", IssueRatingsTable.ratingColumn.ColumnName),
+            New Dex2Field("EJV.GR.RatingDate", IssueRatingsTable.dateColumn.ColumnName),
+            New Dex2Field("EJV.GR.RatingSourceCode", IssueRatingsTable.ratingSrcColumn.ColumnName)
+        }.ToList(), "RH:In", "RTSRC:MDY;S&P RTS:FDL;SPI;MDL RTSC:FRN")
 
-        Private Shared ReadOnly BondDescrFields As List(Of FieldDescription) = {
-            New FieldDescription With {.FieldNum = 0, .ColumnName = BondsTable.ricColumn.ColumnName, .ItsDate = False, .ItsBool = False, .ItsNum = False},
-            New FieldDescription With {.Field = "EJV.X.ADF_BondStructure", .ColumnName = BondsTable.bondStructureColumn.ColumnName, .ItsDate = False, .ItsBool = False, .ItsNum = False},
-            New FieldDescription With {.Field = "EJV.X.ADF_RateStructure", .ColumnName = BondsTable.rateStructureColumn.ColumnName, .ItsDate = False, .ItsBool = False, .ItsNum = False},
-            New FieldDescription With {.Field = "EJV.C.Description", .ColumnName = BondsTable.descriptionColumn.ColumnName, .ItsDate = False, .ItsBool = False, .ItsNum = False},
-            New FieldDescription With {.Field = "EJV.C.OriginalAmountIssued", .ColumnName = BondsTable.issueSizeColumn.ColumnName, .ItsDate = False, .ItsBool = False, .ItsNum = True},
-            New FieldDescription With {.Field = "EJV.C.IssuerName", .ColumnName = BondsTable.issuerNameColumn.ColumnName, .ItsDate = False, .ItsBool = False, .ItsNum = False},
-            New FieldDescription With {.Field = "EJV.C.BorrowerName", .ColumnName = BondsTable.borrowerNameColumn.ColumnName, .ItsDate = False, .ItsBool = False, .ItsNum = False},
-            New FieldDescription With {.Field = "EJV.X.ADF_Coupon", .ColumnName = BondsTable.currentCouponColumn.ColumnName, .ItsDate = False, .ItsBool = False, .ItsNum = True},
-            New FieldDescription With {.Field = "EJV.C.IssueDate", .ColumnName = BondsTable.issueDateColumn.ColumnName, .ItsDate = True, .ItsBool = False, .ItsNum = False},
-            New FieldDescription With {.Field = "EJV.C.MaturityDate", .ColumnName = BondsTable.maturityDateColumn.ColumnName, .ItsDate = True, .ItsBool = False, .ItsNum = False},
-            New FieldDescription With {.Field = "EJV.C.Currency", .ColumnName = BondsTable.currencyColumn.ColumnName, .ItsDate = False, .ItsBool = False, .ItsNum = False},
-            New FieldDescription With {.Field = "EJV.C.ShortName", .ColumnName = BondsTable.shortNameColumn.ColumnName, .ItsDate = False, .ItsBool = False, .ItsNum = False},
-            New FieldDescription With {.Field = "EJV.C.IsCallable", .ColumnName = BondsTable.isCallableColumn.ColumnName, .ItsDate = False, .ItsBool = True, .ItsNum = False},
-            New FieldDescription With {.Field = "EJV.C.IsPutable", .ColumnName = BondsTable.isPutableColumn.ColumnName, .ItsDate = False, .ItsBool = True, .ItsNum = False},
-            New FieldDescription With {.Field = "EJV.C.IsFloater", .ColumnName = BondsTable.isFloaterColumn.ColumnName, .ItsDate = False, .ItsBool = True, .ItsNum = False},
-            New FieldDescription With {.Field = "EJV.C.IsConvertible", .ColumnName = BondsTable.isConvertibleColumn.ColumnName, .ItsDate = False, .ItsBool = True, .ItsNum = False},
-            New FieldDescription With {.Field = "EJV.C.IsStraight", .ColumnName = BondsTable.isStraightColumn.ColumnName, .ItsDate = False, .ItsBool = True, .ItsNum = False},
-            New FieldDescription With {.Field = "EJV.C.Ticker", .ColumnName = BondsTable.tickerColumn.ColumnName, .ItsDate = False, .ItsBool = False, .ItsNum = False},
-            New FieldDescription With {.Field = "EJV.C.Series", .ColumnName = BondsTable.seriesColumn.ColumnName, .ItsDate = False, .ItsBool = False, .ItsNum = False},
-            New FieldDescription With {.Field = "EJV.C.BorrowerCntyCode", .ColumnName = BondsTable.borrowerCountryColumn.ColumnName, .ItsDate = False, .ItsBool = False, .ItsNum = False},
-            New FieldDescription With {.Field = "EJV.C.IssuerCountry", .ColumnName = BondsTable.issuerCountryColumn.ColumnName, .ItsDate = False, .ItsBool = False, .ItsNum = False}
-        }.ToList()
+        Private Shared ReadOnly QueryIssuerRating As New Dex2Query({
+            New Dex2Field(0, IssuerRatingsTable.ricColumn.ColumnName),
+            New Dex2Field("EJV.IR.Rating", IssuerRatingsTable.ratingColumn.ColumnName),
+            New Dex2Field("EJV.IR.RatingDate", IssuerRatingsTable.dateColumn.ColumnName),
+            New Dex2Field("EJV.IR.RatingSourceCode", IssuerRatingsTable.ratingSrcColumn.ColumnName)
+        }.ToList(), "RH:In", "RTSRC:MDY;S&P RTS:FDL;SPI;MDL RTSC:FRN")
 
-        Private _initialized As Boolean
-        Private Const BondsDescrDisplay = "RH:In"
-        Private Const BondsDescrRequest = ""
+        Private Shared ReadOnly QueryCoupom As New Dex2Query({
+            New Dex2Field(0, CouponTable.ricColumn.ColumnName),
+            New Dex2Field(1, CouponTable.dateColumn.ColumnName, itsDate:=True),
+            New Dex2Field("EJV.C.CouponRate", CouponTable.rateColumn.ColumnName, itsNum:=True)
+        }.ToList(), "RH:In,D")
 
-        Private Shared ReadOnly BondIssueRatingFields As List(Of FieldDescription) = {
-            New FieldDescription(0, IssueRatingsTable.ricColumn.ColumnName),
-            New FieldDescription("EJV.GR.Rating", IssueRatingsTable.ratingColumn.ColumnName),
-            New FieldDescription("EJV.GR.RatingDate", IssueRatingsTable.dateColumn.ColumnName),
-            New FieldDescription("EJV.GR.RatingSourceCode", IssueRatingsTable.ratingSrcColumn.ColumnName)
-        }.ToList()
-        Private Const BondIssueRatingDisplay = "RH:In"
-        Private Const BondIssueRatingRequest = "RTSRC:MDY;S&P RTS:FDL;SPI;MDL RTSC:FRN"
-
-        Private Shared ReadOnly BondIssuerRatingFields As List(Of FieldDescription) = {
-            New FieldDescription(0, IssuerRatingsTable.ricColumn.ColumnName),
-            New FieldDescription("EJV.IR.Rating", IssuerRatingsTable.ratingColumn.ColumnName),
-            New FieldDescription("EJV.IR.RatingDate", IssuerRatingsTable.dateColumn.ColumnName),
-            New FieldDescription("EJV.IR.RatingSourceCode", IssuerRatingsTable.ratingSrcColumn.ColumnName)
-        }.ToList()
-        Private Const BondIssuerRatingisplay = "RH:In"
-        Private Const BondIssuerRatingRequest = "RTSRC:MDY;S&P RTS:FDL;SPI;MDL RTSC:FRN"
-
-        Private Shared ReadOnly BondCouponFields As List(Of FieldDescription) = {
-            New FieldDescription(0, CouponTable.ricColumn.ColumnName),
-            New FieldDescription(1, CouponTable.dateColumn.ColumnName, itsDate:=True),
-            New FieldDescription("EJV.C.CouponRate", CouponTable.rateColumn.ColumnName, itsNum:=True)
-        }.ToList()
-        Private Const BondCouponDisplay = "RH:In,D"
-        Private Const BondCouponRequest = ""
-
-        Private Shared ReadOnly FrnFields As List(Of FieldDescription) = {
-            New FieldDescription(0, FrnTable.ricColumn.ColumnName),
-            New FieldDescription("EJV.X.FRNFLOOR", FrnTable.floorColumn.ColumnName),
-            New FieldDescription("EJV.X.FRNCAP", FrnTable.floorColumn.ColumnName),
-            New FieldDescription("PAY_FREQ", FrnTable.floorColumn.ColumnName),
-            New FieldDescription("EJV.C.IndexRic", FrnTable.floorColumn.ColumnName),
-            New FieldDescription("EJV.X.ADF_MARGIN", FrnTable.floorColumn.ColumnName, itsNum:=True)
-        }.ToList()
-        Private Const FrnDisplay = "RH:In"
-        Private Const FrnRequest = ""
-
-        Public Property Initialized() As Boolean Implements IBondsLoader.Initialized
-            Get
-                Return _initialized
-            End Get
-            Private Set(ByVal value As Boolean)
-                _initialized = value
-                If _initialized Then RaiseEvent Initialzed()
-            End Set
-        End Property
+        Private Shared ReadOnly QueryFrn As New Dex2Query({
+            New Dex2Field(0, FrnTable.ricColumn.ColumnName),
+            New Dex2Field("EJV.X.FRNFLOOR", FrnTable.floorColumn.ColumnName),
+            New Dex2Field("EJV.X.FRNCAP", FrnTable.floorColumn.ColumnName),
+            New Dex2Field("PAY_FREQ", FrnTable.floorColumn.ColumnName),
+            New Dex2Field("EJV.C.IndexRic", FrnTable.floorColumn.ColumnName),
+            New Dex2Field("EJV.X.ADF_MARGIN", FrnTable.floorColumn.ColumnName, itsNum:=True)
+        }.ToList(), "RH:In")
 
         ''' <summary>
         ''' Entry point. Loads all data from configuration file and stores them into IMDB
@@ -233,8 +182,9 @@ Namespace Bonds
         ''' Entry point. Loads all data for given RIC and stores them into IMDB
         ''' </summary>
         Public Sub LoadRic(ByVal ric As String, ByVal pseudoChain As String) Implements IBondsLoader.LoadRic
-            StoreRicsAndChains(ric, {ric}.ToList())
-            LoadMetadata(ric)
+            Dim rics = {ric}.ToList()
+            StoreRicsAndChains(pseudoChain, rics)
+            LoadMetadata(rics)
         End Sub
 
         Private Sub OnChainArrived(ByVal ric As String) Handles _chainLoader.Arrived
@@ -256,7 +206,7 @@ Namespace Bonds
                 Exit Sub
             End If
 
-            LoadMetadata(rics.Aggregate(Function(str, ric) str + "," + ric))
+            LoadMetadata(rics)
         End Sub
 
         Private Shared Function GetRics(ByVal chain As String) As List(Of String)
@@ -285,61 +235,61 @@ Namespace Bonds
             End Try
         End Sub
 
-        Private Sub LoadMetadata(ByVal rics As String)
+        Private Sub LoadMetadata(ByVal rics As List(Of String))
             Logger.Info("LoadMetadata")
-            ' todo cleanup before adding! This method might be used not only at the beginning
+
             RaiseEvent Progress("Loading bonds descriptions")
-            Try
-                Dim dex2 As Dex2Mgr = Eikon.Sdk.CreateDex2Mgr()
-                Dim cookie = dex2.Initialize()
-                _rData = dex2.CreateRData(cookie)
-                _rData.InstrumentIDList = rics
-            Catch ex As Exception
-                Logger.ErrorException("Failed to init Dex2 ", ex)
-                Logger.Error("Exception = {0}", ex)
-                RaiseEvent Failure(ex)
-                Exit Sub
-            End Try
 
-            _rData.FieldList = (From fieldDescr In BondDescrFields Select fieldDescr.Field).Aggregate(Function(str, field) str + "," + field)
-            _rData.DisplayParam = BondsDescrDisplay
-            _rData.RequestParam = BondsDescrRequest
+            Dim rowsToDelete = From bondRow In BondsTable
+                               Where rics.Contains(bondRow.ric)
+                               Select bondRow
 
-            AddHandler _rData.OnUpdate, AddressOf ImportBondsData
-            _rData.Subscribe(False)
+            For Each row In rowsToDelete
+                BondsTable.RemoveBondRow(row)
+            Next
+
+            Dim dex2 As New Dex2
+            AddHandler dex2.Failure, Sub() RaiseEvent Failure(New Exception("Dex2 error"))
+            AddHandler dex2.Metadata, AddressOf Step1
+            dex2.Load(rics, QueryBondDescr)
         End Sub
 
-        Private Sub ImportBondsData(ByVal dataStatus As DEX2_DataStatus, ByVal err As Object)
-            Dim data = _rData.Data
-            For i = data.GetLowerBound(0) To data.GetUpperBound(0)
-                Dim rw = BondsTable.NewRow()
-                For j = 0 To BondDescrFields.Count - 1
-                    Dim fieldDescr = BondDescrFields(j)
-                    Dim elem = data.GetValue(i, j + 1)
-                    If fieldDescr.ItsBool Then
-                        rw(fieldDescr.ColumnName) = (elem = "Y")
-                    ElseIf fieldDescr.ItsDate Then
-                        If IsDate(elem) Then rw(fieldDescr.ColumnName) = Date.Parse(elem)
-                    ElseIf fieldDescr.ItsNum Then
-                        If IsNumeric(elem) Then rw(fieldDescr.ColumnName) = Double.Parse(elem)
-                    Else
-                        rw(fieldDescr.ColumnName) = elem
-                    End If
+        Private Sub Step1(ByVal data As LinkedList(Of Dictionary(Of String, Object)))
+            Try
+                For Each slot In data
+                    Dim rw = BondsTable.NewRow()
+                    For Each colName In slot.Keys
+                        Dim elem = slot(colName)
+                        If QueryBondDescr.IsBool(colName) Then
+                            rw(colName) = (elem = "Y")
+                        ElseIf QueryBondDescr.IsDate(colName) Then
+                            If IsDate(elem) Then rw(colName) = Date.Parse(elem)
+                        ElseIf QueryBondDescr.IsNum(colName) Then
+                            If IsNumeric(elem) Then rw(colName) = Double.Parse(elem)
+                        Else
+                            rw(colName) = elem
+                        End If
+                    Next
+                    BondsTable.AddBondRow(rw)
                 Next
-                BondsTable.AddBondRow(rw)
-            Next
-            RemoveHandler _rData.OnUpdate, AddressOf ImportBondsData
 
-            Initialized = True
+                ' Now I can load data: coupons, ratings, frn structures, call and put structures, convertibility things and other like that
+            Catch ex As Exception
+
+            End Try
+
+
+            RaiseEvent Success()
         End Sub
 
         Private Sub New()
         End Sub
 
-        Public Shared Function GetInstance() As IBondsLoader
-            If _instance Is Nothing Then _instance = New BondsLoader
-            Return _instance
-        End Function
-
+        Public Shared ReadOnly Property Instance As IBondsLoader
+            Get
+                If _instance Is Nothing Then _instance = New BondsLoader
+                Return _instance
+            End Get
+        End Property
     End Class
 End Namespace
