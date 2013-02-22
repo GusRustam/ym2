@@ -89,7 +89,7 @@ Public Module SettingsManager
     Private _logLevel As LogLevel = LogLevel.Error
     Public Property LogLevel() As LogLevel
         Set(ByVal value As LogLevel)
-            SaveValue("/settings/property/[@name=log-level]/@value", value.ToString())
+            SaveValue("/settings/property[@name='log-level']/@value", value.ToString())
             _logLevel = value
         End Set
         Get
@@ -103,7 +103,7 @@ Public Module SettingsManager
             Return _showBidAsk
         End Get
         Set(ByVal value As Boolean)
-            SaveValue("/settings/property/[@name=show-bid-ask]/@value", value.ToString())
+            SaveValue("/settings/property[@name='show-bid-ask']/@value", value.ToString())
             If value <> _showBidAsk Then RaiseEvent ShowBidAskChanged(value)
             _showBidAsk = value
         End Set
@@ -115,7 +115,7 @@ Public Module SettingsManager
             Return _showPointSize
         End Get
         Set(ByVal value As Boolean)
-            SaveValue("/settings/property/[@name=show-point-size]/@value", value.ToString())
+            SaveValue("/settings/property[@name='show-point-size']/@value", value.ToString())
             If value <> _showPointSize Then RaiseEvent ShowPointSizeChanged(value)
             _showPointSize = value
         End Set
@@ -127,7 +127,7 @@ Public Module SettingsManager
             Return _showMainToolBar
         End Get
         Set(ByVal value As Boolean)
-            SaveValue("/settings/property/[@name=show-main-toolbar]/@value", value.ToString())
+            SaveValue("/settings/property[@name='show-main-toolbar']/@value", value.ToString())
             _showMainToolBar = value
         End Set
     End Property
@@ -138,7 +138,7 @@ Public Module SettingsManager
             Return _showChartToolBar
         End Get
         Set(ByVal value As Boolean)
-            SaveValue("/settings/property/[@name=show-chart-toolbar]/@value", value.ToString())
+            SaveValue("/settings/property[@name='show-chart-toolbar']/@value", value.ToString())
             _showChartToolBar = value
         End Set
     End Property
@@ -149,7 +149,7 @@ Public Module SettingsManager
             Return _bondSelectorVisibleColumns
         End Get
         Set(ByVal value As String)
-            SaveValue("/settings/property/[@name=visible-columns]/@value", value.ToString())
+            SaveValue("/settings/property[@name='visible-columns']/@value", value.ToString())
             _bondSelectorVisibleColumns = value
         End Set
     End Property
@@ -160,26 +160,27 @@ Public Module SettingsManager
             Return _dataSource
         End Get
         Set(ByVal value As String)
-            SaveValue("/settings/property/[@name=data-sourve]/@value", value.ToString())
+            SaveValue("/settings/property[@name='data-source']/@value", value.ToString())
             _dataSource = value
         End Set
     End Property
 
     Private _lastDbUpdate As Date? = Nothing
+
     Public Property LastDbUpdate As Date?
         Get
             Return _lastDbUpdate
         End Get
         Set(ByVal value As Date?)
-            SaveValue("/settings/property/[@name=last-db-update]/@value", If(value.HasValue, value.Value.ToString("yyyyMMdd"), ""))
+            SaveValue("/settings/property[@name='last-db-update']/@value", If(value.HasValue, value, ""))
             _lastDbUpdate = Date.Parse(value)
         End Set
     End Property
 
+    Private ReadOnly SettingsPath As String = Path.Combine(Utils.GetMyPath(), "config.xml")
 
     Sub New()
-        Dim p = Path.Combine(Utils.GetMyPath(), "settings.xml")
-        Settings.Load(p)
+        Settings.Load(SettingsPath)
 
         GetDoubleValue("/settings/viewport/yield/@max", _maxYield)
         GetDoubleValue("/settings/viewport/yield/@min", _minYield)
@@ -197,7 +198,7 @@ Public Module SettingsManager
         GetStringValue("/settings/property[@name='data-source']/@value", _dataSource)
         GetDateValue("/settings/property[@name='last-db-update']/@value", _lastDbUpdate)
 
-        Dim tmp As String : GetStringValue("/settings/property[@name='log-level']/@value", tmp)
+        Dim tmp As String = "" : GetStringValue("/settings/property[@name='log-level']/@value", tmp)
         _logLevel = If(tmp <> "", LogLevel.FromString(tmp), LogLevel.Error)
         ' todo somebody do set this logging level!
     End Sub
@@ -229,9 +230,9 @@ Public Module SettingsManager
     Private Sub SaveValue(ByVal address As String, ByVal value As String)
         Dim val As XmlNode
         val = Settings.SelectSingleNode(address)
-        If val Is Nothing Then
+        If val IsNot Nothing Then
             val.Value = value
-            Settings.Save("settings.xml")
+            Settings.Save(SettingsPath)
         End If
     End Sub
 End Module
