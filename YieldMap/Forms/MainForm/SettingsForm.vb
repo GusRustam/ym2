@@ -4,8 +4,11 @@ Imports Settings
 
 Namespace Forms.MainForm
     Public Class SettingsForm
-        Private Sub SettingsFormLoad(sender As System.Object, e As EventArgs) Handles MyBase.Load
-            Select Case SettingsManager.LogLevel
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(SettingsForm))
+        Private Shared ReadOnly Settings As SettingsManager = SettingsManager.Instance
+
+        Private Sub SettingsFormLoad(ByVal sender As System.Object, ByVal e As EventArgs) Handles MyBase.Load
+            Select Case Settings.LogLevel
                 Case LogLevel.Trace : LogTraceRadioButton.Checked = True
                 Case LogLevel.Debug : LogDebugRadioButton.Checked = True
                 Case LogLevel.Info : LogInfoRadioButton.Checked = True
@@ -15,23 +18,23 @@ Namespace Forms.MainForm
                 Case LogLevel.Off : LogNoneRadioButton.Checked = True
             End Select
 
-            MinYieldTextBox.Text = If(MinYield.HasValue, MinYield, "")
-            MaxYieldTextBox.Text = If(MaxYield.HasValue, MaxYield, "")
+            MinYieldTextBox.Text = If(Settings.MinYield.HasValue, Settings.MinYield, "")
+            MaxYieldTextBox.Text = If(Settings.MaxYield.HasValue, Settings.MaxYield, "")
 
-            MinDurTextBox.Text = If(MinDur.HasValue, MinDur, "")
-            MaxDurTextBox.Text = If(MaxDur.HasValue, MaxDur, "")
+            MinDurTextBox.Text = If(Settings.MinDur.HasValue, Settings.MinDur, "")
+            MaxDurTextBox.Text = If(Settings.MaxDur.HasValue, Settings.MaxDur, "")
 
-            MinSpreadTextBox.Text = If(MinSpread.HasValue, MinSpread, "")
-            MaxSpreadTextBox.Text = If(MaxSpread.HasValue, MaxSpread, "")
+            MinSpreadTextBox.Text = If(Settings.MinSpread.HasValue, Settings.MinSpread, "")
+            MaxSpreadTextBox.Text = If(Settings.MaxSpread.HasValue, Settings.MaxSpread, "")
 
-            ShowBidAskCheckBox.Checked = ShowBidAsk
-            ShowPointSizeCheckBox.Checked = ShowPointSize
+            ShowBidAskCheckBox.Checked = Settings.ShowBidAsk
+            ShowPointSizeCheckBox.Checked = Settings.ShowPointSize
 
-            
-            MainWindowCheckBox.Checked = ShowMainToolBar
-            ChartWindowCheckBox.Checked = ShowChartToolBar
 
-            Dim selectedFields = BondSelectorVisibleColumns.Split(",")
+            MainWindowCheckBox.Checked = Settings.ShowMainToolBar
+            ChartWindowCheckBox.Checked = Settings.ShowChartToolBar
+
+            Dim selectedFields = Settings.BondSelectorVisibleColumns.Split(",")
             ColumnsCLB.Items.Clear()
             For Each nd As NameDescr In NameDescr.AllNames
                 Dim idx = ColumnsCLB.Items.Add(nd)
@@ -77,34 +80,36 @@ Namespace Forms.MainForm
 
         Private Sub SaveSettingsButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles SaveSettingsButton.Click
             If LogTraceRadioButton.Checked Then
-                SettingsManager.LogLevel = LogLevel.Trace
+                Settings.LogLevel = LogLevel.Trace
             ElseIf LogDebugRadioButton.Checked Then
-                SettingsManager.LogLevel = LogLevel.Debug
+                Settings.LogLevel = LogLevel.Debug
             ElseIf LogInfoRadioButton.Checked Then
-                SettingsManager.LogLevel = LogLevel.Info
+                Settings.LogLevel = LogLevel.Info
             ElseIf LogWarnRadioButton.Checked Then
-                SettingsManager.LogLevel = LogLevel.Warn
+                Settings.LogLevel = LogLevel.Warn
             ElseIf LogErrRadioButton.Checked Then
-                SettingsManager.LogLevel = LogLevel.Error
+                Settings.LogLevel = LogLevel.Error
             ElseIf LogNoneRadioButton.Checked Then
-                SettingsManager.LogLevel = LogLevel.Off
+                Settings.LogLevel = LogLevel.Off
             End If
 
-            Logging.ResetLoggers()
-            SettingsManager.LogLevel = SettingsManager.LogLevel
+            ' Logging.ResetLoggers()
+            'SettingsManager.LogLevel = SettingsManager.LogLevel
+            Logging.LoggingLevel = Settings.LogLevel
+            Logger.Log(Settings.LogLevel, "Log level set to {0}", Settings.LogLevel)
 
-            MinYield = ParseDouble(MinYieldTextBox.Text)
-            MaxYield = ParseDouble(MaxYieldTextBox.Text)
-            MinDur = ParseDouble(MinDurTextBox.Text)
-            MaxDur = ParseDouble(MaxDurTextBox.Text)
-            MinSpread = ParseDouble(MinSpreadTextBox.Text)
-            MaxSpread = ParseDouble(MaxSpreadTextBox.Text)
+            Settings.MinYield = ParseDouble(MinYieldTextBox.Text)
+            Settings.MaxYield = ParseDouble(MaxYieldTextBox.Text)
+            Settings.MinDur = ParseDouble(MinDurTextBox.Text)
+            Settings.MaxDur = ParseDouble(MaxDurTextBox.Text)
+            Settings.MinSpread = ParseDouble(MinSpreadTextBox.Text)
+            Settings.MaxSpread = ParseDouble(MaxSpreadTextBox.Text)
 
-            ShowBidAsk = ShowBidAskCheckBox.Checked
-            ShowPointSize = ShowPointSizeCheckBox.Checked
+            Settings.ShowBidAsk = ShowBidAskCheckBox.Checked
+            Settings.ShowPointSize = ShowPointSizeCheckBox.Checked
 
-            ShowMainToolBar = MainWindowCheckBox.Checked
-            ShowChartToolBar = ChartWindowCheckBox.Checked
+            Settings.ShowMainToolBar = MainWindowCheckBox.Checked
+            Settings.ShowChartToolBar = ChartWindowCheckBox.Checked
 
             Dim columnsString As String = ""
 
@@ -120,7 +125,7 @@ Namespace Forms.MainForm
             If AllColumnsCB.CheckState <> CheckState.Checked And columnsString <> "" Then
                 columnsString = columnsString.Substring(0, columnsString.Length() - 1)
             End If
-            BondSelectorVisibleColumns = columnsString
+            Settings.BondSelectorVisibleColumns = columnsString
 
             Close()
         End Sub
@@ -144,7 +149,6 @@ Namespace Forms.MainForm
         End Sub
 
         Private Sub SetAllCheckState()
-
             If AllColumnsCB.CheckState <> CheckState.Indeterminate Then
                 For i As Integer = 0 To ColumnsCLB.Items.Count - 1
                     ColumnsCLB.SetItemCheckState(i, AllColumnsCB.CheckState)

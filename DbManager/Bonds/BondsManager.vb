@@ -1,7 +1,7 @@
-﻿Imports Logging
+﻿Imports System.Diagnostics.Contracts
+Imports Logging
 Imports NLog
 Imports ReutersData
-Imports Enumerable = System.Linq.Enumerable
 
 Namespace Bonds
     Public Interface IBondsData
@@ -76,6 +76,13 @@ Namespace Bonds
 
         ''' Loads all data for given RIC and stores them into IMDB with given pseudo chain
         Sub LoadRic(ByVal ric As String, ByVal pseudoChain As String)
+
+        Function GetBondsTable() As BondsDataSet.BondDataTable
+        Function GetCouponsTable() As BondsDataSet.CouponDataTable
+        Function GetFRNsTable() As BondsDataSet.FrnDataTable
+        Function GetIssueRatingsTable() As BondsDataSet.IssueRatingDataTable
+        Function GetIssuerRatingsTable() As BondsDataSet.IssuerRatingDataTable
+        Function GetAllRicsTable() As BondsDataSet.RicsDataTable
     End Interface
 
     Public Class BondsLoader
@@ -90,6 +97,7 @@ Namespace Bonds
         Private Shared ReadOnly BondsTable As New BondsDataSet.BondDataTable
         Private Shared ReadOnly IssueRatingsTable As New BondsDataSet.IssueRatingDataTable
         Private Shared ReadOnly IssuerRatingsTable As New BondsDataSet.IssuerRatingDataTable
+        Private Shared ReadOnly RicsTable As New BondsDataSet.RicsDataTable
 
         Private Shared _instance As BondsLoader
 
@@ -119,39 +127,45 @@ Namespace Bonds
             New Dex2Field("EJV.C.Ticker", BondsTable.tickerColumn.ColumnName),
             New Dex2Field("EJV.C.Series", BondsTable.seriesColumn.ColumnName),
             New Dex2Field("EJV.C.BorrowerCntyCode", BondsTable.borrowerCountryColumn.ColumnName),
-            New Dex2Field("EJV.C.IssuerCountry", BondsTable.issuerCountryColumn.ColumnName)
+            New Dex2Field("EJV.C.IssuerCountry", BondsTable.issuerCountryColumn.ColumnName),
+            New Dex2Field("RI.ID.ISIN", BondsTable.isinColumn.ColumnName),
+            New Dex2Field("EJV.C.ParentTicker", BondsTable.parentTickerColumn.ColumnName)
         }.ToList(), "RH:In")
-
 
         Private Shared ReadOnly QueryIssueRating As New Dex2Query({
             New Dex2Field(0, IssueRatingsTable.ricColumn.ColumnName),
             New Dex2Field("EJV.GR.Rating", IssueRatingsTable.ratingColumn.ColumnName),
             New Dex2Field("EJV.GR.RatingDate", IssueRatingsTable.dateColumn.ColumnName),
             New Dex2Field("EJV.GR.RatingSourceCode", IssueRatingsTable.ratingSrcColumn.ColumnName)
-        }.ToList(), "RH:In", "RTSRC:MDY;S&P RTS:FDL;SPI;MDL RTSC:FRN")
+        }.ToList(), "RH:In", "RTSRC:MDY;S&P;FTC")
 
         Private Shared ReadOnly QueryIssuerRating As New Dex2Query({
             New Dex2Field(0, IssuerRatingsTable.ricColumn.ColumnName),
             New Dex2Field("EJV.IR.Rating", IssuerRatingsTable.ratingColumn.ColumnName),
             New Dex2Field("EJV.IR.RatingDate", IssuerRatingsTable.dateColumn.ColumnName),
             New Dex2Field("EJV.IR.RatingSourceCode", IssuerRatingsTable.ratingSrcColumn.ColumnName)
-        }.ToList(), "RH:In", "RTSRC:MDY;S&P RTS:FDL;SPI;MDL RTSC:FRN")
+        }.ToList(), "RH:In", "RTS:FDL;SPI;MDL RTSC:FRN")
 
-        Private Shared ReadOnly QueryCoupom As New Dex2Query({
+        Private Shared ReadOnly QueryCoupon As New Dex2Query({
             New Dex2Field(0, CouponTable.ricColumn.ColumnName),
             New Dex2Field(1, CouponTable.dateColumn.ColumnName, itsDate:=True),
             New Dex2Field("EJV.C.CouponRate", CouponTable.rateColumn.ColumnName, itsNum:=True)
-        }.ToList(), "RH:In,D")
+        }.ToList(), "RH:In,D", "D:1984;2013")
 
         Private Shared ReadOnly QueryFrn As New Dex2Query({
             New Dex2Field(0, FrnTable.ricColumn.ColumnName),
             New Dex2Field("EJV.X.FRNFLOOR", FrnTable.floorColumn.ColumnName),
-            New Dex2Field("EJV.X.FRNCAP", FrnTable.floorColumn.ColumnName),
-            New Dex2Field("PAY_FREQ", FrnTable.floorColumn.ColumnName),
-            New Dex2Field("EJV.C.IndexRic", FrnTable.floorColumn.ColumnName),
-            New Dex2Field("EJV.X.ADF_MARGIN", FrnTable.floorColumn.ColumnName, itsNum:=True)
+            New Dex2Field("EJV.X.FRNCAP", FrnTable.capColumn.ColumnName),
+            New Dex2Field("PAY_FREQ", FrnTable.frequencyColumn.ColumnName),
+            New Dex2Field("EJV.C.IndexRic", FrnTable.indexRicColumn.ColumnName),
+            New Dex2Field("EJV.X.ADF_MARGIN", FrnTable.marginColumn.ColumnName, itsNum:=True)
         }.ToList(), "RH:In")
 
+        Private Shared ReadOnly QueryRics As New Dex2Query({
+            New Dex2Field(0, RicsTable.ricColumn.ColumnName),
+            New Dex2Field(1, RicsTable.contributorColumn.ColumnName),
+            New Dex2Field("EJV.C.RICS", RicsTable.subRicColumn.ColumnName)
+        }.ToList(), "RH:In;Con")
         ''' <summary>
         ''' Entry point. Loads all data from configuration file and stores them into IMDB
         ''' </summary>
@@ -168,6 +182,7 @@ Namespace Bonds
         ''' Entry point. Loads all data from given chain and stores them into IMDB
         ''' </summary>
         Public Sub LoadChain(ByVal chainRic As String) Implements IBondsLoader.LoadChain
+            Contract.Requires(chainRic <> "")
             LoadChains({chainRic}.ToList())
         End Sub
 
@@ -175,6 +190,7 @@ Namespace Bonds
         ''' Entry point. Loads all data from given chains and stores them into IMDB
         ''' </summary>
         Public Sub LoadChains(ByVal chainRics As List(Of String)) Implements IBondsLoader.LoadChains
+            Contract.Requires(chainRics IsNot Nothing AndAlso chainRics.Count > 0)
             _chainLoader.StartChains(chainRics, "UWC:YES LAY:VER")
         End Sub
 
@@ -182,10 +198,35 @@ Namespace Bonds
         ''' Entry point. Loads all data for given RIC and stores them into IMDB
         ''' </summary>
         Public Sub LoadRic(ByVal ric As String, ByVal pseudoChain As String) Implements IBondsLoader.LoadRic
+            Contract.Requires(ric <> "" And pseudoChain <> "")
             Dim rics = {ric}.ToList()
             StoreRicsAndChains(pseudoChain, rics)
-            LoadMetadata(rics)
+            StartLoad(rics)
         End Sub
+
+        Public Function GetBondsTable() As BondsDataSet.BondDataTable Implements IBondsLoader.GetBondsTable
+            Return BondsTable
+        End Function
+
+        Public Function GetCouponsTable() As BondsDataSet.CouponDataTable Implements IBondsLoader.GetCouponsTable
+            Return CouponTable
+        End Function
+
+        Public Function GetFRNsTable() As BondsDataSet.FrnDataTable Implements IBondsLoader.GetFRNsTable
+            Return FrnTable
+        End Function
+
+        Public Function GetIssueRatingsTable() As BondsDataSet.IssueRatingDataTable Implements IBondsLoader.GetIssueRatingsTable
+            Return IssueRatingsTable
+        End Function
+
+        Public Function GetAllRicsTable() As BondsDataSet.RicsDataTable Implements IBondsLoader.GetAllRicsTable
+            Return RicsTable
+        End Function
+
+        Public Function GetIsuuerRatingsTable() As BondsDataSet.IssuerRatingDataTable Implements IBondsLoader.GetIssuerRatingsTable
+            Return IssuerRatingsTable
+        End Function
 
         Private Sub OnChainArrived(ByVal ric As String) Handles _chainLoader.Arrived
             RaiseEvent Progress(ric)
@@ -206,7 +247,7 @@ Namespace Bonds
                 Exit Sub
             End If
 
-            LoadMetadata(rics)
+            StartLoad(rics)
         End Sub
 
         Private Shared Function GetRics(ByVal chain As String) As List(Of String)
@@ -235,51 +276,136 @@ Namespace Bonds
             End Try
         End Sub
 
-        Private Sub LoadMetadata(ByVal rics As List(Of String))
-            Logger.Info("LoadMetadata")
+        Private Shared Sub ImportData(ByVal data As LinkedList(Of Dictionary(Of String, Object)), ByVal table As DataTable, ByVal query As Dex2Query)
+            If data Is Nothing Then
+                Logger.Info("Nothing to importing  into table {0}", table.TableName)
+            Else
+                Logger.Info("Importing {0} data rows into table {1}", data.Count, table.TableName)
+                Try
+                    For Each slot In data
+                        Dim rw = table.NewRow()
+                        For Each colName In slot.Keys
+                            Dim elem = slot(colName)
+                            If query.IsBool(colName) Then
+                                rw(colName) = (elem = "Y")
+                            ElseIf query.IsDate(colName) Then
+                                If IsDate(elem) Then rw(colName) = Date.Parse(elem)
+                            ElseIf query.IsNum(colName) Then
+                                If IsNumeric(elem) Then rw(colName) = Double.Parse(elem)
+                            Else
+                                rw(colName) = elem
+                            End If
+                        Next
+                        table.Rows.Add(rw)
+                    Next
+                Catch ex As Exception
+                    Logger.ErrorException("Failed to import data to table" + table.TableName, ex)
+                    Logger.Error("Exception = {0}", ex.ToString())
+                End Try
+            End If
 
-            RaiseEvent Progress("Loading bonds descriptions")
-
-            Dim rowsToDelete = From bondRow In BondsTable
-                               Where rics.Contains(bondRow.ric)
-                               Select bondRow
-
-            For Each row In rowsToDelete
-                BondsTable.RemoveBondRow(row)
-            Next
-
-            Dim dex2 As New Dex2
-            AddHandler dex2.Failure, Sub() RaiseEvent Failure(New Exception("Dex2 error"))
-            AddHandler dex2.Metadata, AddressOf Step1
-            dex2.Load(rics, QueryBondDescr)
         End Sub
 
-        Private Sub Step1(ByVal data As LinkedList(Of Dictionary(Of String, Object)))
-            Try
-                For Each slot In data
-                    Dim rw = BondsTable.NewRow()
-                    For Each colName In slot.Keys
-                        Dim elem = slot(colName)
-                        If QueryBondDescr.IsBool(colName) Then
-                            rw(colName) = (elem = "Y")
-                        ElseIf QueryBondDescr.IsDate(colName) Then
-                            If IsDate(elem) Then rw(colName) = Date.Parse(elem)
-                        ElseIf QueryBondDescr.IsNum(colName) Then
-                            If IsNumeric(elem) Then rw(colName) = Double.Parse(elem)
-                        Else
-                            rw(colName) = elem
-                        End If
-                    Next
-                    BondsTable.AddBondRow(rw)
+        Private Sub LoadGeneral(ByVal table As DataTable,
+                               ByVal query As Dex2Query,
+                               ByRef msg As String,
+                               ByVal handler As Action(Of LinkedList(Of Dictionary(Of String, Object))),
+                               Optional ByVal allowedRics As HashSet(Of String) = Nothing)
+
+            Contract.Requires(table IsNot Nothing And query IsNot Nothing)
+
+            Logger.Info("Starting loading table {0}", table)
+            If allowedRics Is Nothing Then
+                ' если ничего не передали, то берем все строки
+                allowedRics = New HashSet(Of String)((From row In BondsTable Select row.ric))
+            End If
+
+            If allowedRics.Count > 0 Then
+                RaiseEvent Progress(msg)
+                Dim rowsToDelete = From row In table
+                                   Where allowedRics.Contains(row("ric").ToString())
+                                   Select row
+
+                For Each row In rowsToDelete
+                    table.Rows.Remove(row)
                 Next
 
-                ' Now I can load data: coupons, ratings, frn structures, call and put structures, convertibility things and other like that
-            Catch ex As Exception
+                Dim dex2 As New Dex2
+                AddHandler dex2.Failure, Sub() RaiseEvent Failure(New Exception("Dex2 error"))
+                AddHandler dex2.Metadata, handler
+                dex2.Load(allowedRics.ToList(), query)
+            Else
+                handler(Nothing)
+            End If
+        End Sub
 
-            End Try
+        Private Sub StartLoad(ByVal requiredRics As List(Of String))
+            Logger.Info("LoadMetadata")
+            LoadGeneral(BondsTable, QueryBondDescr, "Loading bonds descriptions",
+                         Sub(data As LinkedList(Of Dictionary(Of String, Object)))
+                             If data IsNot Nothing Then
+                                 ImportData(data, BondsTable, QueryBondDescr)
+                                 LoadStep1(New HashSet(Of String)(requiredRics))
+                             Else
+                                 RaiseEvent NoBonds()
+                             End If
+                         End Sub,
+                         New HashSet(Of String)(requiredRics))
+        End Sub
 
+        Private Sub LoadStep1(ByVal rics As HashSet(Of String))
+            Logger.Info("LoadIssuerRatings")
+            LoadGeneral(IssuerRatingsTable, QueryIssuerRating, "Loading bonds issuers ratings",
+                         Sub(data As LinkedList(Of Dictionary(Of String, Object)))
+                             ImportData(data, IssuerRatingsTable, QueryIssuerRating)
+                             LoadStep2(rics)
+                         End Sub)
+        End Sub
 
-            RaiseEvent Success()
+        Private Sub LoadStep2(ByVal rics As HashSet(Of String))
+            Logger.Info("LoadIssueRatings")
+            LoadGeneral(IssueRatingsTable, QueryIssueRating, "Loading bonds ratings",
+                         Sub(data As LinkedList(Of Dictionary(Of String, Object)))
+                             ImportData(data, IssueRatingsTable, QueryIssueRating)
+                             LoadStep3(rics)
+                         End Sub)
+        End Sub
+
+        Private Sub LoadStep3(ByVal rics As HashSet(Of String))
+            Logger.Info("LoadCoupons")
+            LoadGeneral(CouponTable, QueryCoupon, "Loading bonds coupons",
+                        Sub(data As LinkedList(Of Dictionary(Of String, Object)))
+                            ImportData(data, CouponTable, QueryCoupon)
+                            LoadStep4(rics)
+                        End Sub)
+        End Sub
+
+        Private Sub LoadStep4(ByVal rics As HashSet(Of String))
+            Logger.Info("LoadFrns")
+            Dim floaterRics = New HashSet(Of String)(From row In BondsTable Where rics.Contains(row.ric) And row.isFloater Select row.ric)
+            LoadGeneral(FrnTable, QueryFrn, "Loading FRN structures",
+                         Sub(data As LinkedList(Of Dictionary(Of String, Object)))
+                             ImportData(data, FrnTable, QueryFrn)
+                             LoadStep5(rics)
+                         End Sub,
+                         floaterRics)
+        End Sub
+
+        Private Sub LoadStep5(ByVal rics As HashSet(Of String))
+            Logger.Info("LoadFrns")
+            LoadGeneral(RicsTable, QueryRics, "Loading all rics",
+                         Sub(data As LinkedList(Of Dictionary(Of String, Object)))
+                             ImportData(data, RicsTable, QueryRics)
+                             RaiseEvent Success()
+                         End Sub)
+            'Logger.Info("LoadCalls")
+            'Dim rs = New HashSet(Of String)(From row In BondsTable Where rics.Contains(row.ric) And row.isFloater Select row.ric)
+            'LoadGeneral(FrnTable, QueryFrn, "Loading FRN structures",
+            '             Sub(data As LinkedList(Of Dictionary(Of String, Object)))
+            '                 ImportData(data, FrnTable, QueryFrn)
+            '                 RaiseEvent Success()
+            '             End Sub,
+            '             rs)
         End Sub
 
         Private Sub New()

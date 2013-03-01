@@ -36,7 +36,7 @@
     <chain ric="0#RUTSY=MM" field-set-id="MICEX" name="OFZ" color="Red"/>
     <chain ric="0#RUMOSB=MM" field-set-id="MICEX" name="Moscow" color="Green" curve="True"/>
     <chain ric="0#RUSOVB=MM" field-set-id="MICEX" name="Regional" color="Blue"/>
-    <!--<chain ric="0#RUCORP=MM" field-set-id="MICEX" name="Corporate bonds" color="Cyan"/>-->
+    <chain ric="0#RUCORP=MM" field-set-id="MICEX" name="Corporate bonds" color="Cyan" enabled="False"/>
     <chain ric="0#RFGOVBONDS=" field-set-id="Eurobonds" name="Russian eurobonds" color="DarkOlive" curve="True"/>
   </chains>
 
@@ -61,7 +61,7 @@
       </portfolio>      
     </folder>
     <portfolio id="1" name="Main">
-      <include what="chain" id="0#RUTSY=MM" name="All OFZs" condition="isStraight And currentCoupon>10"/>
+      <include what="chain" id="0#RUTSY=MM" name="All OFZs" condition="${isStraight} And ${currentCoupon}>10"/>
       <exclude what="list" id="12"/>
       <exclude what="ric" id="XXXXX"/>
     </portfolio>

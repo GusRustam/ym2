@@ -10,16 +10,23 @@ Public Module LoggerManager
     Public ZipFileName As String = String.Format("attachments_{0:ddMMyyyy}.zip", Date.Today)
 
     ' default settings
-    Public LoggingLevel As LogLevel = LogLevel.Trace
+    Public Property LoggingLevel As LogLevel
+        Get
+            return _loggingLevel
+        End Get
+        Set(ByVal value As LogLevel)
+            _loggingLevel = value
+            LogManager.GlobalThreshold = LoggingLevel
+        End Set
+    End Property
+
 
     Private ReadOnly Logger As Logger
     Private ReadOnly TxtTarget As FileTarget
     Private ReadOnly UdpTarget As ChainsawTarget
+    Private _loggingLevel As LogLevel = LogLevel.Trace
 
     Sub New()
-        ' 0) Read registry
-        LoggingLevel = LogLevel.Warn
-
         ' 1) Creating logger text config
         Const layoutText As String = "${date} " + ControlChars.Tab + " ${level} " + ControlChars.Tab + " ${callsite:includeSourcePath=false} | ${message} | ${exception:format=Type,Message} | ${stacktrace}"
         TxtTarget = New FileTarget() With {
@@ -27,32 +34,24 @@ Public Module LoggerManager
             .DeleteOldFileOnStartup = True,
             .Name = "Main",
             .Layout = Layout.FromString(layoutText)
-            }
+        }
 
         ' 2) Creating logger UDP config
         UdpTarget = New ChainsawTarget() With {
             .Address = "udp://localhost:7071",
             .Name = "Chainsaw",
             .Layout = New Log4JXmlEventLayout
-            }
+        }
 
         ' 4) Selecting congiguration and initializing
-        ResetLoggers()
 
         Logger = LogManager.GetCurrentClassLogger()
-        Logger.Debug("Logger initialized")
-    End Sub
-
-    Public Sub ResetLoggers()
         Dim loggerConfig As LoggingConfiguration = New LoggingConfiguration()
-
-        loggerConfig.AddTarget("Main", TxtTarget)
-        loggerConfig.AddTarget("Chainsaw", UdpTarget)
         loggerConfig.LoggingRules.Add(New LoggingRule("*", LoggingLevel, TxtTarget))
         loggerConfig.LoggingRules.Add(New LoggingRule("*", LoggingLevel, UdpTarget))
-
         LogManager.Configuration = loggerConfig
-        LogManager.ReconfigExistingLoggers()
+
+        Logger.Debug("Logger initialized")
     End Sub
 
     Public Function GetLogger(ByVal aClass As Type) As Logger

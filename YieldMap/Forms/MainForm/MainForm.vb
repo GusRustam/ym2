@@ -1,6 +1,7 @@
 ﻿Imports System.IO
 Imports DbManager.Bonds
 Imports ReutersData
+Imports Settings
 Imports YieldMap.Commons
 Imports YieldMap.My.Resources
 Imports YieldMap.Forms.ChartForm
@@ -10,6 +11,7 @@ Imports Logging
 Namespace Forms.MainForm
     Public Class MainForm
         Private Shared ReadOnly Logger As Logger = GetLogger(GetType(MainForm))
+        Private WithEvents _theSettings As SettingsManager = SettingsManager.Instance
 
         Private _initialized As Boolean = False
         Private ReadOnly _graphs As New List(Of GraphForm)
@@ -18,7 +20,7 @@ Namespace Forms.MainForm
             Get
                 Return _initialized
             End Get
-            Set(value As Boolean)
+            Set(ByVal value As Boolean)
                 Logger.Warn("Initialized <- {0}", value)
                 If value Then GuiAsync(Sub() StatusLabel.Text = Initialized_successfully)
                 _initialized = value
@@ -28,46 +30,47 @@ Namespace Forms.MainForm
         End Property
 
 #Region "I. GUI Events"
-        Private Sub TileHorTSBClick(sender As Object, e As EventArgs) Handles TileHorTSB.Click
+        Private Sub TileHorTSBClick(ByVal sender As Object, ByVal e As EventArgs) Handles TileHorTSB.Click
             LayoutMdi(MdiLayout.TileVertical)
         End Sub
 
-        Private Sub TileVerTSBClick(sender As Object, e As EventArgs) Handles TileVerTSB.Click
+        Private Sub TileVerTSBClick(ByVal sender As Object, ByVal e As EventArgs) Handles TileVerTSB.Click
             LayoutMdi(MdiLayout.TileHorizontal)
         End Sub
 
-        Private Shared Sub LogSettingsTSMIClick(sender As Object, e As EventArgs) Handles LogSettingsTSMI.Click
+        Private Shared Sub LogSettingsTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles LogSettingsTSMI.Click
             Dim sf = New SettingsForm
             sf.ShowDialog()
         End Sub
 
-        Private Sub MainToolStripMouseDoubleClick(sender As Object, e As MouseEventArgs) Handles MainToolStrip.MouseDoubleClick
+        Private Sub MainToolStripMouseDoubleClick(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MainToolStrip.MouseDoubleClick
             If e.Button = MouseButtons.Right Then
                 CMS.Show(Me, e.Location)
             End If
         End Sub
 
-        Private Sub ConnectButtonClick(sender As Object, e As EventArgs) Handles ConnectButton.Click
+        Private Sub ConnectButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles ConnectButton.Click
             StatusLabel.Text = Connecting_to_Eikon
             ConnectButton.Enabled = False
             ConnectTSMI.Enabled = False
             ConnectToEikon()
         End Sub
 
-        Private Sub MainFormLoad(sender As Object, e As EventArgs) Handles MyBase.Load
+        Private Sub MainFormLoad(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Load
             Logger.Info("MainFormLoad")
-            MainToolStrip.Visible = Settings.ShowMainToolBar
-            ToolbarTSMI.Checked = Settings.ShowChartToolBar
+            MainToolStrip.Visible = _theSettings.ShowMainToolBar
+            ToolbarTSMI.Checked = _theSettings.ShowChartToolBar
         End Sub
 
 
-        Private Shared Sub DatabaseButtonClick(sender As Object, e As EventArgs) Handles DatabaseButton.Click
+        Private Shared Sub DatabaseButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles DatabaseButton.Click
+            PortfolioForm.PortfolioForm.Show()
             'Logger.Info("DatabaseButtonClick()")
             'Dim managerForm = New DataBaseManagerForm
             'managerForm.ShowDialog()
         End Sub
 
-        Private Sub YieldMapButtonClick(sender As Object, e As EventArgs) Handles YieldMapButton.Click
+        Private Sub YieldMapButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles YieldMapButton.Click
             StartNewChart()
         End Sub
 
@@ -89,24 +92,24 @@ Namespace Forms.MainForm
             End If
         End Sub
 
-        Private Shared Sub SettingsButtonClick(sender As Object, e As EventArgs) Handles SettingsButton.Click
+        Private Shared Sub SettingsButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles SettingsButton.Click
             Dim sf = New SettingsForm
             sf.ShowDialog()
         End Sub
 
-        Private Sub MainFormFormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        Private Sub MainFormFormClosing(ByVal sender As Object, ByVal e As FormClosingEventArgs) Handles MyBase.FormClosing
             CloseAllGraphForms()
         End Sub
 
-        Private Shared Sub RaiseExcTSMIClick(sender As Object, e As EventArgs) Handles RaiseExcTSMI.Click
+        Private Shared Sub RaiseExcTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RaiseExcTSMI.Click
             SendErrorReport("Yield Map Info", GetEnvironment())
         End Sub
 
-        Private Shared Sub ShowLogTSMIClick(sender As Object, e As EventArgs) Handles ShowLogTSMI.Click
+        Private Shared Sub ShowLogTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles ShowLogTSMI.Click
             RunCommand(Path.Combine(LogFilePath, LogFileName))
         End Sub
 
-        Private Shared Sub AboutTSMIClick(sender As Object, e As EventArgs) Handles AboutTSMI.Click
+        Private Shared Sub AboutTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles AboutTSMI.Click
             Dim af As New AboutForm
             af.ShowDialog()
         End Sub
@@ -135,7 +138,7 @@ Namespace Forms.MainForm
             AddHandler loader.Success, Sub()
                                            Initialized = True
                                            InitEventLabel.Text = DatabaseUpdatedSuccessfully
-                                           Settings.LastDbUpdate = Today
+                                           _theSettings.LastDbUpdate = Today
                                        End Sub
             AddHandler loader.Failure, Sub(ex As Exception)
                                            Initialized = False
@@ -146,7 +149,7 @@ Namespace Forms.MainForm
                                        End Sub
 
             AddHandler loader.Progress, Sub(message) GuiAsync(Sub() InitEventLabel.Text = message)
-            If Not Settings.LastDbUpdate.HasValue OrElse Settings.LastDbUpdate < Today Then
+            If Not _theSettings.LastDbUpdate.HasValue OrElse _theSettings.LastDbUpdate < Today Then
                 loader.Initialize()
             End If
         End Sub
@@ -158,7 +161,6 @@ Namespace Forms.MainForm
             StatusPicture.Image = Red
             StatusLabel.Text = Status_Disconnected
             CloseAllGraphForms()
-
         End Sub
 
         Private Sub ConnectorLocalMode() Handles _connector.LocalMode
@@ -167,7 +169,6 @@ Namespace Forms.MainForm
             YieldMapButton.Enabled = False
             StatusPicture.Image = Orange
             StatusLabel.Text = Status_Local
-
         End Sub
 
         Private Sub ConnectorOffline() Handles _connector.Offline
@@ -224,7 +225,5 @@ Namespace Forms.MainForm
             Dim sf As New SettingsForm
             sf.ShowDialog()
         End Sub
-
-
     End Class
 End Namespace

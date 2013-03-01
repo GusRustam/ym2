@@ -29,7 +29,7 @@ Public Class Chain
         Dim chainMan As AdxRtChain
         Try
             chainMan = Eikon.Sdk.CreateAdxRtChain()
-            chainMan.Source = ReutersDataSource
+            chainMan.Source = SettingsManager.Instance.ReutersDataSource
             chainMan.ItemName = ricName
             chainMan.Mode = _mode
         Catch ex As Exception

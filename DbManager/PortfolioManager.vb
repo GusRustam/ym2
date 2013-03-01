@@ -29,6 +29,7 @@ Public Class Fields
 End Class
 
 Public Class PortfolioSource
+    'todo ???
     Public Id As Integer
     Public Name As Integer
     Public Fields As Fields
@@ -48,7 +49,7 @@ Public Class PortfolioManager
 
     Public Function GetChainRics() As List(Of String) Implements IPortfolioManager.GetChainRics
         Dim res As New List(Of String)
-        Dim iter = _bonds.SelectNodes("/bonds/chains/chain/@ric")
+        Dim iter = _bonds.SelectNodes("/bonds/chains/chain[not(@enabled='False')]/@ric")
         For i = 0 To iter.Count - 1
             res.Add(iter(i).Value)
         Next
@@ -61,8 +62,8 @@ Public Class PortfolioManager
 
     Public Function Portfolios() As List(Of Tuple(Of Integer, String)) Implements IPortfolioManager.GetPortfoliosFlat
         Dim res As New List(Of Tuple(Of Integer, String))
-        Dim iter = _bonds.SelectNodes("/portfolios//portfolio")
-        For i = 0 To iter.Count
+        Dim iter = _bonds.SelectNodes("/bonds/portfolios//portfolio")
+        For i = 0 To iter.Count - 1
             res.Add(Tuple.Create(CInt(iter(i).SelectSingleNode("@id").Value), iter(i).SelectSingleNode("@name").Value))
         Next
         Return res

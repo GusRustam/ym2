@@ -4,15 +4,22 @@ Imports NLog
 Imports System.Xml
 Imports Uitls
 
-
-Public Module SettingsManager
+Public Class SettingsManager
     Public Event YieldRangeChanged As Action(Of Double?, Double?)
     Public Event DurRangeChanged As Action(Of Double?, Double?)
     Public Event SpreadRangeChanged As Action(Of Double?, Double?)
     Public Event ShowBidAskChanged As Action(Of Boolean)
     Public Event ShowPointSizeChanged As Action(Of Boolean)
 
-    Private ReadOnly Settings As New XmlDocument
+    Private Shared ReadOnly SettingsPath As String = Path.Combine(Utils.GetMyPath(), "config.xml")
+    Private Shared ReadOnly Settings As New XmlDocument
+
+    Private Shared ReadOnly [Me] = New SettingsManager
+    Public Shared ReadOnly Property Instance() As SettingsManager
+        Get
+            Return [Me]
+        End Get
+    End Property
 
     Private _minYield As Double? = Nothing
     Public Property MinYield() As Double?
@@ -86,7 +93,7 @@ Public Module SettingsManager
         End Get
     End Property
 
-    Private _logLevel As LogLevel = LogLevel.Error
+    Private _logLevel As LogLevel = LogLevel.Trace
     Public Property LogLevel() As LogLevel
         Set(ByVal value As LogLevel)
             SaveValue("/settings/property[@name='log-level']/@value", value.ToString())
@@ -166,7 +173,6 @@ Public Module SettingsManager
     End Property
 
     Private _lastDbUpdate As Date? = Nothing
-
     Public Property LastDbUpdate As Date?
         Get
             Return _lastDbUpdate
@@ -176,8 +182,6 @@ Public Module SettingsManager
             _lastDbUpdate = Date.Parse(value)
         End Set
     End Property
-
-    Private ReadOnly SettingsPath As String = Path.Combine(Utils.GetMyPath(), "config.xml")
 
     Sub New()
         Settings.Load(SettingsPath)
@@ -200,34 +204,33 @@ Public Module SettingsManager
 
         Dim tmp As String = "" : GetStringValue("/settings/property[@name='log-level']/@value", tmp)
         _logLevel = If(tmp <> "", LogLevel.FromString(tmp), LogLevel.Error)
-        ' todo somebody do set this logging level!
     End Sub
 
-    Private Sub GetDoubleValue(ByVal address As String, ByRef var As Double?)
+    Private Shared Sub GetDoubleValue(ByVal address As String, ByRef var As Double?)
         Dim val As XmlNode
         val = Settings.SelectSingleNode(address)
         If val IsNot Nothing AndAlso val.Value <> "" Then var = Double.Parse(val.Value)
     End Sub
 
-    Private Sub GetBoolValue(ByVal address As String, ByRef var As Boolean)
+    Private Shared Sub GetBoolValue(ByVal address As String, ByRef var As Boolean)
         Dim val As XmlNode
         val = Settings.SelectSingleNode(address)
         If val IsNot Nothing AndAlso val.Value <> "" Then var = Boolean.Parse(val.Value)
     End Sub
 
-    Private Sub GetDateValue(ByVal address As String, ByRef var As Date?)
+    Private Shared Sub GetDateValue(ByVal address As String, ByRef var As Date?)
         Dim val As XmlNode
         val = Settings.SelectSingleNode(address)
         If val IsNot Nothing AndAlso val.Value <> "" Then var = Date.ParseExact(var, "yyyyMMdd", CultureInfo.InvariantCulture)
     End Sub
 
-    Private Sub GetStringValue(ByVal address As String, ByRef var As String)
+    Private Shared Sub GetStringValue(ByVal address As String, ByRef var As String)
         Dim val As XmlNode
         val = Settings.SelectSingleNode(address)
         var = If(val IsNot Nothing, val.Value, "")
     End Sub
 
-    Private Sub SaveValue(ByVal address As String, ByVal value As String)
+    Private Shared Sub SaveValue(ByVal address As String, ByVal value As String)
         Dim val As XmlNode
         val = Settings.SelectSingleNode(address)
         If val IsNot Nothing Then
@@ -235,4 +238,4 @@ Public Module SettingsManager
             Settings.Save(SettingsPath)
         End If
     End Sub
-End Module
+End Class

@@ -99,6 +99,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Program Files\NLog\.NET Framework 4.0\NLog.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
@@ -111,6 +113,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="WindowsBase" />
     <Reference Include="zlib.net">
       <HintPath>..\packages\zlib.net.1.0.4.0\lib\zlib.net.dll</HintPath>
     </Reference>
@@ -147,6 +150,12 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\ChartForm\GraphFormExtra.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\PortfolioForm\PortfolioForm.Designer.vb">
+      <DependentUpon>PortfolioForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\PortfolioForm\PortfolioForm.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Tools\ChartElements.vb" />
@@ -227,6 +236,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\MainForm\SettingsForm.resx">
       <DependentUpon>SettingsForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\PortfolioForm\PortfolioForm.resx">
+      <DependentUpon>PortfolioForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\TableForm\TableForm.resx">
       <DependentUpon>TableForm.vb</DependentUpon>
@@ -403,9 +415,7 @@
       <Name>Uitls</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Forms\PortfolioForm\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

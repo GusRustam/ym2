@@ -4,6 +4,7 @@ Imports System.Drawing
 Imports AdfinXAnalyticsFunctions
 Imports System.ComponentModel
 Imports DbManager.Bonds
+Imports Settings
 Imports Uitls
 Imports YieldMap.Forms.TableForm
 Imports YieldMap.Tools.History
@@ -17,6 +18,8 @@ Imports DbManager
 Namespace Forms.ChartForm
     Public Class GraphForm
         Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(GraphForm))
+
+        Private WithEvents _theSettings As SettingsManager = SettingsManager.Instance
         Private WithEvents _tableForm As TableForm.TableForm = New TableForm.TableForm()
 
         Private ReadOnly _moneyMarketCurves As New List(Of SwapCurve)
@@ -133,11 +136,11 @@ Namespace Forms.ChartForm
 
 #Region "III) Event handling"
 #Region "a) Form events"
-        Private Sub GraphFormLoad(sender As Object, e As EventArgs) Handles MyBase.Load
+        Private Sub GraphFormLoad(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Load
             Logger.Trace("GraphFormLoad")
             ThisFormStatus = FormDataStatus.Loading
 
-            ItemDescriptionPanel.Visible = Settings.ShowChartToolBar
+            ItemDescriptionPanel.Visible = _theSettings.ShowChartToolBar
             If ItemDescriptionPanel.Visible Then
                 PinUnpinTSB.Image = Pin
                 PinUnpinTSB.ToolTipText = ShowDescriptionPane
@@ -152,7 +155,7 @@ Namespace Forms.ChartForm
             ThisFormDataSource = -1
         End Sub
 
-        Private Sub GraphFormFormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        Private Sub GraphFormFormClosing(ByVal sender As Object, ByVal e As FormClosingEventArgs) Handles MyBase.FormClosing
             Logger.Trace("GraphForm_FormClosing")
             _ansamble.Cleanup()
             _moneyMarketCurves.ForEach(Sub(curve) curve.Cleanup())
@@ -160,12 +163,12 @@ Namespace Forms.ChartForm
             ThisFormStatus = FormDataStatus.Stopped
         End Sub
 
-        Private Sub GraphFormSizeChanged(sender As Object, e As EventArgs) Handles MyBase.SizeChanged
+        Private Sub GraphFormSizeChanged(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.SizeChanged
             InfoLabel.Left = (MainPanel.ClientSize.Width - InfoLabel.Width) / 2
             InfoLabel.Top = (MainPanel.ClientSize.Height - InfoLabel.Height) / 2
         End Sub
 
-        Private Sub GraphFormClick(sender As Object, e As EventArgs) Handles MainPanel.Click
+        Private Sub GraphFormClick(ByVal sender As Object, ByVal e As EventArgs) Handles MainPanel.Click
             Dim mouseEvent As MouseEventArgs = e
             If mouseEvent.X >= TheChart.Left And mouseEvent.X <= TheChart.Right And
                 mouseEvent.Y >= TheChart.Top And mouseEvent.X <= TheChart.Bottom And
@@ -178,7 +181,7 @@ Namespace Forms.ChartForm
 
 #Region "b) Chart events"
         ' The chart
-        Private Sub TheChartClick(sender As Object, e As EventArgs) Handles TheChart.Click
+        Private Sub TheChartClick(ByVal sender As Object, ByVal e As EventArgs) Handles TheChart.Click
             Logger.Trace("TheChartClick")
             Dim mouseEvent As MouseEventArgs = e
             Dim htr As HitTestResult = TheChart.HitTest(mouseEvent.X, mouseEvent.Y)
@@ -267,7 +270,7 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub TheChartMouseMove(sender As Object, e As MouseEventArgs) Handles TheChart.MouseMove
+        Private Sub TheChartMouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles TheChart.MouseMove
             Dim mouseEvent As MouseEventArgs = e
             Dim hasShown = False
             Try
@@ -375,7 +378,7 @@ Namespace Forms.ChartForm
         End Sub
 
         ' The chart resizing
-        Private Sub ResizePictureBoxMouseDown(sender As Object, e As MouseEventArgs) Handles ResizePictureBox.MouseDown
+        Private Sub ResizePictureBoxMouseDown(ByVal sender As Object, ByVal e As MouseEventArgs) Handles ResizePictureBox.MouseDown
             Logger.Trace("ResizePictureBoxMouseDown")
             If ZoomCustomButton.Checked Then
                 _isResizing = True
@@ -387,7 +390,7 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub ResizePictureBoxMouseMove(sender As Object, e As MouseEventArgs) Handles ResizePictureBox.MouseMove
+        Private Sub ResizePictureBoxMouseMove(ByVal sender As Object, ByVal e As MouseEventArgs) Handles ResizePictureBox.MouseMove
             Logger.Trace("ResizePictureBoxMouseMove")
             If ZoomCustomButton.Checked And _isResizing Then
                 Try
@@ -427,7 +430,7 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub ResizePictureBoxMouseLeave(sender As Object, e As EventArgs) Handles ResizePictureBox.MouseLeave
+        Private Sub ResizePictureBoxMouseLeave(ByVal sender As Object, ByVal e As EventArgs) Handles ResizePictureBox.MouseLeave
             Logger.Trace("ResizePictureBoxMouseLeave")
             If ZoomCustomButton.Checked And _isResizing Then
                 StopResize()
@@ -435,7 +438,7 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub ResizePictureBoxMouseUp(sender As Object, e As MouseEventArgs) Handles ResizePictureBox.MouseUp
+        Private Sub ResizePictureBoxMouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles ResizePictureBox.MouseUp
             Logger.Trace("ResizePictureBoxMouseUp")
             If ZoomCustomButton.Checked And _isResizing Then
                 StopResize()
@@ -455,7 +458,7 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub ResizePictureBoxPaint(sender As Object, e As PaintEventArgs) Handles ResizePictureBox.Paint
+        Private Sub ResizePictureBoxPaint(ByVal sender As Object, ByVal e As PaintEventArgs) Handles ResizePictureBox.Paint
             Logger.Trace("ResizePictureBoxMouseUp")
             If ZoomCustomButton.Checked And _isResizing Then
                 e.Graphics.DrawRectangle(New Pen(Color.Black), _resizeRectangle)
@@ -464,13 +467,13 @@ Namespace Forms.ChartForm
 #End Region
 
 #Region "c) Toolbar events"
-        Private Sub ZoomAllButtonClick(sender As Object, e As EventArgs) Handles ZoomAllButton.Click
+        Private Sub ZoomAllButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles ZoomAllButton.Click
             SetChartMinMax()
             TheChart.ChartAreas(0).AxisX.ScaleView.ZoomReset()
             TheChart.ChartAreas(0).AxisY.ScaleView.ZoomReset()
         End Sub
 
-        Private Sub ZoomCustomButtonClick(sender As Object, e As EventArgs) Handles ZoomCustomButton.Click
+        Private Sub ZoomCustomButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles ZoomCustomButton.Click
             Logger.Trace("ZoomCustomButtonClick")
             If Not TheChart.Visible Then
                 ZoomCustomButton.Checked = False
@@ -495,11 +498,11 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub PortfolioTssbDropDownOpening(sender As Object, e As EventArgs) Handles PortfolioTSSB.DropDownOpening
+        Private Sub PortfolioTssbDropDownOpening(ByVal sender As Object, ByVal e As EventArgs) Handles PortfolioTSSB.DropDownOpening
             ' list of portfolios to show
             '(From rw In (New portfolioTableAdapter).GetData() Select New IdName() With {.Id = rw("id"), .Name = rw("portfolio_name")}).ToList()
-            Dim portDescrList As List(Of IdName) = 
-                (From rw In PortfolioManager.GetInstance.GetPortfoliosFlat() 
+            Dim portDescrList As List(Of IdName) =
+                (From rw In PortfolioManager.GetInstance.GetPortfoliosFlat()
                  Select New IdName() With {.Id = rw.Item1, .Name = rw.Item2}).ToList()
 
             PortfolioTSSB.DropDownItems.Clear()
@@ -513,7 +516,7 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub PortfolioSelectTSCBSelectedIndexChanged(sender As Object, e As EventArgs)
+        Private Sub PortfolioSelectTSCBSelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs)
             Logger.Trace("PortfolioSelectTSCBSelectedIndexChanged")
             If ThisFormStatus <> FormDataStatus.Loading Then
                 ThisFormStatus = FormDataStatus.Stopped
@@ -530,7 +533,7 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub RubCCSTSMIClick(sender As Object, e As EventArgs) Handles RubCCSTSMI.Click
+        Private Sub RubCCSTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RubCCSTSMI.Click
             Logger.Debug("RubCCSTSMIClick()")
             Dim rubCCS = New RubCCS(_spreadBenchmarks)
 
@@ -555,7 +558,7 @@ Namespace Forms.ChartForm
             _moneyMarketCurves.Add(rubIRS)
         End Sub
 
-        Private Sub NDFTSMIClick(sender As Object, e As EventArgs) Handles NDFTSMI.Click
+        Private Sub NDFTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles NDFTSMI.Click
             Logger.Debug("NDFTSMI_Click()")
             Dim rubNDF = New RubNDF(_spreadBenchmarks)
             AddHandler rubNDF.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
@@ -567,11 +570,11 @@ Namespace Forms.ChartForm
             _moneyMarketCurves.Add(rubNDF)
         End Sub
 
-        Private Sub ShowLegendTSBClicked(sender As Object, e As EventArgs) Handles ShowLegendTSB.Click
+        Private Sub ShowLegendTSBClicked(ByVal sender As Object, ByVal e As EventArgs) Handles ShowLegendTSB.Click
             TheChart.Legends(0).Enabled = ShowLegendTSB.Checked
         End Sub
 
-        Private Sub ShowLabelsTSBClick(sender As Object, e As EventArgs) Handles ShowLabelsTSB.Click
+        Private Sub ShowLabelsTSBClick(ByVal sender As Object, ByVal e As EventArgs) Handles ShowLabelsTSB.Click
             Logger.Trace("ShowLabelsTSBClick")
             For Each series In From srs In TheChart.Series Where TypeOf srs.Tag Is BondSetSeries
                 Dim points = series.Points
@@ -588,7 +591,7 @@ Namespace Forms.ChartForm
             Next
         End Sub
 
-        Private Sub PinUnpinTSBClick(sender As Object, e As EventArgs) Handles PinUnpinTSB.Click
+        Private Sub PinUnpinTSBClick(ByVal sender As Object, ByVal e As EventArgs) Handles PinUnpinTSB.Click
             If ItemDescriptionPanel.Visible Then
                 ItemDescriptionPanel.Visible = False
                 PinUnpinTSB.Image = Pin
@@ -600,7 +603,7 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub ChartCMSOpening(sender As Object, e As CancelEventArgs) Handles ChartCMS.Opening
+        Private Sub ChartCMSOpening(ByVal sender As Object, ByVal e As CancelEventArgs) Handles ChartCMS.Opening
             CopyToClipboardTSMI.Visible = TheChart.Visible
             ClipboardSeparator.Visible = TheChart.Visible
         End Sub
@@ -614,7 +617,7 @@ Namespace Forms.ChartForm
             If item IsNot Nothing Then _spreadBenchmarks.CurrentType = SpreadType.FromString(item.Text)
         End Sub
 
-        Private Sub CopyToClipboardTSMIClick(sender As Object, e As EventArgs) Handles CopyToClipboardTSMI.Click
+        Private Sub CopyToClipboardTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles CopyToClipboardTSMI.Click
             Dim bmp As New Bitmap(TheChart.Width, TheChart.Height)
             TheChart.DrawToBitmap(bmp, TheChart.ClientRectangle)
             Clipboard.SetImage(bmp)
@@ -638,15 +641,15 @@ Namespace Forms.ChartForm
             ZSpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(SpreadType.ZSpread), " -> " + _spreadBenchmarks.Benchmarks(SpreadType.ZSpread).GetFullName(), "")
         End Sub
 
-        Private Sub RelatedQuoteTSMIClick(sender As Object, e As EventArgs) Handles RelatedQuoteTSMI.Click
+        Private Sub RelatedQuoteTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RelatedQuoteTSMI.Click
             If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then RunCommand("reuters://REALTIME/verb=FullQuote/ric=" + BondCMS.Tag.ToString())
         End Sub
 
-        Private Sub BondDescriptionTSMIClick(sender As Object, e As EventArgs) Handles BondDescriptionTSMI.Click
+        Private Sub BondDescriptionTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles BondDescriptionTSMI.Click
             If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then RunCommand("reuters://REALTIME/verb=BondData/ric=" + BondCMS.Tag.ToString())
         End Sub
 
-        Private Sub RelatedChartTSMIClick(sender As Object, e As EventArgs) Handles RelatedChartTSMI.Click
+        Private Sub RelatedChartTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RelatedChartTSMI.Click
             If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then RunCommand("reuters://REALTIME/verb=RelatedGraph/ric=" + BondCMS.Tag.ToString())
         End Sub
 

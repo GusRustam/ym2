@@ -1,10 +1,14 @@
 ﻿Imports System.Threading
+Imports NLog
+Imports Settings
 Imports YieldMap.Forms.MainForm
 Imports YieldMap.My.Resources
 Imports YieldMap.Forms
 
 Module MainModule
     Private _mainForm As MainForm
+    Private ReadOnly Logger As Logger = Logging.GetLogger(GetType(MainModule))
+
     Public ReadOnly Property AppMainForm() As MainForm
         Get
             Return _mainForm
@@ -12,6 +16,9 @@ Module MainModule
     End Property
 
     Public Sub Main()
+        Logger.Trace("Main method started")
+        Logging.LoggingLevel = SettingsManager.Instance.LogLevel
+
         ' Uninstall:  http://www.codeproject.com/Articles/11377/Add-an-uninstall-start-menu-item-to-your-NET-deplo
         Dim arguments As String() = Environment.GetCommandLineArgs()
         For Each guid As String In From argument In arguments
@@ -21,7 +28,7 @@ Module MainModule
             End
         Next
 
-        ' Error handling
+        ' Error handling ' todo shitty handling ya'know
         AddHandler Application.ThreadException, New ThreadExceptionEventHandler(AddressOf ThreadEventHandler)
         Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException)
 

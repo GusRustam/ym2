@@ -38,6 +38,8 @@
               <xs:element name="series" msprop:Generator_ColumnVarNameInTable="columnseries" msprop:Generator_ColumnPropNameInRow="series" msprop:Generator_ColumnPropNameInTable="seriesColumn" msprop:Generator_UserColumnName="series" type="xs:string" minOccurs="0" />
               <xs:element name="borrowerCountry" msprop:Generator_ColumnVarNameInTable="columnborrowerCountry" msprop:Generator_ColumnPropNameInRow="borrowerCountry" msprop:Generator_ColumnPropNameInTable="borrowerCountryColumn" msprop:Generator_UserColumnName="borrowerCountry" type="xs:string" minOccurs="0" />
               <xs:element name="issuerCountry" msprop:Generator_ColumnVarNameInTable="columnissuerCountry" msprop:Generator_ColumnPropNameInRow="issuerCountry" msprop:Generator_ColumnPropNameInTable="issuerCountryColumn" msprop:Generator_UserColumnName="issuerCountry" type="xs:string" minOccurs="0" />
+              <xs:element name="isin" msprop:Generator_ColumnVarNameInTable="columnisin" msprop:Generator_ColumnPropNameInRow="isin" msprop:Generator_ColumnPropNameInTable="isinColumn" msprop:Generator_UserColumnName="isin" type="xs:string" minOccurs="0" />
+              <xs:element name="parentTicker" msprop:Generator_ColumnVarNameInTable="columnparentTicker" msprop:Generator_ColumnPropNameInRow="parentTicker" msprop:Generator_ColumnPropNameInTable="parentTickerColumn" msprop:Generator_UserColumnName="parentTicker" type="xs:string" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>
@@ -90,6 +92,15 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
+        <xs:element name="Rics" msprop:Generator_TableClassName="RicsDataTable" msprop:Generator_TableVarName="tableRics" msprop:Generator_TablePropName="Rics" msprop:Generator_RowDeletingName="RicsRowDeleting" msprop:Generator_UserTableName="Rics" msprop:Generator_RowChangingName="RicsRowChanging" msprop:Generator_RowEvHandlerName="RicsRowChangeEventHandler" msprop:Generator_RowDeletedName="RicsRowDeleted" msprop:Generator_RowEvArgName="RicsRowChangeEvent" msprop:Generator_RowChangedName="RicsRowChanged" msprop:Generator_RowClassName="RicsRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ric" msprop:Generator_ColumnVarNameInTable="columnric" msprop:Generator_ColumnPropNameInRow="ric" msprop:Generator_ColumnPropNameInTable="ricColumn" msprop:Generator_UserColumnName="ric" type="xs:string" minOccurs="0" />
+              <xs:element name="subRic" msprop:Generator_ColumnVarNameInTable="columnsubRic" msprop:Generator_ColumnPropNameInRow="subRic" msprop:Generator_ColumnPropNameInTable="subRicColumn" msprop:Generator_UserColumnName="subRic" type="xs:string" minOccurs="0" />
+              <xs:element name="contributor" msprop:Generator_ColumnVarNameInTable="columncontributor" msprop:Generator_ColumnPropNameInRow="contributor" msprop:Generator_ColumnPropNameInTable="contributorColumn" msprop:Generator_UserColumnName="contributor" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
       </xs:choice>
     </xs:complexType>
     <xs:unique name="Constraint1">
@@ -100,6 +111,10 @@
       <xs:selector xpath=".//mstns:RicChain" />
       <xs:field xpath="mstns:ric" />
     </xs:unique>
+    <xs:keyref name="FK_Bond_Rics" refer="Constraint1" msdata:ConstraintOnly="true">
+      <xs:selector xpath=".//mstns:Rics" />
+      <xs:field xpath="mstns:ric" />
+    </xs:keyref>
     <xs:keyref name="FK_Bond_FrnDetails" refer="Constraint1" msdata:ConstraintOnly="true">
       <xs:selector xpath=".//mstns:Frn" />
       <xs:field xpath="mstns:ric" />

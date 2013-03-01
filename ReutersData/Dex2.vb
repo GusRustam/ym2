@@ -111,18 +111,23 @@ Public Class Dex2
     End Sub
 
     Private Sub ImportData(ByVal datastatus As DEX2_DataStatus, ByVal [error] As Object)
-        Dim res As New LinkedList(Of Dictionary(Of String, Object))
-        Dim data = _rData.Data
-        For i = data.GetLowerBound(0) To data.GetUpperBound(0)
-            res.AddLast(New Dictionary(Of String, Object)())
+        Try
+            Dim res As New LinkedList(Of Dictionary(Of String, Object))
+            Dim data = _rData.Data
+            For i = data.GetLowerBound(0) To data.GetUpperBound(0)
+                res.AddLast(New Dictionary(Of String, Object)())
 
-            For j = 0 To _columns.Count - 1
-                Dim field = _columns(j)
-                Dim elem = data.GetValue(i, j)
-                res.Last.Value.Add(field, elem)
+                For j = 0 To _columns.Count - 1
+                    Dim field = _columns(j)
+                    Dim elem = data.GetValue(i, j)
+                    res.Last.Value.Add(field, elem)
+                Next
             Next
-        Next
-        RemoveHandler _rData.OnUpdate, AddressOf ImportData
-        RaiseEvent Metadata(res)
+            RemoveHandler _rData.OnUpdate, AddressOf ImportData
+            RaiseEvent Metadata(res)
+        Catch ex As Exception
+            RaiseEvent Failure(ex)
+        End Try
+
     End Sub
 End Class

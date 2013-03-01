@@ -127,13 +127,13 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub HideBidAsk()
-            If Not Settings.ShowBidAsk Then Return
+            If Not _theSettings.ShowBidAsk Then Return
             Dim bidAskSeries = TheChart.Series.FindByName("BidAskSeries")
             If bidAskSeries IsNot Nothing Then TheChart.Series.Remove(bidAskSeries)
         End Sub
 
         Private Sub PlotBidAsk(ByVal bond As Bond)
-            If Not Settings.ShowBidAsk Then Return
+            If Not _theSettings.ShowBidAsk Then Return
             If Not (bond.QuotesAndYields.ContainsKey(QuoteSource.Bid.ToString.ToUpper()) Or bond.QuotesAndYields.ContainsKey(QuoteSource.Ask.ToString.ToUpper())) Then Return
             Dim bidAskSeries = TheChart.Series.FindByName("BidAskSeries")
             Dim minX = TheChart.ChartAreas(0).AxisX.Minimum
@@ -243,11 +243,11 @@ Namespace Forms.ChartForm
 
                     Dim minMin As Double?, maxMax As Double?
                     If _spreadBenchmarks.CurrentType = SpreadType.Yield Then
-                        minMin = Settings.MinYield / 100
-                        maxMax = Settings.MaxYield / 100
+                        minMin = _theSettings.MinYield / 100
+                        maxMax = _theSettings.MaxYield / 100
                     Else
-                        minMin = Settings.MinSpread
-                        maxMax = Settings.MaxSpread
+                        minMin = _theSettings.MinSpread
+                        maxMax = _theSettings.MaxSpread
                     End If
 
                     If newMax > newMin Then
