@@ -23,6 +23,7 @@
         'Do not modify it using the code editor.
         <System.Diagnostics.DebuggerStepThrough()> _
         Private Sub InitializeComponent()
+            Me.components = New System.ComponentModel.Container()
             Me.MainTabControl = New System.Windows.Forms.TabControl()
             Me.PortfoliosPage = New System.Windows.Forms.TabPage()
             Me.TableLayoutPanel2 = New System.Windows.Forms.TableLayoutPanel()
@@ -58,6 +59,11 @@
             Me.FlowLayoutPanel4 = New System.Windows.Forms.FlowLayoutPanel()
             Me.Button7 = New System.Windows.Forms.Button()
             Me.Button8 = New System.Windows.Forms.Button()
+            Me.PortTreeCM = New System.Windows.Forms.ContextMenuStrip(Me.components)
+            Me.AddPortfolioToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.AddFolderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.RenameToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.DeleteToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Me.MainTabControl.SuspendLayout()
             Me.PortfoliosPage.SuspendLayout()
             Me.TableLayoutPanel2.SuspendLayout()
@@ -77,6 +83,7 @@
             Me.TableLayoutPanel1.SuspendLayout()
             CType(Me.BondsTableView, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.FlowLayoutPanel4.SuspendLayout()
+            Me.PortTreeCM.SuspendLayout()
             Me.SuspendLayout()
             '
             'MainTabControl
@@ -106,24 +113,25 @@
             'TableLayoutPanel2
             '
             Me.TableLayoutPanel2.ColumnCount = 2
-            Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-            Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+            Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
+            Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 66.66666!))
             Me.TableLayoutPanel2.Controls.Add(Me.PortfolioTree, 0, 0)
             Me.TableLayoutPanel2.Controls.Add(Me.PortfolioItemsGrid, 1, 0)
             Me.TableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill
             Me.TableLayoutPanel2.Location = New System.Drawing.Point(3, 3)
             Me.TableLayoutPanel2.Name = "TableLayoutPanel2"
             Me.TableLayoutPanel2.RowCount = 1
-            Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+            Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
             Me.TableLayoutPanel2.Size = New System.Drawing.Size(852, 466)
             Me.TableLayoutPanel2.TabIndex = 0
             '
             'PortfolioTree
             '
             Me.PortfolioTree.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.PortfolioTree.LabelEdit = True
             Me.PortfolioTree.Location = New System.Drawing.Point(3, 3)
             Me.PortfolioTree.Name = "PortfolioTree"
-            Me.PortfolioTree.Size = New System.Drawing.Size(420, 460)
+            Me.PortfolioTree.Size = New System.Drawing.Size(278, 460)
             Me.PortfolioTree.TabIndex = 0
             '
             'PortfolioItemsGrid
@@ -133,10 +141,10 @@
             Me.PortfolioItemsGrid.AllowUserToResizeColumns = False
             Me.PortfolioItemsGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
             Me.PortfolioItemsGrid.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.PortfolioItemsGrid.Location = New System.Drawing.Point(429, 3)
+            Me.PortfolioItemsGrid.Location = New System.Drawing.Point(287, 3)
             Me.PortfolioItemsGrid.Name = "PortfolioItemsGrid"
             Me.PortfolioItemsGrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-            Me.PortfolioItemsGrid.Size = New System.Drawing.Size(420, 460)
+            Me.PortfolioItemsGrid.Size = New System.Drawing.Size(562, 460)
             Me.PortfolioItemsGrid.TabIndex = 1
             '
             'ChainsPage
@@ -487,6 +495,36 @@
             Me.Button8.Text = "Reload"
             Me.Button8.UseVisualStyleBackColor = True
             '
+            'PortTreeCM
+            '
+            Me.PortTreeCM.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddPortfolioToolStripMenuItem, Me.AddFolderToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteToolStripMenuItem})
+            Me.PortTreeCM.Name = "PortTreeCM"
+            Me.PortTreeCM.Size = New System.Drawing.Size(153, 114)
+            '
+            'AddPortfolioToolStripMenuItem
+            '
+            Me.AddPortfolioToolStripMenuItem.Name = "AddPortfolioToolStripMenuItem"
+            Me.AddPortfolioToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.AddPortfolioToolStripMenuItem.Text = "Add portfolio..."
+            '
+            'AddFolderToolStripMenuItem
+            '
+            Me.AddFolderToolStripMenuItem.Name = "AddFolderToolStripMenuItem"
+            Me.AddFolderToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.AddFolderToolStripMenuItem.Text = "Add folder..."
+            '
+            'RenameToolStripMenuItem
+            '
+            Me.RenameToolStripMenuItem.Name = "RenameToolStripMenuItem"
+            Me.RenameToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.RenameToolStripMenuItem.Text = "Rename"
+            '
+            'DeleteToolStripMenuItem
+            '
+            Me.DeleteToolStripMenuItem.Name = "DeleteToolStripMenuItem"
+            Me.DeleteToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.DeleteToolStripMenuItem.Text = "Delete"
+            '
             'PortfolioForm
             '
             Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -516,6 +554,7 @@
             Me.TableLayoutPanel1.ResumeLayout(False)
             CType(Me.BondsTableView, System.ComponentModel.ISupportInitialize).EndInit()
             Me.FlowLayoutPanel4.ResumeLayout(False)
+            Me.PortTreeCM.ResumeLayout(False)
             Me.ResumeLayout(False)
 
         End Sub
@@ -554,5 +593,10 @@
         Friend WithEvents Button9 As System.Windows.Forms.Button
         Friend WithEvents Button10 As System.Windows.Forms.Button
         Friend WithEvents DataGridView4 As System.Windows.Forms.DataGridView
+        Friend WithEvents PortTreeCM As System.Windows.Forms.ContextMenuStrip
+        Friend WithEvents AddPortfolioToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents AddFolderToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents RenameToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents DeleteToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     End Class
 End Namespace

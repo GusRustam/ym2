@@ -274,11 +274,11 @@
   <data name="logo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\logo.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Unhandled_domain_exception">
-    <value xml:space="preserve">Unhandled domain exception</value>
+  <data name="Unhandled_domain_exception" xml:space="preserve">
+    <value>Unhandled domain exception</value>
   </data>
-  <data name="Unhandled_thread_exception">
-    <value xml:space="preserve">Unhandled thread exception</value>
+  <data name="Unhandled_thread_exception" xml:space="preserve">
+    <value>Unhandled thread exception</value>
   </data>
   <data name="ShowDescriptionPane" xml:space="preserve">
     <value>Show description pane</value>
@@ -291,5 +291,11 @@
   </data>
   <data name="FailedToUpdateDatabase" xml:space="preserve">
     <value>Failed to update database</value>
+  </data>
+  <data name="briefcase" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\briefcase.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="generic_folder_alt" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\generic_folder_alt.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

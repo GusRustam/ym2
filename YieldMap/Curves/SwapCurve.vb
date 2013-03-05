@@ -111,7 +111,7 @@ Namespace Curves
         End Function
 
         Public Function ToArray() As Array
-            Dim list = Descrs.Values.Where(Function(elem) elem.Yield.HasValue).ToList()
+            Dim list = Descrs.Values.Where(Function(elem) elem.Yield.HasValue).ToList() ' todo BOOTSTRAPPED DATA IF BOOTSTRAPPED
             list.Sort()
             Dim len = list.Count - 1
             Dim res(0 To len, 1) As Object

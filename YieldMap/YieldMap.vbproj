@@ -152,6 +152,12 @@
     <Compile Include="Forms\ChartForm\GraphFormExtra.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\PortfolioForm\AddPortfolioForm.Designer.vb">
+      <DependentUpon>AddPortfolioForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\PortfolioForm\AddPortfolioForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\PortfolioForm\PortfolioForm.Designer.vb">
       <DependentUpon>PortfolioForm.vb</DependentUpon>
     </Compile>
@@ -237,6 +243,9 @@
     <EmbeddedResource Include="Forms\MainForm\SettingsForm.resx">
       <DependentUpon>SettingsForm.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\PortfolioForm\AddPortfolioForm.resx">
+      <DependentUpon>AddPortfolioForm.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\PortfolioForm\PortfolioForm.resx">
       <DependentUpon>PortfolioForm.vb</DependentUpon>
     </EmbeddedResource>
@@ -283,6 +292,7 @@
     </Content>
     <Content Include="Resources\add.png" />
     <Content Include="Resources\arrow_rotate_clockwise.png" />
+    <None Include="Resources\briefcase.png" />
     <Content Include="Resources\ChartBubbleLarge.png" />
     <Content Include="Resources\chart_line.png" />
     <Content Include="Resources\clipboard.png" />
@@ -293,6 +303,7 @@
     <Content Include="Resources\eyeglasses.png" />
     <Content Include="Resources\fit_to_size.png" />
     <Content Include="Resources\folder.png" />
+    <None Include="Resources\generic_folder_alt.png" />
     <Content Include="Resources\graph_edge_curved.png" />
     <None Include="Resources\logo.jpg" />
     <Content Include="config.xml">
