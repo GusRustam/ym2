@@ -23,7 +23,7 @@
         'Do not modify it using the code editor.
         <System.Diagnostics.DebuggerStepThrough()> _
         Private Sub InitializeComponent()
-            Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
+            Me.Layout = New System.Windows.Forms.TableLayoutPanel()
             Me.Label1 = New System.Windows.Forms.Label()
             Me.Label2 = New System.Windows.Forms.Label()
             Me.Panel1 = New System.Windows.Forms.Panel()
@@ -32,30 +32,30 @@
             Me.NewName = New System.Windows.Forms.TextBox()
             Me.OkButton = New System.Windows.Forms.Button()
             Me.CancelButton = New System.Windows.Forms.Button()
-            Me.TableLayoutPanel1.SuspendLayout()
+            Me.Layout.SuspendLayout()
             Me.Panel1.SuspendLayout()
             Me.SuspendLayout()
             '
-            'TableLayoutPanel1
+            'Layout
             '
-            Me.TableLayoutPanel1.ColumnCount = 2
-            Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
-            Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 66.66667!))
-            Me.TableLayoutPanel1.Controls.Add(Me.Label1, 0, 0)
-            Me.TableLayoutPanel1.Controls.Add(Me.Label2, 0, 1)
-            Me.TableLayoutPanel1.Controls.Add(Me.Panel1, 1, 1)
-            Me.TableLayoutPanel1.Controls.Add(Me.NewName, 1, 0)
-            Me.TableLayoutPanel1.Controls.Add(Me.OkButton, 0, 2)
-            Me.TableLayoutPanel1.Controls.Add(Me.CancelButton, 1, 2)
-            Me.TableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.TableLayoutPanel1.Location = New System.Drawing.Point(0, 0)
-            Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
-            Me.TableLayoutPanel1.RowCount = 3
-            Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-            Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-            Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
-            Me.TableLayoutPanel1.Size = New System.Drawing.Size(380, 95)
-            Me.TableLayoutPanel1.TabIndex = 0
+            Me.Layout.ColumnCount = 2
+            Me.Layout.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
+            Me.Layout.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 66.66667!))
+            Me.Layout.Controls.Add(Me.Label1, 0, 0)
+            Me.Layout.Controls.Add(Me.Label2, 0, 1)
+            Me.Layout.Controls.Add(Me.Panel1, 1, 1)
+            Me.Layout.Controls.Add(Me.NewName, 1, 0)
+            Me.Layout.Controls.Add(Me.OkButton, 0, 2)
+            Me.Layout.Controls.Add(Me.CancelButton, 1, 2)
+            Me.Layout.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.Layout.Location = New System.Drawing.Point(0, 0)
+            Me.Layout.Name = "Layout"
+            Me.Layout.RowCount = 3
+            Me.Layout.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+            Me.Layout.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+            Me.Layout.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
+            Me.Layout.Size = New System.Drawing.Size(380, 83)
+            Me.Layout.TabIndex = 0
             '
             'Label1
             '
@@ -69,7 +69,7 @@
             'Label2
             '
             Me.Label2.AutoSize = True
-            Me.Label2.Location = New System.Drawing.Point(3, 32)
+            Me.Label2.Location = New System.Drawing.Point(3, 26)
             Me.Label2.Name = "Label2"
             Me.Label2.Size = New System.Drawing.Size(31, 13)
             Me.Label2.TabIndex = 1
@@ -80,9 +80,9 @@
             Me.Panel1.Controls.Add(Me.ItsFolder)
             Me.Panel1.Controls.Add(Me.ItsPortfolio)
             Me.Panel1.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.Panel1.Location = New System.Drawing.Point(129, 35)
+            Me.Panel1.Location = New System.Drawing.Point(129, 29)
             Me.Panel1.Name = "Panel1"
-            Me.Panel1.Size = New System.Drawing.Size(248, 26)
+            Me.Panel1.Size = New System.Drawing.Size(248, 20)
             Me.Panel1.TabIndex = 2
             '
             'ItsPortfolio
@@ -118,7 +118,7 @@
             'OkButton
             '
             Me.OkButton.DialogResult = System.Windows.Forms.DialogResult.OK
-            Me.OkButton.Location = New System.Drawing.Point(3, 67)
+            Me.OkButton.Location = New System.Drawing.Point(3, 55)
             Me.OkButton.Name = "OkButton"
             Me.OkButton.Size = New System.Drawing.Size(75, 25)
             Me.OkButton.TabIndex = 4
@@ -128,7 +128,7 @@
             'CancelButton
             '
             Me.CancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel
-            Me.CancelButton.Location = New System.Drawing.Point(129, 67)
+            Me.CancelButton.Location = New System.Drawing.Point(129, 55)
             Me.CancelButton.Name = "CancelButton"
             Me.CancelButton.Size = New System.Drawing.Size(75, 25)
             Me.CancelButton.TabIndex = 5
@@ -139,19 +139,20 @@
             '
             Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
             Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-            Me.ClientSize = New System.Drawing.Size(380, 95)
-            Me.Controls.Add(Me.TableLayoutPanel1)
+            Me.ClientSize = New System.Drawing.Size(380, 83)
+            Me.Controls.Add(Me.Layout)
+            Me.MaximumSize = New System.Drawing.Size(440, 220)
             Me.MinimumSize = New System.Drawing.Size(220, 110)
             Me.Name = "AddPortfolioForm"
             Me.Text = "AddPortfolioForm"
-            Me.TableLayoutPanel1.ResumeLayout(False)
-            Me.TableLayoutPanel1.PerformLayout()
+            Me.Layout.ResumeLayout(False)
+            Me.Layout.PerformLayout()
             Me.Panel1.ResumeLayout(False)
             Me.Panel1.PerformLayout()
             Me.ResumeLayout(False)
 
         End Sub
-        Friend WithEvents TableLayoutPanel1 As System.Windows.Forms.TableLayoutPanel
+        Friend WithEvents Layout As System.Windows.Forms.TableLayoutPanel
         Friend WithEvents Label1 As System.Windows.Forms.Label
         Friend WithEvents Label2 As System.Windows.Forms.Label
         Friend WithEvents Panel1 As System.Windows.Forms.Panel

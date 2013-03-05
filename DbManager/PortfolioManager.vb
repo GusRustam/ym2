@@ -24,8 +24,15 @@ Public Interface IPortfolioManager
     '' Returns portfolio as a set of sources, each having different settings
     Function GetPortfolioStructure(ByVal currentPortID As Long) As List(Of PortfolioSource)
     Function GetFolderDescr(ByVal id As String) As PortfolioItemDescription
+
     Sub SetFolderName(ByVal id As String, ByVal name As String)
     Sub SetPortfolioName(ByVal id As String, ByVal name As String)
+
+    Sub DeleteFolder(ByVal id As String)
+    Sub DeletePortfolio(ByVal id As String)
+
+    Function AddFolder(ByVal text As String, Optional ByVal id As String = "") As Long
+    Function AddPortfolio(ByVal text As String, Optional ByVal id As String = "") As Long
 End Interface
 
 Public Class PortfolioItemDescription
@@ -62,27 +69,45 @@ End Class
 
 
 Public Class PortfolioManager
+    ' TODO multiple files
+    ' TOOO events OnLoadConfig, OnConfigFileUpdated
     Implements IPortfolioManager
+
+    Private Const ConfigFile As String = "bonds.xml"
+    Private ReadOnly _configXml As String = Path.Combine(Utils.GetMyPath(), ConfigFile)
+    Private ReadOnly _bonds As New XmlDocument
+
     Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(PortfolioManager))
 
-    Private ReadOnly _bonds As New XmlDocument
     Private Shared _instance As PortfolioManager
 
     Private Sub New()
-        _bonds.Load(Path.Combine(Utils.GetMyPath(), "bonds.xml"))
+        _bonds.Load(_configXML)
     End Sub
 
     Public Function GetPortfoliosByFolder(ByVal id As String) As List(Of PortfolioItemDescription) Implements IPortfolioManager.GetPortfoliosByFolder
         Dim res As New List(Of PortfolioItemDescription)
+        Dim xPathFolder As String
+        Dim xPathPort As String
+
+        If id <> "" Then
+            xPathFolder = String.Format("/bonds/portfolios//folder[@id='{0}']/folder", id)
+            xPathPort = String.Format("/bonds/portfolios//folder[@id='{0}']/portfolio", id)
+        Else
+            xPathFolder = "/bonds/portfolios/folder"
+            xPathPort = "/bonds/portfolios/portfolio"
+        End If
+
         Dim iter As XmlNodeList
-        iter = _bonds.SelectNodes(String.Format("/bonds/portfolios//folder[@id='{0}']/folder", id))
+
+        iter = _bonds.SelectNodes(xPathFolder)
         For i = 0 To iter.Count - 1
             Dim attributes = iter(i).Attributes
             If attributes.ItemOf("id") IsNot Nothing AndAlso attributes.ItemOf("name") IsNot Nothing Then
                 res.Add(New PortfolioItemDescription(True, attributes("name").Value, attributes("id").Value))
             End If
         Next
-        iter = _bonds.SelectNodes(String.Format("/bonds/portfolios//folder[@id='{0}']/portfolio", id))
+        iter = _bonds.SelectNodes(xPathPort)
         For i = 0 To iter.Count - 1
             Dim attributes = iter(i).Attributes
             If attributes.ItemOf("id") IsNot Nothing AndAlso attributes.ItemOf("name") IsNot Nothing Then
@@ -108,17 +133,89 @@ Public Class PortfolioManager
     Public Sub SetFolderName(ByVal id As String, ByVal name As String) Implements IPortfolioManager.SetFolderName
         Dim node = _bonds.SelectSingleNode(String.Format("/bonds/portfolios//folder[@id='{0}']/@name", id))
         node.Value = name
-        _bonds.Save(Path.Combine(Utils.GetMyPath(), "bonds.xml"))
+        _bonds.Save(_configXML)
     End Sub
 
     Public Sub SetPortfolioName(ByVal id As String, ByVal name As String) Implements IPortfolioManager.SetPortfolioName
         Dim node = _bonds.SelectSingleNode(String.Format("/bonds/portfolios//portfolio[@id='{0}']/@name", id))
         node.Value = name
-        _bonds.Save(Path.Combine(Utils.GetMyPath(), "bonds.xml"))
+        _bonds.Save(_configXML)
     End Sub
 
-    Public Function GetMainFolderName(ByVal id As String) As PortfolioItemDescription Implements IPortfolioManager.GetFolderDescr
+    Private Function Add(ByVal text As String, ByVal type As String, Optional ByVal id As String = "") As Long
+        Dim parent As XmlNode
+        If id <> "" Then
+            parent = _bonds.SelectSingleNode(String.Format("/bonds/portfolios//folder[@id='{0}']", id))
+        Else
+            parent = _bonds.SelectSingleNode("/bonds/portfolios")
+        End If
+        Dim folder As XmlNode = _bonds.CreateNode(XmlNodeType.Element, type, "")
+
+        Dim idAttr As XmlAttribute = _bonds.CreateAttribute("id")
+        Dim newId = GenerateNewId()
+        idAttr.Value = newId
+
+        Dim nameAttr As XmlAttribute = _bonds.CreateAttribute("name")
+        nameAttr.Value = text
+
+        folder.Attributes.Append(idAttr)
+        folder.Attributes.Append(nameAttr)
+        parent.AppendChild(folder)
+
+        _bonds.Save(_configXML)
+
+        Return newId
+    End Function
+
+    Private Function GenerateNewId() As Long
+        Dim ids As New HashSet(Of Long)
+        Dim idNodes = _bonds.SelectNodes("/bonds/portfolios//portfolio/@id | /bonds/portfolios//folder/@id")
+        For Each node As XmlNode In idNodes
+            ids.Add(CLng(node.Value))
+        Next
+        Dim rnd As New Random
+        Dim elem As Long
+        Do
+            elem = CLng(rnd.NextDouble() * 100000)
+        Loop While ids.Contains(elem)
+        Return elem
+    End Function
+
+    Public Sub DeleteFolder(ByVal id As String) Implements IPortfolioManager.DeleteFolder
         Dim node = _bonds.SelectSingleNode(String.Format("/bonds/portfolios//folder[@id='{0}']", id))
+        Dim parent = node.ParentNode
+
+        parent.RemoveChild(node)
+        _bonds.Save(_configXML)
+    End Sub
+
+    Public Sub DeletePortfolio(ByVal id As String) Implements IPortfolioManager.DeletePortfolio
+        Dim node = _bonds.SelectSingleNode(String.Format("/bonds/portfolios//portfolio[@id='{0}']", id))
+        Dim parent = node.ParentNode
+
+        parent.RemoveChild(node)
+        _bonds.Save(_configXML)
+    End Sub
+
+    Public Function AddFolder(ByVal text As String, Optional ByVal id As String = "") As Long Implements IPortfolioManager.AddFolder
+        If id <> "" Then
+            Return Add(text, "folder", id)
+        Else
+            Return Add(text, "folder")
+        End If
+    End Function
+
+    Public Function AddPortfolio(ByVal text As String, Optional ByVal id As String = "") As Long Implements IPortfolioManager.AddPortfolio
+        If id <> "" Then
+            Return Add(text, "portfolio", id)
+        Else
+            Return Add(text, "portfolio")
+        End If
+    End Function
+
+    Public Function GetFolderDescr(ByVal id As String) As PortfolioItemDescription Implements IPortfolioManager.GetFolderDescr
+        Dim node = _bonds.SelectSingleNode(String.Format("/bonds/portfolios//folder[@id='{0}']", id))
+        If node Is Nothing Then Return Nothing
         Dim attributes = node.Attributes
         Return New PortfolioItemDescription(True, attributes("name").Value, attributes("id").Value)
     End Function

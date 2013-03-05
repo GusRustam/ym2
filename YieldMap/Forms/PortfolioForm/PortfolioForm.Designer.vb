@@ -60,8 +60,9 @@
             Me.Button7 = New System.Windows.Forms.Button()
             Me.Button8 = New System.Windows.Forms.Button()
             Me.PortTreeCM = New System.Windows.Forms.ContextMenuStrip(Me.components)
-            Me.AddPortfolioToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-            Me.AddFolderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.AddToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.CloneToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
             Me.RenameToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Me.DeleteToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Me.MainTabControl.SuspendLayout()
@@ -127,6 +128,7 @@
             '
             'PortfolioTree
             '
+            Me.PortfolioTree.AllowDrop = True
             Me.PortfolioTree.Dock = System.Windows.Forms.DockStyle.Fill
             Me.PortfolioTree.LabelEdit = True
             Me.PortfolioTree.Location = New System.Drawing.Point(3, 3)
@@ -497,32 +499,37 @@
             '
             'PortTreeCM
             '
-            Me.PortTreeCM.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddPortfolioToolStripMenuItem, Me.AddFolderToolStripMenuItem, Me.RenameToolStripMenuItem, Me.DeleteToolStripMenuItem})
+            Me.PortTreeCM.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddToolStripMenuItem, Me.CloneToolStripMenuItem, Me.ToolStripSeparator1, Me.RenameToolStripMenuItem, Me.DeleteToolStripMenuItem})
             Me.PortTreeCM.Name = "PortTreeCM"
-            Me.PortTreeCM.Size = New System.Drawing.Size(153, 114)
+            Me.PortTreeCM.Size = New System.Drawing.Size(114, 98)
             '
-            'AddPortfolioToolStripMenuItem
+            'AddToolStripMenuItem
             '
-            Me.AddPortfolioToolStripMenuItem.Name = "AddPortfolioToolStripMenuItem"
-            Me.AddPortfolioToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-            Me.AddPortfolioToolStripMenuItem.Text = "Add portfolio..."
+            Me.AddToolStripMenuItem.Name = "AddToolStripMenuItem"
+            Me.AddToolStripMenuItem.Size = New System.Drawing.Size(113, 22)
+            Me.AddToolStripMenuItem.Text = "Add..."
             '
-            'AddFolderToolStripMenuItem
+            'CloneToolStripMenuItem
             '
-            Me.AddFolderToolStripMenuItem.Name = "AddFolderToolStripMenuItem"
-            Me.AddFolderToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-            Me.AddFolderToolStripMenuItem.Text = "Add folder..."
+            Me.CloneToolStripMenuItem.Name = "CloneToolStripMenuItem"
+            Me.CloneToolStripMenuItem.Size = New System.Drawing.Size(113, 22)
+            Me.CloneToolStripMenuItem.Text = "Clone..."
+            '
+            'ToolStripSeparator1
+            '
+            Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
+            Me.ToolStripSeparator1.Size = New System.Drawing.Size(110, 6)
             '
             'RenameToolStripMenuItem
             '
             Me.RenameToolStripMenuItem.Name = "RenameToolStripMenuItem"
-            Me.RenameToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.RenameToolStripMenuItem.Size = New System.Drawing.Size(113, 22)
             Me.RenameToolStripMenuItem.Text = "Rename"
             '
             'DeleteToolStripMenuItem
             '
             Me.DeleteToolStripMenuItem.Name = "DeleteToolStripMenuItem"
-            Me.DeleteToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.DeleteToolStripMenuItem.Size = New System.Drawing.Size(113, 22)
             Me.DeleteToolStripMenuItem.Text = "Delete"
             '
             'PortfolioForm
@@ -594,9 +601,10 @@
         Friend WithEvents Button10 As System.Windows.Forms.Button
         Friend WithEvents DataGridView4 As System.Windows.Forms.DataGridView
         Friend WithEvents PortTreeCM As System.Windows.Forms.ContextMenuStrip
-        Friend WithEvents AddPortfolioToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-        Friend WithEvents AddFolderToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents AddToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents RenameToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents DeleteToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents CloneToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
     End Class
 End Namespace
