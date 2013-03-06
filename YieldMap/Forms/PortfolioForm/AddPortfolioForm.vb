@@ -20,7 +20,7 @@
             End If
         End Sub
 
-        Private Sub AddPortfolioForm_KeyUp(ByVal sender As System.Object, ByVal e As KeyEventArgs) Handles MyBase.KeyUp
+        Private Sub AddPortfolioForm_KeyUp(ByVal sender As System.Object, ByVal e As KeyEventArgs) Handles MyBase.KeyUp, NewName.KeyUp
             If e.KeyCode = Keys.Escape Then
                 DialogResult = DialogResult.OK
                 Close()

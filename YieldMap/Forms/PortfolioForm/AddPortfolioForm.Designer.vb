@@ -27,8 +27,8 @@
             Me.Label1 = New System.Windows.Forms.Label()
             Me.Label2 = New System.Windows.Forms.Label()
             Me.Panel1 = New System.Windows.Forms.Panel()
-            Me.ItsPortfolio = New System.Windows.Forms.RadioButton()
             Me.ItsFolder = New System.Windows.Forms.RadioButton()
+            Me.ItsPortfolio = New System.Windows.Forms.RadioButton()
             Me.NewName = New System.Windows.Forms.TextBox()
             Me.OkButton = New System.Windows.Forms.Button()
             Me.CancelButton = New System.Windows.Forms.Button()
@@ -85,6 +85,16 @@
             Me.Panel1.Size = New System.Drawing.Size(248, 20)
             Me.Panel1.TabIndex = 2
             '
+            'ItsFolder
+            '
+            Me.ItsFolder.AutoSize = True
+            Me.ItsFolder.Location = New System.Drawing.Point(69, 0)
+            Me.ItsFolder.Name = "ItsFolder"
+            Me.ItsFolder.Size = New System.Drawing.Size(54, 17)
+            Me.ItsFolder.TabIndex = 1
+            Me.ItsFolder.Text = "Folder"
+            Me.ItsFolder.UseVisualStyleBackColor = True
+            '
             'ItsPortfolio
             '
             Me.ItsPortfolio.AutoSize = True
@@ -96,16 +106,6 @@
             Me.ItsPortfolio.TabStop = True
             Me.ItsPortfolio.Text = "Portfolio"
             Me.ItsPortfolio.UseVisualStyleBackColor = True
-            '
-            'ItsFolder
-            '
-            Me.ItsFolder.AutoSize = True
-            Me.ItsFolder.Location = New System.Drawing.Point(69, 0)
-            Me.ItsFolder.Name = "ItsFolder"
-            Me.ItsFolder.Size = New System.Drawing.Size(54, 17)
-            Me.ItsFolder.TabIndex = 1
-            Me.ItsFolder.Text = "Folder"
-            Me.ItsFolder.UseVisualStyleBackColor = True
             '
             'NewName
             '

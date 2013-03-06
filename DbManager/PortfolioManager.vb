@@ -33,6 +33,8 @@ Public Interface IPortfolioManager
 
     Function AddFolder(ByVal text As String, Optional ByVal id As String = "") As Long
     Function AddPortfolio(ByVal text As String, Optional ByVal id As String = "") As Long
+    Sub MoveItemToFolder(ByVal whoId As String, ByVal whereId As String)
+    Sub MoveItemToTop(ByVal id As String)
 End Interface
 
 Public Class PortfolioItemDescription
@@ -133,13 +135,13 @@ Public Class PortfolioManager
     Public Sub SetFolderName(ByVal id As String, ByVal name As String) Implements IPortfolioManager.SetFolderName
         Dim node = _bonds.SelectSingleNode(String.Format("/bonds/portfolios//folder[@id='{0}']/@name", id))
         node.Value = name
-        _bonds.Save(_configXML)
+        SaveBonds()
     End Sub
 
     Public Sub SetPortfolioName(ByVal id As String, ByVal name As String) Implements IPortfolioManager.SetPortfolioName
         Dim node = _bonds.SelectSingleNode(String.Format("/bonds/portfolios//portfolio[@id='{0}']/@name", id))
         node.Value = name
-        _bonds.Save(_configXML)
+        SaveBonds()
     End Sub
 
     Private Function Add(ByVal text As String, ByVal type As String, Optional ByVal id As String = "") As Long
@@ -162,7 +164,7 @@ Public Class PortfolioManager
         folder.Attributes.Append(nameAttr)
         parent.AppendChild(folder)
 
-        _bonds.Save(_configXML)
+        SaveBonds()
 
         Return newId
     End Function
@@ -194,7 +196,7 @@ Public Class PortfolioManager
         Dim parent = node.ParentNode
 
         parent.RemoveChild(node)
-        _bonds.Save(_configXML)
+        SaveBonds()
     End Sub
 
     Public Function AddFolder(ByVal text As String, Optional ByVal id As String = "") As Long Implements IPortfolioManager.AddFolder
@@ -212,6 +214,30 @@ Public Class PortfolioManager
             Return Add(text, "portfolio")
         End If
     End Function
+
+    Public Sub MoveItemToFolder(ByVal whoId As String, ByVal whereId As String) Implements IPortfolioManager.MoveItemToFolder
+        Dim whoNode = _bonds.SelectSingleNode(String.Format("/bonds/portfolios//folder[@id='{0}'] | /bonds/portfolios//portfolio[@id='{0}']", whoId))
+        If whoNode Is Nothing Then Return
+        Dim whereNode = _bonds.SelectSingleNode(String.Format("/bonds/portfolios//folder[@id='{0}'] | /bonds/portfolios//portfolio[@id='{0}']", whereId))
+        If whereNode Is Nothing Then Return
+        If whoNode.ParentNode IsNot Nothing Then whoNode.ParentNode.RemoveChild(whoNode)
+        whereNode.AppendChild(whoNode)
+        SaveBonds()
+    End Sub
+
+    Public Sub MoveItemToTop(ByVal id As String) Implements IPortfolioManager.MoveItemToTop
+        Dim whoNode = _bonds.SelectSingleNode(String.Format("/bonds/portfolios//folder[@id='{0}'] | /bonds/portfolios//portfolio[@id='{0}']", id))
+        If whoNode Is Nothing Then Return
+        Dim whereNode = _bonds.SelectSingleNode("/bonds/portfolios")
+        If whereNode Is Nothing Then Return
+        If whoNode.ParentNode IsNot Nothing Then whoNode.ParentNode.RemoveChild(whoNode)
+        whereNode.AppendChild(whoNode)
+        SaveBonds()
+    End Sub
+
+    Private Sub SaveBonds()
+        _bonds.Save(_configXml)
+    End Sub
 
     Public Function GetFolderDescr(ByVal id As String) As PortfolioItemDescription Implements IPortfolioManager.GetFolderDescr
         Dim node = _bonds.SelectSingleNode(String.Format("/bonds/portfolios//folder[@id='{0}']", id))

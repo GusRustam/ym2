@@ -61,10 +61,10 @@
             Me.Button8 = New System.Windows.Forms.Button()
             Me.PortTreeCM = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.AddToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-            Me.CloneToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
             Me.RenameToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Me.DeleteToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.Timer = New System.Windows.Forms.Timer(Me.components)
             Me.MainTabControl.SuspendLayout()
             Me.PortfoliosPage.SuspendLayout()
             Me.TableLayoutPanel2.SuspendLayout()
@@ -499,38 +499,35 @@
             '
             'PortTreeCM
             '
-            Me.PortTreeCM.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddToolStripMenuItem, Me.CloneToolStripMenuItem, Me.ToolStripSeparator1, Me.RenameToolStripMenuItem, Me.DeleteToolStripMenuItem})
+            Me.PortTreeCM.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddToolStripMenuItem, Me.ToolStripSeparator1, Me.RenameToolStripMenuItem, Me.DeleteToolStripMenuItem})
             Me.PortTreeCM.Name = "PortTreeCM"
-            Me.PortTreeCM.Size = New System.Drawing.Size(114, 98)
+            Me.PortTreeCM.Size = New System.Drawing.Size(153, 98)
             '
             'AddToolStripMenuItem
             '
             Me.AddToolStripMenuItem.Name = "AddToolStripMenuItem"
-            Me.AddToolStripMenuItem.Size = New System.Drawing.Size(113, 22)
+            Me.AddToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
             Me.AddToolStripMenuItem.Text = "Add..."
-            '
-            'CloneToolStripMenuItem
-            '
-            Me.CloneToolStripMenuItem.Name = "CloneToolStripMenuItem"
-            Me.CloneToolStripMenuItem.Size = New System.Drawing.Size(113, 22)
-            Me.CloneToolStripMenuItem.Text = "Clone..."
             '
             'ToolStripSeparator1
             '
             Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-            Me.ToolStripSeparator1.Size = New System.Drawing.Size(110, 6)
+            Me.ToolStripSeparator1.Size = New System.Drawing.Size(149, 6)
             '
             'RenameToolStripMenuItem
             '
             Me.RenameToolStripMenuItem.Name = "RenameToolStripMenuItem"
-            Me.RenameToolStripMenuItem.Size = New System.Drawing.Size(113, 22)
+            Me.RenameToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
             Me.RenameToolStripMenuItem.Text = "Rename"
             '
             'DeleteToolStripMenuItem
             '
             Me.DeleteToolStripMenuItem.Name = "DeleteToolStripMenuItem"
-            Me.DeleteToolStripMenuItem.Size = New System.Drawing.Size(113, 22)
+            Me.DeleteToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
             Me.DeleteToolStripMenuItem.Text = "Delete"
+            '
+            'Timer
+            '
             '
             'PortfolioForm
             '
@@ -604,7 +601,7 @@
         Friend WithEvents AddToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents RenameToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents DeleteToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-        Friend WithEvents CloneToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents ToolStripSeparator1 As System.Windows.Forms.ToolStripSeparator
+        Friend WithEvents Timer As System.Windows.Forms.Timer
     End Class
 End Namespace

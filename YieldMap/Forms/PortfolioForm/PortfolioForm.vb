@@ -1,12 +1,18 @@
-﻿Imports DbManager
+﻿Imports System.Diagnostics.Contracts
+Imports DbManager
 Imports DbManager.Bonds
+Imports System.Runtime.InteropServices
 
 Namespace Forms.PortfolioForm
+
+   
+
     Public Class PortfolioForm
 
 #Region "Portfolio TAB"
 
         Private _flag As Boolean
+        Private ReadOnly _portfolioManager As IPortfolioManager = PortfolioManager.GetInstance()
 
         Private Sub RefreshPortfolioTree(Optional ByVal selId As Long = -1)
             Dim selectedNodeId As String
@@ -31,7 +37,7 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Function AddPortfoliosByFolder(ByVal id As String, ByVal selId As String, Optional ByVal whereTo As TreeNode = Nothing) As TreeNode
-            Dim portMan As PortfolioManager = PortfolioManager.GetInstance()
+            Dim portMan As PortfolioManager = _portfolioManager
             Dim res As TreeNode = If(id = selId, whereTo, Nothing)
             Dim descrs = portMan.GetPortfoliosByFolder(id)
             For Each descr In descrs
@@ -63,9 +69,20 @@ Namespace Forms.PortfolioForm
             RefreshPortfolioTree()
         End Sub
 
-        Private Sub RenameToolStripMenuItem_Click(ByVal sender As Object, ByVal e As EventArgs) Handles RenameToolStripMenuItem.Click, PortfolioTree.DoubleClick
+        Private Sub PortfolioTree_DblClick(ByVal sender As Object, ByVal e As EventArgs) Handles PortfolioTree.DoubleClick
+            Dim mea = TryCast(e, MouseEventArgs)
+            Dim node = PortfolioTree.GetNodeAt(mea.Location)
+            If node Is Nothing Then Return
+            DoRename(node)
+        End Sub
+
+        Private Sub RenameToolStripMenuItem_Click(ByVal sender As Object, ByVal e As EventArgs) Handles RenameToolStripMenuItem.Click
             Dim node = CType(PortTreeCM.Tag, TreeNode)
             If node Is Nothing Then Return
+            DoRename(node)
+        End Sub
+
+        Private Sub DoRename(ByVal node As TreeNode)
             PortfolioTree.SelectedNode = node
 
             Dim adder = New AddPortfolioForm
@@ -80,9 +97,9 @@ Namespace Forms.PortfolioForm
                     MessageBox.Show("Failed to update name", "Name edit", MessageBoxButtons.OK, MessageBoxIcon.Error)
                 Else
                     If portDescr.IsFolder Then
-                        PortfolioManager.GetInstance().SetFolderName(portDescr.Id, adder.NewName.Text)
+                        _portfolioManager.SetFolderName(portDescr.Id, adder.NewName.Text)
                     Else
-                        PortfolioManager.GetInstance().SetPortfolioName(portDescr.Id, adder.NewName.Text)
+                        _portfolioManager.SetPortfolioName(portDescr.Id, adder.NewName.Text)
                     End If
                     RefreshPortfolioTree()
                 End If
@@ -94,7 +111,7 @@ Namespace Forms.PortfolioForm
                 PortTreeCM.Tag = e.Node
                 PortTreeCM.Show(PortfolioTree, e.Location)
             End If
-            _flag = false
+            _flag = False
         End Sub
 
         Private Sub PortfolioTree_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles PortfolioTree.MouseUp
@@ -128,9 +145,9 @@ Namespace Forms.PortfolioForm
             If adder.ShowDialog() = DialogResult.OK Then
                 Dim newId As Long
                 If adder.ItsFolder.Checked Then
-                    newId = PortfolioManager.GetInstance().AddFolder(adder.NewName.Text, theId)
+                    newId = _portfolioManager.AddFolder(adder.NewName.Text, theId)
                 Else
-                    newId = PortfolioManager.GetInstance().AddPortfolio(adder.NewName.Text, theId)
+                    newId = _portfolioManager.AddPortfolio(adder.NewName.Text, theId)
                 End If
                 RefreshPortfolioTree(newId)
             End If
@@ -144,28 +161,64 @@ Namespace Forms.PortfolioForm
             If descr Is Nothing Then Return
             If MessageBox.Show("Are you sure you would like to delete an item permanently?", "Delete...", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
                 If descr.IsFolder Then
-                    PortfolioManager.GetInstance().DeleteFolder(descr.Id)
+                    _portfolioManager.DeleteFolder(descr.Id)
                 Else
-                    PortfolioManager.GetInstance().DeletePortfolio(descr.Id)
+                    _portfolioManager.DeletePortfolio(descr.Id)
                 End If
                 RefreshPortfolioTree()
             End If
         End Sub
 
-        Private Sub PortfolioTree_DragEnter(ByVal sender As Object, ByVal e As DragEventArgs) Handles PortfolioTree.DragEnter
-
+        Private _dragNode As TreeNode
+        Private Sub PortfolioTree_ItemDrag(ByVal sender As Object, ByVal e As ItemDragEventArgs) Handles PortfolioTree.ItemDrag
+            _dragNode = e.Item
+            DoDragDrop(e.Item, DragDropEffects.Move)
         End Sub
 
         Private Sub PortfolioTree_DragOver(ByVal sender As Object, ByVal e As DragEventArgs) Handles PortfolioTree.DragOver
+            Dim pos = PortfolioTree.PointToClient(New Point(e.X, e.Y))
+            Dim node = PortfolioTree.GetNodeAt(pos)
+            If node Is Nothing Then
+                e.Effect = DragDropEffects.Move
+            Else
+                node.Expand()
+                Dim descr = TryCast(node.Tag, PortfolioItemDescription)
+                If IsChildOf(_dragNode, node) OrElse (descr IsNot Nothing AndAlso Not descr.IsFolder) Then
+                    e.Effect = DragDropEffects.None
+                Else
+                    e.Effect = DragDropEffects.Move
+                End If
+            End If
 
         End Sub
 
-        Private Sub PortfolioTree_DragLeave(ByVal sender As Object, ByVal e As EventArgs) Handles PortfolioTree.DragLeave
-
-        End Sub
+        Private Shared Function IsChildOf(ByVal ofWhat As TreeNode, ByVal who As TreeNode) As Boolean
+            If ofWhat Is Nothing Then Return False
+            Do
+                If ofWhat.Equals(who) Then Return True
+                If ofWhat.Equals(who.Parent) Then Return True
+                If who.Parent IsNot Nothing AndAlso TypeOf who.Parent Is TreeNode Then
+                    who = who.Parent
+                Else
+                    Return False
+                End If
+            Loop
+        End Function
 
         Private Sub PortfolioTree_DragDrop(ByVal sender As Object, ByVal e As DragEventArgs) Handles PortfolioTree.DragDrop
+            Dim dragDescr = TryCast(_dragNode.Tag, PortfolioItemDescription)
+            If dragDescr Is Nothing Then Return
 
+            Dim pos = PortfolioTree.PointToClient(New Point(e.X, e.Y))
+            Dim node = PortfolioTree.GetNodeAt(pos)
+            If node Is Nothing Then
+                _portfolioManager.MoveItemToTop(dragDescr.Id)
+            Else
+                Dim descr = TryCast(node.Tag, PortfolioItemDescription)
+                If descr Is Nothing OrElse Not descr.IsFolder Then Return
+                _portfolioManager.MoveItemToFolder(dragDescr.Id, descr.Id)
+            End If
+            RefreshPortfolioTree(dragDescr.Id)
         End Sub
 #End Region
 
@@ -183,6 +236,5 @@ Namespace Forms.PortfolioForm
             End If
         End Sub
 #End Region
-
     End Class
 End Namespace
