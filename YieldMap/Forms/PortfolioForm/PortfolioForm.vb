@@ -7,8 +7,31 @@ Namespace Forms.PortfolioForm
     Public Class PortfolioForm
 #Region "Portfolio TAB"
 
+        Private _dragNode As TreeNode
+        Private _currentItem As PortfolioItemDescription
         Private _flag As Boolean
         Private ReadOnly _portfolioManager As IPortfolioManager = PortfolioManager.GetInstance()
+
+        Private Property CurrentItem As PortfolioItemDescription
+            Get
+                Return _currentItem
+            End Get
+            Set(ByVal value As PortfolioItemDescription)
+                _currentItem = value
+                RefreshPortfolioData()
+            End Set
+        End Property
+
+        Private Sub RefreshPortfolioData()
+            If CurrentItem.IsFolder Then
+                PortfolioChainsListsGrid.Columns.Clear()
+                PortfolioChainsListsGrid.Rows.Clear()
+                PortfolioItemsGrid.Columns.Clear()
+                PortfolioItemsGrid.Rows.Clear()
+            Else
+                Dim descr = _portfolioManager.GetPortfolioStructure(CurrentItem.Id)
+            End If
+        End Sub
 
         Private Sub RefreshPortfolioTree(Optional ByVal selId As Long = -1)
             Dim selectedNodeId As String
@@ -41,7 +64,7 @@ Namespace Forms.PortfolioForm
             Dim portMan As PortfolioManager = _portfolioManager
             Dim res As TreeNode = If(theId = selId, whereTo, Nothing)
             Dim descrs = portMan.GetPortfoliosByFolder(theId)
-            
+
             For Each descr In descrs
                 Dim img = If(descr.IsFolder, "folder", "portfolio")
                 Dim newNode As TreeNode
@@ -112,11 +135,14 @@ Namespace Forms.PortfolioForm
             If e.Button = MouseButtons.Right Then
                 PortTreeCM.Tag = e.Node
                 PortTreeCM.Show(PortfolioTree, e.Location)
+            Else
+                Dim temp = TryCast(e.Node.Tag, PortfolioItemDescription)
+                CurrentItem = If(temp IsNot Nothing AndAlso Not temp.IsFolder, temp, Nothing)
             End If
             _flag = False
         End Sub
 
-        Private Sub PortfolioTree_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles PortfolioTree.MouseUp
+        Private Sub PortfolioTree_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles PortfolioTree.MouseUp
             If Not _flag Then
                 _flag = True
                 Return
@@ -170,8 +196,6 @@ Namespace Forms.PortfolioForm
                 RefreshPortfolioTree()
             End If
         End Sub
-
-        Private _dragNode As TreeNode
 
 
         Private Sub PortfolioTree_ItemDrag(ByVal sender As Object, ByVal e As ItemDragEventArgs) Handles PortfolioTree.ItemDrag

@@ -3,13 +3,198 @@ Imports System.IO
 Imports NLog
 Imports Uitls
 
+Public Class ConfingNameAttribute
+    Inherits Attribute
+    Private ReadOnly _xmlName As String
+
+    Public Sub New(ByVal xmlName As String)
+        _xmlName = xmlName
+    End Sub
+
+    Public ReadOnly Property XmlName As String
+        Get
+            Return _xmlName
+        End Get
+    End Property
+End Class
+
+Public Structure FieldSet
+    <ConfingName("TIME")> Public Time As String = ""
+    <ConfingName("BID")> Public Bid As String = ""
+    <ConfingName("ASK")> Public Ask As String = ""
+    <ConfingName("LAST")> Public Last As String = ""
+    <ConfingName("VWAP")> Public VWAP As String = ""
+    <ConfingName("HIST")> Public Hist As String = ""     ' Historical Field. Corresponds to Close
+    <ConfingName("HIST_DATE")> Public HistDate As String = ""
+    <ConfingName("VOLUME")> Public Volume As String = ""
+    <ConfingName("SOURCE")> Public Src As String = ""
+End Structure
+
+Public Structure Fields
+    Public History As New FieldSet
+    Public Realtime As New FieldSet
+End Structure
+
+Public Class Source
+    Private ReadOnly _id As String
+    Private ReadOnly _color As String
+    Private ReadOnly _fields As Fields
+    Private ReadOnly _enabled As Boolean
+    Private ReadOnly _curve As Boolean
+
+    Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As Fields, ByVal enabled As Boolean, ByVal curve As Boolean)
+        _id = id
+        _color = color
+        _fields = fields
+        _enabled = enabled
+        _curve = curve
+    End Sub
+
+    Public ReadOnly Property ID As String
+        Get
+            Return _id
+        End Get
+    End Property
+
+    Public ReadOnly Property Color As String
+        Get
+            Return _color
+        End Get
+    End Property
+
+    Public ReadOnly Property Fields As Fields
+        Get
+            Return _fields
+        End Get
+    End Property
+
+    Public ReadOnly Property Enabled As Boolean
+        Get
+            Return _enabled
+        End Get
+    End Property
+
+    Public ReadOnly Property Curve As Boolean
+        Get
+            Return _curve
+        End Get
+    End Property
+End Class
+
+Public Class Chain
+    Inherits Source
+    Private ReadOnly _chainRic As String
+
+    Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As Fields, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal chainRic As String)
+        MyBase.New(id, color, fields, enabled, curve)
+        _chainRic = chainRic
+    End Sub
+
+    Public ReadOnly Property ChainRic As String
+        Get
+            Return _chainRic
+        End Get
+    End Property
+End Class
+
+Public Class UserList
+    Inherits Source
+    Private ReadOnly _bondRics As List(Of String)
+
+    Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As Fields, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal bondRics As List(Of String))
+        MyBase.New(id, color, fields, enabled, curve)
+        _bondRics = bondRics
+    End Sub
+
+    Public ReadOnly Property BondRics As List(Of String)
+        Get
+            Return _bondRics
+        End Get
+    End Property
+End Class
+
 Public Class PortfolioSource
-    'todo ??? Wuts vet?
-    Public Id As Integer
-    Public Name As Integer
-    Public Fields As Fields
-    Public Color As String
-    Public Rics As List(Of String)
+    Private ReadOnly _order As Integer         ' Order of given source in given portfolio
+    Private ReadOnly _source As Source
+    Private ReadOnly _condition As String
+    Private ReadOnly _customName As String
+    Private ReadOnly _included As Boolean
+
+    Public Sub New(ByVal order As Integer, ByVal source As Source, ByVal condition As String, ByVal customName As String, ByVal included As Boolean)
+        _order = order
+        _source = source
+        _condition = condition
+        _customName = customName
+        _included = included
+    End Sub
+
+    Public ReadOnly Property Order As Integer
+        Get
+            Return _order
+        End Get
+    End Property
+
+    Public ReadOnly Property Source As Source
+        Get
+            Return _source
+        End Get
+    End Property
+
+    Public ReadOnly Property Condition As String
+        Get
+            Return _condition
+        End Get
+    End Property
+
+    Public ReadOnly Property CustomName As String
+        Get
+            Return _customName
+        End Get
+    End Property
+
+    Public ReadOnly Property Included As Boolean
+        Get
+            Return _included
+        End Get
+    End Property
+End Class
+
+Public Class PortfolioStructure
+    Private ReadOnly _id As String
+    Private ReadOnly _name As String
+    Private _sources As List(Of PortfolioSource)
+
+    Public Sub New(ByVal id As String, ByVal name As String, ByVal sources As List(Of PortfolioSource))
+        _id = id
+        _name = name
+        _sources = sources
+    End Sub
+
+    Public Sub New(ByVal id As String, ByVal name As String)
+        _id = id
+        _name = name
+    End Sub
+
+    Public Property Sources As List(Of PortfolioSource)
+        Get
+            Return _sources
+        End Get
+        Friend Set(ByVal value As List(Of PortfolioSource))
+            _sources = value
+        End Set
+    End Property
+
+    Public ReadOnly Property ID As String
+        Get
+            Return _id
+        End Get
+    End Property
+
+    Public ReadOnly Property Name As String
+        Get
+            Return _name
+        End Get
+    End Property
 End Class
 
 Public Interface IPortfolioManager
@@ -22,7 +207,7 @@ Public Interface IPortfolioManager
     Function GetChainRics() As List(Of String)
 
     '' Returns portfolio as a set of sources, each having different settings
-    Function GetPortfolioStructure(ByVal currentPortID As Long) As List(Of PortfolioSource)
+    Function GetPortfolioStructure(ByVal currentPortID As Long) As PortfolioStructure
     Function GetFolderDescr(ByVal id As String) As PortfolioItemDescription
 
     Sub SetFolderName(ByVal id As String, ByVal name As String)
@@ -35,20 +220,16 @@ Public Interface IPortfolioManager
     Function AddPortfolio(ByVal text As String, Optional ByVal id As String = "") As Long
     Function MoveItemToFolder(ByVal whoId As String, ByVal whereId As String) As String
     Function MoveItemToTop(ByVal id As String) As String
-    Function CopyItemToTop(ByVal id As String) As String
     Function CopyItemToFolder(ByVal whoId As String, ByVal whereId As String) As String
-    Function PortfoliosValid() As Boolean
+    Function CopyItemToTop(ByVal id As String) As String
+
+    Function PortfoliosValid() As Boolean ' todo make a function BranchValid so that to be able to find a good branch and show it
 End Interface
 
 Public Class PortfolioItemDescription
     Public IsFolder As Boolean
     Public Name As String
     Public Id As String
-    Public ReadOnly Property NodeId() As String
-        Get
-            Return If(IsFolder, "Folder", "Node") + Id
-        End Get
-    End Property
 
     Public Sub New(ByVal isFolder As Boolean, ByVal name As String, ByVal id As String)
         Me.IsFolder = isFolder
@@ -56,22 +237,6 @@ Public Class PortfolioItemDescription
         Me.Id = id
     End Sub
 End Class
-
-Public Class FieldSet
-    Public Bid As String = Nothing
-    Public Ask As String = Nothing
-    Public Last As String = Nothing
-    Public VWAP As String = Nothing
-    Public Hist As String = Nothing     ' Historical Field. Corresponds to Close
-    Public HistDate As String = Nothing
-    Public Volume As String = Nothing
-End Class
-
-Public Class Fields
-    Public History As New FieldSet
-    Public Realtime As New FieldSet
-End Class
-
 
 Public Class PortfolioManager
     ' TODO multiple files
@@ -82,12 +247,15 @@ Public Class PortfolioManager
     Private ReadOnly _configXml As String = Path.Combine(Utils.GetMyPath(), ConfigFile)
     Private ReadOnly _bonds As New XmlDocument
 
+    Private ReadOnly _ids As New HashSet(Of Long)
+    Private ReadOnly _tmpIds As New HashSet(Of Long)
+
     Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(PortfolioManager))
 
     Private Shared _instance As PortfolioManager
 
     Private Sub New()
-        _bonds.Load(_configXML)
+        _bonds.Load(_configXml)
     End Sub
 
     Public Function GetPortfoliosByFolder(ByVal id As String) As List(Of PortfolioItemDescription) Implements IPortfolioManager.GetPortfoliosByFolder
@@ -131,8 +299,103 @@ Public Class PortfolioManager
         Return res
     End Function
 
-    Public Function GetPortfolioStructure(ByVal currentPortID As Long) As List(Of PortfolioSource) Implements IPortfolioManager.GetPortfolioStructure
-        Throw New NotImplementedException()
+    Public Function GetPortfolioStructure(ByVal id As Long) As PortfolioStructure Implements IPortfolioManager.GetPortfolioStructure
+        Logger.Info("GetPortfolioStructure({0})", id)
+        Dim node = _bonds.SelectSingleNode(String.Format("/bonds/portfolios//portfolio[@id='{0}']", id))
+        If node Is Nothing Then Return Nothing
+        Try
+            Dim res As New PortfolioStructure(id, node.Attributes("name").Value)
+
+            Dim nodes = node.SelectNodes("/include | /exclude")
+            Dim order As Integer
+            For Each item As XmlNode In nodes
+                Try
+                    Dim source As Source
+
+                    Dim isIncluded = (node.Name = "include")
+                    Dim what = item.Attributes("what").Value
+                    Dim condition = GetAttr(item, "condition")
+                    Dim customName = GetAttr(item, "name")
+
+                    Select Case what
+                        Case "chain"
+                            Dim chainId = item.Attributes("id").Value
+                            source = GetChainDescr(chainId)
+                        Case "list"
+                            Dim listId = item.Attributes("id").Value
+                            source = GetListDescr(listId)
+                        Case Else
+                            Logger.Warn("Unsupported item {0}", what)
+                    End Select
+
+                    If source IsNot Nothing Then
+                        order = order + 1
+                        Dim portSource As New PortfolioSource(order, source, condition, customName, isIncluded)
+                        res.Sources.Add(portSource)
+                    Else
+                        Logger.Info("Failed to read description for item {0}", what)
+                    End If
+                Catch ex As Exception
+                    Logger.Warn("Failed to parse ")
+                End Try
+            Next
+
+            Return res
+        Catch ex As Exception
+            Return Nothing
+        End Try
+    End Function
+
+    Private Shared Function GetAttr(ByVal node As XmlNode, ByVal name As String, Optional ByVal defaultValue As String = "") As String
+        Dim attribute As XmlAttribute = node.Attributes(name)
+        If attribute IsNot Nothing Then
+            Return attribute.Value
+        Else
+            Return defaultValue
+        End If
+    End Function
+
+    Private Function GetAttrStrict(ByVal node As XmlNode, ByVal name As String) As String
+        Dim attribute As XmlAttribute = node.Attributes(name)
+        If attribute IsNot Nothing Then
+            Return attribute.Value
+        Else
+            Throw New Exception(String.Format("Failed to find attribute {0} in node {1}", name, node.Name))
+        End If
+    End Function
+
+    Private Function GetChainDescr(ByVal chainId As String) As Chain
+        Dim node = _bonds.SelectSingleNode(String.Format("/bonds/chains/chain[@id='{0}']", chainId))
+        If node Is Nothing Then Return Nothing
+        Try
+            Dim color = GetAttrStrict(node, "color")
+            Dim enabled = GetAttr(node, "enabled", "True")
+            Dim curve = GetAttr(node, "curve", "False")
+            Dim chainRic = GetAttrStrict(node, "ric")
+            Dim fields = GetFields(GetAttrStrict(node, "field-set-id"))
+            Return New Chain(chainId, color, fields, enabled, curve, chainRic)
+        Catch ex As Exception
+            Logger.WarnException("Failed to get chain description", ex)
+            Logger.Warn("Exception = ", ex.ToString())
+            Return Nothing
+        End Try
+    End Function
+
+    Private Function GetListDescr(ByVal listId As String) As UserList
+        Dim node = _bonds.SelectSingleNode(String.Format("/bonds/chains/list[@id='{0}']", listId))
+        If node Is Nothing Then Return Nothing
+        Try
+            Dim color = GetAttrStrict(node, "color")
+            Dim enabled = GetAttr(node, "enabled", "True")
+            Dim curve = GetAttr(node, "curve", "False")
+            Dim rics = GetListRics(listId)
+            Dim fields = GetFields(GetAttrStrict(node, "field-set-id"))
+            Return New UserList(listId, color, fields, enabled, curve, rics)
+        Catch ex As Exception
+            Logger.WarnException("Failed to get chain description", ex)
+            Logger.Warn("Exception = ", ex.ToString())
+            Return Nothing
+        End Try
     End Function
 
     Public Sub SetFolderName(ByVal id As String, ByVal name As String) Implements IPortfolioManager.SetFolderName
@@ -171,9 +434,6 @@ Public Class PortfolioManager
 
         Return newId
     End Function
-
-    Private ReadOnly _ids As New HashSet(Of Long)
-    Private ReadOnly _tmpIds As New HashSet(Of Long)
 
     Private Function GenerateNewId() As Long
         Dim rnd As New Random(DateTime.Now.Millisecond)

@@ -4,6 +4,7 @@
   <field-sets>
     <field-set id="MICEX">
       <realtime>
+        <field type="TIME">???</field>
         <field type="BID">BID</field>
         <field type="ASK">ASK</field>
         <field type="LAST">LAST</field>
@@ -13,9 +14,11 @@
         <field type="VOLUME">CF_VOLUME</field>
       </realtime>
       <historical>
+        <field type="TIME">???</field>
         <field type="DATE">TIMESTAMP</field>
         <field type="CLOSE">CLOSE</field>
         <field type="VOLUME">CF_VOLUME</field>
+        <!-- historical VWAP??? -->
       </historical>
     </field-set>
     
@@ -23,6 +26,7 @@
       <realtime>
         <field type="BID">275</field>
         <field type="ASK">393</field>
+        <field type="SOURCE">???</field>
       </realtime>
       <historical>
         <field type="DATE">TIMESTAMP</field>
@@ -32,12 +36,13 @@
   </field-sets>
   
   <!-- Chains -->
+  <!-- todo if curve or list doesn't have field-set-id then it must have full field set description inside itself -->
   <chains>
-    <chain ric="0#RUTSY=MM" field-set-id="MICEX" name="OFZ" color="Red"/>
-    <chain ric="0#RUMOSB=MM" field-set-id="MICEX" name="Moscow" color="Green" curve="True"/>
-    <chain ric="0#RUSOVB=MM" field-set-id="MICEX" name="Regional" color="Blue"/>
-    <chain ric="0#RUCORP=MM" field-set-id="MICEX" name="Corporate bonds" color="Cyan" enabled="False"/>
-    <chain ric="0#RFGOVBONDS=" field-set-id="Eurobonds" name="Russian eurobonds" color="DarkOlive" curve="True"/>
+    <chain id="1" ric="0#RUTSY=MM" field-set-id="MICEX" name="OFZ" color="Red"/>
+    <chain id="2" ric="0#RUMOSB=MM" field-set-id="MICEX" name="Moscow" color="Green" curve="True"/>
+    <chain id="3" ric="0#RUSOVB=MM" field-set-id="MICEX" name="Regional" color="Blue"/>
+    <chain id="4" ric="0#RUCORP=MM" field-set-id="MICEX" name="Corporate bonds" color="Cyan" enabled="False"/>
+    <chain id="5" ric="0#RFGOVBONDS=" field-set-id="Eurobonds" name="Russian eurobonds" color="DarkOlive" curve="True"/>
   </chains>
 
   <!-- Lists -->
@@ -50,25 +55,38 @@
   </lists>
   
   <!-- Portfolios -->
-  <!-- todo conditions -->
-  <!-- todo include/exclude -->
-  <!-- portfolios trees -->
   <portfolios>
     <folder id="0" name="Main">
       <folder id="1" name="Specific"/>
       <folder id="2" name="Russians">
         <portfolio id="3" name="Mos">
-          <include what="chain" id="0#RUMOSB=MM" name="Moskau"/>
+          <include what="chain" id="2" name="Moskau"/>
         </portfolio>      
       </folder>
       <portfolio id="4" name="Main">
-        <include what="chain" id="0#RUTSY=MM" name="All OFZs" condition="${isStraight} And ${currentCoupon}>10"/>
-        <exclude what="list" id="12"/>
-        <exclude what="ric" id="XXXXX"/>
+        <include what="chain" id="1" name="All OFZs" condition="${isStraight} And ${currentCoupon}>10"/>
+        <exclude what="list" id="1"/>
+        <!-- todo -->
+        <include what="synthetic-bond" id="1"/>
+        <exclude what="ric" name="XXXXX"/>
       </portfolio>
     </folder>
   </portfolios>
   
-  <!-- TODO Curves -->
-  <!-- TODO Synthetics curves -->
+  <curves>
+    <curve name="Micex Bootstrapped OFZ curve">
+      <chain-ric>0#RUXZ=R</chain-ric>
+      <!-- todo -->
+    </curve>
+  </curves>
+
+  <!-- todo -->
+  <synthetic-bonds>
+    <bond id="1" name="QuQu" color="Magenta" shape="hexagram">
+      <currency></currency>
+      <parameters></parameters>
+    </bond>
+  </synthetic-bonds>
+  
+  <!-- TODO Synthetics curves (?????) --> 
 </bonds>
