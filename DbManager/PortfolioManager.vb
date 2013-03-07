@@ -18,7 +18,7 @@ Public Class ConfingNameAttribute
     End Property
 End Class
 
-Public Structure FieldSet
+Public Class FieldSet
     <ConfingName("TIME")> Public Time As String = ""
     <ConfingName("BID")> Public Bid As String = ""
     <ConfingName("ASK")> Public Ask As String = ""
@@ -28,12 +28,44 @@ Public Structure FieldSet
     <ConfingName("HIST_DATE")> Public HistDate As String = ""
     <ConfingName("VOLUME")> Public Volume As String = ""
     <ConfingName("SOURCE")> Public Src As String = ""
-End Structure
 
-Public Structure Fields
-    Public History As New FieldSet
-    Public Realtime As New FieldSet
-End Structure
+    Public Sub New(ByVal node As XmlNode, ByVal subnode As String)
+        'todo extract fields using reflection
+        Throw New NotImplementedException()
+    End Sub
+End Class
+
+Public Class Fields
+    Private ReadOnly _name As String
+    Private ReadOnly _history As FieldSet
+    Private ReadOnly _realtime As FieldSet
+
+    Public Sub New(ByVal id As String, ByVal doc As XmlDocument)
+        Dim node = doc.SelectSingleNode(String.Format("/bonds/field-sets/field-set[@id='{0}']", id))
+        If node Is Nothing Then Throw New Exception(String.Format("Failed to find field set with id {0}", id))
+        _name = node.Attributes("name").Value
+        _realtime = New FieldSet(node, "realtime")
+        _history = New FieldSet(node, "history")
+    End Sub
+
+    Public ReadOnly Property Name As String
+        Get
+            Return _name
+        End Get
+    End Property
+
+    Public ReadOnly Property History As FieldSet
+        Get
+            Return _history
+        End Get
+    End Property
+
+    Public ReadOnly Property Realtime As FieldSet
+        Get
+            Return _realtime
+        End Get
+    End Property
+End Class
 
 Public Class Source
     Private ReadOnly _id As String
@@ -111,6 +143,11 @@ Public Class UserList
             Return _bondRics
         End Get
     End Property
+
+    Public Shared Function ExtractRics(ByVal node As XmlNode) As List(Of String)
+        'todo extract rics by stupid XML
+        Throw New NotImplementedException()
+    End Function
 End Class
 
 Public Class PortfolioSource
@@ -239,7 +276,7 @@ Public Class PortfolioItemDescription
 End Class
 
 Public Class PortfolioManager
-    ' TODO multiple files
+    ' TODO multiple config files
     ' TOOO events OnLoadConfig, OnConfigFileUpdated
     Implements IPortfolioManager
 
@@ -372,7 +409,7 @@ Public Class PortfolioManager
             Dim enabled = GetAttr(node, "enabled", "True")
             Dim curve = GetAttr(node, "curve", "False")
             Dim chainRic = GetAttrStrict(node, "ric")
-            Dim fields = GetFields(GetAttrStrict(node, "field-set-id"))
+            Dim fields = New Fields(GetAttrStrict(node, "field-set-id"), _bonds)
             Return New Chain(chainId, color, fields, enabled, curve, chainRic)
         Catch ex As Exception
             Logger.WarnException("Failed to get chain description", ex)
@@ -388,8 +425,8 @@ Public Class PortfolioManager
             Dim color = GetAttrStrict(node, "color")
             Dim enabled = GetAttr(node, "enabled", "True")
             Dim curve = GetAttr(node, "curve", "False")
-            Dim rics = GetListRics(listId)
-            Dim fields = GetFields(GetAttrStrict(node, "field-set-id"))
+            Dim rics = UserList.ExtractRics(node)
+            Dim fields = New Fields(GetAttrStrict(node, "field-set-id"), _bonds)
             Return New UserList(listId, color, fields, enabled, curve, rics)
         Catch ex As Exception
             Logger.WarnException("Failed to get chain description", ex)
