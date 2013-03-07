@@ -501,33 +501,30 @@
             '
             Me.PortTreeCM.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddToolStripMenuItem, Me.ToolStripSeparator1, Me.RenameToolStripMenuItem, Me.DeleteToolStripMenuItem})
             Me.PortTreeCM.Name = "PortTreeCM"
-            Me.PortTreeCM.Size = New System.Drawing.Size(153, 98)
+            Me.PortTreeCM.Size = New System.Drawing.Size(114, 76)
             '
             'AddToolStripMenuItem
             '
             Me.AddToolStripMenuItem.Name = "AddToolStripMenuItem"
-            Me.AddToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.AddToolStripMenuItem.Size = New System.Drawing.Size(113, 22)
             Me.AddToolStripMenuItem.Text = "Add..."
             '
             'ToolStripSeparator1
             '
             Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-            Me.ToolStripSeparator1.Size = New System.Drawing.Size(149, 6)
+            Me.ToolStripSeparator1.Size = New System.Drawing.Size(110, 6)
             '
             'RenameToolStripMenuItem
             '
             Me.RenameToolStripMenuItem.Name = "RenameToolStripMenuItem"
-            Me.RenameToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.RenameToolStripMenuItem.Size = New System.Drawing.Size(113, 22)
             Me.RenameToolStripMenuItem.Text = "Rename"
             '
             'DeleteToolStripMenuItem
             '
             Me.DeleteToolStripMenuItem.Name = "DeleteToolStripMenuItem"
-            Me.DeleteToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.DeleteToolStripMenuItem.Size = New System.Drawing.Size(113, 22)
             Me.DeleteToolStripMenuItem.Text = "Delete"
-            '
-            'Timer
-            '
             '
             'PortfolioForm
             '

@@ -1,14 +1,10 @@
-﻿Imports System.Diagnostics.Contracts
-Imports DbManager
+﻿Imports DbManager
 Imports DbManager.Bonds
 Imports System.Runtime.InteropServices
 
 Namespace Forms.PortfolioForm
 
-   
-
     Public Class PortfolioForm
-
 #Region "Portfolio TAB"
 
         Private _flag As Boolean
@@ -27,19 +23,25 @@ Namespace Forms.PortfolioForm
 
             PortfolioTree.Nodes.Clear()
 
-            PortfolioTree.BeginUpdate()
-            Dim newSelNode = AddPortfoliosByFolder("", selectedNodeId)
-            If newSelNode IsNot Nothing Then
-                newSelNode.EnsureVisible()
-                PortfolioTree.SelectedNode = newSelNode
+            If _portfolioManager.PortfoliosValid() Then
+                PortfolioTree.BeginUpdate()
+                Dim newSelNode = AddPortfoliosByFolder("", selectedNodeId)
+                If newSelNode IsNot Nothing Then
+                    newSelNode.EnsureVisible()
+                    PortfolioTree.SelectedNode = newSelNode
+                End If
+                PortfolioTree.EndUpdate()
+            Else
+                MessageBox.Show("Portfolios are corrupted, unable to show", "Portfolios...", MessageBoxButtons.OK, MessageBoxIcon.Hand)
             End If
-            PortfolioTree.EndUpdate()
+
         End Sub
 
-        Private Function AddPortfoliosByFolder(ByVal id As String, ByVal selId As String, Optional ByVal whereTo As TreeNode = Nothing) As TreeNode
+        Private Function AddPortfoliosByFolder(ByVal theId As String, ByVal selId As String, Optional ByVal whereTo As TreeNode = Nothing) As TreeNode
             Dim portMan As PortfolioManager = _portfolioManager
-            Dim res As TreeNode = If(id = selId, whereTo, Nothing)
-            Dim descrs = portMan.GetPortfoliosByFolder(id)
+            Dim res As TreeNode = If(theId = selId, whereTo, Nothing)
+            Dim descrs = portMan.GetPortfoliosByFolder(theId)
+            
             For Each descr In descrs
                 Dim img = If(descr.IsFolder, "folder", "portfolio")
                 Dim newNode As TreeNode
@@ -114,7 +116,7 @@ Namespace Forms.PortfolioForm
             _flag = False
         End Sub
 
-        Private Sub PortfolioTree_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles PortfolioTree.MouseUp
+        Private Sub PortfolioTree_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles PortfolioTree.MouseUp
             If Not _flag Then
                 _flag = True
                 Return
@@ -170,26 +172,32 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private _dragNode As TreeNode
+
+
         Private Sub PortfolioTree_ItemDrag(ByVal sender As Object, ByVal e As ItemDragEventArgs) Handles PortfolioTree.ItemDrag
             _dragNode = e.Item
-            DoDragDrop(e.Item, DragDropEffects.Move)
+            DoDragDrop(e.Item, DragDropEffects.Copy Or DragDropEffects.Move)
         End Sub
+
+        <DllImport("user32.dll")>
+        Private Shared Function GetKeyState(ByVal key As Keys) As Short
+        End Function
 
         Private Sub PortfolioTree_DragOver(ByVal sender As Object, ByVal e As DragEventArgs) Handles PortfolioTree.DragOver
             Dim pos = PortfolioTree.PointToClient(New Point(e.X, e.Y))
             Dim node = PortfolioTree.GetNodeAt(pos)
+            Dim copy = GetKeyState(Keys.ControlKey) < 0
             If node Is Nothing Then
-                e.Effect = DragDropEffects.Move
+                e.Effect = If(copy, DragDropEffects.Copy, DragDropEffects.Move)
             Else
                 node.Expand()
                 Dim descr = TryCast(node.Tag, PortfolioItemDescription)
                 If IsChildOf(_dragNode, node) OrElse (descr IsNot Nothing AndAlso Not descr.IsFolder) Then
                     e.Effect = DragDropEffects.None
                 Else
-                    e.Effect = DragDropEffects.Move
+                    e.Effect = If(copy, DragDropEffects.Copy, DragDropEffects.Move)
                 End If
             End If
-
         End Sub
 
         Private Shared Function IsChildOf(ByVal ofWhat As TreeNode, ByVal who As TreeNode) As Boolean
@@ -208,17 +216,27 @@ Namespace Forms.PortfolioForm
         Private Sub PortfolioTree_DragDrop(ByVal sender As Object, ByVal e As DragEventArgs) Handles PortfolioTree.DragDrop
             Dim dragDescr = TryCast(_dragNode.Tag, PortfolioItemDescription)
             If dragDescr Is Nothing Then Return
+            Dim copy = GetKeyState(Keys.ControlKey) < 0
 
             Dim pos = PortfolioTree.PointToClient(New Point(e.X, e.Y))
             Dim node = PortfolioTree.GetNodeAt(pos)
+            Dim resId As String
             If node Is Nothing Then
-                _portfolioManager.MoveItemToTop(dragDescr.Id)
+                If copy Then
+                    resId = _portfolioManager.CopyItemToTop(dragDescr.Id)
+                Else
+                    resId = _portfolioManager.MoveItemToTop(dragDescr.Id)
+                End If
             Else
                 Dim descr = TryCast(node.Tag, PortfolioItemDescription)
                 If descr Is Nothing OrElse Not descr.IsFolder Then Return
-                _portfolioManager.MoveItemToFolder(dragDescr.Id, descr.Id)
+                If copy Then
+                    resId = _portfolioManager.CopyItemToFolder(dragDescr.Id, descr.Id)
+                Else
+                    resId = _portfolioManager.MoveItemToFolder(dragDescr.Id, descr.Id)
+                End If
             End If
-            RefreshPortfolioTree(dragDescr.Id)
+            RefreshPortfolioTree(resId)
         End Sub
 #End Region
 
@@ -236,5 +254,6 @@ Namespace Forms.PortfolioForm
             End If
         End Sub
 #End Region
+
     End Class
 End Namespace

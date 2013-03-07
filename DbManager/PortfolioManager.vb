@@ -33,8 +33,11 @@ Public Interface IPortfolioManager
 
     Function AddFolder(ByVal text As String, Optional ByVal id As String = "") As Long
     Function AddPortfolio(ByVal text As String, Optional ByVal id As String = "") As Long
-    Sub MoveItemToFolder(ByVal whoId As String, ByVal whereId As String)
-    Sub MoveItemToTop(ByVal id As String)
+    Function MoveItemToFolder(ByVal whoId As String, ByVal whereId As String) As String
+    Function MoveItemToTop(ByVal id As String) As String
+    Function CopyItemToTop(ByVal id As String) As String
+    Function CopyItemToFolder(ByVal whoId As String, ByVal whereId As String) As String
+    Function PortfoliosValid() As Boolean
 End Interface
 
 Public Class PortfolioItemDescription
@@ -169,17 +172,16 @@ Public Class PortfolioManager
         Return newId
     End Function
 
+    Private ReadOnly _ids As New HashSet(Of Long)
+    Private ReadOnly _tmpIds As New HashSet(Of Long)
+
     Private Function GenerateNewId() As Long
-        Dim ids As New HashSet(Of Long)
-        Dim idNodes = _bonds.SelectNodes("/bonds/portfolios//portfolio/@id | /bonds/portfolios//folder/@id")
-        For Each node As XmlNode In idNodes
-            ids.Add(CLng(node.Value))
-        Next
-        Dim rnd As New Random
+        Dim rnd As New Random(DateTime.Now.Millisecond)
         Dim elem As Long
         Do
             elem = CLng(rnd.NextDouble() * 100000)
-        Loop While ids.Contains(elem)
+        Loop While _ids.Contains(elem) Or _tmpIds.Contains(elem)
+        _tmpIds.Add(elem)
         Return elem
     End Function
 
@@ -188,7 +190,7 @@ Public Class PortfolioManager
         Dim parent = node.ParentNode
 
         parent.RemoveChild(node)
-        _bonds.Save(_configXML)
+        SaveBonds()
     End Sub
 
     Public Sub DeletePortfolio(ByVal id As String) Implements IPortfolioManager.DeletePortfolio
@@ -200,43 +202,89 @@ Public Class PortfolioManager
     End Sub
 
     Public Function AddFolder(ByVal text As String, Optional ByVal id As String = "") As Long Implements IPortfolioManager.AddFolder
-        If id <> "" Then
-            Return Add(text, "folder", id)
-        Else
-            Return Add(text, "folder")
-        End If
+        Return Add(text, "folder", id)
     End Function
 
     Public Function AddPortfolio(ByVal text As String, Optional ByVal id As String = "") As Long Implements IPortfolioManager.AddPortfolio
-        If id <> "" Then
-            Return Add(text, "portfolio", id)
-        Else
-            Return Add(text, "portfolio")
-        End If
+        Return Add(text, "portfolio", id)
     End Function
 
-    Public Sub MoveItemToFolder(ByVal whoId As String, ByVal whereId As String) Implements IPortfolioManager.MoveItemToFolder
+    Private Function DoCopyMove(ByVal move As Boolean, ByVal whoId As String, Optional ByVal whereId As String = "") As String
         Dim whoNode = _bonds.SelectSingleNode(String.Format("/bonds/portfolios//folder[@id='{0}'] | /bonds/portfolios//portfolio[@id='{0}']", whoId))
-        If whoNode Is Nothing Then Return
-        Dim whereNode = _bonds.SelectSingleNode(String.Format("/bonds/portfolios//folder[@id='{0}'] | /bonds/portfolios//portfolio[@id='{0}']", whereId))
-        If whereNode Is Nothing Then Return
-        If whoNode.ParentNode IsNot Nothing Then whoNode.ParentNode.RemoveChild(whoNode)
-        whereNode.AppendChild(whoNode)
-        SaveBonds()
-    End Sub
+        If whoNode Is Nothing Then Return whoId
 
-    Public Sub MoveItemToTop(ByVal id As String) Implements IPortfolioManager.MoveItemToTop
-        Dim whoNode = _bonds.SelectSingleNode(String.Format("/bonds/portfolios//folder[@id='{0}'] | /bonds/portfolios//portfolio[@id='{0}']", id))
-        If whoNode Is Nothing Then Return
-        Dim whereNode = _bonds.SelectSingleNode("/bonds/portfolios")
-        If whereNode Is Nothing Then Return
-        If whoNode.ParentNode IsNot Nothing Then whoNode.ParentNode.RemoveChild(whoNode)
-        whereNode.AppendChild(whoNode)
-        SaveBonds()
-    End Sub
+        Dim whereNode As XmlNode
+        If whereId <> "" Then
+            whereNode = _bonds.SelectSingleNode(String.Format("/bonds/portfolios//folder[@id='{0}'] | /bonds/portfolios//portfolio[@id='{0}']", whereId))
+        Else
+            whereNode = _bonds.SelectSingleNode("/bonds/portfolios")
+        End If
+        If whereNode Is Nothing Then Return whoId
+
+        Dim res As String
+        If move AndAlso whoNode.ParentNode IsNot Nothing Then
+            whoNode.ParentNode.RemoveChild(whoNode)
+            whereNode.AppendChild(whoNode)
+            res = whoId
+        ElseIf Not move Then
+            Dim clone As XmlNode = DeepClone(whoNode)
+            whereNode.AppendChild(clone)
+            res = clone.Attributes("id").Value
+        Else
+            res = ""
+        End If
+
+        If res <> "" Then SaveBonds()
+        Return res
+    End Function
+
+    Private Function DeepClone(ByVal who As XmlNode) As XmlNode
+        Dim res As XmlNode = who.CloneNode(False)
+        If res.Name = "folder" Or res.Name = "portfolio" Then
+            res.Attributes("id").Value = GenerateNewId()
+        End If
+        For Each node As XmlNode In who.ChildNodes
+            res.AppendChild(DeepClone(node))
+        Next
+        Return res
+    End Function
+
+    Public Function MoveItemToFolder(ByVal whoId As String, ByVal whereId As String) As String Implements IPortfolioManager.MoveItemToFolder
+        Return DoCopyMove(True, whoId, whereId)
+    End Function
+
+    Public Function MoveItemToTop(ByVal id As String) As String Implements IPortfolioManager.MoveItemToTop
+        Return DoCopyMove(True, id)
+    End Function
+
+    Public Function CopyItemToTop(ByVal id As String) As String Implements IPortfolioManager.CopyItemToTop
+        Return DoCopyMove(False, id)
+    End Function
+
+    Public Function CopyItemToFolder(ByVal whoId As String, ByVal whereId As String) As String Implements IPortfolioManager.CopyItemToFolder
+        Return DoCopyMove(False, whoId, whereId)
+    End Function
+
+    Public Function PortfoliosValid() As Boolean Implements IPortfolioManager.PortfoliosValid
+        Dim allIds = _bonds.SelectNodes("/bonds/portfolios//folder/@id | /bonds/portfolios//portfolio/@id")
+        Dim maxCounts = (
+            From v As XmlAttribute In allIds
+            Let val = v.Value
+            Group val By val Into cnt = Count(val)
+            Select cnt).ToList()
+        Return Not maxCounts.Any OrElse maxCounts.Max = 1
+    End Function
 
     Private Sub SaveBonds()
+        _ids.Clear()
+        _tmpIds.Clear()
+
         _bonds.Save(_configXml)
+
+        Dim idNodes = _bonds.SelectNodes("/bonds/portfolios//portfolio/@id | /bonds/portfolios//folder/@id")
+        For Each node As XmlNode In idNodes
+            _ids.Add(CLng(node.Value))
+        Next
     End Sub
 
     Public Function GetFolderDescr(ByVal id As String) As PortfolioItemDescription Implements IPortfolioManager.GetFolderDescr
