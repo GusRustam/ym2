@@ -2,7 +2,7 @@
 <bonds>
   <!-- Field sets -->
   <field-sets>
-    <field-set id="MICEX">
+    <field-set id="MICEX" name="Micex bonds description">
       <realtime>
         <field type="TIME">???</field>
         <field type="BID">BID</field>
@@ -22,7 +22,7 @@
       </historical>
     </field-set>
     
-    <field-set id="Eurobonds">
+    <field-set id="Eurobonds" name="Eurobonds description">
       <realtime>
         <field type="BID">275</field>
         <field type="ASK">393</field>

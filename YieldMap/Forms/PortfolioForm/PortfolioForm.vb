@@ -6,7 +6,6 @@ Namespace Forms.PortfolioForm
 
     Public Class PortfolioForm
 #Region "Portfolio TAB"
-
         Private _dragNode As TreeNode
         Private _currentItem As PortfolioItemDescription
         Private _flag As Boolean
@@ -23,6 +22,8 @@ Namespace Forms.PortfolioForm
         End Property
 
         Private Sub RefreshPortfolioData()
+            If CurrentItem Is Nothing Then Return
+
             If CurrentItem.IsFolder Then
                 PortfolioChainsListsGrid.Columns.Clear()
                 PortfolioChainsListsGrid.Rows.Clear()
@@ -30,6 +31,7 @@ Namespace Forms.PortfolioForm
                 PortfolioItemsGrid.Rows.Clear()
             Else
                 Dim descr = _portfolioManager.GetPortfolioStructure(CurrentItem.Id)
+                ' todo visualize 'em
             End If
         End Sub
 

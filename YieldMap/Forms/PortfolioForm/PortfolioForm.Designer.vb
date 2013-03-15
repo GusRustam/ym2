@@ -46,11 +46,11 @@
             Me.ListsButton = New System.Windows.Forms.RadioButton()
             Me.FieldsPage = New System.Windows.Forms.TabPage()
             Me.TableLayoutPanel4 = New System.Windows.Forms.TableLayoutPanel()
-            Me.ListBox1 = New System.Windows.Forms.ListBox()
+            Me.FieldsListBox = New System.Windows.Forms.ListBox()
             Me.FlowLayoutPanel5 = New System.Windows.Forms.FlowLayoutPanel()
             Me.Button9 = New System.Windows.Forms.Button()
             Me.Button10 = New System.Windows.Forms.Button()
-            Me.DataGridView4 = New System.Windows.Forms.DataGridView()
+            Me.FieldsGrid = New System.Windows.Forms.DataGridView()
             Me.DataPage = New System.Windows.Forms.TabPage()
             Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
             Me.BondsTableView = New System.Windows.Forms.DataGridView()
@@ -98,7 +98,7 @@
             Me.FieldsPage.SuspendLayout()
             Me.TableLayoutPanel4.SuspendLayout()
             Me.FlowLayoutPanel5.SuspendLayout()
-            CType(Me.DataGridView4, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.FieldsGrid, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.DataPage.SuspendLayout()
             Me.TableLayoutPanel1.SuspendLayout()
             CType(Me.BondsTableView, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -335,6 +335,7 @@
             'ChainsButton
             '
             Me.ChainsButton.AutoSize = True
+            Me.ChainsButton.Checked = True
             Me.ChainsButton.Location = New System.Drawing.Point(0, 0)
             Me.ChainsButton.Margin = New System.Windows.Forms.Padding(0)
             Me.ChainsButton.Name = "ChainsButton"
@@ -352,7 +353,6 @@
             Me.ListsButton.Name = "ListsButton"
             Me.ListsButton.Size = New System.Drawing.Size(46, 17)
             Me.ListsButton.TabIndex = 9
-            Me.ListsButton.TabStop = True
             Me.ListsButton.Text = "Lists"
             Me.ListsButton.UseVisualStyleBackColor = True
             '
@@ -372,9 +372,9 @@
             Me.TableLayoutPanel4.ColumnCount = 2
             Me.TableLayoutPanel4.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
             Me.TableLayoutPanel4.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-            Me.TableLayoutPanel4.Controls.Add(Me.ListBox1, 0, 0)
+            Me.TableLayoutPanel4.Controls.Add(Me.FieldsListBox, 0, 0)
             Me.TableLayoutPanel4.Controls.Add(Me.FlowLayoutPanel5, 0, 1)
-            Me.TableLayoutPanel4.Controls.Add(Me.DataGridView4, 1, 0)
+            Me.TableLayoutPanel4.Controls.Add(Me.FieldsGrid, 1, 0)
             Me.TableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill
             Me.TableLayoutPanel4.Location = New System.Drawing.Point(3, 3)
             Me.TableLayoutPanel4.Name = "TableLayoutPanel4"
@@ -384,14 +384,14 @@
             Me.TableLayoutPanel4.Size = New System.Drawing.Size(907, 549)
             Me.TableLayoutPanel4.TabIndex = 0
             '
-            'ListBox1
+            'FieldsListBox
             '
-            Me.ListBox1.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.ListBox1.FormattingEnabled = True
-            Me.ListBox1.Location = New System.Drawing.Point(3, 3)
-            Me.ListBox1.Name = "ListBox1"
-            Me.ListBox1.Size = New System.Drawing.Size(447, 518)
-            Me.ListBox1.TabIndex = 0
+            Me.FieldsListBox.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.FieldsListBox.FormattingEnabled = True
+            Me.FieldsListBox.Location = New System.Drawing.Point(3, 3)
+            Me.FieldsListBox.Name = "FieldsListBox"
+            Me.FieldsListBox.Size = New System.Drawing.Size(447, 518)
+            Me.FieldsListBox.TabIndex = 0
             '
             'FlowLayoutPanel5
             '
@@ -424,14 +424,14 @@
             Me.Button10.Text = "Remove"
             Me.Button10.UseVisualStyleBackColor = True
             '
-            'DataGridView4
+            'FieldsGrid
             '
-            Me.DataGridView4.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-            Me.DataGridView4.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.DataGridView4.Location = New System.Drawing.Point(456, 3)
-            Me.DataGridView4.Name = "DataGridView4"
-            Me.DataGridView4.Size = New System.Drawing.Size(448, 518)
-            Me.DataGridView4.TabIndex = 2
+            Me.FieldsGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+            Me.FieldsGrid.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.FieldsGrid.Location = New System.Drawing.Point(456, 3)
+            Me.FieldsGrid.Name = "FieldsGrid"
+            Me.FieldsGrid.Size = New System.Drawing.Size(448, 518)
+            Me.FieldsGrid.TabIndex = 2
             '
             'DataPage
             '
@@ -814,7 +814,7 @@
             Me.FieldsPage.ResumeLayout(False)
             Me.TableLayoutPanel4.ResumeLayout(False)
             Me.FlowLayoutPanel5.ResumeLayout(False)
-            CType(Me.DataGridView4, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.FieldsGrid, System.ComponentModel.ISupportInitialize).EndInit()
             Me.DataPage.ResumeLayout(False)
             Me.TableLayoutPanel1.ResumeLayout(False)
             CType(Me.BondsTableView, System.ComponentModel.ISupportInitialize).EndInit()
@@ -865,11 +865,11 @@
         Friend WithEvents Button7 As System.Windows.Forms.Button
         Friend WithEvents Button8 As System.Windows.Forms.Button
         Friend WithEvents TableLayoutPanel4 As System.Windows.Forms.TableLayoutPanel
-        Friend WithEvents ListBox1 As System.Windows.Forms.ListBox
+        Friend WithEvents FieldsListBox As System.Windows.Forms.ListBox
         Friend WithEvents FlowLayoutPanel5 As System.Windows.Forms.FlowLayoutPanel
         Friend WithEvents Button9 As System.Windows.Forms.Button
         Friend WithEvents Button10 As System.Windows.Forms.Button
-        Friend WithEvents DataGridView4 As System.Windows.Forms.DataGridView
+        Friend WithEvents FieldsGrid As System.Windows.Forms.DataGridView
         Friend WithEvents PortTreeCM As System.Windows.Forms.ContextMenuStrip
         Friend WithEvents AddToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents RenameToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem

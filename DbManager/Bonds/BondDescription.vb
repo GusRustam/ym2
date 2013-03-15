@@ -1,15 +1,44 @@
-﻿Imports System.Diagnostics.Contracts
+﻿Namespace Bonds
 
-Namespace Bonds
+    Public Class PaymentException
+        Inherits Exception
 
+        Public Sub New()
+        End Sub
+
+        Public Sub New(ByVal message As String)
+            MyBase.New(message)
+        End Sub
+
+        Public Sub New(ByVal message As String, ByVal innerException As Exception)
+            MyBase.New(message, innerException)
+        End Sub
+    End Class
     Public Class BondPayments
-        Private _issueDate As Date
-        Private _matDate As Date?
-        Private _payments As List(Of Tuple(Of Date, Double))
+        Private ReadOnly _issueDate As Date
+        Private ReadOnly _matDate As Date?
+        Private ReadOnly _payments As New LinkedList(Of Tuple(Of Date, Double))
+
+        Sub New(ByVal issueDate As Date, ByVal matDate As Date?)
+            _issueDate = issueDate
+            _matDate = matDate
+        End Sub
+
+        Public Sub AddPayment(ByVal dt As Date, ByVal cpn As Double)
+            _payments.AddLast(Tuple.Create(dt, cpn))
+        End Sub
 
         Public Function GetCoupon(ByVal dt As Date) As Double
-            Contract.Requires(dt < Date.Today)
-            Return 0 ' todo wrong!
+            If dt < _issueDate Then
+                Throw New PaymentException(String.Format("Requested date {0:dd/MMM/yy} is less then issue date {1:dd/MMM/yy}", dt, _issueDate))
+            ElseIf dt > _matDate Then
+                Throw New PaymentException(String.Format("Requested date {0:dd/MMM/yy} is greater then maturity date {1:dd/MMM/yy}", dt, _matDate))
+            End If
+            Dim item = _payments.First
+            While item.Next IsNot Nothing And item.Value.Item1 < dt
+                item = item.Next
+            End While
+            Return item.Value.Item2 / 100
         End Function
     End Class
 

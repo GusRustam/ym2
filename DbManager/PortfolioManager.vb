@@ -1,6 +1,9 @@
-﻿Imports System.Xml
+﻿' TODO LIQUIDITY!!!
+Imports System.Xml
 Imports System.IO
+Imports DbManager.Bonds
 Imports NLog
+Imports System.Collections.ObjectModel
 Imports Uitls
 
 Public Class ConfingNameAttribute
@@ -19,6 +22,9 @@ Public Class ConfingNameAttribute
 End Class
 
 Public Class FieldSet
+    Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(FieldSet))
+
+    <ConfingName("DATE")> Public LastDate As String = ""
     <ConfingName("TIME")> Public Time As String = ""
     <ConfingName("BID")> Public Bid As String = ""
     <ConfingName("ASK")> Public Ask As String = ""
@@ -27,11 +33,26 @@ Public Class FieldSet
     <ConfingName("HIST")> Public Hist As String = ""     ' Historical Field. Corresponds to Close
     <ConfingName("HIST_DATE")> Public HistDate As String = ""
     <ConfingName("VOLUME")> Public Volume As String = ""
-    <ConfingName("SOURCE")> Public Src As String = ""
+    <ConfingName("SOURCE")> Public Src As String = ""   ' Contributor
 
     Public Sub New(ByVal node As XmlNode, ByVal subnode As String)
-        'todo extract fields using reflection
-        Throw New NotImplementedException()
+        Logger.Trace(String.Format("FieldSet({0}, {1})", node.Name, subnode))
+        Dim fields = Me.GetType().GetFields()
+        For Each info In (From fld In fields
+                           Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False)
+                           Where attx.Any
+                           Select fld, attx)
+
+            Dim xmlName = CType(info.attx(0), ConfingNameAttribute).XmlName
+            Logger.Trace(" ---> found node named {0}", xmlName)
+            Dim item = node.SelectSingleNode(String.Format("{0}/field[@type='{1}']", subnode, xmlName))
+            If item IsNot Nothing Then
+                Logger.Trace(" ---> {0} <- {1}", xmlName, item.InnerText)
+                info.fld.SetValue(Me, item.InnerText)
+            Else
+                Logger.Trace(" ---> no data")
+            End If
+        Next
     End Sub
 End Class
 
@@ -45,7 +66,7 @@ Public Class Fields
         If node Is Nothing Then Throw New Exception(String.Format("Failed to find field set with id {0}", id))
         _name = node.Attributes("name").Value
         _realtime = New FieldSet(node, "realtime")
-        _history = New FieldSet(node, "history")
+        _history = New FieldSet(node, "historical")
     End Sub
 
     Public ReadOnly Property Name As String
@@ -67,19 +88,45 @@ Public Class Fields
     End Property
 End Class
 
-Public Class Source
+Public MustInherit Class Source
     Private ReadOnly _id As String
     Private ReadOnly _color As String
+    Private ReadOnly _name As String
     Private ReadOnly _fields As Fields
     Private ReadOnly _enabled As Boolean
     Private ReadOnly _curve As Boolean
 
-    Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As Fields, ByVal enabled As Boolean, ByVal curve As Boolean)
+    Protected Overloads Function Equals(ByVal other As Source) As Boolean
+        Return String.Equals(_id, other._id)
+    End Function
+
+    Public Overloads Overrides Function Equals(ByVal obj As Object) As Boolean
+        If ReferenceEquals(Nothing, obj) Then Return False
+        If ReferenceEquals(Me, obj) Then Return True
+        Dim other As Source = TryCast(obj, Source)
+        Return other IsNot Nothing AndAlso Equals(other)
+    End Function
+
+    Public Overrides Function GetHashCode() As Integer
+        If _id Is Nothing Then Return 0
+        Return _id.GetHashCode
+    End Function
+
+    Public Shared Operator =(ByVal left As Source, ByVal right As Source) As Boolean
+        Return Equals(left, right)
+    End Operator
+
+    Public Shared Operator <>(ByVal left As Source, ByVal right As Source) As Boolean
+        Return Not Equals(left, right)
+    End Operator
+
+    Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As Fields, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
         _id = id
         _color = color
         _fields = fields
         _enabled = enabled
         _curve = curve
+        _name = name
     End Sub
 
     Public ReadOnly Property ID As String
@@ -111,14 +158,29 @@ Public Class Source
             Return _curve
         End Get
     End Property
+
+    Public ReadOnly Property Name As String
+        Get
+            Return _name
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Get list of all Source rics "by default"
+    ''' This means that in a portfolio rics might differ because of filters and excluded items
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public MustOverride Function GetDefaultRics() As List(Of String)
 End Class
 
 Public Class Chain
     Inherits Source
     Private ReadOnly _chainRic As String
+    Private ReadOnly _bondsManager As IBondsLoader = BondsLoader.Instance
 
-    Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As Fields, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal chainRic As String)
-        MyBase.New(id, color, fields, enabled, curve)
+    Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As Fields, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal chainRic As String, ByVal name As String)
+        MyBase.New(id, color, fields, enabled, curve, name)
         _chainRic = chainRic
     End Sub
 
@@ -127,26 +189,27 @@ Public Class Chain
             Return _chainRic
         End Get
     End Property
+
+    Public Overrides Function GetDefaultRics() As List(Of String)
+        Return _bondsManager.GetChainRics(_chainRic)
+    End Function
 End Class
 
 Public Class UserList
     Inherits Source
     Private ReadOnly _bondRics As List(Of String)
 
-    Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As Fields, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal bondRics As List(Of String))
-        MyBase.New(id, color, fields, enabled, curve)
+    Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As Fields, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal bondRics As List(Of String), ByVal name As String)
+        MyBase.New(id, color, fields, enabled, curve, name)
         _bondRics = bondRics
     End Sub
 
-    Public ReadOnly Property BondRics As List(Of String)
-        Get
-            Return _bondRics
-        End Get
-    End Property
+    Shared Function ExtractRics(ByVal node As XmlNode) As List(Of String)
+        Return (From ric As XmlNode In node.SelectNodes("/ric") Select ric.Value).ToList()
+    End Function
 
-    Public Shared Function ExtractRics(ByVal node As XmlNode) As List(Of String)
-        'todo extract rics by stupid XML
-        Throw New NotImplementedException()
+    Public Overrides Function GetDefaultRics() As List(Of String)
+        Return _bondRics
     End Function
 End Class
 
@@ -155,13 +218,39 @@ Public Class PortfolioSource
     Private ReadOnly _source As Source
     Private ReadOnly _condition As String
     Private ReadOnly _customName As String
+    Private ReadOnly _customColor As String
     Private ReadOnly _included As Boolean
 
-    Public Sub New(ByVal order As Integer, ByVal source As Source, ByVal condition As String, ByVal customName As String, ByVal included As Boolean)
+    Protected Overloads Function Equals(ByVal other As PortfolioSource) As Boolean
+        Return Equals(_source, other._source)
+    End Function
+
+    Public Overloads Overrides Function Equals(ByVal obj As Object) As Boolean
+        If ReferenceEquals(Nothing, obj) Then Return False
+        If ReferenceEquals(Me, obj) Then Return True
+        If obj.GetType IsNot Me.GetType Then Return False
+        Return Equals(DirectCast(obj, PortfolioSource))
+    End Function
+
+    Public Overrides Function GetHashCode() As Integer
+        If _source Is Nothing Then Return 0
+        Return _source.GetHashCode
+    End Function
+
+    Public Shared Operator =(ByVal left As PortfolioSource, ByVal right As PortfolioSource) As Boolean
+        Return Equals(left, right)
+    End Operator
+
+    Public Shared Operator <>(ByVal left As PortfolioSource, ByVal right As PortfolioSource) As Boolean
+        Return Not Equals(left, right)
+    End Operator
+
+    Public Sub New(ByVal order As Integer, ByVal source As Source, ByVal condition As String, ByVal customName As String, ByVal customColor As String, ByVal included As Boolean)
         _order = order
         _source = source
         _condition = condition
         _customName = customName
+        _customColor = customColor
         _included = included
     End Sub
 
@@ -194,12 +283,21 @@ Public Class PortfolioSource
             Return _included
         End Get
     End Property
+
+    Public ReadOnly Property CustomColor As String
+        Get
+            Return _customColor
+        End Get
+    End Property
 End Class
 
 Public Class PortfolioStructure
     Private ReadOnly _id As String
     Private ReadOnly _name As String
-    Private _sources As List(Of PortfolioSource)
+    Private ReadOnly _sources As New List(Of PortfolioSource)
+
+    Private ReadOnly _excludes As New HashSet(Of String)
+    Private ReadOnly _rics As New Dictionary(Of PortfolioSource, List(Of String))
 
     Public Sub New(ByVal id As String, ByVal name As String, ByVal sources As List(Of PortfolioSource))
         _id = id
@@ -212,13 +310,10 @@ Public Class PortfolioStructure
         _name = name
     End Sub
 
-    Public Property Sources As List(Of PortfolioSource)
+    Public ReadOnly Property Sources As ReadOnlyCollection(Of PortfolioSource)
         Get
-            Return _sources
+            Return New ReadOnlyCollection(Of PortfolioSource)(_sources)
         End Get
-        Friend Set(ByVal value As List(Of PortfolioSource))
-            _sources = value
-        End Set
     End Property
 
     Public ReadOnly Property ID As String
@@ -232,6 +327,37 @@ Public Class PortfolioStructure
             Return _name
         End Get
     End Property
+
+    Public Function GetRics(ByVal source As PortfolioSource) As List(Of String)
+        Return _rics(source)
+    End Function
+
+    Friend Sub AddSource(ByVal src As PortfolioSource)
+        _sources.Add(src)
+        RecalculateSources()
+    End Sub
+
+    Private Sub RecalculateSources()
+        _excludes.Clear()
+        _rics.Clear()
+
+        For Each ric In From defRics In (
+                            From src In _sources
+                            Where Not src.Included
+                            Select src.Source.GetDefaultRics())
+                        From defRic In defRics
+                        Select defRic
+            _excludes.Add(ric)
+        Next
+
+        For Each src In _sources
+            Dim list = New List(Of String)(src.Source.GetDefaultRics())
+            list.RemoveAll(Function(item) _excludes.Contains(item))
+            _rics.Add(src, list)
+        Next
+        ' todo now apply static filtering
+        ' TODO make a difference between dynamic as static filtering!!!
+    End Sub
 End Class
 
 Public Interface IPortfolioManager
@@ -277,7 +403,7 @@ End Class
 
 Public Class PortfolioManager
     ' TODO multiple config files
-    ' TOOO events OnLoadConfig, OnConfigFileUpdated
+    ' TOdO events OnLoadConfig, OnConfigFileUpdated
     Implements IPortfolioManager
 
     Private Const ConfigFile As String = "bonds.xml"
@@ -343,16 +469,17 @@ Public Class PortfolioManager
         Try
             Dim res As New PortfolioStructure(id, node.Attributes("name").Value)
 
-            Dim nodes = node.SelectNodes("/include | /exclude")
+            Dim nodes = node.SelectNodes("include | exclude")
             Dim order As Integer
             For Each item As XmlNode In nodes
                 Try
                     Dim source As Source
 
-                    Dim isIncluded = (node.Name = "include")
+                    Dim isIncluded = (item.Name = "include")
                     Dim what = item.Attributes("what").Value
                     Dim condition = GetAttr(item, "condition")
                     Dim customName = GetAttr(item, "name")
+                    Dim customColor = GetAttr(item, "color")
 
                     Select Case what
                         Case "chain"
@@ -367,13 +494,14 @@ Public Class PortfolioManager
 
                     If source IsNot Nothing Then
                         order = order + 1
-                        Dim portSource As New PortfolioSource(order, source, condition, customName, isIncluded)
-                        res.Sources.Add(portSource)
+                        Dim portSource As New PortfolioSource(order, source, condition, customName, customColor, isIncluded)
+                        res.AddSource(portSource)
                     Else
                         Logger.Info("Failed to read description for item {0}", what)
                     End If
                 Catch ex As Exception
-                    Logger.Warn("Failed to parse ")
+                    Logger.WarnException("Failed to parse ", ex)
+                    Logger.Warn("Exception = {0}", ex)
                 End Try
             Next
 
@@ -406,14 +534,15 @@ Public Class PortfolioManager
         If node Is Nothing Then Return Nothing
         Try
             Dim color = GetAttrStrict(node, "color")
+            Dim name = GetAttrStrict(node, "name")
             Dim enabled = GetAttr(node, "enabled", "True")
             Dim curve = GetAttr(node, "curve", "False")
             Dim chainRic = GetAttrStrict(node, "ric")
             Dim fields = New Fields(GetAttrStrict(node, "field-set-id"), _bonds)
-            Return New Chain(chainId, color, fields, enabled, curve, chainRic)
+            Return New Chain(chainId, color, fields, enabled, curve, chainRic, name)
         Catch ex As Exception
             Logger.WarnException("Failed to get chain description", ex)
-            Logger.Warn("Exception = ", ex.ToString())
+            Logger.Warn("Exception = {0}", ex.ToString())
             Return Nothing
         End Try
     End Function
@@ -423,11 +552,12 @@ Public Class PortfolioManager
         If node Is Nothing Then Return Nothing
         Try
             Dim color = GetAttrStrict(node, "color")
+            Dim name = GetAttrStrict(node, "name")
             Dim enabled = GetAttr(node, "enabled", "True")
             Dim curve = GetAttr(node, "curve", "False")
             Dim rics = UserList.ExtractRics(node)
             Dim fields = New Fields(GetAttrStrict(node, "field-set-id"), _bonds)
-            Return New UserList(listId, color, fields, enabled, curve, rics)
+            Return New UserList(listId, color, fields, enabled, curve, rics, name)
         Catch ex As Exception
             Logger.WarnException("Failed to get chain description", ex)
             Logger.Warn("Exception = ", ex.ToString())

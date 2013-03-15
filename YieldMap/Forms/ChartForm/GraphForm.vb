@@ -83,7 +83,8 @@ Namespace Forms.ChartForm
 
                 'Dim portfolioSources = (New PortfolioSourcesTableAdapter).GetData()
                 'Dim portfolioUnitedDataTable = (New PortfolioUnitedTableAdapter).GetData()
-                For Each port In PortfolioManager.GetInstance().GetPortfolioStructure(currentPortID) '(From p In portfolioSources Where p.portfolioID = currentPortID Select p)
+                Dim portfolioStructure = PortfolioManager.GetInstance().GetPortfolioStructure(currentPortID)
+                For Each port In portfolioStructure.Sources '(From p In portfolioSources Where p.portfolioID = currentPortID Select p)
                     Dim group As Group
 
                     'Dim fieldSetId = port.id_field_set
@@ -92,17 +93,17 @@ Namespace Forms.ChartForm
                     'Dim history = fields.First(Function(row) row.is_realtime = 0)
                     '    .Group = GroupType,
                     group = New Group(_ansamble) With {
-                        .SeriesName = port.Name,
-                        .PortfolioID = port.Id,
-                        .BidField = port.Fields.Realtime.Bid,
-                        .AskField = port.Fields.Realtime.Ask,
-                        .LastField = port.Fields.Realtime.Hist,
-                        .HistField = port.Fields.Realtime.Hist,
-                        .VolumeField = port.Fields.Realtime.Volume,
-                        .VwapField = port.Fields.Realtime.VWAP,
+                        .SeriesName = If(port.CustomName <> "", port.CustomName, port.Source.Name),
+                        .PortfolioID = port.Source.ID,
+                        .BidField = port.Source.Fields.Realtime.Bid,
+                        .AskField = port.Source.Fields.Realtime.Ask,
+                        .LastField = port.Source.Fields.Realtime.Hist,
+                        .HistField = port.Source.Fields.Realtime.Hist,
+                        .VolumeField = port.Source.Fields.Realtime.Volume,
+                        .VwapField = port.Source.Fields.Realtime.VWAP,
                         .Brokers = {"MM", ""}.ToList(),
                         .Currency = "",
-                        .Color = port.Color
+                        .Color = port.Source.Color
                     }
 
                     ' TODO THAT'S BULLSHIT BUT CURRENTLY NECESSARY BULLSHIT
@@ -117,7 +118,7 @@ Namespace Forms.ChartForm
                         selectedField = group.AskField
                     End If
 
-                    port.Rics.ForEach(
+                    portfolioStructure.GetRics(port).ForEach(
                         Sub(ric)
                             Dim descr = BondsData.Instance.GetBondInfo(ric)
                             If descr IsNot Nothing Then

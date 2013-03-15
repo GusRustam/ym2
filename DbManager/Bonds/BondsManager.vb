@@ -5,23 +5,37 @@ Imports ReutersData
 
 Namespace Bonds
     Public Interface IBondsData
-        '' Returns BondDescription object which contains data on selected bond
         Function GetBondInfo(ByVal ric As String) As BondDescription
         Function GetBondPayments(ByVal ric As String) As BondPayments
-
-        Function IsStraight(ByVal ric As String) As Boolean
-        Function IsConvertible(ByVal ric As String) As Boolean
-        Function IsFrn(ByVal ric As String) As Boolean
-        Function IsPutable(ByVal ric As String) As Boolean
-        Function IsCallable(ByVal ric As String) As Boolean
     End Interface
 
     Public Class BondsData
         Implements IBondsData
 
+        'Private Shared ReadOnly Logger As Logger = GetLogger(GetType(BondsData))
+        Private Shared WithEvents _ldr As IBondsLoader = BondsLoader.Instance
         Private Shared ReadOnly [Me] As New BondsData
 
-        Private Sub New()
+        Private Shared _ricToSubRic As Dictionary(Of String, List(Of String))
+        Private Shared _subRicToRic As Dictionary(Of String, String)
+        Private Shared _initialized As Boolean
+
+        Private Shared Sub OnBondsLoaded() Handles _ldr.Success
+            Refresh()
+        End Sub
+
+        Private Shared Sub Refresh()
+            _ricToSubRic.Clear()
+            _subRicToRic.Clear()
+            For Each row In _ldr.GetAllRicsTable()
+                If _ricToSubRic.ContainsKey(row.ric) Then
+                    _ricToSubRic(row.ric).Add(row.subRic)
+                Else
+                    _ricToSubRic.Add(row.ric, New List(Of String)({row.subRic}))
+                End If
+                _subRicToRic.Add(row.subRic, row.ric)
+            Next
+            _initialized = True
         End Sub
 
         Public Shared ReadOnly Property Instance As IBondsData
@@ -30,33 +44,63 @@ Namespace Bonds
             End Get
         End Property
 
-        Public Function GetBondInfo(ByVal ric As String) As BondDescription Implements IBondsData.GetBondInfo
-            Throw New NotImplementedException()
+        Private Sub New()
+            _ricToSubRic = New Dictionary(Of String, List(Of String))
+            _subRicToRic = New Dictionary(Of String, String)
+
+            If Not _initialized Then
+                Refresh()
+                _initialized = True
+            End If
+        End Sub
+
+        Public Function GetBondInfo(ByVal aRic As String) As BondDescription Implements IBondsData.GetBondInfo
+            Dim descr As BondsDataSet.BondRow = (From row In _ldr.GetBondsTable() Where row.ric = _subRicToRic(aRic) Select row).First()
+
+            Dim coupon As Double
+            If Not Double.TryParse(descr.currentCoupon, coupon) Then coupon = 0
+
+            Dim series  = If(Not IsDBNull(descr("series")), descr.series, "")
+            Dim shortName = descr.shortName & " " & series
+            Return New BondDescription(descr.ric, shortName, shortName, descr.maturityDate, descr.currentCoupon,
+                                       descr.bondStructure, descr.rateStructure, descr.issueDate, shortName,
+                                       descr.shortName & " " & If(coupon > 0, String.Format("{0}", coupon), "ZC"),
+                                       descr.description, series)
         End Function
 
-        Public Function GetBondPayments(ByVal ric As String) As BondPayments Implements IBondsData.GetBondPayments
-            Throw New NotImplementedException()
+        Public Function GetBondPayments(ByVal aRic As String) As BondPayments Implements IBondsData.GetBondPayments
+            Dim descr = (From row In _ldr.GetBondsTable() Where row.ric = _subRicToRic(aRic) Select row).First()
+            Dim rows = (From row In _ldr.GetCouponsTable()
+                        Where row.ric = _subRicToRic(aRic)
+                        Let dt = CDate(row._date)
+                        Select row.ric, dt, row.rate
+                        Order By dt)
+            Dim res As New BondPayments(CDate(descr.issueDate), If(IsDate(descr.maturityDate), CDate(descr.maturityDate), Nothing))
+            For Each row In rows
+                res.AddPayment(row.dt, row.rate)
+            Next
+            Return res
         End Function
 
-        Public Function IsStraight(ByVal ric As String) As Boolean Implements IBondsData.IsStraight
-            Throw New NotImplementedException()
-        End Function
+        'Public Function IsStraight(ByVal aRic As String) As Boolean Implements IBondsData.IsStraight
+        '    Return (From row In Loader.GetBondsTable() Where row.ric = aRic Select row.isStraight).First()
+        'End Function
 
-        Public Function IsConvertible(ByVal ric As String) As Boolean Implements IBondsData.IsConvertible
-            Throw New NotImplementedException()
-        End Function
+        'Public Function IsConvertible(ByVal ric As String) As Boolean Implements IBondsData.IsConvertible
+        '    Throw New NotImplementedException()
+        'End Function
 
-        Public Function IsFrn(ByVal ric As String) As Boolean Implements IBondsData.IsFrn
-            Throw New NotImplementedException()
-        End Function
+        'Public Function IsFrn(ByVal ric As String) As Boolean Implements IBondsData.IsFrn
+        '    Throw New NotImplementedException()
+        'End Function
 
-        Public Function IsPutable(ByVal ric As String) As Boolean Implements IBondsData.IsPutable
-            Throw New NotImplementedException()
-        End Function
+        'Public Function IsPutable(ByVal ric As String) As Boolean Implements IBondsData.IsPutable
+        '    Throw New NotImplementedException()
+        'End Function
 
-        Public Function IsCallable(ByVal ric As String) As Boolean Implements IBondsData.IsCallable
-            Throw New NotImplementedException()
-        End Function
+        'Public Function IsCallable(ByVal ric As String) As Boolean Implements IBondsData.IsCallable
+        '    Throw New NotImplementedException()
+        'End Function
     End Class
 
     Public Interface IBondsLoader
@@ -83,11 +127,12 @@ Namespace Bonds
         Function GetIssueRatingsTable() As BondsDataSet.IssueRatingDataTable
         Function GetIssuerRatingsTable() As BondsDataSet.IssuerRatingDataTable
         Function GetAllRicsTable() As BondsDataSet.RicsDataTable
+        Function GetChainRics(ByVal chainRic As String) As List(Of String)
     End Interface
 
     Public Class BondsLoader
         Implements IBondsLoader
-        Private WithEvents _chainLoader As New Chain
+        Private WithEvents _chainLoader As New ReutersData.Chain
 
         Private Shared ReadOnly Logger As Logger = GetLogger(GetType(BondsLoader))
 
@@ -224,6 +269,10 @@ Namespace Bonds
             Return RicsTable
         End Function
 
+        Public Function GetChainRics(ByVal chainRic As String) As List(Of String) Implements IBondsLoader.GetChainRics
+            Return (From row In RicChain Where row.chain = chainRic Select row.ric).ToList()
+        End Function
+
         Public Function GetIsuuerRatingsTable() As BondsDataSet.IssuerRatingDataTable Implements IBondsLoader.GetIssuerRatingsTable
             Return IssuerRatingsTable
         End Function
@@ -293,7 +342,7 @@ Namespace Bonds
                             ElseIf query.IsNum(colName) Then
                                 If IsNumeric(elem) Then rw(colName) = Double.Parse(elem)
                             Else
-                                rw(colName) = elem
+                                rw(colName) = elem '.ToString()
                             End If
                         Next
                         table.Rows.Add(rw)
@@ -386,26 +435,18 @@ Namespace Bonds
             LoadGeneral(FrnTable, QueryFrn, "Loading FRN structures",
                          Sub(data As LinkedList(Of Dictionary(Of String, Object)))
                              ImportData(data, FrnTable, QueryFrn)
-                             LoadStep5(rics)
+                             LoadStep5()
                          End Sub,
                          floaterRics)
         End Sub
 
-        Private Sub LoadStep5(ByVal rics As HashSet(Of String))
+        Private Sub LoadStep5()
             Logger.Info("LoadFrns")
             LoadGeneral(RicsTable, QueryRics, "Loading all rics",
                          Sub(data As LinkedList(Of Dictionary(Of String, Object)))
                              ImportData(data, RicsTable, QueryRics)
                              RaiseEvent Success()
                          End Sub)
-            'Logger.Info("LoadCalls")
-            'Dim rs = New HashSet(Of String)(From row In BondsTable Where rics.Contains(row.ric) And row.isFloater Select row.ric)
-            'LoadGeneral(FrnTable, QueryFrn, "Loading FRN structures",
-            '             Sub(data As LinkedList(Of Dictionary(Of String, Object)))
-            '                 ImportData(data, FrnTable, QueryFrn)
-            '                 RaiseEvent Success()
-            '             End Sub,
-            '             rs)
         End Sub
 
         Private Sub New()
