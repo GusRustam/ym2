@@ -4,6 +4,21 @@ Imports NLog
 Imports ReutersData
 
 Namespace Bonds
+    Public Class NoBondException
+        Inherits Exception
+
+        Public Sub New()
+        End Sub
+
+        Public Sub New(ByVal message As String)
+            MyBase.New(message)
+        End Sub
+
+        Public Sub New(ByVal message As String, ByVal innerException As Exception)
+            MyBase.New(message, innerException)
+        End Sub
+    End Class
+
     Public Interface IBondsData
         Function GetBondInfo(ByVal ric As String) As BondDescription
         Function GetBondPayments(ByVal ric As String) As BondPayments
@@ -22,6 +37,10 @@ Namespace Bonds
 
         Private Shared Sub OnBondsLoaded() Handles _ldr.Success
             Refresh()
+        End Sub
+
+        Private Sub AssertBondExists(ByVal ric As String)
+            If Not _subRicToRic.ContainsKey(ric) Then Throw New NoBondException(ric)
         End Sub
 
         Private Shared Sub Refresh()
@@ -55,12 +74,13 @@ Namespace Bonds
         End Sub
 
         Public Function GetBondInfo(ByVal aRic As String) As BondDescription Implements IBondsData.GetBondInfo
+            AssertBondExists(aRic)
             Dim descr As BondsDataSet.BondRow = (From row In _ldr.GetBondsTable() Where row.ric = _subRicToRic(aRic) Select row).First()
 
             Dim coupon As Double
             If Not Double.TryParse(descr.currentCoupon, coupon) Then coupon = 0
 
-            Dim series  = If(Not IsDBNull(descr("series")), descr.series, "")
+            Dim series = If(Not IsDBNull(descr("series")), descr.series, "")
             Dim shortName = descr.shortName & " " & series
             Return New BondDescription(descr.ric, shortName, shortName, descr.maturityDate, descr.currentCoupon,
                                        descr.bondStructure, descr.rateStructure, descr.issueDate, shortName,
@@ -69,6 +89,7 @@ Namespace Bonds
         End Function
 
         Public Function GetBondPayments(ByVal aRic As String) As BondPayments Implements IBondsData.GetBondPayments
+            AssertBondExists(aRic)
             Dim descr = (From row In _ldr.GetBondsTable() Where row.ric = _subRicToRic(aRic) Select row).First()
             Dim rows = (From row In _ldr.GetCouponsTable()
                         Where row.ric = _subRicToRic(aRic)

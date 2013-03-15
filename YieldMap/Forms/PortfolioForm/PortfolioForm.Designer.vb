@@ -28,6 +28,25 @@
             Me.PortfoliosPage = New System.Windows.Forms.TabPage()
             Me.TableLayoutPanel2 = New System.Windows.Forms.TableLayoutPanel()
             Me.PortfolioTree = New System.Windows.Forms.TreeView()
+            Me.TabControl1 = New System.Windows.Forms.TabControl()
+            Me.TabPage2 = New System.Windows.Forms.TabPage()
+            Me.TableLayoutPanel6 = New System.Windows.Forms.TableLayoutPanel()
+            Me.FlowLayoutPanel10 = New System.Windows.Forms.FlowLayoutPanel()
+            Me.AddChainListButton = New System.Windows.Forms.Button()
+            Me.RemoveChainListButton = New System.Windows.Forms.Button()
+            Me.UpChainListButton = New System.Windows.Forms.Button()
+            Me.DownChainListButton = New System.Windows.Forms.Button()
+            Me.EditChainListButton = New System.Windows.Forms.Button()
+            Me.PortfolioChainsListsGrid = New System.Windows.Forms.DataGridView()
+            Me.FlowLayoutPanel9 = New System.Windows.Forms.FlowLayoutPanel()
+            Me.ChainsCB = New System.Windows.Forms.CheckBox()
+            Me.ListsCB = New System.Windows.Forms.CheckBox()
+            Me.TabPage3 = New System.Windows.Forms.TabPage()
+            Me.TableLayoutPanel7 = New System.Windows.Forms.TableLayoutPanel()
+            Me.PortfolioItemsGrid = New System.Windows.Forms.DataGridView()
+            Me.FlowLayoutPanel7 = New System.Windows.Forms.FlowLayoutPanel()
+            Me.AllRB = New System.Windows.Forms.RadioButton()
+            Me.SeparateRB = New System.Windows.Forms.RadioButton()
             Me.ChainsPage = New System.Windows.Forms.TabPage()
             Me.TableLayoutPanel3 = New System.Windows.Forms.TableLayoutPanel()
             Me.ChainsListsGrid = New System.Windows.Forms.DataGridView()
@@ -44,6 +63,9 @@
             Me.FlowLayoutPanel3 = New System.Windows.Forms.FlowLayoutPanel()
             Me.ChainsButton = New System.Windows.Forms.RadioButton()
             Me.ListsButton = New System.Windows.Forms.RadioButton()
+            Me.CurvesPage = New System.Windows.Forms.TabPage()
+            Me.TableLayoutPanel5 = New System.Windows.Forms.TableLayoutPanel()
+            Me.CustomBondsPage = New System.Windows.Forms.TabPage()
             Me.FieldsPage = New System.Windows.Forms.TabPage()
             Me.TableLayoutPanel4 = New System.Windows.Forms.TableLayoutPanel()
             Me.FieldsListBox = New System.Windows.Forms.ListBox()
@@ -63,31 +85,19 @@
             Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
             Me.RenameToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Me.DeleteToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-            Me.CurvesPage = New System.Windows.Forms.TabPage()
-            Me.TableLayoutPanel5 = New System.Windows.Forms.TableLayoutPanel()
-            Me.TabControl1 = New System.Windows.Forms.TabControl()
-            Me.TabPage2 = New System.Windows.Forms.TabPage()
-            Me.TabPage3 = New System.Windows.Forms.TabPage()
-            Me.TableLayoutPanel6 = New System.Windows.Forms.TableLayoutPanel()
-            Me.FlowLayoutPanel9 = New System.Windows.Forms.FlowLayoutPanel()
-            Me.ChainsCB = New System.Windows.Forms.CheckBox()
-            Me.ListsCB = New System.Windows.Forms.CheckBox()
-            Me.PortfolioChainsListsGrid = New System.Windows.Forms.DataGridView()
-            Me.FlowLayoutPanel10 = New System.Windows.Forms.FlowLayoutPanel()
-            Me.AddChainListButton = New System.Windows.Forms.Button()
-            Me.RemoveChainListButton = New System.Windows.Forms.Button()
-            Me.UpChainListButton = New System.Windows.Forms.Button()
-            Me.DownChainListButton = New System.Windows.Forms.Button()
-            Me.EditChainListButton = New System.Windows.Forms.Button()
-            Me.TableLayoutPanel7 = New System.Windows.Forms.TableLayoutPanel()
-            Me.FlowLayoutPanel7 = New System.Windows.Forms.FlowLayoutPanel()
-            Me.AllRB = New System.Windows.Forms.RadioButton()
-            Me.SeparateRB = New System.Windows.Forms.RadioButton()
-            Me.PortfolioItemsGrid = New System.Windows.Forms.DataGridView()
-            Me.CustomBondsPage = New System.Windows.Forms.TabPage()
             Me.MainTabControl.SuspendLayout()
             Me.PortfoliosPage.SuspendLayout()
             Me.TableLayoutPanel2.SuspendLayout()
+            Me.TabControl1.SuspendLayout()
+            Me.TabPage2.SuspendLayout()
+            Me.TableLayoutPanel6.SuspendLayout()
+            Me.FlowLayoutPanel10.SuspendLayout()
+            CType(Me.PortfolioChainsListsGrid, System.ComponentModel.ISupportInitialize).BeginInit()
+            Me.FlowLayoutPanel9.SuspendLayout()
+            Me.TabPage3.SuspendLayout()
+            Me.TableLayoutPanel7.SuspendLayout()
+            CType(Me.PortfolioItemsGrid, System.ComponentModel.ISupportInitialize).BeginInit()
+            Me.FlowLayoutPanel7.SuspendLayout()
             Me.ChainsPage.SuspendLayout()
             Me.TableLayoutPanel3.SuspendLayout()
             CType(Me.ChainsListsGrid, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -95,6 +105,7 @@
             Me.FlowLayoutPanel1.SuspendLayout()
             Me.FlowLayoutPanel2.SuspendLayout()
             Me.FlowLayoutPanel3.SuspendLayout()
+            Me.CurvesPage.SuspendLayout()
             Me.FieldsPage.SuspendLayout()
             Me.TableLayoutPanel4.SuspendLayout()
             Me.FlowLayoutPanel5.SuspendLayout()
@@ -104,17 +115,6 @@
             CType(Me.BondsTableView, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.FlowLayoutPanel4.SuspendLayout()
             Me.PortTreeCM.SuspendLayout()
-            Me.CurvesPage.SuspendLayout()
-            Me.TabControl1.SuspendLayout()
-            Me.TabPage2.SuspendLayout()
-            Me.TabPage3.SuspendLayout()
-            Me.TableLayoutPanel6.SuspendLayout()
-            Me.FlowLayoutPanel9.SuspendLayout()
-            CType(Me.PortfolioChainsListsGrid, System.ComponentModel.ISupportInitialize).BeginInit()
-            Me.FlowLayoutPanel10.SuspendLayout()
-            Me.TableLayoutPanel7.SuspendLayout()
-            Me.FlowLayoutPanel7.SuspendLayout()
-            CType(Me.PortfolioItemsGrid, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.SuspendLayout()
             '
             'MainTabControl
@@ -167,6 +167,218 @@
             Me.PortfolioTree.Name = "PortfolioTree"
             Me.PortfolioTree.Size = New System.Drawing.Size(220, 543)
             Me.PortfolioTree.TabIndex = 0
+            '
+            'TabControl1
+            '
+            Me.TabControl1.Controls.Add(Me.TabPage2)
+            Me.TabControl1.Controls.Add(Me.TabPage3)
+            Me.TabControl1.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.TabControl1.Location = New System.Drawing.Point(229, 3)
+            Me.TabControl1.Name = "TabControl1"
+            Me.TabControl1.SelectedIndex = 0
+            Me.TabControl1.Size = New System.Drawing.Size(675, 543)
+            Me.TabControl1.TabIndex = 6
+            '
+            'TabPage2
+            '
+            Me.TabPage2.Controls.Add(Me.TableLayoutPanel6)
+            Me.TabPage2.Location = New System.Drawing.Point(4, 22)
+            Me.TabPage2.Name = "TabPage2"
+            Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
+            Me.TabPage2.Size = New System.Drawing.Size(667, 517)
+            Me.TabPage2.TabIndex = 0
+            Me.TabPage2.Text = "Chains and lists"
+            Me.TabPage2.UseVisualStyleBackColor = True
+            '
+            'TableLayoutPanel6
+            '
+            Me.TableLayoutPanel6.ColumnCount = 1
+            Me.TableLayoutPanel6.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+            Me.TableLayoutPanel6.Controls.Add(Me.FlowLayoutPanel10, 0, 2)
+            Me.TableLayoutPanel6.Controls.Add(Me.PortfolioChainsListsGrid, 0, 1)
+            Me.TableLayoutPanel6.Controls.Add(Me.FlowLayoutPanel9, 0, 0)
+            Me.TableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.TableLayoutPanel6.Location = New System.Drawing.Point(3, 3)
+            Me.TableLayoutPanel6.Name = "TableLayoutPanel6"
+            Me.TableLayoutPanel6.RowCount = 3
+            Me.TableLayoutPanel6.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
+            Me.TableLayoutPanel6.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+            Me.TableLayoutPanel6.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
+            Me.TableLayoutPanel6.Size = New System.Drawing.Size(661, 511)
+            Me.TableLayoutPanel6.TabIndex = 0
+            '
+            'FlowLayoutPanel10
+            '
+            Me.FlowLayoutPanel10.Controls.Add(Me.AddChainListButton)
+            Me.FlowLayoutPanel10.Controls.Add(Me.RemoveChainListButton)
+            Me.FlowLayoutPanel10.Controls.Add(Me.UpChainListButton)
+            Me.FlowLayoutPanel10.Controls.Add(Me.DownChainListButton)
+            Me.FlowLayoutPanel10.Controls.Add(Me.EditChainListButton)
+            Me.FlowLayoutPanel10.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.FlowLayoutPanel10.Location = New System.Drawing.Point(3, 484)
+            Me.FlowLayoutPanel10.Name = "FlowLayoutPanel10"
+            Me.FlowLayoutPanel10.Size = New System.Drawing.Size(655, 24)
+            Me.FlowLayoutPanel10.TabIndex = 7
+            '
+            'AddChainListButton
+            '
+            Me.AddChainListButton.Location = New System.Drawing.Point(3, 3)
+            Me.AddChainListButton.Name = "AddChainListButton"
+            Me.AddChainListButton.Size = New System.Drawing.Size(36, 21)
+            Me.AddChainListButton.TabIndex = 0
+            Me.AddChainListButton.Text = "Add"
+            Me.AddChainListButton.UseVisualStyleBackColor = True
+            '
+            'RemoveChainListButton
+            '
+            Me.RemoveChainListButton.Location = New System.Drawing.Point(45, 3)
+            Me.RemoveChainListButton.Name = "RemoveChainListButton"
+            Me.RemoveChainListButton.Size = New System.Drawing.Size(56, 21)
+            Me.RemoveChainListButton.TabIndex = 1
+            Me.RemoveChainListButton.Text = "Remove"
+            Me.RemoveChainListButton.UseVisualStyleBackColor = True
+            '
+            'UpChainListButton
+            '
+            Me.UpChainListButton.Location = New System.Drawing.Point(107, 3)
+            Me.UpChainListButton.Name = "UpChainListButton"
+            Me.UpChainListButton.Size = New System.Drawing.Size(43, 21)
+            Me.UpChainListButton.TabIndex = 2
+            Me.UpChainListButton.Text = "Up"
+            Me.UpChainListButton.UseVisualStyleBackColor = True
+            '
+            'DownChainListButton
+            '
+            Me.DownChainListButton.Location = New System.Drawing.Point(156, 3)
+            Me.DownChainListButton.Name = "DownChainListButton"
+            Me.DownChainListButton.Size = New System.Drawing.Size(43, 21)
+            Me.DownChainListButton.TabIndex = 3
+            Me.DownChainListButton.Text = "Down"
+            Me.DownChainListButton.UseVisualStyleBackColor = True
+            '
+            'EditChainListButton
+            '
+            Me.EditChainListButton.Location = New System.Drawing.Point(205, 3)
+            Me.EditChainListButton.Name = "EditChainListButton"
+            Me.EditChainListButton.Size = New System.Drawing.Size(43, 21)
+            Me.EditChainListButton.TabIndex = 4
+            Me.EditChainListButton.Text = "Edit"
+            Me.EditChainListButton.UseVisualStyleBackColor = True
+            '
+            'PortfolioChainsListsGrid
+            '
+            Me.PortfolioChainsListsGrid.AllowUserToAddRows = False
+            Me.PortfolioChainsListsGrid.AllowUserToDeleteRows = False
+            Me.PortfolioChainsListsGrid.AllowUserToResizeColumns = False
+            Me.PortfolioChainsListsGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+            Me.PortfolioChainsListsGrid.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.PortfolioChainsListsGrid.Location = New System.Drawing.Point(3, 33)
+            Me.PortfolioChainsListsGrid.Name = "PortfolioChainsListsGrid"
+            Me.PortfolioChainsListsGrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
+            Me.PortfolioChainsListsGrid.Size = New System.Drawing.Size(655, 445)
+            Me.PortfolioChainsListsGrid.TabIndex = 6
+            '
+            'FlowLayoutPanel9
+            '
+            Me.FlowLayoutPanel9.Controls.Add(Me.ChainsCB)
+            Me.FlowLayoutPanel9.Controls.Add(Me.ListsCB)
+            Me.FlowLayoutPanel9.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.FlowLayoutPanel9.Location = New System.Drawing.Point(3, 3)
+            Me.FlowLayoutPanel9.Name = "FlowLayoutPanel9"
+            Me.FlowLayoutPanel9.Size = New System.Drawing.Size(655, 24)
+            Me.FlowLayoutPanel9.TabIndex = 4
+            '
+            'ChainsCB
+            '
+            Me.ChainsCB.AutoSize = True
+            Me.ChainsCB.Checked = True
+            Me.ChainsCB.CheckState = System.Windows.Forms.CheckState.Checked
+            Me.ChainsCB.Location = New System.Drawing.Point(3, 3)
+            Me.ChainsCB.Name = "ChainsCB"
+            Me.ChainsCB.Size = New System.Drawing.Size(58, 17)
+            Me.ChainsCB.TabIndex = 0
+            Me.ChainsCB.Text = "Chains"
+            Me.ChainsCB.UseVisualStyleBackColor = True
+            '
+            'ListsCB
+            '
+            Me.ListsCB.AutoSize = True
+            Me.ListsCB.Checked = True
+            Me.ListsCB.CheckState = System.Windows.Forms.CheckState.Checked
+            Me.ListsCB.Location = New System.Drawing.Point(67, 3)
+            Me.ListsCB.Name = "ListsCB"
+            Me.ListsCB.Size = New System.Drawing.Size(47, 17)
+            Me.ListsCB.TabIndex = 1
+            Me.ListsCB.Text = "Lists"
+            Me.ListsCB.UseVisualStyleBackColor = True
+            '
+            'TabPage3
+            '
+            Me.TabPage3.Controls.Add(Me.TableLayoutPanel7)
+            Me.TabPage3.Location = New System.Drawing.Point(4, 22)
+            Me.TabPage3.Name = "TabPage3"
+            Me.TabPage3.Padding = New System.Windows.Forms.Padding(3)
+            Me.TabPage3.Size = New System.Drawing.Size(667, 517)
+            Me.TabPage3.TabIndex = 1
+            Me.TabPage3.Text = "Items"
+            Me.TabPage3.UseVisualStyleBackColor = True
+            '
+            'TableLayoutPanel7
+            '
+            Me.TableLayoutPanel7.ColumnCount = 1
+            Me.TableLayoutPanel7.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+            Me.TableLayoutPanel7.Controls.Add(Me.PortfolioItemsGrid, 0, 1)
+            Me.TableLayoutPanel7.Controls.Add(Me.FlowLayoutPanel7, 0, 0)
+            Me.TableLayoutPanel7.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.TableLayoutPanel7.Location = New System.Drawing.Point(3, 3)
+            Me.TableLayoutPanel7.Name = "TableLayoutPanel7"
+            Me.TableLayoutPanel7.RowCount = 2
+            Me.TableLayoutPanel7.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
+            Me.TableLayoutPanel7.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+            Me.TableLayoutPanel7.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+            Me.TableLayoutPanel7.Size = New System.Drawing.Size(661, 511)
+            Me.TableLayoutPanel7.TabIndex = 0
+            '
+            'PortfolioItemsGrid
+            '
+            Me.PortfolioItemsGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+            Me.PortfolioItemsGrid.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.PortfolioItemsGrid.Location = New System.Drawing.Point(3, 33)
+            Me.PortfolioItemsGrid.Name = "PortfolioItemsGrid"
+            Me.PortfolioItemsGrid.Size = New System.Drawing.Size(655, 475)
+            Me.PortfolioItemsGrid.TabIndex = 7
+            '
+            'FlowLayoutPanel7
+            '
+            Me.FlowLayoutPanel7.Controls.Add(Me.AllRB)
+            Me.FlowLayoutPanel7.Controls.Add(Me.SeparateRB)
+            Me.FlowLayoutPanel7.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.FlowLayoutPanel7.Location = New System.Drawing.Point(3, 3)
+            Me.FlowLayoutPanel7.Name = "FlowLayoutPanel7"
+            Me.FlowLayoutPanel7.Size = New System.Drawing.Size(655, 24)
+            Me.FlowLayoutPanel7.TabIndex = 6
+            '
+            'AllRB
+            '
+            Me.AllRB.AutoSize = True
+            Me.AllRB.Checked = True
+            Me.AllRB.Location = New System.Drawing.Point(3, 3)
+            Me.AllRB.Name = "AllRB"
+            Me.AllRB.Size = New System.Drawing.Size(63, 17)
+            Me.AllRB.TabIndex = 0
+            Me.AllRB.TabStop = True
+            Me.AllRB.Text = "All items"
+            Me.AllRB.UseVisualStyleBackColor = True
+            '
+            'SeparateRB
+            '
+            Me.SeparateRB.AutoSize = True
+            Me.SeparateRB.Location = New System.Drawing.Point(72, 3)
+            Me.SeparateRB.Name = "SeparateRB"
+            Me.SeparateRB.Size = New System.Drawing.Size(184, 17)
+            Me.SeparateRB.TabIndex = 1
+            Me.SeparateRB.Text = "Included and excluded separately"
+            Me.SeparateRB.UseVisualStyleBackColor = True
             '
             'ChainsPage
             '
@@ -355,6 +567,40 @@
             Me.ListsButton.TabIndex = 9
             Me.ListsButton.Text = "Lists"
             Me.ListsButton.UseVisualStyleBackColor = True
+            '
+            'CurvesPage
+            '
+            Me.CurvesPage.Controls.Add(Me.TableLayoutPanel5)
+            Me.CurvesPage.Location = New System.Drawing.Point(4, 22)
+            Me.CurvesPage.Name = "CurvesPage"
+            Me.CurvesPage.Padding = New System.Windows.Forms.Padding(3)
+            Me.CurvesPage.Size = New System.Drawing.Size(913, 555)
+            Me.CurvesPage.TabIndex = 5
+            Me.CurvesPage.Text = "Curves"
+            Me.CurvesPage.UseVisualStyleBackColor = True
+            '
+            'TableLayoutPanel5
+            '
+            Me.TableLayoutPanel5.ColumnCount = 2
+            Me.TableLayoutPanel5.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+            Me.TableLayoutPanel5.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+            Me.TableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.TableLayoutPanel5.Location = New System.Drawing.Point(3, 3)
+            Me.TableLayoutPanel5.Name = "TableLayoutPanel5"
+            Me.TableLayoutPanel5.RowCount = 2
+            Me.TableLayoutPanel5.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+            Me.TableLayoutPanel5.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+            Me.TableLayoutPanel5.Size = New System.Drawing.Size(907, 549)
+            Me.TableLayoutPanel5.TabIndex = 0
+            '
+            'CustomBondsPage
+            '
+            Me.CustomBondsPage.Location = New System.Drawing.Point(4, 22)
+            Me.CustomBondsPage.Name = "CustomBondsPage"
+            Me.CustomBondsPage.Size = New System.Drawing.Size(913, 555)
+            Me.CustomBondsPage.TabIndex = 6
+            Me.CustomBondsPage.Text = "Custom bonds"
+            Me.CustomBondsPage.UseVisualStyleBackColor = True
             '
             'FieldsPage
             '
@@ -545,252 +791,6 @@
             Me.DeleteToolStripMenuItem.Size = New System.Drawing.Size(113, 22)
             Me.DeleteToolStripMenuItem.Text = "Delete"
             '
-            'CurvesPage
-            '
-            Me.CurvesPage.Controls.Add(Me.TableLayoutPanel5)
-            Me.CurvesPage.Location = New System.Drawing.Point(4, 22)
-            Me.CurvesPage.Name = "CurvesPage"
-            Me.CurvesPage.Padding = New System.Windows.Forms.Padding(3)
-            Me.CurvesPage.Size = New System.Drawing.Size(913, 555)
-            Me.CurvesPage.TabIndex = 5
-            Me.CurvesPage.Text = "Curves"
-            Me.CurvesPage.UseVisualStyleBackColor = True
-            '
-            'TableLayoutPanel5
-            '
-            Me.TableLayoutPanel5.ColumnCount = 2
-            Me.TableLayoutPanel5.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-            Me.TableLayoutPanel5.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-            Me.TableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.TableLayoutPanel5.Location = New System.Drawing.Point(3, 3)
-            Me.TableLayoutPanel5.Name = "TableLayoutPanel5"
-            Me.TableLayoutPanel5.RowCount = 2
-            Me.TableLayoutPanel5.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-            Me.TableLayoutPanel5.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-            Me.TableLayoutPanel5.Size = New System.Drawing.Size(907, 549)
-            Me.TableLayoutPanel5.TabIndex = 0
-            '
-            'TabControl1
-            '
-            Me.TabControl1.Controls.Add(Me.TabPage2)
-            Me.TabControl1.Controls.Add(Me.TabPage3)
-            Me.TabControl1.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.TabControl1.Location = New System.Drawing.Point(229, 3)
-            Me.TabControl1.Name = "TabControl1"
-            Me.TabControl1.SelectedIndex = 0
-            Me.TabControl1.Size = New System.Drawing.Size(675, 543)
-            Me.TabControl1.TabIndex = 6
-            '
-            'TabPage2
-            '
-            Me.TabPage2.Controls.Add(Me.TableLayoutPanel6)
-            Me.TabPage2.Location = New System.Drawing.Point(4, 22)
-            Me.TabPage2.Name = "TabPage2"
-            Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
-            Me.TabPage2.Size = New System.Drawing.Size(667, 517)
-            Me.TabPage2.TabIndex = 0
-            Me.TabPage2.Text = "Chains and lists"
-            Me.TabPage2.UseVisualStyleBackColor = True
-            '
-            'TabPage3
-            '
-            Me.TabPage3.Controls.Add(Me.TableLayoutPanel7)
-            Me.TabPage3.Location = New System.Drawing.Point(4, 22)
-            Me.TabPage3.Name = "TabPage3"
-            Me.TabPage3.Padding = New System.Windows.Forms.Padding(3)
-            Me.TabPage3.Size = New System.Drawing.Size(667, 517)
-            Me.TabPage3.TabIndex = 1
-            Me.TabPage3.Text = "Items"
-            Me.TabPage3.UseVisualStyleBackColor = True
-            '
-            'TableLayoutPanel6
-            '
-            Me.TableLayoutPanel6.ColumnCount = 1
-            Me.TableLayoutPanel6.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-            Me.TableLayoutPanel6.Controls.Add(Me.FlowLayoutPanel10, 0, 2)
-            Me.TableLayoutPanel6.Controls.Add(Me.PortfolioChainsListsGrid, 0, 1)
-            Me.TableLayoutPanel6.Controls.Add(Me.FlowLayoutPanel9, 0, 0)
-            Me.TableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.TableLayoutPanel6.Location = New System.Drawing.Point(3, 3)
-            Me.TableLayoutPanel6.Name = "TableLayoutPanel6"
-            Me.TableLayoutPanel6.RowCount = 3
-            Me.TableLayoutPanel6.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
-            Me.TableLayoutPanel6.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-            Me.TableLayoutPanel6.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
-            Me.TableLayoutPanel6.Size = New System.Drawing.Size(661, 511)
-            Me.TableLayoutPanel6.TabIndex = 0
-            '
-            'FlowLayoutPanel9
-            '
-            Me.FlowLayoutPanel9.Controls.Add(Me.ChainsCB)
-            Me.FlowLayoutPanel9.Controls.Add(Me.ListsCB)
-            Me.FlowLayoutPanel9.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.FlowLayoutPanel9.Location = New System.Drawing.Point(3, 3)
-            Me.FlowLayoutPanel9.Name = "FlowLayoutPanel9"
-            Me.FlowLayoutPanel9.Size = New System.Drawing.Size(655, 24)
-            Me.FlowLayoutPanel9.TabIndex = 4
-            '
-            'ChainsCB
-            '
-            Me.ChainsCB.AutoSize = True
-            Me.ChainsCB.Checked = True
-            Me.ChainsCB.CheckState = System.Windows.Forms.CheckState.Checked
-            Me.ChainsCB.Location = New System.Drawing.Point(3, 3)
-            Me.ChainsCB.Name = "ChainsCB"
-            Me.ChainsCB.Size = New System.Drawing.Size(58, 17)
-            Me.ChainsCB.TabIndex = 0
-            Me.ChainsCB.Text = "Chains"
-            Me.ChainsCB.UseVisualStyleBackColor = True
-            '
-            'ListsCB
-            '
-            Me.ListsCB.AutoSize = True
-            Me.ListsCB.Checked = True
-            Me.ListsCB.CheckState = System.Windows.Forms.CheckState.Checked
-            Me.ListsCB.Location = New System.Drawing.Point(67, 3)
-            Me.ListsCB.Name = "ListsCB"
-            Me.ListsCB.Size = New System.Drawing.Size(47, 17)
-            Me.ListsCB.TabIndex = 1
-            Me.ListsCB.Text = "Lists"
-            Me.ListsCB.UseVisualStyleBackColor = True
-            '
-            'PortfolioChainsListsGrid
-            '
-            Me.PortfolioChainsListsGrid.AllowUserToAddRows = False
-            Me.PortfolioChainsListsGrid.AllowUserToDeleteRows = False
-            Me.PortfolioChainsListsGrid.AllowUserToResizeColumns = False
-            Me.PortfolioChainsListsGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-            Me.PortfolioChainsListsGrid.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.PortfolioChainsListsGrid.Location = New System.Drawing.Point(3, 33)
-            Me.PortfolioChainsListsGrid.Name = "PortfolioChainsListsGrid"
-            Me.PortfolioChainsListsGrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-            Me.PortfolioChainsListsGrid.Size = New System.Drawing.Size(655, 445)
-            Me.PortfolioChainsListsGrid.TabIndex = 6
-            '
-            'FlowLayoutPanel10
-            '
-            Me.FlowLayoutPanel10.Controls.Add(Me.AddChainListButton)
-            Me.FlowLayoutPanel10.Controls.Add(Me.RemoveChainListButton)
-            Me.FlowLayoutPanel10.Controls.Add(Me.UpChainListButton)
-            Me.FlowLayoutPanel10.Controls.Add(Me.DownChainListButton)
-            Me.FlowLayoutPanel10.Controls.Add(Me.EditChainListButton)
-            Me.FlowLayoutPanel10.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.FlowLayoutPanel10.Location = New System.Drawing.Point(3, 484)
-            Me.FlowLayoutPanel10.Name = "FlowLayoutPanel10"
-            Me.FlowLayoutPanel10.Size = New System.Drawing.Size(655, 24)
-            Me.FlowLayoutPanel10.TabIndex = 7
-            '
-            'AddChainListButton
-            '
-            Me.AddChainListButton.Location = New System.Drawing.Point(3, 3)
-            Me.AddChainListButton.Name = "AddChainListButton"
-            Me.AddChainListButton.Size = New System.Drawing.Size(36, 21)
-            Me.AddChainListButton.TabIndex = 0
-            Me.AddChainListButton.Text = "Add"
-            Me.AddChainListButton.UseVisualStyleBackColor = True
-            '
-            'RemoveChainListButton
-            '
-            Me.RemoveChainListButton.Location = New System.Drawing.Point(45, 3)
-            Me.RemoveChainListButton.Name = "RemoveChainListButton"
-            Me.RemoveChainListButton.Size = New System.Drawing.Size(56, 21)
-            Me.RemoveChainListButton.TabIndex = 1
-            Me.RemoveChainListButton.Text = "Remove"
-            Me.RemoveChainListButton.UseVisualStyleBackColor = True
-            '
-            'UpChainListButton
-            '
-            Me.UpChainListButton.Location = New System.Drawing.Point(107, 3)
-            Me.UpChainListButton.Name = "UpChainListButton"
-            Me.UpChainListButton.Size = New System.Drawing.Size(43, 21)
-            Me.UpChainListButton.TabIndex = 2
-            Me.UpChainListButton.Text = "Up"
-            Me.UpChainListButton.UseVisualStyleBackColor = True
-            '
-            'DownChainListButton
-            '
-            Me.DownChainListButton.Location = New System.Drawing.Point(156, 3)
-            Me.DownChainListButton.Name = "DownChainListButton"
-            Me.DownChainListButton.Size = New System.Drawing.Size(43, 21)
-            Me.DownChainListButton.TabIndex = 3
-            Me.DownChainListButton.Text = "Down"
-            Me.DownChainListButton.UseVisualStyleBackColor = True
-            '
-            'EditChainListButton
-            '
-            Me.EditChainListButton.Location = New System.Drawing.Point(205, 3)
-            Me.EditChainListButton.Name = "EditChainListButton"
-            Me.EditChainListButton.Size = New System.Drawing.Size(43, 21)
-            Me.EditChainListButton.TabIndex = 4
-            Me.EditChainListButton.Text = "Edit"
-            Me.EditChainListButton.UseVisualStyleBackColor = True
-            '
-            'TableLayoutPanel7
-            '
-            Me.TableLayoutPanel7.ColumnCount = 1
-            Me.TableLayoutPanel7.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-            Me.TableLayoutPanel7.Controls.Add(Me.PortfolioItemsGrid, 0, 1)
-            Me.TableLayoutPanel7.Controls.Add(Me.FlowLayoutPanel7, 0, 0)
-            Me.TableLayoutPanel7.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.TableLayoutPanel7.Location = New System.Drawing.Point(3, 3)
-            Me.TableLayoutPanel7.Name = "TableLayoutPanel7"
-            Me.TableLayoutPanel7.RowCount = 2
-            Me.TableLayoutPanel7.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
-            Me.TableLayoutPanel7.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-            Me.TableLayoutPanel7.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-            Me.TableLayoutPanel7.Size = New System.Drawing.Size(661, 511)
-            Me.TableLayoutPanel7.TabIndex = 0
-            '
-            'FlowLayoutPanel7
-            '
-            Me.FlowLayoutPanel7.Controls.Add(Me.AllRB)
-            Me.FlowLayoutPanel7.Controls.Add(Me.SeparateRB)
-            Me.FlowLayoutPanel7.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.FlowLayoutPanel7.Location = New System.Drawing.Point(3, 3)
-            Me.FlowLayoutPanel7.Name = "FlowLayoutPanel7"
-            Me.FlowLayoutPanel7.Size = New System.Drawing.Size(655, 24)
-            Me.FlowLayoutPanel7.TabIndex = 6
-            '
-            'AllRB
-            '
-            Me.AllRB.AutoSize = True
-            Me.AllRB.Checked = True
-            Me.AllRB.Location = New System.Drawing.Point(3, 3)
-            Me.AllRB.Name = "AllRB"
-            Me.AllRB.Size = New System.Drawing.Size(63, 17)
-            Me.AllRB.TabIndex = 0
-            Me.AllRB.TabStop = True
-            Me.AllRB.Text = "All items"
-            Me.AllRB.UseVisualStyleBackColor = True
-            '
-            'SeparateRB
-            '
-            Me.SeparateRB.AutoSize = True
-            Me.SeparateRB.Location = New System.Drawing.Point(72, 3)
-            Me.SeparateRB.Name = "SeparateRB"
-            Me.SeparateRB.Size = New System.Drawing.Size(184, 17)
-            Me.SeparateRB.TabIndex = 1
-            Me.SeparateRB.Text = "Included and excluded separately"
-            Me.SeparateRB.UseVisualStyleBackColor = True
-            '
-            'PortfolioItemsGrid
-            '
-            Me.PortfolioItemsGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-            Me.PortfolioItemsGrid.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.PortfolioItemsGrid.Location = New System.Drawing.Point(3, 33)
-            Me.PortfolioItemsGrid.Name = "PortfolioItemsGrid"
-            Me.PortfolioItemsGrid.Size = New System.Drawing.Size(655, 475)
-            Me.PortfolioItemsGrid.TabIndex = 7
-            '
-            'CustomBondsPage
-            '
-            Me.CustomBondsPage.Location = New System.Drawing.Point(4, 22)
-            Me.CustomBondsPage.Name = "CustomBondsPage"
-            Me.CustomBondsPage.Size = New System.Drawing.Size(913, 555)
-            Me.CustomBondsPage.TabIndex = 6
-            Me.CustomBondsPage.Text = "Custom bonds"
-            Me.CustomBondsPage.UseVisualStyleBackColor = True
-            '
             'PortfolioForm
             '
             Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -802,6 +802,18 @@
             Me.MainTabControl.ResumeLayout(False)
             Me.PortfoliosPage.ResumeLayout(False)
             Me.TableLayoutPanel2.ResumeLayout(False)
+            Me.TabControl1.ResumeLayout(False)
+            Me.TabPage2.ResumeLayout(False)
+            Me.TableLayoutPanel6.ResumeLayout(False)
+            Me.FlowLayoutPanel10.ResumeLayout(False)
+            CType(Me.PortfolioChainsListsGrid, System.ComponentModel.ISupportInitialize).EndInit()
+            Me.FlowLayoutPanel9.ResumeLayout(False)
+            Me.FlowLayoutPanel9.PerformLayout()
+            Me.TabPage3.ResumeLayout(False)
+            Me.TableLayoutPanel7.ResumeLayout(False)
+            CType(Me.PortfolioItemsGrid, System.ComponentModel.ISupportInitialize).EndInit()
+            Me.FlowLayoutPanel7.ResumeLayout(False)
+            Me.FlowLayoutPanel7.PerformLayout()
             Me.ChainsPage.ResumeLayout(False)
             Me.TableLayoutPanel3.ResumeLayout(False)
             Me.TableLayoutPanel3.PerformLayout()
@@ -811,6 +823,7 @@
             Me.FlowLayoutPanel2.ResumeLayout(False)
             Me.FlowLayoutPanel3.ResumeLayout(False)
             Me.FlowLayoutPanel3.PerformLayout()
+            Me.CurvesPage.ResumeLayout(False)
             Me.FieldsPage.ResumeLayout(False)
             Me.TableLayoutPanel4.ResumeLayout(False)
             Me.FlowLayoutPanel5.ResumeLayout(False)
@@ -820,19 +833,6 @@
             CType(Me.BondsTableView, System.ComponentModel.ISupportInitialize).EndInit()
             Me.FlowLayoutPanel4.ResumeLayout(False)
             Me.PortTreeCM.ResumeLayout(False)
-            Me.CurvesPage.ResumeLayout(False)
-            Me.TabControl1.ResumeLayout(False)
-            Me.TabPage2.ResumeLayout(False)
-            Me.TabPage3.ResumeLayout(False)
-            Me.TableLayoutPanel6.ResumeLayout(False)
-            Me.FlowLayoutPanel9.ResumeLayout(False)
-            Me.FlowLayoutPanel9.PerformLayout()
-            CType(Me.PortfolioChainsListsGrid, System.ComponentModel.ISupportInitialize).EndInit()
-            Me.FlowLayoutPanel10.ResumeLayout(False)
-            Me.TableLayoutPanel7.ResumeLayout(False)
-            Me.FlowLayoutPanel7.ResumeLayout(False)
-            Me.FlowLayoutPanel7.PerformLayout()
-            CType(Me.PortfolioItemsGrid, System.ComponentModel.ISupportInitialize).EndInit()
             Me.ResumeLayout(False)
 
         End Sub

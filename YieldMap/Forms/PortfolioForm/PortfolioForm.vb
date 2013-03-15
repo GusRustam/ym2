@@ -21,6 +21,26 @@ Namespace Forms.PortfolioForm
             End Set
         End Property
 
+        Private Sub PortSourcesCheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles ChainsCB.CheckedChanged, ListsCB.CheckedChanged
+            RefreshPortfolioData()
+        End Sub
+
+        Private Sub PortItemsCheckChanged(ByVal sender As Object, ByVal e As EventArgs) Handles AllRB.CheckedChanged, SeparateRB.CheckedChanged
+            RefreshPortfolioData()
+        End Sub
+
+        Private Shared Sub ColorCellFormatting(ByVal sender As Object, ByVal e As DataGridViewCellFormattingEventArgs) Handles PortfolioChainsListsGrid.CellFormatting, PortfolioItemsGrid.CellFormatting
+            Dim dgv = TryCast(sender, DataGridView)
+            If dgv Is Nothing Then Return
+            If dgv.Columns(e.ColumnIndex).DataPropertyName = "Color" Then
+                Dim theColor As KnownColor
+                If TypeOf e.Value Is String AndAlso KnownColor.TryParse(e.Value, theColor) Then
+                    e.CellStyle.BackColor = Color.FromKnownColor(theColor)
+                    e.CellStyle.ForeColor = Color.FromKnownColor(theColor)
+                End If
+            End If
+        End Sub
+
         Private Sub RefreshPortfolioData()
             If CurrentItem Is Nothing Then Return
 
@@ -31,7 +51,11 @@ Namespace Forms.PortfolioForm
                 PortfolioItemsGrid.Rows.Clear()
             Else
                 Dim descr = _portfolioManager.GetPortfolioStructure(CurrentItem.Id)
-                ' todo visualize 'em
+                PortfolioChainsListsGrid.DataSource = descr.Sources(
+                    If(ChainsCB.Checked, PortfolioStructure.Chain, 0) Or
+                    If(ListsCB.Checked, PortfolioStructure.List, 0))
+
+                PortfolioItemsGrid.DataSource = descr.Rics(AllRB.Checked)
             End If
         End Sub
 

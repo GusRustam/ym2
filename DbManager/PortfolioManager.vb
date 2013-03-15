@@ -1,6 +1,7 @@
 ﻿' TODO LIQUIDITY!!!
 Imports System.Xml
 Imports System.IO
+Imports System.ComponentModel
 Imports DbManager.Bonds
 Imports NLog
 Imports System.Collections.ObjectModel
@@ -179,6 +180,10 @@ Public Class Chain
     Private ReadOnly _chainRic As String
     Private ReadOnly _bondsManager As IBondsLoader = BondsLoader.Instance
 
+    Public Overrides Function ToString() As String
+        Return "Chain"
+    End Function
+
     Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As Fields, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal chainRic As String, ByVal name As String)
         MyBase.New(id, color, fields, enabled, curve, name)
         _chainRic = chainRic
@@ -199,18 +204,78 @@ Public Class UserList
     Inherits Source
     Private ReadOnly _bondRics As List(Of String)
 
+    Public Overrides Function ToString() As String
+        Return "List"
+    End Function
+
     Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As Fields, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal bondRics As List(Of String), ByVal name As String)
         MyBase.New(id, color, fields, enabled, curve, name)
         _bondRics = bondRics
     End Sub
 
     Shared Function ExtractRics(ByVal node As XmlNode) As List(Of String)
-        Return (From ric As XmlNode In node.SelectNodes("/ric") Select ric.Value).ToList()
+        Return (From ric As XmlNode In node.SelectNodes("ric") Select ric.InnerText).ToList()
     End Function
 
     Public Overrides Function GetDefaultRics() As List(Of String)
         Return _bondRics
     End Function
+End Class
+
+Public Class RicDescription
+    Private ReadOnly _ric As String
+    Private ReadOnly _descr As String
+    Private ReadOnly _srcType As String
+    Private ReadOnly _srcName As String
+    Private ReadOnly _color As String
+    Private ReadOnly _included As Boolean
+
+    Public Sub New(ByVal ric As String, ByVal descr As String, ByVal srcType As String, ByVal srcName As String, ByVal color As String, ByVal included As Boolean)
+        _ric = ric
+        _srcType = srcType
+        _srcName = srcName
+        _color = color
+        _included = included
+        _descr = descr
+    End Sub
+
+    <DisplayName("Description")>
+    Public ReadOnly Property Descr() As String
+        Get
+            Return _descr
+        End Get
+    End Property
+
+    Public ReadOnly Property RIC() As String
+        Get
+            Return _ric
+        End Get
+    End Property
+
+    Public ReadOnly Property From() As String
+        Get
+            Return _srcType
+        End Get
+    End Property
+
+    <DisplayName("Name of source")>
+    Public ReadOnly Property FromName() As String
+        Get
+            Return _srcName
+        End Get
+    End Property
+
+    Public ReadOnly Property Color() As String
+        Get
+            Return _color
+        End Get
+    End Property
+
+    Public ReadOnly Property Included() As Boolean
+        Get
+            Return _included
+        End Get
+    End Property
 End Class
 
 Public Class PortfolioSource
@@ -272,7 +337,7 @@ Public Class PortfolioSource
         End Get
     End Property
 
-    Public ReadOnly Property CustomName As String
+    Public ReadOnly Property Name As String
         Get
             Return _customName
         End Get
@@ -284,14 +349,26 @@ Public Class PortfolioSource
         End Get
     End Property
 
-    Public ReadOnly Property CustomColor As String
+    Public ReadOnly Property Color As String
         Get
             Return _customColor
         End Get
     End Property
 End Class
 
+''' <summary>
+''' This class has two representations:
+''' 1) Sources property - low level representation
+''' 2) Rics property - returns already recalculated data
+''' </summary>
+''' <remarks></remarks>
 Public Class PortfolioStructure
+    Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(PortfolioStructure))
+
+    Public Const List As Byte = 1
+    Public Const Chain As Byte = 2
+    Public Const All As Byte = List Or Chain
+
     Private ReadOnly _id As String
     Private ReadOnly _name As String
     Private ReadOnly _sources As New List(Of PortfolioSource)
@@ -310,9 +387,17 @@ Public Class PortfolioStructure
         _name = name
     End Sub
 
-    Public ReadOnly Property Sources As ReadOnlyCollection(Of PortfolioSource)
+    Public ReadOnly Property Sources(Optional ByVal what As Byte = All) As ReadOnlyCollection(Of PortfolioSource)
         Get
-            Return New ReadOnlyCollection(Of PortfolioSource)(_sources)
+            Dim data As New List(Of PortfolioSource)
+            If what And List Then
+                data.AddRange(From src In _sources Where TypeOf src.Source Is UserList)
+            End If
+            If what And Chain Then
+                data.AddRange(From src In _sources Where TypeOf src.Source Is Chain)
+            End If
+            data.Sort(Function(item1, item2) item1.Order.CompareTo(item1.Order))
+            Return New ReadOnlyCollection(Of PortfolioSource)(data)
         End Get
     End Property
 
@@ -328,9 +413,32 @@ Public Class PortfolioStructure
         End Get
     End Property
 
-    Public Function GetRics(ByVal source As PortfolioSource) As List(Of String)
-        Return _rics(source)
-    End Function
+    Public ReadOnly Property Rics(ByVal source As PortfolioSource) As ReadOnlyCollection(Of String)
+        Get
+            Return New ReadOnlyCollection(Of String)(_rics(source))
+        End Get
+    End Property
+
+    Public ReadOnly Property Rics(Optional ByVal netted As Boolean = False) As ReadOnlyCollection(Of RicDescription)
+        Get
+            Dim res As New List(Of RicDescription)
+            For Each src In _sources
+                Dim description As RicDescription
+                For Each ric In src.Source.GetDefaultRics()
+                    If netted AndAlso _excludes.Contains(ric) Then Continue For
+                    Try
+                        Dim descr = BondsData.Instance.GetBondInfo(ric)
+                        Dim type = src.Source.GetType().Name
+                        description = New RicDescription(ric, descr.Label1, type, src.Name, src.Color, src.Included)
+                        res.Add(description)
+                    Catch ex As NoBondException
+                        Logger.Warn("No bond {0}", ric)
+                    End Try
+                Next
+            Next
+            Return New ReadOnlyCollection(Of RicDescription)(res)
+        End Get
+    End Property
 
     Friend Sub AddSource(ByVal src As PortfolioSource)
         _sources.Add(src)
@@ -350,7 +458,7 @@ Public Class PortfolioStructure
             _excludes.Add(ric)
         Next
 
-        For Each src In _sources
+        For Each src In (From srcs In _sources Where srcs.Included)
             Dim list = New List(Of String)(src.Source.GetDefaultRics())
             list.RemoveAll(Function(item) _excludes.Contains(item))
             _rics.Add(src, list)
@@ -471,9 +579,10 @@ Public Class PortfolioManager
 
             Dim nodes = node.SelectNodes("include | exclude")
             Dim order As Integer
+            Dim source As Source
             For Each item As XmlNode In nodes
                 Try
-                    Dim source As Source
+                    source = Nothing
 
                     Dim isIncluded = (item.Name = "include")
                     Dim what = item.Attributes("what").Value
@@ -494,10 +603,12 @@ Public Class PortfolioManager
 
                     If source IsNot Nothing Then
                         order = order + 1
+                        If customColor = "" Then customColor = source.Color
+                        If customName = "" Then customName = source.Name
                         Dim portSource As New PortfolioSource(order, source, condition, customName, customColor, isIncluded)
                         res.AddSource(portSource)
                     Else
-                        Logger.Info("Failed to read description for item {0}", what)
+                        Logger.Info("Failed to read description for item [{0}]", what)
                     End If
                 Catch ex As Exception
                     Logger.WarnException("Failed to parse ", ex)
@@ -548,7 +659,7 @@ Public Class PortfolioManager
     End Function
 
     Private Function GetListDescr(ByVal listId As String) As UserList
-        Dim node = _bonds.SelectSingleNode(String.Format("/bonds/chains/list[@id='{0}']", listId))
+        Dim node = _bonds.SelectSingleNode(String.Format("/bonds/lists/list[@id='{0}']", listId))
         If node Is Nothing Then Return Nothing
         Try
             Dim color = GetAttrStrict(node, "color")
@@ -559,7 +670,7 @@ Public Class PortfolioManager
             Dim fields = New Fields(GetAttrStrict(node, "field-set-id"), _bonds)
             Return New UserList(listId, color, fields, enabled, curve, rics, name)
         Catch ex As Exception
-            Logger.WarnException("Failed to get chain description", ex)
+            Logger.WarnException("Failed to get list description", ex)
             Logger.Warn("Exception = ", ex.ToString())
             Return Nothing
         End Try

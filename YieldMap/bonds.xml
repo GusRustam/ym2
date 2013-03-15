@@ -47,7 +47,7 @@
 
   <!-- Lists -->
   <lists>
-    <list id="1" name="test" color="Violet" curve="No" field-set-id="MICEX">
+    <list id="1" name="test" color="Violet" curve="False" field-set-id="MICEX">
       <ric>AAA</ric>
       <ric>BBB</ric>
       <ric>CCC</ric>

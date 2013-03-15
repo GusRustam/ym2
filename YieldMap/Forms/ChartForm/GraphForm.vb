@@ -93,7 +93,7 @@ Namespace Forms.ChartForm
                     'Dim history = fields.First(Function(row) row.is_realtime = 0)
                     '    .Group = GroupType,
                     group = New Group(_ansamble) With {
-                        .SeriesName = If(port.CustomName <> "", port.CustomName, port.Source.Name),
+                        .SeriesName = If(port.Name <> "", port.Name, port.Source.Name),
                         .PortfolioID = port.Source.ID,
                         .BidField = port.Source.Fields.Realtime.Bid,
                         .AskField = port.Source.Fields.Realtime.Ask,
@@ -118,15 +118,15 @@ Namespace Forms.ChartForm
                         selectedField = group.AskField
                     End If
 
-                    portfolioStructure.GetRics(port).ForEach(
-                        Sub(ric)
-                            Dim descr = BondsData.Instance.GetBondInfo(ric)
-                            If descr IsNot Nothing Then
-                                group.AddRic(ric, descr, selectedField)
-                            Else
-                                Logger.Error("No description for bond {0} found", ric)
-                            End If
-                        End Sub)
+                    For Each ric In portfolioStructure.Rics(port)
+                        Dim descr = BondsData.Instance.GetBondInfo(ric)
+                        If descr IsNot Nothing Then
+                            group.AddRic(ric, descr, selectedField)
+                        Else
+                            Logger.Error("No description for bond {0} found", ric)
+                        End If
+                    Next
+                    
                     _ansamble.AddGroup(group)
                 Next
                 _ansamble.StartLoadingLiveData()
