@@ -1,4 +1,6 @@
-﻿Namespace Bonds
+﻿Imports System.ComponentModel
+
+Namespace Bonds
 
     Public Class PaymentException
         Inherits Exception
@@ -75,24 +77,28 @@
             _label4 = label4
         End Sub
 
+        <DisplayName("Ric")>
         Public ReadOnly Property RIC As String
             Get
                 Return _ric
             End Get
         End Property
 
+        <DisplayName("Name")>
         Public ReadOnly Property ShortName As String
             Get
                 Return _shortName
             End Get
         End Property
 
+        <Browsable(False)>
         Public ReadOnly Property Label As String
             Get
                 Return _label
             End Get
         End Property
 
+        <DisplayName("Maturity date")>
         Public ReadOnly Property Maturity As Date
             Get
                 Return _maturity
@@ -105,42 +111,49 @@
             End Get
         End Property
 
+        <Browsable(False)>
         Public ReadOnly Property PaymentStructure As String
             Get
                 Return _paymentStructure
             End Get
         End Property
 
+        <Browsable(False)>
         Public ReadOnly Property RateStructure As String
             Get
                 Return _rateStructure
             End Get
         End Property
 
+        <DisplayName("Issue date")>
         Public ReadOnly Property IssueDate As Date
             Get
                 Return _issueDate
             End Get
         End Property
 
+        <Browsable(False)>
         Public ReadOnly Property Label1 As String
             Get
                 Return _label1
             End Get
         End Property
 
+        <Browsable(False)>
         Public ReadOnly Property Label2 As String
             Get
                 Return _label2
             End Get
         End Property
 
+        <Browsable(False)>
         Public ReadOnly Property Label3 As String
             Get
                 Return _label3
             End Get
         End Property
 
+        <Browsable(False)>
         Public ReadOnly Property Label4 As String
             Get
                 Return _label4

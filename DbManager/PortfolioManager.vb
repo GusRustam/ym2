@@ -185,6 +185,10 @@ Public MustInherit Class Source
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public MustOverride Function GetDefaultRics() As List(Of String)
+
+    Public Function GetDefaultRicsView() As List(Of BondDescription)
+        Return (From ric In GetDefaultRics() Select BondsData.Instance.GetBondInfo(ric)).ToList()
+    End Function
 End Class
 
 Public Class Chain

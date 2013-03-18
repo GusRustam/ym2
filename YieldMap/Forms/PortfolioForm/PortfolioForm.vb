@@ -21,6 +21,17 @@ Namespace Forms.PortfolioForm
             RefreshChainsLists()
         End Sub
 
+        Private Shared Sub ColorCellFormatting(ByVal sender As Object, ByVal e As DataGridViewCellFormattingEventArgs) Handles PortfolioChainsListsGrid.CellFormatting, PortfolioItemsGrid.CellFormatting, ChainsListsGrid.CellFormatting
+            Dim dgv = TryCast(sender, DataGridView)
+            If dgv Is Nothing Then Return
+            If dgv.Columns(e.ColumnIndex).DataPropertyName = "Color" Then
+                Dim theColor As KnownColor
+                If TypeOf e.Value Is String AndAlso KnownColor.TryParse(e.Value, theColor) Then
+                    e.CellStyle.BackColor = Color.FromKnownColor(theColor)
+                    e.CellStyle.ForeColor = Color.FromKnownColor(theColor)
+                End If
+            End If
+        End Sub
 
 #Region "Portfolio TAB"
         Private _dragNode As TreeNode
@@ -43,18 +54,6 @@ Namespace Forms.PortfolioForm
 
         Private Sub PortItemsCheckChanged(ByVal sender As Object, ByVal e As EventArgs) Handles AllRB.CheckedChanged, SeparateRB.CheckedChanged
             RefreshPortfolioData()
-        End Sub
-
-        Private Shared Sub ColorCellFormatting(ByVal sender As Object, ByVal e As DataGridViewCellFormattingEventArgs) Handles PortfolioChainsListsGrid.CellFormatting, PortfolioItemsGrid.CellFormatting
-            Dim dgv = TryCast(sender, DataGridView)
-            If dgv Is Nothing Then Return
-            If dgv.Columns(e.ColumnIndex).DataPropertyName = "Color" Then
-                Dim theColor As KnownColor
-                If TypeOf e.Value Is String AndAlso KnownColor.TryParse(e.Value, theColor) Then
-                    e.CellStyle.BackColor = Color.FromKnownColor(theColor)
-                    e.CellStyle.ForeColor = Color.FromKnownColor(theColor)
-                End If
-            End If
         End Sub
 
         Private Sub RefreshPortfolioData()
@@ -125,7 +124,6 @@ Namespace Forms.PortfolioForm
             Next
             Return res
         End Function
-
 
         Private Sub PortfolioTree_DblClick(ByVal sender As Object, ByVal e As EventArgs) Handles PortfolioTree.DoubleClick
             Dim mea = TryCast(e, MouseEventArgs)
@@ -319,7 +317,19 @@ Namespace Forms.PortfolioForm
 
         Private Sub RefreshChainsLists()
             ChainsListsGrid.DataSource = If(ChainsButton.Checked, PortfolioManager.ChainsView, PortfolioManager.UserListsView)
+            AddItemsButton.Enabled = ChainsButton.Checked
+            DeleteItemsButton.Enabled = ChainsButton.Checked
+            For Each col As DataGridViewColumn In ChainsListsGrid.Columns
+                col.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            Next
+        End Sub
+
+        Private Sub ChainsListsGrid_CellClick(ByVal sender As Object, ByVal e As DataGridViewCellEventArgs) Handles ChainsListsGrid.CellClick
+            Dim elem = ChainsListsGrid.Rows(e.RowIndex).DataBoundItem
+            Dim chain As Source = TryCast(elem, Source)
+            If chain IsNot Nothing Then ChainListItemsGrid.DataSource = chain.GetDefaultRicsView()
         End Sub
 #End Region
+
     End Class
 End Namespace
