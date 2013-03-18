@@ -1,15 +1,31 @@
 ﻿Imports DbManager
 Imports DbManager.Bonds
 Imports System.Runtime.InteropServices
+Imports NLog
 
 Namespace Forms.PortfolioForm
 
     Public Class PortfolioForm
+        Private Shared ReadOnly PortfolioManager As IPortfolioManager = DbManager.PortfolioManager.GetInstance()
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(PortfolioForm))
+        Private Shared ReadOnly BondsLoader As IBondsLoader = Bonds.BondsLoader.Instance
+
+        Private Sub PortfolioForm_Load(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Load
+            BondsTableView.DataSource = BondsLoader.GetBondsTable()
+            If PortfolioTree.ImageList Is Nothing Then
+                PortfolioTree.ImageList = New ImageList
+                PortfolioTree.ImageList.Images.Add("folder", My.Resources.folder)
+                PortfolioTree.ImageList.Images.Add("portfolio", My.Resources.briefcase)
+            End If
+            RefreshPortfolioTree()
+            RefreshChainsLists()
+        End Sub
+
+
 #Region "Portfolio TAB"
         Private _dragNode As TreeNode
         Private _currentItem As PortfolioItemDescription
         Private _flag As Boolean
-        Private ReadOnly _portfolioManager As IPortfolioManager = PortfolioManager.GetInstance()
 
         Private Property CurrentItem As PortfolioItemDescription
             Get
@@ -50,7 +66,7 @@ Namespace Forms.PortfolioForm
                 PortfolioItemsGrid.Columns.Clear()
                 PortfolioItemsGrid.Rows.Clear()
             Else
-                Dim descr = _portfolioManager.GetPortfolioStructure(CurrentItem.Id)
+                Dim descr = PortfolioManager.GetPortfolioStructure(CurrentItem.Id)
                 PortfolioChainsListsGrid.DataSource = descr.Sources(
                     If(ChainsCB.Checked, PortfolioStructure.Chain, 0) Or
                     If(ListsCB.Checked, PortfolioStructure.List, 0))
@@ -72,7 +88,7 @@ Namespace Forms.PortfolioForm
 
             PortfolioTree.Nodes.Clear()
 
-            If _portfolioManager.PortfoliosValid() Then
+            If PortfolioManager.PortfoliosValid() Then
                 PortfolioTree.BeginUpdate()
                 Dim newSelNode = AddPortfoliosByFolder("", selectedNodeId)
                 If newSelNode IsNot Nothing Then
@@ -87,7 +103,7 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Function AddPortfoliosByFolder(ByVal theId As String, ByVal selId As String, Optional ByVal whereTo As TreeNode = Nothing) As TreeNode
-            Dim portMan As PortfolioManager = _portfolioManager
+            Dim portMan As PortfolioManager = PortfolioManager
             Dim res As TreeNode = If(theId = selId, whereTo, Nothing)
             Dim descrs = portMan.GetPortfoliosByFolder(theId)
 
@@ -110,15 +126,6 @@ Namespace Forms.PortfolioForm
             Return res
         End Function
 
-        Private Sub PortfolioForm_Load(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Load
-            BondsTableView.DataSource = BondsLoader.Instance.GetBondsTable()
-            If PortfolioTree.ImageList Is Nothing Then
-                PortfolioTree.ImageList = New ImageList
-                PortfolioTree.ImageList.Images.Add("folder", My.Resources.folder)
-                PortfolioTree.ImageList.Images.Add("portfolio", My.Resources.briefcase)
-            End If
-            RefreshPortfolioTree()
-        End Sub
 
         Private Sub PortfolioTree_DblClick(ByVal sender As Object, ByVal e As EventArgs) Handles PortfolioTree.DoubleClick
             Dim mea = TryCast(e, MouseEventArgs)
@@ -148,9 +155,9 @@ Namespace Forms.PortfolioForm
                     MessageBox.Show("Failed to update name", "Name edit", MessageBoxButtons.OK, MessageBoxIcon.Error)
                 Else
                     If portDescr.IsFolder Then
-                        _portfolioManager.SetFolderName(portDescr.Id, adder.NewName.Text)
+                        PortfolioManager.SetFolderName(portDescr.Id, adder.NewName.Text)
                     Else
-                        _portfolioManager.SetPortfolioName(portDescr.Id, adder.NewName.Text)
+                        PortfolioManager.SetPortfolioName(portDescr.Id, adder.NewName.Text)
                     End If
                     RefreshPortfolioTree()
                 End If
@@ -199,9 +206,9 @@ Namespace Forms.PortfolioForm
             If adder.ShowDialog() = DialogResult.OK Then
                 Dim newId As Long
                 If adder.ItsFolder.Checked Then
-                    newId = _portfolioManager.AddFolder(adder.NewName.Text, theId)
+                    newId = PortfolioManager.AddFolder(adder.NewName.Text, theId)
                 Else
-                    newId = _portfolioManager.AddPortfolio(adder.NewName.Text, theId)
+                    newId = PortfolioManager.AddPortfolio(adder.NewName.Text, theId)
                 End If
                 RefreshPortfolioTree(newId)
             End If
@@ -215,14 +222,13 @@ Namespace Forms.PortfolioForm
             If descr Is Nothing Then Return
             If MessageBox.Show("Are you sure you would like to delete an item permanently?", "Delete...", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
                 If descr.IsFolder Then
-                    _portfolioManager.DeleteFolder(descr.Id)
+                    PortfolioManager.DeleteFolder(descr.Id)
                 Else
-                    _portfolioManager.DeletePortfolio(descr.Id)
+                    PortfolioManager.DeletePortfolio(descr.Id)
                 End If
                 RefreshPortfolioTree()
             End If
         End Sub
-
 
         Private Sub PortfolioTree_ItemDrag(ByVal sender As Object, ByVal e As ItemDragEventArgs) Handles PortfolioTree.ItemDrag
             _dragNode = e.Item
@@ -273,17 +279,17 @@ Namespace Forms.PortfolioForm
             Dim resId As String
             If node Is Nothing Then
                 If copy Then
-                    resId = _portfolioManager.CopyItemToTop(dragDescr.Id)
+                    resId = PortfolioManager.CopyItemToTop(dragDescr.Id)
                 Else
-                    resId = _portfolioManager.MoveItemToTop(dragDescr.Id)
+                    resId = PortfolioManager.MoveItemToTop(dragDescr.Id)
                 End If
             Else
                 Dim descr = TryCast(node.Tag, PortfolioItemDescription)
                 If descr Is Nothing OrElse Not descr.IsFolder Then Return
                 If copy Then
-                    resId = _portfolioManager.CopyItemToFolder(dragDescr.Id, descr.Id)
+                    resId = PortfolioManager.CopyItemToFolder(dragDescr.Id, descr.Id)
                 Else
-                    resId = _portfolioManager.MoveItemToFolder(dragDescr.Id, descr.Id)
+                    resId = PortfolioManager.MoveItemToFolder(dragDescr.Id, descr.Id)
                 End If
             End If
             RefreshPortfolioTree(resId)
@@ -294,16 +300,26 @@ Namespace Forms.PortfolioForm
         Private Sub TableChooserList_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs) Handles TableChooserList.SelectedIndexChanged
             If TableChooserList.SelectedIndex >= 0 Then
                 Select Case TableChooserList.Items(TableChooserList.SelectedIndex).ToString()
-                    Case "Bonds" : BondsTableView.DataSource = BondsLoader.Instance.GetBondsTable()
-                    Case "Coupons" : BondsTableView.DataSource = BondsLoader.Instance.GetCouponsTable()
-                    Case "FRNs" : BondsTableView.DataSource = BondsLoader.Instance.GetFRNsTable()
-                    Case "Issue ratings" : BondsTableView.DataSource = BondsLoader.Instance.GetIssueRatingsTable()
-                    Case "Issuer ratings" : BondsTableView.DataSource = BondsLoader.Instance.GetIssuerRatingsTable()
-                    Case "Rics" : BondsTableView.DataSource = BondsLoader.Instance.GetAllRicsTable()
+                    Case "Bonds" : BondsTableView.DataSource = BondsLoader.GetBondsTable()
+                    Case "Coupons" : BondsTableView.DataSource = BondsLoader.GetCouponsTable()
+                    Case "FRNs" : BondsTableView.DataSource = BondsLoader.GetFRNsTable()
+                    Case "Issue ratings" : BondsTableView.DataSource = BondsLoader.GetIssueRatingsTable()
+                    Case "Issuer ratings" : BondsTableView.DataSource = BondsLoader.GetIssuerRatingsTable()
+                    Case "Rics" : BondsTableView.DataSource = BondsLoader.GetAllRicsTable()
                 End Select
             End If
         End Sub
 #End Region
 
+#Region "Chains and lists TAB"
+        Private Sub ChainsListCheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles ChainsButton.CheckedChanged
+            Logger.Debug("Refresh...")
+            RefreshChainsLists()
+        End Sub
+
+        Private Sub RefreshChainsLists()
+            ChainsListsGrid.DataSource = If(ChainsButton.Checked, PortfolioManager.ChainsView, PortfolioManager.UserListsView)
+        End Sub
+#End Region
     End Class
 End Namespace

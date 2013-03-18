@@ -70,6 +70,10 @@
         <include what="synthetic-bond" id="1"/>
         <exclude what="ric" name="XXXXX"/>
       </portfolio>
+      <portfolio id="11" name="Regional w/o Moscow">
+        <include what="chain" id="3"/>
+        <exclude what="chain" id="2"/>
+      </portfolio>
     </folder>
   </portfolios>
   

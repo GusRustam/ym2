@@ -48,21 +48,23 @@
             Me.AllRB = New System.Windows.Forms.RadioButton()
             Me.SeparateRB = New System.Windows.Forms.RadioButton()
             Me.ChainsPage = New System.Windows.Forms.TabPage()
-            Me.TableLayoutPanel3 = New System.Windows.Forms.TableLayoutPanel()
-            Me.ChainsListsGrid = New System.Windows.Forms.DataGridView()
-            Me.ChainListItemsGrid = New System.Windows.Forms.DataGridView()
-            Me.Label2 = New System.Windows.Forms.Label()
+            Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
+            Me.TableLayoutPanel8 = New System.Windows.Forms.TableLayoutPanel()
             Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
             Me.AddCLButton = New System.Windows.Forms.Button()
             Me.EditCLButton = New System.Windows.Forms.Button()
             Me.ReloadCLButton = New System.Windows.Forms.Button()
             Me.DeleteCLButton = New System.Windows.Forms.Button()
-            Me.FlowLayoutPanel2 = New System.Windows.Forms.FlowLayoutPanel()
-            Me.AddItemsButton = New System.Windows.Forms.Button()
-            Me.DeleteItemsButton = New System.Windows.Forms.Button()
+            Me.ChainsListsGrid = New System.Windows.Forms.DataGridView()
             Me.FlowLayoutPanel3 = New System.Windows.Forms.FlowLayoutPanel()
             Me.ChainsButton = New System.Windows.Forms.RadioButton()
             Me.ListsButton = New System.Windows.Forms.RadioButton()
+            Me.TableLayoutPanel9 = New System.Windows.Forms.TableLayoutPanel()
+            Me.FlowLayoutPanel2 = New System.Windows.Forms.FlowLayoutPanel()
+            Me.AddItemsButton = New System.Windows.Forms.Button()
+            Me.DeleteItemsButton = New System.Windows.Forms.Button()
+            Me.Label2 = New System.Windows.Forms.Label()
+            Me.ChainListItemsGrid = New System.Windows.Forms.DataGridView()
             Me.CurvesPage = New System.Windows.Forms.TabPage()
             Me.TableLayoutPanel5 = New System.Windows.Forms.TableLayoutPanel()
             Me.CustomBondsPage = New System.Windows.Forms.TabPage()
@@ -99,12 +101,17 @@
             CType(Me.PortfolioItemsGrid, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.FlowLayoutPanel7.SuspendLayout()
             Me.ChainsPage.SuspendLayout()
-            Me.TableLayoutPanel3.SuspendLayout()
-            CType(Me.ChainsListsGrid, System.ComponentModel.ISupportInitialize).BeginInit()
-            CType(Me.ChainListItemsGrid, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
+            Me.SplitContainer1.Panel1.SuspendLayout()
+            Me.SplitContainer1.Panel2.SuspendLayout()
+            Me.SplitContainer1.SuspendLayout()
+            Me.TableLayoutPanel8.SuspendLayout()
             Me.FlowLayoutPanel1.SuspendLayout()
-            Me.FlowLayoutPanel2.SuspendLayout()
+            CType(Me.ChainsListsGrid, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.FlowLayoutPanel3.SuspendLayout()
+            Me.TableLayoutPanel9.SuspendLayout()
+            Me.FlowLayoutPanel2.SuspendLayout()
+            CType(Me.ChainListItemsGrid, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.CurvesPage.SuspendLayout()
             Me.FieldsPage.SuspendLayout()
             Me.TableLayoutPanel4.SuspendLayout()
@@ -382,7 +389,7 @@
             '
             'ChainsPage
             '
-            Me.ChainsPage.Controls.Add(Me.TableLayoutPanel3)
+            Me.ChainsPage.Controls.Add(Me.SplitContainer1)
             Me.ChainsPage.Location = New System.Drawing.Point(4, 22)
             Me.ChainsPage.Name = "ChainsPage"
             Me.ChainsPage.Padding = New System.Windows.Forms.Padding(3)
@@ -391,63 +398,39 @@
             Me.ChainsPage.Text = "Chains and lists"
             Me.ChainsPage.UseVisualStyleBackColor = True
             '
-            'TableLayoutPanel3
+            'SplitContainer1
             '
-            Me.TableLayoutPanel3.ColumnCount = 2
-            Me.TableLayoutPanel3.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-            Me.TableLayoutPanel3.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-            Me.TableLayoutPanel3.Controls.Add(Me.ChainsListsGrid, 0, 1)
-            Me.TableLayoutPanel3.Controls.Add(Me.ChainListItemsGrid, 1, 1)
-            Me.TableLayoutPanel3.Controls.Add(Me.Label2, 1, 0)
-            Me.TableLayoutPanel3.Controls.Add(Me.FlowLayoutPanel1, 0, 2)
-            Me.TableLayoutPanel3.Controls.Add(Me.FlowLayoutPanel2, 1, 2)
-            Me.TableLayoutPanel3.Controls.Add(Me.FlowLayoutPanel3, 0, 0)
-            Me.TableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.TableLayoutPanel3.Location = New System.Drawing.Point(3, 3)
-            Me.TableLayoutPanel3.Name = "TableLayoutPanel3"
-            Me.TableLayoutPanel3.RowCount = 3
-            Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-            Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-            Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-            Me.TableLayoutPanel3.Size = New System.Drawing.Size(907, 549)
-            Me.TableLayoutPanel3.TabIndex = 0
+            Me.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.SplitContainer1.Location = New System.Drawing.Point(3, 3)
+            Me.SplitContainer1.Name = "SplitContainer1"
             '
-            'ChainsListsGrid
+            'SplitContainer1.Panel1
             '
-            Me.ChainsListsGrid.AllowUserToAddRows = False
-            Me.ChainsListsGrid.AllowUserToDeleteRows = False
-            Me.ChainsListsGrid.AllowUserToOrderColumns = True
-            Me.ChainsListsGrid.AllowUserToResizeColumns = False
-            Me.ChainsListsGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-            Me.ChainsListsGrid.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.ChainsListsGrid.Location = New System.Drawing.Point(3, 23)
-            Me.ChainsListsGrid.Name = "ChainsListsGrid"
-            Me.ChainsListsGrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-            Me.ChainsListsGrid.Size = New System.Drawing.Size(447, 503)
-            Me.ChainsListsGrid.TabIndex = 0
+            Me.SplitContainer1.Panel1.Controls.Add(Me.TableLayoutPanel8)
             '
-            'ChainListItemsGrid
+            'SplitContainer1.Panel2
             '
-            Me.ChainListItemsGrid.AllowUserToAddRows = False
-            Me.ChainListItemsGrid.AllowUserToDeleteRows = False
-            Me.ChainListItemsGrid.AllowUserToResizeColumns = False
-            Me.ChainListItemsGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-            Me.ChainListItemsGrid.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.ChainListItemsGrid.Location = New System.Drawing.Point(456, 23)
-            Me.ChainListItemsGrid.Name = "ChainListItemsGrid"
-            Me.ChainListItemsGrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-            Me.ChainListItemsGrid.Size = New System.Drawing.Size(448, 503)
-            Me.ChainListItemsGrid.TabIndex = 1
+            Me.SplitContainer1.Panel2.Controls.Add(Me.TableLayoutPanel9)
+            Me.SplitContainer1.Size = New System.Drawing.Size(907, 549)
+            Me.SplitContainer1.SplitterDistance = 302
+            Me.SplitContainer1.TabIndex = 12
             '
-            'Label2
+            'TableLayoutPanel8
             '
-            Me.Label2.AutoSize = True
-            Me.Label2.Location = New System.Drawing.Point(456, 0)
-            Me.Label2.Name = "Label2"
-            Me.Label2.Padding = New System.Windows.Forms.Padding(0, 3, 0, 0)
-            Me.Label2.Size = New System.Drawing.Size(32, 16)
-            Me.Label2.TabIndex = 3
-            Me.Label2.Text = "Items"
+            Me.TableLayoutPanel8.ColumnCount = 1
+            Me.TableLayoutPanel8.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+            Me.TableLayoutPanel8.Controls.Add(Me.FlowLayoutPanel1, 0, 2)
+            Me.TableLayoutPanel8.Controls.Add(Me.ChainsListsGrid, 0, 1)
+            Me.TableLayoutPanel8.Controls.Add(Me.FlowLayoutPanel3, 0, 0)
+            Me.TableLayoutPanel8.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.TableLayoutPanel8.Location = New System.Drawing.Point(0, 0)
+            Me.TableLayoutPanel8.Name = "TableLayoutPanel8"
+            Me.TableLayoutPanel8.RowCount = 3
+            Me.TableLayoutPanel8.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25.0!))
+            Me.TableLayoutPanel8.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+            Me.TableLayoutPanel8.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+            Me.TableLayoutPanel8.Size = New System.Drawing.Size(302, 549)
+            Me.TableLayoutPanel8.TabIndex = 11
             '
             'FlowLayoutPanel1
             '
@@ -459,8 +442,8 @@
             Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 529)
             Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(0)
             Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-            Me.FlowLayoutPanel1.Size = New System.Drawing.Size(453, 20)
-            Me.FlowLayoutPanel1.TabIndex = 5
+            Me.FlowLayoutPanel1.Size = New System.Drawing.Size(302, 20)
+            Me.FlowLayoutPanel1.TabIndex = 11
             '
             'AddCLButton
             '
@@ -494,7 +477,7 @@
             '
             'DeleteCLButton
             '
-            Me.DeleteCLButton.Location = New System.Drawing.Point(234, 0)
+            Me.DeleteCLButton.Location = New System.Drawing.Point(0, 20)
             Me.DeleteCLButton.Margin = New System.Windows.Forms.Padding(0, 0, 3, 0)
             Me.DeleteCLButton.Name = "DeleteCLButton"
             Me.DeleteCLButton.Size = New System.Drawing.Size(75, 20)
@@ -502,47 +485,29 @@
             Me.DeleteCLButton.Text = "Delete"
             Me.DeleteCLButton.UseVisualStyleBackColor = True
             '
-            'FlowLayoutPanel2
+            'ChainsListsGrid
             '
-            Me.FlowLayoutPanel2.Controls.Add(Me.AddItemsButton)
-            Me.FlowLayoutPanel2.Controls.Add(Me.DeleteItemsButton)
-            Me.FlowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.FlowLayoutPanel2.Location = New System.Drawing.Point(453, 529)
-            Me.FlowLayoutPanel2.Margin = New System.Windows.Forms.Padding(0)
-            Me.FlowLayoutPanel2.Name = "FlowLayoutPanel2"
-            Me.FlowLayoutPanel2.Size = New System.Drawing.Size(454, 20)
-            Me.FlowLayoutPanel2.TabIndex = 6
-            '
-            'AddItemsButton
-            '
-            Me.AddItemsButton.Location = New System.Drawing.Point(0, 0)
-            Me.AddItemsButton.Margin = New System.Windows.Forms.Padding(0, 0, 3, 0)
-            Me.AddItemsButton.Name = "AddItemsButton"
-            Me.AddItemsButton.Size = New System.Drawing.Size(75, 20)
-            Me.AddItemsButton.TabIndex = 1
-            Me.AddItemsButton.Text = "Add"
-            Me.AddItemsButton.UseVisualStyleBackColor = True
-            '
-            'DeleteItemsButton
-            '
-            Me.DeleteItemsButton.Location = New System.Drawing.Point(78, 0)
-            Me.DeleteItemsButton.Margin = New System.Windows.Forms.Padding(0, 0, 3, 0)
-            Me.DeleteItemsButton.Name = "DeleteItemsButton"
-            Me.DeleteItemsButton.Size = New System.Drawing.Size(75, 20)
-            Me.DeleteItemsButton.TabIndex = 3
-            Me.DeleteItemsButton.Text = "Delete"
-            Me.DeleteItemsButton.UseVisualStyleBackColor = True
+            Me.ChainsListsGrid.AllowUserToAddRows = False
+            Me.ChainsListsGrid.AllowUserToDeleteRows = False
+            Me.ChainsListsGrid.AllowUserToOrderColumns = True
+            Me.ChainsListsGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+            Me.ChainsListsGrid.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.ChainsListsGrid.Location = New System.Drawing.Point(3, 28)
+            Me.ChainsListsGrid.Name = "ChainsListsGrid"
+            Me.ChainsListsGrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
+            Me.ChainsListsGrid.Size = New System.Drawing.Size(296, 498)
+            Me.ChainsListsGrid.TabIndex = 10
             '
             'FlowLayoutPanel3
             '
             Me.FlowLayoutPanel3.Controls.Add(Me.ChainsButton)
             Me.FlowLayoutPanel3.Controls.Add(Me.ListsButton)
-            Me.FlowLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.FlowLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Top
             Me.FlowLayoutPanel3.Location = New System.Drawing.Point(0, 0)
             Me.FlowLayoutPanel3.Margin = New System.Windows.Forms.Padding(0)
             Me.FlowLayoutPanel3.Name = "FlowLayoutPanel3"
-            Me.FlowLayoutPanel3.Size = New System.Drawing.Size(453, 20)
-            Me.FlowLayoutPanel3.TabIndex = 7
+            Me.FlowLayoutPanel3.Size = New System.Drawing.Size(302, 20)
+            Me.FlowLayoutPanel3.TabIndex = 9
             '
             'ChainsButton
             '
@@ -567,6 +532,76 @@
             Me.ListsButton.TabIndex = 9
             Me.ListsButton.Text = "Lists"
             Me.ListsButton.UseVisualStyleBackColor = True
+            '
+            'TableLayoutPanel9
+            '
+            Me.TableLayoutPanel9.ColumnCount = 1
+            Me.TableLayoutPanel9.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+            Me.TableLayoutPanel9.Controls.Add(Me.FlowLayoutPanel2, 0, 2)
+            Me.TableLayoutPanel9.Controls.Add(Me.Label2, 0, 0)
+            Me.TableLayoutPanel9.Controls.Add(Me.ChainListItemsGrid, 0, 1)
+            Me.TableLayoutPanel9.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.TableLayoutPanel9.Location = New System.Drawing.Point(0, 0)
+            Me.TableLayoutPanel9.Name = "TableLayoutPanel9"
+            Me.TableLayoutPanel9.RowCount = 3
+            Me.TableLayoutPanel9.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25.0!))
+            Me.TableLayoutPanel9.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+            Me.TableLayoutPanel9.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+            Me.TableLayoutPanel9.Size = New System.Drawing.Size(601, 549)
+            Me.TableLayoutPanel9.TabIndex = 12
+            '
+            'FlowLayoutPanel2
+            '
+            Me.FlowLayoutPanel2.Controls.Add(Me.AddItemsButton)
+            Me.FlowLayoutPanel2.Controls.Add(Me.DeleteItemsButton)
+            Me.FlowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.FlowLayoutPanel2.Location = New System.Drawing.Point(0, 529)
+            Me.FlowLayoutPanel2.Margin = New System.Windows.Forms.Padding(0)
+            Me.FlowLayoutPanel2.Name = "FlowLayoutPanel2"
+            Me.FlowLayoutPanel2.Size = New System.Drawing.Size(601, 20)
+            Me.FlowLayoutPanel2.TabIndex = 7
+            '
+            'AddItemsButton
+            '
+            Me.AddItemsButton.Location = New System.Drawing.Point(0, 0)
+            Me.AddItemsButton.Margin = New System.Windows.Forms.Padding(0, 0, 3, 0)
+            Me.AddItemsButton.Name = "AddItemsButton"
+            Me.AddItemsButton.Size = New System.Drawing.Size(75, 20)
+            Me.AddItemsButton.TabIndex = 1
+            Me.AddItemsButton.Text = "Add"
+            Me.AddItemsButton.UseVisualStyleBackColor = True
+            '
+            'DeleteItemsButton
+            '
+            Me.DeleteItemsButton.Location = New System.Drawing.Point(78, 0)
+            Me.DeleteItemsButton.Margin = New System.Windows.Forms.Padding(0, 0, 3, 0)
+            Me.DeleteItemsButton.Name = "DeleteItemsButton"
+            Me.DeleteItemsButton.Size = New System.Drawing.Size(75, 20)
+            Me.DeleteItemsButton.TabIndex = 3
+            Me.DeleteItemsButton.Text = "Delete"
+            Me.DeleteItemsButton.UseVisualStyleBackColor = True
+            '
+            'Label2
+            '
+            Me.Label2.AutoSize = True
+            Me.Label2.Location = New System.Drawing.Point(3, 0)
+            Me.Label2.Name = "Label2"
+            Me.Label2.Padding = New System.Windows.Forms.Padding(0, 3, 0, 0)
+            Me.Label2.Size = New System.Drawing.Size(32, 16)
+            Me.Label2.TabIndex = 4
+            Me.Label2.Text = "Items"
+            '
+            'ChainListItemsGrid
+            '
+            Me.ChainListItemsGrid.AllowUserToAddRows = False
+            Me.ChainListItemsGrid.AllowUserToDeleteRows = False
+            Me.ChainListItemsGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+            Me.ChainListItemsGrid.Dock = System.Windows.Forms.DockStyle.Fill
+            Me.ChainListItemsGrid.Location = New System.Drawing.Point(3, 28)
+            Me.ChainListItemsGrid.Name = "ChainListItemsGrid"
+            Me.ChainListItemsGrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
+            Me.ChainListItemsGrid.Size = New System.Drawing.Size(595, 498)
+            Me.ChainListItemsGrid.TabIndex = 3
             '
             'CurvesPage
             '
@@ -815,14 +850,19 @@
             Me.FlowLayoutPanel7.ResumeLayout(False)
             Me.FlowLayoutPanel7.PerformLayout()
             Me.ChainsPage.ResumeLayout(False)
-            Me.TableLayoutPanel3.ResumeLayout(False)
-            Me.TableLayoutPanel3.PerformLayout()
-            CType(Me.ChainsListsGrid, System.ComponentModel.ISupportInitialize).EndInit()
-            CType(Me.ChainListItemsGrid, System.ComponentModel.ISupportInitialize).EndInit()
+            Me.SplitContainer1.Panel1.ResumeLayout(False)
+            Me.SplitContainer1.Panel2.ResumeLayout(False)
+            CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).EndInit()
+            Me.SplitContainer1.ResumeLayout(False)
+            Me.TableLayoutPanel8.ResumeLayout(False)
             Me.FlowLayoutPanel1.ResumeLayout(False)
-            Me.FlowLayoutPanel2.ResumeLayout(False)
+            CType(Me.ChainsListsGrid, System.ComponentModel.ISupportInitialize).EndInit()
             Me.FlowLayoutPanel3.ResumeLayout(False)
             Me.FlowLayoutPanel3.PerformLayout()
+            Me.TableLayoutPanel9.ResumeLayout(False)
+            Me.TableLayoutPanel9.PerformLayout()
+            Me.FlowLayoutPanel2.ResumeLayout(False)
+            CType(Me.ChainListItemsGrid, System.ComponentModel.ISupportInitialize).EndInit()
             Me.CurvesPage.ResumeLayout(False)
             Me.FieldsPage.ResumeLayout(False)
             Me.TableLayoutPanel4.ResumeLayout(False)
@@ -846,21 +886,6 @@
         Friend WithEvents PortfolioTree As System.Windows.Forms.TreeView
         Friend WithEvents ChainsPage As System.Windows.Forms.TabPage
         Friend WithEvents FieldsPage As System.Windows.Forms.TabPage
-        Friend WithEvents TableLayoutPanel3 As System.Windows.Forms.TableLayoutPanel
-        Friend WithEvents ChainsListsGrid As System.Windows.Forms.DataGridView
-        Friend WithEvents ChainListItemsGrid As System.Windows.Forms.DataGridView
-        Friend WithEvents Label2 As System.Windows.Forms.Label
-        Friend WithEvents FlowLayoutPanel1 As System.Windows.Forms.FlowLayoutPanel
-        Friend WithEvents FlowLayoutPanel2 As System.Windows.Forms.FlowLayoutPanel
-        Friend WithEvents AddCLButton As System.Windows.Forms.Button
-        Friend WithEvents EditCLButton As System.Windows.Forms.Button
-        Friend WithEvents ReloadCLButton As System.Windows.Forms.Button
-        Friend WithEvents DeleteCLButton As System.Windows.Forms.Button
-        Friend WithEvents AddItemsButton As System.Windows.Forms.Button
-        Friend WithEvents DeleteItemsButton As System.Windows.Forms.Button
-        Friend WithEvents FlowLayoutPanel3 As System.Windows.Forms.FlowLayoutPanel
-        Friend WithEvents ChainsButton As System.Windows.Forms.RadioButton
-        Friend WithEvents ListsButton As System.Windows.Forms.RadioButton
         Friend WithEvents FlowLayoutPanel4 As System.Windows.Forms.FlowLayoutPanel
         Friend WithEvents Button7 As System.Windows.Forms.Button
         Friend WithEvents Button8 As System.Windows.Forms.Button
@@ -897,5 +922,22 @@
         Friend WithEvents CurvesPage As System.Windows.Forms.TabPage
         Friend WithEvents TableLayoutPanel5 As System.Windows.Forms.TableLayoutPanel
         Friend WithEvents CustomBondsPage As System.Windows.Forms.TabPage
+        Friend WithEvents SplitContainer1 As System.Windows.Forms.SplitContainer
+        Friend WithEvents TableLayoutPanel8 As System.Windows.Forms.TableLayoutPanel
+        Friend WithEvents FlowLayoutPanel1 As System.Windows.Forms.FlowLayoutPanel
+        Friend WithEvents AddCLButton As System.Windows.Forms.Button
+        Friend WithEvents EditCLButton As System.Windows.Forms.Button
+        Friend WithEvents ReloadCLButton As System.Windows.Forms.Button
+        Friend WithEvents DeleteCLButton As System.Windows.Forms.Button
+        Friend WithEvents ChainsListsGrid As System.Windows.Forms.DataGridView
+        Friend WithEvents FlowLayoutPanel3 As System.Windows.Forms.FlowLayoutPanel
+        Friend WithEvents ChainsButton As System.Windows.Forms.RadioButton
+        Friend WithEvents ListsButton As System.Windows.Forms.RadioButton
+        Friend WithEvents TableLayoutPanel9 As System.Windows.Forms.TableLayoutPanel
+        Friend WithEvents FlowLayoutPanel2 As System.Windows.Forms.FlowLayoutPanel
+        Friend WithEvents AddItemsButton As System.Windows.Forms.Button
+        Friend WithEvents DeleteItemsButton As System.Windows.Forms.Button
+        Friend WithEvents Label2 As System.Windows.Forms.Label
+        Friend WithEvents ChainListItemsGrid As System.Windows.Forms.DataGridView
     End Class
 End Namespace

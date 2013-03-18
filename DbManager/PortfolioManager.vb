@@ -130,21 +130,32 @@ Public MustInherit Class Source
         _name = name
     End Sub
 
+    <Browsable(False)>
     Public ReadOnly Property ID As String
         Get
             Return _id
         End Get
     End Property
 
-    Public ReadOnly Property Color As String
+
+    Public ReadOnly Property Name As String
         Get
-            Return _color
+            Return _name
         End Get
     End Property
 
+
+    <Browsable(False)>
     Public ReadOnly Property Fields As Fields
         Get
             Return _fields
+        End Get
+    End Property
+
+    <DisplayName("Fields layout")>
+    Public ReadOnly Property FieldsName As String
+        Get
+            Return _fields.Name
         End Get
     End Property
 
@@ -154,15 +165,16 @@ Public MustInherit Class Source
         End Get
     End Property
 
+    <DisplayName("Is curve")>
     Public ReadOnly Property Curve As Boolean
         Get
             Return _curve
         End Get
     End Property
 
-    Public ReadOnly Property Name As String
+    Public ReadOnly Property Color As String
         Get
-            Return _name
+            Return _color
         End Get
     End Property
 
@@ -189,6 +201,7 @@ Public Class Chain
         _chainRic = chainRic
     End Sub
 
+    <DisplayName("Chain RIC")>
     Public ReadOnly Property ChainRic As String
         Get
             Return _chainRic
@@ -495,6 +508,8 @@ Public Interface IPortfolioManager
     Function CopyItemToTop(ByVal id As String) As String
 
     Function PortfoliosValid() As Boolean ' todo make a function BranchValid so that to be able to find a good branch and show it
+    ReadOnly Property ChainsView() As List(Of Chain)
+    ReadOnly Property UserListsView() As List(Of UserList)
 End Interface
 
 Public Class PortfolioItemDescription
@@ -578,7 +593,7 @@ Public Class PortfolioManager
             Dim res As New PortfolioStructure(id, node.Attributes("name").Value)
 
             Dim nodes = node.SelectNodes("include | exclude")
-            Dim order As Integer
+            'Dim order As Integer
             Dim source As Source
             For Each item As XmlNode In nodes
                 Try
@@ -589,6 +604,7 @@ Public Class PortfolioManager
                     Dim condition = GetAttr(item, "condition")
                     Dim customName = GetAttr(item, "name")
                     Dim customColor = GetAttr(item, "color")
+                    Dim order = GetAttr(item, "order", "1") ' todo order field. Requires special treatment on saving
 
                     Select Case what
                         Case "chain"
@@ -602,7 +618,6 @@ Public Class PortfolioManager
                     End Select
 
                     If source IsNot Nothing Then
-                        order = order + 1
                         If customColor = "" Then customColor = source.Color
                         If customName = "" Then customName = source.Name
                         Dim portSource As New PortfolioSource(order, source, condition, customName, customColor, isIncluded)
@@ -631,7 +646,7 @@ Public Class PortfolioManager
         End If
     End Function
 
-    Private Function GetAttrStrict(ByVal node As XmlNode, ByVal name As String) As String
+    Private Shared Function GetAttrStrict(ByVal node As XmlNode, ByVal name As String) As String
         Dim attribute As XmlAttribute = node.Attributes(name)
         If attribute IsNot Nothing Then
             Return attribute.Value
@@ -812,6 +827,20 @@ Public Class PortfolioManager
             Select cnt).ToList()
         Return Not maxCounts.Any OrElse maxCounts.Max = 1
     End Function
+
+    Public ReadOnly Property ChainsView() As List(Of Chain) Implements IPortfolioManager.ChainsView
+        Get
+            Dim chainIds = _bonds.SelectNodes("/bonds/chains/chain/@id")
+            Return (From id As XmlNode In chainIds Select GetChainDescr(id.Value)).ToList()
+        End Get
+    End Property
+
+    Public ReadOnly Property UserListsView() As List(Of UserList) Implements IPortfolioManager.UserListsView
+        Get
+            Dim chainIds = _bonds.SelectNodes("/bonds/lists/list/@id")
+            Return (From id As XmlNode In chainIds Select GetListDescr(id.Value)).ToList()
+        End Get
+    End Property
 
     Private Sub SaveBonds()
         _ids.Clear()
