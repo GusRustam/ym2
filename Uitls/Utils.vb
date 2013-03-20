@@ -1,12 +1,24 @@
 ﻿Imports System.Reflection
 Imports System.IO
 
-Public Class IdName
-    Public Property Id As Integer
+Public Class IdName(Of T)
+    Public Property Id As T
     Public Property Name As String
-    Public Shared Widening Operator CType(ByVal value As IdName) As Int32
+    Public Shared Widening Operator CType(ByVal value As IdName(Of T)) As T
         Return value.Id
     End Operator
+
+    Public Sub New()
+    End Sub
+
+    Public Sub New(ByVal id As T, ByVal name As String)
+        Me.Id = id
+        Me.Name = name
+    End Sub
+
+    Public Overrides Function ToString() As String
+        Return Name
+    End Function
 End Class
 
 Public Class Utils

@@ -83,7 +83,7 @@ Namespace Forms.ChartForm
 
                 'Dim portfolioSources = (New PortfolioSourcesTableAdapter).GetData()
                 'Dim portfolioUnitedDataTable = (New PortfolioUnitedTableAdapter).GetData()
-                Dim portfolioStructure = PortfolioManager.GetInstance().GetPortfolioStructure(currentPortID)
+                Dim portfolioStructure = PortfolioManager.Instance().GetPortfolioStructure(currentPortID)
                 For Each port In portfolioStructure.Sources '(From p In portfolioSources Where p.portfolioID = currentPortID Select p)
                     Dim group As Group
 
@@ -126,7 +126,7 @@ Namespace Forms.ChartForm
                             Logger.Error("No description for bond {0} found", ric)
                         End If
                     Next
-                    
+
                     _ansamble.AddGroup(group)
                 Next
                 _ansamble.StartLoadingLiveData()
@@ -502,9 +502,9 @@ Namespace Forms.ChartForm
         Private Sub PortfolioTssbDropDownOpening(ByVal sender As Object, ByVal e As EventArgs) Handles PortfolioTSSB.DropDownOpening
             ' list of portfolios to show
             '(From rw In (New portfolioTableAdapter).GetData() Select New IdName() With {.Id = rw("id"), .Name = rw("portfolio_name")}).ToList()
-            Dim portDescrList As List(Of IdName) =
-                (From rw In PortfolioManager.GetInstance.GetPortfoliosFlat()
-                 Select New IdName() With {.Id = rw.Item1, .Name = rw.Item2}).ToList()
+            Dim portDescrList As List(Of IdName(Of Integer)) =
+                (From rw In PortfolioManager.Instance.GetPortfoliosFlat()
+                 Select New IdName(Of Integer)() With {.Id = rw.Item1, .Name = rw.Item2}).ToList()
 
             PortfolioTSSB.DropDownItems.Clear()
 

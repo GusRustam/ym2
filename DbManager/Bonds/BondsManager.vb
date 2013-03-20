@@ -149,6 +149,7 @@ Namespace Bonds
         Function GetIssuerRatingsTable() As BondsDataSet.IssuerRatingDataTable
         Function GetAllRicsTable() As BondsDataSet.RicsDataTable
         Function GetChainRics(ByVal chainRic As String) As List(Of String)
+        Sub Clear()
     End Interface
 
     Public Class BondsLoader
@@ -236,7 +237,7 @@ Namespace Bonds
         ''' Entry point. Loads all data from configuration file and stores them into IMDB
         ''' </summary>
         Public Sub UpdateAllChains() Implements IBondsLoader.Initialize
-            Dim chainRics = PortfolioManager.GetInstance().GetChainRics()
+            Dim chainRics = PortfolioManager.Instance().GetChainRics()
             If chainRics.Count = 0 Then
                 RaiseEvent NoBonds()
                 Exit Sub
@@ -293,6 +294,16 @@ Namespace Bonds
         Public Function GetChainRics(ByVal chainRic As String) As List(Of String) Implements IBondsLoader.GetChainRics
             Return (From row In RicChain Where row.chain = chainRic Select row.ric).ToList()
         End Function
+
+        Public Sub Clear() Implements IBondsLoader.Clear
+            RicChain.Clear()
+            CouponTable.Clear()
+            FrnTable.Clear()
+            BondsTable.Clear()
+            IssueRatingsTable.Clear()
+            IssuerRatingsTable.Clear()
+            RicsTable.Clear()
+        End Sub
 
         Public Function GetIsuuerRatingsTable() As BondsDataSet.IssuerRatingDataTable Implements IBondsLoader.GetIssuerRatingsTable
             Return IssuerRatingsTable

@@ -2,6 +2,7 @@
 Imports System.Xml
 Imports System.IO
 Imports System.ComponentModel
+Imports System.Runtime.CompilerServices
 Imports DbManager.Bonds
 Imports NLog
 Imports System.Collections.ObjectModel
@@ -53,8 +54,8 @@ Public Class FieldNotFoundException
     End Sub
 End Class
 
-Public Class FieldSet
-    Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(FieldSet))
+Public Class Fields
+    Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(Fields))
     Private ReadOnly _id As String
     Private ReadOnly _name As String
 
@@ -73,13 +74,20 @@ Public Class FieldSet
     ' ReSharper restore ConvertToConstant.Local
     ' ReSharper restore FieldCanBeMadeReadOnly.Local
 
+    Public ReadOnly Property ID() As String
+        Get
+            Return _id
+        End Get
+    End Property
+
     Private Sub Update()
         Dim list = (From fld In Me.GetType().GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
                            Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False)
                            Where attx.Any
                            Let confName = CType(attx(0), ConfingNameAttribute).XmlName, value = fld.GetValue(Me).ToString()
+                           Where value <> ""
                            Select confName, value).ToDictionary(Function(item) item.confName, Function(item) item.value)
-        PortfolioManager.GetInstance().UpdateFieldSet(_id, _name, list)
+        PortfolioManager.Instance().UpdateFieldSet(_id, _name, list)
 
     End Sub
 
@@ -236,17 +244,20 @@ Public Class FieldSet
     End Sub
 End Class
 
-' todo store reference on base field
-' todo update field by config name
-' todo save updates into XML
-' todo refresh not necessary in case save was successful
 Public Class FieldDescription
     Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(FieldDescription))
     Private ReadOnly _configName As String
     Private _value As String
-    Private ReadOnly _parent As FieldSet
+    Private ReadOnly _parent As Fields
 
-    Public Sub New(ByVal configName As String, ByVal value As String, ByVal parent As FieldSet)
+    <Browsable(False)>
+    Public ReadOnly Property Parent() As Fields
+        Get
+            Return _parent
+        End Get
+    End Property
+
+    Public Sub New(ByVal configName As String, ByVal value As String, ByVal parent As Fields)
         _configName = configName
         _value = value
         _parent = parent
@@ -275,17 +286,20 @@ Public Class FieldDescription
     End Property
 End Class
 
-Public Class Fields
+Public Class FieldSet
     Private ReadOnly _name As String
-    Private ReadOnly _history As FieldSet
-    Private ReadOnly _realtime As FieldSet
+    Private ReadOnly _history As Fields
+    Private ReadOnly _realtime As Fields
+    Private ReadOnly _id As String
 
-    Public Sub New(ByVal id As String, ByVal doc As XmlDocument)
+    Public Sub New(ByVal id As String, Optional ByVal doc As XmlDocument = Nothing)
+        _id = id
+        If doc Is Nothing Then doc = PortfolioManager.ClassInstance.GetConfigDocument
         Dim node = doc.SelectSingleNode(String.Format("/bonds/field-sets/field-set[@id='{0}']", id))
         If node Is Nothing Then Throw New Exception(String.Format("Failed to find field set with id {0}", id))
         _name = node.Attributes("name").Value
-        _realtime = New FieldSet(id, node, "realtime")
-        _history = New FieldSet(id, node, "historical")
+        _realtime = New Fields(id, node, "realtime")
+        _history = New Fields(id, node, "historical")
     End Sub
 
     Public Overrides Function ToString() As String
@@ -298,32 +312,39 @@ Public Class Fields
         End Get
     End Property
 
-    Public ReadOnly Property History As FieldSet
+    Public ReadOnly Property History As Fields
         Get
             Return _history
         End Get
     End Property
 
-    Public ReadOnly Property Realtime As FieldSet
+    Public ReadOnly Property Realtime As Fields
         Get
             Return _realtime
         End Get
     End Property
 
-    Public ReadOnly Property AsDataSource() As List(Of FieldSet)
+    Public ReadOnly Property AsDataSource() As List(Of Fields)
         Get
-            Return New List(Of FieldSet)({_history, _realtime})
+            Return New List(Of Fields)({_history, _realtime})
+        End Get
+    End Property
+
+    Public ReadOnly Property ID As String
+        Get
+            Return _id
         End Get
     End Property
 End Class
 
 Public MustInherit Class Source
-    Private ReadOnly _id As String
+    Protected _id As String
     Private ReadOnly _color As String
     Private ReadOnly _name As String
-    Private ReadOnly _fields As Fields
+    Private ReadOnly _fields As FieldSet
     Private ReadOnly _enabled As Boolean
     Private ReadOnly _curve As Boolean
+    Protected Friend ReadOnly PMan As PortfolioManager = PortfolioManager.ClassInstance
 
     Protected Overloads Function Equals(ByVal other As Source) As Boolean
         Return String.Equals(_id, other._id)
@@ -349,13 +370,21 @@ Public MustInherit Class Source
         Return Not Equals(left, right)
     End Operator
 
-    Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As Fields, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
+    Friend Sub New(ByVal id As String, ByVal color As String, ByVal fields As FieldSet, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
         _id = id
         _color = color
         _fields = fields
         _enabled = enabled
         _curve = curve
         _name = name
+    End Sub
+
+    Public Sub New(ByVal color As String, ByVal fieldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String, Optional ByVal doc As XmlDocument = Nothing)
+        _color = color
+        _enabled = enabled
+        _curve = curve
+        _name = name
+        _fields = New FieldSet(fieldSetId)
     End Sub
 
     <Browsable(False)>
@@ -365,16 +394,14 @@ Public MustInherit Class Source
         End Get
     End Property
 
-
     Public ReadOnly Property Name As String
         Get
             Return _name
         End Get
     End Property
 
-
     <Browsable(False)>
-    Public ReadOnly Property Fields As Fields
+    Public ReadOnly Property Fields As FieldSet
         Get
             Return _fields
         End Get
@@ -428,9 +455,16 @@ Public Class Chain
         Return "Chain"
     End Function
 
-    Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As Fields, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal chainRic As String, ByVal name As String)
+    Friend Sub New(ByVal id As String, ByVal color As String, ByVal fields As FieldSet, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal chainRic As String, ByVal name As String)
         MyBase.New(id, color, fields, enabled, curve, name)
         _chainRic = chainRic
+    End Sub
+
+    Public Sub New(ByVal color As String, ByVal fieldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String, ByVal chainRic As String, Optional ByVal doc As XmlDocument = Nothing)
+        MyBase.New(color, fieldSetId, enabled, curve, name, doc)
+        _chainRic = ChainRic
+        _id = PMan.GenerateNewChainId()
+        PMan.AddSource(Me)
     End Sub
 
     <DisplayName("Chain RIC")>
@@ -449,13 +483,24 @@ Public Class UserList
     Inherits Source
     Private ReadOnly _bondRics As List(Of String)
 
+    Public Sub New(ByVal color As String, ByVal fieldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String, Optional ByVal bondRics As List(Of String) = Nothing, Optional ByVal doc As XmlDocument = Nothing)
+        MyBase.New(color, fieldSetId, enabled, curve, name, doc)
+        If bondRics IsNot Nothing Then
+            _bondRics = New List(Of String)(bondRics)
+        Else
+            _bondRics = New List(Of String)()
+        End If
+        _id = PMan.GenerateNewListId()
+        PMan.AddSource(Me)
+    End Sub
+
     Public Overrides Function ToString() As String
         Return "List"
     End Function
 
-    Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As Fields, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal bondRics As List(Of String), ByVal name As String)
+    Friend Sub New(ByVal id As String, ByVal color As String, ByVal fields As FieldSet, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal bondRics As List(Of String), ByVal name As String)
         MyBase.New(id, color, fields, enabled, curve, name)
-        _bondRics = bondRics
+        _bondRics = New List(Of String)(bondRics)
     End Sub
 
     Shared Function ExtractRics(ByVal node As XmlNode) As List(Of String)
@@ -607,6 +652,7 @@ End Class
 ''' 2) Rics property - returns already recalculated data
 ''' </summary>
 ''' <remarks></remarks>
+
 Public Class PortfolioStructure
     Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(PortfolioStructure))
 
@@ -742,36 +788,18 @@ Public Interface IPortfolioManager
     Function PortfoliosValid() As Boolean ' todo make a function BranchValid so that to be able to find a good branch and show it
     ReadOnly Property ChainsView() As List(Of Chain)
     ReadOnly Property UserListsView() As List(Of UserList)
-    Function GetFieldLayouts() As List(Of LayoutDescription)
-    Function GetFieldLayout(ByVal id As String) As Fields
+    Function GetFieldLayouts() As List(Of IdName(Of String))
+    Function GetFieldLayout(ByVal id As String) As FieldSet
     Sub UpdateFieldSet(ByVal id As String, ByVal type As String, ByVal fields As Dictionary(Of String, String))
+
+    Sub AddSource(ByVal src As Source)
 End Interface
 
-Public Class LayoutDescription
-    Private ReadOnly _id As String
-    Private ReadOnly _name As String
-
-    Public Sub New(ByVal id As String, ByVal name As String)
-        _id = id
-        _name = name
-    End Sub
-
-    Public ReadOnly Property ID() As String
-        Get
-            Return _id
-        End Get
-    End Property
-
-    Public ReadOnly Property Name() As String
-        Get
-            Return _name
-        End Get
-    End Property
-
-    Public Overrides Function ToString() As String
-        Return Name
-    End Function
-End Class
+Friend Interface IPortfolioManagerLocal
+    Function GenerateNewListId() As String
+    Function GenerateNewChainId() As String
+    Function GetConfigDocument() As XmlDocument
+End Interface
 
 Public Class PortfolioItemDescription
     Public IsFolder As Boolean
@@ -785,10 +813,20 @@ Public Class PortfolioItemDescription
     End Sub
 End Class
 
+Public Module Extensions
+    <Extension()>
+    Public Sub Import(Of T)(ByVal this As HashSet(Of T), ByVal what As HashSet(Of T))
+        For Each elem In what
+            this.Add(elem)
+        Next
+    End Sub
+End Module
+
 Public Class PortfolioManager
     ' TODO multiple config files
     ' TOdO events OnLoadConfig, OnConfigFileUpdated
     Implements IPortfolioManager
+    Implements IPortfolioManagerLocal
 
     Private Const ConfigFile As String = "bonds.xml"
     Private ReadOnly _configXml As String = Path.Combine(Utils.GetMyPath(), ConfigFile)
@@ -797,13 +835,37 @@ Public Class PortfolioManager
     Private ReadOnly _ids As New HashSet(Of Long)
     Private ReadOnly _tmpIds As New HashSet(Of Long)
 
+    Private ReadOnly _chainIds As New HashSet(Of Long)
+    Private ReadOnly _listIds As New HashSet(Of Long)
+
     Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(PortfolioManager))
 
     Private Shared _instance As PortfolioManager
+    Private Shared ReadOnly Rnd As Random = New Random(DateTime.Now.Millisecond)
 
     Private Sub New()
         _bonds.Load(_configXml)
+        _ids.Import(LoadIds(_bonds.SelectNodes("/bonds/portfolios//@id")))
+        _chainIds.Import(LoadIds(_bonds.SelectNodes("/chains/chain/@id")))
+        _listIds.Import(LoadIds(_bonds.SelectNodes("/lists/list/@id")))
     End Sub
+
+    Private Function LoadIds(ByVal nodes As XmlNodeList) As HashSet(Of Long)
+        Dim res As New HashSet(Of Long)
+        For Each node As XmlNode In nodes
+            If Not IsNumeric(node.Value) Then
+                Logger.Error("Node {0} id is not numeric: {1}", node.Name, node.Value)
+            Else
+                Dim id = CLng(node.Value)
+                If _ids.Contains(id) Then
+                    Logger.Error("Duplicate ids in {0}: {1}", node.Name, id)
+                Else
+                    res.Add(node.Value)
+                End If
+            End If
+        Next
+        Return res
+    End Function
 
     Public Function GetPortfoliosByFolder(ByVal id As String) As List(Of PortfolioItemDescription) Implements IPortfolioManager.GetPortfoliosByFolder
         Dim res As New List(Of PortfolioItemDescription)
@@ -925,7 +987,7 @@ Public Class PortfolioManager
             Dim enabled = GetAttr(node, "enabled", "True")
             Dim curve = GetAttr(node, "curve", "False")
             Dim chainRic = GetAttrStrict(node, "ric")
-            Dim fields = New Fields(GetAttrStrict(node, "field-set-id"), _bonds)
+            Dim fields = New FieldSet(GetAttrStrict(node, "field-set-id"))
             Return New Chain(chainId, color, fields, enabled, curve, chainRic, name)
         Catch ex As Exception
             Logger.WarnException("Failed to get chain description", ex)
@@ -943,7 +1005,7 @@ Public Class PortfolioManager
             Dim enabled = GetAttr(node, "enabled", "True")
             Dim curve = GetAttr(node, "curve", "False")
             Dim rics = UserList.ExtractRics(node)
-            Dim fields = New Fields(GetAttrStrict(node, "field-set-id"), _bonds)
+            Dim fields = New FieldSet(GetAttrStrict(node, "field-set-id"))
             Return New UserList(listId, color, fields, enabled, curve, rics, name)
         Catch ex As Exception
             Logger.WarnException("Failed to get list description", ex)
@@ -974,7 +1036,9 @@ Public Class PortfolioManager
         Dim folder As XmlNode = _bonds.CreateNode(XmlNodeType.Element, type, "")
 
         Dim idAttr As XmlAttribute = _bonds.CreateAttribute("id")
-        Dim newId = GenerateNewId()
+        Dim newId = GenerateNewId(_ids.Union(_tmpIds))
+        _tmpIds.Add(newId)
+
         idAttr.Value = newId
 
         Dim nameAttr As XmlAttribute = _bonds.CreateAttribute("name")
@@ -989,13 +1053,11 @@ Public Class PortfolioManager
         Return newId
     End Function
 
-    Private Function GenerateNewId() As Long
-        Dim rnd As New Random(DateTime.Now.Millisecond)
+    Private Function GenerateNewId(ByVal keys As HashSet(Of Long)) As Long
         Dim elem As Long
         Do
-            elem = CLng(rnd.NextDouble() * 100000)
-        Loop While _ids.Contains(elem) Or _tmpIds.Contains(elem)
-        _tmpIds.Add(elem)
+            elem = CLng(Rnd.NextDouble() * 100000)
+        Loop While keys.Contains(elem)
         Return elem
     End Function
 
@@ -1055,7 +1117,7 @@ Public Class PortfolioManager
     Private Function DeepClone(ByVal who As XmlNode) As XmlNode
         Dim res As XmlNode = who.CloneNode(False)
         If res.Name = "folder" Or res.Name = "portfolio" Then
-            res.Attributes("id").Value = GenerateNewId()
+            res.Attributes("id").Value = GenerateNewId(_ids.Union(_tmpIds))
         End If
         For Each node As XmlNode In who.ChildNodes
             res.AppendChild(DeepClone(node))
@@ -1103,19 +1165,19 @@ Public Class PortfolioManager
         End Get
     End Property
 
-    Public Function GetFieldLayouts() As List(Of LayoutDescription) Implements IPortfolioManager.GetFieldLayouts
+    Public Function GetFieldLayouts() As List(Of IdName(Of String)) Implements IPortfolioManager.GetFieldLayouts
         Try
             Return (From node As XmlNode In _bonds.SelectNodes("/bonds/field-sets/field-set")
-                    Select New LayoutDescription(node.Attributes("id").Value, node.Attributes("name").Value)).ToList()
+                    Select New IdName(Of String)(node.Attributes("id").Value, node.Attributes("name").Value)).ToList()
         Catch ex As Exception
             Logger.ErrorException("Failed to read list of all nodes", ex)
             Logger.Error("Exception = {0}", ex.ToString())
-            Return New List(Of LayoutDescription)()
+            Return New List(Of IdName(Of String))()
         End Try
     End Function
 
-    Public Function GetFieldLayout(ByVal id As String) As Fields Implements IPortfolioManager.GetFieldLayout
-        Return New Fields(id, _bonds)
+    Public Function GetFieldLayout(ByVal id As String) As FieldSet Implements IPortfolioManager.GetFieldLayout
+        Return New FieldSet(id, _bonds)
     End Function
 
     Public Sub UpdateFieldSet(ByVal id As String, ByVal type As String, ByVal fields As Dictionary(Of String, String)) Implements IPortfolioManager.UpdateFieldSet
@@ -1140,6 +1202,23 @@ Public Class PortfolioManager
         Next
         parent.AppendChild(kid)
         SaveBonds()
+    End Sub
+
+    Friend Function GetConfigDocument() As XmlDocument Implements IPortfolioManagerLocal.GetConfigDocument
+        Return _bonds
+    End Function
+
+    Friend Function GenerateNewChainId() As String Implements IPortfolioManagerLocal.GenerateNewChainId
+        Return GenerateNewId(_chainIds)
+    End Function
+
+    Friend Function GenerateNewListId() As String Implements IPortfolioManagerLocal.GenerateNewListId
+        Return GenerateNewId(_listIds)
+    End Function
+
+    Public Sub AddSource(ByVal src As Source) Implements IPortfolioManager.AddSource
+        ' TODO 
+
     End Sub
 
     Private Sub SaveBonds()
@@ -1170,8 +1249,17 @@ Public Class PortfolioManager
         Return res
     End Function
 
-    Public Shared Function GetInstance() As IPortfolioManager
-        If _instance Is Nothing Then _instance = New PortfolioManager()
-        Return _instance
-    End Function
+    Public Shared ReadOnly Property Instance() As IPortfolioManager
+        Get
+            If _instance Is Nothing Then _instance = New PortfolioManager()
+            Return _instance
+        End Get
+    End Property
+
+    Friend Shared ReadOnly Property ClassInstance() As PortfolioManager
+        Get
+            If _instance Is Nothing Then _instance = New PortfolioManager()
+            Return _instance
+        End Get
+    End Property
 End Class

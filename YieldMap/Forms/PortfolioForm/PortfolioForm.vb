@@ -2,11 +2,12 @@
 Imports DbManager.Bonds
 Imports System.Runtime.InteropServices
 Imports NLog
+Imports Uitls
 
 Namespace Forms.PortfolioForm
 
     Public Class PortfolioForm
-        Private Shared ReadOnly PortfolioManager As IPortfolioManager = DbManager.PortfolioManager.GetInstance()
+        Private Shared ReadOnly PortfolioManager As IPortfolioManager = DbManager.PortfolioManager.Instance()
         Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(PortfolioForm))
         Private Shared ReadOnly BondsLoader As IBondsLoader = Bonds.BondsLoader.Instance
 
@@ -298,6 +299,10 @@ Namespace Forms.PortfolioForm
 
 #Region "Data TAB"
         Private Sub TableChooserList_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs) Handles TableChooserList.SelectedIndexChanged
+            RefreshDataGrid()
+        End Sub
+
+        Private Sub RefreshDataGrid()
             If TableChooserList.SelectedIndex >= 0 Then
                 Select Case TableChooserList.Items(TableChooserList.SelectedIndex).ToString()
                     Case "Bonds" : BondsTableView.DataSource = BondsLoader.GetBondsTable()
@@ -306,8 +311,22 @@ Namespace Forms.PortfolioForm
                     Case "Issue ratings" : BondsTableView.DataSource = BondsLoader.GetIssueRatingsTable()
                     Case "Issuer ratings" : BondsTableView.DataSource = BondsLoader.GetIssuerRatingsTable()
                     Case "Rics" : BondsTableView.DataSource = BondsLoader.GetAllRicsTable()
+                    Case Else
+                        BondsTableView.DataSource = Nothing
                 End Select
             End If
+        End Sub
+
+        Private Sub CleanupDataButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles CleanupDataButton.Click
+            BondsLoader.Clear()
+            RefreshDataGrid()
+        End Sub
+
+
+        Private Sub ReloadDataButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles ReloadDataButton.Click
+            BondsLoader.Clear()
+            BondsLoader.Initialize()
+            RefreshDataGrid()
         End Sub
 #End Region
 
@@ -322,14 +341,16 @@ Namespace Forms.PortfolioForm
             RefreshChainsLists()
         End Sub
 
-        Private Sub RefreshChainsLists()
+        Private Sub RefreshChainsLists(Optional ByVal selectedSource As Source = Nothing)
             ChainsListsGrid.DataSource = If(ChainsButton.Checked, PortfolioManager.ChainsView, PortfolioManager.UserListsView)
-            AddItemsButton.Enabled = ChainsButton.Checked
-            DeleteItemsButton.Enabled = ChainsButton.Checked
+            AddItemsButton.Enabled = Not ChainsButton.Checked
+            DeleteItemsButton.Enabled = Not ChainsButton.Checked
             For Each col As DataGridViewColumn In ChainsListsGrid.Columns
                 col.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             Next
-
+            If selectedSource IsNot Nothing Then
+                ' todo select it
+            End If
         End Sub
 
         Private Sub ChainsListsGrid_CellClick(ByVal sender As Object, ByVal e As DataGridViewCellEventArgs) Handles ChainsListsGrid.CellClick
@@ -341,6 +362,22 @@ Namespace Forms.PortfolioForm
                     col.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
                 Next
             End If
+        End Sub
+
+        Private Sub AddCLButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AddCLButton.Click
+            Dim frm As New AddEditChainList
+            If frm.ShowDialog() = DialogResult.OK Then
+                Dim soruce = frm.SaveSource()
+                RefreshChainsLists()
+            End If
+        End Sub
+
+        Private Sub EditCLButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles EditCLButton.Click
+
+        End Sub
+
+        Private Sub DeleteCLButton_Click(ByVal sender As System.Object, ByVal e As EventArgs) Handles DeleteCLButton.Click
+
         End Sub
 #End Region
 
@@ -357,7 +394,7 @@ Namespace Forms.PortfolioForm
         Private Sub RefreshFieldLayoutsList()
             If FieldsListBox.SelectedIndex < 0 Then Return
 
-            Dim elem = TryCast(FieldsListBox.Items(FieldsListBox.SelectedIndex), LayoutDescription)
+            Dim elem = TryCast(FieldsListBox.Items(FieldsListBox.SelectedIndex), IdName(Of String))
             If elem Is Nothing Then Return
 
             FieldLayoutsListBox.DataSource = PortfolioManager.GetFieldLayout(elem.ID).AsDataSource
@@ -366,14 +403,14 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub FieldLayoutsListBox_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs) Handles FieldLayoutsListBox.SelectedIndexChanged
-            RefreshFieldsGrid
+            RefreshFieldsGrid()
         End Sub
 
         Private Sub RefreshFieldsGrid()
             If FieldLayoutsListBox.SelectedIndex < 0 Then
                 FieldsGrid.DataSource = Nothing
             Else
-                Dim item = TryCast(FieldLayoutsListBox.Items(FieldLayoutsListBox.SelectedIndex), FieldSet)
+                Dim item = TryCast(FieldLayoutsListBox.Items(FieldLayoutsListBox.SelectedIndex), Fields)
                 If item Is Nothing Then
                     FieldsGrid.DataSource = Nothing
                 Else
@@ -389,5 +426,6 @@ Namespace Forms.PortfolioForm
             elem.Value = FieldsGrid.Rows(e.RowIndex).Cells(e.ColumnIndex).Value
         End Sub
 #End Region
+
     End Class
 End Namespace
