@@ -19,7 +19,9 @@ Namespace Forms.PortfolioForm
             End If
             RefreshPortfolioTree()
             RefreshChainsLists()
+            RefreshFieldsList()
         End Sub
+
 
         Private Shared Sub ColorCellFormatting(ByVal sender As Object, ByVal e As DataGridViewCellFormattingEventArgs) Handles PortfolioChainsListsGrid.CellFormatting, PortfolioItemsGrid.CellFormatting, ChainsListsGrid.CellFormatting
             Dim dgv = TryCast(sender, DataGridView)
@@ -312,6 +314,11 @@ Namespace Forms.PortfolioForm
 #Region "Chains and lists TAB"
         Private Sub ChainsListCheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles ChainsButton.CheckedChanged
             Logger.Debug("Refresh...")
+
+            ChainListItemsGrid.DataSource = Nothing
+            ChainListItemsGrid.Rows.Clear()
+            ChainListItemsGrid.Columns.Clear()
+
             RefreshChainsLists()
         End Sub
 
@@ -322,14 +329,65 @@ Namespace Forms.PortfolioForm
             For Each col As DataGridViewColumn In ChainsListsGrid.Columns
                 col.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             Next
+
         End Sub
 
         Private Sub ChainsListsGrid_CellClick(ByVal sender As Object, ByVal e As DataGridViewCellEventArgs) Handles ChainsListsGrid.CellClick
             Dim elem = ChainsListsGrid.Rows(e.RowIndex).DataBoundItem
             Dim chain As Source = TryCast(elem, Source)
-            If chain IsNot Nothing Then ChainListItemsGrid.DataSource = chain.GetDefaultRicsView()
+            If chain IsNot Nothing Then
+                ChainListItemsGrid.DataSource = chain.GetDefaultRicsView()
+                For Each col As DataGridViewColumn In ChainListItemsGrid.Columns
+                    col.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+                Next
+            End If
         End Sub
 #End Region
 
+#Region "Fields TAB"
+        Private Sub RefreshFieldsList()
+            FieldsListBox.DataSource = PortfolioManager.GetFieldLayouts
+            RefreshFieldLayoutsList()
+        End Sub
+
+        Private Sub FieldsListBox_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs) Handles FieldsListBox.SelectedIndexChanged
+            RefreshFieldLayoutsList()
+        End Sub
+
+        Private Sub RefreshFieldLayoutsList()
+            If FieldsListBox.SelectedIndex < 0 Then Return
+
+            Dim elem = TryCast(FieldsListBox.Items(FieldsListBox.SelectedIndex), LayoutDescription)
+            If elem Is Nothing Then Return
+
+            FieldLayoutsListBox.DataSource = PortfolioManager.GetFieldLayout(elem.ID).AsDataSource
+            FieldLayoutsListBox.SelectedIndex = -1
+            FieldsGrid.DataSource = Nothing
+        End Sub
+
+        Private Sub FieldLayoutsListBox_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs) Handles FieldLayoutsListBox.SelectedIndexChanged
+            RefreshFieldsGrid
+        End Sub
+
+        Private Sub RefreshFieldsGrid()
+            If FieldLayoutsListBox.SelectedIndex < 0 Then
+                FieldsGrid.DataSource = Nothing
+            Else
+                Dim item = TryCast(FieldLayoutsListBox.Items(FieldLayoutsListBox.SelectedIndex), FieldSet)
+                If item Is Nothing Then
+                    FieldsGrid.DataSource = Nothing
+                Else
+                    FieldsGrid.DataSource = item.AsDataSource()
+                End If
+
+            End If
+        End Sub
+
+        Private Sub FieldsGrid_CellEndEdit(ByVal sender As Object, ByVal e As DataGridViewCellEventArgs) Handles FieldsGrid.CellEndEdit
+            Dim elem = TryCast(FieldsGrid.Rows(e.RowIndex).DataBoundItem, FieldDescription)
+            If elem Is Nothing Then Return
+            elem.Value = FieldsGrid.Rows(e.RowIndex).Cells(e.ColumnIndex).Value
+        End Sub
+#End Region
     End Class
 End Namespace

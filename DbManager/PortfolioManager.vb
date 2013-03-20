@@ -5,6 +5,7 @@ Imports System.ComponentModel
 Imports DbManager.Bonds
 Imports NLog
 Imports System.Collections.ObjectModel
+Imports System.Reflection
 Imports Uitls
 
 Public Class ConfingNameAttribute
@@ -22,24 +23,177 @@ Public Class ConfingNameAttribute
     End Property
 End Class
 
+Public Class FieldException
+    Inherits Exception
+
+    Public Sub New()
+    End Sub
+
+    Public Sub New(ByVal message As String)
+        MyBase.New(message)
+    End Sub
+
+    Public Sub New(ByVal message As String, ByVal innerException As Exception)
+        MyBase.New(message, innerException)
+    End Sub
+End Class
+
+Public Class FieldNotFoundException
+    Inherits FieldException
+
+    Public Sub New()
+    End Sub
+
+    Public Sub New(ByVal message As String)
+        MyBase.New(message)
+    End Sub
+
+    Public Sub New(ByVal message As String, ByVal innerException As Exception)
+        MyBase.New(message, innerException)
+    End Sub
+End Class
+
 Public Class FieldSet
     Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(FieldSet))
+    Private ReadOnly _id As String
+    Private ReadOnly _name As String
 
-    <ConfingName("DATE")> Public LastDate As String = ""
-    <ConfingName("TIME")> Public Time As String = ""
-    <ConfingName("BID")> Public Bid As String = ""
-    <ConfingName("ASK")> Public Ask As String = ""
-    <ConfingName("LAST")> Public Last As String = ""
-    <ConfingName("VWAP")> Public VWAP As String = ""
-    <ConfingName("HIST")> Public Hist As String = ""     ' Historical Field. Corresponds to Close
-    <ConfingName("HIST_DATE")> Public HistDate As String = ""
-    <ConfingName("VOLUME")> Public Volume As String = ""
-    <ConfingName("SOURCE")> Public Src As String = ""   ' Contributor
+    ' ReSharper disable ConvertToConstant.Local
+    ' ReSharper disable FieldCanBeMadeReadOnly.Local
+    <ConfingName("DATE")> Private _lastDate As String = ""
+    <ConfingName("TIME")> Private _time As String = ""
+    <ConfingName("BID")> Private _bid As String = ""
+    <ConfingName("ASK")> Private _ask As String = ""
+    <ConfingName("LAST")> Private _last As String = ""
+    <ConfingName("VWAP")> Private _vwap As String = ""
+    <ConfingName("HIST")> Private _hist As String = ""     ' Historical Field. Corresponds to Close
+    <ConfingName("HIST_DATE")> Private _histDate As String = ""
+    <ConfingName("VOLUME")> Private _volume As String = ""
+    <ConfingName("SOURCE")> Private _src As String = ""
+    ' ReSharper restore ConvertToConstant.Local
+    ' ReSharper restore FieldCanBeMadeReadOnly.Local
 
-    Public Sub New(ByVal node As XmlNode, ByVal subnode As String)
+    Private Sub Update()
+        Dim list = (From fld In Me.GetType().GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
+                           Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False)
+                           Where attx.Any
+                           Let confName = CType(attx(0), ConfingNameAttribute).XmlName, value = fld.GetValue(Me).ToString()
+                           Select confName, value).ToDictionary(Function(item) item.confName, Function(item) item.value)
+        PortfolioManager.GetInstance().UpdateFieldSet(_id, _name, list)
+
+    End Sub
+
+    <DisplayName("Trade date")>
+    Public Property LastDate() As String
+        Get
+            Return _lastDate
+        End Get
+        Set(ByVal value As String)
+            _lastDate = value
+            Update()
+        End Set
+    End Property
+
+    <DisplayName("Last trade time")>
+    Public Property Time() As String
+        Get
+            Return _time
+        End Get
+        Set(ByVal value As String)
+            _time = value
+            Update()
+        End Set
+    End Property
+
+    Public Property Bid() As String
+        Get
+            Return _bid
+        End Get
+        Set(ByVal value As String)
+            _bid = value
+            Update()
+        End Set
+    End Property
+
+    Public Property Ask() As String
+        Get
+            Return _ask
+        End Get
+        Set(ByVal value As String)
+            _ask = value
+            Update()
+        End Set
+    End Property
+
+    Public Property Last() As String
+        Get
+            Return _last
+        End Get
+        Set(ByVal value As String)
+            _last = value
+            Update()
+        End Set
+    End Property
+
+    Public Property VWAP() As String
+        Get
+            Return _vwap
+        End Get
+        Set(ByVal value As String)
+            _vwap = value
+            Update()
+        End Set
+    End Property
+
+    <DisplayName("Historical price")>
+    Public Property Hist() As String
+        Get
+            Return _hist
+        End Get
+        Set(ByVal value As String)
+            _hist = value
+            Update()
+        End Set
+    End Property
+
+    <DisplayName("Historical price date")>
+    Public Property HistDate() As String
+        Get
+            Return _histDate
+        End Get
+        Set(ByVal value As String)
+            _histDate = value
+            Update()
+        End Set
+    End Property
+
+    <DisplayName("Trade volume")>
+    Public Property Volume() As String
+        Get
+            Return _volume
+        End Get
+        Set(ByVal value As String)
+            _volume = value
+            Update()
+        End Set
+    End Property
+
+    <DisplayName("Last quote source")>
+    Public Property Src() As String
+        Get
+            Return _src
+        End Get
+        Set(ByVal value As String)
+            _src = value
+            Update()
+        End Set
+    End Property
+
+    Public Sub New(ByVal id As String, ByVal node As XmlNode, ByVal subnode As String)
+        _name = subnode
+        _id = id
         Logger.Trace(String.Format("FieldSet({0}, {1})", node.Name, subnode))
-        Dim fields = Me.GetType().GetFields()
-        For Each info In (From fld In fields
+        For Each info In (From fld In Me.GetType().GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
                            Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False)
                            Where attx.Any
                            Select fld, attx)
@@ -55,6 +209,70 @@ Public Class FieldSet
             End If
         Next
     End Sub
+
+    Public Overrides Function ToString() As String
+        Return _name
+    End Function
+
+    Public Function AsDataSource() As List(Of FieldDescription)
+        Return (From fld In Me.GetType().GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
+            Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False)
+            Where attx.Any
+            Let xmlName = CType(attx(0), ConfingNameAttribute).XmlName, value = fld.GetValue(Me).ToString()
+            Select New FieldDescription(xmlName, value, Me)).ToList()
+    End Function
+
+    Public Sub UpdateField(ByVal configName As String, ByVal value As String)
+        Logger.Trace("UpdateField({0},{1})", configName, value)
+        Dim fields = (From fld In Me.GetType().GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
+            Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False)
+            Where attx.Any AndAlso CType(attx(0), ConfingNameAttribute).XmlName = configName
+            Select fld).ToList()
+        If Not fields.Any Then Throw New FieldNotFoundException(String.Format("Field with name {0} not found", configName))
+        If fields.Count > 1 Then Throw New FieldException(String.Format("There's more than one field with name {0}", configName))
+        Dim field = fields.First()
+        field.SetValue(Me, value)
+        Update()
+    End Sub
+End Class
+
+' todo store reference on base field
+' todo update field by config name
+' todo save updates into XML
+' todo refresh not necessary in case save was successful
+Public Class FieldDescription
+    Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(FieldDescription))
+    Private ReadOnly _configName As String
+    Private _value As String
+    Private ReadOnly _parent As FieldSet
+
+    Public Sub New(ByVal configName As String, ByVal value As String, ByVal parent As FieldSet)
+        _configName = configName
+        _value = value
+        _parent = parent
+    End Sub
+
+    <DisplayName("Name")>
+    Public ReadOnly Property ConfigName() As String
+        Get
+            Return _configName
+        End Get
+    End Property
+
+    Public Property Value() As String
+        Get
+            Return _value
+        End Get
+        Set(ByVal val As String)
+            _value = val
+            Try
+                _parent.UpdateField(_configName, _value)
+            Catch ex As FieldException
+                Logger.ErrorException("Failed to save field update", ex)
+                Logger.Error("Exception = {0}", ex.ToString())
+            End Try
+        End Set
+    End Property
 End Class
 
 Public Class Fields
@@ -66,9 +284,13 @@ Public Class Fields
         Dim node = doc.SelectSingleNode(String.Format("/bonds/field-sets/field-set[@id='{0}']", id))
         If node Is Nothing Then Throw New Exception(String.Format("Failed to find field set with id {0}", id))
         _name = node.Attributes("name").Value
-        _realtime = New FieldSet(node, "realtime")
-        _history = New FieldSet(node, "historical")
+        _realtime = New FieldSet(id, node, "realtime")
+        _history = New FieldSet(id, node, "historical")
     End Sub
+
+    Public Overrides Function ToString() As String
+        Return Name
+    End Function
 
     Public ReadOnly Property Name As String
         Get
@@ -85,6 +307,12 @@ Public Class Fields
     Public ReadOnly Property Realtime As FieldSet
         Get
             Return _realtime
+        End Get
+    End Property
+
+    Public ReadOnly Property AsDataSource() As List(Of FieldSet)
+        Get
+            Return New List(Of FieldSet)({_history, _realtime})
         End Get
     End Property
 End Class
@@ -476,9 +704,9 @@ Public Class PortfolioStructure
         Next
 
         For Each src In (From srcs In _sources Where srcs.Included)
-            Dim list = New List(Of String)(src.Source.GetDefaultRics())
-            list.RemoveAll(Function(item) _excludes.Contains(item))
-            _rics.Add(src, list)
+            Dim lst = New List(Of String)(src.Source.GetDefaultRics())
+            lst.RemoveAll(Function(item) _excludes.Contains(item))
+            _rics.Add(src, lst)
         Next
         ' todo now apply static filtering
         ' TODO make a difference between dynamic as static filtering!!!
@@ -514,7 +742,36 @@ Public Interface IPortfolioManager
     Function PortfoliosValid() As Boolean ' todo make a function BranchValid so that to be able to find a good branch and show it
     ReadOnly Property ChainsView() As List(Of Chain)
     ReadOnly Property UserListsView() As List(Of UserList)
+    Function GetFieldLayouts() As List(Of LayoutDescription)
+    Function GetFieldLayout(ByVal id As String) As Fields
+    Sub UpdateFieldSet(ByVal id As String, ByVal type As String, ByVal fields As Dictionary(Of String, String))
 End Interface
+
+Public Class LayoutDescription
+    Private ReadOnly _id As String
+    Private ReadOnly _name As String
+
+    Public Sub New(ByVal id As String, ByVal name As String)
+        _id = id
+        _name = name
+    End Sub
+
+    Public ReadOnly Property ID() As String
+        Get
+            Return _id
+        End Get
+    End Property
+
+    Public ReadOnly Property Name() As String
+        Get
+            Return _name
+        End Get
+    End Property
+
+    Public Overrides Function ToString() As String
+        Return Name
+    End Function
+End Class
 
 Public Class PortfolioItemDescription
     Public IsFolder As Boolean
@@ -845,6 +1102,45 @@ Public Class PortfolioManager
             Return (From id As XmlNode In chainIds Select GetListDescr(id.Value)).ToList()
         End Get
     End Property
+
+    Public Function GetFieldLayouts() As List(Of LayoutDescription) Implements IPortfolioManager.GetFieldLayouts
+        Try
+            Return (From node As XmlNode In _bonds.SelectNodes("/bonds/field-sets/field-set")
+                    Select New LayoutDescription(node.Attributes("id").Value, node.Attributes("name").Value)).ToList()
+        Catch ex As Exception
+            Logger.ErrorException("Failed to read list of all nodes", ex)
+            Logger.Error("Exception = {0}", ex.ToString())
+            Return New List(Of LayoutDescription)()
+        End Try
+    End Function
+
+    Public Function GetFieldLayout(ByVal id As String) As Fields Implements IPortfolioManager.GetFieldLayout
+        Return New Fields(id, _bonds)
+    End Function
+
+    Public Sub UpdateFieldSet(ByVal id As String, ByVal type As String, ByVal fields As Dictionary(Of String, String)) Implements IPortfolioManager.UpdateFieldSet
+        Dim parent = _bonds.SelectSingleNode(String.Format("/bonds/field-sets/field-set[@id='{0}']", id))
+        If parent Is Nothing Then Throw New FieldException(String.Format("Failed to find field set with id {0} ", id))
+
+        Dim child = parent.SelectSingleNode(type)
+        If child IsNot Nothing Then
+            parent.RemoveChild(child)
+        Else
+            Logger.Warn("No field set with id {0} and type {1}", id, type)
+        End If
+
+        Dim kid = _bonds.CreateNode(XmlNodeType.Element, type, "")
+        For Each nameVal In fields
+            Dim fieldNode = _bonds.CreateNode(XmlNodeType.Element, "field", "")
+            Dim attr = _bonds.CreateAttribute("type")
+            attr.Value = nameVal.Key
+            fieldNode.Attributes.Append(attr)
+            fieldNode.InnerText = nameVal.Value
+            kid.AppendChild(fieldNode)
+        Next
+        parent.AppendChild(kid)
+        SaveBonds()
+    End Sub
 
     Private Sub SaveBonds()
         _ids.Clear()
