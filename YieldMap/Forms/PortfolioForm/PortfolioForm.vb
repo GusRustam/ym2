@@ -322,7 +322,6 @@ Namespace Forms.PortfolioForm
             RefreshDataGrid()
         End Sub
 
-
         Private Sub ReloadDataButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles ReloadDataButton.Click
             BondsLoader.Clear()
             BondsLoader.Initialize()
@@ -331,6 +330,10 @@ Namespace Forms.PortfolioForm
 #End Region
 
 #Region "Chains and lists TAB"
+        Private Shared Sub OnCellBeginEdit(ByVal sender As Object, ByVal e As DataGridViewCellCancelEventArgs) Handles ChainsListsGrid.CellBeginEdit, ChainListItemsGrid.CellBeginEdit
+            e.Cancel = True
+        End Sub
+
         Private Sub ChainsListCheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles ChainsButton.CheckedChanged
             Logger.Debug("Refresh...")
 
@@ -354,30 +357,84 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub ChainsListsGrid_CellClick(ByVal sender As Object, ByVal e As DataGridViewCellEventArgs) Handles ChainsListsGrid.CellClick
-            Dim elem = ChainsListsGrid.Rows(e.RowIndex).DataBoundItem
-            Dim chain As Source = TryCast(elem, Source)
-            If chain IsNot Nothing Then
-                ChainListItemsGrid.DataSource = chain.GetDefaultRicsView()
-                For Each col As DataGridViewColumn In ChainListItemsGrid.Columns
-                    col.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-                Next
-            End If
+
         End Sub
 
         Private Sub AddCLButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AddCLButton.Click
+            AddChainList()
+        End Sub
+
+        Private Sub AddChainList()
             Dim frm As New AddEditChainList
+            If frm.ShowDialog() = DialogResult.OK Then RefreshChainsLists(frm.SaveSource())
+        End Sub
+
+        Private Sub EditCLButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles EditCLButton.Click
+            If ChainsListsGrid.SelectedRows.Count <> 1 Then
+                MessageBox.Show("Please select chain or list to edit", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Return
+            End If
+            Dim selectedItem = CType(ChainsListsGrid.SelectedRows.Item(0).DataBoundItem, Source)
+            EditChainList(selectedItem)
+        End Sub
+
+        Private Sub EditChainList(ByVal selectedItem As Source)
+            Dim frm As New AddEditChainList
+            frm.Src = selectedItem
             If frm.ShowDialog() = DialogResult.OK Then
-                Dim soruce = frm.SaveSource()
+                PortfolioManager.UpdateSource(frm.Src)
+                RefreshChainsLists(frm.Src)
+            End If
+        End Sub
+
+        Private Sub DeleteCLButton_Click(ByVal sender As System.Object, ByVal e As EventArgs) Handles DeleteCLButton.Click
+            If ChainsListsGrid.SelectedRows.Count <> 1 Then
+                MessageBox.Show("Please select chain or list to delete", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Return
+            End If
+            Dim selectedItem = CType(ChainsListsGrid.SelectedRows.Item(0).DataBoundItem, Source)
+            DeleteChainList(selectedItem)
+        End Sub
+
+        Private Sub DeleteChainList(ByVal selectedItem As Source)
+            Dim list = PortfolioManager.GetPortfoliosBySource(selectedItem)
+            If Not list.Any OrElse (
+                   MessageBox.Show(
+                       String.Format("There are {0} portfolios using this item, are you sure you'd like to delete it?", list.Count),
+                       "Please confirm",
+                       MessageBoxButtons.YesNo,
+                       MessageBoxIcon.Question) = DialogResult.Yes) Then
+                PortfolioManager.DeleteSource(selectedItem)
                 RefreshChainsLists()
             End If
         End Sub
 
-        Private Sub EditCLButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles EditCLButton.Click
-
+        Private Sub ChainsListsGrid_CellMouseClick(ByVal sender As Object, ByVal e As DataGridViewCellMouseEventArgs) Handles ChainsListsGrid.CellMouseClick
+            Dim elem = ChainsListsGrid.Rows(e.RowIndex).DataBoundItem
+            Dim chain As Source = TryCast(elem, Source)
+            If chain Is Nothing Then Return
+            If e.Button = MouseButtons.Left Then
+                ChainListItemsGrid.DataSource = chain.GetDefaultRicsView()
+                For Each col As DataGridViewColumn In ChainListItemsGrid.Columns
+                    col.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+                Next
+            Else
+                ChainsListsCMS.Show(ChainsListsGrid, e.Location)
+            End If
         End Sub
 
-        Private Sub DeleteCLButton_Click(ByVal sender As System.Object, ByVal e As EventArgs) Handles DeleteCLButton.Click
+        Private Sub AddCLTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AddCLTSMI.Click
+            AddChainList()
+        End Sub
 
+        Private Sub EditCLTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles EditCLTSMI.Click
+            Dim item = CType(ChainsListsGrid.SelectedRows.Item(0).DataBoundItem, Source)
+            EditChainList(item)
+        End Sub
+
+        Private Sub DeleteCLTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles DeleteCLTSMI.Click
+            Dim item = CType(ChainsListsGrid.SelectedRows.Item(0).DataBoundItem, Source)
+            DeleteChainList(item)
         End Sub
 #End Region
 
@@ -397,7 +454,7 @@ Namespace Forms.PortfolioForm
             Dim elem = TryCast(FieldsListBox.Items(FieldsListBox.SelectedIndex), IdName(Of String))
             If elem Is Nothing Then Return
 
-            FieldLayoutsListBox.DataSource = PortfolioManager.GetFieldLayout(elem.ID).AsDataSource
+            FieldLayoutsListBox.DataSource = New FieldSet(elem.Id).AsDataSource
             FieldLayoutsListBox.SelectedIndex = -1
             FieldsGrid.DataSource = Nothing
         End Sub
@@ -425,6 +482,7 @@ Namespace Forms.PortfolioForm
             If elem Is Nothing Then Return
             elem.Value = FieldsGrid.Rows(e.RowIndex).Cells(e.ColumnIndex).Value
         End Sub
+
 #End Region
 
     End Class

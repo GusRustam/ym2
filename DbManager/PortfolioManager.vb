@@ -338,13 +338,16 @@ Public Class FieldSet
 End Class
 
 Public MustInherit Class Source
-    Protected _id As String
-    Private ReadOnly _color As String
-    Private ReadOnly _name As String
-    Private ReadOnly _fields As FieldSet
-    Private ReadOnly _enabled As Boolean
-    Private ReadOnly _curve As Boolean
-    Protected Friend ReadOnly PMan As PortfolioManager = PortfolioManager.ClassInstance
+    Private ReadOnly _id As String
+    Private _color As String
+    Private _name As String
+    Private _enabled As Boolean
+    Private _curve As Boolean
+    Private _fieldSetId As String
+    Private _fields As FieldSet
+
+
+    Protected Friend ReadOnly PortMan As PortfolioManager = PortfolioManager.ClassInstance
 
     Protected Overloads Function Equals(ByVal other As Source) As Boolean
         Return String.Equals(_id, other._id)
@@ -373,18 +376,19 @@ Public MustInherit Class Source
     Friend Sub New(ByVal id As String, ByVal color As String, ByVal fields As FieldSet, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
         _id = id
         _color = color
-        _fields = fields
         _enabled = enabled
         _curve = curve
         _name = name
+        FieldSetId = fields.ID
     End Sub
 
-    Public Sub New(ByVal color As String, ByVal fieldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String, Optional ByVal doc As XmlDocument = Nothing)
+    Public Sub New(ByVal color As String, ByVal fldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
+        _id = GenerateId()
         _color = color
         _enabled = enabled
         _curve = curve
         _name = name
-        _fields = New FieldSet(fieldSetId)
+        FieldSetId = fldSetId
     End Sub
 
     <Browsable(False)>
@@ -394,10 +398,24 @@ Public MustInherit Class Source
         End Get
     End Property
 
-    Public ReadOnly Property Name As String
+    Public Property Name As String
         Get
             Return _name
         End Get
+        Set(ByVal value As String)
+            _name = value
+        End Set
+    End Property
+
+    <Browsable(False)>
+    Public Property FieldSetId() As String
+        Get
+            Return _fieldSetId
+        End Get
+        Set(ByVal value As String)
+            _fieldSetId = value
+            _fields = New FieldSet(_fieldSetId)
+        End Set
     End Property
 
     <Browsable(False)>
@@ -414,23 +432,32 @@ Public MustInherit Class Source
         End Get
     End Property
 
-    Public ReadOnly Property Enabled As Boolean
+    Public Property Enabled As Boolean
         Get
             Return _enabled
         End Get
+        Set(ByVal value As Boolean)
+            _enabled = value
+        End Set
     End Property
 
     <DisplayName("Is curve")>
-    Public ReadOnly Property Curve As Boolean
+    Public Property Curve As Boolean
         Get
             Return _curve
         End Get
+        Set(ByVal value As Boolean)
+            _curve = value
+        End Set
     End Property
 
-    Public ReadOnly Property Color As String
+    Public Property Color As String
         Get
             Return _color
         End Get
+        Set(ByVal value As String)
+            _color = value
+        End Set
     End Property
 
     ''' <summary>
@@ -441,6 +468,8 @@ Public MustInherit Class Source
     ''' <remarks></remarks>
     Public MustOverride Function GetDefaultRics() As List(Of String)
 
+    Protected MustOverride Function GenerateId() As String
+
     Public Function GetDefaultRicsView() As List(Of BondDescription)
         Return (From ric In GetDefaultRics() Select BondsData.Instance.GetBondInfo(ric)).ToList()
     End Function
@@ -448,7 +477,7 @@ End Class
 
 Public Class Chain
     Inherits Source
-    Private ReadOnly _chainRic As String
+    Private _chainRic As String
     Private ReadOnly _bondsManager As IBondsLoader = BondsLoader.Instance
 
     Public Overrides Function ToString() As String
@@ -460,22 +489,28 @@ Public Class Chain
         _chainRic = chainRic
     End Sub
 
-    Public Sub New(ByVal color As String, ByVal fieldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String, ByVal chainRic As String, Optional ByVal doc As XmlDocument = Nothing)
-        MyBase.New(color, fieldSetId, enabled, curve, name, doc)
-        _chainRic = ChainRic
-        _id = PMan.GenerateNewChainId()
-        PMan.AddSource(Me)
+    Public Sub New(ByVal color As String, ByVal fieldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String, ByVal chainRic As String)
+        MyBase.New(color, fieldSetId, enabled, curve, name)
+        _chainRic = chainRic
+        PortMan.AddSource(Me)
     End Sub
 
     <DisplayName("Chain RIC")>
-    Public ReadOnly Property ChainRic As String
+    Public Property ChainRic As String
         Get
             Return _chainRic
         End Get
+        Set(ByVal value As String)
+            _chainRic = value
+        End Set
     End Property
 
     Public Overrides Function GetDefaultRics() As List(Of String)
         Return _bondsManager.GetChainRics(_chainRic)
+    End Function
+
+    Protected Overrides Function GenerateId() As String
+        Return PortMan.GenerateNewChainId()
     End Function
 End Class
 
@@ -483,15 +518,14 @@ Public Class UserList
     Inherits Source
     Private ReadOnly _bondRics As List(Of String)
 
-    Public Sub New(ByVal color As String, ByVal fieldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String, Optional ByVal bondRics As List(Of String) = Nothing, Optional ByVal doc As XmlDocument = Nothing)
-        MyBase.New(color, fieldSetId, enabled, curve, name, doc)
+    Public Sub New(ByVal color As String, ByVal fieldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String, Optional ByVal bondRics As List(Of String) = Nothing)
+        MyBase.New(color, fieldSetId, enabled, curve, name)
         If bondRics IsNot Nothing Then
             _bondRics = New List(Of String)(bondRics)
         Else
             _bondRics = New List(Of String)()
         End If
-        _id = PMan.GenerateNewListId()
-        PMan.AddSource(Me)
+        PortMan.AddSource(Me)
     End Sub
 
     Public Overrides Function ToString() As String
@@ -509,6 +543,10 @@ Public Class UserList
 
     Public Overrides Function GetDefaultRics() As List(Of String)
         Return _bondRics
+    End Function
+
+    Protected Overrides Function GenerateId() As String
+        Return PortMan.GenerateNewListId()
     End Function
 End Class
 
@@ -789,10 +827,12 @@ Public Interface IPortfolioManager
     ReadOnly Property ChainsView() As List(Of Chain)
     ReadOnly Property UserListsView() As List(Of UserList)
     Function GetFieldLayouts() As List(Of IdName(Of String))
-    Function GetFieldLayout(ByVal id As String) As FieldSet
     Sub UpdateFieldSet(ByVal id As String, ByVal type As String, ByVal fields As Dictionary(Of String, String))
 
     Sub AddSource(ByVal src As Source)
+    Sub UpdateSource(ByVal source As Source)
+    Function GetPortfoliosBySource(ByVal selectedItem As Source) As List(Of IdName(Of String))
+    Sub DeleteSource(ByVal source As Source)
 End Interface
 
 Friend Interface IPortfolioManagerLocal
@@ -1117,7 +1157,7 @@ Public Class PortfolioManager
     Private Function DeepClone(ByVal who As XmlNode) As XmlNode
         Dim res As XmlNode = who.CloneNode(False)
         If res.Name = "folder" Or res.Name = "portfolio" Then
-            res.Attributes("id").Value = GenerateNewId(_ids.Union(_tmpIds))
+            res.Attributes("id").Value = GenerateNewId(New HashSet(Of Long)(_ids.Union(_tmpIds)))
         End If
         For Each node As XmlNode In who.ChildNodes
             res.AppendChild(DeepClone(node))
@@ -1176,10 +1216,6 @@ Public Class PortfolioManager
         End Try
     End Function
 
-    Public Function GetFieldLayout(ByVal id As String) As FieldSet Implements IPortfolioManager.GetFieldLayout
-        Return New FieldSet(id, _bonds)
-    End Function
-
     Public Sub UpdateFieldSet(ByVal id As String, ByVal type As String, ByVal fields As Dictionary(Of String, String)) Implements IPortfolioManager.UpdateFieldSet
         Dim parent = _bonds.SelectSingleNode(String.Format("/bonds/field-sets/field-set[@id='{0}']", id))
         If parent Is Nothing Then Throw New FieldException(String.Format("Failed to find field set with id {0} ", id))
@@ -1217,8 +1253,130 @@ Public Class PortfolioManager
     End Function
 
     Public Sub AddSource(ByVal src As Source) Implements IPortfolioManager.AddSource
-        ' TODO 
+        If TypeOf src Is Chain Then
+            Dim chain = CType(src, Chain)
+            Dim parent = _bonds.SelectSingleNode("/bonds/chains")
+            Dim newChainNode = _bonds.CreateNode(XmlNodeType.Element, "chain", "")
+            AppendAttr(newChainNode, "id", chain.ID)
+            AppendAttr(newChainNode, "ric", chain.ChainRic)
+            AppendAttr(newChainNode, "field-set-id", chain.Fields.ID)
+            AppendAttr(newChainNode, "name", chain.Name)
+            AppendAttr(newChainNode, "color", chain.Color)
+            AppendAttr(newChainNode, "curve", chain.Curve)
+            AppendAttr(newChainNode, "enabled", chain.Enabled)
+            parent.AppendChild(newChainNode)
+            SaveBonds()
+        ElseIf TypeOf src Is UserList Then
+            Dim list = CType(src, UserList)
+            Dim parent = _bonds.SelectSingleNode("/bonds/lists")
+            Dim newListNode = _bonds.CreateNode(XmlNodeType.Element, "chain", "")
+            AppendAttr(newListNode, "id", list.ID)
+            AppendAttr(newListNode, "field-set-id", list.Fields.ID)
+            AppendAttr(newListNode, "name", list.Name)
+            AppendAttr(newListNode, "color", list.Color)
+            AppendAttr(newListNode, "curve", list.Curve)
+            AppendAttr(newListNode, "enabled", list.Enabled)
+            For Each ric In list.GetDefaultRics()
+                Dim ricNode = _bonds.CreateNode(XmlNodeType.Element, "ric", "")
+                ricNode.InnerText = ric
+                newListNode.AppendChild(ricNode)
+            Next
+            parent.AppendChild(newListNode)
+            SaveBonds()
+        Else
+            Logger.Warn("AddSource(): unsupported source type {0}", src.GetType())
+        End If
+    End Sub
 
+    Public Sub UpdateSource(ByVal src As Source) Implements IPortfolioManager.UpdateSource
+        If TypeOf src Is Chain Then
+            Dim chain = CType(src, Chain)
+            Dim chainNode = _bonds.SelectSingleNode(String.Format("/bonds/chains/chain[@id='{0}']", src.ID))
+            If chainNode Is Nothing Then
+                Logger.Error("No chain with id {0} found", src.ID)
+                Return
+            End If
+            UpdateAttr(chainNode, "id", chain.ID)
+            UpdateAttr(chainNode, "ric", chain.ChainRic)
+            UpdateAttr(chainNode, "field-set-id", chain.Fields.ID)
+            UpdateAttr(chainNode, "name", chain.Name)
+            UpdateAttr(chainNode, "color", chain.Color)
+            UpdateAttr(chainNode, "curve", chain.Curve)
+            UpdateAttr(chainNode, "enabled", chain.Enabled)
+            SaveBonds()
+        ElseIf TypeOf src Is UserList Then
+            Dim list = CType(src, UserList)
+            Dim listNode = _bonds.SelectSingleNode(String.Format("/bonds/lists/list[@id='{0}']", src.ID))
+            If listNode Is Nothing Then
+                Logger.Error("No list with id {0} found", src.ID)
+                Return
+            End If
+            UpdateAttr(listNode, "id", list.ID)
+            UpdateAttr(listNode, "field-set-id", list.Fields.ID)
+            UpdateAttr(listNode, "name", list.Name)
+            UpdateAttr(listNode, "color", list.Color)
+            UpdateAttr(listNode, "curve", list.Curve)
+            UpdateAttr(listNode, "enabled", list.Enabled)
+            SaveBonds()
+        Else
+            Logger.Warn("UpdateSource(): unsupported source type {0}", src.GetType())
+        End If
+
+    End Sub
+
+    Public Function GetPortfoliosBySource(ByVal src As Source) As List(Of IdName(Of String)) Implements IPortfolioManager.GetPortfoliosBySource
+        If TypeOf src Is Chain Then
+            Dim chain = CType(src, Chain)
+            Dim nodes = _bonds.SelectNodes(String.Format("/bonds/portfolios//portfolio[include[@what='chain' and @id='{0}']]", chain.ID))
+            Return (From node As XmlNode In nodes
+                    Select New IdName(Of String)(node.Attributes("id").Value, node.Attributes("name").Value)).ToList()
+        ElseIf TypeOf src Is UserList Then
+            Dim list = CType(src, UserList)
+            Dim nodes = _bonds.SelectNodes(String.Format("/bonds/portfolios//portfolio[include[@what='list' and @id='{0}']]", list.ID))
+            Return (From node As XmlNode In nodes
+                    Select New IdName(Of String)(node.Attributes("id").Value, node.Attributes("name").Value)).ToList()
+        Else
+            Return New List(Of IdName(Of String))
+        End If
+    End Function
+
+    Public Sub DeleteSource(ByVal src As Source) Implements IPortfolioManager.DeleteSource
+        If TypeOf src Is Chain Then
+            Dim chain = CType(src, Chain)
+            Dim nodes = _bonds.SelectNodes(String.Format("/bonds/portfolios//portfolio[include[@what='chain' and @id='{0}']]", chain.ID))
+            For Each node As XmlNode In nodes
+                node.ParentNode.RemoveChild(node)
+            Next
+            Dim elem = _bonds.SelectSingleNode(String.Format("/bonds/chains/chain[@id='{0}']", src.ID))
+            elem.ParentNode.RemoveChild(elem)
+        ElseIf TypeOf src Is UserList Then
+            Dim list = CType(src, UserList)
+            Dim nodes = _bonds.SelectNodes(String.Format("/bonds/portfolios//portfolio[include[@what='list' and @id='{0}']]", list.ID))
+            For Each node As XmlNode In nodes
+                node.ParentNode.RemoveChild(node)
+            Next
+            Dim elem = _bonds.SelectSingleNode(String.Format("/bonds/lists/list[@id='{0}']", src.ID))
+            elem.ParentNode.RemoveChild(elem)
+        Else
+            Return
+        End If
+        SaveBonds()
+    End Sub
+
+    Private Sub UpdateAttr(ByRef node As XmlNode, ByVal attrName As String, ByVal attrVal As String)
+        If node.Attributes(attrName) Is Nothing Then
+            AppendAttr(node, attrName, attrVal)
+        Else
+            node.Attributes(attrName).Value = attrVal
+        End If
+    End Sub
+
+    Private Sub AppendAttr(ByRef node As XmlNode, ByVal attrName As String, ByVal attrVal As String)
+        If attrVal = "" Then Return
+        Dim attr As XmlAttribute
+        attr = _bonds.CreateAttribute(attrName)
+        attr.Value = attrVal
+        node.Attributes.Append(attr)
     End Sub
 
     Private Sub SaveBonds()
