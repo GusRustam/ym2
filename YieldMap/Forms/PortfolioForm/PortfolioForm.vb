@@ -1,5 +1,4 @@
-﻿Imports YieldMap.Commons
-Imports DbManager
+﻿Imports DbManager
 Imports DbManager.Bonds
 Imports System.Runtime.InteropServices
 Imports NLog
@@ -10,7 +9,7 @@ Namespace Forms.PortfolioForm
     Public Class PortfolioForm
         Private Shared ReadOnly PortfolioManager As IPortfolioManager = DbManager.PortfolioManager.Instance()
         Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(PortfolioForm))
-        Private WithEvents _loader As IBondsLoader = New BondsLoader '.Instance
+        Private WithEvents _loader As IBondsLoader = BondsLoader.Instance
 
         Private Sub PortfolioForm_Load(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Load
             BondsTableView.DataSource = _loader.GetBondsTable()
@@ -319,12 +318,12 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub CleanupDataButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles CleanupDataButton.Click
-            _loader.Clear()
+            _loader.ClearTables()
             RefreshDataGrid()
         End Sub
 
         Private Sub ReloadDataButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles ReloadDataButton.Click
-            _loader.Clear()
+            _loader.ClearTables()
             _loader.Initialize()
             RefreshDataGrid()
         End Sub
@@ -418,15 +417,6 @@ Namespace Forms.PortfolioForm
 
             _loader.LoadChain(CType(selectedItem, Chain).ChainRic)
         End Sub
-
-        'Private Shared Sub BondsLoader_Failure(ByVal ric As String, ByVal ex As Exception) Handles _loader.FailureChain
-        '    ErrorMessages.Add(String.Format("Failed to retrieve chain {0};{1}Error is {2}", ric, Environment.NewLine, ex.ToString()))
-        'End Sub
-
-        'Private Shared Sub BondsLoader_FailureAll(ByVal rics As List(Of String), ByVal ex As Exception) Handles _loader.FailureRics
-        '    ErrorMessages.Add(String.Format("Failed to retrieve data for {0} ric;{1}Error is {2}", rics.Count, Environment.NewLine, ex.ToString()))
-        'End Sub
-
 
         Private Sub BondsLoaderFinished(ByVal evt As ProgressEvent) Handles _loader.Progress
             Logger.Info("Got message {0}", evt.Msg)

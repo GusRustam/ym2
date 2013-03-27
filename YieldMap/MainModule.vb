@@ -1,6 +1,7 @@
 ﻿Imports System.Threading
 Imports NLog
 Imports Settings
+Imports YieldMap.Commons
 Imports YieldMap.Forms.MainForm
 Imports YieldMap.My.Resources
 Imports YieldMap.Forms
@@ -46,14 +47,14 @@ Module MainModule
     Private Sub DomainEventHandler(ByVal sender As Object, ByVal e As UnhandledExceptionEventArgs)
         Dim frm As New UnhandledExcForm
         frm.Text = Unhandled_domain_exception
-        frm.ErrorTextBox.Text = Commons.GetEnvironment() + Environment.NewLine + Environment.NewLine + e.ExceptionObject.ToString()
+        frm.ErrorTextBox.Text = GetEnvironment() + Environment.NewLine + Environment.NewLine + e.ExceptionObject.ToString()
         frm.ShowDialog()
     End Sub
 
     Private Sub ThreadEventHandler(ByVal sender As Object, ByVal e As ThreadExceptionEventArgs)
         Dim frm As New UnhandledExcForm
         frm.Text = Unhandled_thread_exception
-        frm.ErrorTextBox.Text = Commons.GetEnvironment() + Environment.NewLine + Environment.NewLine + e.Exception.ToString()
+        frm.ErrorTextBox.Text = GetEnvironment() + Environment.NewLine + Environment.NewLine + e.Exception.ToString()
         frm.ShowDialog()
     End Sub
 End Module

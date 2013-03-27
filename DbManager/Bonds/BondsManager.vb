@@ -9,7 +9,7 @@ Namespace Bonds
         Implements IBondsData
 
         'Private Shared ReadOnly Logger As Logger = GetLogger(GetType(BondsData))
-        Private WithEvents _ldr As IBondsLoader = New BondsLoader '.Instance
+        Private WithEvents _ldr As IBondsLoader = BondsLoader.Instance
         Private Shared ReadOnly [Me] As New BondsData
 
         Private Shared _ricToSubRic As Dictionary(Of String, List(Of String))
@@ -137,13 +137,13 @@ Namespace Bonds
         Private ReadOnly _handlers As New List(Of Action(Of ProgressEvent))
         Private Shared ReadOnly Logger As Logger = GetLogger(GetType(BondLoaderProgressProcess))
 
-        Private Shared ReadOnly RicChain As New BondsDataSet.RicChainDataTable
-        Private Shared ReadOnly CouponTable As New BondsDataSet.CouponDataTable
-        Private Shared ReadOnly FrnTable As New BondsDataSet.FrnDataTable
-        Private Shared ReadOnly BondsTable As New BondsDataSet.BondDataTable
-        Private Shared ReadOnly IssueRatingsTable As New BondsDataSet.IssueRatingDataTable
-        Private Shared ReadOnly IssuerRatingsTable As New BondsDataSet.IssuerRatingDataTable
-        Private Shared ReadOnly RicsTable As New BondsDataSet.RicsDataTable
+        Private Shared ReadOnly RicChain As BondsDataSet.RicChainDataTable = BondsLoader.Instance.GetRicChainTable()
+        Private Shared ReadOnly CouponTable As BondsDataSet.CouponDataTable = BondsLoader.Instance.GetCouponsTable()
+        Private Shared ReadOnly FrnTable As BondsDataSet.FrnDataTable = BondsLoader.Instance.GetFrnTable()
+        Private Shared ReadOnly BondsTable As BondsDataSet.BondDataTable = BondsLoader.Instance.GetBondsTable()
+        Private Shared ReadOnly IssueRatingsTable As BondsDataSet.IssueRatingDataTable = BondsLoader.Instance.GetIssueRatingsTable()
+        Private Shared ReadOnly IssuerRatingsTable As BondsDataSet.IssuerRatingDataTable = BondsLoader.Instance.GetIssuerRatingsTable()
+        Private Shared ReadOnly RicsTable As BondsDataSet.RicsDataTable = BondsLoader.Instance.GetRicsTable()
 
         Public Custom Event Progress As Action(Of ProgressEvent) Implements IProgressProcess.Progress
             AddHandler(ByVal value As Action(Of ProgressEvent))
@@ -399,9 +399,9 @@ Namespace Bonds
             End Try
         End Sub
 
-        Private Sub _chainLoader_Failed(ByVal arg1 As String, ByVal arg2 As Exception) Handles _chainLoader.Failed
+        Private Sub ChainLoaderFailed(ByVal ric As String, ByVal ex As Exception, ByVal final As Boolean) Handles _chainLoader.Failed
             Logger.Trace("Chain failed")
-            RaiseEvent Progress(New ProgressEvent(MessageKind.Fail, String.Format("Failed to load chain {0}", arg1)))
+            RaiseEvent Progress(New ProgressEvent(If(final, MessageKind.Fail, MessageKind.Negative), String.Format("Failed to load chain {0}", ric)))
         End Sub
     End Class
 
@@ -417,8 +417,19 @@ Namespace Bonds
         Private Shared ReadOnly IssueRatingsTable As New BondsDataSet.IssueRatingDataTable
         Private Shared ReadOnly IssuerRatingsTable As New BondsDataSet.IssuerRatingDataTable
         Private Shared ReadOnly RicsTable As New BondsDataSet.RicsDataTable
+        Private Shared _me As IBondsLoader
 
         Public Event Progress As Action(Of ProgressEvent) Implements IBondsLoader.Progress
+
+        Private Sub New()
+        End Sub
+
+        Public Shared ReadOnly Property Instance() As IBondsLoader
+            Get
+                If _me Is Nothing Then _me = New BondsLoader
+                Return _me
+            End Get
+        End Property
 
         ''' <summary>
         ''' Entry point. Loads all data from configuration file and stores them into IMDB
@@ -490,7 +501,15 @@ Namespace Bonds
             Return (From row In RicChain Where row.chain = chainRic Select row.ric).ToList()
         End Function
 
-        Public Sub Clear() Implements IBondsLoader.Clear
+        Public Function GetFrnTable() As BondsDataSet.FrnDataTable Implements IBondsLoader.GetFrnTable
+            Return FrnTable
+        End Function
+
+        Public Function GetRicsTable() As BondsDataSet.RicsDataTable Implements IBondsLoader.GetRicsTable
+            Return RicsTable
+        End Function
+
+        Public Sub ClearTables() Implements IBondsLoader.ClearTables
             RicChain.Clear()
             CouponTable.Clear()
             FrnTable.Clear()

@@ -2,7 +2,6 @@
 Imports System.Xml
 Imports System.IO
 Imports System.ComponentModel
-Imports System.Runtime.CompilerServices
 Imports DbManager.Bonds
 Imports NLog
 Imports System.Collections.ObjectModel
@@ -483,7 +482,7 @@ End Class
 Public Class Chain
     Inherits Source
     Private _chainRic As String
-    Private ReadOnly _bondsManager As IBondsLoader = New BondsLoader '.Instance
+    Private ReadOnly _bondsManager As IBondsLoader = BondsLoader.Instance
 
     Public Overrides Function ToString() As String
         Return "Chain"
@@ -857,15 +856,6 @@ Public Class PortfolioItemDescription
         Me.Id = id
     End Sub
 End Class
-
-Public Module Extensions
-    <Extension()>
-    Public Sub Import(Of T)(ByVal this As HashSet(Of T), ByVal what As HashSet(Of T))
-        For Each elem In what
-            this.Add(elem)
-        Next
-    End Sub
-End Module
 
 Public Class PortfolioManager
     ' TODO multiple config files

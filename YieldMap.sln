@@ -15,6 +15,9 @@ EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Loggers", "Logging\Loggers.vbproj", "{B010EAB3-4503-4E36-B15D-36E3BF552DD3}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Uitls", "Uitls\Uitls.vbproj", "{E4CE19AC-D60C-49F4-8358-9DACC4B9B35D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B010EAB3-4503-4E36-B15D-36E3BF552DD3} = {B010EAB3-4503-4E36-B15D-36E3BF552DD3}
+	EndProjectSection
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ReutersData", "ReutersData\ReutersData.vbproj", "{703E1833-D8F6-4FB3-83BA-BF30B50AB7C3}"
 	ProjectSection(ProjectDependencies) = postProject

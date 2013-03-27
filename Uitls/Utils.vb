@@ -1,5 +1,7 @@
 ﻿Imports System.Reflection
 Imports System.IO
+Imports System.Runtime.CompilerServices
+Imports System.Windows.Forms
 
 Public Interface IProgressObject
     ReadOnly Property Name() As String
@@ -147,3 +149,23 @@ Public Class Utils
         Return res
     End Function
 End Class
+
+Public Module Extensions
+    <Extension()>
+    Public Sub Import(Of T)(ByVal this As HashSet(Of T), ByVal what As HashSet(Of T))
+        For Each elem In what
+            this.Add(elem)
+        Next
+    End Sub
+
+    <Extension()>
+    Public Sub GuiAsync(ByVal frm As Form, ByVal action As Action)
+        If action IsNot Nothing Then
+            If frm.InvokeRequired Then
+                frm.Invoke(action)
+            Else
+                action()
+            End If
+        End If
+    End Sub
+End Module

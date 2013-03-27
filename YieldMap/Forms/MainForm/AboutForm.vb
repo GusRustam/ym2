@@ -4,7 +4,7 @@ Imports YieldMap.Commons
 Namespace Forms.MainForm
     Public Class AboutForm
         Private Sub AboutFormLoad(sender As Object, e As EventArgs) Handles MyBase.Load
-            BuildVerLabel.Text = Assembly.GetAssembly(GetType(Common)).GetName().Version.ToString()
+            BuildVerLabel.Text = Assembly.GetAssembly(GetType(AboutForm)).GetName().Version.ToString()
             OsVerLabel.Text = Environment.OSVersion.VersionString
         End Sub
 

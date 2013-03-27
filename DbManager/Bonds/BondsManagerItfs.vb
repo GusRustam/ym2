@@ -46,6 +46,9 @@ Namespace Bonds
         Function GetIssuerRatingsTable() As BondsDataSet.IssuerRatingDataTable
         Function GetAllRicsTable() As BondsDataSet.RicsDataTable
         Function GetChainRics(ByVal chainRic As String) As List(Of String)
-        Sub Clear()
+        Function GetFrnTable() As BondsDataSet.FrnDataTable
+        Function GetRicsTable() As BondsDataSet.RicsDataTable
+
+        Sub ClearTables()
     End Interface
 End Namespace

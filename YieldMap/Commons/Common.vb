@@ -1,5 +1,4 @@
 ﻿Imports System.IO
-Imports System.Runtime.InteropServices
 Imports System.Drawing.Imaging
 Imports System.Runtime.CompilerServices
 Imports NLog
@@ -9,14 +8,6 @@ Imports Ionic.Zip
 Namespace Commons
     Module Common
         Private ReadOnly Logger As Logger = Logging.GetLogger(GetType(Common))
-
-        <DllImport("PLVbaApis.dll")>
-        Function CreateReutersObject(ByVal progId As String) As <MarshalAs(UnmanagedType.IUnknown)> Object
-        End Function
-
-        <DllImport("user32.dll")>
-        Public Function SetForegroundWindow(ByVal hWnd As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
-        End Function
 
         Public Sub RunCommand(ByVal command As String)
             Try
@@ -87,15 +78,15 @@ Namespace Commons
             End Try
         End Sub
 
-        <Extension()>
-        Public Sub GuiAsync(ByVal frm As Form, ByVal action As Action)
-            If action IsNot Nothing Then
-                If frm.InvokeRequired Then
-                    frm.Invoke(action)
-                Else
-                    action()
-                End If
-            End If
-        End Sub
+        '<Extension()>
+        'Public Sub GuiAsync(ByVal frm As Form, ByVal action As Action)
+        '    If action IsNot Nothing Then
+        '        If frm.InvokeRequired Then
+        '            frm.Invoke(action)
+        '        Else
+        '            action()
+        '        End If
+        '    End If
+        'End Sub
     End Module
 End Namespace

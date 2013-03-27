@@ -2,11 +2,13 @@
 Imports DbManager.Bonds
 Imports ReutersData
 Imports Settings
-Imports YieldMap.Commons
+Imports Uitls
 Imports YieldMap.My.Resources
 Imports YieldMap.Forms.ChartForm
 Imports NLog
 Imports Logging
+Imports YieldMap.Commons
+
 
 Namespace Forms.MainForm
     Public Class MainForm
@@ -114,6 +116,7 @@ Namespace Forms.MainForm
 
 #Region "II. Connecting to Eikon"
         Private WithEvents _connector As New EikonConnector(Eikon.Sdk)
+        Private Shared ReadOnly BondLdr As IBondsLoader = BondsLoader.Instance()
 
         Private Sub ConnectToEikon()
             _connector.ConnectToEikon()
@@ -131,19 +134,22 @@ Namespace Forms.MainForm
             StatusPicture.Image = Green
             StatusLabel.Text = Status_Connected
 
-            Dim loader As IBondsLoader = New BondsLoader '.Instance()
-            AddHandler loader.Progress, Sub(message As ProgressEvent)
-                                            InitEventLabel.Text = message.Msg
-                                            If message.Log.Success() Then
-                                                Initialized = True
-                                                InitEventLabel.Text = DatabaseUpdatedSuccessfully
-                                                _theSettings.LastDbUpdate = Today
-                                            ElseIf message.Log.Failed() Then
-                                                InitEventLabel.Text = FailedToUpdateDatabase
-                                            End If
-                                        End Sub
+            AddHandler BondLdr.Progress, AddressOf ProgressHandler
             If Not _theSettings.LastDbUpdate.HasValue OrElse _theSettings.LastDbUpdate < Today Then
-                loader.Initialize()
+                BondLdr.Initialize()
+            End If
+        End Sub
+
+        Sub ProgressHandler(ByVal message As ProgressEvent)
+            InitEventLabel.Text = message.Msg
+            If message.Log.Success() Then
+                Initialized = True
+                InitEventLabel.Text = DatabaseUpdatedSuccessfully
+                _theSettings.LastDbUpdate = Today
+                RemoveHandler BondLdr.Progress, AddressOf ProgressHandler
+            ElseIf message.Log.Failed() Then
+                InitEventLabel.Text = FailedToUpdateDatabase
+                RemoveHandler BondLdr.Progress, AddressOf ProgressHandler
             End If
         End Sub
 
