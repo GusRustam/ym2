@@ -88,6 +88,7 @@ Public Class Dex2
     Public Event Failure As Action(Of Exception)
 
     Public Sub Load(ByVal rics As List(Of String), ByVal what As Dex2Query)
+        Logger.Trace("Load({0})", rics.Count())
         Contract.Requires(rics.Count > 0 And what IsNot Nothing)
         _columns = what.ColumnList
         Try
@@ -111,21 +112,29 @@ Public Class Dex2
     End Sub
 
     Private Sub ImportData(ByVal datastatus As DEX2_DataStatus, ByVal [error] As Object)
+        Logger.Trace("ImportData({0})", datastatus)
         Try
-            Dim res As New LinkedList(Of Dictionary(Of String, Object))
-            Dim data = _rData.Data
-            For i = data.GetLowerBound(0) To data.GetUpperBound(0)
-                res.AddLast(New Dictionary(Of String, Object)())
+            If datastatus = DEX2_DataStatus.DE_DS_FULL Then
+                Dim res As New LinkedList(Of Dictionary(Of String, Object))
+                Dim data = _rData.Data
+                For i = data.GetLowerBound(0) To data.GetUpperBound(0)
+                    res.AddLast(New Dictionary(Of String, Object)())
 
-                For j = 0 To _columns.Count - 1
-                    Dim field = _columns(j)
-                    Dim elem = data.GetValue(i, j)
-                    res.Last.Value.Add(field, elem)
+                    For j = 0 To _columns.Count - 1
+                        Dim field = _columns(j)
+                        Dim elem = data.GetValue(i, j)
+                        res.Last.Value.Add(field, elem)
+                    Next
                 Next
-            Next
-            RemoveHandler _rData.OnUpdate, AddressOf ImportData
-            RaiseEvent Metadata(res)
+                RemoveHandler _rData.OnUpdate, AddressOf ImportData
+                RaiseEvent Metadata(res)
+            ElseIf datastatus <> DEX2_DataStatus.DE_DS_PARTIAL Then
+                Logger.Error("Error is {0}", [error].ToString())
+                RaiseEvent Failure(New Exception([error].ToString()))
+            End If
         Catch ex As Exception
+            Logger.ErrorException("Failed to import data", ex)
+            Logger.Error("Error is {0} and exception = {0}", [error].ToString(), ex.ToString())
             RaiseEvent Failure(ex)
         End Try
 

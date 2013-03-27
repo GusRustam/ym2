@@ -2,50 +2,30 @@
 Imports Logging
 Imports NLog
 Imports ReutersData
+Imports Uitls
 
 Namespace Bonds
-    Public Class NoBondException
-        Inherits Exception
-
-        Public Sub New()
-        End Sub
-
-        Public Sub New(ByVal message As String)
-            MyBase.New(message)
-        End Sub
-
-        Public Sub New(ByVal message As String, ByVal innerException As Exception)
-            MyBase.New(message, innerException)
-        End Sub
-    End Class
-
-    Public Interface IBondsData
-        Function GetBondInfo(ByVal ric As String) As BondDescription
-        Function GetBondPayments(ByVal ric As String) As BondPayments
-    End Interface
-
     Public Class BondsData
         Implements IBondsData
 
         'Private Shared ReadOnly Logger As Logger = GetLogger(GetType(BondsData))
-        Private Shared WithEvents _ldr As IBondsLoader = BondsLoader.Instance
+        Private WithEvents _ldr As IBondsLoader = New BondsLoader '.Instance
         Private Shared ReadOnly [Me] As New BondsData
 
         Private Shared _ricToSubRic As Dictionary(Of String, List(Of String))
         Private Shared _subRicToRic As Dictionary(Of String, String)
         Private Shared _initialized As Boolean
 
-        Private Shared Sub OnBondsLoaded() Handles _ldr.Success
-            Refresh()
+        Private Sub OnBondsLoaded(ByVal evt As ProgressEvent) Handles _ldr.Progress
+            If evt.Log.Success() Then
+                Refresh()
+            Else
+                Clear()
+            End If
         End Sub
 
-        Private Sub AssertBondExists(ByVal ric As String)
-            If Not _subRicToRic.ContainsKey(ric) Then Throw New NoBondException(ric)
-        End Sub
-
-        Private Shared Sub Refresh()
-            _ricToSubRic.Clear()
-            _subRicToRic.Clear()
+        Public Sub Refresh() Implements IBondsData.Refresh
+            Clear()
             For Each row In _ldr.GetAllRicsTable()
                 If _ricToSubRic.ContainsKey(row.ric) Then
                     _ricToSubRic(row.ric).Add(row.subRic)
@@ -55,6 +35,11 @@ Namespace Bonds
                 _subRicToRic.Add(row.subRic, row.ric)
             Next
             _initialized = True
+        End Sub
+
+        Private Shared Sub Clear()
+            _ricToSubRic.Clear()
+            _subRicToRic.Clear()
         End Sub
 
         Public Shared ReadOnly Property Instance As IBondsData
@@ -73,23 +58,31 @@ Namespace Bonds
             End If
         End Sub
 
+        Public Function BondExists(ByVal ric As String) As Boolean Implements IBondsData.BondExists
+            Return _subRicToRic.ContainsKey(ric)
+        End Function
+
         Public Function GetBondInfo(ByVal aRic As String) As BondDescription Implements IBondsData.GetBondInfo
-            AssertBondExists(aRic)
             Dim descr As BondsDataSet.BondRow = (From row In _ldr.GetBondsTable() Where row.ric = _subRicToRic(aRic) Select row).First()
 
-            Dim coupon As Double
-            If Not Double.TryParse(descr.currentCoupon, coupon) Then coupon = 0
-
+            Dim coupon = If(Not IsDBNull(descr("currentCoupon")) AndAlso IsNumeric(descr.currentCoupon), CDbl(descr.currentCoupon), 0)
+            Dim maturityDate As Date = If(Not IsDBNull(descr("maturityDate")) AndAlso IsDate(descr.maturityDate), CDate(descr.maturityDate), Date.MinValue)
+            Dim issueDate As Date = If(Not IsDBNull(descr("issueDate")) AndAlso IsDate(descr.issueDate), CDate(descr.issueDate), Date.MinValue)
             Dim series = If(Not IsDBNull(descr("series")), descr.series, "")
-            Dim shortName = descr.shortName & " " & series
-            Return New BondDescription(descr.ric, shortName, shortName, descr.maturityDate, descr.currentCoupon,
-                                       descr.bondStructure, descr.rateStructure, descr.issueDate, shortName,
-                                       descr.shortName & " " & If(coupon > 0, String.Format("{0}", coupon), "ZC"),
-                                       descr.description, series)
+            Dim rateStructure = If(Not IsDBNull(descr("rateStructure")), descr.rateStructure, "")
+            Dim ric = If(Not IsDBNull(descr("ric")), descr.ric, "")
+            Dim paymentStructure = If(Not IsDBNull(descr("bondStructure")), descr.bondStructure, "")
+            Dim shortName = If(Not IsDBNull(descr("shortName")), descr.shortName, "")
+            Dim description = If(Not IsDBNull(descr("description")), descr.description, "")
+            Dim sN = shortName & " " & series
+
+            Return New BondDescription(ric, sN, sN, maturityDate, coupon,
+                                       paymentStructure, rateStructure, issueDate, sN,
+                                       shortName & " " & If(coupon > 0, String.Format("{0}", coupon), "ZC"),
+                                       description, series)
         End Function
 
         Public Function GetBondPayments(ByVal aRic As String) As BondPayments Implements IBondsData.GetBondPayments
-            AssertBondExists(aRic)
             Dim descr = (From row In _ldr.GetBondsTable() Where row.ric = _subRicToRic(aRic) Select row).First()
             Dim rows = (From row In _ldr.GetCouponsTable()
                         Where row.ric = _subRicToRic(aRic)
@@ -102,61 +95,47 @@ Namespace Bonds
             Next
             Return res
         End Function
-
-        'Public Function IsStraight(ByVal aRic As String) As Boolean Implements IBondsData.IsStraight
-        '    Return (From row In Loader.GetBondsTable() Where row.ric = aRic Select row.isStraight).First()
-        'End Function
-
-        'Public Function IsConvertible(ByVal ric As String) As Boolean Implements IBondsData.IsConvertible
-        '    Throw New NotImplementedException()
-        'End Function
-
-        'Public Function IsFrn(ByVal ric As String) As Boolean Implements IBondsData.IsFrn
-        '    Throw New NotImplementedException()
-        'End Function
-
-        'Public Function IsPutable(ByVal ric As String) As Boolean Implements IBondsData.IsPutable
-        '    Throw New NotImplementedException()
-        'End Function
-
-        'Public Function IsCallable(ByVal ric As String) As Boolean Implements IBondsData.IsCallable
-        '    Throw New NotImplementedException()
-        'End Function
     End Class
 
-    Public Interface IBondsLoader
-        Event Progress As Action(Of String)
-        Event Success As Action
-        Event NoBonds As action
-        Event Failure As Action(Of Exception)
+    Public Class ChainProgress
+        Implements IProgressObject
 
-        ''' Loads all data from configuration file and stores them into IMDB
-        Sub Initialize()
+        Private ReadOnly _name As String
 
-        ''' Loads all data from given chain and stores them into IMDB
-        Sub LoadChain(ByVal chainRic As String)
+        Public Sub New(ByVal name As String)
+            _name = name
+        End Sub
 
-        ''' Loads all data from given chains and stores them into IMDB
-        Sub LoadChains(ByVal chainRics As List(Of String))
+        Public ReadOnly Property Name() As String Implements IProgressObject.Name
+            Get
+                Return _name
+            End Get
+        End Property
+    End Class
 
-        ''' Loads all data for given RIC and stores them into IMDB with given pseudo chain
-        Sub LoadRic(ByVal ric As String, ByVal pseudoChain As String)
+    Public Class TableProgress
+        Implements IProgressObject
 
-        Function GetBondsTable() As BondsDataSet.BondDataTable
-        Function GetCouponsTable() As BondsDataSet.CouponDataTable
-        Function GetFRNsTable() As BondsDataSet.FrnDataTable
-        Function GetIssueRatingsTable() As BondsDataSet.IssueRatingDataTable
-        Function GetIssuerRatingsTable() As BondsDataSet.IssuerRatingDataTable
-        Function GetAllRicsTable() As BondsDataSet.RicsDataTable
-        Function GetChainRics(ByVal chainRic As String) As List(Of String)
-        Sub Clear()
-    End Interface
+        Private ReadOnly _name As String
 
-    Public Class BondsLoader
-        Implements IBondsLoader
+        Public Sub New(ByVal name As String)
+            _name = name
+        End Sub
+
+        Public ReadOnly Property Name() As String Implements IProgressObject.Name
+            Get
+                Return _name
+            End Get
+        End Property
+    End Class
+ 
+    Public Class BondLoaderProgressProcess
+        Implements IProgressProcess
+
         Private WithEvents _chainLoader As New ReutersData.Chain
-
-        Private Shared ReadOnly Logger As Logger = GetLogger(GetType(BondsLoader))
+        Private ReadOnly _progress As New ProgressLog
+        Private ReadOnly _handlers As New List(Of Action(Of ProgressEvent))
+        Private Shared ReadOnly Logger As Logger = GetLogger(GetType(BondLoaderProgressProcess))
 
         Private Shared ReadOnly RicChain As New BondsDataSet.RicChainDataTable
         Private Shared ReadOnly CouponTable As New BondsDataSet.CouponDataTable
@@ -166,12 +145,23 @@ Namespace Bonds
         Private Shared ReadOnly IssuerRatingsTable As New BondsDataSet.IssuerRatingDataTable
         Private Shared ReadOnly RicsTable As New BondsDataSet.RicsDataTable
 
-        Private Shared _instance As BondsLoader
+        Public Custom Event Progress As Action(Of ProgressEvent) Implements IProgressProcess.Progress
+            AddHandler(ByVal value As Action(Of ProgressEvent))
+                _handlers.Add(value)
+            End AddHandler
 
-        Public Event Progress As Action(Of String) Implements IBondsLoader.Progress
-        Public Event Success As Action Implements IBondsLoader.Success
-        Public Event NoBonds As action Implements IBondsLoader.NoBonds
-        Public Event Failure As Action(Of Exception) Implements IBondsLoader.Failure
+            RemoveHandler(ByVal value As Action(Of ProgressEvent))
+                _handlers.Remove(value)
+            End RemoveHandler
+
+            RaiseEvent(ByVal obj As ProgressEvent)
+                _progress.LogEvent(obj)
+                obj.Log = _progress
+                For Each handler In _handlers
+                    handler(obj)
+                Next
+            End RaiseEvent
+        End Event
 
         Private Shared ReadOnly QueryBondDescr As New Dex2Query({
             New Dex2Field(0, BondsTable.ricColumn.ColumnName),
@@ -223,7 +213,7 @@ Namespace Bonds
             New Dex2Field(0, FrnTable.ricColumn.ColumnName),
             New Dex2Field("EJV.X.FRNFLOOR", FrnTable.floorColumn.ColumnName),
             New Dex2Field("EJV.X.FRNCAP", FrnTable.capColumn.ColumnName),
-            New Dex2Field("PAY_FREQ", FrnTable.frequencyColumn.ColumnName),
+            New Dex2Field("EJV.X.FREQ", FrnTable.frequencyColumn.ColumnName),
             New Dex2Field("EJV.C.IndexRic", FrnTable.indexRicColumn.ColumnName),
             New Dex2Field("EJV.X.ADF_MARGIN", FrnTable.marginColumn.ColumnName, itsNum:=True)
         }.ToList(), "RH:In")
@@ -233,159 +223,6 @@ Namespace Bonds
             New Dex2Field(1, RicsTable.contributorColumn.ColumnName),
             New Dex2Field("EJV.C.RICS", RicsTable.subRicColumn.ColumnName)
         }.ToList(), "RH:In;Con")
-        ''' <summary>
-        ''' Entry point. Loads all data from configuration file and stores them into IMDB
-        ''' </summary>
-        Public Sub UpdateAllChains() Implements IBondsLoader.Initialize
-            Dim chainRics = PortfolioManager.Instance().GetChainRics()
-            If chainRics.Count = 0 Then
-                RaiseEvent NoBonds()
-                Exit Sub
-            End If
-            _chainLoader.StartChains(chainRics, "UWC:YES LAY:VER")
-        End Sub
-
-        ''' <summary>
-        ''' Entry point. Loads all data from given chain and stores them into IMDB
-        ''' </summary>
-        Public Sub LoadChain(ByVal chainRic As String) Implements IBondsLoader.LoadChain
-            Contract.Requires(chainRic <> "")
-            LoadChains({chainRic}.ToList())
-        End Sub
-
-        ''' <summary>
-        ''' Entry point. Loads all data from given chains and stores them into IMDB
-        ''' </summary>
-        Public Sub LoadChains(ByVal chainRics As List(Of String)) Implements IBondsLoader.LoadChains
-            Contract.Requires(chainRics IsNot Nothing AndAlso chainRics.Count > 0)
-            _chainLoader.StartChains(chainRics, "UWC:YES LAY:VER")
-        End Sub
-
-        ''' <summary>
-        ''' Entry point. Loads all data for given RIC and stores them into IMDB
-        ''' </summary>
-        Public Sub LoadRic(ByVal ric As String, ByVal pseudoChain As String) Implements IBondsLoader.LoadRic
-            Contract.Requires(ric <> "" And pseudoChain <> "")
-            Dim rics = {ric}.ToList()
-            StoreRicsAndChains(pseudoChain, rics)
-            StartLoad(rics)
-        End Sub
-
-        Public Function GetBondsTable() As BondsDataSet.BondDataTable Implements IBondsLoader.GetBondsTable
-            Return BondsTable
-        End Function
-
-        Public Function GetCouponsTable() As BondsDataSet.CouponDataTable Implements IBondsLoader.GetCouponsTable
-            Return CouponTable
-        End Function
-
-        Public Function GetFRNsTable() As BondsDataSet.FrnDataTable Implements IBondsLoader.GetFRNsTable
-            Return FrnTable
-        End Function
-
-        Public Function GetIssueRatingsTable() As BondsDataSet.IssueRatingDataTable Implements IBondsLoader.GetIssueRatingsTable
-            Return IssueRatingsTable
-        End Function
-
-        Public Function GetAllRicsTable() As BondsDataSet.RicsDataTable Implements IBondsLoader.GetAllRicsTable
-            Return RicsTable
-        End Function
-
-        Public Function GetChainRics(ByVal chainRic As String) As List(Of String) Implements IBondsLoader.GetChainRics
-            Return (From row In RicChain Where row.chain = chainRic Select row.ric).ToList()
-        End Function
-
-        Public Sub Clear() Implements IBondsLoader.Clear
-            RicChain.Clear()
-            CouponTable.Clear()
-            FrnTable.Clear()
-            BondsTable.Clear()
-            IssueRatingsTable.Clear()
-            IssuerRatingsTable.Clear()
-            RicsTable.Clear()
-        End Sub
-
-        Public Function GetIsuuerRatingsTable() As BondsDataSet.IssuerRatingDataTable Implements IBondsLoader.GetIssuerRatingsTable
-            Return IssuerRatingsTable
-        End Function
-
-        Private Sub OnChainArrived(ByVal ric As String) Handles _chainLoader.Arrived
-            RaiseEvent Progress(ric)
-        End Sub
-
-        Private Sub OnChainData(ByVal chainsAndRics As Dictionary(Of String, List(Of String))) Handles _chainLoader.Chain
-            If chainsAndRics.Count = 0 Then
-                RaiseEvent NoBonds()
-                Exit Sub
-            End If
-
-            Dim chainRics = chainsAndRics.Keys.ToList()
-            chainRics.ForEach(Sub(chainRic) StoreRicsAndChains(chainRic, chainsAndRics(chainRic)))
-
-            Dim rics = GetRics(chainRics)
-            If rics.Count = 0 Then
-                RaiseEvent NoBonds()
-                Exit Sub
-            End If
-
-            StartLoad(rics)
-        End Sub
-
-        Private Shared Function GetRics(ByVal chain As String) As List(Of String)
-            Return (From row As BondsDataSet.RicChainRow In RicChain.Rows
-                Where row.chain = chain
-                Select row.ric Distinct).ToList()
-        End Function
-
-        Private Shared Function GetRics(ByVal chains As List(Of String)) As List(Of String)
-            Dim res As New List(Of String)
-            chains.ForEach(Sub(chain) res.AddRange(GetRics(chain)))
-            Return res.Distinct().ToList()
-        End Function
-
-        Private Shared Sub StoreRicsAndChains(ByVal chain As String, ByRef rics As List(Of String))
-            Try
-                rics.ForEach(
-                    Sub(ric)
-                        If Not RicChain.Any(Function(row As BondsDataSet.RicChainRow) row.ric = ric And row.chain = chain) Then
-                            RicChain.AddRicChainRow(ric, chain)
-                        End If
-                    End Sub)
-            Catch ex As Exception
-                Logger.ErrorException("Failed to store chain " & chain, ex)
-                Logger.Error("Exception = {0}", ex)
-            End Try
-        End Sub
-
-        Private Shared Sub ImportData(ByVal data As LinkedList(Of Dictionary(Of String, Object)), ByVal table As DataTable, ByVal query As Dex2Query)
-            If data Is Nothing Then
-                Logger.Info("Nothing to importing  into table {0}", table.TableName)
-            Else
-                Logger.Info("Importing {0} data rows into table {1}", data.Count, table.TableName)
-                Try
-                    For Each slot In data
-                        Dim rw = table.NewRow()
-                        For Each colName In slot.Keys
-                            Dim elem = slot(colName)
-                            If query.IsBool(colName) Then
-                                rw(colName) = (elem = "Y")
-                            ElseIf query.IsDate(colName) Then
-                                If IsDate(elem) Then rw(colName) = Date.Parse(elem)
-                            ElseIf query.IsNum(colName) Then
-                                If IsNumeric(elem) Then rw(colName) = Double.Parse(elem)
-                            Else
-                                rw(colName) = elem '.ToString()
-                            End If
-                        Next
-                        table.Rows.Add(rw)
-                    Next
-                Catch ex As Exception
-                    Logger.ErrorException("Failed to import data to table" + table.TableName, ex)
-                    Logger.Error("Exception = {0}", ex.ToString())
-                End Try
-            End If
-
-        End Sub
 
         Private Sub LoadGeneral(ByVal table As DataTable,
                                ByVal query As Dex2Query,
@@ -402,36 +239,22 @@ Namespace Bonds
             End If
 
             If allowedRics.Count > 0 Then
-                RaiseEvent Progress(msg)
-                Dim rowsToDelete = From row In table
+                RaiseEvent Progress(New ProgressEvent(MessageKind.Positive, msg, New TableProgress(table.TableName)))
+                Dim rowsToDelete = (From row In table
                                    Where allowedRics.Contains(row("ric").ToString())
-                                   Select row
+                                   Select row).ToList()
 
                 For Each row In rowsToDelete
                     table.Rows.Remove(row)
                 Next
 
                 Dim dex2 As New Dex2
-                AddHandler dex2.Failure, Sub() RaiseEvent Failure(New Exception("Dex2 error"))
+                AddHandler dex2.Failure, Sub(ex As Exception) RaiseEvent Progress(New ProgressEvent(MessageKind.Fail, "Failed to start Dex2", ex))
                 AddHandler dex2.Metadata, handler
                 dex2.Load(allowedRics.ToList(), query)
             Else
                 handler(Nothing)
             End If
-        End Sub
-
-        Private Sub StartLoad(ByVal requiredRics As List(Of String))
-            Logger.Info("LoadMetadata")
-            LoadGeneral(BondsTable, QueryBondDescr, "Loading bonds descriptions",
-                         Sub(data As LinkedList(Of Dictionary(Of String, Object)))
-                             If data IsNot Nothing Then
-                                 ImportData(data, BondsTable, QueryBondDescr)
-                                 LoadStep1(New HashSet(Of String)(requiredRics))
-                             Else
-                                 RaiseEvent NoBonds()
-                             End If
-                         End Sub,
-                         New HashSet(Of String)(requiredRics))
         End Sub
 
         Private Sub LoadStep1(ByVal rics As HashSet(Of String))
@@ -473,22 +296,212 @@ Namespace Bonds
         End Sub
 
         Private Sub LoadStep5()
-            Logger.Info("LoadFrns")
+            Logger.Info("LoadAllRics")
             LoadGeneral(RicsTable, QueryRics, "Loading all rics",
                          Sub(data As LinkedList(Of Dictionary(Of String, Object)))
                              ImportData(data, RicsTable, QueryRics)
-                             RaiseEvent Success()
+                             BondsData.Instance.Refresh()
+                             RaiseEvent Progress(New ProgressEvent(MessageKind.Finished, "All data loaded"))
                          End Sub)
         End Sub
 
-        Private Sub New()
+
+        Public Sub Start(ByVal ParamArray params()) Implements IProgressProcess.Start
+            Dim chainRics As List(Of String) = params(0)
+            Dim dexParams As String = params(1)
+            _chainLoader.StartChains(chainRics, dexParams)
         End Sub
 
-        Public Shared ReadOnly Property Instance As IBondsLoader
-            Get
-                If _instance Is Nothing Then _instance = New BondsLoader
-                Return _instance
-            End Get
-        End Property
+        Private Shared Function GetRics(ByVal chain As String) As List(Of String)
+            Return (From row As BondsDataSet.RicChainRow In RicChain.Rows
+                Where row.chain = chain
+                Select row.ric Distinct).ToList()
+        End Function
+
+        Private Shared Function GetRics(ByVal chains As List(Of String)) As List(Of String)
+            Dim res As New List(Of String)
+            chains.ForEach(Sub(chain) res.AddRange(GetRics(chain)))
+            Return res.Distinct().ToList()
+        End Function
+
+        Private Sub OnChainData(ByVal ricOfChain As String, ByVal chainsAndRics As Dictionary(Of String, List(Of String))) Handles _chainLoader.Chain
+            RaiseEvent Progress(New ProgressEvent(MessageKind.Positive, String.Format("Chain {0} arrived", ricOfChain), New ChainProgress(ricOfChain)))
+            If chainsAndRics.Count = 0 Then
+                Exit Sub
+            End If
+
+            Dim chainRics = chainsAndRics.Keys.ToList()
+            chainRics.ForEach(Sub(chainRic) StoreRicsAndChains(chainRic, chainsAndRics(chainRic)))
+
+            Dim rics = GetRics(chainRics)
+            If rics.Count = 0 Then
+                Exit Sub
+            End If
+
+            StartLoad(rics)
+        End Sub
+
+        Private Shared Sub ImportData(ByVal data As LinkedList(Of Dictionary(Of String, Object)), ByVal table As DataTable, ByVal query As Dex2Query)
+            If data Is Nothing Then
+                Logger.Info("Nothing to importing  into table {0}", table.TableName)
+            Else
+                Logger.Info("Importing {0} data rows into table {1}", data.Count, table.TableName)
+                Try
+                    For Each slot In data
+                        Dim rw = table.NewRow()
+                        For Each colName In slot.Keys
+                            Dim elem = slot(colName)
+                            If query.IsBool(colName) Then
+                                rw(colName) = (elem = "Y")
+                            ElseIf query.IsDate(colName) Then
+                                If IsDate(elem) Then rw(colName) = Date.Parse(elem)
+                            ElseIf query.IsNum(colName) Then
+                                If IsNumeric(elem) Then rw(colName) = Double.Parse(elem)
+                            Else
+                                rw(colName) = elem '.ToString()
+                            End If
+                        Next
+                        table.Rows.Add(rw)
+                    Next
+                Catch ex As Exception
+                    Logger.ErrorException("Failed to import data to table" + table.TableName, ex)
+                    Logger.Error("Exception = {0}", ex.ToString())
+                End Try
+            End If
+
+        End Sub
+
+        Private Sub StartLoad(ByVal requiredRics As List(Of String))
+            Logger.Info("LoadMetadata")
+            LoadGeneral(BondsTable, QueryBondDescr, "Loading bonds descriptions",
+                         Sub(data As LinkedList(Of Dictionary(Of String, Object)))
+                             If data IsNot Nothing Then
+                                 ImportData(data, BondsTable, QueryBondDescr)
+                                 LoadStep1(New HashSet(Of String)(requiredRics))
+                             Else
+                                 RaiseEvent Progress(New ProgressEvent(MessageKind.Fail, "No bond descriptions available"))
+                             End If
+                         End Sub,
+                         New HashSet(Of String)(requiredRics))
+        End Sub
+
+        Private Shared Sub StoreRicsAndChains(ByVal chain As String, ByRef rics As List(Of String))
+            Try
+                rics.ForEach(
+                    Sub(ric)
+                        If Not RicChain.Any(Function(row As BondsDataSet.RicChainRow) row.ric = ric And row.chain = chain) Then
+                            RicChain.AddRicChainRow(ric, chain)
+                        End If
+                    End Sub)
+            Catch ex As Exception
+                Logger.ErrorException("Failed to store chain " & chain, ex)
+                Logger.Error("Exception = {0}", ex)
+            End Try
+        End Sub
+
+        Private Sub _chainLoader_Failed(ByVal arg1 As String, ByVal arg2 As Exception) Handles _chainLoader.Failed
+            Logger.Trace("Chain failed")
+            RaiseEvent Progress(New ProgressEvent(MessageKind.Fail, String.Format("Failed to load chain {0}", arg1)))
+        End Sub
+    End Class
+
+    Public NotInheritable Class BondsLoader
+        Implements IBondsLoader
+
+        'Private Shared ReadOnly Logger As Logger = GetLogger(GetType(BondsLoader))
+
+        Private Shared ReadOnly RicChain As New BondsDataSet.RicChainDataTable
+        Private Shared ReadOnly CouponTable As New BondsDataSet.CouponDataTable
+        Private Shared ReadOnly FrnTable As New BondsDataSet.FrnDataTable
+        Private Shared ReadOnly BondsTable As New BondsDataSet.BondDataTable
+        Private Shared ReadOnly IssueRatingsTable As New BondsDataSet.IssueRatingDataTable
+        Private Shared ReadOnly IssuerRatingsTable As New BondsDataSet.IssuerRatingDataTable
+        Private Shared ReadOnly RicsTable As New BondsDataSet.RicsDataTable
+
+        Public Event Progress As Action(Of ProgressEvent) Implements IBondsLoader.Progress
+
+        ''' <summary>
+        ''' Entry point. Loads all data from configuration file and stores them into IMDB
+        ''' </summary>
+        Public Sub Initialize() Implements IBondsLoader.Initialize
+            Dim ppp As New BondLoaderProgressProcess
+            Dim chainRics = PortfolioManager.Instance().GetChainRics()
+            If chainRics.Count = 0 Then
+                Exit Sub
+            End If
+            AddHandler ppp.Progress, Sub(evt As ProgressEvent) RaiseEvent Progress(evt)
+            ppp.Start(chainRics, "UWC:YES LAY:VER")
+        End Sub
+
+
+        ''' <summary>
+        ''' Entry point. Loads all data from given chain and stores them into IMDB
+        ''' </summary>
+        Public Sub LoadChain(ByVal chainRic As String) Implements IBondsLoader.LoadChain
+            Contract.Requires(chainRic <> "")
+            LoadChains({chainRic}.ToList())
+        End Sub
+
+        ''' <summary>
+        ''' Entry point. Loads all data from given chains and stores them into IMDB
+        ''' </summary>
+        Public Sub LoadChains(ByVal chainRics As List(Of String)) Implements IBondsLoader.LoadChains
+            Contract.Requires(chainRics IsNot Nothing AndAlso chainRics.Count > 0)
+            Dim ppp As New BondLoaderProgressProcess
+            AddHandler ppp.Progress, Sub(evt As ProgressEvent) RaiseEvent Progress(evt)
+            ppp.Start(chainRics, "UWC:YES LAY:VER")
+        End Sub
+
+        ''' <summary>
+        ''' Entry point. Loads all data for given RIC and stores them into IMDB
+        ''' </summary>
+        Public Sub LoadRic(ByVal ric As String, ByVal pseudoChain As String) Implements IBondsLoader.LoadRic
+            Contract.Requires(ric <> "" And pseudoChain <> "")
+            Dim ppp As New BondLoaderProgressProcess
+            AddHandler ppp.Progress, Sub(evt) RaiseEvent Progress(evt)
+            ppp.Start({ric}.ToList(), "UWC:YES LAY:VER")
+        End Sub
+
+        Public Function GetRicChainTable() As BondsDataSet.RicChainDataTable Implements IBondsLoader.GetRicChainTable
+            Return RicChain
+        End Function
+
+        Public Function GetBondsTable() As BondsDataSet.BondDataTable Implements IBondsLoader.GetBondsTable
+            Return BondsTable
+        End Function
+
+        Public Function GetCouponsTable() As BondsDataSet.CouponDataTable Implements IBondsLoader.GetCouponsTable
+            Return CouponTable
+        End Function
+
+        Public Function GetFRNsTable() As BondsDataSet.FrnDataTable Implements IBondsLoader.GetFRNsTable
+            Return FrnTable
+        End Function
+
+        Public Function GetIssueRatingsTable() As BondsDataSet.IssueRatingDataTable Implements IBondsLoader.GetIssueRatingsTable
+            Return IssueRatingsTable
+        End Function
+
+        Public Function GetAllRicsTable() As BondsDataSet.RicsDataTable Implements IBondsLoader.GetAllRicsTable
+            Return RicsTable
+        End Function
+
+        Public Function GetChainRics(ByVal chainRic As String) As List(Of String) Implements IBondsLoader.GetChainRics
+            Return (From row In RicChain Where row.chain = chainRic Select row.ric).ToList()
+        End Function
+
+        Public Sub Clear() Implements IBondsLoader.Clear
+            RicChain.Clear()
+            CouponTable.Clear()
+            FrnTable.Clear()
+            BondsTable.Clear()
+            IssueRatingsTable.Clear()
+            IssuerRatingsTable.Clear()
+            RicsTable.Clear()
+        End Sub
+
+        Public Function GetIsuuerRatingsTable() As BondsDataSet.IssuerRatingDataTable Implements IBondsLoader.GetIssuerRatingsTable
+            Return IssuerRatingsTable
+        End Function
     End Class
 End Namespace

@@ -1,6 +1,94 @@
 ﻿Imports System.Reflection
 Imports System.IO
 
+Public Interface IProgressObject
+    ReadOnly Property Name() As String
+End Interface
+
+Public Enum MessageKind
+    Positive
+    Neutral
+    Negative
+    Fail
+    Finished
+End Enum
+
+Public Class ProgressEvent
+    Private ReadOnly _kind As MessageKind
+    Private ReadOnly _msg As String
+    Private ReadOnly _item As IProgressObject
+    Private ReadOnly _exc As Exception
+    Private _log As ProgressLog
+
+    Public Sub New(ByVal kind As MessageKind, ByVal msg As String, Optional ByVal item As IProgressObject = Nothing, Optional ByVal exc As Exception = Nothing)
+        _kind = kind
+        _msg = msg
+        _exc = exc
+        _log = Log
+        _item = item
+    End Sub
+
+    Public ReadOnly Property Item() As IProgressObject
+        Get
+            Return _item
+        End Get
+    End Property
+
+    Public ReadOnly Property Kind() As MessageKind
+        Get
+            Return _kind
+        End Get
+    End Property
+
+    Public ReadOnly Property Msg() As String
+        Get
+            Return _msg
+        End Get
+    End Property
+
+    Public ReadOnly Property Exc() As Exception
+        Get
+            Return _exc
+        End Get
+    End Property
+
+    Public Property Log As ProgressLog
+        Get
+            Return _log
+        End Get
+        Set(ByVal value As ProgressLog)
+            _log = value
+        End Set
+    End Property
+End Class
+
+Public NotInheritable Class ProgressLog
+    Private ReadOnly _entries As New List(Of ProgressEvent)
+
+    Public ReadOnly Property Entries() As List(Of ProgressEvent)
+        Get
+            Return _entries
+        End Get
+    End Property
+
+    Public Sub LogEvent(ByVal evt As ProgressEvent)
+        _entries.Add(evt)
+    End Sub
+
+    Public Function Success() As Boolean
+        Return Not _entries.Any(Function(item) item.Kind = MessageKind.Fail) AndAlso _entries.Any(Function(item) item.Kind = MessageKind.Finished)
+    End Function
+
+    Public Function Failed() As Boolean
+        Return _entries.Any(Function(item) item.Kind = MessageKind.Fail)
+    End Function
+End Class
+
+Public Interface IProgressProcess
+    Event Progress As Action(Of ProgressEvent)
+    Sub Start(ByVal ParamArray params())
+End Interface
+
 Public Class IdName(Of T)
     Public Property Id As T
     Public Property Name As String

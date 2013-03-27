@@ -63,11 +63,8 @@ Namespace Forms.MainForm
         End Sub
 
 
-        Private Shared Sub DatabaseButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles DatabaseButton.Click
+        Private Shared Sub DatabaseButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles DatabaseButton.Click, DatabaseManagerTSMI.Click
             PortfolioForm.PortfolioForm.Show()
-            'Logger.Info("DatabaseButtonClick()")
-            'Dim managerForm = New DataBaseManagerForm
-            'managerForm.ShowDialog()
         End Sub
 
         Private Sub YieldMapButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles YieldMapButton.Click
@@ -134,21 +131,17 @@ Namespace Forms.MainForm
             StatusPicture.Image = Green
             StatusLabel.Text = Status_Connected
 
-            Dim loader = BondsLoader.Instance()
-            AddHandler loader.Success, Sub()
-                                           Initialized = True
-                                           InitEventLabel.Text = DatabaseUpdatedSuccessfully
-                                           _theSettings.LastDbUpdate = Today
-                                       End Sub
-            AddHandler loader.Failure, Sub(ex As Exception)
-                                           Initialized = False
-                                           InitEventLabel.Text = FailedToUpdateDatabase
-                                           If MsgBox("Failed to initialize database. Would you like to report an error to the developer?", vbYesNo, "Database error") = vbYes Then
-                                               SendErrorReport("Yield Map Database Error", "Exception: " + ex.ToString() + Environment.NewLine + Environment.NewLine + GetEnvironment())
-                                           End If
-                                       End Sub
-
-            AddHandler loader.Progress, Sub(message) GuiAsync(Sub() InitEventLabel.Text = message)
+            Dim loader As IBondsLoader = New BondsLoader '.Instance()
+            AddHandler loader.Progress, Sub(message As ProgressEvent)
+                                            InitEventLabel.Text = message.Msg
+                                            If message.Log.Success() Then
+                                                Initialized = True
+                                                InitEventLabel.Text = DatabaseUpdatedSuccessfully
+                                                _theSettings.LastDbUpdate = Today
+                                            ElseIf message.Log.Failed() Then
+                                                InitEventLabel.Text = FailedToUpdateDatabase
+                                            End If
+                                        End Sub
             If Not _theSettings.LastDbUpdate.HasValue OrElse _theSettings.LastDbUpdate < Today Then
                 loader.Initialize()
             End If
@@ -189,12 +182,7 @@ Namespace Forms.MainForm
             af.ShowDialog()
         End Sub
 
-        Private Shared Sub DatabaseManagerTSMIClick(sender As Object, e As EventArgs) Handles DatabaseManagerTSMI.Click
-            'Dim managerForm = New DataBaseManagerForm
-            'managerForm.ShowDialog()
-        End Sub
-
-        Private Sub ExitTSMIClick(sender As Object, e As EventArgs) Handles ExitTSMI.Click
+        Private Sub ExitTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles ExitTSMI.Click
             Close()
         End Sub
 
@@ -221,7 +209,7 @@ Namespace Forms.MainForm
             LayoutMdi(MdiLayout.Cascade)
         End Sub
 
-        Private Sub SettingsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SettingsToolStripMenuItem.Click
+        Private Shared Sub SettingsToolStripMenuItem_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SettingsToolStripMenuItem.Click
             Dim sf As New SettingsForm
             sf.ShowDialog()
         End Sub

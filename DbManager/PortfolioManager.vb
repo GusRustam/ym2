@@ -81,14 +81,16 @@ Public Class Fields
     End Property
 
     Private Sub Update()
-        Dim list = (From fld In Me.GetType().GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
-                           Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False)
-                           Where attx.Any
-                           Let confName = CType(attx(0), ConfingNameAttribute).XmlName, value = fld.GetValue(Me).ToString()
-                           Where value <> ""
-                           Select confName, value).ToDictionary(Function(item) item.confName, Function(item) item.value)
+        Dim fieldInfos = Me.GetType().GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
+        Dim list = (From fld In fieldInfos
+                    Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False)
+                    Where attx.Any
+                    Let val1 = fld.GetValue(Me)
+                    Where val1 IsNot Nothing
+                    Let confName = CType(attx(0), ConfingNameAttribute).XmlName, value = val1.ToString().Trim()
+                    Where value <> ""
+                    Select confName = confName, value = value).ToDictionary(Function(item) item.confName, Function(item) item.value)
         PortfolioManager.Instance().UpdateFieldSet(_id, _name, list)
-
     End Sub
 
     <DisplayName("Trade date")>
@@ -471,14 +473,17 @@ Public MustInherit Class Source
     Protected MustOverride Function GenerateId() As String
 
     Public Function GetDefaultRicsView() As List(Of BondDescription)
-        Return (From ric In GetDefaultRics() Select BondsData.Instance.GetBondInfo(ric)).ToList()
+        Dim bondsData As IBondsData = Bonds.BondsData.Instance
+        Return (From ric In GetDefaultRics()
+                Where bondsData.BondExists(ric)
+                Select bondsData.GetBondInfo(ric)).ToList()
     End Function
 End Class
 
 Public Class Chain
     Inherits Source
     Private _chainRic As String
-    Private ReadOnly _bondsManager As IBondsLoader = BondsLoader.Instance
+    Private ReadOnly _bondsManager As IBondsLoader = New BondsLoader '.Instance
 
     Public Overrides Function ToString() As String
         Return "Chain"

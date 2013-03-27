@@ -1,4 +1,5 @@
-﻿Imports DbManager
+﻿Imports YieldMap.Commons
+Imports DbManager
 Imports DbManager.Bonds
 Imports System.Runtime.InteropServices
 Imports NLog
@@ -9,10 +10,10 @@ Namespace Forms.PortfolioForm
     Public Class PortfolioForm
         Private Shared ReadOnly PortfolioManager As IPortfolioManager = DbManager.PortfolioManager.Instance()
         Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(PortfolioForm))
-        Private Shared ReadOnly BondsLoader As IBondsLoader = Bonds.BondsLoader.Instance
+        Private WithEvents _loader As IBondsLoader = New BondsLoader '.Instance
 
         Private Sub PortfolioForm_Load(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Load
-            BondsTableView.DataSource = BondsLoader.GetBondsTable()
+            BondsTableView.DataSource = _loader.GetBondsTable()
             If PortfolioTree.ImageList Is Nothing Then
                 PortfolioTree.ImageList = New ImageList
                 PortfolioTree.ImageList.Images.Add("folder", My.Resources.folder)
@@ -22,7 +23,6 @@ Namespace Forms.PortfolioForm
             RefreshChainsLists()
             RefreshFieldsList()
         End Sub
-
 
         Private Shared Sub ColorCellFormatting(ByVal sender As Object, ByVal e As DataGridViewCellFormattingEventArgs) Handles PortfolioChainsListsGrid.CellFormatting, PortfolioItemsGrid.CellFormatting, ChainsListsGrid.CellFormatting
             Dim dgv = TryCast(sender, DataGridView)
@@ -40,6 +40,7 @@ Namespace Forms.PortfolioForm
         Private _dragNode As TreeNode
         Private _currentItem As PortfolioItemDescription
         Private _flag As Boolean
+        'Private Shared ReadOnly ErrorMessages As New List(Of String)
 
         Private Property CurrentItem As PortfolioItemDescription
             Get
@@ -305,12 +306,12 @@ Namespace Forms.PortfolioForm
         Private Sub RefreshDataGrid()
             If TableChooserList.SelectedIndex >= 0 Then
                 Select Case TableChooserList.Items(TableChooserList.SelectedIndex).ToString()
-                    Case "Bonds" : BondsTableView.DataSource = BondsLoader.GetBondsTable()
-                    Case "Coupons" : BondsTableView.DataSource = BondsLoader.GetCouponsTable()
-                    Case "FRNs" : BondsTableView.DataSource = BondsLoader.GetFRNsTable()
-                    Case "Issue ratings" : BondsTableView.DataSource = BondsLoader.GetIssueRatingsTable()
-                    Case "Issuer ratings" : BondsTableView.DataSource = BondsLoader.GetIssuerRatingsTable()
-                    Case "Rics" : BondsTableView.DataSource = BondsLoader.GetAllRicsTable()
+                    Case "Bonds" : BondsTableView.DataSource = _loader.GetBondsTable()
+                    Case "Coupons" : BondsTableView.DataSource = _loader.GetCouponsTable()
+                    Case "FRNs" : BondsTableView.DataSource = _loader.GetFRNsTable()
+                    Case "Issue ratings" : BondsTableView.DataSource = _loader.GetIssueRatingsTable()
+                    Case "Issuer ratings" : BondsTableView.DataSource = _loader.GetIssuerRatingsTable()
+                    Case "Rics" : BondsTableView.DataSource = _loader.GetAllRicsTable()
                     Case Else
                         BondsTableView.DataSource = Nothing
                 End Select
@@ -318,13 +319,13 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub CleanupDataButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles CleanupDataButton.Click
-            BondsLoader.Clear()
+            _loader.Clear()
             RefreshDataGrid()
         End Sub
 
         Private Sub ReloadDataButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles ReloadDataButton.Click
-            BondsLoader.Clear()
-            BondsLoader.Initialize()
+            _loader.Clear()
+            _loader.Initialize()
             RefreshDataGrid()
         End Sub
 #End Region
@@ -356,29 +357,17 @@ Namespace Forms.PortfolioForm
             End If
         End Sub
 
-        Private Sub ChainsListsGrid_CellClick(ByVal sender As Object, ByVal e As DataGridViewCellEventArgs) Handles ChainsListsGrid.CellClick
-
-        End Sub
-
-        Private Sub AddCLButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AddCLButton.Click
-            AddChainList()
-        End Sub
-
-        Private Sub AddChainList()
+        Private Sub AddCLButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AddCLButton.Click, AddCLTSMI.Click
             Dim frm As New AddEditChainList
             If frm.ShowDialog() = DialogResult.OK Then RefreshChainsLists(frm.SaveSource())
         End Sub
 
-        Private Sub EditCLButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles EditCLButton.Click
+        Private Sub EditCLButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles EditCLButton.Click, EditCLTSMI.Click
             If ChainsListsGrid.SelectedRows.Count <> 1 Then
                 MessageBox.Show("Please select chain or list to edit", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Return
             End If
             Dim selectedItem = CType(ChainsListsGrid.SelectedRows.Item(0).DataBoundItem, Source)
-            EditChainList(selectedItem)
-        End Sub
-
-        Private Sub EditChainList(ByVal selectedItem As Source)
             Dim frm As New AddEditChainList
             frm.Src = selectedItem
             If frm.ShowDialog() = DialogResult.OK Then
@@ -387,16 +376,12 @@ Namespace Forms.PortfolioForm
             End If
         End Sub
 
-        Private Sub DeleteCLButton_Click(ByVal sender As System.Object, ByVal e As EventArgs) Handles DeleteCLButton.Click
+        Private Sub DeleteCLButton_Click(ByVal sender As System.Object, ByVal e As EventArgs) Handles DeleteCLButton.Click, DeleteCLTSMI.Click
             If ChainsListsGrid.SelectedRows.Count <> 1 Then
                 MessageBox.Show("Please select chain or list to delete", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Return
             End If
             Dim selectedItem = CType(ChainsListsGrid.SelectedRows.Item(0).DataBoundItem, Source)
-            DeleteChainList(selectedItem)
-        End Sub
-
-        Private Sub DeleteChainList(ByVal selectedItem As Source)
             Dim list = PortfolioManager.GetPortfoliosBySource(selectedItem)
             If Not list.Any OrElse (
                    MessageBox.Show(
@@ -423,18 +408,35 @@ Namespace Forms.PortfolioForm
             End If
         End Sub
 
-        Private Sub AddCLTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AddCLTSMI.Click
-            AddChainList()
+        Private Sub ReloadChainButtin_Click(ByVal sender As Object, ByVal e As EventArgs) Handles ReloadChainButton.Click, ReloadCLTSMI.Click
+            If ChainsListsGrid.SelectedRows.Count <> 1 Then
+                MessageBox.Show("Please select chain or list to delete", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Return
+            End If
+            Dim selectedItem = CType(ChainsListsGrid.SelectedRows.Item(0).DataBoundItem, Source)
+            If Not TypeOf selectedItem Is Chain Then Return
+
+            _loader.LoadChain(CType(selectedItem, Chain).ChainRic)
         End Sub
 
-        Private Sub EditCLTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles EditCLTSMI.Click
-            Dim item = CType(ChainsListsGrid.SelectedRows.Item(0).DataBoundItem, Source)
-            EditChainList(item)
-        End Sub
+        'Private Shared Sub BondsLoader_Failure(ByVal ric As String, ByVal ex As Exception) Handles _loader.FailureChain
+        '    ErrorMessages.Add(String.Format("Failed to retrieve chain {0};{1}Error is {2}", ric, Environment.NewLine, ex.ToString()))
+        'End Sub
 
-        Private Sub DeleteCLTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles DeleteCLTSMI.Click
-            Dim item = CType(ChainsListsGrid.SelectedRows.Item(0).DataBoundItem, Source)
-            DeleteChainList(item)
+        'Private Shared Sub BondsLoader_FailureAll(ByVal rics As List(Of String), ByVal ex As Exception) Handles _loader.FailureRics
+        '    ErrorMessages.Add(String.Format("Failed to retrieve data for {0} ric;{1}Error is {2}", rics.Count, Environment.NewLine, ex.ToString()))
+        'End Sub
+
+
+        Private Sub BondsLoaderFinished(ByVal evt As ProgressEvent) Handles _loader.Progress
+            Logger.Info("Got message {0}", evt.Msg)
+            If evt.Log.Success() Then
+
+                GuiAsync(AddressOf RefreshChainsLists)
+            ElseIf evt.Log.Failed() Then
+                MessageBox.Show(evt.Log.Entries.Select(Function(item) item.Msg).Aggregate(Function(str, item) str + Environment.NewLine + item),
+                                "Errors occured", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End If
         End Sub
 #End Region
 
@@ -484,6 +486,7 @@ Namespace Forms.PortfolioForm
         End Sub
 
 #End Region
+
 
     End Class
 End Namespace

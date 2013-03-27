@@ -82,14 +82,13 @@
       <chain-ric>0#RUXZ=R</chain-ric>
       <!-- todo -->
     </curve>
+    <curve name="My CCS">
+    </curve>
   </curves>
 
   <!-- todo -->
   <synthetic-bonds>
-    <bond id="1" name="QuQu" color="Magenta" shape="hexagram">
-      <currency></currency>
-      <parameters></parameters>
-    </bond>
+    <bond id="1" name="QuQu" rateStructure="" bondStructure=""/>
   </synthetic-bonds>
   
   <!-- TODO Synthetics curves (?????) --> 
