@@ -158,10 +158,22 @@
     <Compile Include="Forms\PortfolioForm\AddEditChainList.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\PortfolioForm\AddPortfolioSource.Designer.vb">
+      <DependentUpon>AddPortfolioSource.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\PortfolioForm\AddPortfolioSource.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\PortfolioForm\AddPortfolioForm.Designer.vb">
       <DependentUpon>AddPortfolioForm.vb</DependentUpon>
     </Compile>
     <Compile Include="Forms\PortfolioForm\AddPortfolioForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\PortfolioForm\EditPortfolioSource.Designer.vb">
+      <DependentUpon>EditPortfolioSource.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\PortfolioForm\EditPortfolioSource.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\PortfolioForm\PortfolioForm.Designer.vb">
@@ -252,8 +264,14 @@
     <EmbeddedResource Include="Forms\PortfolioForm\AddEditChainList.resx">
       <DependentUpon>AddEditChainList.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\PortfolioForm\AddPortfolioSource.resx">
+      <DependentUpon>AddPortfolioSource.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\PortfolioForm\AddPortfolioForm.resx">
       <DependentUpon>AddPortfolioForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\PortfolioForm\EditPortfolioSource.resx">
+      <DependentUpon>EditPortfolioSource.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\PortfolioForm\PortfolioForm.resx">
       <DependentUpon>PortfolioForm.vb</DependentUpon>

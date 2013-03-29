@@ -37,15 +37,15 @@ Namespace Forms.PortfolioForm
 
 #Region "Portfolio TAB"
         Private _dragNode As TreeNode
-        Private _currentItem As PortfolioItemDescription
+        Private _currentItem As Portfolio
         Private _flag As Boolean
         'Private Shared ReadOnly ErrorMessages As New List(Of String)
 
-        Private Property CurrentItem As PortfolioItemDescription
+        Private Property CurrentItem As Portfolio
             Get
                 Return _currentItem
             End Get
-            Set(ByVal value As PortfolioItemDescription)
+            Set(ByVal value As Portfolio)
                 _currentItem = value
                 RefreshPortfolioData()
             End Set
@@ -81,7 +81,7 @@ Namespace Forms.PortfolioForm
             Dim selectedNodeId As String
             If selId = -1 Then
                 If PortfolioTree.SelectedNode IsNot Nothing Then
-                    Dim descr = CType(PortfolioTree.SelectedNode.Tag, PortfolioItemDescription)
+                    Dim descr = CType(PortfolioTree.SelectedNode.Tag, Portfolio)
                     selectedNodeId = descr.Id
                 End If
             Else
@@ -147,11 +147,11 @@ Namespace Forms.PortfolioForm
             Dim adder = New AddPortfolioForm
             adder.EditMode = True
             adder.NewName.Text = node.Text
-            adder.ItIsPortfolio = Not CType(node.Tag, PortfolioItemDescription).IsFolder
+            adder.ItIsPortfolio = Not CType(node.Tag, Portfolio).IsFolder
 
             If adder.ShowDialog() = DialogResult.OK Then
-                Dim portDescr As PortfolioItemDescription
-                portDescr = CType(node.Tag, PortfolioItemDescription)
+                Dim portDescr As Portfolio
+                portDescr = CType(node.Tag, Portfolio)
                 If portDescr Is Nothing Then
                     MessageBox.Show("Failed to update name", "Name edit", MessageBoxButtons.OK, MessageBoxIcon.Error)
                 Else
@@ -170,8 +170,12 @@ Namespace Forms.PortfolioForm
                 PortTreeCM.Tag = e.Node
                 PortTreeCM.Show(PortfolioTree, e.Location)
             Else
-                Dim temp = TryCast(e.Node.Tag, PortfolioItemDescription)
+                Dim temp = TryCast(e.Node.Tag, Portfolio)
                 CurrentItem = If(temp IsNot Nothing AndAlso Not temp.IsFolder, temp, Nothing)
+                Dim portSelected  = CurrentItem IsNot Nothing AndAlso Not CurrentItem.IsFolder
+                AddChainListButton.Enabled = portSelected
+                RemoveChainListButton.Enabled = portSelected
+                EditChainListButton.Enabled = portSelected
             End If
             _flag = False
         End Sub
@@ -199,7 +203,7 @@ Namespace Forms.PortfolioForm
 
             If node IsNot Nothing Then
                 PortfolioTree.SelectedNode = node
-                Dim descr = TryCast(node.Tag, PortfolioItemDescription)
+                Dim descr = TryCast(node.Tag, Portfolio)
                 If descr Is Nothing Then Return
                 theId = descr.Id
             End If
@@ -219,7 +223,7 @@ Namespace Forms.PortfolioForm
             Dim node = TryCast(PortTreeCM.Tag, TreeNode)
             If node Is Nothing Then Return
 
-            Dim descr = TryCast(node.Tag, PortfolioItemDescription)
+            Dim descr = TryCast(node.Tag, Portfolio)
             If descr Is Nothing Then Return
             If MessageBox.Show("Are you sure you would like to delete an item permanently?", "Delete...", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
                 If descr.IsFolder Then
@@ -248,7 +252,7 @@ Namespace Forms.PortfolioForm
                 e.Effect = If(copy, DragDropEffects.Copy, DragDropEffects.Move)
             Else
                 node.Expand()
-                Dim descr = TryCast(node.Tag, PortfolioItemDescription)
+                Dim descr = TryCast(node.Tag, Portfolio)
                 If IsChildOf(_dragNode, node) OrElse (descr IsNot Nothing AndAlso Not descr.IsFolder) Then
                     e.Effect = DragDropEffects.None
                 Else
@@ -271,7 +275,7 @@ Namespace Forms.PortfolioForm
         End Function
 
         Private Sub PortfolioTree_DragDrop(ByVal sender As Object, ByVal e As DragEventArgs) Handles PortfolioTree.DragDrop
-            Dim dragDescr = TryCast(_dragNode.Tag, PortfolioItemDescription)
+            Dim dragDescr = TryCast(_dragNode.Tag, Portfolio)
             If dragDescr Is Nothing Then Return
             Dim copy = GetKeyState(Keys.ControlKey) < 0
 
@@ -285,7 +289,7 @@ Namespace Forms.PortfolioForm
                     resId = PortfolioManager.MoveItemToTop(dragDescr.Id)
                 End If
             Else
-                Dim descr = TryCast(node.Tag, PortfolioItemDescription)
+                Dim descr = TryCast(node.Tag, Portfolio)
                 If descr Is Nothing OrElse Not descr.IsFolder Then Return
                 If copy Then
                     resId = PortfolioManager.CopyItemToFolder(dragDescr.Id, descr.Id)
@@ -294,6 +298,48 @@ Namespace Forms.PortfolioForm
                 End If
             End If
             RefreshPortfolioTree(resId)
+        End Sub
+
+        Private Sub AddChainListButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AddChainListButton.Click
+            Dim a As New AddPortfolioSource
+            If a.ShowDialog() = DialogResult.OK Then
+
+            End If
+        End Sub
+
+        Private Sub RemoveChainListButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles RemoveChainListButton.Click
+            If PortfolioChainsListsGrid.SelectedRows.Count <= 0 Then
+                MessageBox.Show("Please select an item to delete", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Exit Sub
+            End If
+
+            Dim item = CType(PortfolioChainsListsGrid.SelectedRows(0).DataBoundItem, PortfolioSource)
+            If item Is Nothing Then Exit Sub
+            Try
+                item.Portfolio.DeleteSource(item)
+                RefreshPortfolioData()
+            Catch ex As Exception
+                Logger.ErrorException("Failed to delete selected source", ex)
+                Logger.Error("Exception = {0}", ex.ToString())
+                MessageBox.Show("Failed to delete selected source", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End Try
+        End Sub
+
+        Private Sub EditChainListButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles EditChainListButton.Click
+            If PortfolioChainsListsGrid.SelectedRows.Count <= 0 Then
+                MessageBox.Show("Please select an item to edit", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Exit Sub
+            End If
+            Dim item = CType(PortfolioChainsListsGrid.SelectedRows(0).DataBoundItem, PortfolioSource)
+            If item Is Nothing Then Exit Sub
+            Dim a As New EditPortfolioSource(item.Source)
+            a.CustomName = item.Name
+            a.CustomColor = item.Color
+            a.Condition = item.Condition
+
+            If a.ShowDialog() = DialogResult.OK Then
+
+            End If
         End Sub
 #End Region
 
@@ -375,7 +421,7 @@ Namespace Forms.PortfolioForm
             End If
         End Sub
 
-        Private Sub DeleteCLButton_Click(ByVal sender As System.Object, ByVal e As EventArgs) Handles DeleteCLButton.Click, DeleteCLTSMI.Click
+        Private Sub DeleteCLButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles DeleteCLButton.Click, DeleteCLTSMI.Click
             If ChainsListsGrid.SelectedRows.Count <> 1 Then
                 MessageBox.Show("Please select chain or list to delete", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Return
@@ -476,7 +522,5 @@ Namespace Forms.PortfolioForm
         End Sub
 
 #End Region
-
-
     End Class
 End Namespace

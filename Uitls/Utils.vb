@@ -2,6 +2,8 @@
 Imports System.IO
 Imports System.Runtime.CompilerServices
 Imports System.Windows.Forms
+Imports System.Drawing
+Imports System.Xml
 
 Public Interface IProgressObject
     ReadOnly Property Name() As String
@@ -91,27 +93,53 @@ Public Interface IProgressProcess
     Sub Start(ByVal ParamArray params())
 End Interface
 
-Public Class IdName(Of T)
-    Public Property Id As T
-    Public Property Name As String
-    Public Shared Widening Operator CType(ByVal value As IdName(Of T)) As T
+Public Class IdValue(Of TIdType, TValueType)
+    Public Property Id As TIdType
+    Public Property Value As TValueType
+    Public Shared Widening Operator CType(ByVal value As IdValue(Of TIdType, TValueType)) As TIdType
         Return value.Id
     End Operator
 
     Public Sub New()
     End Sub
 
-    Public Sub New(ByVal id As T, ByVal name As String)
+    Public Sub New(ByVal id As TIdType, ByVal name As TValueType)
         Me.Id = id
-        Me.Name = name
+        Me.Value = name
     End Sub
 
     Public Overrides Function ToString() As String
-        Return Name
+        Return Value.ToString()
     End Function
 End Class
 
+Public Class IdName(Of TIdType)
+    Inherits IdValue(Of TIdType, String)
+
+    Public Sub New()
+    End Sub
+
+    Public Sub New(ByVal id As TIdType, ByVal name As String)
+        MyBase.New(id, name)
+    End Sub
+End Class
+
 Public Class Utils
+    Public Shared Function GetColorList(Optional ByVal threshold As Double = 0.7) As List(Of String)
+        Dim colorsArr = [Enum].GetValues(GetType(KnownColor))
+        Dim colors = New List(Of String)()
+        Array.ForEach(Of KnownColor)(colorsArr, Sub(color) colors.Add(color.ToString()))
+        Dim props = GetType(SystemColors).GetProperties(BindingFlags.Static Or BindingFlags.Public)
+        Array.ForEach(props, Sub(prop) colors.Remove(prop.Name))
+
+        Return (From aColor In colors
+            Let c = Color.FromName(aColor),
+                cmps = {c.R, c.G, c.B}.ToList(),
+                lightness = 0.5 * (CDbl(cmps.Min()) + CDbl(cmps.Max())) / 255
+            Where lightness < threshold
+            Select aColor).ToList
+    End Function
+
     Public Shared Function GetMyPath() As String
         Dim installPath = Path.GetDirectoryName(Assembly.GetAssembly(GetType(Utils)).CodeBase)
         Return installPath.Substring(6)
@@ -168,4 +196,34 @@ Public Module Extensions
             End If
         End If
     End Sub
+
+    <Extension()>
+    Public Sub InsertForm(ByVal ctl As Control, ByVal frm As Form)
+        frm.TopLevel = False
+        frm.FormBorderStyle = FormBorderStyle.None
+        frm.Dock = DockStyle.Fill
+        frm.Visible = True
+        ctl.Controls.Add(frm)
+    End Sub
+
+
+    <Extension()>
+    Public Function GetAttr(ByVal node As XmlNode, ByVal name As String, Optional ByVal defaultValue As String = "") As String
+        Dim attribute As XmlAttribute = node.Attributes(name)
+        If attribute IsNot Nothing Then
+            Return attribute.Value
+        Else
+            Return defaultValue
+        End If
+    End Function
+
+    <Extension()>
+    Public Function GetAttrStrict(ByVal node As XmlNode, ByVal name As String) As String
+        Dim attribute As XmlAttribute = node.Attributes(name)
+        If attribute IsNot Nothing Then
+            Return attribute.Value
+        Else
+            Throw New Exception(String.Format("Failed to find attribute {0} in node {1}", name, node.Name))
+        End If
+    End Function
 End Module

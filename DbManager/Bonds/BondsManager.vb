@@ -63,7 +63,9 @@ Namespace Bonds
         End Function
 
         Public Function GetBondInfo(ByVal aRic As String) As BondDescription Implements IBondsData.GetBondInfo
-            Dim descr As BondsDataSet.BondRow = (From row In _ldr.GetBondsTable() Where row.ric = _subRicToRic(aRic) Select row).First()
+            Dim items = (From row In _ldr.GetBondsTable() Where row.ric = _subRicToRic(aRic) Select row).ToList()
+            If Not items.Any Then Throw New NoBondException(aRic)
+            Dim descr As BondsDataSet.BondRow = items.First()
 
             Dim coupon = If(Not IsDBNull(descr("currentCoupon")) AndAlso IsNumeric(descr.currentCoupon), CDbl(descr.currentCoupon), 0)
             Dim maturityDate As Date = If(Not IsDBNull(descr("maturityDate")) AndAlso IsDate(descr.maturityDate), CDate(descr.maturityDate), Date.MinValue)

@@ -347,7 +347,6 @@ Public MustInherit Class Source
     Private _fieldSetId As String
     Private _fields As FieldSet
 
-
     Protected Friend ReadOnly PortMan As PortfolioManager = PortfolioManager.ClassInstance
 
     Protected Overloads Function Equals(ByVal other As Source) As Boolean
@@ -443,7 +442,7 @@ Public MustInherit Class Source
     End Property
 
     <DisplayName("Is curve")>
-    Public Property Curve As Boolean
+    Public Overridable Property Curve As Boolean
         Get
             Return _curve
         End Get
@@ -468,6 +467,7 @@ Public MustInherit Class Source
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public MustOverride Function GetDefaultRics() As List(Of String)
+    Public MustOverride Function GetXmlTypeName() As String
 
     Protected MustOverride Function GenerateId() As String
 
@@ -513,8 +513,29 @@ Public Class Chain
         Return _bondsManager.GetChainRics(_chainRic)
     End Function
 
+    Public Overrides Function GetXmlTypeName() As String
+        Return "chain"
+    End Function
+
     Protected Overrides Function GenerateId() As String
         Return PortMan.GenerateNewChainId()
+    End Function
+
+    Public Shared Function Load(ByVal id As String) As Chain
+        Dim xml = PortfolioManager.ClassInstance.GetConfigDocument()
+        Dim node = xml.SelectSingleNode(String.Format("/bonds/chains//chain[@id='{0}']", id))
+        If node Is Nothing Then Throw New NoSourceException(String.Format("Failed to find chain with id {0}", id))
+        Try
+            Dim color = node.GetAttrStrict("color")
+            Dim name = node.GetAttrStrict("name")
+            Dim enabled = node.GetAttr("enabled", "True")
+            Dim curve = node.GetAttr("curve", "False")
+            Dim chainRic = node.GetAttrStrict("ric")
+            Dim fields = New FieldSet(node.GetAttrStrict("field-set-id"))
+            Return New Chain(id, color, fields, enabled, curve, chainRic, name)
+        Catch ex As Exception
+            Throw New NoSourceException(String.Format("Failed to find chain with id {0}", id), ex)
+        End Try
     End Function
 End Class
 
@@ -549,8 +570,89 @@ Public Class UserList
         Return _bondRics
     End Function
 
+    Public Overrides Function GetXmlTypeName() As String
+        Return "list"
+    End Function
+
     Protected Overrides Function GenerateId() As String
         Return PortMan.GenerateNewListId()
+    End Function
+
+    Public Shared Function Load(ByVal listId As String) As UserList
+        Dim node = PortfolioManager.ClassInstance.GetConfigDocument().SelectSingleNode(String.Format("/bonds/lists/list[@id='{0}']", listId))
+        If node Is Nothing Then Throw New NoSourceException(String.Format("Failed to find list with id {0}", listId))
+        Try
+            Dim color = node.GetAttrStrict("color")
+            Dim name = node.GetAttrStrict("name")
+            Dim enabled = node.GetAttr("enabled", "True")
+            Dim curve = node.GetAttr("curve", "False")
+            Dim rics = ExtractRics(node)
+            Dim fields = New FieldSet(node.GetAttrStrict("field-set-id"))
+            Return New UserList(listId, color, fields, enabled, curve, rics, name)
+        Catch ex As Exception
+            Throw New NoSourceException(String.Format("Failed to find list with id {0}", listId), ex)
+        End Try
+    End Function
+End Class
+
+Public Class RegularBond
+    Inherits Source
+
+    Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As FieldSet, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
+        MyBase.New(id, color, fields, enabled, curve, name)
+    End Sub
+
+    Public Sub New(ByVal color As String, ByVal fldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
+        MyBase.New(color, fldSetId, enabled, curve, name)
+    End Sub
+
+    Public Overrides Function GetDefaultRics() As List(Of String)
+        Throw New NotImplementedException()
+    End Function
+
+    Public Overrides Function GetXmlTypeName() As String
+        Throw New NotImplementedException()
+    End Function
+
+    Protected Overrides Function GenerateId() As String
+        Throw New NotImplementedException()
+    End Function
+End Class
+
+Public Class CustomBond
+    Inherits Source
+
+    Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As FieldSet, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
+        MyBase.New(id, color, fields, enabled, curve, name)
+    End Sub
+
+    Public Sub New(ByVal color As String, ByVal fldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
+        MyBase.New(color, fldSetId, enabled, curve, name)
+    End Sub
+
+    Public Overrides Function GetXmlTypeName() As String
+        Return "custom-bond"
+    End Function
+
+    Protected Overrides Function GenerateId() As String
+        Return PortMan.GenerateNewCustomBondId()
+    End Function
+
+    Public Overrides Function GetDefaultRics() As List(Of String)
+        Return {Name}.ToList()
+    End Function
+
+    <DisplayName("Is curve")>
+    Public Overrides Property Curve() As Boolean
+        Get
+            Return False
+        End Get
+        Set(ByVal value As Boolean)
+        End Set
+    End Property
+
+    Public Overrides Function ToString() As String
+        Return "Custom Bond"
     End Function
 End Class
 
@@ -611,55 +713,41 @@ Public Class RicDescription
 End Class
 
 Public Class PortfolioSource
-    Private ReadOnly _order As Integer         ' Order of given source in given portfolio
+    Private ReadOnly _id As String
+    Private ReadOnly _portfolio As Portfolio
     Private ReadOnly _source As Source
     Private ReadOnly _condition As String
     Private ReadOnly _customName As String
     Private ReadOnly _customColor As String
     Private ReadOnly _included As Boolean
 
-    Protected Overloads Function Equals(ByVal other As PortfolioSource) As Boolean
-        Return Equals(_source, other._source)
-    End Function
-
-    Public Overloads Overrides Function Equals(ByVal obj As Object) As Boolean
-        If ReferenceEquals(Nothing, obj) Then Return False
-        If ReferenceEquals(Me, obj) Then Return True
-        If obj.GetType IsNot Me.GetType Then Return False
-        Return Equals(DirectCast(obj, PortfolioSource))
-    End Function
-
-    Public Overrides Function GetHashCode() As Integer
-        If _source Is Nothing Then Return 0
-        Return _source.GetHashCode
-    End Function
-
-    Public Shared Operator =(ByVal left As PortfolioSource, ByVal right As PortfolioSource) As Boolean
-        Return Equals(left, right)
-    End Operator
-
-    Public Shared Operator <>(ByVal left As PortfolioSource, ByVal right As PortfolioSource) As Boolean
-        Return Not Equals(left, right)
-    End Operator
-
-    Public Sub New(ByVal order As Integer, ByVal source As Source, ByVal condition As String, ByVal customName As String, ByVal customColor As String, ByVal included As Boolean)
-        _order = order
+    Friend Sub New(ByVal id As String, ByVal source As Source, ByVal condition As String, ByVal customName As String, ByVal customColor As String, ByVal included As Boolean, ByVal portfolio As Portfolio)
+        _id = id
         _source = source
         _condition = condition
         _customName = customName
         _customColor = customColor
         _included = included
+        _portfolio = portfolio
     End Sub
 
-    Public ReadOnly Property Order As Integer
+    <Browsable(False)>
+    Public ReadOnly Property Id As String
         Get
-            Return _order
+            Return _id
         End Get
     End Property
 
     Public ReadOnly Property Source As Source
         Get
             Return _source
+        End Get
+    End Property
+
+    <Browsable(False)>
+    Public ReadOnly Property Portfolio() As Portfolio
+        Get
+            Return _portfolio
         End Get
     End Property
 
@@ -729,7 +817,6 @@ Public Class PortfolioStructure
             If what And Chain Then
                 data.AddRange(From src In _sources Where TypeOf src.Source Is Chain)
             End If
-            data.Sort(Function(item1, item2) item1.Order.CompareTo(item1.Order))
             Return New ReadOnlyCollection(Of PortfolioSource)(data)
         End Get
     End Property
@@ -791,7 +878,7 @@ Public Class PortfolioStructure
             _excludes.Add(ric)
         Next
 
-        For Each src In (From srcs In _sources Where srcs.Included)
+        For Each src In (From srcs In _sources Where srcs.Included) ' Order By srcs
             Dim lst = New List(Of String)(src.Source.GetDefaultRics())
             lst.RemoveAll(Function(item) _excludes.Contains(item))
             _rics.Add(src, lst)
@@ -803,16 +890,17 @@ End Class
 
 Public Interface IPortfolioManager
     '' Returns flat structure of portfolios: only id-name pairs, disregarding any folder structure
-    Function GetPortfoliosFlat() As List(Of Tuple(Of Integer, String))
+    Function GetAllPortfolios() As List(Of IdName(Of String))
+    Function GetAllSources() As List(Of Source)
 
-    Function GetPortfoliosByFolder(ByVal id As String) As List(Of PortfolioItemDescription)
+    Function GetPortfoliosByFolder(ByVal id As String) As List(Of Portfolio)
 
     '' Returns RICs of all chains given in XML
     Function GetChainRics() As List(Of String)
 
     '' Returns portfolio as a set of sources, each having different settings
     Function GetPortfolioStructure(ByVal currentPortID As Long) As PortfolioStructure
-    Function GetFolderDescr(ByVal id As String) As PortfolioItemDescription
+    Function GetFolderDescr(ByVal id As String) As Portfolio
 
     Sub SetFolderName(ByVal id As String, ByVal name As String)
     Sub SetPortfolioName(ByVal id As String, ByVal name As String)
@@ -845,15 +933,58 @@ Friend Interface IPortfolioManagerLocal
     Function GetConfigDocument() As XmlDocument
 End Interface
 
-Public Class PortfolioItemDescription
+Public Class Portfolio
     Public IsFolder As Boolean
     Public Name As String
     Public Id As String
+
+    Private Shared ReadOnly PortMan As PortfolioManager = PortfolioManager.ClassInstance
 
     Public Sub New(ByVal isFolder As Boolean, ByVal name As String, ByVal id As String)
         Me.IsFolder = isFolder
         Me.Name = name
         Me.Id = id
+    End Sub
+
+    Public Sub DeleteSource(ByVal src As PortfolioSource)
+        If IsFolder Then Throw New PortfolioException(String.Format("Item with id {0} is a folder", Id))
+        Dim xml = PortMan.GetConfigDocument()
+        Dim papa = xml.SelectSingleNode(String.Format("/bonds/portfolios//portfolio[@id='{0}']", Id))
+        If papa Is Nothing Then Throw New PortfolioException(String.Format("Can not find portfolio with id {0}", Id))
+        Dim node = papa.SelectSingleNode(String.Format("include[@what='{0}' and @id='{1}'] | exclude[@what='{0}' and @id='{1}']", src.Source.GetXmlTypeName(), src.Source.ID))
+        If node Is Nothing Then Throw New PortfolioException(String.Format("Can not find source with id {0} and type [{2}] in portfolio with id {1} ", src.Source.ID, Id, src.Source.GetXmlTypeName()))
+        papa.RemoveChild(node)
+        PortMan.SaveBonds()
+    End Sub
+End Class
+
+Public Class PortfolioException
+    Inherits Exception
+
+    Public Sub New()
+    End Sub
+
+    Public Sub New(ByVal message As String)
+        MyBase.New(message)
+    End Sub
+
+    Public Sub New(ByVal message As String, ByVal innerException As Exception)
+        MyBase.New(message, innerException)
+    End Sub
+End Class
+
+Public Class NoSourceException
+    Inherits PortfolioException
+
+    Public Sub New()
+    End Sub
+
+    Public Sub New(ByVal message As String)
+        MyBase.New(message)
+    End Sub
+
+    Public Sub New(ByVal message As String, ByVal innerException As Exception)
+        MyBase.New(message, innerException)
     End Sub
 End Class
 
@@ -872,6 +1003,7 @@ Public Class PortfolioManager
 
     Private ReadOnly _chainIds As New HashSet(Of Long)
     Private ReadOnly _listIds As New HashSet(Of Long)
+    Private ReadOnly _customBondsIds As New HashSet(Of Long)
 
     Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(PortfolioManager))
 
@@ -879,10 +1011,23 @@ Public Class PortfolioManager
     Private Shared ReadOnly Rnd As Random = New Random(DateTime.Now.Millisecond)
 
     Private Sub New()
+        LoadBonds()
+    End Sub
+
+    Private Sub LoadBonds()
         _bonds.Load(_configXml)
         _ids.Import(LoadIds(_bonds.SelectNodes("/bonds/portfolios//@id")))
         _chainIds.Import(LoadIds(_bonds.SelectNodes("/chains/chain/@id")))
         _listIds.Import(LoadIds(_bonds.SelectNodes("/lists/list/@id")))
+        _customBondsIds.Import(LoadIds(_bonds.SelectNodes("/custom-bonds/bond/@id")))
+    End Sub
+
+    Public Sub SaveBonds()
+        _ids.Clear()
+        _tmpIds.Clear()
+
+        _bonds.Save(_configXml)
+        LoadBonds()
     End Sub
 
     Private Function LoadIds(ByVal nodes As XmlNodeList) As HashSet(Of Long)
@@ -902,8 +1047,9 @@ Public Class PortfolioManager
         Return res
     End Function
 
-    Public Function GetPortfoliosByFolder(ByVal id As String) As List(Of PortfolioItemDescription) Implements IPortfolioManager.GetPortfoliosByFolder
-        Dim res As New List(Of PortfolioItemDescription)
+
+    Public Function GetPortfoliosByFolder(ByVal id As String) As List(Of Portfolio) Implements IPortfolioManager.GetPortfoliosByFolder
+        Dim res As New List(Of Portfolio)
         Dim xPathFolder As String
         Dim xPathPort As String
 
@@ -921,14 +1067,14 @@ Public Class PortfolioManager
         For i = 0 To iter.Count - 1
             Dim attributes = iter(i).Attributes
             If attributes.ItemOf("id") IsNot Nothing AndAlso attributes.ItemOf("name") IsNot Nothing Then
-                res.Add(New PortfolioItemDescription(True, attributes("name").Value, attributes("id").Value))
+                res.Add(New Portfolio(True, attributes("name").Value, attributes("id").Value))
             End If
         Next
         iter = _bonds.SelectNodes(xPathPort)
         For i = 0 To iter.Count - 1
             Dim attributes = iter(i).Attributes
             If attributes.ItemOf("id") IsNot Nothing AndAlso attributes.ItemOf("name") IsNot Nothing Then
-                res.Add(New PortfolioItemDescription(False, attributes("name").Value, attributes("id").Value))
+                res.Add(New Portfolio(False, attributes("name").Value, attributes("id").Value))
             End If
         Next
         Return res
@@ -956,21 +1102,21 @@ Public Class PortfolioManager
             For Each item As XmlNode In nodes
                 Try
                     source = Nothing
-
+                    Dim srcId As String
                     Dim isIncluded = (item.Name = "include")
                     Dim what = item.Attributes("what").Value
-                    Dim condition = GetAttr(item, "condition")
-                    Dim customName = GetAttr(item, "name")
-                    Dim customColor = GetAttr(item, "color")
-                    Dim order = GetAttr(item, "order", "1") ' todo order field. Requires special treatment on saving
+                    Dim condition = item.GetAttr("condition")
+                    Dim customName = item.GetAttr("name")
+                    Dim customColor = item.GetAttr("color")
+                    'Dim order = GetAttr(item, "order", "1") ' todo order field. Requires special treatment on saving
 
                     Select Case what
                         Case "chain"
-                            Dim chainId = item.Attributes("id").Value
-                            source = GetChainDescr(chainId)
+                            srcId = item.Attributes("id").Value
+                            source = Chain.Load(srcId)
                         Case "list"
-                            Dim listId = item.Attributes("id").Value
-                            source = GetListDescr(listId)
+                            srcId = item.Attributes("id").Value
+                            source = UserList.Load(srcId)
                         Case Else
                             Logger.Warn("Unsupported item {0}", what)
                     End Select
@@ -978,7 +1124,8 @@ Public Class PortfolioManager
                     If source IsNot Nothing Then
                         If customColor = "" Then customColor = source.Color
                         If customName = "" Then customName = source.Name
-                        Dim portSource As New PortfolioSource(order, source, condition, customName, customColor, isIncluded)
+                        'order,
+                        Dim portSource As New PortfolioSource(srcId, source, condition, customName, customColor, isIncluded, GetPortfolio(id))
                         res.AddSource(portSource)
                     Else
                         Logger.Info("Failed to read description for item [{0}]", what)
@@ -995,58 +1142,9 @@ Public Class PortfolioManager
         End Try
     End Function
 
-    Private Shared Function GetAttr(ByVal node As XmlNode, ByVal name As String, Optional ByVal defaultValue As String = "") As String
-        Dim attribute As XmlAttribute = node.Attributes(name)
-        If attribute IsNot Nothing Then
-            Return attribute.Value
-        Else
-            Return defaultValue
-        End If
-    End Function
-
-    Private Shared Function GetAttrStrict(ByVal node As XmlNode, ByVal name As String) As String
-        Dim attribute As XmlAttribute = node.Attributes(name)
-        If attribute IsNot Nothing Then
-            Return attribute.Value
-        Else
-            Throw New Exception(String.Format("Failed to find attribute {0} in node {1}", name, node.Name))
-        End If
-    End Function
-
-    Private Function GetChainDescr(ByVal chainId As String) As Chain
-        Dim node = _bonds.SelectSingleNode(String.Format("/bonds/chains/chain[@id='{0}']", chainId))
-        If node Is Nothing Then Return Nothing
-        Try
-            Dim color = GetAttrStrict(node, "color")
-            Dim name = GetAttrStrict(node, "name")
-            Dim enabled = GetAttr(node, "enabled", "True")
-            Dim curve = GetAttr(node, "curve", "False")
-            Dim chainRic = GetAttrStrict(node, "ric")
-            Dim fields = New FieldSet(GetAttrStrict(node, "field-set-id"))
-            Return New Chain(chainId, color, fields, enabled, curve, chainRic, name)
-        Catch ex As Exception
-            Logger.WarnException("Failed to get chain description", ex)
-            Logger.Warn("Exception = {0}", ex.ToString())
-            Return Nothing
-        End Try
-    End Function
-
-    Private Function GetListDescr(ByVal listId As String) As UserList
-        Dim node = _bonds.SelectSingleNode(String.Format("/bonds/lists/list[@id='{0}']", listId))
-        If node Is Nothing Then Return Nothing
-        Try
-            Dim color = GetAttrStrict(node, "color")
-            Dim name = GetAttrStrict(node, "name")
-            Dim enabled = GetAttr(node, "enabled", "True")
-            Dim curve = GetAttr(node, "curve", "False")
-            Dim rics = UserList.ExtractRics(node)
-            Dim fields = New FieldSet(GetAttrStrict(node, "field-set-id"))
-            Return New UserList(listId, color, fields, enabled, curve, rics, name)
-        Catch ex As Exception
-            Logger.WarnException("Failed to get list description", ex)
-            Logger.Warn("Exception = ", ex.ToString())
-            Return Nothing
-        End Try
+    Private Function GetPortfolio(ByVal id As Long) As Portfolio
+        Dim node = _bonds.SelectSingleNode(String.Format("/bonds/portfolios//portfolio[@id='{0}']", id))
+        Return New Portfolio(False, node.GetAttrStrict("name"), id)
     End Function
 
     Public Sub SetFolderName(ByVal id As String, ByVal name As String) Implements IPortfolioManager.SetFolderName
@@ -1088,7 +1186,7 @@ Public Class PortfolioManager
         Return newId
     End Function
 
-    Private Function GenerateNewId(ByVal keys As HashSet(Of Long)) As Long
+    Private Shared Function GenerateNewId(ByVal keys As HashSet(Of Long)) As Long
         Dim elem As Long
         Do
             elem = CLng(Rnd.NextDouble() * 100000)
@@ -1189,14 +1287,14 @@ Public Class PortfolioManager
     Public ReadOnly Property ChainsView() As List(Of Chain) Implements IPortfolioManager.ChainsView
         Get
             Dim chainIds = _bonds.SelectNodes("/bonds/chains/chain/@id")
-            Return (From id As XmlNode In chainIds Select GetChainDescr(id.Value)).ToList()
+            Return (From id As XmlNode In chainIds Select Chain.Load(id.Value)).ToList()
         End Get
     End Property
 
     Public ReadOnly Property UserListsView() As List(Of UserList) Implements IPortfolioManager.UserListsView
         Get
             Dim chainIds = _bonds.SelectNodes("/bonds/lists/list/@id")
-            Return (From id As XmlNode In chainIds Select GetListDescr(id.Value)).ToList()
+            Return (From id As XmlNode In chainIds Select UserList.Load(id.Value)).ToList()
         End Get
     End Property
 
@@ -1245,6 +1343,10 @@ Public Class PortfolioManager
 
     Friend Function GenerateNewListId() As String Implements IPortfolioManagerLocal.GenerateNewListId
         Return GenerateNewId(_listIds)
+    End Function
+
+    Public Function GenerateNewCustomBondId() As String
+        Return GenerateNewId(_customBondsIds)
     End Function
 
     Public Sub AddSource(ByVal src As Source) Implements IPortfolioManager.AddSource
@@ -1374,31 +1476,26 @@ Public Class PortfolioManager
         node.Attributes.Append(attr)
     End Sub
 
-    Private Sub SaveBonds()
-        _ids.Clear()
-        _tmpIds.Clear()
 
-        _bonds.Save(_configXml)
-
-        Dim idNodes = _bonds.SelectNodes("/bonds/portfolios//portfolio/@id | /bonds/portfolios//folder/@id")
-        For Each node As XmlNode In idNodes
-            _ids.Add(CLng(node.Value))
-        Next
-    End Sub
-
-    Public Function GetFolderDescr(ByVal id As String) As PortfolioItemDescription Implements IPortfolioManager.GetFolderDescr
+    Public Function GetFolderDescr(ByVal id As String) As Portfolio Implements IPortfolioManager.GetFolderDescr
         Dim node = _bonds.SelectSingleNode(String.Format("/bonds/portfolios//folder[@id='{0}']", id))
         If node Is Nothing Then Return Nothing
         Dim attributes = node.Attributes
-        Return New PortfolioItemDescription(True, attributes("name").Value, attributes("id").Value)
+        Return New Portfolio(True, attributes("name").Value, attributes("id").Value)
     End Function
 
-    Public Function Portfolios() As List(Of Tuple(Of Integer, String)) Implements IPortfolioManager.GetPortfoliosFlat
-        Dim res As New List(Of Tuple(Of Integer, String))
+    Public Function GetAllPortfolios() As List(Of IdName(Of String)) Implements IPortfolioManager.GetAllPortfolios
+        Dim res As New List(Of IdName(Of String))
         Dim iter = _bonds.SelectNodes("/bonds/portfolios//portfolio")
         For i = 0 To iter.Count - 1
-            res.Add(Tuple.Create(CInt(iter(i).SelectSingleNode("@id").Value), iter(i).SelectSingleNode("@name").Value))
+            res.Add(New IdName(Of String)(iter(i).SelectSingleNode("@id").Value, iter(i).SelectSingleNode("@name").Value))
         Next
+        Return res
+    End Function
+
+    Public Function GetAllSources() As List(Of Source) Implements IPortfolioManager.GetAllSources
+        Dim res = (From node As XmlNode In _bonds.SelectNodes("/bonds/chains//chain") Select Chain.Load(node.SelectSingleNode("@id").Value)).Cast(Of Source).ToList()
+        res.AddRange((From node As XmlNode In _bonds.SelectNodes("/bonds/lists//list") Select UserList.Load(node.SelectSingleNode("@id").Value)).Cast(Of Source))
         Return res
     End Function
 

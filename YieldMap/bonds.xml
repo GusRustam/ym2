@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <bonds>
+  <!-- todo Rating sources mapping -->
   <!-- Field sets -->
   <field-sets>
     <field-set id="MICEX" name="Micex bonds description">
@@ -60,14 +61,14 @@
       <folder id="1" name="Specific"/>
       <folder id="2" name="Russians">
         <portfolio id="3" name="Mos">
-          <include what="chain" id="2" name="Moskau"/>
+          <include what="chain" id="2" name="Moskau" color="Blue"/>
         </portfolio>      
       </folder>
       <portfolio id="4" name="Main">
         <include what="chain" id="1" name="All OFZs" condition="${isStraight} And ${currentCoupon}>10"/>
         <exclude what="list" id="1"/>
         <!-- todo -->
-        <include what="synthetic-bond" id="1"/>
+        <include what="custom-bond" id="1"/>
         <exclude what="ric" name="XXXXX"/>
       </portfolio>
       <portfolio id="11" name="Regional w/o Moscow">
@@ -87,9 +88,9 @@
   </curves>
 
   <!-- todo -->
-  <synthetic-bonds>
+  <custom-bonds>
     <bond id="1" name="QuQu" rateStructure="" bondStructure=""/>
-  </synthetic-bonds>
+  </custom-bonds>
   
   <!-- TODO Synthetics curves (?????) --> 
 </bonds>

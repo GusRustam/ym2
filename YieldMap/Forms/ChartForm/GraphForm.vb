@@ -503,15 +503,15 @@ Namespace Forms.ChartForm
             ' list of portfolios to show
             '(From rw In (New portfolioTableAdapter).GetData() Select New IdName() With {.Id = rw("id"), .Name = rw("portfolio_name")}).ToList()
             Dim portDescrList As List(Of IdName(Of Integer)) =
-                (From rw In PortfolioManager.Instance.GetPortfoliosFlat()
-                 Select New IdName(Of Integer)() With {.Id = rw.Item1, .Name = rw.Item2}).ToList()
+                (From rw In PortfolioManager.Instance.GetAllPortfolios()
+                 Select New IdName(Of Integer)() With {.Id = rw.Id, .Value = rw.Value}).ToList()
 
             PortfolioTSSB.DropDownItems.Clear()
 
             If portDescrList.Any Then
                 portDescrList.ForEach(
                     Sub(idname)
-                        Dim item = PortfolioTSSB.DropDownItems.Add(idname.Name, Nothing, AddressOf PortfolioSelectTSCBSelectedIndexChanged)
+                        Dim item = PortfolioTSSB.DropDownItems.Add(idname.Value, Nothing, AddressOf PortfolioSelectTSCBSelectedIndexChanged)
                         item.Tag = idname.Id
                     End Sub)
             End If

@@ -1,5 +1,4 @@
 ﻿Imports DbManager
-Imports System.Reflection
 Imports Uitls
 
 Namespace Forms.PortfolioForm
@@ -28,7 +27,6 @@ Namespace Forms.PortfolioForm
                     End With
                     Return _src
                 Else
-
                     If ListRadioButton.Checked Then
                         Return New UserList(color, fieldSetId, enbld, curve, nme)
                     Else
@@ -36,7 +34,6 @@ Namespace Forms.PortfolioForm
                     End If
                 End If
             End Get
-
             Set(ByVal value As Source)
                 _src = value
 
@@ -93,18 +90,7 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub AddEditChainList_Load(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Load
-            Dim colorsArr = [Enum].GetValues(GetType(KnownColor))
-            Dim colors = New List(Of String)
-            Array.ForEach(Of KnownColor)(colorsArr, Sub(color) colors.Add(color.ToString()))
-            Dim props = GetType(SystemColors).GetProperties(BindingFlags.Static Or BindingFlags.Public)
-            Array.ForEach(props, Sub(prop) colors.Remove(prop.Name))
-
-            For Each clr In (From aColor In colors
-                             Let c = Color.FromName(aColor),
-                                 cmps = {c.R, c.G, c.B}.ToList(),
-                                 lightness = 0.5 * (CDbl(cmps.Min()) + CDbl(cmps.Max())) / 255
-                             Where lightness < 0.7
-                             Select aColor)
+            For Each clr In Utils.GetColorList()
                 ColorComboBox.Items.Add(clr)
             Next
             If _src IsNot Nothing Then ColorComboBox.SelectedItem = _src.Color
