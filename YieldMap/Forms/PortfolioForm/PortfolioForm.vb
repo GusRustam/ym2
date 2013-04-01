@@ -11,6 +11,21 @@ Namespace Forms.PortfolioForm
         Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(PortfolioForm))
         Private WithEvents _loader As IBondsLoader = BondsLoader.Instance
 
+        Private _dragNode As TreeNode
+        Private _flag As Boolean
+
+        Private _currentItem As Portfolio
+        Private Property CurrentItem As Portfolio
+            Get
+                Return _currentItem
+            End Get
+            Set(ByVal value As Portfolio)
+                _currentItem = value
+                RefreshPortfolioData()
+            End Set
+        End Property
+
+
         Private Sub PortfolioForm_Load(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Load
             BondsTableView.DataSource = _loader.GetBondsTable()
             If PortfolioTree.ImageList Is Nothing Then
@@ -36,20 +51,9 @@ Namespace Forms.PortfolioForm
         End Sub
 
 #Region "Portfolio TAB"
-        Private _dragNode As TreeNode
-        Private _currentItem As Portfolio
-        Private _flag As Boolean
+
         'Private Shared ReadOnly ErrorMessages As New List(Of String)
 
-        Private Property CurrentItem As Portfolio
-            Get
-                Return _currentItem
-            End Get
-            Set(ByVal value As Portfolio)
-                _currentItem = value
-                RefreshPortfolioData()
-            End Set
-        End Property
 
         Private Sub PortSourcesCheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles ChainsCB.CheckedChanged, ListsCB.CheckedChanged
             RefreshPortfolioData()
@@ -303,7 +307,8 @@ Namespace Forms.PortfolioForm
         Private Sub AddChainListButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AddChainListButton.Click
             Dim a As New AddPortfolioSource
             If a.ShowDialog() = DialogResult.OK Then
-
+                CurrentItem.AddSource(a.Data.Src, a.Data.CustomName, a.Data.CustomColor, a.Data.Condition, a.Data.Include)
+                RefreshPortfolioData()
             End If
         End Sub
 
@@ -316,7 +321,7 @@ Namespace Forms.PortfolioForm
             Dim item = CType(PortfolioChainsListsGrid.SelectedRows(0).DataBoundItem, PortfolioSource)
             If item Is Nothing Then Exit Sub
             Try
-                item.Portfolio.DeleteSource(item)
+                CurrentItem.DeleteSource(item)
                 RefreshPortfolioData()
             Catch ex As Exception
                 Logger.ErrorException("Failed to delete selected source", ex)
@@ -338,7 +343,8 @@ Namespace Forms.PortfolioForm
             a.Condition = item.Condition
 
             If a.ShowDialog() = DialogResult.OK Then
-
+                CurrentItem.UpdateSource(item, a.Data.Src, a.Data.CustomName, a.Data.CustomColor, a.Data.Condition, a.Data.Include)
+                RefreshPortfolioData()
             End If
         End Sub
 #End Region

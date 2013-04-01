@@ -4,6 +4,7 @@ Imports Uitls
 Namespace Forms.PortfolioForm
     Public Class EditPortfolioSource
         Private ReadOnly _thePortfolio As Source
+        Private _color As String
 
         Public ReadOnly Property Portfolio As Source
             Get
@@ -22,9 +23,10 @@ Namespace Forms.PortfolioForm
 
         Public Property CustomColor() As String
             Get
-                Return CustomColorCB.SelectedText
+                Return If(CustomColorCB.SelectedItem IsNot Nothing, CustomColorCB.SelectedItem.ToString(), "")
             End Get
             Set(ByVal value As String)
+                _color = value
                 CustomColorCB.SelectedItem = value
             End Set
         End Property
@@ -36,6 +38,26 @@ Namespace Forms.PortfolioForm
             Set(ByVal value As String)
                 ConditionTB.Text = value
             End Set
+        End Property
+
+        Public Structure ItemDescription
+            Public Src As Source
+            Public CustomColor As String
+            Public CustomName As String
+            Public Condition As String
+            Public Include As Boolean
+        End Structure
+
+        Public ReadOnly Property Data() As ItemDescription
+            Get
+                Dim res As New ItemDescription
+                res.CustomColor = CustomColor
+                res.CustomName = CustomName
+                res.Condition = Condition
+                res.Include = IncludeCB.Checked
+                res.Src = If(MainTabControl.SelectedTab.Name = ChainOrListTP.Name, ChainsListsLB.SelectedItem, Nothing)
+                Return res
+            End Get
         End Property
 
         Sub New(ByVal p As Source)
@@ -59,6 +81,7 @@ Namespace Forms.PortfolioForm
             For Each clr In Utils.GetColorList()
                 CustomColorCB.Items.Add(clr)
             Next
+            If _color <> "" Then CustomColorCB.SelectedItem = _color
 
             If TypeOf Portfolio Is Chain OrElse TypeOf Portfolio Is UserList Then
                 MainTabControl.SelectedTab = ChainOrListTP
@@ -74,10 +97,10 @@ Namespace Forms.PortfolioForm
 
                 ChainsListsLB.DataSource =
                  If(ShowChainsRB.Checked,
-                     (From item In PortfolioManager.Instance.ChainsView Select New IdName(Of String)(item.ID, item.Name)).ToList(),
-                     (From item In PortfolioManager.Instance.UserListsView Select New IdName(Of String)(item.ID, item.Name)).ToList())
+                     PortfolioManager.Instance.ChainsView,
+                     PortfolioManager.Instance.UserListsView)
 
-                Dim itms = (From elem In ChainsListsLB.Items Let id = CType(elem, IdName(Of String)).Id Where id = Portfolio.ID Select elem).ToList()
+                Dim itms = (From elem In ChainsListsLB.Items Let id = CType(elem, Source).ID Where id = Portfolio.ID Select elem).ToList()
                 If itms.Any() Then ChainsListsLB.SelectedItem = itms.First()
 
             ElseIf TypeOf Portfolio Is CustomBond OrElse TypeOf Portfolio Is RegularBond Then
@@ -125,6 +148,10 @@ Namespace Forms.PortfolioForm
 
         Private Sub ClearCustomColorB_Click(ByVal sender As Object, ByVal e As EventArgs) Handles ClearCustomColorB.Click
             CustomColorCB.SelectedIndex = -1
+        End Sub
+
+        Private Sub IncludeCB_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles IncludeCB.CheckedChanged
+            IncludeCB.Text = If(IncludeCB.Checked, "Yes", "No")
         End Sub
     End Class
 End Namespace

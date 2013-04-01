@@ -1,5 +1,4 @@
-﻿' TODO LIQUIDITY!!!
-Imports System.Xml
+﻿Imports System.Xml
 Imports System.IO
 Imports System.ComponentModel
 Imports DbManager.Bonds
@@ -485,7 +484,7 @@ Public Class Chain
     Private ReadOnly _bondsManager As IBondsLoader = BondsLoader.Instance
 
     Public Overrides Function ToString() As String
-        Return "Chain"
+        Return Name
     End Function
 
     Friend Sub New(ByVal id As String, ByVal color As String, ByVal fields As FieldSet, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal chainRic As String, ByVal name As String)
@@ -554,7 +553,7 @@ Public Class UserList
     End Sub
 
     Public Overrides Function ToString() As String
-        Return "List"
+        Return Name
     End Function
 
     Friend Sub New(ByVal id As String, ByVal color As String, ByVal fields As FieldSet, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal bondRics As List(Of String), ByVal name As String)
@@ -956,6 +955,26 @@ Public Class Portfolio
         papa.RemoveChild(node)
         PortMan.SaveBonds()
     End Sub
+
+    Public Sub AddSource(ByVal source As Source, ByVal customName As String, ByVal customColor As String, ByVal condition As String, ByVal include As Boolean)
+        If IsFolder Then Throw New PortfolioException(String.Format("Item with id {0} is a folder", Id))
+        Dim xml = PortMan.GetConfigDocument()
+        Dim node = xml.SelectSingleNode(String.Format("/bonds/portfolios//portfolio[@id='{0}']", Id))
+        If node Is Nothing Then Throw New PortfolioException(String.Format("Can not find portfolio with id {0}", Id))
+        Dim newSrc = xml.CreateNode(XmlNodeType.Element, If(include, "include", "exclude"), "")
+        xml.AppendAttr(newSrc, "what", source.GetXmlTypeName())
+        xml.AppendAttr(newSrc, "id", source.ID)
+        If customName <> "" Then xml.AppendAttr(newSrc, "name", customName)
+        If customColor <> "" Then xml.AppendAttr(newSrc, "color", customColor)
+        If condition <> "" Then xml.AppendAttr(newSrc, "condition", condition)
+        node.AppendChild(newSrc)
+        PortMan.SaveBonds()
+    End Sub
+
+    Public Sub UpdateSource(ByVal who As PortfolioSource, ByVal source As Source, ByVal customName As String, ByVal customColor As String, ByVal condition As String, ByVal include As Boolean)
+        DeleteSource(who)
+        AddSource(source, customName, customColor, condition, include)
+    End Sub
 End Class
 
 Public Class PortfolioException
@@ -1169,7 +1188,7 @@ Public Class PortfolioManager
         Dim folder As XmlNode = _bonds.CreateNode(XmlNodeType.Element, type, "")
 
         Dim idAttr As XmlAttribute = _bonds.CreateAttribute("id")
-        Dim newId = GenerateNewId(_ids.Union(_tmpIds))
+        Dim newId = GenerateNewId(New HashSet(Of Long)(_ids.Union(_tmpIds)))
         _tmpIds.Add(newId)
 
         idAttr.Value = newId
@@ -1354,25 +1373,25 @@ Public Class PortfolioManager
             Dim chain = CType(src, Chain)
             Dim parent = _bonds.SelectSingleNode("/bonds/chains")
             Dim newChainNode = _bonds.CreateNode(XmlNodeType.Element, "chain", "")
-            AppendAttr(newChainNode, "id", chain.ID)
-            AppendAttr(newChainNode, "ric", chain.ChainRic)
-            AppendAttr(newChainNode, "field-set-id", chain.Fields.ID)
-            AppendAttr(newChainNode, "name", chain.Name)
-            AppendAttr(newChainNode, "color", chain.Color)
-            AppendAttr(newChainNode, "curve", chain.Curve)
-            AppendAttr(newChainNode, "enabled", chain.Enabled)
+            _bonds.AppendAttr(newChainNode, "id", chain.ID)
+            _bonds.AppendAttr(newChainNode, "ric", chain.ChainRic)
+            _bonds.AppendAttr(newChainNode, "field-set-id", chain.Fields.ID)
+            _bonds.AppendAttr(newChainNode, "name", chain.Name)
+            _bonds.AppendAttr(newChainNode, "color", chain.Color)
+            _bonds.AppendAttr(newChainNode, "curve", chain.Curve)
+            _bonds.AppendAttr(newChainNode, "enabled", chain.Enabled)
             parent.AppendChild(newChainNode)
             SaveBonds()
         ElseIf TypeOf src Is UserList Then
             Dim list = CType(src, UserList)
             Dim parent = _bonds.SelectSingleNode("/bonds/lists")
             Dim newListNode = _bonds.CreateNode(XmlNodeType.Element, "chain", "")
-            AppendAttr(newListNode, "id", list.ID)
-            AppendAttr(newListNode, "field-set-id", list.Fields.ID)
-            AppendAttr(newListNode, "name", list.Name)
-            AppendAttr(newListNode, "color", list.Color)
-            AppendAttr(newListNode, "curve", list.Curve)
-            AppendAttr(newListNode, "enabled", list.Enabled)
+            _bonds.AppendAttr(newListNode, "id", list.ID)
+            _bonds.AppendAttr(newListNode, "field-set-id", list.Fields.ID)
+            _bonds.AppendAttr(newListNode, "name", list.Name)
+            _bonds.AppendAttr(newListNode, "color", list.Color)
+            _bonds.AppendAttr(newListNode, "curve", list.Curve)
+            _bonds.AppendAttr(newListNode, "enabled", list.Enabled)
             For Each ric In list.GetDefaultRics()
                 Dim ricNode = _bonds.CreateNode(XmlNodeType.Element, "ric", "")
                 ricNode.InnerText = ric
@@ -1393,13 +1412,13 @@ Public Class PortfolioManager
                 Logger.Error("No chain with id {0} found", src.ID)
                 Return
             End If
-            UpdateAttr(chainNode, "id", chain.ID)
-            UpdateAttr(chainNode, "ric", chain.ChainRic)
-            UpdateAttr(chainNode, "field-set-id", chain.Fields.ID)
-            UpdateAttr(chainNode, "name", chain.Name)
-            UpdateAttr(chainNode, "color", chain.Color)
-            UpdateAttr(chainNode, "curve", chain.Curve)
-            UpdateAttr(chainNode, "enabled", chain.Enabled)
+            _bonds.UpdateAttr(chainNode, "id", chain.ID)
+            _bonds.UpdateAttr(chainNode, "ric", chain.ChainRic)
+            _bonds.UpdateAttr(chainNode, "field-set-id", chain.Fields.ID)
+            _bonds.UpdateAttr(chainNode, "name", chain.Name)
+            _bonds.UpdateAttr(chainNode, "color", chain.Color)
+            _bonds.UpdateAttr(chainNode, "curve", chain.Curve)
+            _bonds.UpdateAttr(chainNode, "enabled", chain.Enabled)
             SaveBonds()
         ElseIf TypeOf src Is UserList Then
             Dim list = CType(src, UserList)
@@ -1408,12 +1427,12 @@ Public Class PortfolioManager
                 Logger.Error("No list with id {0} found", src.ID)
                 Return
             End If
-            UpdateAttr(listNode, "id", list.ID)
-            UpdateAttr(listNode, "field-set-id", list.Fields.ID)
-            UpdateAttr(listNode, "name", list.Name)
-            UpdateAttr(listNode, "color", list.Color)
-            UpdateAttr(listNode, "curve", list.Curve)
-            UpdateAttr(listNode, "enabled", list.Enabled)
+            _bonds.UpdateAttr(listNode, "id", list.ID)
+            _bonds.UpdateAttr(listNode, "field-set-id", list.Fields.ID)
+            _bonds.UpdateAttr(listNode, "name", list.Name)
+            _bonds.UpdateAttr(listNode, "color", list.Color)
+            _bonds.UpdateAttr(listNode, "curve", list.Curve)
+            _bonds.UpdateAttr(listNode, "enabled", list.Enabled)
             SaveBonds()
         Else
             Logger.Warn("UpdateSource(): unsupported source type {0}", src.GetType())
@@ -1460,21 +1479,6 @@ Public Class PortfolioManager
         SaveBonds()
     End Sub
 
-    Private Sub UpdateAttr(ByRef node As XmlNode, ByVal attrName As String, ByVal attrVal As String)
-        If node.Attributes(attrName) Is Nothing Then
-            AppendAttr(node, attrName, attrVal)
-        Else
-            node.Attributes(attrName).Value = attrVal
-        End If
-    End Sub
-
-    Private Sub AppendAttr(ByRef node As XmlNode, ByVal attrName As String, ByVal attrVal As String)
-        If attrVal = "" Then Return
-        Dim attr As XmlAttribute
-        attr = _bonds.CreateAttribute(attrName)
-        attr.Value = attrVal
-        node.Attributes.Append(attr)
-    End Sub
 
 
     Public Function GetFolderDescr(ByVal id As String) As Portfolio Implements IPortfolioManager.GetFolderDescr

@@ -51,6 +51,8 @@
             Me.SampleColorPB = New System.Windows.Forms.PictureBox()
             Me.RandomColorB = New System.Windows.Forms.Button()
             Me.ClearCustomColorB = New System.Windows.Forms.Button()
+            Me.Label2 = New System.Windows.Forms.Label()
+            Me.IncludeCB = New System.Windows.Forms.CheckBox()
             Me.TableLayoutPanel1.SuspendLayout()
             Me.MainTabControl.SuspendLayout()
             Me.ChainOrListTP.SuspendLayout()
@@ -78,7 +80,7 @@
             Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
             Me.TableLayoutPanel1.RowCount = 3
             Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-            Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 90.0!))
+            Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 120.0!))
             Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
             Me.TableLayoutPanel1.Size = New System.Drawing.Size(492, 465)
             Me.TableLayoutPanel1.TabIndex = 1
@@ -91,7 +93,7 @@
             Me.MainTabControl.Location = New System.Drawing.Point(3, 3)
             Me.MainTabControl.Name = "MainTabControl"
             Me.MainTabControl.SelectedIndex = 0
-            Me.MainTabControl.Size = New System.Drawing.Size(486, 339)
+            Me.MainTabControl.Size = New System.Drawing.Size(486, 309)
             Me.MainTabControl.TabIndex = 1
             '
             'ChainOrListTP
@@ -100,7 +102,7 @@
             Me.ChainOrListTP.Location = New System.Drawing.Point(4, 22)
             Me.ChainOrListTP.Name = "ChainOrListTP"
             Me.ChainOrListTP.Padding = New System.Windows.Forms.Padding(3)
-            Me.ChainOrListTP.Size = New System.Drawing.Size(478, 313)
+            Me.ChainOrListTP.Size = New System.Drawing.Size(478, 283)
             Me.ChainOrListTP.TabIndex = 0
             Me.ChainOrListTP.Text = "Chain or List"
             Me.ChainOrListTP.UseVisualStyleBackColor = True
@@ -117,7 +119,7 @@
             Me.TableLayoutPanel2.RowCount = 2
             Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
             Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-            Me.TableLayoutPanel2.Size = New System.Drawing.Size(472, 307)
+            Me.TableLayoutPanel2.Size = New System.Drawing.Size(472, 277)
             Me.TableLayoutPanel2.TabIndex = 0
             '
             'FlowLayoutPanel2
@@ -158,7 +160,7 @@
             Me.ChainsListsLB.FormattingEnabled = True
             Me.ChainsListsLB.Location = New System.Drawing.Point(3, 33)
             Me.ChainsListsLB.Name = "ChainsListsLB"
-            Me.ChainsListsLB.Size = New System.Drawing.Size(466, 271)
+            Me.ChainsListsLB.Size = New System.Drawing.Size(466, 241)
             Me.ChainsListsLB.TabIndex = 1
             '
             'IndividualAndCustomBondsTP
@@ -273,14 +275,17 @@
             Me.TableLayoutPanel3.Controls.Add(Me.Label1, 0, 0)
             Me.TableLayoutPanel3.Controls.Add(Me.CustomNameTB, 1, 0)
             Me.TableLayoutPanel3.Controls.Add(Me.FlowLayoutPanel3, 1, 1)
+            Me.TableLayoutPanel3.Controls.Add(Me.Label2, 0, 3)
+            Me.TableLayoutPanel3.Controls.Add(Me.IncludeCB, 1, 3)
             Me.TableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.TableLayoutPanel3.Location = New System.Drawing.Point(3, 348)
+            Me.TableLayoutPanel3.Location = New System.Drawing.Point(3, 318)
             Me.TableLayoutPanel3.Name = "TableLayoutPanel3"
-            Me.TableLayoutPanel3.RowCount = 3
-            Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
-            Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
-            Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
-            Me.TableLayoutPanel3.Size = New System.Drawing.Size(486, 84)
+            Me.TableLayoutPanel3.RowCount = 4
+            Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25.00062!))
+            Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25.00062!))
+            Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25.00062!))
+            Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 24.99813!))
+            Me.TableLayoutPanel3.Size = New System.Drawing.Size(486, 114)
             Me.TableLayoutPanel3.TabIndex = 3
             '
             'ConditionTB
@@ -379,6 +384,28 @@
             Me.ClearCustomColorB.Text = "Clear"
             Me.ClearCustomColorB.UseVisualStyleBackColor = True
             '
+            'Label2
+            '
+            Me.Label2.AutoSize = True
+            Me.Label2.Location = New System.Drawing.Point(3, 84)
+            Me.Label2.Name = "Label2"
+            Me.Label2.Size = New System.Drawing.Size(42, 13)
+            Me.Label2.TabIndex = 8
+            Me.Label2.Text = "Include"
+            '
+            'IncludeCB
+            '
+            Me.IncludeCB.AutoSize = True
+            Me.IncludeCB.CheckAlign = System.Drawing.ContentAlignment.MiddleRight
+            Me.IncludeCB.Checked = True
+            Me.IncludeCB.CheckState = System.Windows.Forms.CheckState.Checked
+            Me.IncludeCB.Location = New System.Drawing.Point(141, 87)
+            Me.IncludeCB.Name = "IncludeCB"
+            Me.IncludeCB.Size = New System.Drawing.Size(44, 17)
+            Me.IncludeCB.TabIndex = 9
+            Me.IncludeCB.Text = "Yes"
+            Me.IncludeCB.UseVisualStyleBackColor = True
+            '
             'EditPortfolioSource
             '
             Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -435,5 +462,7 @@
         Friend WithEvents CustomBondsRB As System.Windows.Forms.RadioButton
         Friend WithEvents BondsDGV As System.Windows.Forms.DataGridView
         Friend WithEvents ClearCustomColorB As System.Windows.Forms.Button
+        Friend WithEvents Label2 As System.Windows.Forms.Label
+        Friend WithEvents IncludeCB As System.Windows.Forms.CheckBox
     End Class
 End Namespace

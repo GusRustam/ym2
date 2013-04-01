@@ -226,4 +226,22 @@ Public Module Extensions
             Throw New Exception(String.Format("Failed to find attribute {0} in node {1}", name, node.Name))
         End If
     End Function
+
+    <Extension()>
+    Public Sub UpdateAttr(ByVal xml As XmlDocument, ByRef node As XmlNode, ByVal attrName As String, ByVal attrVal As String)
+        If node.Attributes(attrName) Is Nothing Then
+            xml.AppendAttr(node, attrName, attrVal)
+        Else
+            node.Attributes(attrName).Value = attrVal
+        End If
+    End Sub
+
+    <Extension()>
+    Public Sub AppendAttr(ByVal xml As XmlDocument, ByRef node As XmlNode, ByVal attrName As String, ByVal attrVal As String)
+        If attrVal = "" Then Return
+        Dim attr As XmlAttribute
+        attr = xml.CreateAttribute(attrName)
+        attr.Value = attrVal
+        node.Attributes.Append(attr)
+    End Sub
 End Module
