@@ -80,7 +80,9 @@ Namespace Tools.History
         End Function
 
         Public Sub StartTask(ByVal item As String, ByVal fields As String, ByVal since As Date, ByVal till As Date, Optional ByVal frequency As String = "D", Optional ByVal timeOut As Integer = 30)
-            Logger.Warn("StartTask({0})", item)
+            Dim ric As String
+            If item(0) = "/" Then ric = item.Substring(1)
+            Logger.Warn("StartTask({0})", ric)
             Try
                 Err = False
                 Finished = False
@@ -91,7 +93,7 @@ Namespace Tools.History
                     .Mode = String.Format(
                         CultureInfo.CreateSpecificCulture("en-US"),
                         "FRQ:{0} HEADER:YES START:{1:ddMMMyy} END:{2:ddMMMyy}", frequency, since, till).ToUpper()
-                    .ItemName = item
+                    .ItemName = ric
                     .RequestHistory(fields)
                     If .Data IsNot Nothing Then
                         ParseData()

@@ -81,17 +81,10 @@ Namespace Forms.ChartForm
                     currentPortID = value
                 End If
 
-                'Dim portfolioSources = (New PortfolioSourcesTableAdapter).GetData()
-                'Dim portfolioUnitedDataTable = (New PortfolioUnitedTableAdapter).GetData()
                 Dim portfolioStructure = PortfolioManager.Instance().GetPortfolioStructure(currentPortID)
                 For Each port In portfolioStructure.Sources '(From p In portfolioSources Where p.portfolioID = currentPortID Select p)
                     Dim group As Group
 
-                    'Dim fieldSetId = port.id_field_set
-                    'Dim fields = (New field_layoutTableAdapter).GetData().Where(Function(row) row.field_set_id = fieldSetId)
-                    'Dim realTime = fields.First(Function(row) row.is_realtime = 1)
-                    'Dim history = fields.First(Function(row) row.is_realtime = 0)
-                    '    .Group = GroupType,
                     group = New Group(_ansamble) With {
                         .SeriesName = If(port.Name <> "", port.Name, port.Source.Name),
                         .PortfolioID = port.Source.ID,
@@ -500,8 +493,6 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub PortfolioTssbDropDownOpening(ByVal sender As Object, ByVal e As EventArgs) Handles PortfolioTSSB.DropDownOpening
-            ' list of portfolios to show
-            '(From rw In (New portfolioTableAdapter).GetData() Select New IdName() With {.Id = rw("id"), .Name = rw("portfolio_name")}).ToList()
             Dim portDescrList As List(Of IdName(Of Integer)) =
                 (From rw In PortfolioManager.Instance.GetAllPortfolios()
                  Select New IdName(Of Integer)() With {.Id = rw.Id, .Value = rw.Value}).ToList()
@@ -901,28 +892,24 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub CurvesTSMIDropDownOpening(ByVal sender As Object, ByVal e As EventArgs) Handles CurvesTSMI.DropDownOpening
-            'BondCurvesTSMI.DropDownItems.Clear()
-            'Dim chainTA As New chainTableAdapter
-            'Dim chainCurves = chainTA.GetData.Where(Function(row) row.curve).Select(
-            '    Function(row)
-            '        Return New CurveDescr With {
-            '        .Type = "Chain",
-            '        .Name = row.descr,
-            '        .ID = row.id,
-            '        .Color = row.color}
-            '    End Function).ToList()
-            'DoAdd(chainCurves)
+            BondCurvesTSMI.DropDownItems.Clear()
+            Dim chains = (From chain In PortfolioManager.Instance.ChainsView
+                         Where chain.Curve
+                         Select New CurveDescr With {
+                                    .Type = "Chain",
+                                    .Name = chain.Name,
+                                    .ID = chain.ID,
+                                    .Color = chain.Color}).ToList
+            DoAdd(chains)
 
-            'Dim hawserTA As New hawserTableAdapter
-            'Dim hawserCurves = hawserTA.GetData.Where(Function(row) row.curve).Select(
-            '    Function(row)
-            '        Return New CurveDescr With {
-            '        .Type = "List",
-            '        .Name = row.hawser_name,
-            '        .ID = row.id,
-            '        .Color = row.color}
-            '    End Function).ToList()
-            'DoAdd(hawserCurves)
+            Dim lists = (From list In PortfolioManager.Instance.UserListsView
+                         Where list.Curve
+                         Select New CurveDescr With {
+                                    .Type = "List",
+                                    .Name = list.Name,
+                                    .ID = list.ID,
+                                    .Color = list.Color}).ToList
+            DoAdd(lists)
         End Sub
 
         Private Sub AddBondCurveTSMIClick(ByVal sender As Object, ByVal e As EventArgs)
@@ -1213,7 +1200,7 @@ Namespace Forms.ChartForm
                         point = series.Points.First(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric)
                         If yValue IsNot Nothing Then
                             point.XValue = calc.Duration
-                            If yValue.Value <> point.YValues.First Then
+                            If Math.Abs(yValue.Value - point.YValues.First) > 0.01 Then
                                 Logger.Trace("{0}: delta is {1}", ric, yValue.Value - point.YValues.First)
                             End If
                             point.YValues = {yValue.Value}

@@ -536,6 +536,33 @@ Public Class Chain
             Throw New NoSourceException(String.Format("Failed to find chain with id {0}", id), ex)
         End Try
     End Function
+
+    Protected Overloads Function Equals(ByVal other As Chain) As Boolean
+        Return MyBase.Equals(other) AndAlso String.Equals(_chainRic, other._chainRic)
+    End Function
+
+    Public Overloads Overrides Function Equals(ByVal obj As Object) As Boolean
+        If ReferenceEquals(Nothing, obj) Then Return False
+        If ReferenceEquals(Me, obj) Then Return True
+        If obj.GetType IsNot Me.GetType Then Return False
+        Return Equals(DirectCast(obj, Chain))
+    End Function
+
+    Public Overrides Function GetHashCode() As Integer
+        Dim hashCode As Integer = MyBase.GetHashCode
+        If _chainRic IsNot Nothing Then
+            hashCode = CInt((hashCode * 397L) Mod Integer.MaxValue) Xor _chainRic.GetHashCode
+        End If
+        Return hashCode
+    End Function
+
+    Public Shared Operator =(ByVal left As Chain, ByVal right As Chain) As Boolean
+        Return Equals(left, right)
+    End Operator
+
+    Public Shared Operator <>(ByVal left As Chain, ByVal right As Chain) As Boolean
+        Return Not Equals(left, right)
+    End Operator
 End Class
 
 Public Class UserList
@@ -596,7 +623,7 @@ End Class
 
 Public Class RegularBond
     Inherits Source
-
+    ' todo equality members
     Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As FieldSet, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
         MyBase.New(id, color, fields, enabled, curve, name)
     End Sub
@@ -620,6 +647,7 @@ End Class
 
 Public Class CustomBond
     Inherits Source
+    ' todo equality members
 
     Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As FieldSet, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
         MyBase.New(id, color, fields, enabled, curve, name)
@@ -773,6 +801,36 @@ Public Class PortfolioSource
             Return _customColor
         End Get
     End Property
+
+    Protected Overloads Function Equals(ByVal other As PortfolioSource) As Boolean
+        Return String.Equals(_id, other._id) AndAlso Equals(_source, other._source)
+    End Function
+
+    Public Overloads Overrides Function Equals(ByVal obj As Object) As Boolean
+        If ReferenceEquals(Nothing, obj) Then Return False
+        If ReferenceEquals(Me, obj) Then Return True
+        If obj.GetType IsNot Me.GetType Then Return False
+        Return Equals(DirectCast(obj, PortfolioSource))
+    End Function
+
+    Public Overrides Function GetHashCode() As Integer
+        Dim hashCode As Integer = 0
+        If _id IsNot Nothing Then
+            hashCode = CInt((hashCode * 397L) Mod Integer.MaxValue) Xor _id.GetHashCode
+        End If
+        If _source IsNot Nothing Then
+            hashCode = CInt((hashCode * 397L) Mod Integer.MaxValue) Xor _source.GetHashCode
+        End If
+        Return hashCode
+    End Function
+
+    Public Shared Operator =(ByVal left As PortfolioSource, ByVal right As PortfolioSource) As Boolean
+        Return Equals(left, right)
+    End Operator
+
+    Public Shared Operator <>(ByVal left As PortfolioSource, ByVal right As PortfolioSource) As Boolean
+        Return Not Equals(left, right)
+    End Operator
 End Class
 
 ''' <summary>
@@ -834,7 +892,11 @@ Public Class PortfolioStructure
 
     Public ReadOnly Property Rics(ByVal source As PortfolioSource) As ReadOnlyCollection(Of String)
         Get
-            Return New ReadOnlyCollection(Of String)(_rics(source))
+            If _rics.Keys.Contains(source) Then
+                Return New ReadOnlyCollection(Of String)(_rics(source))
+            Else
+                Return New ReadOnlyCollection(Of String)({})
+            End If
         End Get
     End Property
 

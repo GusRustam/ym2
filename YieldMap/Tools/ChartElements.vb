@@ -361,6 +361,7 @@ Namespace Tools
         End Sub
 
         Public Sub StartRics(ByVal rics As List(Of String))
+            If rics.Count = 0 Then Return
             Dim res = _quoteLoader.AddItems(rics, GetAllKnownFields())
             If res Is Nothing Then
                 RaiseEvent LoadCriticalError()
@@ -491,10 +492,15 @@ Namespace Tools
 
                 Dim maxdate As Date, maxElem As HistoricalItem
                 Try
-                    maxdate = data.Where(Function(kvp) kvp.Value.SomePrice()).Select(Function(kvp) kvp.Key).Max
-                    maxElem = data(maxdate)
+                    If data.Any(Function(kvp) kvp.Value.SomePrice()) Then
+                        maxdate = data.Where(Function(kvp) kvp.Value.SomePrice()).Select(Function(kvp) kvp.Key).Max
+                        maxElem = data(maxdate)
+                    Else
+                        Return
+                    End If
                 Catch ex As Exception
-                    Logger.Info("Failed to retreive max date for {0}", ric)
+                    Logger.ErrorException(String.Format("Failed to retreive max date for {0}", ric), ex)
+                    Logger.Error("Exception = {0}", ex.ToString())
                     Return
                 End Try
 

@@ -160,7 +160,7 @@ Namespace Tools.History
                 End If
                 With _historyManager
                     .Source = "IDN"
-                    .ItemName = descr.Item
+                    .ItemName = If(descr.Item(0) = "/", descr.Item.Substring(1), descr.Item)
                     .RequestHistory(descr.Fields.Aggregate(Function(str, elem) str + ", " + elem))
                     AddHandler HistoricalData, handler
                     .ErrorMode = AdxErrorMode.EXCEPTION

@@ -59,10 +59,12 @@ Namespace Bonds
         End Sub
 
         Public Function BondExists(ByVal ric As String) As Boolean Implements IBondsData.BondExists
+            ric = SkipSlash(ric)
             Return _subRicToRic.ContainsKey(ric)
         End Function
 
         Public Function GetBondInfo(ByVal aRic As String) As BondDescription Implements IBondsData.GetBondInfo
+            aRic = SkipSlash(aRic)
             Dim items = (From row In _ldr.GetBondsTable() Where row.ric = _subRicToRic(aRic) Select row).ToList()
             If Not items.Any Then Throw New NoBondException(aRic)
             Dim descr As BondsDataSet.BondRow = items.First()
@@ -84,7 +86,14 @@ Namespace Bonds
                                        description, series)
         End Function
 
+        Private Shared Function SkipSlash(ByVal aRic As String) As String
+            If aRic.Length = 0 Then Return aRic
+            If aRic(0) = "/" Then Return aRic.Substring(1)
+            Return aRic
+        End Function
+
         Public Function GetBondPayments(ByVal aRic As String) As BondPayments Implements IBondsData.GetBondPayments
+            aRic = SkipSlash(aRic)
             Dim descr = (From row In _ldr.GetBondsTable() Where row.ric = _subRicToRic(aRic) Select row).First()
             Dim rows = (From row In _ldr.GetCouponsTable()
                         Where row.ric = _subRicToRic(aRic)
@@ -130,7 +139,7 @@ Namespace Bonds
             End Get
         End Property
     End Class
- 
+
     Public Class BondLoaderProgressProcess
         Implements IProgressProcess
 
