@@ -110,6 +110,9 @@
     </Compile>
     <Compile Include="Bonds\BondsManager.vb" />
     <Compile Include="Bonds\BondsManagerItfs.vb" />
+    <Compile Include="Bonds\BondView.vb" />
+    <Compile Include="Bonds\FilterParser.vb" />
+    <Compile Include="Bonds\Rating.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

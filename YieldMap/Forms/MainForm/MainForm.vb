@@ -14,6 +14,7 @@ Namespace Forms.MainForm
     Public Class MainForm
         Private Shared ReadOnly Logger As Logger = GetLogger(GetType(MainForm))
         Private WithEvents _theSettings As SettingsManager = SettingsManager.Instance
+        'Private _x As IBondsData = BondsData.Instance
 
         Private _initialized As Boolean = False
         Private ReadOnly _graphs As New List(Of GraphForm)
@@ -116,7 +117,7 @@ Namespace Forms.MainForm
 
 #Region "II. Connecting to Eikon"
         Private WithEvents _connector As New EikonConnector(Eikon.Sdk)
-        Private Shared ReadOnly BondLdr As IBondsLoader = BondsLoader.Instance()
+        Private WithEvents _ldr As IBondsLoader = BondsLoader.Instance()
 
         Private Sub ConnectToEikon()
             _connector.ConnectToEikon()
@@ -134,22 +135,23 @@ Namespace Forms.MainForm
             StatusPicture.Image = Green
             StatusLabel.Text = Status_Connected
 
-            AddHandler BondLdr.Progress, AddressOf ProgressHandler
+            BondsData.Instance.Refresh()
+
             If Not _theSettings.LastDbUpdate.HasValue OrElse _theSettings.LastDbUpdate < Today Then
-                BondLdr.Initialize()
+                _ldr.Initialize()
             End If
         End Sub
 
-        Sub ProgressHandler(ByVal message As ProgressEvent)
+        Sub ProgressHandler(ByVal message As ProgressEvent) Handles _ldr.Progress
             InitEventLabel.Text = message.Msg
             If message.Log.Success() Then
                 Initialized = True
                 InitEventLabel.Text = DatabaseUpdatedSuccessfully
                 _theSettings.LastDbUpdate = Today
-                RemoveHandler BondLdr.Progress, AddressOf ProgressHandler
+                RemoveHandler _ldr.Progress, AddressOf ProgressHandler
             ElseIf message.Log.Failed() Then
                 InitEventLabel.Text = FailedToUpdateDatabase
-                RemoveHandler BondLdr.Progress, AddressOf ProgressHandler
+                RemoveHandler _ldr.Progress, AddressOf ProgressHandler
             End If
         End Sub
 

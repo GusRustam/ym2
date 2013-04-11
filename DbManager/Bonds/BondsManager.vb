@@ -8,12 +8,12 @@ Namespace Bonds
     Public Class BondsData
         Implements IBondsData
 
-        'Private Shared ReadOnly Logger As Logger = GetLogger(GetType(BondsData))
+        Private Shared ReadOnly Logger As Logger = GetLogger(GetType(BondsData))
         Private WithEvents _ldr As IBondsLoader = BondsLoader.Instance
         Private Shared ReadOnly [Me] As New BondsData
 
-        Private Shared _ricToSubRic As Dictionary(Of String, List(Of String))
-        Private Shared _subRicToRic As Dictionary(Of String, String)
+        Private Shared _ricToSubRic As Dictionary(Of String, List(Of String))    ' соответствия "верхний рик" -> "рики нижнего уровня" (1 -> N)
+        Private Shared _subRicToRic As Dictionary(Of String, String)             ' соответствия "рик нижнего уровня" -> "верхний рик"  (1 -> 1)
         Private Shared _initialized As Boolean
 
         Private Sub OnBondsLoaded(ByVal evt As ProgressEvent) Handles _ldr.Progress
@@ -25,14 +25,29 @@ Namespace Bonds
         End Sub
 
         Public Sub Refresh() Implements IBondsData.Refresh
+            Logger.Info("Refresh()")
             Clear()
-            For Each row In _ldr.GetAllRicsTable()
-                If _ricToSubRic.ContainsKey(row.ric) Then
-                    _ricToSubRic(row.ric).Add(row.subRic)
+
+            ' соответствия сам к себе
+            For Each rowRic In From row In _ldr.GetBondsTable() Select row.ric 'SkipSlash(row.ric)
+                If _ricToSubRic.ContainsKey(rowRic) Then
+                    _ricToSubRic(rowRic).Add(rowRic)
                 Else
-                    _ricToSubRic.Add(row.ric, New List(Of String)({row.subRic}))
+                    _ricToSubRic.Add(rowRic, New List(Of String)({rowRic}))
                 End If
-                _subRicToRic.Add(row.subRic, row.ric)
+                _subRicToRic.Add(rowRic, rowRic)
+            Next
+
+            ' соответствия сам к деткам. Только вот среди деток может быть и он сам.
+            For Each row In From rw In _ldr.GetAllRicsTable() Where rw.subRic <> rw.ric
+                Dim rowRic = row.ric 'SkipSlash(row.ric)
+                Dim subRic = row.subRic 'SkipSlash(row.subRic)
+                If _ricToSubRic.ContainsKey(rowRic) Then
+                    _ricToSubRic(rowRic).Add(subRic)
+                Else
+                    _ricToSubRic.Add(rowRic, New List(Of String)({subRic}))
+                End If
+                _subRicToRic.Add(subRic, rowRic)
             Next
             _initialized = True
         End Sub
@@ -59,18 +74,21 @@ Namespace Bonds
         End Sub
 
         Public Function BondExists(ByVal ric As String) As Boolean Implements IBondsData.BondExists
-            ric = SkipSlash(ric)
+            'ric = SkipSlash(ric)
             Return _subRicToRic.ContainsKey(ric)
         End Function
 
         Public Function GetBondInfo(ByVal aRic As String) As BondDescription Implements IBondsData.GetBondInfo
-            aRic = SkipSlash(aRic)
-            Dim items = (From row In _ldr.GetBondsTable() Where row.ric = _subRicToRic(aRic) Select row).ToList()
+            'aRic = SkipSlash(aRic)
+            Dim items = (From row In _ldr.GetBondsTable()
+                         Where _subRicToRic.Keys.Contains(aRic) AndAlso row.ric = _subRicToRic(aRic)
+                         Select row).ToList()
+
             If Not items.Any Then Throw New NoBondException(aRic)
             Dim descr As BondsDataSet.BondRow = items.First()
 
             Dim coupon = If(Not IsDBNull(descr("currentCoupon")) AndAlso IsNumeric(descr.currentCoupon), CDbl(descr.currentCoupon), 0)
-            Dim maturityDate As Date = If(Not IsDBNull(descr("maturityDate")) AndAlso IsDate(descr.maturityDate), CDate(descr.maturityDate), Date.MinValue)
+            Dim maturityDate As Date = If(Not IsDBNull(descr("maturityDate")) AndAlso IsDate(descr.maturityDate), CDate(descr.maturityDate), Nothing)
             Dim issueDate As Date = If(Not IsDBNull(descr("issueDate")) AndAlso IsDate(descr.issueDate), CDate(descr.issueDate), Date.MinValue)
             Dim series = If(Not IsDBNull(descr("series")), descr.series, "")
             Dim rateStructure = If(Not IsDBNull(descr("rateStructure")), descr.rateStructure, "")
@@ -78,22 +96,58 @@ Namespace Bonds
             Dim paymentStructure = If(Not IsDBNull(descr("bondStructure")), descr.bondStructure, "")
             Dim shortName = If(Not IsDBNull(descr("shortName")), descr.shortName, "")
             Dim description = If(Not IsDBNull(descr("description")), descr.description, "")
+            Dim issuerName = If(Not IsDBNull(descr("issuerName")), descr.issuerName, "")
+            Dim borrowerName = If(Not IsDBNull(descr("borrowerName")), descr.borrowerName, "")
+            Dim currency = If(Not IsDBNull(descr("currency")), descr.currency, "")
+            Dim isPutable = Not IsDBNull(descr("isPutable")) AndAlso descr.isPutable
+            Dim isCallable = Not IsDBNull(descr("isCallable")) AndAlso descr.isCallable
+            Dim isFloater = Not IsDBNull(descr("isFloater")) AndAlso descr.isFloater
             Dim sN = shortName & " " & series
+
+            Dim issueRatings = (From row In _ldr.GetIssueRatingsTable()
+                                Where row.ric = _subRicToRic(aRic) And Not IsDBNull(row("date")) AndAlso IsDate(row("date"))
+                                Let dt = row._date, rate = row.rating, rateSrc = row.ratingSrc
+                                Select dt, rate, rateSrc).ToList
+            Dim lastIssueRating As RatingDescr
+            If issueRatings.Any Then
+                Dim maxDate = (From rw In issueRatings Select rw.dt).ToList().Max()
+                Dim rt = issueRatings.First(Function(elem) elem.dt = maxDate)
+                lastIssueRating = New RatingDescr(Rating.Parse(rt.rate), rt.dt, RatingSource.Parse(rt.rateSrc))
+            Else
+                lastIssueRating = New RatingDescr(Rating.Other, Nothing, Nothing)
+            End If
+
+            Dim issuerRatings = (From row In _ldr.GetIssuerRatingsTable()
+                                Where row.ric = _subRicToRic(aRic) And Not IsDBNull(row("date")) AndAlso IsDate(row("date"))
+                                Let dt = row._date, rate = row.rating, rateSrc = row.ratingSrc
+                                Select dt, rate, rateSrc).ToList
+
+            Dim lastIssuerRating As RatingDescr
+            If issuerRatings.Any Then
+                Dim maxDate = (From rw In issuerRatings Select rw.dt).ToList().Max()
+                Dim rt = issuerRatings.First(Function(elem) elem.dt = maxDate)
+                lastIssuerRating = New RatingDescr(Rating.Parse(rt.rate), rt.dt, RatingSource.Parse(rt.rateSrc))
+            Else
+                lastIssuerRating = New RatingDescr(Rating.Other, Nothing, Nothing)
+            End If
+
+            Dim lastRating = If(lastIssueRating > lastIssuerRating, lastIssueRating, lastIssuerRating)
 
             Return New BondDescription(ric, sN, sN, maturityDate, coupon,
                                        paymentStructure, rateStructure, issueDate, sN,
                                        shortName & " " & If(coupon > 0, String.Format("{0}", coupon), "ZC"),
-                                       description, series)
+                                       description, series, issuerName, borrowerName, currency,
+                                       isPutable, isCallable, isFloater, lastIssueRating, lastIssuerRating, lastRating)
         End Function
 
-        Private Shared Function SkipSlash(ByVal aRic As String) As String
-            If aRic.Length = 0 Then Return aRic
-            If aRic(0) = "/" Then Return aRic.Substring(1)
-            Return aRic
-        End Function
+        'Private Shared Function SkipSlash(ByVal aRic As String) As String
+        '    If aRic.Length = 0 Then Return aRic
+        '    If aRic(0) = "/" Then Return aRic.Substring(1)
+        '    Return aRic
+        'End Function
 
         Public Function GetBondPayments(ByVal aRic As String) As BondPayments Implements IBondsData.GetBondPayments
-            aRic = SkipSlash(aRic)
+            'aRic = SkipSlash(aRic)
             Dim descr = (From row In _ldr.GetBondsTable() Where row.ric = _subRicToRic(aRic) Select row).First()
             Dim rows = (From row In _ldr.GetCouponsTable()
                         Where row.ric = _subRicToRic(aRic)
@@ -105,6 +159,10 @@ Namespace Bonds
                 res.AddPayment(row.dt, row.rate)
             Next
             Return res
+        End Function
+
+        Public Function GetBondInfo(ByVal rics As List(Of String)) As List(Of BondDescription) Implements IBondsData.GetBondInfo
+            Return (From item In rics Select GetBondInfo(item)).ToList()
         End Function
     End Class
 
@@ -260,7 +318,7 @@ Namespace Bonds
                 Next
 
                 Dim dex2 As New Dex2
-                AddHandler dex2.Failure, Sub(ex As Exception) RaiseEvent Progress(New ProgressEvent(MessageKind.Fail, "Failed to start Dex2", ex))
+                AddHandler dex2.Failure, Sub(ex As Exception) RaiseEvent Progress(New ProgressEvent(MessageKind.Fail, "Failed to start Dex2", exc:=ex))
                 AddHandler dex2.Metadata, handler
                 dex2.Load(allowedRics.ToList(), query)
             Else
@@ -307,13 +365,14 @@ Namespace Bonds
         End Sub
 
         Private Sub LoadStep5()
-            Logger.Info("LoadAllRics")
-            LoadGeneral(RicsTable, QueryRics, "Loading all rics",
-                         Sub(data As LinkedList(Of Dictionary(Of String, Object)))
-                             ImportData(data, RicsTable, QueryRics)
-                             BondsData.Instance.Refresh()
-                             RaiseEvent Progress(New ProgressEvent(MessageKind.Finished, "All data loaded"))
-                         End Sub)
+            'Logger.Info("LoadAllRics")
+            'LoadGeneral(RicsTable, QueryRics, "Loading all rics",
+            '             Sub(data As LinkedList(Of Dictionary(Of String, Object)))
+            '                 ImportData(data, RicsTable, QueryRics)
+            '                 BondsData.Instance.Refresh()
+            '                 RaiseEvent Progress(New ProgressEvent(MessageKind.Finished, "All data loaded"))
+            '             End Sub)
+            RaiseEvent Progress(New ProgressEvent(MessageKind.Finished, "All data loaded"))
         End Sub
 
 

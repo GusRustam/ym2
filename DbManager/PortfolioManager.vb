@@ -200,20 +200,20 @@ Public Class Fields
     Public Sub New(ByVal id As String, ByVal node As XmlNode, ByVal subnode As String)
         _name = subnode
         _id = id
-        Logger.Trace(String.Format("FieldSet({0}, {1})", node.Name, subnode))
+        'Logger.Trace(String.Format("FieldSet({0}, {1})", node.Name, subnode))
         For Each info In (From fld In Me.GetType().GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
                            Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False)
                            Where attx.Any
                            Select fld, attx)
 
             Dim xmlName = CType(info.attx(0), ConfingNameAttribute).XmlName
-            Logger.Trace(" ---> found node named {0}", xmlName)
+            'Logger.Trace(" ---> found node named {0}", xmlName)
             Dim item = node.SelectSingleNode(String.Format("{0}/field[@type='{1}']", subnode, xmlName))
             If item IsNot Nothing Then
-                Logger.Trace(" ---> {0} <- {1}", xmlName, item.InnerText)
+                'Logger.Trace(" ---> {0} <- {1}", xmlName, item.InnerText)
                 info.fld.SetValue(Me, item.InnerText)
-            Else
-                Logger.Trace(" ---> no data")
+                'Else
+                '    Logger.Trace(" ---> no data")
             End If
         Next
     End Sub
@@ -1054,6 +1054,21 @@ Public Class PortfolioException
     End Sub
 End Class
 
+Public Class NoPortfolioException
+    Inherits PortfolioException
+
+    Public Sub New()
+    End Sub
+
+    Public Sub New(ByVal message As String)
+        MyBase.New(message)
+    End Sub
+
+    Public Sub New(ByVal message As String, ByVal innerException As Exception)
+        MyBase.New(message, innerException)
+    End Sub
+End Class
+
 Public Class NoSourceException
     Inherits PortfolioException
 
@@ -1247,6 +1262,12 @@ Public Class PortfolioManager
         Else
             parent = _bonds.SelectSingleNode("/bonds/portfolios")
         End If
+        If parent Is Nothing Then
+            parent = _bonds.SelectSingleNode(String.Format("/bonds/portfolios//folder[portfolio[@id='{0}']]", id))
+            If parent Is Nothing Then parent = _bonds.SelectSingleNode("/bonds/portfolios")
+            If parent Is Nothing Then Throw New NoPortfolioException()
+        End If
+
         Dim folder As XmlNode = _bonds.CreateNode(XmlNodeType.Element, type, "")
 
         Dim idAttr As XmlAttribute = _bonds.CreateAttribute("id")

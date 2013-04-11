@@ -49,20 +49,30 @@ Namespace Bonds
         Private ReadOnly _shortName As String
         Private ReadOnly _label As String
 
-        Private ReadOnly _maturity As Date
+        Private ReadOnly _maturity As Date?
         Private ReadOnly _coupon As Double
 
         Private ReadOnly _paymentStructure As String
         Private ReadOnly _rateStructure As String
         Private ReadOnly _issueDate As Date
 
-        ' todo user-defined labels, combined from fields and formatted as necessary (???)
+        Private ReadOnly _issuerName As String
+        Private ReadOnly _borrowerName As String
+        Private ReadOnly _currency As String
+        Private ReadOnly _putable As Boolean
+        Private ReadOnly _callable As Boolean
+        Private ReadOnly _floater As Boolean
+        Private ReadOnly _lastIssueRating As RatingDescr
+        Private ReadOnly _lastIssuerRating As RatingDescr
+        Private ReadOnly _lastRating As RatingDescr
+
         Private ReadOnly _label1 As String
         Private ReadOnly _label2 As String
         Private ReadOnly _label3 As String
         Private ReadOnly _label4 As String
 
-        Sub New(ByVal ric As String, ByVal shortName As String, ByVal label As String, ByVal maturity As Date, ByVal coupon As Double, ByVal paymentStructure As String, ByVal rateStructure As String, ByVal issueDate As Date, ByVal label1 As String, ByVal label2 As String, ByVal label3 As String, ByVal label4 As String)
+        Sub New(ByVal ric As String, ByVal shortName As String, ByVal label As String, ByVal maturity As Date?, ByVal coupon As Double, ByVal paymentStructure As String, ByVal rateStructure As String, ByVal issueDate As Date, ByVal label1 As String, ByVal label2 As String, ByVal label3 As String, ByVal label4 As String,
+                ByVal issuerName As String, ByVal borrowerName As String, ByVal currency As String, ByVal putable As Boolean, ByVal callable As Boolean, ByVal floater As Boolean, ByVal lastIssueRating As RatingDescr, ByVal lastIssuerRating As RatingDescr, ByVal lastRating As RatingDescr)
             _ric = ric
             _shortName = shortName
             _label = label
@@ -75,9 +85,20 @@ Namespace Bonds
             _label2 = label2
             _label3 = label3
             _label4 = label4
+
+            _issuerName = issuerName
+            _borrowerName = borrowerName
+            _currency = currency
+            _putable = putable
+            _callable = callable
+            _floater = floater
+            _lastIssueRating = lastIssueRating
+            _lastIssuerRating = lastIssuerRating
+            _lastRating = lastRating
         End Sub
 
         <DisplayName("Ric")>
+        <FilterName("Ric")>
         Public ReadOnly Property RIC As String
             Get
                 Return _ric
@@ -85,6 +106,7 @@ Namespace Bonds
         End Property
 
         <DisplayName("Name")>
+        <FilterName("Name")>
         Public ReadOnly Property ShortName As String
             Get
                 Return _shortName
@@ -99,12 +121,15 @@ Namespace Bonds
         End Property
 
         <DisplayName("Maturity date")>
-        Public ReadOnly Property Maturity As Date
+        <FilterName("MaturityDate", "=", "^#(?<day>[0-9]{2})/(?<month>[0-9]{2})/(?<year>[0-9]{2,4})#$")>
+        Public ReadOnly Property Maturity As Date?
             Get
                 Return _maturity
             End Get
         End Property
 
+        <FilterName("CurrentCoupon", "(?<sign>(=|>|<|>=|<=))", "(?<num>([0-9]+)(.[0-9]{1,})?)")>
+        <DisplayName("Current coupon")>
         Public ReadOnly Property Coupon As Double
             Get
                 Return _coupon
@@ -126,6 +151,7 @@ Namespace Bonds
         End Property
 
         <DisplayName("Issue date")>
+        <FilterName("IssueDate", "=", "^#(?<day>[0-9]{2})/(?<month>[0-9]{2})/(?<year>[0-9]{2,4})#$")>
         Public ReadOnly Property IssueDate As Date
             Get
                 Return _issueDate
@@ -157,6 +183,73 @@ Namespace Bonds
         Public ReadOnly Property Label4 As String
             Get
                 Return _label4
+            End Get
+        End Property
+
+
+        <DisplayName("Issuer Name")>
+        Public ReadOnly Property IssuerName As String
+            Get
+                Return _issuerName
+            End Get
+        End Property
+
+        <DisplayName("Borrower Name")>
+        Public ReadOnly Property BorrowerName As String
+            Get
+                Return _borrowerName
+            End Get
+        End Property
+
+        <FilterName("Currency")>
+        Public ReadOnly Property Currency As String
+            Get
+                Return _currency
+            End Get
+        End Property
+
+        <FilterName("Putable", "=", "(?<bool>True|False)")>
+        Public ReadOnly Property Putable As Boolean
+            Get
+                Return _putable
+            End Get
+        End Property
+
+        <FilterName("Callable", "=", "(?<bool>True|False)")>
+        Public ReadOnly Property Callable As Boolean
+            Get
+                Return _callable
+            End Get
+        End Property
+
+        <FilterName("Floater", "=", "(?<bool>True|False)")>
+        Public ReadOnly Property Floater As Boolean
+            Get
+                Return _floater
+            End Get
+        End Property
+
+        <DisplayName("Last issue rating")>
+        <FilterName("LastIssueRating", "(?<sign>(=|>|<|>=|<=))")>
+        Public ReadOnly Property LastIssueRating As RatingDescr
+            Get
+                Return _lastIssueRating
+            End Get
+        End Property
+
+        <DisplayName("Last issuer rating")>
+        <FilterName("LastIssuerRating", "(?<sign>(=|>|<|>=|<=))")>
+        Public ReadOnly Property LastIssuerRating As RatingDescr
+            Get
+                Return _lastIssuerRating
+            End Get
+        End Property
+
+        <DisplayName("Last rating")>
+        <FilterName("LastRating", "(?<sign>(=|>|<|>=|<=))")>
+        Public ReadOnly Property LastRating As RatingDescr
+            Get
+                Return _lastRating
             End Get
         End Property
 

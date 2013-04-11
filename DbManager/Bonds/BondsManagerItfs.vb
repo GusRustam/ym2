@@ -1,4 +1,5 @@
-﻿Imports Uitls
+﻿Imports System.ComponentModel
+Imports Uitls
 
 Namespace Bonds
     Public Class NoBondException
@@ -21,6 +22,7 @@ Namespace Bonds
         Function BondExists(ByVal ric As String) As Boolean
         Function GetBondInfo(ByVal ric As String) As BondDescription
         Function GetBondPayments(ByVal ric As String) As BondPayments
+        Function GetBondInfo(ByVal rics As List(Of String)) As List(Of BondDescription)
     End Interface
 
     Public Interface IBondsLoader
@@ -48,7 +50,6 @@ Namespace Bonds
         Function GetChainRics(ByVal chainRic As String) As List(Of String)
         Function GetFrnTable() As BondsDataSet.FrnDataTable
         Function GetRicsTable() As BondsDataSet.RicsDataTable
-
         Sub ClearTables()
     End Interface
 End Namespace

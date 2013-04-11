@@ -1,4 +1,5 @@
 ﻿Imports System.Windows.Forms.DataVisualization.Charting
+Imports DbManager
 Imports DbManager.Bonds
 Imports Uitls
 Imports YieldMap.Tools.History
@@ -288,14 +289,16 @@ Namespace Forms.ChartForm
         Private Sub ShowCurveCMS(nm As String, ByVal refCurve As SwapCurve)
             SpreadCMS.Items.Clear()
             SpreadCMS.Tag = nm
-            If Not _moneyMarketCurves.Any() Then Return
-            _moneyMarketCurves.Cast(Of SwapCurve).ToList().ForEach(
+            'If Not _moneyMarketCurves.Any() Then Return
+            ' todo add menu point to add a curve...
+            _moneyMarketCurves.ForEach(
                 Sub(item)
                     Dim elem = CType(SpreadCMS.Items.Add(item.GetFullName(), Nothing, AddressOf OnYieldCurveSelected), ToolStripMenuItem)
                     elem.CheckOnClick = True
                     elem.Checked = refCurve IsNot Nothing AndAlso item.GetFullName() = refCurve.GetFullName()
                     elem.Tag = item
                 End Sub)
+
             SpreadCMS.Show(MousePosition)
         End Sub
 
@@ -336,19 +339,11 @@ Namespace Forms.ChartForm
             TheChart.BringToFront()
         End Sub
 
-        Private Class CurveDescr
-            Public Type As String
-            Public Name As String
-            Public ID As Integer
-            Public Color As String
-        End Class
-
-        Private Sub DoAdd(ByVal curves As List(Of CurveDescr))
-            curves.ForEach(
-                Sub(curve)
-                    Dim item = BondCurvesTSMI.DropDownItems.Add(curve.Name, Nothing, AddressOf AddBondCurveTSMIClick)
-                    item.Tag = curve
-                End Sub)
+        Private Sub DoAdd(ByVal curves As IEnumerable(Of Source))
+            For Each curve In curves
+                Dim item = BondCurvesTSMI.DropDownItems.Add(curve.Name, Nothing, AddressOf AddBondCurveTSMIClick)
+                item.Tag = curve
+            Next
         End Sub
 
         Private Sub PaintSwapCurve(ByVal curve As SwapCurve, raw As Boolean)

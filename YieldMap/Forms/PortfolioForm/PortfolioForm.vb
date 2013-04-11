@@ -214,12 +214,18 @@ Namespace Forms.PortfolioForm
 
             If adder.ShowDialog() = DialogResult.OK Then
                 Dim newId As Long
-                If adder.ItsFolder.Checked Then
-                    newId = PortfolioManager.AddFolder(adder.NewName.Text, theId)
-                Else
-                    newId = PortfolioManager.AddPortfolio(adder.NewName.Text, theId)
-                End If
-                RefreshPortfolioTree(newId)
+                Try
+                    If adder.ItsFolder.Checked Then
+                        newId = PortfolioManager.AddFolder(adder.NewName.Text, theId)
+                    Else
+                        newId = PortfolioManager.AddPortfolio(adder.NewName.Text, theId)
+                    End If
+                Catch ex As PortfolioException
+                    MessageBox.Show("Can not add item into portfolio, please select a folder", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Finally
+                    RefreshPortfolioTree(newId)
+                End Try
+
             End If
         End Sub
 
@@ -473,12 +479,17 @@ Namespace Forms.PortfolioForm
         Private Sub BondsLoaderFinished(ByVal evt As ProgressEvent) Handles _loader.Progress
             Logger.Info("Got message {0}", evt.Msg)
             If evt.Log.Success() Then
-
                 GuiAsync(AddressOf RefreshChainsLists)
             ElseIf evt.Log.Failed() Then
                 MessageBox.Show(evt.Log.Entries.Select(Function(item) item.Msg).Aggregate(Function(str, item) str + Environment.NewLine + item),
                                 "Errors occured", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End If
+        End Sub
+
+        Private Sub AddItemsButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AddItemsButton.Click
+            If ChainsButton.Checked Then Return
+            Dim a As New BondSelectorForm
+            a.ShowDialog()
         End Sub
 #End Region
 
@@ -528,5 +539,6 @@ Namespace Forms.PortfolioForm
         End Sub
 
 #End Region
+
     End Class
 End Namespace

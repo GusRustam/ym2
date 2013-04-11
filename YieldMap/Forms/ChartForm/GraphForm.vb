@@ -4,6 +4,7 @@ Imports System.Drawing
 Imports AdfinXAnalyticsFunctions
 Imports System.ComponentModel
 Imports DbManager.Bonds
+Imports YieldMap.Forms.PortfolioForm
 Imports Settings
 Imports Uitls
 Imports YieldMap.Forms.TableForm
@@ -83,48 +84,52 @@ Namespace Forms.ChartForm
 
                 Dim portfolioStructure = PortfolioManager.Instance().GetPortfolioStructure(currentPortID)
                 For Each port In portfolioStructure.Sources '(From p In portfolioSources Where p.portfolioID = currentPortID Select p)
-                    Dim group As Group
-
-                    group = New Group(_ansamble) With {
-                        .SeriesName = If(port.Name <> "", port.Name, port.Source.Name),
-                        .PortfolioID = port.Source.ID,
-                        .BidField = port.Source.Fields.Realtime.Bid,
-                        .AskField = port.Source.Fields.Realtime.Ask,
-                        .LastField = port.Source.Fields.Realtime.Hist,
-                        .HistField = port.Source.Fields.Realtime.Hist,
-                        .VolumeField = port.Source.Fields.Realtime.Volume,
-                        .VwapField = port.Source.Fields.Realtime.VWAP,
-                        .Brokers = {"MM", ""}.ToList(),
-                        .Currency = "",
-                        .Color = port.Source.Color
-                    }
-
-                    ' TODO THAT'S BULLSHIT BUT CURRENTLY NECESSARY BULLSHIT
-                    Dim selectedField As String
-                    If group.LastField.Trim() <> "" Then
-                        selectedField = group.LastField
-                    ElseIf group.VwapField.Trim() <> "" Then
-                        selectedField = group.VwapField
-                    ElseIf group.BidField.Trim() <> "" Then
-                        selectedField = group.BidField
-                    Else
-                        selectedField = group.AskField
-                    End If
-
-                    For Each ric In portfolioStructure.Rics(port)
-                        Dim descr = BondsData.Instance.GetBondInfo(ric)
-                        If descr IsNot Nothing Then
-                            group.AddRic(ric, descr, selectedField)
-                        Else
-                            Logger.Error("No description for bond {0} found", ric)
-                        End If
-                    Next
-
+                    Dim group As Group = GetGroup(port, portfolioStructure)
                     _ansamble.AddGroup(group)
                 Next
                 _ansamble.StartLoadingLiveData()
             End Set
         End Property
+
+        Private Function GetGroup(ByVal port As PortfolioSource, ByVal portfolioStructure As PortfolioStructure) As Group
+            Dim group As Group
+
+            group = New Group(_ansamble) With {
+                .SeriesName = If(port.Name <> "", port.Name, port.Source.Name),
+                .PortfolioID = port.Source.ID,
+                .BidField = port.Source.Fields.Realtime.Bid,
+                .AskField = port.Source.Fields.Realtime.Ask,
+                .LastField = port.Source.Fields.Realtime.Hist,
+                .HistField = port.Source.Fields.Realtime.Hist,
+                .VolumeField = port.Source.Fields.Realtime.Volume,
+                .VwapField = port.Source.Fields.Realtime.VWAP,
+                .Brokers = {"MM", ""}.ToList(),
+                .Currency = "",
+                .Color = port.Source.Color
+            }
+
+            ' TODO THAT'S BULLSHIT BUT CURRENTLY NECESSARY BULLSHIT
+            Dim selectedField As String
+            If group.LastField.Trim() <> "" Then
+                selectedField = group.LastField
+            ElseIf group.VwapField.Trim() <> "" Then
+                selectedField = group.VwapField
+            ElseIf group.BidField.Trim() <> "" Then
+                selectedField = group.BidField
+            Else
+                selectedField = group.AskField
+            End If
+
+            For Each ric In portfolioStructure.Rics(port)
+                Dim descr = BondsData.Instance.GetBondInfo(ric)
+                If descr IsNot Nothing Then
+                    group.AddRic(ric, descr, selectedField)
+                Else
+                    Logger.Error("No description for bond {0} found", ric)
+                End If
+            Next
+            Return group
+        End Function
 
 #End Region
 
@@ -893,68 +898,39 @@ Namespace Forms.ChartForm
 
         Private Sub CurvesTSMIDropDownOpening(ByVal sender As Object, ByVal e As EventArgs) Handles CurvesTSMI.DropDownOpening
             BondCurvesTSMI.DropDownItems.Clear()
-            Dim chains = (From chain In PortfolioManager.Instance.ChainsView
-                         Where chain.Curve
-                         Select New CurveDescr With {
-                                    .Type = "Chain",
-                                    .Name = chain.Name,
-                                    .ID = chain.ID,
-                                    .Color = chain.Color}).ToList
-            DoAdd(chains)
-
-            Dim lists = (From list In PortfolioManager.Instance.UserListsView
-                         Where list.Curve
-                         Select New CurveDescr With {
-                                    .Type = "List",
-                                    .Name = list.Name,
-                                    .ID = list.ID,
-                                    .Color = list.Color}).ToList
-            DoAdd(lists)
+            DoAdd(From chain In PortfolioManager.Instance.ChainsView Where chain.Curve)
+            DoAdd(From list In PortfolioManager.Instance.UserListsView Where list.Curve)
         End Sub
 
         Private Sub AddBondCurveTSMIClick(ByVal sender As Object, ByVal e As EventArgs)
-            'Logger.Info("AddBondCurveTSMIClick")
-            'Dim selectedItem = CType(CType(sender, ToolStripMenuItem).Tag, CurveDescr)
-            'Dim ricsInCurve As List(Of String)
+            Logger.Info("AddBondCurveTSMIClick")
+            Dim selectedItem = CType(CType(sender, ToolStripMenuItem).Tag, Source)
+            Dim fieldNames As New Dictionary(Of QuoteSource, String)
+            Dim ricsInCurve = selectedItem.GetDefaultRics()
 
-            'Dim fieldNames As New Dictionary(Of QuoteSource, String)
-            'Dim fieldSetId As Integer
-            'If selectedItem.Type = "List" Then
-            '    Dim data As New _ricsInHawserTableAdapter
-            '    Dim theData = data.GetData
-            '    ricsInCurve = theData.Where(Function(row) row.ric IsNot Nothing AndAlso row.id = selectedItem.ID).Select(Function(row) row.ric).ToList()
-            '    fieldSetId = (New hawserTableAdapter).GetData.First(Function(row) row.id = selectedItem.ID).id_field_set
-            'Else
-            '    Dim data As New _ricsInChainTableAdapter
-            '    Dim theData = data.GetData
-            '    ricsInCurve = theData.Where(Function(row) row.ric IsNot Nothing AndAlso row.id = selectedItem.ID).Select(Function(row) row.ric).ToList()
-            '    fieldSetId = (New chainTableAdapter).GetData.First(Function(row) row.id = selectedItem.ID).id_field_set
-            'End If
+            If Not ricsInCurve.Any() Then
+                MsgBox("Empty curve selected!")
+                Return
+            End If
 
-            'Dim layoutData = (New field_layoutTableAdapter).GetData.Where(Function(row) row.field_set_id = fieldSetId)
-            'Dim realTime = layoutData.First(Function(row) row.is_realtime = 1)
-            'Dim history = layoutData.First(Function(row) row.is_realtime = 0)
+            Dim fields = New FieldSet(selectedItem.FieldSetId)
 
-            'fieldNames.Add(QuoteSource.Bid, realTime.bid_field)
-            'fieldNames.Add(QuoteSource.Ask, realTime.ask_field)
-            'fieldNames.Add(QuoteSource.Last, realTime.last_field)
-            'fieldNames.Add(QuoteSource.Hist, history.last_field)
+            fieldNames.Add(QuoteSource.Bid, fields.Realtime.Bid)
+            fieldNames.Add(QuoteSource.Ask, fields.Realtime.Ask)
+            fieldNames.Add(QuoteSource.Last, fields.Realtime.Last)
+            fieldNames.Add(QuoteSource.Hist, fields.History.Last)
 
-            'If Not ricsInCurve.Any() Then
-            '    MsgBox("Empty curve selected!")
-            '    Return
-            'End If
 
-            'Dim newCurve = New YieldCurve(selectedItem.Name, ricsInCurve, selectedItem.Color, fieldNames, _spreadBenchmarks)
+            Dim newCurve = New YieldCurve(selectedItem.Name, ricsInCurve, selectedItem.Color, fieldNames, _spreadBenchmarks)
 
-            'AddHandler newCurve.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
-            'AddHandler newCurve.Cleared, AddressOf CurveDeleted
-            'AddHandler newCurve.Recalculated, AddressOf OnCurveRecalculated
-            'AddHandler newCurve.Updated, AddressOf OnCurvePaint
-            'AddHandler newCurve.Faulted, AddressOf OnCurveFault
+            AddHandler newCurve.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
+            AddHandler newCurve.Cleared, AddressOf CurveDeleted
+            AddHandler newCurve.Recalculated, AddressOf OnCurveRecalculated
+            AddHandler newCurve.Updated, AddressOf OnCurvePaint
+            AddHandler newCurve.Faulted, AddressOf OnCurveFault
 
-            '_moneyMarketCurves.Add(newCurve)
-            'newCurve.Subscribe()
+            _moneyMarketCurves.Add(newCurve)
+            newCurve.Subscribe()
         End Sub
 
         Private Sub SelDateTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles SelDateTSMI.Click
@@ -1072,58 +1048,58 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub SelectFromAListTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SelectFromAListTSMI.Click
-            'Dim bondSelector As New BondSelectorForm
-            'If bondSelector.ShowDialog() = DialogResult.OK AndAlso bondSelector.SelectedRICs.Any Then
-            '    Dim groupSelector As New GroupSelectForm
-            '    groupSelector.InitGroupList(_ansamble.GetGroupList())
-            '    If groupSelector.ShowDialog() = DialogResult.OK Then
-            '        Dim grp As Group
-            '        If groupSelector.UseNew Then
-            '            grp = New Group(_ansamble)
-            '            grp.Color = groupSelector.NewColor.ToString()
-            '            grp.SeriesName = groupSelector.NewName
+            Dim bondSelector As New BondSelectorForm
+            If bondSelector.ShowDialog() = DialogResult.OK AndAlso bondSelector.SelectedRICs.Any Then
+                '    Dim groupSelector As New GroupSelectForm
+                '    groupSelector.InitGroupList(_ansamble.GetGroupList())
+                '    If groupSelector.ShowDialog() = DialogResult.OK Then
+                '        Dim grp As Group
+                '        If groupSelector.UseNew Then
+                '            grp = New Group(_ansamble)
+                '            grp.Color = groupSelector.NewColor.ToString()
+                '            grp.SeriesName = groupSelector.NewName
 
-            '            Dim layout As New field_layoutTableAdapter
-            '            Dim setInfo = layout.GetData().Where(Function(row) row.field_set_id = groupSelector.LayoutId)
-            '            Dim rw = setInfo.First(Function(row) row.is_realtime = 1)
+                '            Dim layout As New field_layoutTableAdapter
+                '            Dim setInfo = layout.GetData().Where(Function(row) row.field_set_id = groupSelector.LayoutId)
+                '            Dim rw = setInfo.First(Function(row) row.is_realtime = 1)
 
-            '            grp.AskField = rw.ask_field
-            '            grp.BidField = rw.bid_field
-            '            grp.LastField = rw.last_field
-            '            grp.VwapField = rw.vwap_field
-            '            grp.VolumeField = rw.volume_field
+                '            grp.AskField = rw.ask_field
+                '            grp.BidField = rw.bid_field
+                '            grp.LastField = rw.last_field
+                '            grp.VwapField = rw.vwap_field
+                '            grp.VolumeField = rw.volume_field
 
-            '            rw = setInfo.First(Function(row) row.is_realtime = 0)
-            '            grp.HistField = rw.last_field
+                '            rw = setInfo.First(Function(row) row.is_realtime = 0)
+                '            grp.HistField = rw.last_field
 
-            '            _ansamble.AddGroup(grp)
-            '        Else
-            '            grp = _ansamble.GetGroup(groupSelector.ExistingGroupId)
-            '        End If
+                '            _ansamble.AddGroup(grp)
+                '        Else
+                '            grp = _ansamble.GetGroup(groupSelector.ExistingGroupId)
+                '        End If
 
-            '        ' TODO BULLSHIT AGAIN!!!
-            '        Dim selectedField As String
-            '        If grp.LastField.Trim() <> "" Then
-            '            selectedField = grp.LastField
-            '        ElseIf grp.VwapField.Trim() <> "" Then
-            '            selectedField = grp.VwapField
-            '        ElseIf grp.BidField.Trim() <> "" Then
-            '            selectedField = grp.BidField
-            '        Else
-            '            selectedField = grp.AskField
-            '        End If
+                '        ' TODO BULLSHIT AGAIN!!!
+                '        Dim selectedField As String
+                '        If grp.LastField.Trim() <> "" Then
+                '            selectedField = grp.LastField
+                '        ElseIf grp.VwapField.Trim() <> "" Then
+                '            selectedField = grp.VwapField
+                '        ElseIf grp.BidField.Trim() <> "" Then
+                '            selectedField = grp.BidField
+                '        Else
+                '            selectedField = grp.AskField
+                '        End If
 
-            '        bondSelector.SelectedRICs.ForEach(
-            '            Sub(aRic)
-            '                Dim descr = DbInitializer.GetBondInfo(aRic)
-            '                If descr IsNot Nothing Then
-            '                    grp.AddRic(aRic, descr, selectedField)
-            '                End If
-            '            End Sub)
-            '        grp.StartRics(bondSelector.SelectedRICs)
-            '    End If
+                '        bondSelector.SelectedRICs.ForEach(
+                '            Sub(aRic)
+                '                Dim descr = DbInitializer.GetBondInfo(aRic)
+                '                If descr IsNot Nothing Then
+                '                    grp.AddRic(aRic, descr, selectedField)
+                '                End If
+                '            End Sub)
+                '        grp.StartRics(bondSelector.SelectedRICs)
+                '    End If
 
-            'End If
+            End If
         End Sub
 #End Region
 

@@ -1,6 +1,6 @@
 ﻿Imports System.Windows.Forms
+Imports DbManager.Bonds
 Imports YieldMap.Forms.MainForm
-Imports YieldMap.Commons
 
 Namespace Forms.PortfolioForm
     Public Class BondSelectorForm
@@ -18,7 +18,7 @@ Namespace Forms.PortfolioForm
             End Get
         End Property
 
-        Private Sub BondSelectorFormLoad(sender As System.Object, e As EventArgs) Handles MyBase.Load
+        Private Sub BondSelectorFormLoad(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Load
             RefreshList()
             RefreshGrid()
             RefreshColumns()
@@ -26,21 +26,32 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub RefreshColumns()
-            Dim selectedFields = BondSelectorVisibleColumns.Split(",")
-            If selectedFields.Contains("ALL") Then
-                For Each column As DataGridViewColumn In BondListDGV.Columns
-                    column.Visible = True
-                Next
-            Else
-                For Each column As DataGridViewColumn In BondListDGV.Columns
-                    column.Visible = selectedFields.Contains(column.DataPropertyName)
-                Next
-            End If
-            BondListDGV.Columns(0).Visible = False
+            'Dim selectedFields = BondSelectorVisibleColumns.Split(",")
+            'If selectedFields.Contains("ALL") Then
+            '    For Each column As DataGridViewColumn In BondListDGV.Columns
+            '        column.Visible = True
+            '    Next
+            'Else
+            '    For Each column As DataGridViewColumn In BondListDGV.Columns
+            '        column.Visible = selectedFields.Contains(column.DataPropertyName)
+            '    Next
+            'End If
+            'BondListDGV.Columns(0).Visible = False
         End Sub
 
         Private Sub RefreshList()
-            IssuerTableAdapter.Fill(BondsDataSet.issuer)
+            Dim rics = (From row In BondsLoader.Instance.GetBondsTable() Select row.ric).ToList()
+            BondListDGV.DataSource = BondsData.Instance.GetBondInfo(rics)
+            '
+            ' todo 1) выборка списка облигаций ( с загрузкой рейтингов )
+            ' todo 2) показ их в табличке
+            ' todo 3) сортировка и статическая фильтрация
+            ' todo 4) для строк предусмотреть оператор LIKE
+            ' todo 5) выполнение распарсенного представления и динамическая фильтрация
+            '
+            'IssuerTableAdapter.Fill(BondsDataSet.issuer)
+
+
             'Dim accs = New AutoCompleteStringCollection()
 
             'For Each aName In BondsDataSet.issuer.Select(Function(row As BondsDataSet.issuerRow) row.shortname)
@@ -60,11 +71,11 @@ Namespace Forms.PortfolioForm
                 strFitler = If(strFitler <> "", strFitler & " AND ", "") & String.Format("ric LIKE '{0}%'", RICTextBox.Text)
             End If
 
-            BondDescriptionsBindingSource.Filter = strFitler
+            'BondDescriptionsBindingSource.Filter = strFitler
 
-            AddHandler BondDescriptionsTableAdapter.Adapter.FillError, AddressOf SkipInvalidRows
-            BondDescriptionsTableAdapter.Fill(BondsDataSet.BondDescriptions)
-            RemoveHandler BondDescriptionsTableAdapter.Adapter.FillError, AddressOf SkipInvalidRows
+            'AddHandler BondDescriptionsTableAdapter.Adapter.FillError, AddressOf SkipInvalidRows
+            'BondDescriptionsTableAdapter.Fill(BondsDataSet.BondDescriptions)
+            'RemoveHandler BondDescriptionsTableAdapter.Adapter.FillError, AddressOf SkipInvalidRows
         End Sub
 
         Private Sub OkButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles OkButton.Click
@@ -118,11 +129,11 @@ Namespace Forms.PortfolioForm
                     anOrder = SortOrder.None
                     dir = ""
             End Select
-            If anOrder <> SortOrder.None Then
-                BondDescriptionsBindingSource.Sort = " " & nm & " " & dir
-            Else
-                BondDescriptionsBindingSource.Sort = ""
-            End If
+            'If anOrder <> SortOrder.None Then
+            '    BondDescriptionsBindingSource.Sort = " " & nm & " " & dir
+            'Else
+            '    BondDescriptionsBindingSource.Sort = ""
+            'End If
             Return anOrder
         End Function
 
