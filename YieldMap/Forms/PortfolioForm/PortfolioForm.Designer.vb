@@ -955,7 +955,7 @@
             '
             Me.ChainsListsCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddCLTSMI, Me.EditCLTSMI, Me.DeleteCLTSMI, Me.ReloadCLTSMI})
             Me.ChainsListsCMS.Name = "ChainsListsCMS"
-            Me.ChainsListsCMS.Size = New System.Drawing.Size(153, 114)
+            Me.ChainsListsCMS.Size = New System.Drawing.Size(136, 92)
             '
             'AddCLTSMI
             '
@@ -978,7 +978,7 @@
             'ReloadCLTSMI
             '
             Me.ReloadCLTSMI.Name = "ReloadCLTSMI"
-            Me.ReloadCLTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.ReloadCLTSMI.Size = New System.Drawing.Size(135, 22)
             Me.ReloadCLTSMI.Text = "Reload items"
             '
             'PortfolioForm

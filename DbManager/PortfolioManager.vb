@@ -48,51 +48,6 @@ Friend Interface IPortfolioManagerLocal
     Function GetConfigDocument() As XmlDocument
 End Interface
 
-Public Class Portfolio
-    Public IsFolder As Boolean
-    Public Name As String
-    Public Id As String
-
-    Private Shared ReadOnly PortMan As PortfolioManager = PortfolioManager.ClassInstance
-
-    Public Sub New(ByVal isFolder As Boolean, ByVal name As String, ByVal id As String)
-        Me.IsFolder = isFolder
-        Me.Name = name
-        Me.Id = id
-    End Sub
-
-    Public Sub DeleteSource(ByVal src As PortfolioSource)
-        If IsFolder Then Throw New PortfolioException(String.Format("Item with id {0} is a folder", Id))
-        Dim xml = PortMan.GetConfigDocument()
-        Dim papa = xml.SelectSingleNode(String.Format("/bonds/portfolios//portfolio[@id='{0}']", Id))
-        If papa Is Nothing Then Throw New PortfolioException(String.Format("Can not find portfolio with id {0}", Id))
-        Dim node = papa.SelectSingleNode(String.Format("include[@what='{0}' and @id='{1}'] | exclude[@what='{0}' and @id='{1}']", src.Source.GetXmlTypeName(), src.Source.ID))
-        If node Is Nothing Then Throw New PortfolioException(String.Format("Can not find source with id {0} and type [{2}] in portfolio with id {1} ", src.Source.ID, Id, src.Source.GetXmlTypeName()))
-        papa.RemoveChild(node)
-        PortMan.SaveBonds()
-    End Sub
-
-    Public Sub AddSource(ByVal source As Source, ByVal customName As String, ByVal customColor As String, ByVal condition As String, ByVal include As Boolean)
-        If IsFolder Then Throw New PortfolioException(String.Format("Item with id {0} is a folder", Id))
-        Dim xml = PortMan.GetConfigDocument()
-        Dim node = xml.SelectSingleNode(String.Format("/bonds/portfolios//portfolio[@id='{0}']", Id))
-        If node Is Nothing Then Throw New PortfolioException(String.Format("Can not find portfolio with id {0}", Id))
-        Dim newSrc = xml.CreateNode(XmlNodeType.Element, If(include, "include", "exclude"), "")
-        xml.AppendAttr(newSrc, "what", source.GetXmlTypeName())
-        xml.AppendAttr(newSrc, "id", source.ID)
-        If customName <> "" Then xml.AppendAttr(newSrc, "name", customName)
-        If customColor <> "" Then xml.AppendAttr(newSrc, "color", customColor)
-        If condition <> "" Then xml.AppendAttr(newSrc, "condition", condition)
-        node.AppendChild(newSrc)
-        PortMan.SaveBonds()
-    End Sub
-
-    Public Sub UpdateSource(ByVal who As PortfolioSource, ByVal source As Source, ByVal customName As String, ByVal customColor As String, ByVal condition As String, ByVal include As Boolean)
-        DeleteSource(who)
-        AddSource(source, customName, customColor, condition, include)
-    End Sub
-End Class
-
 Public Class PortfolioManager
     ' TODO multiple config files
     ' TOdO events OnLoadConfig, OnConfigFileUpdated

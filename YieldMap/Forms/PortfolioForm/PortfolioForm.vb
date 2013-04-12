@@ -456,10 +456,7 @@ Namespace Forms.PortfolioForm
             Dim chain As Source = TryCast(elem, Source)
             If chain Is Nothing Then Return
             If e.Button = MouseButtons.Left Then
-                ChainListItemsGrid.DataSource = chain.GetDefaultRicsView()
-                For Each col As DataGridViewColumn In ChainListItemsGrid.Columns
-                    col.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-                Next
+                RefreshChainListItemGrid(chain)
             Else
                 ChainsListsCMS.Show(ChainsListsGrid, e.Location)
             End If
@@ -497,11 +494,32 @@ Namespace Forms.PortfolioForm
             Dim a As New BondSelectorForm
             If a.ShowDialog() = DialogResult.OK Then
                 src.AddItems(a.SelectedRICs)
+                RefreshChainListItemGrid(src)
+            End If
+        End Sub
 
-                ChainListItemsGrid.DataSource = src.GetDefaultRicsView()
-                For Each col As DataGridViewColumn In ChainListItemsGrid.Columns
-                    col.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-                Next
+        Private Sub RefreshChainListItemGrid(ByVal src As UserList)
+            ChainListItemsGrid.DataSource = src.GetDefaultRicsView()
+            For Each col As DataGridViewColumn In ChainListItemsGrid.Columns
+                col.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            Next
+        End Sub
+
+        Private Sub DeleteItemsButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles DeleteItemsButton.Click
+            If ChainsButton.Checked Then Return
+            If ChainsListsGrid.SelectedRows.Count <= 0 Then Return
+
+            Dim elem = ChainsListsGrid.SelectedRows.Item(0).DataBoundItem
+            Dim src As UserList = TryCast(elem, UserList)
+            If src Is Nothing Then Return
+
+            Dim rics = (From row As DataGridViewRow In ChainListItemsGrid.SelectedRows
+                        Let descr = TryCast(row.DataBoundItem, BondDescription)
+                        Where descr IsNot Nothing
+                        Select descr.RIC).ToList()
+            If rics.Any Then
+                src.RemoveItems(rics)
+                RefreshChainListItemGrid(src)
             End If
         End Sub
 #End Region
@@ -552,6 +570,7 @@ Namespace Forms.PortfolioForm
         End Sub
 
 #End Region
+
 
     End Class
 End Namespace

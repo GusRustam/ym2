@@ -113,6 +113,7 @@
     <Compile Include="Bonds\BondView.vb" />
     <Compile Include="Bonds\FilterParser.vb" />
     <Compile Include="Bonds\Rating.vb" />
+    <Compile Include="Fields.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -129,6 +130,8 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="PortfolioManager.vb" />
+    <Compile Include="PortfolioSource.vb" />
+    <Compile Include="Source.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

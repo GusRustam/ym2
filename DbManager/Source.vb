@@ -285,11 +285,24 @@ Public Class UserList
         Dim node = xml.SelectSingleNode(String.Format("/bonds/lists/list[@id='{0}']", ID))
         If node Is Nothing Then Return
         For Each ric In selectedRICs
-            If node.SelectSingleNode(String.Format("/ric[text()='{0}']", ric)) Is Nothing Then
+            If node.SelectSingleNode(String.Format("ric[text() = '{0}']", ric)) Is Nothing Then
                 Dim ricNode = xml.CreateNode(XmlNodeType.Element, "ric", "")
                 ricNode.InnerText = ric
                 node.AppendChild(ricNode)
             End If
+        Next
+        PortfolioManager.ClassInstance.SaveBonds()
+    End Sub
+
+    Public Sub RemoveItems(ByVal rics As List(Of String))
+        Dim xml = PortfolioManager.ClassInstance.GetConfigDocument()
+        Dim node = xml.SelectSingleNode(String.Format("/bonds/lists/list[@id='{0}']", ID))
+        If node Is Nothing Then Return
+        For Each kid In From ric In rics
+                        Let childNode = node.SelectSingleNode(String.Format("ric[text() = '{0}']", ric))
+                        Where childNode IsNot Nothing
+                        Select elem = childNode
+            node.RemoveChild(kid)
         Next
         PortfolioManager.ClassInstance.SaveBonds()
     End Sub
