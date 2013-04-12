@@ -1,4 +1,5 @@
-﻿Imports DbManager
+﻿Imports DbManager.Bonds
+Imports DbManager
 Imports Uitls
 
 Namespace Forms.PortfolioForm
@@ -17,7 +18,15 @@ Namespace Forms.PortfolioForm
 
         Public ReadOnly Property Condition() As String
             Get
-                Return ConditionTB.Text
+                Dim cond = ConditionTB.Text
+                Dim parser As New FilterParser
+                Try
+                    parser.SetFilter(cond)
+                Catch ex As ParserException
+                    
+                    Return ""
+                End Try
+                Return cond
             End Get
         End Property
 
@@ -86,12 +95,12 @@ Namespace Forms.PortfolioForm
                 CustomNameTB.Enabled = True
                 CustomColorCB.Enabled = True
                 RandomColorB.Enabled = True
-                ConditionTB.Enabled = False
+                ConditionTB.Enabled = True
             Else
                 CustomNameTB.Enabled = False
                 CustomColorCB.Enabled = True
                 RandomColorB.Enabled = True
-                ConditionTB.Enabled = False
+                ConditionTB.Enabled = True
             End If
         End Sub
 
@@ -126,6 +135,13 @@ Namespace Forms.PortfolioForm
 
         Private Sub IncludeCB_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles IncludeCB.CheckedChanged
             IncludeCB.Text = If(IncludeCB.Checked, "Yes", "No")
+        End Sub
+
+        Private Sub ConditionTB_Enter(ByVal sender As Object, ByVal e As EventArgs) Handles ConditionTB.Enter
+            Dim frm As New ParserErrorForm
+            If frm.ShowDialog() = DialogResult.OK Then
+
+            End If
         End Sub
     End Class
 End Namespace

@@ -41,6 +41,7 @@
             Me.OkButton = New System.Windows.Forms.Button()
             Me.CancelButton = New System.Windows.Forms.Button()
             Me.TableLayoutPanel3 = New System.Windows.Forms.TableLayoutPanel()
+            Me.Label2 = New System.Windows.Forms.Label()
             Me.ConditionTB = New System.Windows.Forms.TextBox()
             Me.Label5 = New System.Windows.Forms.Label()
             Me.Label3 = New System.Windows.Forms.Label()
@@ -50,7 +51,6 @@
             Me.CustomColorCB = New System.Windows.Forms.ComboBox()
             Me.SampleColorPB = New System.Windows.Forms.PictureBox()
             Me.RandomColorB = New System.Windows.Forms.Button()
-            Me.Label2 = New System.Windows.Forms.Label()
             Me.IncludeCB = New System.Windows.Forms.CheckBox()
             Me.TableLayoutPanel1.SuspendLayout()
             Me.MainTabControl.SuspendLayout()
@@ -168,7 +168,7 @@
             Me.IndividualAndCustomBondsTP.Location = New System.Drawing.Point(4, 22)
             Me.IndividualAndCustomBondsTP.Name = "IndividualAndCustomBondsTP"
             Me.IndividualAndCustomBondsTP.Padding = New System.Windows.Forms.Padding(3)
-            Me.IndividualAndCustomBondsTP.Size = New System.Drawing.Size(408, 313)
+            Me.IndividualAndCustomBondsTP.Size = New System.Drawing.Size(408, 269)
             Me.IndividualAndCustomBondsTP.TabIndex = 1
             Me.IndividualAndCustomBondsTP.Text = "Bonds"
             Me.IndividualAndCustomBondsTP.UseVisualStyleBackColor = True
@@ -185,7 +185,7 @@
             Me.TableLayoutPanel4.RowCount = 2
             Me.TableLayoutPanel4.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
             Me.TableLayoutPanel4.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-            Me.TableLayoutPanel4.Size = New System.Drawing.Size(402, 307)
+            Me.TableLayoutPanel4.Size = New System.Drawing.Size(402, 263)
             Me.TableLayoutPanel4.TabIndex = 1
             '
             'FlowLayoutPanel4
@@ -230,7 +230,7 @@
             Me.BondsDGV.Location = New System.Drawing.Point(3, 33)
             Me.BondsDGV.Name = "BondsDGV"
             Me.BondsDGV.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-            Me.BondsDGV.Size = New System.Drawing.Size(396, 271)
+            Me.BondsDGV.Size = New System.Drawing.Size(396, 227)
             Me.BondsDGV.TabIndex = 1
             '
             'FlowLayoutPanel1
@@ -286,6 +286,17 @@
             Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 24.99813!))
             Me.TableLayoutPanel3.Size = New System.Drawing.Size(416, 114)
             Me.TableLayoutPanel3.TabIndex = 3
+            '
+            'Label2
+            '
+            Me.Label2.AutoSize = True
+            Me.Label2.Enabled = False
+            Me.Label2.Location = New System.Drawing.Point(3, 87)
+            Me.Label2.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
+            Me.Label2.Name = "Label2"
+            Me.Label2.Size = New System.Drawing.Size(42, 13)
+            Me.Label2.TabIndex = 8
+            Me.Label2.Text = "Include"
             '
             'ConditionTB
             '
@@ -372,17 +383,6 @@
             Me.RandomColorB.TabIndex = 2
             Me.RandomColorB.Text = "Random"
             Me.RandomColorB.UseVisualStyleBackColor = True
-            '
-            'Label2
-            '
-            Me.Label2.AutoSize = True
-            Me.Label2.Enabled = False
-            Me.Label2.Location = New System.Drawing.Point(3, 87)
-            Me.Label2.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
-            Me.Label2.Name = "Label2"
-            Me.Label2.Size = New System.Drawing.Size(42, 13)
-            Me.Label2.TabIndex = 8
-            Me.Label2.Text = "Include"
             '
             'IncludeCB
             '

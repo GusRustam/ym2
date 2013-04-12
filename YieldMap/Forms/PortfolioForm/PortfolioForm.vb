@@ -498,7 +498,7 @@ Namespace Forms.PortfolioForm
             End If
         End Sub
 
-        Private Sub RefreshChainListItemGrid(ByVal src As UserList)
+        Private Sub RefreshChainListItemGrid(ByVal src As Source)
             ChainListItemsGrid.DataSource = src.GetDefaultRicsView()
             For Each col As DataGridViewColumn In ChainListItemsGrid.Columns
                 col.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
@@ -570,7 +570,6 @@ Namespace Forms.PortfolioForm
         End Sub
 
 #End Region
-
 
     End Class
 End Namespace

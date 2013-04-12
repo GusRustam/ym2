@@ -540,13 +540,69 @@ Namespace Bonds
         End Sub
     End Class
 
+    Public Class FilterHelper
+        Public Shared Function GetFilterableFields(Of T)() As List(Of String)
+            Dim filteredFields As List(Of PropertyInfo) = GetFilteredFields(Of T)()
+            Dim fields = (
+                    From field In filteredFields
+                    Where field.PropertyType.GetInterface(GetType(IFilterable).Name) Is Nothing
+                    Let nm = field.Name
+                    Select nm).ToList()
+
+            filteredFields.
+                Where(Function(field) field.PropertyType.GetInterface(GetType(IFilterable).Name) IsNot Nothing).
+                Select(Function(field) New With {.Nam = field.Name, .Typ = field.PropertyType}).ToList().
+                ForEach(Sub(element)
+                            ' ReSharper disable VBPossibleMistakenCallToGetType.2
+                            Dim readableProperties = (
+                                    From prop In element.Typ.GetProperties(BindingFlags.Public Or BindingFlags.Instance)
+                                    Where prop.GetCustomAttributes(GetType(FilterableAttribute), False).Any
+                                    Let nm = String.Format("{0}.{1}", element.Nam, prop.Name)
+                                    Select nm
+                                    ).ToList()
+                            ' ReSharper restore VBPossibleMistakenCallToGetType.2
+                            fields.AddRange(readableProperties)
+                        End Sub)
+            Return fields
+        End Function
+
+        Private Shared Function GetFilteredFields(Of T)() As List(Of PropertyInfo)
+            Return (From prop In GetType(T).GetProperties(BindingFlags.Public Or BindingFlags.Instance)
+                    Where prop.GetCustomAttributes(GetType(FilterableAttribute), False).Any).ToList()
+        End Function
+
+        Public Shared Function GetFieldsAndValues(Of T)(ByVal elem As T) As Dictionary(Of String, Object)
+            Dim filteredFields = GetFilteredFields(Of T)()
+            Dim fieldsAndValues = (From field In filteredFields
+                    Where Not TypeOf field.GetValue(elem, Nothing) Is IFilterable
+                    Let nm = field.Name.ToUpper(), val = field.GetValue(elem, Nothing)
+                    Select nm, val).ToDictionary(Function(item) item.nm, Function(item) item.val)
+
+            filteredFields.
+                Where(Function(field) TypeOf field.GetValue(elem, Nothing) Is IFilterable).
+                Select(Function(field) New With {.Nam = field.Name, .Val = field.GetValue(elem, Nothing)}).ToList().
+                ForEach(Sub(element)
+                            ' ReSharper disable VBPossibleMistakenCallToGetType.2
+                            Dim readableProperties = (
+                                    From prop In element.Val.GetType().GetProperties(BindingFlags.Public Or BindingFlags.Instance)
+                                    Where prop.GetCustomAttributes(GetType(FilterableAttribute), False).Any
+                                    Let nm = String.Format("{0}.{1}", element.Nam, prop.Name).ToUpper(), val = prop.GetValue(element.Val, Nothing)
+                                    Select nm, val
+                                    ).ToDictionary(Function(item) item.nm, Function(item) item.val)
+                            ' ReSharper restore VBPossibleMistakenCallToGetType.2
+                            For Each kvp In readableProperties
+                                fieldsAndValues.Add(kvp.Key, kvp.Value)
+                            Next
+                        End Sub)
+            Return fieldsAndValues
+        End Function
+    End Class
+
     Public Class FilterInterpreter(Of T)
         Private _grammar As LinkedList(Of FilterParser.IGrammarElement)
-        Private ReadOnly _filteredFields As List(Of PropertyInfo)
 
         Public Sub New()
-            _filteredFields = (From prop In GetType(T).GetProperties(BindingFlags.Public Or BindingFlags.Instance)
-                                 Where prop.GetCustomAttributes(GetType(FilterableAttribute), False).Any).ToList()
+
         End Sub
 
         Public Sub SetGrammar(ByVal grammar As LinkedList(Of FilterParser.IGrammarElement))
@@ -555,29 +611,12 @@ Namespace Bonds
 
         Public Function Allows(ByVal elem As T)
             If _grammar Is Nothing OrElse Not _grammar.Any Then Return True
+            Dim fieldsAndValues As Dictionary(Of String, Object) = FilterHelper.GetFieldsAndValues(elem)
             ' field.GetType.IsValueType
-            Dim fieldsAndValues = (From field In _filteredFields
-                                   Where Not TypeOf field.GetValue(elem, Nothing) Is IFilterable
-                                   Let nm = field.Name.ToUpper(), val = field.GetValue(elem, Nothing)
-                                   Select nm, val).ToDictionary(Function(item) item.nm, Function(item) item.val)
-            _filteredFields.
-                Where(Function(field) TypeOf field.GetValue(elem, Nothing) Is IFilterable).
-                Select(Function(field) New With {.Nam = field.Name, .Val = field.GetValue(elem, Nothing)}).ToList().
-                ForEach(Sub(element)
-                            ' ReSharper disable VBPossibleMistakenCallToGetType.2
-                            Dim readableProperties = (
-                                From prop In element.Val.GetType().GetProperties(BindingFlags.Public Or BindingFlags.Instance)
-                                Where prop.GetCustomAttributes(GetType(FilterableAttribute), False).Any
-                                Let nm = String.Format("{0}.{1}", element.Nam, prop.Name).ToUpper(), val = prop.GetValue(element.Val, Nothing)
-                                Select nm, val
-                            ).ToDictionary(Function(item) item.nm, Function(item) item.val)
-                            ' ReSharper restore VBPossibleMistakenCallToGetType.2
-                            For Each kvp In readableProperties
-                                fieldsAndValues.Add(kvp.Key, kvp.Value)
-                            Next
-                        End Sub)
             Return Allows(fieldsAndValues)
         End Function
+
+        
 
         Private Function Allows(ByVal fav As Dictionary(Of String, Object)) As Boolean
             ' тут надо считывать и вычислять тройки, складывать их в стек, а в стеке постепенно продолжать вычисления
@@ -746,7 +785,7 @@ Namespace Bonds
         End Sub
     End Class
 
-    Interface IFilterable
+    Public Interface IFilterable
     End Interface
 
     Public Enum SortDirection

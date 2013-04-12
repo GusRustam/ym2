@@ -182,6 +182,12 @@
     <Compile Include="Forms\PortfolioForm\EditPortfolioSource.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\PortfolioForm\ParserErrorForm.Designer.vb">
+      <DependentUpon>ParserErrorForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\PortfolioForm\ParserErrorForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\PortfolioForm\PortfolioForm.Designer.vb">
       <DependentUpon>PortfolioForm.vb</DependentUpon>
     </Compile>
@@ -281,6 +287,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\PortfolioForm\EditPortfolioSource.resx">
       <DependentUpon>EditPortfolioSource.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\PortfolioForm\ParserErrorForm.resx">
+      <DependentUpon>ParserErrorForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\PortfolioForm\PortfolioForm.resx">
       <DependentUpon>PortfolioForm.vb</DependentUpon>
@@ -464,6 +473,11 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_BuildVersioningStyle="None.Increment.Increment.TimeStamp" />
+    </VisualStudio>
+  </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
