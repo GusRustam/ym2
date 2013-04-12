@@ -4,9 +4,11 @@ Imports YieldMap.Forms.MainForm
 
 Namespace Forms.PortfolioForm
     Public Class BondSelectorForm
+        Private _bonds As New BondView
+
         Private _canExclude As Boolean = False
         Public WriteOnly Property CanExclude As Boolean
-            Set(value As Boolean)
+            Set(ByVal value As Boolean)
                 _canExclude = value
             End Set
         End Property
@@ -26,6 +28,7 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub RefreshColumns()
+            ' todo choosing columns
             'Dim selectedFields = BondSelectorVisibleColumns.Split(",")
             'If selectedFields.Contains("ALL") Then
             '    For Each column As DataGridViewColumn In BondListDGV.Columns
@@ -40,14 +43,13 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub RefreshList()
-            Dim rics = (From row In BondsLoader.Instance.GetBondsTable() Select row.ric).ToList()
-            BondListDGV.DataSource = BondsData.Instance.GetBondInfo(rics)
+            'Dim rics = (From row In BondsLoader.Instance.GetBondsTable() Select row.ric).ToList()
+            BondListDGV.DataSource = _bonds.Items 'BondsData.Instance.GetBondInfo(rics)
             '
-            ' todo 1) выборка списка облигаций ( с загрузкой рейтингов )
-            ' todo 2) показ их в табличке
-            ' todo 3) сортировка и статическая фильтрация
-            ' todo 4) для строк предусмотреть оператор LIKE
-            ' todo 5) выполнение распарсенного представления и динамическая фильтрация
+            ' todo 1) сортировка и статическая фильтрация
+            ' todo 2) для строк предусмотреть оператор LIKE
+            ' todo 3) для рейтингов предусмотреть сортировку и отбор (например, квадратные скобки)
+            ' todo 4) выполнение распарсенного представления и динамическая фильтрация
             '
             'IssuerTableAdapter.Fill(BondsDataSet.issuer)
 
@@ -65,17 +67,14 @@ Namespace Forms.PortfolioForm
             Dim strFitler As String = ""
 
             If IssuerTextBox.Text <> "" Then
-                strFitler = String.Format("issname LIKE '{0}%'", IssuerTextBox.Text)
+                strFitler = String.Format("$issuerName Like ""{0}""", IssuerTextBox.Text)
             End If
             If RICTextBox.Text <> "" Then
-                strFitler = If(strFitler <> "", strFitler & " AND ", "") & String.Format("ric LIKE '{0}%'", RICTextBox.Text)
+                strFitler = If(strFitler <> "", strFitler & " AND ", "") & String.Format("$ric LIKE ""{0}""", RICTextBox.Text)
             End If
 
-            'BondDescriptionsBindingSource.Filter = strFitler
-
-            'AddHandler BondDescriptionsTableAdapter.Adapter.FillError, AddressOf SkipInvalidRows
-            'BondDescriptionsTableAdapter.Fill(BondsDataSet.BondDescriptions)
-            'RemoveHandler BondDescriptionsTableAdapter.Adapter.FillError, AddressOf SkipInvalidRows
+            _bonds.SetFilter(strFitler)
+            RefreshList()
         End Sub
 
         Private Sub OkButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles OkButton.Click
@@ -99,7 +98,7 @@ Namespace Forms.PortfolioForm
             If e.Button = MouseButtons.Left Then
                 Dim sorted As Boolean = True
                 Dim order As SortOrder
-                If BondListDGV.Columns(e.ColumnIndex).HeaderText = "Maturity" Then
+                If BondListDGV.Columns(e.ColumnIndex).HeaderText = "Maturity date" Then
                     order = SetDateSort(_matOrder, "matsort")
                 ElseIf BondListDGV.Columns(e.ColumnIndex).HeaderText = "Issued" Then
                     order = SetDateSort(_issOrder, "isssort")

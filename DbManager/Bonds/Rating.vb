@@ -154,9 +154,41 @@
         Public Shared Operator <>(ByVal left As Rating, ByVal right As Rating) As Boolean
             Return Not Equals(left, right)
         End Operator
+
+        Public Shared Operator >(ByVal left As Rating, ByVal right As Rating) As Boolean
+            Return left.CompareTo(right) > 0
+        End Operator
+
+        Public Shared Operator <(ByVal left As Rating, ByVal right As Rating) As Boolean
+            Return left.CompareTo(right) < 0
+        End Operator
+
+        Public Shared Operator >=(ByVal left As Rating, ByVal right As Rating) As Boolean
+            Return left.CompareTo(right) >= 0
+        End Operator
+
+        Public Shared Operator <=(ByVal left As Rating, ByVal right As Rating) As Boolean
+            Return left.CompareTo(right) <= 0
+        End Operator
+
+        Private Function CompareTo(ByVal obj As Rating) As Integer
+            If ReferenceEquals(Nothing, obj) Then Return 1
+            If ReferenceEquals(Me, obj) Then Return 0
+            If _level < obj.Level Then Return -1
+            If _level > obj.Level Then Return 1
+            Return 0
+        End Function
+
     End Class
 
+    '
+    ' VERY INTERESTING THING: RATINGS ARE COMPARED BY VALUE
+    ' WHILST RATING_DESCRS ARE COMPARED BY DATE. THIS BEHAVIOR 
+    ' WOULDN'T WORK IN CASE OF WHAT? CURRENTLY THAT LOOKS OK
+    '
+    '
     Public Class RatingDescr
+        Implements IFilterable
         Private ReadOnly _rating As Rating
         Private ReadOnly _ratingDate As Date?
         Private ReadOnly _ratingSource As RatingSource
@@ -167,18 +199,21 @@
             _ratingSource = ratingSource
         End Sub
 
+        <Filtered()>
         Public ReadOnly Property Rating() As Rating
             Get
                 Return _rating
             End Get
         End Property
 
+        <Filtered()>
         Public ReadOnly Property RatingDate() As Date?
             Get
                 Return _ratingDate
             End Get
         End Property
 
+        <Filtered()>
         Public ReadOnly Property RatingSource() As RatingSource
             Get
                 Return _ratingSource
@@ -209,40 +244,41 @@
         End Function
     End Class
 
-    Public Class BondRating
-        Private _issueRating As RatingDescr
-        Private _issuerRating As RatingDescr
+    '' todo currently unused
+    'Public Class BondRating
+    '    Private _issueRating As RatingDescr
+    '    Private _issuerRating As RatingDescr
 
-        Sub New(ByVal issueRating As RatingDescr, ByVal issuerRating As RatingDescr)
-            Me.IssueRating = issueRating
-            Me.IssuerRating = issuerRating
-        End Sub
+    '    Sub New(ByVal issueRating As RatingDescr, ByVal issuerRating As RatingDescr)
+    '        Me.IssueRating = issueRating
+    '        Me.IssuerRating = issuerRating
+    '    End Sub
 
-        Public Property IssuerRating As RatingDescr
-            Get
-                Return _issuerRating
-            End Get
-            Set(ByVal value As RatingDescr)
-                _issuerRating = value
-            End Set
-        End Property
+    '    Public Property IssuerRating As RatingDescr
+    '        Get
+    '            Return _issuerRating
+    '        End Get
+    '        Set(ByVal value As RatingDescr)
+    '            _issuerRating = value
+    '        End Set
+    '    End Property
 
-        Public Property IssueRating As RatingDescr
-            Get
-                Return _issueRating
-            End Get
-            Set(ByVal value As RatingDescr)
-                _issueRating = value
-            End Set
-        End Property
-    End Class
+    '    Public Property IssueRating As RatingDescr
+    '        Get
+    '            Return _issueRating
+    '        End Get
+    '        Set(ByVal value As RatingDescr)
+    '            _issueRating = value
+    '        End Set
+    '    End Property
+    'End Class
 
-    Public Class RatingComparer
-        Implements IComparer(Of RatingDescr)
+    'Public Class RatingComparer
+    '    Implements IComparer(Of RatingDescr)
 
-        Public Function Compare(ByVal x As RatingDescr, ByVal y As RatingDescr) As Integer Implements IComparer(Of RatingDescr).Compare
-            Throw New NotImplementedException()
-        End Function
-    End Class
+    '    Public Function Compare(ByVal x As RatingDescr, ByVal y As RatingDescr) As Integer Implements IComparer(Of RatingDescr).Compare
+    '        Throw New NotImplementedException()
+    '    End Function
+    'End Class
 
 End Namespace

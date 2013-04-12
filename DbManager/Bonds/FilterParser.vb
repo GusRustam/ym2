@@ -1,4 +1,5 @@
 ﻿Imports System.Text.RegularExpressions
+Imports System.Reflection
 
 Namespace Bonds
     Public Class FilterParser
@@ -8,12 +9,14 @@ Namespace Bonds
 
         Private ReadOnly _opStack As New LinkedList(Of Operation)
 
-        Private Shared ReadOnly VarName As Regex = New Regex("^\s*?\$(?<varname>[a-zA-Z0-9_0]+?)")
+        Private Shared ReadOnly VarName1 As Regex = New Regex("^\s*?\$(?<varname>\w+\.\w+|\w+)")
+        Private Shared ReadOnly ObjName1 As Regex = New Regex("^\s*?\$(?<objname>\w+)\.(?<fieldname>\w+)")
         Private Shared ReadOnly LogOp As Regex = New Regex("^\s*?(?<lop>AND|OR)")
         Private Shared ReadOnly BinOp As Regex = New Regex("^\s*?(?<bop>\<=|\>=|=|\<\>|\<|\>|like)")
-        Private Shared ReadOnly NumValue As Regex = New Regex("^\s*?(?<num>[0-9]+|[0-9]+.[0-9]+?)")
+        Private Shared ReadOnly NumValue As Regex = New Regex("^\s*?(?<num>\d+.\d+|\d+)")
         Private Shared ReadOnly StrValue As Regex = New Regex("^\s*?""(?<str>[^""]*)""")
-        Private Shared ReadOnly DatValue As Regex = New Regex("^\s*?#(?<dd>[0-9]{1,2})/(?<mm>[0-9]{1,2})/(?<yy>[0-9]{2}|[0-9]{4})#")
+        Private Shared ReadOnly DatValue As Regex = New Regex("^\s*?#(?<dd>\d{1,2})/(?<mm>\d{1,2})/(?<yy>\d{2}|\d{4})#")
+        Private Shared ReadOnly RatingValue As Regex = New Regex("^\s*?\[(?<rating>[^\]]*)\]")
 
         Private Enum ParserState
             Expr
@@ -85,7 +88,7 @@ Namespace Bonds
                 OpEquals
                 OpGreater
                 OpLess
-                OpGreatorOrEquals
+                OpGreaterOrEquals
                 OpLessOrEquals
                 OpNotEqual
                 OpLike
@@ -99,7 +102,7 @@ Namespace Bonds
                     Case BinaryOperation.OpEquals : res = "="
                     Case BinaryOperation.OpGreater : res = ">"
                     Case BinaryOperation.OpLess : res = "<"
-                    Case BinaryOperation.OpGreatorOrEquals : res = ">="
+                    Case BinaryOperation.OpGreaterOrEquals : res = ">="
                     Case BinaryOperation.OpLessOrEquals : res = "<="
                     Case BinaryOperation.OpNotEqual : res = "<>"
                     Case BinaryOperation.OpLike : res = "like"
@@ -114,7 +117,7 @@ Namespace Bonds
                     Case "<>" : _binaryOperation = Bop.BinaryOperation.OpNotEqual
                     Case ">" : _binaryOperation = Bop.BinaryOperation.OpGreater
                     Case "<" : _binaryOperation = Bop.BinaryOperation.OpLess
-                    Case ">=" : _binaryOperation = Bop.BinaryOperation.OpGreatorOrEquals
+                    Case ">=" : _binaryOperation = Bop.BinaryOperation.OpGreaterOrEquals
                     Case "<=" : _binaryOperation = Bop.BinaryOperation.OpLessOrEquals
                     Case "like" : _binaryOperation = Bop.BinaryOperation.OpLike
                     Case Else : Throw New ConditionLexicalException(String.Format("Invalid binary operation {0}", binaryOperation))
@@ -145,10 +148,41 @@ Namespace Bonds
                     Return _name
                 End Get
             End Property
+
         End Class
 
+        Public Class ObjVar
+            Inherits Var
+            Private ReadOnly _fieldname As String
+
+            Public ReadOnly Property FullName() As String
+                Get
+                    Return String.Format("{0}.{1}", Name, _fieldname)
+                End Get
+            End Property
+
+            Public Overrides Function ToString() As String
+                Return FullName
+            End Function
+
+            Sub New(ByVal name As String, ByVal fieldname As String)
+                MyBase.new(name)
+                _fieldname = fieldname
+            End Sub
+
+            Public ReadOnly Property FieldName As String
+                Get
+                    Return _fieldname
+                End Get
+            End Property
+        End Class
+
+        Public Interface IVal
+            Inherits IGrammarElement
+        End Interface
+
         Public Class Val(Of T)
-            Implements IGrammarElement
+            Implements IVal
             Private ReadOnly _value As T
 
             Sub New(ByVal value As T)
@@ -213,7 +247,7 @@ Namespace Bonds
         '   <TERM>          ::= <NAME> <OP> <VALUE>
         '   <OP>            ::= =|>|<|>=|<=
         '   <NAME>          ::= ${<LETTERS>}
-        '   <VALUE>         ::= <STRVAL>|<DATVAL>|<NUMVAL>
+        '   <VALUE>         ::= <STRVAL>|<DATVAL>|<NUMVAL>|<RATEVAL>
         '
         '=========================================================================================
         Private Function ParseFilterString(ByVal fltStr As String, ByRef endIndex As Integer, ByVal bracketsLevel As Integer) As LinkedList(Of IGrammarElement)
@@ -243,7 +277,7 @@ Namespace Bonds
                                 End If
                             End Try
 
-                            If elems Is Nothing OrElse Not elems.Any Then
+                            If elems Is Nothing OrElse Not elems.Any Then 
                                 Throw New ConditionSyntaxException("Invalid expression in brackets", i)
                             End If
 
@@ -284,11 +318,18 @@ Namespace Bonds
                         End If
 
                         ' Reading variable name
-                        match = VarName.Match(fltStr.Substring(i))
-                        If match.Success Then
-                            Dim variableName = match.Groups("varname").Captures(0).Value
-                            Dim node As New Var(variableName)
-                            i = i + match.Length + 1
+                        Dim match1 = VarName1.Match(fltStr.Substring(i))
+                        Dim match2 = ObjName1.Match(fltStr.Substring(i))
+                        If match1.Success Then
+                            Dim variableName = match1.Groups("varname").Captures(0).Value
+                            Dim node As New Var(variableName.ToUpper())
+                            i = i + match1.Length + 1
+                            res.AddLast(node)
+                        ElseIf match2.success Then
+                            Dim objName = match1.Groups("objname").Captures(0).Value
+                            Dim fieldName = match1.Groups("fieldname").Captures(0).Value
+                            Dim node As New ObjVar(objName.ToUpper(), fieldName.ToUpper())
+                            i = i + match1.Length + 1
                             res.AddLast(node)
                         Else
                             Throw New ConditionSyntaxException("Unexpected sequence, variable name required", i)
@@ -344,6 +385,16 @@ Namespace Bonds
                                 i = i + match.Length + 1
                             Else
                                 Throw New ConditionSyntaxException("Unexpected sequence, date expression required", i)
+                            End If
+                        ElseIf fltStr(i) = "[" Then       ' Rating
+                            match = RatingValue.Match(fltStr.Substring(i))
+                            If match.Success Then
+                                Dim rate = match.Groups("rating").Captures(0).Value
+                                Dim rt = Rating.Parse(rate)
+                                valNode = New Val(Of Rating)(rt)
+                                i = i + match.Length + 1
+                            Else
+                                Throw New ConditionSyntaxException("Unexpected sequence, rating expression required", i)
                             End If
                         Else
                             Throw New ConditionSyntaxException("Unexpected symbol, string, date or number required", i)
@@ -444,4 +495,223 @@ Namespace Bonds
             MyBase.New(message, innerException)
         End Sub
     End Class
+
+    Public Class FilteredAttribute
+        Inherits Attribute
+    End Class
+
+    Public Class InterpreterException
+        Inherits Exception
+    End Class
+
+    Public Class FilterInterpreter(Of T)
+        Private _grammar As LinkedList(Of FilterParser.IGrammarElement)
+        Private ReadOnly _filteredFields As List(Of PropertyInfo)
+
+        Public Sub New()
+            _filteredFields = (From prop In GetType(T).GetProperties(BindingFlags.Public Or BindingFlags.Instance)
+                                 Where prop.GetCustomAttributes(GetType(FilteredAttribute), False).Any).ToList()
+
+        End Sub
+
+        Public Sub SetGrammar(ByVal grammar As LinkedList(Of FilterParser.IGrammarElement))
+            _grammar = grammar
+        End Sub
+
+        Public Function Allows(ByVal elem As T)
+            If _grammar Is Nothing OrElse Not _grammar.Any Then Return True
+            ' field.GetType.IsValueType
+            Dim fieldsAndValues = (From field In _filteredFields
+                                   Where Not TypeOf field.GetValue(elem, Nothing) Is IFilterable
+                                   Let nm = field.Name.ToUpper(), val = field.GetValue(elem, Nothing)
+                                   Select nm, val).ToDictionary(Function(item) item.nm, Function(item) item.val)
+            _filteredFields.
+                Where(Function(field) TypeOf field.GetValue(elem, Nothing) Is IFilterable).
+                Select(Function(field) New With {.Nam = field.Name, .Val = field.GetValue(elem, Nothing)}).ToList().
+                ForEach(Sub(element)
+                            Dim readableProperties = (
+                                From prop In element.Val.GetType().GetProperties(BindingFlags.Public Or BindingFlags.Instance)
+                                Where prop.GetCustomAttributes(GetType(FilteredAttribute), False).Any
+                                Let nm = String.Format("{0}.{1}", element.Nam, prop.Name).ToUpper(), val = prop.GetValue(element.Val, Nothing)
+                                Select nm, val
+                            ).ToDictionary(Function(item) item.nm, Function(item) item.val)
+                            For Each kvp In readableProperties
+                                fieldsAndValues.Add(kvp.Key, kvp.Value)
+                            Next
+                        End Sub)
+            ' todo troubles might arise with ratingSource. At the same time it would cast to string so it must be of
+            ' todo do toUpper with both fields and values and field names and so on
+            Return Allows(fieldsAndValues)
+        End Function
+
+
+
+        Private Function Allows(ByVal fav As Dictionary(Of String, Object)) As Boolean
+            ' i have a stack
+            ' тут надо считывать и вычислять тройки, складывать их в стек, а в стеке постепенно продолжать вычисления
+            Dim resultStack As New Stack(Of Boolean)
+            Dim first = True
+            Dim pointer = _grammar.First
+            Do
+                If TypeOf pointer.Value Is FilterParser.Var Then
+                    InterpretTriple(resultStack, fav, pointer)
+                ElseIf TypeOf pointer.Value Is FilterParser.Lop And Not first Then
+                    ApplyBoolean(resultStack, pointer.Value)
+                Else
+                    Throw New InterpreterException() ' unexpected sequence of elements
+                End If
+                first = False
+                pointer = pointer.Next
+            Loop Until pointer Is Nothing
+            If resultStack.Count <> 1 Then Throw New InterpreterException()
+            Return resultStack.Pop()
+        End Function
+
+        Private Shared Sub ApplyBoolean(ByRef resultStack As Stack(Of Boolean), ByVal lop As FilterParser.Lop)
+            ' pop 2 booleans, apply lop and push back
+            Try
+                Dim operand1 = resultStack.Pop()
+                Dim operand2 = resultStack.Pop()
+                Dim res As Boolean
+                Select Case lop.LogOperation
+                    Case FilterParser.Lop.LogicalOperation.OpAnd
+                        res = operand1 And operand2
+                    Case FilterParser.Lop.LogicalOperation.OpOr
+                        res = operand1 Or operand2
+                    Case Else
+                        Throw New InterpreterException()
+                End Select
+                resultStack.Push(res)
+            Catch ex As InvalidOperationException
+                Throw New InterpreterException()
+            End Try
+        End Sub
+
+        Private Shared Sub InterpretTriple(ByRef resultStack As Stack(Of Boolean), ByVal fav As Dictionary(Of String, Object), ByRef node As LinkedListNode(Of FilterParser.IGrammarElement))
+            ' load three items - var, val and boolop, return pointer to last
+            ' evaluate var, boolop it to var, push result to resultStack
+            Try
+                If node Is Nothing Then Throw New InterpreterException()
+                ' todo to work with ratings do develop a object variable with syntax 
+                ' todo $lastRating.source = "XXX" And $lastRating.rate >= [BBB-]
+                ' todo here first one is string and the second one is Rating!
+                Dim var = TryCast(node.Value, FilterParser.Var)
+                node = node.Next
+                If node Is Nothing Then Throw New InterpreterException()
+                If var Is Nothing Then Throw New InterpreterException()
+
+                If TypeOf var Is FilterParser.ObjVar Then
+                    If Not fav.Keys.Contains(CType(var, FilterParser.ObjVar).FullName) Then Throw New InterpreterException() ' todo how do rating variables come here?
+                ElseIf TypeOf var Is FilterParser.Var Then
+                    If Not fav.Keys.Contains(var.Name) Then Throw New InterpreterException()
+                    ' todo how do rating variables come here?
+                    ' todo what to do with obj var?
+                End If
+
+                Dim val = TryCast(node.Value, FilterParser.IVal)
+                node = node.Next
+                If node Is Nothing Then Throw New InterpreterException()
+                If val Is Nothing Then Throw New InterpreterException()
+
+                Dim boolOp = TryCast(node.Value, FilterParser.Bop)
+                If boolOp Is Nothing Then Throw New InterpreterException()
+
+                If TypeOf val Is FilterParser.Val(Of String) Then
+                    Dim strObjVal = fav(var.Name).ToString().ToUpper()
+                    Dim strValVal = CType(val, FilterParser.Val(Of String)).Value.ToUpper()
+
+                    Select Case boolOp.BinOperation
+                        Case FilterParser.Bop.BinaryOperation.OpEquals
+                            resultStack.Push(strObjVal = strValVal)
+                        Case FilterParser.Bop.BinaryOperation.OpNotEqual
+                            resultStack.Push(strObjVal <> strValVal)
+                        Case FilterParser.Bop.BinaryOperation.OpLike
+                            Try
+                                Dim rx = New Regex(strValVal)
+                                resultStack.Push(rx.Match(strObjVal).Success)
+                            Catch ex As ArgumentException
+                                Throw New InterpreterException() ' invalid pattern
+                            End Try
+                        Case Else
+                            Throw New InterpreterException() ' invalid string operation
+                    End Select
+
+                ElseIf TypeOf val Is FilterParser.Val(Of Date) Then
+                    If Not IsDate(fav(var.Name)) Then Throw New InterpreterException()
+                    Dim datObjVal = CType(fav(var.Name), Date)
+                    Dim datValVal = CType(val, FilterParser.Val(Of Date)).Value
+
+                    Select Case boolOp.BinOperation
+                        Case FilterParser.Bop.BinaryOperation.OpEquals
+                            resultStack.Push(datObjVal = datValVal)
+                        Case FilterParser.Bop.BinaryOperation.OpNotEqual
+                            resultStack.Push(datObjVal <> datValVal)
+                        Case FilterParser.Bop.BinaryOperation.OpGreater
+                            resultStack.Push(datObjVal > datValVal)
+                        Case FilterParser.Bop.BinaryOperation.OpGreaterOrEquals
+                            resultStack.Push(datObjVal >= datValVal)
+                        Case FilterParser.Bop.BinaryOperation.OpLess
+                            resultStack.Push(datObjVal < datValVal)
+                        Case FilterParser.Bop.BinaryOperation.OpLessOrEquals
+                            resultStack.Push(datObjVal <= datValVal)
+                        Case Else
+                            Throw New InterpreterException() ' invalid date operation
+                    End Select
+
+                ElseIf TypeOf val Is FilterParser.Val(Of Double) Then
+                    ' todo in theory I could separate double and integer so that to disallow = and <> for double
+                    If Not IsNumeric(fav(var.Name)) Then Throw New InterpreterException()
+                    Dim dblObjVal = CType(fav(var.Name), Double)
+                    Dim dblValVal = CType(val, FilterParser.Val(Of Double)).Value
+                    Select Case boolOp.BinOperation
+                        Case FilterParser.Bop.BinaryOperation.OpEquals
+                            resultStack.Push(dblObjVal = dblValVal)
+                        Case FilterParser.Bop.BinaryOperation.OpNotEqual
+                            resultStack.Push(dblObjVal <> dblValVal)
+                        Case FilterParser.Bop.BinaryOperation.OpGreater
+                            resultStack.Push(dblObjVal > dblValVal)
+                        Case FilterParser.Bop.BinaryOperation.OpGreaterOrEquals
+                            resultStack.Push(dblObjVal >= dblValVal)
+                        Case FilterParser.Bop.BinaryOperation.OpLess
+                            resultStack.Push(dblObjVal < dblValVal)
+                        Case FilterParser.Bop.BinaryOperation.OpLessOrEquals
+                            resultStack.Push(dblObjVal <= dblValVal)
+                        Case Else
+                            Throw New InterpreterException() ' invalid date operation
+                    End Select
+
+                ElseIf TypeOf val Is FilterParser.Val(Of Rating) Then ' todo for future generations
+                    Dim rateObjVal = TryCast(fav(var.Name), Rating)
+                    If rateObjVal Is Nothing Then Throw New InterpreterException()
+                    Dim rateValVal = CType(val, FilterParser.Val(Of Rating)).Value
+                    Select Case boolOp.BinOperation
+                        Case FilterParser.Bop.BinaryOperation.OpEquals
+                            resultStack.Push(rateObjVal = rateValVal)
+                        Case FilterParser.Bop.BinaryOperation.OpNotEqual
+                            resultStack.Push(rateObjVal <> rateValVal)
+                        Case FilterParser.Bop.BinaryOperation.OpGreater
+                            resultStack.Push(rateObjVal > rateValVal)
+                        Case FilterParser.Bop.BinaryOperation.OpGreaterOrEquals
+                            resultStack.Push(rateObjVal >= rateValVal)
+                        Case FilterParser.Bop.BinaryOperation.OpLess
+                            resultStack.Push(rateObjVal < rateValVal)
+                        Case FilterParser.Bop.BinaryOperation.OpLessOrEquals
+                            resultStack.Push(rateObjVal <= rateValVal)
+                        Case Else
+                            Throw New InterpreterException() ' invalid rating operation
+                    End Select
+                Else
+                    Throw New InterpreterException() ' unknown type
+                End If
+            Catch ex As NullReferenceException
+
+            Catch ex As InvalidOperationException
+                Throw New InterpreterException()
+            End Try
+        End Sub
+    End Class
+    Interface IFilterable
+
+    End Interface
+
 End Namespace

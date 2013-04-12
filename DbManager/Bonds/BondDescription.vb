@@ -1,7 +1,6 @@
 ﻿Imports System.ComponentModel
 
 Namespace Bonds
-
     Public Class PaymentException
         Inherits Exception
 
@@ -16,6 +15,7 @@ Namespace Bonds
             MyBase.New(message, innerException)
         End Sub
     End Class
+
     Public Class BondPayments
         Private ReadOnly _issueDate As Date
         Private ReadOnly _matDate As Date?
@@ -98,7 +98,7 @@ Namespace Bonds
         End Sub
 
         <DisplayName("Ric")>
-        <FilterName("Ric")>
+        <Filtered()>
         Public ReadOnly Property RIC As String
             Get
                 Return _ric
@@ -106,7 +106,7 @@ Namespace Bonds
         End Property
 
         <DisplayName("Name")>
-        <FilterName("Name")>
+        <Filtered()>
         Public ReadOnly Property ShortName As String
             Get
                 Return _shortName
@@ -121,15 +121,15 @@ Namespace Bonds
         End Property
 
         <DisplayName("Maturity date")>
-        <FilterName("MaturityDate", "=", "^#(?<day>[0-9]{2})/(?<month>[0-9]{2})/(?<year>[0-9]{2,4})#$")>
+        <Filtered()>
         Public ReadOnly Property Maturity As Date?
             Get
                 Return _maturity
             End Get
         End Property
 
-        <FilterName("CurrentCoupon", "(?<sign>(=|>|<|>=|<=))", "(?<num>([0-9]+)(.[0-9]{1,})?)")>
         <DisplayName("Current coupon")>
+        <Filtered()>
         Public ReadOnly Property Coupon As Double
             Get
                 Return _coupon
@@ -151,7 +151,7 @@ Namespace Bonds
         End Property
 
         <DisplayName("Issue date")>
-        <FilterName("IssueDate", "=", "^#(?<day>[0-9]{2})/(?<month>[0-9]{2})/(?<year>[0-9]{2,4})#$")>
+        <Filtered()>
         Public ReadOnly Property IssueDate As Date
             Get
                 Return _issueDate
@@ -188,6 +188,7 @@ Namespace Bonds
 
 
         <DisplayName("Issuer Name")>
+        <Filtered()>
         Public ReadOnly Property IssuerName As String
             Get
                 Return _issuerName
@@ -195,34 +196,35 @@ Namespace Bonds
         End Property
 
         <DisplayName("Borrower Name")>
+        <Filtered()>
         Public ReadOnly Property BorrowerName As String
             Get
                 Return _borrowerName
             End Get
         End Property
 
-        <FilterName("Currency")>
+        <Filtered()>
         Public ReadOnly Property Currency As String
             Get
                 Return _currency
             End Get
         End Property
 
-        <FilterName("Putable", "=", "(?<bool>True|False)")>
+        <Filtered()>
         Public ReadOnly Property Putable As Boolean
             Get
                 Return _putable
             End Get
         End Property
 
-        <FilterName("Callable", "=", "(?<bool>True|False)")>
+        <Filtered()>
         Public ReadOnly Property Callable As Boolean
             Get
                 Return _callable
             End Get
         End Property
 
-        <FilterName("Floater", "=", "(?<bool>True|False)")>
+        <Filtered()>
         Public ReadOnly Property Floater As Boolean
             Get
                 Return _floater
@@ -230,7 +232,7 @@ Namespace Bonds
         End Property
 
         <DisplayName("Last issue rating")>
-        <FilterName("LastIssueRating", "(?<sign>(=|>|<|>=|<=))")>
+        <Filtered()>
         Public ReadOnly Property LastIssueRating As RatingDescr
             Get
                 Return _lastIssueRating
@@ -238,7 +240,7 @@ Namespace Bonds
         End Property
 
         <DisplayName("Last issuer rating")>
-        <FilterName("LastIssuerRating", "(?<sign>(=|>|<|>=|<=))")>
+        <Filtered()>
         Public ReadOnly Property LastIssuerRating As RatingDescr
             Get
                 Return _lastIssuerRating
@@ -246,7 +248,7 @@ Namespace Bonds
         End Property
 
         <DisplayName("Last rating")>
-        <FilterName("LastRating", "(?<sign>(=|>|<|>=|<=))")>
+        <Filtered()>
         Public ReadOnly Property LastRating As RatingDescr
             Get
                 Return _lastRating
