@@ -488,8 +488,21 @@ Namespace Forms.PortfolioForm
 
         Private Sub AddItemsButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AddItemsButton.Click
             If ChainsButton.Checked Then Return
+            If ChainsListsGrid.SelectedRows.Count <= 0 Then Return
+
+            Dim elem = ChainsListsGrid.SelectedRows.Item(0).DataBoundItem
+            Dim src As UserList = TryCast(elem, UserList)
+            If src Is Nothing Then Return
+
             Dim a As New BondSelectorForm
-            a.ShowDialog()
+            If a.ShowDialog() = DialogResult.OK Then
+                src.AddItems(a.SelectedRICs)
+
+                ChainListItemsGrid.DataSource = src.GetDefaultRicsView()
+                For Each col As DataGridViewColumn In ChainListItemsGrid.Columns
+                    col.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+                Next
+            End If
         End Sub
 #End Region
 

@@ -188,7 +188,6 @@
             '
             Me.PortfolioTree.AllowDrop = True
             Me.PortfolioTree.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.PortfolioTree.LabelEdit = True
             Me.PortfolioTree.Location = New System.Drawing.Point(3, 3)
             Me.PortfolioTree.Name = "PortfolioTree"
             Me.PortfolioTree.Size = New System.Drawing.Size(220, 543)

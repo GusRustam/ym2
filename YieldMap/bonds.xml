@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <bonds>
-  <!-- todo Rating sources mapping -->
   <!-- Field sets -->
   <field-sets>
     <field-set id="MICEX" name="Micex bonds description">
@@ -49,9 +48,6 @@
   <!-- Lists -->
   <lists>
     <list id="1" name="test" color="Violet" curve="False" field-set-id="MICEX">
-      <ric>AAA</ric>
-      <ric>BBB</ric>
-      <ric>CCC</ric>
     </list>
   </lists>
   

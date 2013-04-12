@@ -84,7 +84,7 @@ Namespace Bonds
                          Where _subRicToRic.Keys.Contains(aRic) AndAlso row.ric = _subRicToRic(aRic)
                          Select row).ToList()
 
-            If Not items.Any Then Throw New NoBondException(aRic)
+            If Not items.Any Then Throw New NoBondException(aRic) ' todo catch it :)
             Dim descr As BondsDataSet.BondRow = items.First()
 
             Dim coupon = If(Not IsDBNull(descr("currentCoupon")) AndAlso IsNumeric(descr.currentCoupon), CDbl(descr.currentCoupon), 0)

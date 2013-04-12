@@ -189,6 +189,7 @@
     '
     Public Class RatingDescr
         Implements IFilterable
+        Implements IComparable
         Private ReadOnly _rating As Rating
         Private ReadOnly _ratingDate As Date?
         Private ReadOnly _ratingSource As RatingSource
@@ -199,21 +200,21 @@
             _ratingSource = ratingSource
         End Sub
 
-        <Filtered()>
+        <Filterable()>
         Public ReadOnly Property Rating() As Rating
             Get
                 Return _rating
             End Get
         End Property
 
-        <Filtered()>
+        <Filterable()>
         Public ReadOnly Property RatingDate() As Date?
             Get
                 Return _ratingDate
             End Get
         End Property
 
-        <Filtered()>
+        <Filterable()>
         Public ReadOnly Property RatingSource() As RatingSource
             Get
                 Return _ratingSource
@@ -233,6 +234,48 @@
 
         Public Shared Operator <(ByVal r1 As RatingDescr, ByVal r2 As RatingDescr) As Boolean
             Return r2 > r1
+        End Operator
+
+        Public Function CompareTo(ByVal obj As Object) As Integer Implements IComparable.CompareTo
+            If Not TypeOf obj Is RatingDescr Then Return 1
+            Return CompareToo(CType(obj, RatingDescr))
+        End Function
+
+        Private Function CompareToo(ByVal other As RatingDescr) As Integer
+            If Me = other Then Return 0
+            If Me > other Then Return 1
+            Return -1
+        End Function
+
+        Protected Overloads Function Equals(ByVal other As RatingDescr) As Boolean
+            Return _ratingDate.Equals(other._ratingDate) AndAlso Equals(_rating, other._rating) AndAlso Equals(_ratingSource, other._ratingSource)
+        End Function
+
+        Public Overloads Overrides Function Equals(ByVal obj As Object) As Boolean
+            If ReferenceEquals(Nothing, obj) Then Return False
+            If ReferenceEquals(Me, obj) Then Return True
+            If obj.GetType IsNot Me.GetType Then Return False
+            Return Equals(DirectCast(obj, RatingDescr))
+        End Function
+
+        Public Overrides Function GetHashCode() As Integer
+            Dim hashCode As Integer = _ratingDate.GetHashCode
+            If _rating IsNot Nothing Then
+                hashCode = CInt((hashCode * 397L) Mod Integer.MaxValue) Xor _rating.GetHashCode
+            End If
+            If _ratingSource IsNot Nothing Then
+                hashCode = CInt((hashCode * 397L) Mod Integer.MaxValue) Xor _ratingSource.GetHashCode
+            End If
+            Return hashCode
+        End Function
+
+
+        Public Shared Operator =(ByVal left As RatingDescr, ByVal right As RatingDescr) As Boolean
+            Return Equals(left, right)
+        End Operator
+
+        Public Shared Operator <>(ByVal left As RatingDescr, ByVal right As RatingDescr) As Boolean
+            Return Not Equals(left, right)
         End Operator
 
         Public Overrides Function ToString() As String

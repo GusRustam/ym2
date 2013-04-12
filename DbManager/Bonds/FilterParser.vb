@@ -216,8 +216,8 @@ Namespace Bonds
 
                 Dim ind As Integer
                 res = ParseFilterString(fltStr, ind, 0)
-                If ind < fltStr.Length() Then Throw New ConditionSyntaxException("Parsing not finished", ind)
-            Catch ex As ConditionSyntaxException
+                If ind < fltStr.Length() Then Throw New ParserException("Parsing not finished", ind)
+            Catch ex As ParserException
                 If ex.FilterStr = "" Then ex.FilterStr = fltStr
                 Throw
             End Try
@@ -270,18 +270,20 @@ Namespace Bonds
                             Dim elems As LinkedList(Of IGrammarElement)
                             Try
                                 elems = ParseFilterString(fltStr.Substring(i + 1), ind, bracketsLevel + 1)
-                            Catch ex As ConditionSyntaxException
+                            Catch ex As ParserException
                                 If bracketsLevel > 0 Then
                                     ex.ErrorPos = ex.ErrorPos + i + 1
                                     Throw
                                 End If
                             End Try
 
-                            If elems Is Nothing OrElse Not elems.Any Then 
-                                Throw New ConditionSyntaxException("Invalid expression in brackets", i)
+                            If elems Is Nothing OrElse Not elems.Any Then
+                                Throw New ParserException("Invalid expression in brackets", i)
                             End If
 
+                            ' ReSharper disable VBWarnings::BC42104 ' it's ok, if nothing exception is thrown, see above
                             Dim elem = elems.First
+                            ' ReSharper restore VBWarnings::BC42104
                             Do
                                 res.AddLast(elem.Value)
                                 elem = elem.Next
@@ -296,7 +298,7 @@ Namespace Bonds
                             ' NAME
                             _state = ParserState.Term
                         Else
-                            Throw New ConditionSyntaxException("Unexpected symbol, brackets or variable name required", i)
+                            Throw New ParserException("Unexpected symbol, brackets or variable name required", i)
                         End If
 
                     Case ParserState.Term
@@ -314,7 +316,7 @@ Namespace Bonds
                     Case ParserState.Name
                         'Console.WriteLine("--> NAME")
                         If fltStr(i) <> "$" Then
-                            Throw New ConditionSyntaxException("Unexpected symbol, variable name required", i)
+                            Throw New ParserException("Unexpected symbol, variable name required", i)
                         End If
 
                         ' Reading variable name
@@ -325,14 +327,14 @@ Namespace Bonds
                             Dim node As New Var(variableName.ToUpper())
                             i = i + match1.Length + 1
                             res.AddLast(node)
-                        ElseIf match2.success Then
+                        ElseIf match2.Success Then
                             Dim objName = match1.Groups("objname").Captures(0).Value
                             Dim fieldName = match1.Groups("fieldname").Captures(0).Value
                             Dim node As New ObjVar(objName.ToUpper(), fieldName.ToUpper())
                             i = i + match1.Length + 1
                             res.AddLast(node)
                         Else
-                            Throw New ConditionSyntaxException("Unexpected sequence, variable name required", i)
+                            Throw New ParserException("Unexpected sequence, variable name required", i)
                         End If
                         _state = ParserState.Bop
 
@@ -343,11 +345,16 @@ Namespace Bonds
                         Dim opNode As Bop
                         If match.Success Then
                             Dim opName = match.Groups("bop").Captures(0).Value
-                            opNode = New Bop(opName, BinaryOpPriority + bracketsLevel * BracketsPriority)
-                            i = i + match.Length + 1
-                            PushToOpStack(res, opNode)
+                            Try
+                                opNode = New Bop(opName, BinaryOpPriority + bracketsLevel * BracketsPriority)
+                                i = i + match.Length + 1
+                                PushToOpStack(res, opNode)
+                            Catch ex As ConditionLexicalException
+                                Throw New ParserException("Unexpected error in binary operation", ex, i)
+                            End Try
+
                         Else
-                            Throw New ConditionSyntaxException("Unexpected sequence, binary operation (>/</=/<>/>=/<=/like) required", i)
+                            Throw New ParserException("Unexpected sequence, binary operation (>/</=/<>/>=/<=/like) required", i)
                         End If
                         _state = ParserState.Value
 
@@ -362,17 +369,17 @@ Namespace Bonds
                                 valNode = New Val(Of String)(str)
                                 i = i + match.Length + 1
                             Else
-                                Throw New ConditionSyntaxException("Unexpected sequence, string expression required", i)
+                                Throw New ParserException("Unexpected sequence, string expression required", i)
                             End If
                         ElseIf IsNumeric(fltStr(i)) Then ' number
                             match = NumValue.Match(fltStr.Substring(i))
                             If match.Success Then
                                 Dim num = match.Groups("num").Captures(0).Value
-                                If Not IsNumeric(num) Then Throw New ConditionSyntaxException("Invalid number", i)
+                                If Not IsNumeric(num) Then Throw New ParserException("Invalid number", i)
                                 valNode = New Val(Of Double)(num)
                                 i = i + match.Length + 1
                             Else
-                                Throw New ConditionSyntaxException("Unexpected sequence, string expression required", i)
+                                Throw New ParserException("Unexpected sequence, string expression required", i)
                             End If
                         ElseIf fltStr(i) = "#" Then       ' date
                             match = DatValue.Match(fltStr.Substring(i))
@@ -384,7 +391,7 @@ Namespace Bonds
                                 valNode = New Val(Of Date)(dt)
                                 i = i + match.Length + 1
                             Else
-                                Throw New ConditionSyntaxException("Unexpected sequence, date expression required", i)
+                                Throw New ParserException("Unexpected sequence, date expression required", i)
                             End If
                         ElseIf fltStr(i) = "[" Then       ' Rating
                             match = RatingValue.Match(fltStr.Substring(i))
@@ -394,10 +401,10 @@ Namespace Bonds
                                 valNode = New Val(Of Rating)(rt)
                                 i = i + match.Length + 1
                             Else
-                                Throw New ConditionSyntaxException("Unexpected sequence, rating expression required", i)
+                                Throw New ParserException("Unexpected sequence, rating expression required", i)
                             End If
                         Else
-                            Throw New ConditionSyntaxException("Unexpected symbol, string, date or number required", i)
+                            Throw New ParserException("Unexpected symbol, string, date or number required", i)
                         End If
                         res.AddLast(valNode)
 
@@ -408,12 +415,16 @@ Namespace Bonds
                         match = LogOp.Match(fltStr.Substring(i).ToUpper())
                         Dim opNode As Lop
                         If match.Success Then
-                            Dim num = match.Groups("lop").Captures(0).Value
-                            opNode = New Lop(num, LogicalOpPriority + bracketsLevel * BracketsPriority)
-                            PushToOpStack(res, opNode)
-                            i = i + match.Length + 1
+                            Try
+                                Dim num = match.Groups("lop").Captures(0).Value
+                                opNode = New Lop(num, LogicalOpPriority + bracketsLevel * BracketsPriority)
+                                PushToOpStack(res, opNode)
+                                i = i + match.Length + 1
+                            Catch ex As ConditionLexicalException
+                                Throw New ParserException("Unexpected error in logical operation", ex, i)
+                            End Try
                         Else
-                            Throw New ConditionSyntaxException("Unexpected sequence, logical expression required", i)
+                            Throw New ParserException("Unexpected sequence, logical expression required", i)
                         End If
                         _state = ParserState.Expr
                 End Select
@@ -437,7 +448,7 @@ Namespace Bonds
         End Sub
     End Class
 
-    Public Class ConditionSyntaxException
+    Public Class ParserException
         Inherits Exception
 
         Private _errorPos As Integer
@@ -447,6 +458,11 @@ Namespace Bonds
             MyBase.New(message)
             _errorPos = errorPos
             _filterStr = filterStr
+        End Sub
+
+        Public Sub New(ByVal message As String, ByVal innerException As Exception, ByVal errorPos As Integer)
+            MyBase.New(message, innerException)
+            _errorPos = errorPos
         End Sub
 
         Public Property FilterStr() As String
@@ -464,10 +480,18 @@ Namespace Bonds
         End Sub
 
         Public Overrides Function ToString() As String
-            If _filterStr = "" Then
-                Return String.Format("At position {0}: {1}", ErrorPos, Message)
+            If InnerException Is Nothing Then
+                If _filterStr = "" Then
+                    Return String.Format("At position {0}: {1}", ErrorPos, Message)
+                Else
+                    Return String.Format("At position {0}: {1} {2}{3} {2}{4," + CStr(ErrorPos) + "} {2}", ErrorPos, Message, Environment.NewLine, _filterStr, "^")
+                End If
             Else
-                Return String.Format("At position {0}: {1} {2}{3} {2}{4," + CStr(ErrorPos) + "} {2}", ErrorPos, Message, Environment.NewLine, _filterStr, "^")
+                If _filterStr = "" Then
+                    Return String.Format("At position {0}: {1}{2}{3}", ErrorPos, Message, Environment.NewLine, InnerException.ToString())
+                Else
+                    Return String.Format("At position {0}: {1} {2}{3} {2}{4," + CStr(ErrorPos) + "} {2}{3}{5}", ErrorPos, Message, Environment.NewLine, _filterStr, "^", InnerException.ToString())
+                End If
             End If
         End Function
 
@@ -481,7 +505,7 @@ Namespace Bonds
         End Property
     End Class
 
-    Public Class ConditionLexicalException
+    Friend Class ConditionLexicalException
         Inherits Exception
 
         Public Sub New()
@@ -496,12 +520,24 @@ Namespace Bonds
         End Sub
     End Class
 
-    Public Class FilteredAttribute
+    Public Class FilterableAttribute
+        Inherits Attribute
+    End Class
+
+    Public Class SortableAttribute
         Inherits Attribute
     End Class
 
     Public Class InterpreterException
         Inherits Exception
+
+        Public Sub New(ByVal message As String)
+            MyBase.New(message)
+        End Sub
+
+        Public Sub New(ByVal message As String, ByVal innerException As Exception)
+            MyBase.New(message, innerException)
+        End Sub
     End Class
 
     Public Class FilterInterpreter(Of T)
@@ -510,8 +546,7 @@ Namespace Bonds
 
         Public Sub New()
             _filteredFields = (From prop In GetType(T).GetProperties(BindingFlags.Public Or BindingFlags.Instance)
-                                 Where prop.GetCustomAttributes(GetType(FilteredAttribute), False).Any).ToList()
-
+                                 Where prop.GetCustomAttributes(GetType(FilterableAttribute), False).Any).ToList()
         End Sub
 
         Public Sub SetGrammar(ByVal grammar As LinkedList(Of FilterParser.IGrammarElement))
@@ -529,25 +564,22 @@ Namespace Bonds
                 Where(Function(field) TypeOf field.GetValue(elem, Nothing) Is IFilterable).
                 Select(Function(field) New With {.Nam = field.Name, .Val = field.GetValue(elem, Nothing)}).ToList().
                 ForEach(Sub(element)
+                            ' ReSharper disable VBPossibleMistakenCallToGetType.2
                             Dim readableProperties = (
                                 From prop In element.Val.GetType().GetProperties(BindingFlags.Public Or BindingFlags.Instance)
-                                Where prop.GetCustomAttributes(GetType(FilteredAttribute), False).Any
+                                Where prop.GetCustomAttributes(GetType(FilterableAttribute), False).Any
                                 Let nm = String.Format("{0}.{1}", element.Nam, prop.Name).ToUpper(), val = prop.GetValue(element.Val, Nothing)
                                 Select nm, val
                             ).ToDictionary(Function(item) item.nm, Function(item) item.val)
+                            ' ReSharper restore VBPossibleMistakenCallToGetType.2
                             For Each kvp In readableProperties
                                 fieldsAndValues.Add(kvp.Key, kvp.Value)
                             Next
                         End Sub)
-            ' todo troubles might arise with ratingSource. At the same time it would cast to string so it must be of
-            ' todo do toUpper with both fields and values and field names and so on
             Return Allows(fieldsAndValues)
         End Function
 
-
-
         Private Function Allows(ByVal fav As Dictionary(Of String, Object)) As Boolean
-            ' i have a stack
             ' тут надо считывать и вычислять тройки, складывать их в стек, а в стеке постепенно продолжать вычисления
             Dim resultStack As New Stack(Of Boolean)
             Dim first = True
@@ -558,12 +590,12 @@ Namespace Bonds
                 ElseIf TypeOf pointer.Value Is FilterParser.Lop And Not first Then
                     ApplyBoolean(resultStack, pointer.Value)
                 Else
-                    Throw New InterpreterException() ' unexpected sequence of elements
+                    Throw New InterpreterException("Invalid filter expression") ' unexpected sequence of elements
                 End If
                 first = False
                 pointer = pointer.Next
             Loop Until pointer Is Nothing
-            If resultStack.Count <> 1 Then Throw New InterpreterException()
+            If resultStack.Count <> 1 Then Throw New InterpreterException("Filter not fully evaluated")
             Return resultStack.Pop()
         End Function
 
@@ -579,11 +611,11 @@ Namespace Bonds
                     Case FilterParser.Lop.LogicalOperation.OpOr
                         res = operand1 Or operand2
                     Case Else
-                        Throw New InterpreterException()
+                        Throw New InterpreterException(String.Format("Invalid operand {0}", lop.LogOperation))
                 End Select
                 resultStack.Push(res)
             Catch ex As InvalidOperationException
-                Throw New InterpreterException()
+                Throw New InterpreterException("Failed to load operands")
             End Try
         End Sub
 
@@ -591,30 +623,26 @@ Namespace Bonds
             ' load three items - var, val and boolop, return pointer to last
             ' evaluate var, boolop it to var, push result to resultStack
             Try
-                If node Is Nothing Then Throw New InterpreterException()
-                ' todo to work with ratings do develop a object variable with syntax 
-                ' todo $lastRating.source = "XXX" And $lastRating.rate >= [BBB-]
-                ' todo here first one is string and the second one is Rating!
+                If node Is Nothing Then Throw New InterpreterException("Failed to load operands")
                 Dim var = TryCast(node.Value, FilterParser.Var)
                 node = node.Next
-                If node Is Nothing Then Throw New InterpreterException()
-                If var Is Nothing Then Throw New InterpreterException()
+                If node Is Nothing Then Throw New InterpreterException("Failed to load operands")
+                If var Is Nothing Then Throw New InterpreterException(String.Format("Variable name expected instead of {0}", node.Value.ToString()))
 
                 If TypeOf var Is FilterParser.ObjVar Then
-                    If Not fav.Keys.Contains(CType(var, FilterParser.ObjVar).FullName) Then Throw New InterpreterException() ' todo how do rating variables come here?
+                    Dim fullName = CType(var, FilterParser.ObjVar).FullName
+                    If Not fav.Keys.Contains(fullName) Then Throw New InterpreterException(String.Format("Object variable {0} not found", fullName))
                 ElseIf TypeOf var Is FilterParser.Var Then
-                    If Not fav.Keys.Contains(var.Name) Then Throw New InterpreterException()
-                    ' todo how do rating variables come here?
-                    ' todo what to do with obj var?
+                    If Not fav.Keys.Contains(var.Name) Then Throw New InterpreterException(String.Format("Variable {0} not found", var.Name))
                 End If
 
                 Dim val = TryCast(node.Value, FilterParser.IVal)
                 node = node.Next
-                If node Is Nothing Then Throw New InterpreterException()
-                If val Is Nothing Then Throw New InterpreterException()
+                If node Is Nothing Then Throw New InterpreterException("Failed to load operands")
+                If val Is Nothing Then Throw New InterpreterException(String.Format("Value expected instead of {0}", node.Value.ToString()))
 
                 Dim boolOp = TryCast(node.Value, FilterParser.Bop)
-                If boolOp Is Nothing Then Throw New InterpreterException()
+                If boolOp Is Nothing Then Throw New InterpreterException(String.Format("Invalid filter expression; boolean operation expected instead of {0}", node.Value.ToString()))
 
                 If TypeOf val Is FilterParser.Val(Of String) Then
                     Dim strObjVal = fav(var.Name).ToString().ToUpper()
@@ -630,14 +658,14 @@ Namespace Bonds
                                 Dim rx = New Regex(strValVal)
                                 resultStack.Push(rx.Match(strObjVal).Success)
                             Catch ex As ArgumentException
-                                Throw New InterpreterException() ' invalid pattern
+                                Throw New InterpreterException(String.Format("Invalid regular expression pattern {0}", strValVal)) ' invalid pattern
                             End Try
                         Case Else
-                            Throw New InterpreterException() ' invalid string operation
+                            Throw New InterpreterException(String.Format("Operation {0} is not applicable to strings", boolOp.BinOperation)) ' invalid string operation
                     End Select
 
                 ElseIf TypeOf val Is FilterParser.Val(Of Date) Then
-                    If Not IsDate(fav(var.Name)) Then Throw New InterpreterException()
+                    If Not IsDate(fav(var.Name)) Then Throw New InterpreterException(String.Format("Value {0} is not in date format", fav(var.Name)))
                     Dim datObjVal = CType(fav(var.Name), Date)
                     Dim datValVal = CType(val, FilterParser.Val(Of Date)).Value
 
@@ -655,19 +683,23 @@ Namespace Bonds
                         Case FilterParser.Bop.BinaryOperation.OpLessOrEquals
                             resultStack.Push(datObjVal <= datValVal)
                         Case Else
-                            Throw New InterpreterException() ' invalid date operation
+                            Throw New InterpreterException(String.Format("Operation {0} is not applicable to dates", boolOp.BinOperation)) ' invalid date operation
                     End Select
 
                 ElseIf TypeOf val Is FilterParser.Val(Of Double) Then
                     ' todo in theory I could separate double and integer so that to disallow = and <> for double
-                    If Not IsNumeric(fav(var.Name)) Then Throw New InterpreterException()
+                    If Not IsNumeric(fav(var.Name)) Then Throw New InterpreterException(String.Format("Value {0} is not in numeric format", fav(var.Name)))
                     Dim dblObjVal = CType(fav(var.Name), Double)
                     Dim dblValVal = CType(val, FilterParser.Val(Of Double)).Value
                     Select Case boolOp.BinOperation
                         Case FilterParser.Bop.BinaryOperation.OpEquals
+                            ' ReSharper disable CompareOfFloatsByEqualityOperator
                             resultStack.Push(dblObjVal = dblValVal)
+                            ' ReSharper restore CompareOfFloatsByEqualityOperator
                         Case FilterParser.Bop.BinaryOperation.OpNotEqual
+                            ' ReSharper disable CompareOfFloatsByEqualityOperator
                             resultStack.Push(dblObjVal <> dblValVal)
+                            ' ReSharper restore CompareOfFloatsByEqualityOperator
                         Case FilterParser.Bop.BinaryOperation.OpGreater
                             resultStack.Push(dblObjVal > dblValVal)
                         Case FilterParser.Bop.BinaryOperation.OpGreaterOrEquals
@@ -677,12 +709,12 @@ Namespace Bonds
                         Case FilterParser.Bop.BinaryOperation.OpLessOrEquals
                             resultStack.Push(dblObjVal <= dblValVal)
                         Case Else
-                            Throw New InterpreterException() ' invalid date operation
+                            Throw New InterpreterException(String.Format("Operation {0} is not applicable to numbers", boolOp.BinOperation)) ' invalid date operation
                     End Select
 
-                ElseIf TypeOf val Is FilterParser.Val(Of Rating) Then ' todo for future generations
+                ElseIf TypeOf val Is FilterParser.Val(Of Rating) Then
                     Dim rateObjVal = TryCast(fav(var.Name), Rating)
-                    If rateObjVal Is Nothing Then Throw New InterpreterException()
+                    If rateObjVal Is Nothing Then Throw New InterpreterException(String.Format("Value {0} is not in rating format", fav(var.Name)))
                     Dim rateValVal = CType(val, FilterParser.Val(Of Rating)).Value
                     Select Case boolOp.BinOperation
                         Case FilterParser.Bop.BinaryOperation.OpEquals
@@ -698,20 +730,56 @@ Namespace Bonds
                         Case FilterParser.Bop.BinaryOperation.OpLessOrEquals
                             resultStack.Push(rateObjVal <= rateValVal)
                         Case Else
-                            Throw New InterpreterException() ' invalid rating operation
+                            Throw New InterpreterException(String.Format("Operation {0} is not applicable to ratings", boolOp.BinOperation)) ' invalid rating operation
                     End Select
                 Else
-                    Throw New InterpreterException() ' unknown type
+                    ' ReSharper disable VBPossibleMistakenCallToGetType.2
+                    Throw New InterpreterException(String.Format("Unknown operand type {0} ", node.Value.GetType().ToString())) ' unknown type
+                    ' ReSharper restore VBPossibleMistakenCallToGetType.2
                 End If
             Catch ex As NullReferenceException
+                Throw New InterpreterException("Failed to interpret, NPE occured", ex) ' unknown type
 
             Catch ex As InvalidOperationException
-                Throw New InterpreterException()
+                Throw New InterpreterException("Failed to load operands")
             End Try
         End Sub
     End Class
-    Interface IFilterable
 
+    Interface IFilterable
     End Interface
 
+    Public Enum SortDirection
+        None
+        Asc
+        Desc
+    End Enum
+
+    Friend Class Sorter(Of T)
+        Implements IComparer(Of T)
+
+
+        Private _field As PropertyInfo
+        Private _direction As SortDirection = SortDirection.None
+
+        Public Sub SetSort(ByVal fieldName As String, ByVal sortDirection As SortDirection)
+            Dim filteredFields = (From prop In GetType(T).GetProperties(BindingFlags.Public Or BindingFlags.Instance)
+                                  Where prop.Name = fieldName).ToList()
+            If Not filteredFields.Any Then Throw New SorterException()
+            _field = filteredFields.First()
+            _direction = sortDirection
+        End Sub
+
+        Public Function Compare(ByVal x As T, ByVal y As T) As Integer Implements IComparer(Of T).Compare
+            If _direction = SortDirection.None Then Return 0
+            If _field Is Nothing Then Return 0
+            Dim xVal = _field.GetValue(x, Nothing)
+            Dim yVal = _field.GetValue(y, Nothing)
+            Return If(_direction = SortDirection.Asc, 1, -1) * Comparer.Default.Compare(xVal, yVal)
+        End Function
+    End Class
+
+    Friend Class SorterException
+        Inherits Exception
+    End Class
 End Namespace

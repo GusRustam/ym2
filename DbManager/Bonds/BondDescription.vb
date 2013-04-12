@@ -98,7 +98,7 @@ Namespace Bonds
         End Sub
 
         <DisplayName("Ric")>
-        <Filtered()>
+        <Filterable()>
         Public ReadOnly Property RIC As String
             Get
                 Return _ric
@@ -106,7 +106,8 @@ Namespace Bonds
         End Property
 
         <DisplayName("Name")>
-        <Filtered()>
+        <Filterable()>
+        <Sortable()>
         Public ReadOnly Property ShortName As String
             Get
                 Return _shortName
@@ -121,7 +122,8 @@ Namespace Bonds
         End Property
 
         <DisplayName("Maturity date")>
-        <Filtered()>
+        <Filterable()>
+        <Sortable()>
         Public ReadOnly Property Maturity As Date?
             Get
                 Return _maturity
@@ -129,7 +131,8 @@ Namespace Bonds
         End Property
 
         <DisplayName("Current coupon")>
-        <Filtered()>
+        <Filterable()>
+        <Sortable()>
         Public ReadOnly Property Coupon As Double
             Get
                 Return _coupon
@@ -151,7 +154,8 @@ Namespace Bonds
         End Property
 
         <DisplayName("Issue date")>
-        <Filtered()>
+        <Filterable()>
+        <Sortable()>
         Public ReadOnly Property IssueDate As Date
             Get
                 Return _issueDate
@@ -188,7 +192,8 @@ Namespace Bonds
 
 
         <DisplayName("Issuer Name")>
-        <Filtered()>
+        <Filterable()>
+        <Sortable()>
         Public ReadOnly Property IssuerName As String
             Get
                 Return _issuerName
@@ -196,35 +201,37 @@ Namespace Bonds
         End Property
 
         <DisplayName("Borrower Name")>
-        <Filtered()>
+        <Filterable()>
+        <Sortable()>
         Public ReadOnly Property BorrowerName As String
             Get
                 Return _borrowerName
             End Get
         End Property
 
-        <Filtered()>
+        <Filterable()>
+        <Sortable()>
         Public ReadOnly Property Currency As String
             Get
                 Return _currency
             End Get
         End Property
 
-        <Filtered()>
+        <Filterable()>
         Public ReadOnly Property Putable As Boolean
             Get
                 Return _putable
             End Get
         End Property
 
-        <Filtered()>
+        <Filterable()>
         Public ReadOnly Property Callable As Boolean
             Get
                 Return _callable
             End Get
         End Property
 
-        <Filtered()>
+        <Filterable()>
         Public ReadOnly Property Floater As Boolean
             Get
                 Return _floater
@@ -232,7 +239,8 @@ Namespace Bonds
         End Property
 
         <DisplayName("Last issue rating")>
-        <Filtered()>
+        <Filterable()>
+        <Sortable()>
         Public ReadOnly Property LastIssueRating As RatingDescr
             Get
                 Return _lastIssueRating
@@ -240,7 +248,8 @@ Namespace Bonds
         End Property
 
         <DisplayName("Last issuer rating")>
-        <Filtered()>
+        <Filterable()>
+        <Sortable()>
         Public ReadOnly Property LastIssuerRating As RatingDescr
             Get
                 Return _lastIssuerRating
@@ -248,7 +257,8 @@ Namespace Bonds
         End Property
 
         <DisplayName("Last rating")>
-        <Filtered()>
+        <Filterable()>
+        <Sortable()>
         Public ReadOnly Property LastRating As RatingDescr
             Get
                 Return _lastRating

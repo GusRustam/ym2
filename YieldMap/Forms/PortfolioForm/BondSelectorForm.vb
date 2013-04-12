@@ -1,10 +1,14 @@
 ﻿Imports System.Windows.Forms
 Imports DbManager.Bonds
+Imports System.Reflection
+Imports NLog
+Imports Settings
 Imports YieldMap.Forms.MainForm
 
 Namespace Forms.PortfolioForm
     Public Class BondSelectorForm
-        Private _bonds As New BondView
+        Private ReadOnly _bonds As New BondView
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(BondSelectorForm))
 
         Private _canExclude As Boolean = False
         Public WriteOnly Property CanExclude As Boolean
@@ -28,39 +32,21 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub RefreshColumns()
-            ' todo choosing columns
-            'Dim selectedFields = BondSelectorVisibleColumns.Split(",")
-            'If selectedFields.Contains("ALL") Then
-            '    For Each column As DataGridViewColumn In BondListDGV.Columns
-            '        column.Visible = True
-            '    Next
-            'Else
-            '    For Each column As DataGridViewColumn In BondListDGV.Columns
-            '        column.Visible = selectedFields.Contains(column.DataPropertyName)
-            '    Next
-            'End If
-            'BondListDGV.Columns(0).Visible = False
+            Dim selectedFields = SettingsManager.Instance.BondSelectorVisibleColumns.Split(",")
+            If selectedFields.Contains("ALL") Then
+                For Each column As DataGridViewColumn In BondListDGV.Columns
+                    column.Visible = True
+                Next
+            Else
+                For Each column As DataGridViewColumn In BondListDGV.Columns
+                    column.Visible = selectedFields.Contains(column.DataPropertyName)
+                Next
+            End If
+            BondListDGV.Columns(0).Visible = False
         End Sub
 
         Private Sub RefreshList()
-            'Dim rics = (From row In BondsLoader.Instance.GetBondsTable() Select row.ric).ToList()
-            BondListDGV.DataSource = _bonds.Items 'BondsData.Instance.GetBondInfo(rics)
-            '
-            ' todo 1) сортировка и статическая фильтрация
-            ' todo 2) для строк предусмотреть оператор LIKE
-            ' todo 3) для рейтингов предусмотреть сортировку и отбор (например, квадратные скобки)
-            ' todo 4) выполнение распарсенного представления и динамическая фильтрация
-            '
-            'IssuerTableAdapter.Fill(BondsDataSet.issuer)
-
-
-            'Dim accs = New AutoCompleteStringCollection()
-
-            'For Each aName In BondsDataSet.issuer.Select(Function(row As BondsDataSet.issuerRow) row.shortname)
-            '    accs.Add(aName)
-            'Next
-
-            'IssuerCB.AutoCompleteCustomSource = accs
+            BondListDGV.DataSource = _bonds.Items
         End Sub
 
         Private Sub RefreshGrid()
@@ -72,9 +58,14 @@ Namespace Forms.PortfolioForm
             If RICTextBox.Text <> "" Then
                 strFitler = If(strFitler <> "", strFitler & " AND ", "") & String.Format("$ric LIKE ""{0}""", RICTextBox.Text)
             End If
-
-            _bonds.SetFilter(strFitler)
-            RefreshList()
+            Try
+                _bonds.SetFilter(strFitler)
+                RefreshList()
+            Catch ex As ParserException
+                Logger.ErrorException("Failed to set filtering", ex)
+                Logger.Error("Exception = {0}", ex.ToString())
+                MessageBox.Show(String.Format("Failed to apply filtering, message is {0}", ex.ToString()), "Filtering error", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            End Try
         End Sub
 
         Private Sub OkButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles OkButton.Click
@@ -89,51 +80,35 @@ Namespace Forms.PortfolioForm
             RefreshGrid()
         End Sub
 
-        Private _matOrder As SortOrder
-        Private _issOrder As SortOrder
-        Private _nextPutOrder As SortOrder
-        Private _nextCallOrder As SortOrder
-
         Private Sub BondListDGV_ColumnHeaderMouseClick(ByVal sender As Object, ByVal e As DataGridViewCellMouseEventArgs) Handles BondListDGV.ColumnHeaderMouseClick
             If e.Button = MouseButtons.Left Then
-                Dim sorted As Boolean = True
-                Dim order As SortOrder
-                If BondListDGV.Columns(e.ColumnIndex).HeaderText = "Maturity date" Then
-                    order = SetDateSort(_matOrder, "matsort")
-                ElseIf BondListDGV.Columns(e.ColumnIndex).HeaderText = "Issued" Then
-                    order = SetDateSort(_issOrder, "isssort")
-                ElseIf BondListDGV.Columns(e.ColumnIndex).HeaderText = "Next Put" Then
-                    order = SetDateSort(_nextPutOrder, "nextputsort")
-                ElseIf BondListDGV.Columns(e.ColumnIndex).HeaderText = "Next Call" Then
-                    order = SetDateSort(_nextCallOrder, "nextcallsort")
-                Else
-                    sorted = False
+                Dim order As SortDirection
+                Select Case BondListDGV.Columns(e.ColumnIndex).HeaderCell.SortGlyphDirection
+                    Case SortDirection.Asc
+                        order = SortDirection.Desc
+                    Case SortDirection.Desc
+                        order = SortDirection.None
+                    Case SortDirection.None
+                        order = SortDirection.Asc
+                End Select
+                Dim propertyName = BondListDGV.Columns(e.ColumnIndex).DataPropertyName
+                Dim sortableFields = (From prop In GetType(BondDescription).GetProperties(BindingFlags.Public Or BindingFlags.Instance)
+                                 Where prop.GetCustomAttributes(GetType(SortableAttribute), False).Any
+                                 Select prop.Name).ToList()
+                If sortableFields.Contains(propertyName) Then
+                    _bonds.SetSort(propertyName, order)
+                    RefreshList()
+                    BondListDGV.Columns(e.ColumnIndex).HeaderCell.SortGlyphDirection = GetSortOrder(order)
                 End If
-                If sorted Then BondListDGV.Columns(e.ColumnIndex).HeaderCell.SortGlyphDirection = order
             ElseIf e.Button = MouseButtons.Right Then
                 SelectColumnsCMS.Show(MousePosition)
             End If
         End Sub
 
-        Private Function SetDateSort(ByRef anOrder As SortOrder, ByVal nm As String) As SortOrder
-            Dim dir As String
-            Select Case anOrder
-                Case SortOrder.None
-                    anOrder = SortOrder.Ascending
-                    dir = "asc"
-                Case SortOrder.Ascending
-                    anOrder = SortOrder.Descending
-                    dir = "desc"
-                Case SortOrder.Descending
-                    anOrder = SortOrder.None
-                    dir = ""
-            End Select
-            'If anOrder <> SortOrder.None Then
-            '    BondDescriptionsBindingSource.Sort = " " & nm & " " & dir
-            'Else
-            '    BondDescriptionsBindingSource.Sort = ""
-            'End If
-            Return anOrder
+        Private Shared Function GetSortOrder(ByVal sortDirection As SortDirection) As SortOrder
+            If sortDirection = sortDirection.None Then Return SortOrder.None
+            If sortDirection = sortDirection.Asc Then Return SortOrder.Ascending
+            Return SortOrder.Descending
         End Function
 
         Private Sub SelectColumnsToolStripMenuItem_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SelectColumnsToolStripMenuItem.Click
