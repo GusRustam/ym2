@@ -37,7 +37,7 @@ Namespace Forms.MainForm
 
             Dim selectedFields = Settings.BondSelectorVisibleColumns.Split(",")
             ColumnsCLB.Items.Clear()
-            For Each field In BondDescription.GetSelectableFields()
+            For Each field In BondDescription.GetHideableFields()
                 Dim idx = ColumnsCLB.Items.Add(field)
                 ColumnsCLB.SetItemCheckState(idx, If(selectedFields.Contains(field), CheckState.Checked, CheckState.Unchecked))
             Next

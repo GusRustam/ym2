@@ -225,12 +225,36 @@ Public Class PortfolioStructure
     Public ReadOnly Property Rics(Optional ByVal netted As Boolean = False) As ReadOnlyCollection(Of RicDescription)
         Get
             Dim res As New List(Of RicDescription)
+            Dim interpreter = New FilterInterpreter(Of BondDescription)
+            Dim filter As Boolean = False
             For Each src In _sources
                 Dim description As RicDescription
+                Dim cond = src.Condition
+                If cond <> "" Then
+                    Dim parser As New FilterParser
+                    Try
+                        Dim grammar As LinkedList(Of FilterParser.IGrammarElement)
+                        grammar = parser.SetFilter(cond)
+                        interpreter.SetGrammar(grammar)
+                        filter = True
+                    Catch ex As Exception
+                        Logger.ErrorException(String.Format("Failed to parse condition {0}", cond), ex)
+                        Logger.Error("Exception = {0}", ex.ToString())
+                    End Try
+
+                End If
                 For Each ric In src.Source.GetDefaultRics()
                     If netted AndAlso _excludes.Contains(ric) Then Continue For
                     Try
                         Dim descr = BondsData.Instance.GetBondInfo(ric)
+                        If filter Then
+                            Try
+                                If Not interpreter.Allows(descr) Then Continue For
+                            Catch ex As Exception
+                                Logger.ErrorException(String.Format("Failed to apply filter to bond {0}", ric), ex)
+                                Logger.Error("Exception = {0}", ex.ToString())
+                            End Try
+                        End If
                         Dim type = src.Source.GetType().Name
                         description = New RicDescription(ric, descr.Label1, type, src.Name, src.Color, src.Included)
                         res.Add(description)
