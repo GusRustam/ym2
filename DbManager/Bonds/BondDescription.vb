@@ -1,4 +1,5 @@
 ﻿Imports System.ComponentModel
+Imports System.Reflection
 
 Namespace Bonds
     Public Class PaymentException
@@ -42,6 +43,10 @@ Namespace Bonds
             End While
             Return item.Value.Item2 / 100
         End Function
+    End Class
+
+    Public Class Hideable
+        Inherits Attribute
     End Class
 
     Public Class BondDescription
@@ -97,6 +102,7 @@ Namespace Bonds
             _lastRating = lastRating
         End Sub
 
+        <Hideable()>
         <DisplayName("Ric")>
         <Filterable()>
         Public ReadOnly Property RIC As String
@@ -105,6 +111,7 @@ Namespace Bonds
             End Get
         End Property
 
+        <Hideable()>
         <DisplayName("Name")>
         <Filterable()>
         <Sortable()>
@@ -124,6 +131,7 @@ Namespace Bonds
         <DisplayName("Maturity date")>
         <Filterable()>
         <Sortable()>
+        <Hideable()>
         Public ReadOnly Property Maturity As Date?
             Get
                 Return _maturity
@@ -133,6 +141,7 @@ Namespace Bonds
         <DisplayName("Current coupon")>
         <Filterable()>
         <Sortable()>
+        <Hideable()>
         Public ReadOnly Property Coupon As Double
             Get
                 Return _coupon
@@ -155,6 +164,7 @@ Namespace Bonds
 
         <DisplayName("Issue date")>
         <Filterable()>
+        <Hideable()>
         <Sortable()>
         Public ReadOnly Property IssueDate As Date
             Get
@@ -190,7 +200,7 @@ Namespace Bonds
             End Get
         End Property
 
-
+        <Hideable()>
         <DisplayName("Issuer Name")>
         <Filterable()>
         <Sortable()>
@@ -200,6 +210,7 @@ Namespace Bonds
             End Get
         End Property
 
+        <Hideable()>
         <DisplayName("Borrower Name")>
         <Filterable()>
         <Sortable()>
@@ -209,6 +220,7 @@ Namespace Bonds
             End Get
         End Property
 
+        <Hideable()>
         <Filterable()>
         <Sortable()>
         Public ReadOnly Property Currency As String
@@ -217,6 +229,7 @@ Namespace Bonds
             End Get
         End Property
 
+        <Hideable()>
         <Filterable()>
         Public ReadOnly Property Putable As Boolean
             Get
@@ -224,6 +237,7 @@ Namespace Bonds
             End Get
         End Property
 
+        <Hideable()>
         <Filterable()>
         Public ReadOnly Property Callable As Boolean
             Get
@@ -231,6 +245,7 @@ Namespace Bonds
             End Get
         End Property
 
+        <Hideable()>
         <Filterable()>
         Public ReadOnly Property Floater As Boolean
             Get
@@ -238,6 +253,7 @@ Namespace Bonds
             End Get
         End Property
 
+        <Hideable()>
         <DisplayName("Last issue rating")>
         <Filterable()>
         <Sortable()>
@@ -247,6 +263,7 @@ Namespace Bonds
             End Get
         End Property
 
+        <Hideable()>
         <DisplayName("Last issuer rating")>
         <Filterable()>
         <Sortable()>
@@ -256,6 +273,7 @@ Namespace Bonds
             End Get
         End Property
 
+        <Hideable()>
         <DisplayName("Last rating")>
         <Filterable()>
         <Sortable()>
@@ -267,6 +285,13 @@ Namespace Bonds
 
         Public Function GetCouponByDate(ByVal dt As Date) As Double
             Return BondsData.Instance.GetBondPayments(_ric).GetCoupon(dt)
+        End Function
+
+
+        Public Shared Function GetHideableFields() As List(Of String)
+            Return (From field In GetType(BondDescription).GetProperties(BindingFlags.Instance Or BindingFlags.Public)
+                      Where field.GetCustomAttributes(GetType(Hideable), False).Any
+                      Select field.Name).ToList()
         End Function
     End Class
 End Namespace

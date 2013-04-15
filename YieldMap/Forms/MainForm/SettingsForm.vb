@@ -1,4 +1,5 @@
 ﻿Imports System.Text.RegularExpressions
+Imports DbManager.Bonds
 Imports NLog
 Imports Settings
 
@@ -36,11 +37,9 @@ Namespace Forms.MainForm
 
             Dim selectedFields = Settings.BondSelectorVisibleColumns.Split(",")
             ColumnsCLB.Items.Clear()
-            For Each nd As NameDescr In NameDescr.AllNames
-                Dim idx = ColumnsCLB.Items.Add(nd)
-                If selectedFields.Contains(nd.Field) Then
-                    ColumnsCLB.SetItemCheckState(idx, CheckState.Checked)
-                End If
+            For Each field In BondDescription.GetSelectableFields()
+                Dim idx = ColumnsCLB.Items.Add(field)
+                ColumnsCLB.SetItemCheckState(idx, If(selectedFields.Contains(field), CheckState.Checked, CheckState.Unchecked))
             Next
             If selectedFields.Contains("ALL") Then
                 AllColumnsCB.Checked = True
@@ -51,32 +50,6 @@ Namespace Forms.MainForm
         Private Sub CancelButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles TheCancelButton.Click
             Close()
         End Sub
-
-        Private Class NameDescr
-            Public Shared ReadOnly AllNames = {New NameDescr("Bond name", "bondshortname"),
-                               New NameDescr("Description", "descr"),
-                               New NameDescr("RIC", "ric"),
-                               New NameDescr("Issuer", "issname"),
-                               New NameDescr("Issue date", "issuedate"),
-                               New NameDescr("Issue size", "issue_size"),
-                               New NameDescr("Maturity", "maturitydate"),
-                               New NameDescr("Coupon", "coupon"),
-                               New NameDescr("Currency", "currency"),
-                               New NameDescr("Next put", "nextputdate"),
-                               New NameDescr("Next call", "nextcalldate")}
-
-            Private ReadOnly _descr As String
-            Public ReadOnly Field As String
-
-            Private Sub New(ByVal descr As String, ByVal field As String)
-                _descr = descr
-                Me.Field = field
-            End Sub
-
-            Public Overrides Function ToString() As String
-                Return _descr
-            End Function
-        End Class
 
         Private Sub SaveSettingsButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles SaveSettingsButton.Click
             If LogTraceRadioButton.Checked Then
@@ -118,7 +91,7 @@ Namespace Forms.MainForm
             Else
                 For i = 0 To ColumnsCLB.Items.Count - 1
                     If ColumnsCLB.GetItemCheckState(i) = CheckState.Checked Then
-                        columnsString = columnsString & CType(ColumnsCLB.Items(i), NameDescr).Field & ","
+                        columnsString = columnsString & ColumnsCLB.Items(i).ToString() & ","
                     End If
                 Next
             End If

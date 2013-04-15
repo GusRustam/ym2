@@ -5,7 +5,6 @@ Imports NLog
 Imports Uitls
 
 Namespace Forms.PortfolioForm
-
     Public Class PortfolioForm
         Private Shared ReadOnly PortfolioManager As IPortfolioManager = DbManager.PortfolioManager.Instance()
         Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(PortfolioForm))

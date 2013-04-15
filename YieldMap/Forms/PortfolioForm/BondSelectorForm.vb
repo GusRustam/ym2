@@ -42,7 +42,6 @@ Namespace Forms.PortfolioForm
                     column.Visible = selectedFields.Contains(column.DataPropertyName)
                 Next
             End If
-            BondListDGV.Columns(0).Visible = False
         End Sub
 
         Private Sub RefreshList()
@@ -113,7 +112,7 @@ Namespace Forms.PortfolioForm
 
         Private Sub SelectColumnsToolStripMenuItem_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SelectColumnsToolStripMenuItem.Click
             Dim sf As New SettingsForm
-            sf.MainLoadColumnsPage.Select()
+            sf.MainTabControl.SelectedTab = sf.MainLoadColumnsPage
             sf.ShowDialog()
             RefreshColumns()
         End Sub

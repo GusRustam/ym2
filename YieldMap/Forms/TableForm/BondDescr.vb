@@ -1,6 +1,4 @@
-﻿Imports System.ComponentModel
-Imports System.Globalization
-Imports System.Windows.Forms
+﻿Imports System.Windows.Forms
 Imports NLog
 Imports YieldMap.Tools
 
@@ -19,9 +17,9 @@ Namespace Forms.TableForm
         Public Function Compare(ByVal x As BondDescr, ByVal y As BondDescr) As Integer Implements IComparer(Of BondDescr).Compare
             Dim res As Integer
             Dim mult  = IIf(_sortOrder = SortOrder.Ascending, 1, -1)
-            Dim nameOrder As Integer = x.Name.CompareTo(y.Name)
+            Dim nameOrder As Integer = String.Compare(x.Name, y.Name, StringComparison.Ordinal)
             Select Case _memberName
-                Case "RIC" : res = mult * x.RIC.CompareTo(y.RIC)
+                Case "RIC" : res = mult * String.Compare(x.RIC, y.RIC, StringComparison.Ordinal)
                 Case "Name" : res = mult * nameOrder
                 Case Else
                     Dim srt As Integer

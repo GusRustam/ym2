@@ -190,7 +190,7 @@
             '
             Me.SelectColumnsCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SelectColumnsToolStripMenuItem})
             Me.SelectColumnsCMS.Name = "SelectColumnsCMS"
-            Me.SelectColumnsCMS.Size = New System.Drawing.Size(164, 26)
+            Me.SelectColumnsCMS.Size = New System.Drawing.Size(164, 48)
             '
             'SelectColumnsToolStripMenuItem
             '
