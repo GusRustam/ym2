@@ -120,30 +120,37 @@
   <metadata name="Label1.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
-  <metadata name="Label2.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
   <metadata name="Label3.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
   <metadata name="Label4.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </metadata>
+  <metadata name="Label6.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="Label5.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="Label2.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="Label7.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="Label8.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
   <data name="GrammarTB.Text" xml:space="preserve">
-    <value>General expression
-&lt;COND&gt;  ::= &lt;TERM&gt;|&lt;TERM&gt; &lt;LOP&gt; &lt;TERM&gt;|&lt;TERM&gt; &lt;LOP&gt; &lt;COND&gt;
-&lt;TERM&gt;  ::= [(]&lt;NAME&gt; &lt;OP&gt; &lt;VALUE&gt;[)]
-&lt;NAME&gt;  ::= $&lt;LETTERS&gt;
+    <value>General expression is a combination of terms {$var} {binaryOperation} {value} with logical operators. You can use parentheses to group operators.
+Logical operations are AND and OR, binary operations are =, &gt;, &lt;, &gt;=, &lt;=, LIKE
 
-Operations:
-&lt;LOP&gt;   ::= AND|OR
-&lt;OP&gt;    ::= =|&gt;|&lt;|&gt;=|&lt;=|LIKE
+Values can be string, number, date and rating: 
+ - String must be enclosed in "";
+ - Date format is #DD/MM/YY# or #DD/MM/YYYY# (all numbers);
+ - Numbers can be with or without floating point, like 12 or 0.001 or 3.1415;
+ - Rating looks like [AA-] or [Baa1]. All ratings are cast to one scale, so you can use Caa1 and CCC+ interchangebly
 
-Values:
-&lt;VALUE&gt;   ::= &lt;STRVAL&gt;|&lt;DATVAL&gt;|&lt;NUMVAL&gt;|&lt;RATEVAL&gt;
-&lt;STRVAL&gt;  ::= "&lt;LETTERS&gt;"
-&lt;NUMVAL&gt;  ::= DIGITS[.DIGITS]
-&lt;DATVAL&gt;  ::= #DD/MM/YY# | #DD/MM/YYYY#
-&lt;RATEVAL&gt; ::= [&lt;LETTERS&gt;]</value>
+All strings are case insensitive except for value of LIKE operator.</value>
   </data>
 </root>

@@ -14,6 +14,7 @@ Namespace Bonds
         Private Shared ReadOnly LogOp As Regex = New Regex("^\s*?(?<lop>AND|OR)")
         Private Shared ReadOnly BinOp As Regex = New Regex("^\s*?(?<bop>\<=|\>=|=|\<\>|\<|\>|like)")
         Private Shared ReadOnly NumValue As Regex = New Regex("^\s*?(?<num>\d+.\d+|\d+)")
+        Private Shared ReadOnly BoolValue As Regex = New Regex("^\s*?(?<bool>True|False)")
         Private Shared ReadOnly StrValue As Regex = New Regex("^\s*?""(?<str>[^""]*)""")
         Private Shared ReadOnly DatValue As Regex = New Regex("^\s*?#(?<dd>\d{1,2})/(?<mm>\d{1,2})/(?<yy>\d{2}|\d{4})#")
         Private Shared ReadOnly RatingValue As Regex = New Regex("^\s*?\[(?<rating>[^\]]*)\]")
@@ -403,6 +404,19 @@ Namespace Bonds
                             Else
                                 Throw New ParserException("Unexpected sequence, rating expression required", i)
                             End If
+                        ElseIf {"T", "F"}.Contains(fltStr.ToUpper()(i)) Then
+                            match = BoolValue.Match(fltStr.Substring(i))
+                            If match.Success Then
+                                Dim bool = match.Groups("bool").Captures(0).Value
+                                Try
+                                    valNode = New Val(Of Boolean)(Boolean.Parse(bool))
+                                Catch ex As FormatException
+                                    Throw New ParserException("Unexpected sequence, boolean (True/False) expression required", i)
+                                End Try
+                                i = i + match.Length + 1
+                            Else
+                                Throw New ParserException("Unexpected sequence, rating expression required", i)
+                            End If
                         Else
                             Throw New ParserException("Unexpected symbol, string, date or number required", i)
                         End If
@@ -609,7 +623,7 @@ Namespace Bonds
             _grammar = grammar
         End Sub
 
-        Public Function Allows(ByVal elem As T)
+        Public Function Allows(ByVal elem As T) As Boolean
             If _grammar Is Nothing OrElse Not _grammar.Any Then Return True
             Dim fieldsAndValues As Dictionary(Of String, Object) = FilterHelper.GetFieldsAndValues(elem)
             ' field.GetType.IsValueType
@@ -750,6 +764,23 @@ Namespace Bonds
                         Case Else
                             Throw New InterpreterException(String.Format("Operation {0} is not applicable to numbers", boolOp.BinOperation)) ' invalid date operation
                     End Select
+
+                ElseIf TypeOf val Is FilterParser.Val(Of Boolean) Then
+                    ' todo interpretation of booleans
+                    Try
+                        Dim boolObjVal = CType(fav(var.Name), Boolean)
+                        Dim boolValVal = CType(val, FilterParser.Val(Of Boolean)).Value
+                        Select Case boolOp.BinOperation
+                            Case FilterParser.Bop.BinaryOperation.OpEquals
+                                resultStack.Push(boolObjVal = boolValVal)
+                            Case FilterParser.Bop.BinaryOperation.OpNotEqual
+                                resultStack.Push(boolObjVal <> boolValVal)
+                            Case Else
+                                Throw New InterpreterException(String.Format("Operation {0} is not applicable to booleans", boolOp.BinOperation)) ' invalid bool operation
+                        End Select
+                    Catch ex As Exception
+                        Throw New InterpreterException(String.Format("Value {0} is not in boolean format", fav(var.Name)), ex)
+                    End Try
 
                 ElseIf TypeOf val Is FilterParser.Val(Of Rating) Then
                     Dim rateObjVal = TryCast(fav(var.Name), Rating)

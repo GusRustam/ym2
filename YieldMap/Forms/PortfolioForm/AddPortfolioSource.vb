@@ -137,11 +137,9 @@ Namespace Forms.PortfolioForm
             IncludeCB.Text = If(IncludeCB.Checked, "Yes", "No")
         End Sub
 
-        Private Sub ConditionTB_Enter(ByVal sender As Object, ByVal e As EventArgs) Handles ConditionTB.Enter
+        Private Sub ConditionTB_Enter(ByVal sender As Object, ByVal e As EventArgs) Handles ConditionTB.Enter, ConditionTB.MouseClick
             Dim frm As New ParserErrorForm
-            If frm.ShowDialog() = DialogResult.OK Then
-
-            End If
+            If frm.ShowDialog() = DialogResult.OK Then ConditionTB.Text = frm.ConditionTB.Text
         End Sub
     End Class
 End Namespace

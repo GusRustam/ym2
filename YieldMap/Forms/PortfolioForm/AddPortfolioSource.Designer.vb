@@ -290,7 +290,6 @@
             'Label2
             '
             Me.Label2.AutoSize = True
-            Me.Label2.Enabled = False
             Me.Label2.Location = New System.Drawing.Point(3, 87)
             Me.Label2.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
             Me.Label2.Name = "Label2"
@@ -301,16 +300,15 @@
             'ConditionTB
             '
             Me.ConditionTB.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.ConditionTB.Enabled = False
             Me.ConditionTB.Location = New System.Drawing.Point(121, 59)
             Me.ConditionTB.Name = "ConditionTB"
+            Me.ConditionTB.ReadOnly = True
             Me.ConditionTB.Size = New System.Drawing.Size(292, 20)
             Me.ConditionTB.TabIndex = 7
             '
             'Label5
             '
             Me.Label5.AutoSize = True
-            Me.Label5.Enabled = False
             Me.Label5.Location = New System.Drawing.Point(3, 59)
             Me.Label5.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
             Me.Label5.Name = "Label5"

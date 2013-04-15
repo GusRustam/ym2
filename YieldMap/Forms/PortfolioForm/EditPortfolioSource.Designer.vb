@@ -169,7 +169,7 @@
             Me.IndividualAndCustomBondsTP.Location = New System.Drawing.Point(4, 22)
             Me.IndividualAndCustomBondsTP.Name = "IndividualAndCustomBondsTP"
             Me.IndividualAndCustomBondsTP.Padding = New System.Windows.Forms.Padding(3)
-            Me.IndividualAndCustomBondsTP.Size = New System.Drawing.Size(478, 313)
+            Me.IndividualAndCustomBondsTP.Size = New System.Drawing.Size(478, 283)
             Me.IndividualAndCustomBondsTP.TabIndex = 1
             Me.IndividualAndCustomBondsTP.Text = "Bonds"
             Me.IndividualAndCustomBondsTP.UseVisualStyleBackColor = True
@@ -186,7 +186,7 @@
             Me.TableLayoutPanel4.RowCount = 2
             Me.TableLayoutPanel4.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
             Me.TableLayoutPanel4.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-            Me.TableLayoutPanel4.Size = New System.Drawing.Size(472, 307)
+            Me.TableLayoutPanel4.Size = New System.Drawing.Size(472, 277)
             Me.TableLayoutPanel4.TabIndex = 1
             '
             'FlowLayoutPanel4
@@ -231,7 +231,7 @@
             Me.BondsDGV.Location = New System.Drawing.Point(3, 33)
             Me.BondsDGV.Name = "BondsDGV"
             Me.BondsDGV.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-            Me.BondsDGV.Size = New System.Drawing.Size(466, 271)
+            Me.BondsDGV.Size = New System.Drawing.Size(466, 241)
             Me.BondsDGV.TabIndex = 1
             '
             'FlowLayoutPanel1
@@ -275,8 +275,8 @@
             Me.TableLayoutPanel3.Controls.Add(Me.Label1, 0, 0)
             Me.TableLayoutPanel3.Controls.Add(Me.CustomNameTB, 1, 0)
             Me.TableLayoutPanel3.Controls.Add(Me.FlowLayoutPanel3, 1, 1)
-            Me.TableLayoutPanel3.Controls.Add(Me.Label2, 0, 3)
             Me.TableLayoutPanel3.Controls.Add(Me.IncludeCB, 1, 3)
+            Me.TableLayoutPanel3.Controls.Add(Me.Label2, 0, 3)
             Me.TableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill
             Me.TableLayoutPanel3.Location = New System.Drawing.Point(3, 318)
             Me.TableLayoutPanel3.Name = "TableLayoutPanel3"
@@ -291,16 +291,15 @@
             'ConditionTB
             '
             Me.ConditionTB.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.ConditionTB.Enabled = False
             Me.ConditionTB.Location = New System.Drawing.Point(141, 59)
             Me.ConditionTB.Name = "ConditionTB"
+            Me.ConditionTB.ReadOnly = True
             Me.ConditionTB.Size = New System.Drawing.Size(342, 20)
             Me.ConditionTB.TabIndex = 7
             '
             'Label5
             '
             Me.Label5.AutoSize = True
-            Me.Label5.Enabled = False
             Me.Label5.Location = New System.Drawing.Point(3, 59)
             Me.Label5.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
             Me.Label5.Name = "Label5"

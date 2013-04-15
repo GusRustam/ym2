@@ -8,7 +8,7 @@
         Private ReadOnly _descr As String
         Private ReadOnly _abbr As String()
 
-        Private Shared ReadOnly RateSources As RatingSource() = {SnP, Moodys, Fitch}
+        Public Shared ReadOnly RateSources As RatingSource() = {SnP, Moodys, Fitch}
 
         Private Sub New(ByVal name As String, ByVal descr As String, ByVal abbr As String())
             _name = name
@@ -95,6 +95,13 @@
         Public Shared C As New Rating(1, {"C"})
         Public Shared Other As New Rating(0, {""})
 
+        Public Shared ReadOnly Property AllRatings(ByVal mode As RatingSource) As List(Of RatingListItem)
+            Get
+                Dim all = {Aaa, Aa1, Aa2, A1, A2, A3, Baa1, Baa2, Baa3, Ba1, Ba2, Ba3, B1, B2, B3, Caa1, Caa2, Caa3, Ca, C, Other}
+                Return all.Select(Function(rt) New RatingListItem(rt, mode)).ToList()
+            End Get
+        End Property
+
         Public Shared Ratings As Rating() = {Aaa, Aa1, Aa2, A1, A2, A3,
                                  Baa1, Baa2, Baa3, Ba1, Ba2, Ba3, B1, B2, B3,
                                  Caa1, Caa2, Caa3, Ca, C}
@@ -105,6 +112,30 @@
 
         Private ReadOnly _names As String()
         Private ReadOnly _level As Integer
+
+        Public Class RatingListItem
+            Private ReadOnly _rating As Rating
+            Private ReadOnly _src As RatingSource
+
+            Public Overrides Function ToString() As String
+                If _rating <> Other Then
+                    Return _rating.GetName(_src)
+                Else
+                    Return ""
+                End If
+            End Function
+
+            Sub New(ByVal rating As Rating, ByVal src As RatingSource)
+                _rating = rating
+                _src = src
+            End Sub
+
+            Public ReadOnly Property Rating As Rating
+                Get
+                    Return _rating
+                End Get
+            End Property
+        End Class
 
         Public ReadOnly Property Level() As Integer
             Get
