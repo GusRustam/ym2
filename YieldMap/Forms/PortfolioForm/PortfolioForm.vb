@@ -2,6 +2,7 @@
 Imports DbManager.Bonds
 Imports System.Runtime.InteropServices
 Imports NLog
+Imports System.Text.RegularExpressions
 Imports Uitls
 
 Namespace Forms.PortfolioForm
@@ -14,6 +15,8 @@ Namespace Forms.PortfolioForm
         Private _flag As Boolean
 
         Private _currentItem As Portfolio
+        Private _currentBond As CustomBond
+
         Private Property CurrentItem As Portfolio
             Get
                 Return _currentItem
@@ -23,7 +26,6 @@ Namespace Forms.PortfolioForm
                 RefreshPortfolioData()
             End Set
         End Property
-
 
         Private Sub PortfolioForm_Load(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Load
             BondsTableView.DataSource = _loader.GetBondsTable()
@@ -35,6 +37,7 @@ Namespace Forms.PortfolioForm
             RefreshPortfolioTree()
             RefreshChainsLists()
             RefreshFieldsList()
+            RefreshCustomBondList()
         End Sub
 
         Private Shared Sub ColorCellFormatting(ByVal sender As Object, ByVal e As DataGridViewCellFormattingEventArgs) Handles PortfolioChainsListsGrid.CellFormatting, PortfolioItemsGrid.CellFormatting, ChainsListsGrid.CellFormatting
@@ -568,6 +571,102 @@ Namespace Forms.PortfolioForm
             elem.Value = FieldsGrid.Rows(e.RowIndex).Cells(e.ColumnIndex).Value
         End Sub
 
+#End Region
+
+#Region "Custom bond TAB"
+        Private Enum CMSSource
+            CustomBond
+            CouponSchedule
+            AmortSchedule
+            OptionList
+        End Enum
+
+
+        Private Function GetSource(ByVal sender As Object) As CMSSource?
+            If ReferenceEquals(sender, CustomBondsList) Then Return CMSSource.CustomBond
+            If ReferenceEquals(sender, CouponScheduleDGV) Then Return CMSSource.CouponSchedule
+            If ReferenceEquals(sender, AmortScheduleDGV) Then Return CMSSource.AmortSchedule
+            If ReferenceEquals(sender, OptionsDGV) Then Return CMSSource.OptionList
+            Return Nothing
+        End Function
+
+        Private Sub CustomBondsList_MouseClick(ByVal sender As Object, ByVal e As MouseEventArgs) _
+            Handles CustomBondsList.MouseClick, CouponScheduleDGV.MouseClick, AmortScheduleDGV.MouseClick, OptionsDGV.MouseClick
+
+            If e.Button <> MouseButtons.Right Then Return
+
+            Dim src = GetSource(sender)
+
+            If src Is Nothing Then Return
+            RenameCustomBondTSMI.Visible = (src = CMSSource.CustomBond)
+
+            CustomBondListCMS.Tag = sender
+            CustomBondListCMS.Show(sender, e.Location)
+        End Sub
+
+        Private Sub RefreshCustomBondList()
+            CustomBondsList.DataSource = PortfolioManager.GetCustomBonds()
+            If CustomBondsList.Rows.Count > 0 Then
+                RefreshBondView()
+            Else
+                CleanupBondView()
+            End If
+
+        End Sub
+
+        Private Sub RefreshBondView()
+            If _currentBond Is Nothing Then
+                CleanupBondView()
+                Return
+            End If
+            ' todo if not connected to DB, disallow any editing (or not?)
+
+        End Sub
+
+        Private Sub CleanupBondView()
+            ' todo
+            FixedCouponRB.Checked = True
+            CouponScheduleDGV.DataSource = Nothing
+            BulletPaymentRB.Checked = True
+            BulletPaymentDTP.Value = Date.Today
+            AmortScheduleDGV.DataSource = Nothing
+            MaturityDTP.Value = Date.Today
+            PerpetualCB.Checked = False
+            OtherRulesML.Text = "" ' todo load OFZ structure
+            OptionsDGV.DataSource = Nothing
+            CustomBondColorCB.SelectedIndex = -1
+            CashFlowsDGV.DataSource = Nothing
+        End Sub
+
+        Private Sub AddNewCustomBondTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AddNewCustomBondTSMI.Click
+            Dim src = GetSource(CustomBondListCMS.Tag)
+            If src Is Nothing Then Return
+            Select Case src
+                Case CMSSource.CustomBond
+                    Dim frm As New Form With {.Width = 400, .Height = 300, .Text = "Create new custom bond"}
+                    frm.Controls.Add(New Label With {.Text = "Name", .Location = New Point(20, 20), .Width = 60})
+                    frm.Controls.Add(New Label With {.Text = "Code", .Location = New Point(20, 40), .Width = 60})
+                    Dim nameTB = New TextBox With {.Location = New Point(80, 20), .Width = 200}
+                    frm.Controls.Add(nameTB)
+                    Dim descrTB = New TextBox With {.Location = New Point(80, 40), .Width = 200}
+                    frm.Controls.Add(descrTB)
+                    Dim btnOk As New Button With {.Text = "Ok", .Location = New Point(20, 80), .DialogResult = DialogResult.OK}
+                    AddHandler btnOk.Click, Sub() frm.Close()
+                    frm.Controls.Add(btnOk)
+                    Dim btnCancel As New Button With {.Text = "Cancel", .Location = New Point(120, 80), .DialogResult = DialogResult.Cancel}
+                    AddHandler btnCancel.Click, Sub() frm.Close()
+                    frm.Controls.Add(btnCancel)
+                    frm.CancelButton = btnCancel
+
+                    If frm.ShowDialog() = DialogResult.OK Then
+                        _currentBond = New CustomBond(Color.Gray.ToString(), nameTB.Text, descrTB.Text)
+                        PortfolioManager.AddSource(_currentBond)
+                    End If
+                Case CMSSource.CouponSchedule
+                Case CMSSource.AmortSchedule
+                Case CMSSource.OptionList
+            End Select
+        End Sub
 #End Region
 
     End Class

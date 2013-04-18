@@ -6,7 +6,7 @@ Namespace Forms.PortfolioForm
         Private ReadOnly _thePortfolio As Source
         Private _color As String
 
-        Public ReadOnly Property Portfolio As Source
+        Public ReadOnly Property Portfolio As SourceBase
             Get
                 Return _thePortfolio
             End Get

@@ -3,57 +3,22 @@ Imports DbManager.Bonds
 Imports Uitls
 Imports System.Xml
 
-Public MustInherit Class Source
+Public MustInherit Class SourceBase
     Private ReadOnly _id As String
     Private _color As String
     Private _name As String
-    Private _enabled As Boolean
-    Private _curve As Boolean
-    Private _fieldSetId As String
-    Private _fields As FieldSet
-
     Protected Friend ReadOnly PortMan As PortfolioManager = PortfolioManager.ClassInstance
 
-    Protected Overloads Function Equals(ByVal other As Source) As Boolean
-        Return String.Equals(_id, other._id)
-    End Function
-
-    Public Overloads Overrides Function Equals(ByVal obj As Object) As Boolean
-        If ReferenceEquals(Nothing, obj) Then Return False
-        If ReferenceEquals(Me, obj) Then Return True
-        Dim other As Source = TryCast(obj, Source)
-        Return other IsNot Nothing AndAlso Equals(other)
-    End Function
-
-    Public Overrides Function GetHashCode() As Integer
-        If _id Is Nothing Then Return 0
-        Return _id.GetHashCode
-    End Function
-
-    Public Shared Operator =(ByVal left As Source, ByVal right As Source) As Boolean
-        Return Equals(left, right)
-    End Operator
-
-    Public Shared Operator <>(ByVal left As Source, ByVal right As Source) As Boolean
-        Return Not Equals(left, right)
-    End Operator
-
-    Friend Sub New(ByVal id As String, ByVal color As String, ByVal fields As FieldSet, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
+    Friend Sub New(ByVal id As String, ByVal color As String, ByVal name As String)
         _id = id
         _color = color
-        _enabled = enabled
-        _curve = curve
         _name = name
-        FieldSetId = fields.ID
     End Sub
 
-    Public Sub New(ByVal color As String, ByVal fldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
+    Friend Sub New(ByVal color As String, ByVal name As String)
         _id = GenerateId()
         _color = color
-        _enabled = enabled
-        _curve = curve
         _name = name
-        FieldSetId = fldSetId
     End Sub
 
     <Browsable(False)>
@@ -71,6 +36,71 @@ Public MustInherit Class Source
             _name = value
         End Set
     End Property
+
+    Public Property Color As String
+        Get
+            Return _color
+        End Get
+        Set(ByVal value As String)
+            _color = value
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' Get list of all Source rics "by default"
+    ''' This means that in a portfolio rics might differ because of filters and excluded items
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public MustOverride Function GetDefaultRics() As List(Of String)
+    Public MustOverride Function GetXmlTypeName() As String
+    Protected MustOverride Function GenerateId() As String
+End Class
+
+Public MustInherit Class Source
+    Inherits SourceBase
+    Private _enabled As Boolean
+    Private _curve As Boolean
+    Private _fieldSetId As String
+    Private _fields As FieldSet
+
+    Protected Overloads Function Equals(ByVal other As Source) As Boolean
+        Return String.Equals(ID, other.ID)
+    End Function
+
+    Public Overloads Overrides Function Equals(ByVal obj As Object) As Boolean
+        If ReferenceEquals(Nothing, obj) Then Return False
+        If ReferenceEquals(Me, obj) Then Return True
+        Dim other As Source = TryCast(obj, Source)
+        Return other IsNot Nothing AndAlso Equals(other)
+    End Function
+
+    Public Overrides Function GetHashCode() As Integer
+        If ID Is Nothing Then Return 0
+        Return ID.GetHashCode
+    End Function
+
+    Public Shared Operator =(ByVal left As Source, ByVal right As Source) As Boolean
+        Return Equals(left, right)
+    End Operator
+
+    Public Shared Operator <>(ByVal left As Source, ByVal right As Source) As Boolean
+        Return Not Equals(left, right)
+    End Operator
+
+    Friend Sub New(ByVal id As String, ByVal color As String, ByVal fields As FieldSet, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
+        MyBase.new(id, color, name)
+        _enabled = enabled
+        _curve = curve
+        FieldSetId = fields.ID
+    End Sub
+
+    Public Sub New(ByVal color As String, ByVal fldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
+        MyBase.new(color, name)
+        _enabled = enabled
+        _curve = curve
+        FieldSetId = fldSetId
+    End Sub
 
     <Browsable(False)>
     Public Property FieldSetId() As String
@@ -116,31 +146,12 @@ Public MustInherit Class Source
         End Set
     End Property
 
-    Public Property Color As String
-        Get
-            Return _color
-        End Get
-        Set(ByVal value As String)
-            _color = value
-        End Set
-    End Property
-
-    ''' <summary>
-    ''' Get list of all Source rics "by default"
-    ''' This means that in a portfolio rics might differ because of filters and excluded items
-    ''' </summary>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
-    Public MustOverride Function GetDefaultRics() As List(Of String)
-    Public MustOverride Function GetXmlTypeName() As String
-
-    Protected MustOverride Function GenerateId() As String
 
     Public Function GetDefaultRicsView() As List(Of BondDescription)
         Dim bondsData As IBondsData = Bonds.BondsData.Instance
         Return (From ric In GetDefaultRics()
-                Where bondsData.BondExists(ric)
-                Select bondsData.GetBondInfo(ric)).ToList()
+            Where bondsData.BondExists(ric)
+            Select bondsData.GetBondInfo(ric)).ToList()
     End Function
 End Class
 
@@ -309,14 +320,10 @@ Public Class UserList
 End Class
 
 Public Class RegularBond
-    Inherits Source
+    Inherits SourceBase
     ' todo equality members
-    Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As FieldSet, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
-        MyBase.New(id, color, fields, enabled, curve, name)
-    End Sub
-
-    Public Sub New(ByVal color As String, ByVal fldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
-        MyBase.New(color, fldSetId, enabled, curve, name)
+    Public Sub New(ByVal id As String, ByVal color As String, ByVal name As String)
+        MyBase.New(id, color, name)
     End Sub
 
     Public Overrides Function GetDefaultRics() As List(Of String)
@@ -332,17 +339,32 @@ Public Class RegularBond
     End Function
 End Class
 
+
+' todo think of it
+' Два принципиально разных подхода к созданию объекта
+' 1) виртуализировать существующую xml запись
+' 2) создать "висячий" объект, который может быть сохранен, а может и не быть сохранен
 Public Class CustomBond
-    Inherits Source
+    Inherits SourceBase
     ' todo equality members
 
-    Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As FieldSet, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
-        MyBase.New(id, color, fields, enabled, curve, name)
+    Private ReadOnly _code As String
+
+    Public Sub New(ByVal id As String, ByVal color As String, ByVal name As String, ByVal code As String)
+        MyBase.New(id, color, name)
+        _code = code
     End Sub
 
-    Public Sub New(ByVal color As String, ByVal fldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
-        MyBase.New(color, fldSetId, enabled, curve, name)
+    Public Sub New(ByVal color As String, ByVal name As String, ByVal code As String)
+        MyBase.New(color, name)
+        _code = code
     End Sub
+
+    Public ReadOnly Property Code() As String
+        Get
+            Return _code
+        End Get
+    End Property
 
     Public Overrides Function GetXmlTypeName() As String
         Return "custom-bond"
@@ -353,17 +375,9 @@ Public Class CustomBond
     End Function
 
     Public Overrides Function GetDefaultRics() As List(Of String)
-        Return {Name}.ToList()
+        Return {_code}.ToList()
     End Function
 
-    <DisplayName("Is curve")>
-    Public Overrides Property Curve() As Boolean
-        Get
-            Return False
-        End Get
-        Set(ByVal value As Boolean)
-        End Set
-    End Property
 
     Public Overrides Function ToString() As String
         Return "Custom Bond"

@@ -36,10 +36,12 @@ Public Interface IPortfolioManager
     Function GetFieldLayouts() As List(Of IdName(Of String))
     Sub UpdateFieldSet(ByVal id As String, ByVal type As String, ByVal fields As Dictionary(Of String, String))
 
-    Sub AddSource(ByVal src As Source)
-    Sub UpdateSource(ByVal source As Source)
-    Function GetPortfoliosBySource(ByVal selectedItem As Source) As List(Of IdName(Of String))
+    Sub AddSource(ByVal src As SourceBase)
+    Sub UpdateSource(ByVal source As SourceBase)
+    Function GetPortfoliosBySource(ByVal selectedItem As SourceBase) As List(Of IdName(Of String))
     Sub DeleteSource(ByVal source As Source)
+
+    Function GetCustomBonds() As List(Of CustomBond)
 End Interface
 
 Friend Interface IPortfolioManagerLocal
@@ -415,7 +417,7 @@ Public Class PortfolioManager
         Return GenerateNewId(_customBondsIds)
     End Function
 
-    Public Sub AddSource(ByVal src As Source) Implements IPortfolioManager.AddSource
+    Public Sub AddSource(ByVal src As SourceBase) Implements IPortfolioManager.AddSource
         If TypeOf src Is Chain Then
             Dim chain = CType(src, Chain)
             Dim parent = _bonds.SelectSingleNode("/bonds/chains")
@@ -432,20 +434,31 @@ Public Class PortfolioManager
         ElseIf TypeOf src Is UserList Then
             Dim list = CType(src, UserList)
             Dim parent = _bonds.SelectSingleNode("/bonds/lists")
-            Dim newListNode = _bonds.CreateNode(XmlNodeType.Element, "chain", "")
+            Dim newListNode = _bonds.CreateNode(XmlNodeType.Element, "list", "")
             _bonds.AppendAttr(newListNode, "id", list.ID)
             _bonds.AppendAttr(newListNode, "field-set-id", list.Fields.ID)
             _bonds.AppendAttr(newListNode, "name", list.Name)
             _bonds.AppendAttr(newListNode, "color", list.Color)
             _bonds.AppendAttr(newListNode, "curve", list.Curve)
             _bonds.AppendAttr(newListNode, "enabled", list.Enabled)
+            parent.AppendChild(newListNode)
+            SaveBonds()
+        ElseIf TypeOf src Is CustomBond Then
+            Dim list = CType(src, CustomBond)
+            Dim parent = _bonds.SelectSingleNode("/bonds/custom-bonds")
+            Dim newListNode = _bonds.CreateNode(XmlNodeType.Element, "bond", "")
+            _bonds.AppendAttr(newListNode, "id", list.ID)
+            _bonds.AppendAttr(newListNode, "name", list.Name)
+            _bonds.AppendAttr(newListNode, "color", list.Color)
+            _bonds.AppendAttr(newListNode, "code", list.Code)
+            parent.AppendChild(newListNode)
             SaveBonds()
         Else
             Logger.Warn("AddSource(): unsupported source type {0}", src.GetType())
         End If
     End Sub
 
-    Public Sub UpdateSource(ByVal src As Source) Implements IPortfolioManager.UpdateSource
+    Public Sub UpdateSource(ByVal src As SourceBase) Implements IPortfolioManager.UpdateSource
         If TypeOf src Is Chain Then
             Dim chain = CType(src, Chain)
             Dim chainNode = _bonds.SelectSingleNode(String.Format("/bonds/chains/chain[@id='{0}']", src.ID))
@@ -475,13 +488,25 @@ Public Class PortfolioManager
             _bonds.UpdateAttr(listNode, "curve", list.Curve)
             _bonds.UpdateAttr(listNode, "enabled", list.Enabled)
             SaveBonds()
+        ElseIf TypeOf src Is CustomBond Then
+            Dim list = CType(src, CustomBond)
+            Dim listNode = _bonds.SelectSingleNode(String.Format("/bonds/custom-bonds/bond[@id='{0}']", src.ID))
+            If listNode Is Nothing Then
+                Logger.Error("No custom bond with id {0} found", src.ID)
+                Return
+            End If
+            _bonds.UpdateAttr(listNode, "id", list.ID)
+            _bonds.UpdateAttr(listNode, "name", list.Name)
+            _bonds.UpdateAttr(listNode, "color", list.Color)
+            _bonds.UpdateAttr(listNode, "code", list.Code)
+            SaveBonds()
         Else
             Logger.Warn("UpdateSource(): unsupported source type {0}", src.GetType())
         End If
 
     End Sub
 
-    Public Function GetPortfoliosBySource(ByVal src As Source) As List(Of IdName(Of String)) Implements IPortfolioManager.GetPortfoliosBySource
+    Public Function GetPortfoliosBySource(ByVal src As SourceBase) As List(Of IdName(Of String)) Implements IPortfolioManager.GetPortfoliosBySource
         If TypeOf src Is Chain Then
             Dim chain = CType(src, Chain)
             Dim nodes = _bonds.SelectNodes(String.Format("/bonds/portfolios//portfolio[include[@what='chain' and @id='{0}']]", chain.ID))
@@ -520,7 +545,12 @@ Public Class PortfolioManager
         SaveBonds()
     End Sub
 
-
+    Public Function GetCustomBonds() As List(Of CustomBond) Implements IPortfolioManager.GetCustomBonds
+        Dim nodes = _bonds.SelectNodes("/bonds/custom-bonds/bond")
+        Return New List(Of CustomBond)(From node As XmlNode In nodes
+                                       Select New CustomBond(node.GetAttrStrict("id"), node.GetAttr("color"),
+                                                             node.GetAttrStrict("name"), node.GetAttr("code")))
+    End Function
 
     Public Function GetFolderDescr(ByVal id As String) As Portfolio Implements IPortfolioManager.GetFolderDescr
         Dim node = _bonds.SelectSingleNode(String.Format("/bonds/portfolios//folder[@id='{0}']", id))
