@@ -595,7 +595,7 @@ Namespace Forms.PortfolioForm
         End Function
 
         Private Sub CustomBondsList_MouseClick(ByVal sender As Object, ByVal e As MouseEventArgs) _
-            Handles CustomBondsList.MouseClick, CouponScheduleDGV.MouseClick, AmortScheduleDGV.MouseClick, OptionsDGV.MouseClick
+            Handles CustomBondsList.MouseClick, CouponScheduleDGV.MouseClick, OptionsDGV.MouseClick
 
             If e.Button <> MouseButtons.Right Then Return
 
@@ -608,8 +608,14 @@ Namespace Forms.PortfolioForm
             CustomBondListCMS.Show(sender, e.Location)
         End Sub
 
-        Private Sub RefreshCustomBondList()
+        Private Sub RefreshCustomBondList(Optional ByVal toselect As CustomBond = Nothing)
             CustomBondsList.DataSource = PortfolioManager.GetCustomBonds()
+            If toselect IsNot Nothing Then
+                Dim x = (From row As DataGridViewRow In CustomBondsList.Rows
+                         Where CType(row.DataBoundItem, CustomBond).ID = toselect.ID
+                         Select row.Index).ToList()
+                If x.Any Then CustomBondsList.Rows(x.First).Selected = True
+            End If
             If CustomBondsList.Rows.Count > 0 Then
                 RefreshBondView()
             Else
@@ -661,39 +667,92 @@ Namespace Forms.PortfolioForm
             Dim bondStructure = _currentBond.Struct
             ' Заполнение простых полей
             CustomBondColorCB.SelectedItem = _currentBond.Color
-            MaturityDTP.Value = _currentBond.Maturity.AsDate
+            MaturityDTP.Value = If(_currentBond.Maturity.HasValue, _currentBond.Maturity, Date.Today)
             FrequencyCB.SelectedItem = bondStructure.Frequency
 
             If bondStructure.HasSingleFixedRate Then
-                FixedCouponRB.Checked = True
-                FixedRateUD.Value = bondStructure.GetFixedRate()
+                FixedRateTB.Text = String.Format("{0:F2}", bondStructure.GetFixedRate())
             Else
-                CouponScheduleRB.Checked = True
                 CouponScheduleDGV.DataSource = bondStructure.GetCouponsList()
             End If
 
             If bondStructure.HasAmortizationSchedule Then
-                AmortScheduleCB.Checked = True
                 AmortScheduleDGV.DataSource = bondStructure.GetAmortizationSchedule()
             Else
-                AmortScheduleCB.Checked = False
                 PerpetualCB.Checked = bondStructure.IsPerpetual
             End If
 
             OptionsDGV.DataSource = bondStructure.GetEmbeddedOptions()
             OtherRulesML.Text = bondStructure.ToString(False)
 
+            If bondStructure.IssueDate <> "" Then
+                UnspecifiedIssueDateCB.Checked = False
+                IssueDateDTP.Enabled = True
+                IssueDateDTP.Value = ReutersDate.ReutersToDate(bondStructure.IssueDate)
+            Else
+                UnspecifiedIssueDateCB.Checked = True
+                IssueDateDTP.Enabled = False
+            End If
+
+            RecalculateCashFlows()
+        End Sub
+
+        Private Sub RecalculateCashFlows()
+            Dim bondStructure = _currentBond.Struct
             If MainForm.MainForm.Connected Then
+                MessagesTB.Text = ""
                 Dim bondModule As AdxBondModule = Eikon.Sdk.CreateAdxBondModule()
                 bondStructure.SetBondModule(bondModule)
-                CashFlowsDGV.DataSource = bondStructure.GetCashFlows(_currentBond.Maturity.ToString(),
-                                                                     _currentBond.CurrentCouponRate)
-                ' todo функция не сделана
+                Try
+                    CashFlowsDGV.DataSource = bondStructure.GetCashFlows(ReutersDate.DateToReuters(_currentBond.Maturity), _currentBond.CurrentCouponRate)
+                Catch ex As Exception
+                    MessagesTB.Text = ex.Message
+                End Try
+            Else
+                MessagesTB.Text = "Not connected to Eikon platform"
             End If
         End Sub
 
+        Private Sub UnspecifiedIssueDateCB_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles UnspecifiedIssueDateCB.CheckedChanged
+            IssueDateDTP.Enabled = UnspecifiedIssueDateCB.Checked
+            If _currentBond Is Nothing Then Return
+            If UnspecifiedIssueDateCB.Checked Then
+                _currentBond.Struct.IssueDate = ReutersDate.DateToReuters(IssueDateDTP.Value)
+            Else
+                _currentBond.Struct.IssueDate = ""
+            End If
+            RecalculateCashFlows()
+        End Sub
+
+        Private Sub MaturityDTP_ValueChanged(ByVal sender As Object, ByVal e As EventArgs) Handles MaturityDTP.ValueChanged, IssueDateDTP.ValueChanged
+            If _currentBond Is Nothing Then Return
+            _currentBond.Maturity = MaturityDTP.Value
+            RefreshCustomBondList(_currentBond)
+            RecalculateCashFlows()
+        End Sub
+
+
+        Private Sub FrequencyCB_SelectedValueChanged(ByVal sender As Object, ByVal e As EventArgs) Handles FrequencyCB.SelectedValueChanged
+            If _currentBond Is Nothing Then Return
+            _currentBond.Struct.Frequency = FrequencyCB.SelectedItem
+            RecalculateCashFlows()
+        End Sub
+
+        Private Sub FixedRateTB_TextChanged(ByVal sender As Object, ByVal e As EventArgs) Handles FixedRateTB.TextChanged
+            If _currentBond Is Nothing Then Return
+            If Not IsNumeric(FixedRateTB.Text) Then
+                FixedRateTB.ForeColor = Color.Red
+                Return
+            Else
+                FixedRateTB.ForeColor = Color.Black
+            End If
+            _currentBond.CurrentCouponRate = CDbl(FixedRateTB.Text)
+            _currentBond.Struct.Rate = FixedRateTB.Text
+            RefreshCustomBondList(_currentBond)
+            RecalculateCashFlows()
+        End Sub
+
         Private Sub CleanupBondView()
-            FixedCouponRB.Checked = True
             CouponScheduleDGV.DataSource = Nothing
             AmortScheduleDGV.DataSource = Nothing
             MaturityDTP.Value = Date.Today
@@ -725,13 +784,45 @@ Namespace Forms.PortfolioForm
                     frm.CancelButton = btnCancel
 
                     If frm.ShowDialog() = DialogResult.OK Then
-                        _currentBond = New CustomBond(Color.Gray.Name, nameTb.Text, descrTb.Text, "",
+                        Const struct = "ACC:A5 IC:L1 CLDR:RUS_FI SETTLE:0WD  CFADJ:NO DMC:FOLLOWING EMC:LASTDAY PX:CLEAN REFDATE:MATURITY YM:DISCA5"
+                        _currentBond = New CustomBond(Color.Gray.Name, nameTb.Text, descrTb.Text, struct,
                                                       ReutersDate.DateToReuters(Date.Today.AddYears(1)), 0.1)
                         PortfolioManager.AddSource(_currentBond)
                         RefreshCustomBondList()
                     End If
                 Case CMSSource.CouponSchedule
+                    Dim frm As New Form With {.Width = 300, .Height = 200, .Text = "Add another coupon rate"}
+                    frm.Controls.Add(New Label With {.Text = "Since date", .Location = New Point(20, 20), .Width = 60})
+                    frm.Controls.Add(New Label With {.Text = "Coupon rate", .Location = New Point(20, 60), .Width = 60})
+                    Dim sinceDateDtp = New DateTimePicker With {
+                        .Location = New Point(80, 20),
+                        .Width = 200,
+                        .Format = DateTimePickerFormat.Custom,
+                        .CustomFormat = "dd/MM/yyyy"
+                    }
+                    frm.Controls.Add(sinceDateDtp)
+                    Dim newRateTb = New TextBox With {.Location = New Point(80, 60), .Width = 200}
+                    frm.Controls.Add(newRateTb)
+                    Dim btnOk As New Button With {.Text = "Ok", .Location = New Point(20, 100), .DialogResult = DialogResult.OK}
+                    AddHandler btnOk.Click, Sub() frm.Close()
+                    frm.Controls.Add(btnOk)
+                    Dim btnCancel As New Button With {.Text = "Cancel", .Location = New Point(120, 100), .DialogResult = DialogResult.Cancel}
+                    AddHandler btnCancel.Click, Sub() frm.Close()
+                    frm.Controls.Add(btnCancel)
+                    frm.CancelButton = btnCancel
+
+                    If frm.ShowDialog() = DialogResult.OK Then
+                        If Not IsNumeric(newRateTb.Text) Then
+                            MessageBox.Show(String.Format("Coupon value {0} is not numeric", newRateTb.Text),
+                                            "Please try once again", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        Else
+                            _currentBond.Struct.StepCouponPattern.Add(tuple.Create(sinceDateDtp.Value, CSng(newRateTb.Text)))
+                            RefreshBondView()
+                            RecalculateCashFlows()
+                        End If
+                    End If
                 Case CMSSource.AmortSchedule
+
                 Case CMSSource.OptionList
             End Select
         End Sub

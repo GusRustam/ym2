@@ -452,7 +452,7 @@ Public Class PortfolioManager
             _bonds.AppendAttr(newBondNode, "name", bond.Name)
             _bonds.AppendAttr(newBondNode, "color", bond.Color)
             _bonds.AppendAttr(newBondNode, "code", bond.Code)
-            _bonds.AppendAttr(newBondNode, "maturity", bond.Maturity.AsReuters)
+            _bonds.AppendAttr(newBondNode, "maturity", If(bond.Maturity.HasValue, ReutersDate.DateToReuters(bond.Maturity), ""))
             _bonds.AppendAttr(newBondNode, "coupon", bond.CurrentCouponRate)
             parent.AppendChild(newBondNode)
             SaveBonds()
@@ -553,7 +553,7 @@ Public Class PortfolioManager
         Return New List(Of CustomBond)(From node As XmlNode In nodes
                                        Select New CustomBond(node.GetAttrStrict("id"), node.GetAttr("color"),
                                                              node.GetAttrStrict("name"), node.GetAttr("code"),
-                                                             node.GetAttr("bondStructure"), node.GetAttrStrict("maturity"),
+                                                             node.GetAttr("bondStructure"), node.GetAttr("maturity").Trim(),
                                                              node.GetAttrStrict("coupon")))
     End Function
 

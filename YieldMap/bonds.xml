@@ -94,7 +94,7 @@
   </curves>
   <!-- todo -->
   <custom-bonds>
-    <bond id="1" name="Base case 3Y 12% bond" code="NewIssueBase" rateStructure="" bondStructure="" maturity="" coupon="0.12" color="Red"/>
+    <bond id="1" name="Base case 3Y 12% bond" code="NewIssueBase" rateStructure="" bondStructure="" maturity="01JAN2015" coupon="0.12" color="Red"/>
   </custom-bonds>
   <!-- TODO Synthetics curves (?????) -->
 </bonds>

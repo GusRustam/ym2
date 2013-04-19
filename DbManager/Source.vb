@@ -350,13 +350,13 @@ Public Class CustomBond
 
     Private ReadOnly _code As String
     Private ReadOnly _struct As ReutersBondStructure
-    Private ReadOnly _maturity As ReutersDate
-    Private ReadOnly _currentCouponRate As Double
+    Private _maturity As Date?
+    Private _currentCouponRate As Double
 
     Public Sub New(ByVal id As String, ByVal color As String, ByVal name As String, ByVal code As String, ByVal struct As String, ByVal maturity As String, ByVal currentCouponRate As Double)
         MyBase.New(id, color, name)
         _code = code
-        _maturity = New ReutersDate(maturity)
+        If maturity <> "" Then _maturity = ReutersDate.ReutersToDate(maturity)
         _currentCouponRate = currentCouponRate
         _struct = ReutersBondStructure.Parse(struct)
     End Sub
@@ -364,7 +364,7 @@ Public Class CustomBond
     Public Sub New(ByVal color As String, ByVal name As String, ByVal code As String, ByVal struct As String, ByVal maturity As String, ByVal currentCouponRate As Double)
         MyBase.New(color, name)
         _code = code
-        _maturity = New ReutersDate(maturity)
+        If maturity <> "" Then _maturity = ReutersDate.ReutersToDate(maturity)
         _currentCouponRate = currentCouponRate
         _struct = ReutersBondStructure.Parse(struct)
     End Sub
@@ -382,16 +382,23 @@ Public Class CustomBond
         End Get
     End Property
 
-    Public ReadOnly Property Maturity() As ReutersDate
+    Public Property Maturity() As Date?
         Get
             Return _maturity
         End Get
+        Set(ByVal value As Date?)
+            _maturity = value
+        End Set
     End Property
 
-    Public ReadOnly Property CurrentCouponRate() As Double
+    <DisplayName("Coupon")>
+    Public Property CurrentCouponRate() As Double
         Get
             Return _currentCouponRate
         End Get
+        Set(ByVal value As Double)
+            _currentCouponRate = value
+        End Set
     End Property
 
     Public Overrides Function GetXmlTypeName() As String

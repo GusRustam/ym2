@@ -3,6 +3,7 @@ Imports System.Reflection
 Imports AdfinXAnalyticsFunctions
 Imports System.ComponentModel
 Imports NLog
+Imports Uitls
 
 Namespace Bonds
     Public Class ReutersDate
@@ -388,7 +389,7 @@ Namespace Bonds
             End Set
         End Property
 
-        Public Property RateProperty() As String
+        Public Property Rate() As String
             Get
                 Return _rate
             End Get
@@ -493,11 +494,11 @@ Namespace Bonds
             Dim res As New List(Of CashFlowDescription)
             Dim i As Integer
             For i = cashFlows.GetLowerBound(0) To cashFlows.GetUpperBound(0)
-                If Not IsDate(cashFlows.GetValue(i, 1)) Then Exit For
+                If cashFlows.GetValue(i, 1) Is Nothing Then Exit For
                 Try
-                    Dim dt = CDate(cashFlows.GetValue(i, 1))
+                    Dim dt = Utils.FromExcelSerialDate(cashFlows.GetValue(i, 1))
                     Dim cpn = CDbl(cashFlows.GetValue(i, 2))
-                    Dim amort = CDate(cashFlows.GetValue(i, 3))
+                    Dim amort = CDbl(cashFlows.GetValue(i, 3))
                     res.Add(New CashFlowDescription(dt, cpn, amort))
                 Catch ex As Exception
                     Logger.WarnException(String.Format("Failed to read {0}th row in result", i), ex)
@@ -510,7 +511,7 @@ Namespace Bonds
         Public Class CashFlowDescription
             Private ReadOnly _dt As Date
             Private ReadOnly _cpn As Double
-            Private ReadOnly _amort As Date
+            Private ReadOnly _amort As Double
 
             <DisplayName("Date")>
             Public ReadOnly Property Dt() As Date
@@ -527,13 +528,13 @@ Namespace Bonds
             End Property
 
             <DisplayName("Redemption")>
-            Public ReadOnly Property Amort() As Date
+            Public ReadOnly Property Amort() As Double
                 Get
                     Return _amort
                 End Get
             End Property
 
-            Public Sub New(ByVal dt As Date, ByVal cpn As Double, ByVal amort As Date)
+            Public Sub New(ByVal dt As Date, ByVal cpn As Double, ByVal amort As Double)
                 _dt = dt
                 _cpn = cpn
                 _amort = amort
@@ -549,12 +550,9 @@ Namespace Bonds
         End Function
 
         Public Function GetFixedRate() As Single
-            Try
-                If _rate <> "" Then Return CSng(_rate)
-                Return CSng(_stepCouponPattern(0).Item2)
-            Catch ex As Exception
-                Throw New InvalidOperationException("Couldn't determine fixed rate")
-            End Try
+            If _rate <> "" Then Return CSng(_rate)
+            If _stepCouponPattern.Any Then Return CSng(_stepCouponPattern(0).Item2)
+            Return 0
         End Function
 
         Public Function GetCouponsList() As List(Of CouponDescription)
