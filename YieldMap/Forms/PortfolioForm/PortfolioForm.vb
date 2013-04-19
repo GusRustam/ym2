@@ -1,8 +1,9 @@
-﻿Imports DbManager
+﻿Imports AdfinXAnalyticsFunctions
+Imports DbManager
 Imports DbManager.Bonds
 Imports System.Runtime.InteropServices
 Imports NLog
-Imports System.Text.RegularExpressions
+Imports ReutersData
 Imports Uitls
 
 Namespace Forms.PortfolioForm
@@ -38,6 +39,10 @@ Namespace Forms.PortfolioForm
             RefreshChainsLists()
             RefreshFieldsList()
             RefreshCustomBondList()
+
+            For Each clr In Utils.GetColorList()
+                CustomBondColorCB.Items.Add(clr)
+            Next
         End Sub
 
         Private Shared Sub ColorCellFormatting(ByVal sender As Object, ByVal e As DataGridViewCellFormattingEventArgs) Handles PortfolioChainsListsGrid.CellFormatting, PortfolioItemsGrid.CellFormatting, ChainsListsGrid.CellFormatting
@@ -178,7 +183,7 @@ Namespace Forms.PortfolioForm
             Else
                 Dim temp = TryCast(e.Node.Tag, Portfolio)
                 CurrentItem = If(temp IsNot Nothing AndAlso Not temp.IsFolder, temp, Nothing)
-                Dim portSelected  = CurrentItem IsNot Nothing AndAlso Not CurrentItem.IsFolder
+                Dim portSelected = CurrentItem IsNot Nothing AndAlso Not CurrentItem.IsFolder
                 AddChainListButton.Enabled = portSelected
                 RemoveChainListButton.Enabled = portSelected
                 EditChainListButton.Enabled = portSelected
@@ -470,9 +475,9 @@ Namespace Forms.PortfolioForm
                 Return
             End If
             Dim selectedItem = CType(ChainsListsGrid.SelectedRows.Item(0).DataBoundItem, Source)
-            If Not TypeOf selectedItem Is Chain Then Return
+            If Not TypeOf selectedItem Is DbManager.Chain Then Return
 
-            _loader.LoadChain(CType(selectedItem, Chain).ChainRic)
+            _loader.LoadChain(CType(selectedItem, DbManager.Chain).ChainRic)
         End Sub
 
         Private Sub BondsLoaderFinished(ByVal evt As ProgressEvent) Handles _loader.Progress
@@ -581,7 +586,6 @@ Namespace Forms.PortfolioForm
             OptionList
         End Enum
 
-
         Private Function GetSource(ByVal sender As Object) As CMSSource?
             If ReferenceEquals(sender, CustomBondsList) Then Return CMSSource.CustomBond
             If ReferenceEquals(sender, CouponScheduleDGV) Then Return CMSSource.CouponSchedule
@@ -614,21 +618,83 @@ Namespace Forms.PortfolioForm
 
         End Sub
 
+        Private Sub CustomBondsList_SelectionChanged(ByVal sender As Object, ByVal e As EventArgs) Handles CustomBondsList.SelectionChanged
+            If CustomBondsList.SelectedRows.Count = 0 Then
+                CleanupBondView()
+            Else
+                _currentBond = CustomBondsList.SelectedRows(0).DataBoundItem
+                RefreshBondView()
+            End If
+        End Sub
+
+        Private Sub RandomColorButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles RandomColorButton.Click
+            CustomBondColorCB.SelectedIndex = New Random().NextDouble() * CustomBondColorCB.Items.Count
+        End Sub
+
+        Private Sub ColorComboBox_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs) Handles CustomBondColorCB.SelectedIndexChanged
+            If CustomBondColorCB.SelectedIndex < 0 Then
+                CustomBondColorPB.BackColor = Color.White
+            Else
+                CustomBondColorPB.BackColor = Color.FromName(CustomBondColorCB.SelectedItem)
+            End If
+        End Sub
+
+        Private Sub CustomColorCB_DrawItem(ByVal sender As Object, ByVal e As DrawItemEventArgs) Handles CustomBondColorCB.DrawItem
+            Dim g As Graphics = e.Graphics
+            Dim r As Rectangle = e.Bounds
+            If e.Index > 0 Then
+                Dim txt As String = CustomBondColorCB.Items(e.Index)
+                g.DrawString(txt, CustomBondColorCB.Font, Brushes.Black, r.X, r.Top)
+                Dim m = g.MeasureString(txt, CustomBondColorCB.Font)
+                Dim c As Color = Color.FromName(txt)
+                g.FillRectangle(New SolidBrush(c), r.X + m.Width + 10, r.Y + 2, r.Width - m.Width - 15, r.Height - 6)
+                g.DrawRectangle(New Pen(New SolidBrush(Color.Black)), r.X + m.Width + 10, r.Y + 2, r.Width - m.Width - 15, r.Height - 6)
+            End If
+        End Sub
+
         Private Sub RefreshBondView()
             If _currentBond Is Nothing Then
                 CleanupBondView()
                 Return
             End If
-            ' todo if not connected to DB, disallow any editing (or not?)
 
+            Dim bondStructure = _currentBond.Struct
+            ' Заполнение простых полей
+            CustomBondColorCB.SelectedItem = _currentBond.Color
+            MaturityDTP.Value = _currentBond.Maturity.AsDate
+            FrequencyCB.SelectedItem = bondStructure.Frequency
+
+            If bondStructure.HasSingleFixedRate Then
+                FixedCouponRB.Checked = True
+                FixedRateUD.Value = bondStructure.GetFixedRate()
+            Else
+                CouponScheduleRB.Checked = True
+                CouponScheduleDGV.DataSource = bondStructure.GetCouponsList()
+            End If
+
+            If bondStructure.HasAmortizationSchedule Then
+                AmortScheduleCB.Checked = True
+                AmortScheduleDGV.DataSource = bondStructure.GetAmortizationSchedule()
+            Else
+                AmortScheduleCB.Checked = False
+                PerpetualCB.Checked = bondStructure.IsPerpetual
+            End If
+
+            OptionsDGV.DataSource = bondStructure.GetEmbeddedOptions()
+            OtherRulesML.Text = bondStructure.ToString(False)
+
+            If MainForm.MainForm.Connected Then
+                Dim bondModule As AdxBondModule = Eikon.Sdk.CreateAdxBondModule()
+                bondStructure.SetBondModule(bondModule)
+                CashFlowsDGV.DataSource = bondStructure.GetCashFlows(_currentBond.Maturity.ToString(),
+                                                                     _currentBond.CurrentCouponRate)
+                ' todo функция не сделана
+            End If
         End Sub
 
         Private Sub CleanupBondView()
-            ' todo
             FixedCouponRB.Checked = True
             CouponScheduleDGV.DataSource = Nothing
-            BulletPaymentRB.Checked = True
-            BulletPaymentDTP.Value = Date.Today
             AmortScheduleDGV.DataSource = Nothing
             MaturityDTP.Value = Date.Today
             PerpetualCB.Checked = False
@@ -643,24 +709,26 @@ Namespace Forms.PortfolioForm
             If src Is Nothing Then Return
             Select Case src
                 Case CMSSource.CustomBond
-                    Dim frm As New Form With {.Width = 400, .Height = 300, .Text = "Create new custom bond"}
+                    Dim frm As New Form With {.Width = 300, .Height = 200, .Text = "Create new custom bond"}
                     frm.Controls.Add(New Label With {.Text = "Name", .Location = New Point(20, 20), .Width = 60})
-                    frm.Controls.Add(New Label With {.Text = "Code", .Location = New Point(20, 40), .Width = 60})
-                    Dim nameTB = New TextBox With {.Location = New Point(80, 20), .Width = 200}
-                    frm.Controls.Add(nameTB)
-                    Dim descrTB = New TextBox With {.Location = New Point(80, 40), .Width = 200}
-                    frm.Controls.Add(descrTB)
-                    Dim btnOk As New Button With {.Text = "Ok", .Location = New Point(20, 80), .DialogResult = DialogResult.OK}
+                    frm.Controls.Add(New Label With {.Text = "Code", .Location = New Point(20, 60), .Width = 60})
+                    Dim nameTb = New TextBox With {.Location = New Point(80, 20), .Width = 200}
+                    frm.Controls.Add(nameTb)
+                    Dim descrTb = New TextBox With {.Location = New Point(80, 60), .Width = 200}
+                    frm.Controls.Add(descrTb)
+                    Dim btnOk As New Button With {.Text = "Ok", .Location = New Point(20, 100), .DialogResult = DialogResult.OK}
                     AddHandler btnOk.Click, Sub() frm.Close()
                     frm.Controls.Add(btnOk)
-                    Dim btnCancel As New Button With {.Text = "Cancel", .Location = New Point(120, 80), .DialogResult = DialogResult.Cancel}
+                    Dim btnCancel As New Button With {.Text = "Cancel", .Location = New Point(120, 100), .DialogResult = DialogResult.Cancel}
                     AddHandler btnCancel.Click, Sub() frm.Close()
                     frm.Controls.Add(btnCancel)
                     frm.CancelButton = btnCancel
 
                     If frm.ShowDialog() = DialogResult.OK Then
-                        _currentBond = New CustomBond(Color.Gray.ToString(), nameTB.Text, descrTB.Text)
+                        _currentBond = New CustomBond(Color.Gray.Name, nameTb.Text, descrTb.Text, "",
+                                                      ReutersDate.DateToReuters(Date.Today.AddYears(1)), 0.1)
                         PortfolioManager.AddSource(_currentBond)
+                        RefreshCustomBondList()
                     End If
                 Case CMSSource.CouponSchedule
                 Case CMSSource.AmortSchedule

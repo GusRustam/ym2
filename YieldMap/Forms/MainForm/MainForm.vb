@@ -118,6 +118,7 @@ Namespace Forms.MainForm
 #Region "II. Connecting to Eikon"
         Private WithEvents _connector As New EikonConnector(Eikon.Sdk)
         Private WithEvents _ldr As IBondsLoader = BondsLoader.Instance()
+        Private Shared _connected As Boolean
 
         Private Sub ConnectToEikon()
             _connector.ConnectToEikon()
@@ -134,6 +135,7 @@ Namespace Forms.MainForm
             ConnectButton.Enabled = False
             StatusPicture.Image = Green
             StatusLabel.Text = Status_Connected
+            _connected = True
 
             BondsData.Instance.Refresh()
 
@@ -156,6 +158,7 @@ Namespace Forms.MainForm
         End Sub
 
         Private Sub ConnectorDisconnected() Handles _connector.Disconnected
+            _connected = False
             ConnectTSMI.Enabled = True
             ConnectButton.Enabled = True
             YieldMapButton.Enabled = False
@@ -164,7 +167,14 @@ Namespace Forms.MainForm
             CloseAllGraphForms()
         End Sub
 
+        Public Shared ReadOnly Property Connected() As Boolean
+            Get
+                Return _connected
+            End Get
+        End Property
+
         Private Sub ConnectorLocalMode() Handles _connector.LocalMode
+            _connected = True
             ConnectTSMI.Enabled = True
             ConnectButton.Enabled = True
             YieldMapButton.Enabled = False
@@ -173,6 +183,7 @@ Namespace Forms.MainForm
         End Sub
 
         Private Sub ConnectorOffline() Handles _connector.Offline
+            _connected = False
             ConnectTSMI.Enabled = True
             ConnectButton.Enabled = True
             YieldMapButton.Enabled = False

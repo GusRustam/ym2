@@ -1,5 +1,7 @@
 ﻿Imports System.Text.RegularExpressions
 Imports System.Reflection
+Imports AdfinXAnalyticsFunctions
+Imports System.ComponentModel
 Imports NLog
 
 Namespace Bonds
@@ -53,6 +55,10 @@ Namespace Bonds
 
         Public Shared Function DateToReuters(ByVal dt As Date) As String
             Return String.Format("{0:00}{1}{2:0000}", dt.Day, Months(dt.Month - 1), dt.Year)
+        End Function
+
+        Public Overrides Function ToString() As String
+            Return _rDate
         End Function
     End Class
 
@@ -231,6 +237,10 @@ Namespace Bonds
         End Function
     End Class
 
+    Public Class PrimaryAttribute
+        Inherits Attribute
+    End Class
+
     Public Class ReutersBondStructure
         Private Shared ReadOnly Attributes As Dictionary(Of String, ReutersValueAttribute)
         Private Shared ReadOnly Fields As Dictionary(Of String, String)
@@ -244,17 +254,18 @@ Namespace Bonds
         <ReutersString("CFADJ")> Private _cashFlowAdj As String
         <ReutersString("DMC")> Private _dateMovingConvention As String
         <ReutersString("EMC")> Private _endMonthConvention As String
-        <ReutersString("FRQ")> Private _frequency As String
+        <ReutersString("FRQ")> <Primary()> Private _frequency As String
         <ReutersString("PX")> Private _priceType As String
         <ReutersString("REFDATE")> Private _referenceDate As String
         <ReutersString("YM")> Private _yieldStyleName As String
         <ReutersString("ISSUE")> Private _issueDate As String
-        <ReutersString("RATE")> Private _rate As String
-        <ReutersDate("AMORT")> Private _amortPattern As New List(Of Tuple(Of Date, Single))
-        <ReutersOption("CALL")> Private _callPattern As New List(Of Tuple(Of Date, Date, Single))
-        <ReutersOption("PUT")> Private _putPattern As New List(Of Tuple(Of Date, Date, Single))
-        <ReutersDate("STEP")> Private _stepCouponPattern As New List(Of Tuple(Of Date, Single))
-        <ReutersString("RT")> Private _reimbursementType As String
+        <ReutersString("RATE")> <Primary()> Private _rate As String
+        <ReutersDate("AMORT")> <Primary()> Private _amortPattern As New List(Of Tuple(Of Date, Single))
+        <ReutersOption("CALL")> <Primary()> Private _callPattern As New List(Of Tuple(Of Date, Date, Single))
+        <ReutersOption("PUT")> <Primary()> Private _putPattern As New List(Of Tuple(Of Date, Date, Single))
+        <ReutersDate("STEP")> <Primary()> Private _stepCouponPattern As New List(Of Tuple(Of Date, Single))
+        <ReutersString("RT")> <Primary()> Private _reimbursementType As String
+        Private _bondModule As AdxBondModule
 
         Private Sub New()
         End Sub
@@ -464,8 +475,203 @@ Namespace Bonds
                 Aggregate("", Function(current, name) current + Attributes(name).IntoString(Me, Fields(name)) + " ")
         End Function
 
+        Public Overloads Function ToString(ByVal primary As Boolean) As String
+            Return Attributes.Keys.Where(AddressOf FieldNotNothing).Where(
+                Function(elem)
+                    Dim k = GetType(ReutersBondStructure).GetField(Fields(elem), BindingFlags.Instance Or BindingFlags.NonPublic).GetCustomAttributes(GetType(PrimaryAttribute), False)
+                    Return If(primary, k.Any, Not k.Any)
+                End Function).
+            Aggregate("", Function(current, name) current + Attributes(name).IntoString(Me, Fields(name)) + " ")
+        End Function
+
         Private Function FieldNotNothing(ByVal key As String) As Boolean
             Return GetType(ReutersBondStructure).GetField(Fields(key), BindingFlags.Instance Or BindingFlags.NonPublic).GetValue(Me) IsNot Nothing
         End Function
+
+        Public Function GetCashFlows(ByVal matDate As String, ByVal couponRate As Double) As List(Of CashFlowDescription)
+            Dim cashFlows As Array = _bondModule.BdCashflows(Date.Today, matDate, couponRate, ToString(), "IAC RET:A100")
+            Dim res As New List(Of CashFlowDescription)
+            Dim i As Integer
+            For i = cashFlows.GetLowerBound(0) To cashFlows.GetUpperBound(0)
+                If Not IsDate(cashFlows.GetValue(i, 1)) Then Exit For
+                Try
+                    Dim dt = CDate(cashFlows.GetValue(i, 1))
+                    Dim cpn = CDbl(cashFlows.GetValue(i, 2))
+                    Dim amort = CDate(cashFlows.GetValue(i, 3))
+                    res.Add(New CashFlowDescription(dt, cpn, amort))
+                Catch ex As Exception
+                    Logger.WarnException(String.Format("Failed to read {0}th row in result", i), ex)
+                    Logger.Warn("Exception = {0}", ex.ToString())
+                End Try
+            Next
+            Return res
+        End Function
+
+        Public Class CashFlowDescription
+            Private ReadOnly _dt As Date
+            Private ReadOnly _cpn As Double
+            Private ReadOnly _amort As Date
+
+            <DisplayName("Date")>
+            Public ReadOnly Property Dt() As Date
+                Get
+                    Return _dt
+                End Get
+            End Property
+
+            <DisplayName("Coupon")>
+            Public ReadOnly Property Cpn() As Double
+                Get
+                    Return _cpn
+                End Get
+            End Property
+
+            <DisplayName("Redemption")>
+            Public ReadOnly Property Amort() As Date
+                Get
+                    Return _amort
+                End Get
+            End Property
+
+            Public Sub New(ByVal dt As Date, ByVal cpn As Double, ByVal amort As Date)
+                _dt = dt
+                _cpn = cpn
+                _amort = amort
+            End Sub
+        End Class
+
+        Public Sub SetBondModule(ByVal adxBondModule As AdxBondModule)
+            _bondModule = adxBondModule
+        End Sub
+
+        Public Function HasSingleFixedRate() As Boolean
+            Return (_stepCouponPattern.Count() = 0) Or (_rate <> "" And _stepCouponPattern.Count() <= 1)
+        End Function
+
+        Public Function GetFixedRate() As Single
+            Try
+                If _rate <> "" Then Return CSng(_rate)
+                Return CSng(_stepCouponPattern(0).Item2)
+            Catch ex As Exception
+                Throw New InvalidOperationException("Couldn't determine fixed rate")
+            End Try
+        End Function
+
+        Public Function GetCouponsList() As List(Of CouponDescription)
+            Return (From elem In _stepCouponPattern Select New CouponDescription(elem.Item1, elem.Item2)).tolist()
+        End Function
+
+        Public Class CouponDescription
+            Private ReadOnly _dt As Date
+            Private ReadOnly _rate As Single
+
+            Public Sub New(ByVal dt As Date, ByVal rate As Single)
+                _dt = dt
+                _rate = rate
+            End Sub
+
+            <DisplayName("Date")>
+            Public ReadOnly Property Dt() As Date
+                Get
+                    Return _dt
+                End Get
+            End Property
+
+            <DisplayName("Coupon rate")>
+            Public ReadOnly Property Rate() As Single
+                Get
+                    Return _rate
+                End Get
+            End Property
+        End Class
+
+        Public Function HasAmortizationSchedule() As Boolean
+            Return _amortPattern.Count > 0
+        End Function
+
+        Public Function GetAmortizationSchedule() As List(Of AmortizationDescription)
+            Return (From elem In _amortPattern Select New AmortizationDescription(elem.Item1, elem.Item2)).ToList()
+        End Function
+
+        Public Function IsPerpetual() As Boolean
+            Return _reimbursementType = "PT"
+        End Function
+
+        Public Function GetEmbeddedOptions() As List(Of EmbdeddedOptionDescription)
+            Dim res As New List(Of EmbdeddedOptionDescription)
+            res.AddRange(From elem In _callPattern Select New EmbdeddedOptionDescription(elem, "Call"))
+            res.AddRange(From elem In _putPattern Select New EmbdeddedOptionDescription(elem, "Call"))
+            Return res
+        End Function
+
+        Public Class AmortizationDescription
+            Private ReadOnly _dt As Date
+            Private ReadOnly _amount As Single
+
+            Public Sub New(ByVal dt As Date, ByVal amount As Single)
+                _dt = dt
+                _amount = amount
+            End Sub
+
+            <DisplayName("Date")>
+            Public ReadOnly Property Dt() As Date
+                Get
+                    Return _dt
+                End Get
+            End Property
+
+            Public ReadOnly Property Amount() As Single
+                Get
+                    Return _amount
+                End Get
+            End Property
+        End Class
+
+        Public Class EmbdeddedOptionDescription
+            Private ReadOnly _type As String
+            Private ReadOnly _kind As String
+            Private ReadOnly _starts As Date
+            Private ReadOnly _ends As Date
+            Private ReadOnly _price As Single
+
+            Public ReadOnly Property Type() As String
+                Get
+                    Return _type
+                End Get
+            End Property
+
+            Public ReadOnly Property Kind() As String
+                Get
+                    Return _kind
+                End Get
+            End Property
+
+            Public ReadOnly Property Starts() As Date
+                Get
+                    Return _starts
+                End Get
+            End Property
+
+            Public ReadOnly Property Ends() As Date
+                Get
+                    Return _ends
+                End Get
+            End Property
+
+            Public ReadOnly Property Price() As Single
+                Get
+                    Return _price
+                End Get
+            End Property
+
+            Public Sub New(ByVal elem As Tuple(Of Date, Date, Single), ByVal type As String)
+                _type = type
+                _kind = If(elem.Item1 = elem.Item2, "European", "American")
+                _starts = elem.Item1
+                _ends = elem.Item2
+                _price = elem.Item3
+            End Sub
+        End Class
     End Class
+
 End Namespace

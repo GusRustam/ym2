@@ -71,7 +71,7 @@
           <include what="chain" id="2" name="Moskau" color="Blue" />
         </portfolio>
         <portfolio id="4" name="Main">
-          <include what="chain" id="1" name="All OFZs" condition="${isStraight} And ${currentCoupon}&gt;10" />
+          <include what="chain" id="1" name="All OFZs" />
           <exclude what="list" id="1" />
           <!-- todo -->
           <include what="custom-bond" id="1" />
@@ -94,7 +94,7 @@
   </curves>
   <!-- todo -->
   <custom-bonds>
-    <bond id="1" name="Base case 3Y 12% bond" code="NewIssueBase" rateStructure="" bondStructure=""/>
+    <bond id="1" name="Base case 3Y 12% bond" code="NewIssueBase" rateStructure="" bondStructure="" maturity="" coupon="0.12" color="Red"/>
   </custom-bonds>
   <!-- TODO Synthetics curves (?????) -->
 </bonds>

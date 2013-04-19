@@ -349,20 +349,48 @@ Public Class CustomBond
     ' todo equality members
 
     Private ReadOnly _code As String
+    Private ReadOnly _struct As ReutersBondStructure
+    Private ReadOnly _maturity As ReutersDate
+    Private ReadOnly _currentCouponRate As Double
 
-    Public Sub New(ByVal id As String, ByVal color As String, ByVal name As String, ByVal code As String)
+    Public Sub New(ByVal id As String, ByVal color As String, ByVal name As String, ByVal code As String, ByVal struct As String, ByVal maturity As String, ByVal currentCouponRate As Double)
         MyBase.New(id, color, name)
         _code = code
+        _maturity = New ReutersDate(maturity)
+        _currentCouponRate = currentCouponRate
+        _struct = ReutersBondStructure.Parse(struct)
     End Sub
 
-    Public Sub New(ByVal color As String, ByVal name As String, ByVal code As String)
+    Public Sub New(ByVal color As String, ByVal name As String, ByVal code As String, ByVal struct As String, ByVal maturity As String, ByVal currentCouponRate As Double)
         MyBase.New(color, name)
         _code = code
+        _maturity = New ReutersDate(maturity)
+        _currentCouponRate = currentCouponRate
+        _struct = ReutersBondStructure.Parse(struct)
     End Sub
 
     Public ReadOnly Property Code() As String
         Get
             Return _code
+        End Get
+    End Property
+
+    <Browsable(False)>
+    Public ReadOnly Property Struct As ReutersBondStructure
+        Get
+            Return _struct
+        End Get
+    End Property
+
+    Public ReadOnly Property Maturity() As ReutersDate
+        Get
+            Return _maturity
+        End Get
+    End Property
+
+    Public ReadOnly Property CurrentCouponRate() As Double
+        Get
+            Return _currentCouponRate
         End Get
     End Property
 

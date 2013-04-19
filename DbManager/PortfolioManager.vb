@@ -1,5 +1,6 @@
 ﻿Imports System.Xml
 Imports System.IO
+Imports DbManager.Bonds
 Imports NLog
 Imports Uitls
 
@@ -444,14 +445,16 @@ Public Class PortfolioManager
             parent.AppendChild(newListNode)
             SaveBonds()
         ElseIf TypeOf src Is CustomBond Then
-            Dim list = CType(src, CustomBond)
+            Dim bond = CType(src, CustomBond)
             Dim parent = _bonds.SelectSingleNode("/bonds/custom-bonds")
-            Dim newListNode = _bonds.CreateNode(XmlNodeType.Element, "bond", "")
-            _bonds.AppendAttr(newListNode, "id", list.ID)
-            _bonds.AppendAttr(newListNode, "name", list.Name)
-            _bonds.AppendAttr(newListNode, "color", list.Color)
-            _bonds.AppendAttr(newListNode, "code", list.Code)
-            parent.AppendChild(newListNode)
+            Dim newBondNode = _bonds.CreateNode(XmlNodeType.Element, "bond", "")
+            _bonds.AppendAttr(newBondNode, "id", bond.ID)
+            _bonds.AppendAttr(newBondNode, "name", bond.Name)
+            _bonds.AppendAttr(newBondNode, "color", bond.Color)
+            _bonds.AppendAttr(newBondNode, "code", bond.Code)
+            _bonds.AppendAttr(newBondNode, "maturity", bond.Maturity.AsReuters)
+            _bonds.AppendAttr(newBondNode, "coupon", bond.CurrentCouponRate)
+            parent.AppendChild(newBondNode)
             SaveBonds()
         Else
             Logger.Warn("AddSource(): unsupported source type {0}", src.GetType())
@@ -549,7 +552,9 @@ Public Class PortfolioManager
         Dim nodes = _bonds.SelectNodes("/bonds/custom-bonds/bond")
         Return New List(Of CustomBond)(From node As XmlNode In nodes
                                        Select New CustomBond(node.GetAttrStrict("id"), node.GetAttr("color"),
-                                                             node.GetAttrStrict("name"), node.GetAttr("code")))
+                                                             node.GetAttrStrict("name"), node.GetAttr("code"),
+                                                             node.GetAttr("bondStructure"), node.GetAttrStrict("maturity"),
+                                                             node.GetAttrStrict("coupon")))
     End Function
 
     Public Function GetFolderDescr(ByVal id As String) As Portfolio Implements IPortfolioManager.GetFolderDescr
