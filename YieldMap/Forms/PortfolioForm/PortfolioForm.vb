@@ -595,7 +595,7 @@ Namespace Forms.PortfolioForm
         End Function
 
         Private Sub CustomBondsList_MouseClick(ByVal sender As Object, ByVal e As MouseEventArgs) _
-            Handles CustomBondsList.MouseClick, CouponScheduleDGV.MouseClick, OptionsDGV.MouseClick
+            Handles CustomBondsList.MouseClick, OptionsDGV.MouseClick, CouponScheduleDGV.Click, AmortScheduleDGV.Click
 
             If e.Button <> MouseButtons.Right Then Return
 
@@ -628,9 +628,14 @@ Namespace Forms.PortfolioForm
             If CustomBondsList.SelectedRows.Count = 0 Then
                 CleanupBondView()
             Else
+                If _currentBond IsNot Nothing Then SaveCurrentBond()
                 _currentBond = CustomBondsList.SelectedRows(0).DataBoundItem
                 RefreshBondView()
             End If
+        End Sub
+
+        Private Sub SaveCurrentBond()
+            PortfolioManager.UpdateSource(_currentBond)
         End Sub
 
         Private Sub RandomColorButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles RandomColorButton.Click
@@ -665,16 +670,13 @@ Namespace Forms.PortfolioForm
             End If
 
             Dim bondStructure = _currentBond.Struct
-            ' Заполнение простых полей
+
             CustomBondColorCB.SelectedItem = _currentBond.Color
             MaturityDTP.Value = If(_currentBond.Maturity.HasValue, _currentBond.Maturity, Date.Today)
             FrequencyCB.SelectedItem = bondStructure.Frequency
 
-            If bondStructure.HasSingleFixedRate Then
-                FixedRateTB.Text = String.Format("{0:F2}", bondStructure.GetFixedRate())
-            Else
-                CouponScheduleDGV.DataSource = bondStructure.GetCouponsList()
-            End If
+            FixedRateTB.Text = String.Format("{0:F2}", bondStructure.GetFixedRate())
+            CouponScheduleDGV.DataSource = bondStructure.GetCouponsList()
 
             If bondStructure.HasAmortizationSchedule Then
                 AmortScheduleDGV.DataSource = bondStructure.GetAmortizationSchedule()
@@ -683,9 +685,9 @@ Namespace Forms.PortfolioForm
             End If
 
             OptionsDGV.DataSource = bondStructure.GetEmbeddedOptions()
-            OtherRulesML.Text = bondStructure.ToString(False)
+            OtherRulesML.Text = bondStructure.ToString()
 
-            If bondStructure.IssueDate <> "" Then
+            If bondStructure.IssueDate IsNot Nothing AndAlso bondStructure.IssueDate <> "" Then
                 UnspecifiedIssueDateCB.Checked = False
                 IssueDateDTP.Enabled = True
                 IssueDateDTP.Value = ReutersDate.ReutersToDate(bondStructure.IssueDate)
@@ -704,7 +706,10 @@ Namespace Forms.PortfolioForm
                 Dim bondModule As AdxBondModule = Eikon.Sdk.CreateAdxBondModule()
                 bondStructure.SetBondModule(bondModule)
                 Try
-                    CashFlowsDGV.DataSource = bondStructure.GetCashFlows(ReutersDate.DateToReuters(_currentBond.Maturity), _currentBond.CurrentCouponRate)
+                    ' todo сохранять при добавлении новой облигации
+                    ' todo почему-то в новой облигации вот это вот все не сохранилось (CFADJ ...)
+                    OtherRulesML.Text = _currentBond.Struct.ToString()
+                    CashFlowsDGV.DataSource = bondStructure.GetCashFlows(If(_currentBond.Maturity.HasValue, ReutersDate.DateToReuters(_currentBond.Maturity), ""), _currentBond.CurrentCouponRate)
                 Catch ex As Exception
                     MessagesTB.Text = ex.Message
                 End Try
@@ -714,23 +719,53 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub UnspecifiedIssueDateCB_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles UnspecifiedIssueDateCB.CheckedChanged
-            IssueDateDTP.Enabled = UnspecifiedIssueDateCB.Checked
+            IssueDateDTP.Enabled = Not UnspecifiedIssueDateCB.Checked
             If _currentBond Is Nothing Then Return
             If UnspecifiedIssueDateCB.Checked Then
-                _currentBond.Struct.IssueDate = ReutersDate.DateToReuters(IssueDateDTP.Value)
-            Else
                 _currentBond.Struct.IssueDate = ""
+            Else
+                _currentBond.Struct.IssueDate = ReutersDate.DateToReuters(IssueDateDTP.Value)
             End If
             RecalculateCashFlows()
         End Sub
 
-        Private Sub MaturityDTP_ValueChanged(ByVal sender As Object, ByVal e As EventArgs) Handles MaturityDTP.ValueChanged, IssueDateDTP.ValueChanged
+        Private Sub MaturityDTP_ValueChanged(ByVal sender As Object, ByVal e As EventArgs) Handles MaturityDTP.ValueChanged
             If _currentBond Is Nothing Then Return
+            _currentBond.Struct.ReimbursementType = ""
             _currentBond.Maturity = MaturityDTP.Value
-            RefreshCustomBondList(_currentBond)
             RecalculateCashFlows()
         End Sub
 
+        Private Sub IssueDTP_ValueChanged(ByVal sender As Object, ByVal e As EventArgs) Handles IssueDateDTP.ValueChanged
+            If _currentBond Is Nothing Then Return
+            _currentBond.Struct.IssueDate = ReutersDate.DateToReuters(IssueDateDTP.Value)
+            RecalculateCashFlows()
+        End Sub
+
+
+        Private Sub AnnuityCB_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles AnnuityCB.CheckedChanged
+            If AnnuityCB.Checked Then
+                If PerpetualCB.Checked Then PerpetualCB.Checked = False
+                _currentBond.Struct.ReimbursementType = "C"
+            Else
+                _currentBond.Struct.ReimbursementType = ""
+            End If
+            RecalculateCashFlows()
+        End Sub
+
+        Private Sub PerpetualCB_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles PerpetualCB.CheckedChanged
+            If _currentBond Is Nothing Then Return
+            MaturityDTP.Enabled = Not PerpetualCB.Checked
+            If PerpetualCB.Checked Then
+                AnnuityCB.Checked = False
+                _currentBond.Maturity = Nothing
+                _currentBond.Struct.ReimbursementType = "P"
+            Else
+                _currentBond.Maturity = MaturityDTP.Value
+                _currentBond.Struct.ReimbursementType = ""
+            End If
+            RecalculateCashFlows()
+        End Sub
 
         Private Sub FrequencyCB_SelectedValueChanged(ByVal sender As Object, ByVal e As EventArgs) Handles FrequencyCB.SelectedValueChanged
             If _currentBond Is Nothing Then Return
@@ -748,7 +783,6 @@ Namespace Forms.PortfolioForm
             End If
             _currentBond.CurrentCouponRate = CDbl(FixedRateTB.Text)
             _currentBond.Struct.Rate = FixedRateTB.Text
-            RefreshCustomBondList(_currentBond)
             RecalculateCashFlows()
         End Sub
 
@@ -757,7 +791,7 @@ Namespace Forms.PortfolioForm
             AmortScheduleDGV.DataSource = Nothing
             MaturityDTP.Value = Date.Today
             PerpetualCB.Checked = False
-            OtherRulesML.Text = "" ' todo load OFZ structure
+            OtherRulesML.Text = ""
             OptionsDGV.DataSource = Nothing
             CustomBondColorCB.SelectedIndex = -1
             CashFlowsDGV.DataSource = Nothing
@@ -798,7 +832,7 @@ Namespace Forms.PortfolioForm
                         .Location = New Point(80, 20),
                         .Width = 200,
                         .Format = DateTimePickerFormat.Custom,
-                        .CustomFormat = "dd/MM/yyyy"
+                        .CustomFormat = "dd/MMM/yyyy"
                     }
                     frm.Controls.Add(sinceDateDtp)
                     Dim newRateTb = New TextBox With {.Location = New Point(80, 60), .Width = 200}
@@ -822,9 +856,100 @@ Namespace Forms.PortfolioForm
                         End If
                     End If
                 Case CMSSource.AmortSchedule
+                    Dim frm As New Form With {.Width = 300, .Height = 200, .Text = "Add partial redemption"}
+                    frm.Controls.Add(New Label With {.Text = "Date", .Location = New Point(20, 20), .Width = 60})
+                    frm.Controls.Add(New Label With {.Text = "Amount", .Location = New Point(20, 60), .Width = 60})
+                    Dim dateDtp = New DateTimePicker With {
+                        .Location = New Point(80, 20),
+                        .Width = 200,
+                        .Format = DateTimePickerFormat.Custom,
+                        .CustomFormat = "dd/MMM/yyyy"
+                    }
+                    frm.Controls.Add(dateDtp)
+                    Dim amountTb = New TextBox With {.Location = New Point(80, 60), .Width = 200}
+                    frm.Controls.Add(amountTb)
+                    Dim btnOk As New Button With {.Text = "Ok", .Location = New Point(20, 100), .DialogResult = DialogResult.OK}
+                    AddHandler btnOk.Click, Sub() frm.Close()
+                    frm.Controls.Add(btnOk)
+                    Dim btnCancel As New Button With {.Text = "Cancel", .Location = New Point(120, 100), .DialogResult = DialogResult.Cancel}
+                    AddHandler btnCancel.Click, Sub() frm.Close()
+                    frm.Controls.Add(btnCancel)
+                    frm.CancelButton = btnCancel
 
+                    If frm.ShowDialog() = DialogResult.OK Then
+                        If Not IsNumeric(amountTb.Text) Then
+                            MessageBox.Show(String.Format("Redemption value {0} is not numeric", amountTb.Text),
+                                            "Please try once again", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        Else
+                            _currentBond.Struct.AmortPattern.Add(tuple.Create(dateDtp.Value, CSng(amountTb.Text)))
+                            RefreshBondView()
+                            RecalculateCashFlows()
+                        End If
+                    End If
                 Case CMSSource.OptionList
+                    Dim frm As New Form With {.Width = 300, .Height = 200, .Text = "Add partial redemption"}
+                    frm.Controls.Add(New Label With {.Text = "Option start date", .Location = New Point(20, 20), .Width = 80})
+                    frm.Controls.Add(New Label With {.Text = "Option end date", .Location = New Point(20, 40), .Width = 80})
+                    frm.Controls.Add(New Label With {.Text = "Strike price", .Location = New Point(20, 60), .Width = 80})
+                    frm.Controls.Add(New Label With {.Text = "Option type", .Location = New Point(20, 80), .Width = 80})
+
+                    Dim startDateDtp = New DateTimePicker With {
+                        .Location = New Point(20, 20),
+                        .Width = 200,
+                        .Format = DateTimePickerFormat.Custom,
+                        .CustomFormat = "dd/MMM/yyyy"
+                    }
+                    frm.Controls.Add(startDateDtp)
+
+                    Dim endDateDtp = New DateTimePicker With {
+                        .Location = New Point(20, 40),
+                        .Width = 200,
+                        .Format = DateTimePickerFormat.Custom,
+                        .CustomFormat = "dd/MMM/yyyy"
+                    }
+                    frm.Controls.Add(endDateDtp)
+
+                    Dim priceTb = New TextBox With {.Location = New Point(80, 60), .Width = 200}
+                    frm.Controls.Add(priceTb)
+
+                    Dim optionTypeCb = New ComboBox With {
+                        .Location = New Point(20, 80),
+                        .Width = 200
+                    }
+                    optionTypeCb.Items.Add("Call")
+                    optionTypeCb.Items.Add("Put")
+                    optionTypeCb.SelectedIndex = 1
+                    frm.Controls.Add(optionTypeCb)
+
+                    Dim btnOk As New Button With {.Text = "Ok", .Location = New Point(20, 140), .DialogResult = DialogResult.OK}
+                    AddHandler btnOk.Click, Sub() frm.Close()
+                    frm.Controls.Add(btnOk)
+                    Dim btnCancel As New Button With {.Text = "Cancel", .Location = New Point(120, 140), .DialogResult = DialogResult.Cancel}
+                    AddHandler btnCancel.Click, Sub() frm.Close()
+                    frm.Controls.Add(btnCancel)
+                    frm.CancelButton = btnCancel
+
+                    If frm.ShowDialog() = DialogResult.OK Then
+                        If Not IsNumeric(priceTb.Text) Then
+                            MessageBox.Show(String.Format("Strike price {0} is not numeric", priceTb.Text),
+                                            "Please try once again", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        Else
+                            If optionTypeCb.SelectedValue.ToString() = "Call" Then
+                                _currentBond.Struct.CallPattern.Add(tuple.Create(startDateDtp.Value, endDateDtp.Value, CSng(priceTb.Text)))
+                            Else
+                                _currentBond.Struct.PutPattern.Add(tuple.Create(startDateDtp.Value, endDateDtp.Value, CSng(priceTb.Text)))
+                            End If
+                            RefreshBondView()
+                            RecalculateCashFlows()
+                        End If
+                    End If
+
             End Select
+        End Sub
+
+        Private Sub SaveButton_Click(ByVal sender As System.Object, ByVal e As EventArgs) Handles SaveButton.Click
+            If _currentBond Is Nothing Then Return
+            PortfolioManager.UpdateSource(_currentBond)
         End Sub
 #End Region
 

@@ -454,6 +454,7 @@ Public Class PortfolioManager
             _bonds.AppendAttr(newBondNode, "code", bond.Code)
             _bonds.AppendAttr(newBondNode, "maturity", If(bond.Maturity.HasValue, ReutersDate.DateToReuters(bond.Maturity), ""))
             _bonds.AppendAttr(newBondNode, "coupon", bond.CurrentCouponRate)
+            _bonds.AppendAttr(newBondNode, "bondStructure", bond.Struct.ToString())
             parent.AppendChild(newBondNode)
             SaveBonds()
         Else
@@ -492,16 +493,19 @@ Public Class PortfolioManager
             _bonds.UpdateAttr(listNode, "enabled", list.Enabled)
             SaveBonds()
         ElseIf TypeOf src Is CustomBond Then
-            Dim list = CType(src, CustomBond)
-            Dim listNode = _bonds.SelectSingleNode(String.Format("/bonds/custom-bonds/bond[@id='{0}']", src.ID))
-            If listNode Is Nothing Then
+            Dim bond = CType(src, CustomBond)
+            Dim bondNode = _bonds.SelectSingleNode(String.Format("/bonds/custom-bonds/bond[@id='{0}']", src.ID))
+            If bondNode Is Nothing Then
                 Logger.Error("No custom bond with id {0} found", src.ID)
                 Return
             End If
-            _bonds.UpdateAttr(listNode, "id", list.ID)
-            _bonds.UpdateAttr(listNode, "name", list.Name)
-            _bonds.UpdateAttr(listNode, "color", list.Color)
-            _bonds.UpdateAttr(listNode, "code", list.Code)
+            _bonds.UpdateAttr(bondNode, "id", bond.ID)
+            _bonds.UpdateAttr(bondNode, "name", bond.Name)
+            _bonds.UpdateAttr(bondNode, "color", bond.Color)
+            _bonds.UpdateAttr(bondNode, "code", bond.Code)
+            _bonds.UpdateAttr(bondNode, "maturity", If(bond.Maturity.HasValue, ReutersDate.DateToReuters(bond.Maturity), ""))
+            _bonds.UpdateAttr(bondNode, "coupon", bond.CurrentCouponRate)
+            _bonds.UpdateAttr(bondNode, "bondStructure", bond.Struct.ToString())
             SaveBonds()
         Else
             Logger.Warn("UpdateSource(): unsupported source type {0}", src.GetType())

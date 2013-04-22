@@ -486,7 +486,15 @@ Namespace Bonds
         End Function
 
         Private Function FieldNotNothing(ByVal key As String) As Boolean
-            Return GetType(ReutersBondStructure).GetField(Fields(key), BindingFlags.Instance Or BindingFlags.NonPublic).GetValue(Me) IsNot Nothing
+            Dim field = GetType(ReutersBondStructure).GetField(Fields(key), BindingFlags.Instance Or BindingFlags.NonPublic)
+            Dim empty = field.GetCustomAttributes(GetType(ReutersEmptyAttribute), False).Any()
+            Dim value = field.GetValue(Me)
+
+            If value IsNot Nothing AndAlso Not empty AndAlso TypeOf value Is String Then
+                Return CStr(value) <> ""
+            Else
+                Return value IsNot Nothing
+            End If
         End Function
 
         Public Function GetCashFlows(ByVal matDate As String, ByVal couponRate As Double) As List(Of CashFlowDescription)
@@ -521,16 +529,16 @@ Namespace Bonds
             End Property
 
             <DisplayName("Coupon")>
-            Public ReadOnly Property Cpn() As Double
+            Public ReadOnly Property Cpn() As String
                 Get
-                    Return _cpn
+                    Return String.Format("{0:F4}", _cpn)
                 End Get
             End Property
 
             <DisplayName("Redemption")>
-            Public ReadOnly Property Amort() As Double
+            Public ReadOnly Property Amort() As String
                 Get
-                    Return _amort
+                    Return String.Format("{0:F4}", _amort)
                 End Get
             End Property
 
@@ -540,24 +548,6 @@ Namespace Bonds
                 _amort = amort
             End Sub
         End Class
-
-        Public Sub SetBondModule(ByVal adxBondModule As AdxBondModule)
-            _bondModule = adxBondModule
-        End Sub
-
-        Public Function HasSingleFixedRate() As Boolean
-            Return (_stepCouponPattern.Count() = 0) Or (_rate <> "" And _stepCouponPattern.Count() <= 1)
-        End Function
-
-        Public Function GetFixedRate() As Single
-            If _rate <> "" Then Return CSng(_rate)
-            If _stepCouponPattern.Any Then Return CSng(_stepCouponPattern(0).Item2)
-            Return 0
-        End Function
-
-        Public Function GetCouponsList() As List(Of CouponDescription)
-            Return (From elem In _stepCouponPattern Select New CouponDescription(elem.Item1, elem.Item2)).tolist()
-        End Function
 
         Public Class CouponDescription
             Private ReadOnly _dt As Date
@@ -576,31 +566,12 @@ Namespace Bonds
             End Property
 
             <DisplayName("Coupon rate")>
-            Public ReadOnly Property Rate() As Single
+            Public ReadOnly Property Rate() As String
                 Get
-                    Return _rate
+                    Return String.Format("{0:F4}", _rate)
                 End Get
             End Property
         End Class
-
-        Public Function HasAmortizationSchedule() As Boolean
-            Return _amortPattern.Count > 0
-        End Function
-
-        Public Function GetAmortizationSchedule() As List(Of AmortizationDescription)
-            Return (From elem In _amortPattern Select New AmortizationDescription(elem.Item1, elem.Item2)).ToList()
-        End Function
-
-        Public Function IsPerpetual() As Boolean
-            Return _reimbursementType = "PT"
-        End Function
-
-        Public Function GetEmbeddedOptions() As List(Of EmbdeddedOptionDescription)
-            Dim res As New List(Of EmbdeddedOptionDescription)
-            res.AddRange(From elem In _callPattern Select New EmbdeddedOptionDescription(elem, "Call"))
-            res.AddRange(From elem In _putPattern Select New EmbdeddedOptionDescription(elem, "Call"))
-            Return res
-        End Function
 
         Public Class AmortizationDescription
             Private ReadOnly _dt As Date
@@ -618,9 +589,9 @@ Namespace Bonds
                 End Get
             End Property
 
-            Public ReadOnly Property Amount() As Single
+            Public ReadOnly Property Amount() As String
                 Get
-                    Return _amount
+                    Return String.Format("{0:F4}", _amount)
                 End Get
             End Property
         End Class
@@ -656,9 +627,9 @@ Namespace Bonds
                 End Get
             End Property
 
-            Public ReadOnly Property Price() As Single
+            Public ReadOnly Property Price() As String
                 Get
-                    Return _price
+                    Return String.Format("{0:F4}", _price)
                 End Get
             End Property
 
@@ -670,6 +641,42 @@ Namespace Bonds
                 _price = elem.Item3
             End Sub
         End Class
-    End Class
 
+        Public Sub SetBondModule(ByVal adxBondModule As AdxBondModule)
+            _bondModule = adxBondModule
+        End Sub
+
+        Public Function HasSingleFixedRate() As Boolean
+            Return (_stepCouponPattern.Count() = 0) Or (_rate <> "" And _stepCouponPattern.Count() <= 1)
+        End Function
+
+        Public Function GetFixedRate() As Single
+            If _rate <> "" Then Return CSng(_rate)
+            If _stepCouponPattern.Any Then Return CSng(_stepCouponPattern(0).Item2)
+            Return 0
+        End Function
+
+        Public Function GetCouponsList() As List(Of CouponDescription)
+            Return (From elem In _stepCouponPattern Select New CouponDescription(elem.Item1, elem.Item2)).tolist()
+        End Function
+
+        Public Function HasAmortizationSchedule() As Boolean
+            Return _amortPattern.Count > 0
+        End Function
+
+        Public Function GetAmortizationSchedule() As List(Of AmortizationDescription)
+            Return (From elem In _amortPattern Select New AmortizationDescription(elem.Item1, elem.Item2)).ToList()
+        End Function
+
+        Public Function IsPerpetual() As Boolean
+            Return _reimbursementType = "PT"
+        End Function
+
+        Public Function GetEmbeddedOptions() As List(Of EmbdeddedOptionDescription)
+            Dim res As New List(Of EmbdeddedOptionDescription)
+            res.AddRange(From elem In _callPattern Select New EmbdeddedOptionDescription(elem, "Call"))
+            res.AddRange(From elem In _putPattern Select New EmbdeddedOptionDescription(elem, "Call"))
+            Return res
+        End Function
+    End Class
 End Namespace
