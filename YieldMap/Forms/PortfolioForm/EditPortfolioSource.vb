@@ -3,7 +3,7 @@ Imports Uitls
 
 Namespace Forms.PortfolioForm
     Public Class EditPortfolioSource
-        Private ReadOnly _thePortfolio As Source
+        Private ReadOnly _thePortfolio As SourceBase
         Private _color As String
 
         Public ReadOnly Property Portfolio As SourceBase
@@ -60,7 +60,7 @@ Namespace Forms.PortfolioForm
             End Get
         End Property
 
-        Sub New(ByVal p As Source)
+        Sub New(ByVal p As SourceBase)
             InitializeComponent()
             _thePortfolio = p
         End Sub
@@ -108,6 +108,7 @@ Namespace Forms.PortfolioForm
 
                 IndividualAndCustomBondsTP.Visible = True
 
+                IncludeCB.Enabled = False
                 ChainOrListTP.Visible = False
                 ChainOrListTP.Enabled = False
 
@@ -115,6 +116,9 @@ Namespace Forms.PortfolioForm
                 IndBondsRB.Enabled = IndBondsRB.Checked
                 CustomBondsRB.Checked = Not IndBondsRB.Checked
                 CustomBondsRB.Enabled = Not IndBondsRB.Checked
+                BondsDGV.DataSource = If(CustomBondsRB.Checked,
+                                         PortfolioManager.Instance.CustomBondsView(),
+                                         Nothing)
 
                 ' ReSharper disable ConditionalTernaryEqualBranch
                 BondsDGV.DataSource = If(IndBondsRB.Checked, Nothing, Nothing)

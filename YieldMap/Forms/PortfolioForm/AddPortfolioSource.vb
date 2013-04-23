@@ -59,7 +59,7 @@ Namespace Forms.PortfolioForm
                 CustomColorCB.Items.Add(clr)
             Next
             RefreshChainListList()
-            BondsDGV.DataSource = If(IndBondsRB.Checked, Nothing, PortfolioManager.Instance.GetCustomBonds())
+            BondsDGV.DataSource = If(IndBondsRB.Checked, Nothing, PortfolioManager.Instance.CustomBondsView())
         End Sub
 
         Private Sub BondsDGV_CellClick(ByVal sender As Object, ByVal e As DataGridViewCellEventArgs) Handles BondsDGV.CellClick

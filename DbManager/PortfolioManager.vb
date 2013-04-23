@@ -34,6 +34,7 @@ Public Interface IPortfolioManager
     Function PortfoliosValid() As Boolean ' todo make a function BranchValid so that to be able to find a good branch and show it
     ReadOnly Property ChainsView() As List(Of Chain)
     ReadOnly Property UserListsView() As List(Of UserList)
+    ReadOnly Property CustomBondsView() As List(Of CustomBond)
     Function GetFieldLayouts() As List(Of IdName(Of String))
     Sub UpdateFieldSet(ByVal id As String, ByVal type As String, ByVal fields As Dictionary(Of String, String))
 
@@ -42,7 +43,6 @@ Public Interface IPortfolioManager
     Function GetPortfoliosBySource(ByVal selectedItem As SourceBase) As List(Of IdName(Of String))
     Sub DeleteSource(ByVal source As Source)
 
-    Function GetCustomBonds() As List(Of CustomBond)
 End Interface
 
 Friend Interface IPortfolioManagerLocal
@@ -552,14 +552,17 @@ Public Class PortfolioManager
         SaveBonds()
     End Sub
 
-    Public Function GetCustomBonds() As List(Of CustomBond) Implements IPortfolioManager.GetCustomBonds
-        Dim nodes = _bonds.SelectNodes("/bonds/custom-bonds/bond")
-        Return New List(Of CustomBond)(From node As XmlNode In nodes
-                                       Select New CustomBond(node.GetAttrStrict("id"), node.GetAttr("color"),
-                                                             node.GetAttrStrict("name"), node.GetAttr("code"),
-                                                             node.GetAttr("bondStructure"), node.GetAttr("maturity").Trim(),
-                                                             node.GetAttrStrict("coupon")))
-    End Function
+    Public ReadOnly Property CustomBondsView() As List(Of CustomBond) Implements IPortfolioManager.CustomBondsView
+        Get
+            Dim nodes = _bonds.SelectNodes("/bonds/custom-bonds/bond")
+            Return New List(Of CustomBond)(From node As XmlNode In nodes
+                                           Select New CustomBond(node.GetAttrStrict("id"), node.GetAttr("color"),
+                                                                 node.GetAttrStrict("name"), node.GetAttr("code"),
+                                                                 node.GetAttr("bondStructure"), node.GetAttr("maturity").Trim(),
+                                                                 node.GetAttrStrict("coupon")))
+        End Get
+    End Property
+
 
     Public Function GetFolderDescr(ByVal id As String) As Portfolio Implements IPortfolioManager.GetFolderDescr
         Dim node = _bonds.SelectSingleNode(String.Format("/bonds/portfolios//folder[@id='{0}']", id))

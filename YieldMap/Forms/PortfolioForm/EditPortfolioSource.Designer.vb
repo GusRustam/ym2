@@ -51,8 +51,8 @@
             Me.SampleColorPB = New System.Windows.Forms.PictureBox()
             Me.RandomColorB = New System.Windows.Forms.Button()
             Me.ClearCustomColorB = New System.Windows.Forms.Button()
-            Me.Label2 = New System.Windows.Forms.Label()
             Me.IncludeCB = New System.Windows.Forms.CheckBox()
+            Me.Label2 = New System.Windows.Forms.Label()
             Me.TableLayoutPanel1.SuspendLayout()
             Me.MainTabControl.SuspendLayout()
             Me.ChainOrListTP.SuspendLayout()
@@ -383,15 +383,6 @@
             Me.ClearCustomColorB.Text = "Clear"
             Me.ClearCustomColorB.UseVisualStyleBackColor = True
             '
-            'Label2
-            '
-            Me.Label2.AutoSize = True
-            Me.Label2.Location = New System.Drawing.Point(3, 84)
-            Me.Label2.Name = "Label2"
-            Me.Label2.Size = New System.Drawing.Size(42, 13)
-            Me.Label2.TabIndex = 8
-            Me.Label2.Text = "Include"
-            '
             'IncludeCB
             '
             Me.IncludeCB.AutoSize = True
@@ -404,6 +395,15 @@
             Me.IncludeCB.TabIndex = 9
             Me.IncludeCB.Text = "Yes"
             Me.IncludeCB.UseVisualStyleBackColor = True
+            '
+            'Label2
+            '
+            Me.Label2.AutoSize = True
+            Me.Label2.Location = New System.Drawing.Point(3, 84)
+            Me.Label2.Name = "Label2"
+            Me.Label2.Size = New System.Drawing.Size(42, 13)
+            Me.Label2.TabIndex = 8
+            Me.Label2.Text = "Include"
             '
             'EditPortfolioSource
             '

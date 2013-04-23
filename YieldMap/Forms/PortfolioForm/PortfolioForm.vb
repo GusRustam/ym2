@@ -361,6 +361,7 @@ Namespace Forms.PortfolioForm
             a.Condition = item.Condition
 
             If a.ShowDialog() = DialogResult.OK Then
+                If a.Data.Src Is Nothing Then Return
                 CurrentItem.UpdateSource(item, a.Data.Src, a.Data.CustomName, a.Data.CustomColor, a.Data.Condition, a.Data.Include)
                 RefreshPortfolioData()
             End If
@@ -614,7 +615,7 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub RefreshCustomBondList(Optional ByVal toselect As CustomBond = Nothing)
-            CustomBondsList.DataSource = PortfolioManager.GetCustomBonds()
+            CustomBondsList.DataSource = PortfolioManager.CustomBondsView()
             If toselect IsNot Nothing Then
                 Dim x = (From row As DataGridViewRow In CustomBondsList.Rows
                          Where CType(row.DataBoundItem, CustomBond).ID = toselect.ID
@@ -989,7 +990,17 @@ Namespace Forms.PortfolioForm
                             RecalculateCashFlows()
                         End If
                     End If
+            End Select
+        End Sub
 
+        Private Sub DeleteCustomBondTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles DeleteCustomBondTSMI.Click
+            Dim src = GetSource(CustomBondListCMS.Tag)
+            If src Is Nothing Then Return
+            Select src
+                Case CMSSource.CustomBond ' todo
+                Case CMSSource.AmortSchedule ' todo
+                Case CMSSource.CouponSchedule ' todo
+                Case CMSSource.OptionList ' todo
             End Select
         End Sub
 
@@ -1024,5 +1035,6 @@ Namespace Forms.PortfolioForm
             DoToggle(False)
         End Sub
 #End Region
+
     End Class
 End Namespace
