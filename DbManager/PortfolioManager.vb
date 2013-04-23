@@ -160,8 +160,7 @@ Public Class PortfolioManager
             Dim res As New PortfolioStructure(id, node.Attributes("name").Value)
 
             Dim nodes = node.SelectNodes("include | exclude")
-            'Dim order As Integer
-            Dim source As Source
+            Dim source As SourceBase
             For Each item As XmlNode In nodes
                 Try
                     source = Nothing
@@ -171,7 +170,6 @@ Public Class PortfolioManager
                     Dim condition = item.GetAttr("condition")
                     Dim customName = item.GetAttr("name")
                     Dim customColor = item.GetAttr("color")
-                    'Dim order = GetAttr(item, "order", "1") ' todo order field. Requires special treatment on saving
 
                     Select Case what
                         Case "chain"
@@ -180,6 +178,9 @@ Public Class PortfolioManager
                         Case "list"
                             srcId = item.Attributes("id").Value
                             source = UserList.Load(srcId)
+                        Case "custom-bond"
+                            srcId = item.Attributes("id").Value
+                            source = CustomBond.Load(srcId)
                         Case Else
                             Logger.Warn("Unsupported item {0}", what)
                     End Select
@@ -187,7 +188,6 @@ Public Class PortfolioManager
                     If source IsNot Nothing Then
                         If customColor = "" Then customColor = source.Color
                         If customName = "" Then customName = source.Name
-                        'order,
                         Dim portSource As New PortfolioSource(srcId, source, condition, customName, customColor, isIncluded, GetPortfolio(id))
                         res.AddSource(portSource)
                     Else

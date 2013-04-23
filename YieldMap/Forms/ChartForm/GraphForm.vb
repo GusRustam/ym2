@@ -83,8 +83,11 @@ Namespace Forms.ChartForm
                 End If
 
                 Dim portfolioStructure = PortfolioManager.Instance().GetPortfolioStructure(currentPortID)
-                For Each port In portfolioStructure.Sources '(From p In portfolioSources Where p.portfolioID = currentPortID Select p)
-                    Dim group As Group = GetGroup(port, portfolioStructure)
+
+                For Each group As Group In From port In portfolioStructure.Sources
+                                           Where TypeOf port.Source Is Chain Or TypeOf port.Source Is UserList
+                                           Select GetGroup(port, portfolioStructure)
+
                     _ansamble.AddGroup(group)
                 Next
                 _ansamble.StartLoadingLiveData()
@@ -94,18 +97,23 @@ Namespace Forms.ChartForm
         Private Function GetGroup(ByVal port As PortfolioSource, ByVal portfolioStructure As PortfolioStructure) As Group
             Dim group As Group
 
+            Dim source = TryCast(port.Source, Source)
+            If source Is Nothing Then
+                Logger.Warn("Unsupported source {0}", source)
+                Return Nothing
+            End If
             group = New Group(_ansamble) With {
-                .SeriesName = If(port.Name <> "", port.Name, port.Source.Name),
-                .PortfolioID = port.Source.ID,
-                .BidField = port.Source.Fields.Realtime.Bid,
-                .AskField = port.Source.Fields.Realtime.Ask,
-                .LastField = port.Source.Fields.Realtime.Hist,
-                .HistField = port.Source.Fields.Realtime.Hist,
-                .VolumeField = port.Source.Fields.Realtime.Volume,
-                .VwapField = port.Source.Fields.Realtime.VWAP,
+                .SeriesName = If(port.Name <> "", port.Name, source.Name),
+                .PortfolioID = source.ID,
+                .BidField = source.Fields.Realtime.Bid,
+                .AskField = source.Fields.Realtime.Ask,
+                .LastField = source.Fields.Realtime.Hist,
+                .HistField = source.Fields.Realtime.Hist,
+                .VolumeField = source.Fields.Realtime.Volume,
+                .VwapField = source.Fields.Realtime.VWAP,
                 .Brokers = {"MM", ""}.ToList(),
                 .Currency = "",
-                .Color = port.Source.Color
+                .Color = source.Color
             }
 
             ' TODO THAT'S BULLSHIT BUT CURRENTLY NECESSARY BULLSHIT

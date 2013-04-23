@@ -201,22 +201,23 @@
             'IndBondsRB
             '
             Me.IndBondsRB.AutoSize = True
-            Me.IndBondsRB.Checked = True
+            Me.IndBondsRB.Enabled = False
             Me.IndBondsRB.Location = New System.Drawing.Point(3, 3)
             Me.IndBondsRB.Name = "IndBondsRB"
             Me.IndBondsRB.Size = New System.Drawing.Size(62, 17)
             Me.IndBondsRB.TabIndex = 0
-            Me.IndBondsRB.TabStop = True
             Me.IndBondsRB.Text = "Regular"
             Me.IndBondsRB.UseVisualStyleBackColor = True
             '
             'CustomBondsRB
             '
             Me.CustomBondsRB.AutoSize = True
+            Me.CustomBondsRB.Checked = True
             Me.CustomBondsRB.Location = New System.Drawing.Point(71, 3)
             Me.CustomBondsRB.Name = "CustomBondsRB"
             Me.CustomBondsRB.Size = New System.Drawing.Size(60, 17)
             Me.CustomBondsRB.TabIndex = 1
+            Me.CustomBondsRB.TabStop = True
             Me.CustomBondsRB.Text = "Custom"
             Me.CustomBondsRB.UseVisualStyleBackColor = True
             '

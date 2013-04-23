@@ -63,7 +63,7 @@ Namespace Forms.PortfolioForm
         'Private Shared ReadOnly ErrorMessages As New List(Of String)
 
 
-        Private Sub PortSourcesCheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles ChainsCB.CheckedChanged, ListsCB.CheckedChanged
+        Private Sub PortSourcesCheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles ChainsCB.CheckedChanged, ListsCB.CheckedChanged, CustomBondsCB.CheckedChanged
             RefreshPortfolioData()
         End Sub
 
@@ -81,9 +81,13 @@ Namespace Forms.PortfolioForm
                 PortfolioItemsGrid.Rows.Clear()
             Else
                 Dim descr = PortfolioManager.GetPortfolioStructure(CurrentItem.Id)
+
+                '
                 PortfolioChainsListsGrid.DataSource = descr.Sources(
                     If(ChainsCB.Checked, PortfolioStructure.Chain, 0) Or
-                    If(ListsCB.Checked, PortfolioStructure.List, 0))
+                    If(ListsCB.Checked, PortfolioStructure.List, 0) Or
+                    If(CustomBondsCB.Checked, PortfolioStructure.CustomBond, 0)
+                )
 
                 PortfolioItemsGrid.DataSource = descr.Rics(AllRB.Checked)
             End If
@@ -989,12 +993,6 @@ Namespace Forms.PortfolioForm
             End Select
         End Sub
 
-        Private Sub SaveButton_Click(ByVal sender As System.Object, ByVal e As EventArgs) Handles SaveButton.Click
-            If _currentBond Is Nothing Then Return
-            PortfolioManager.UpdateSource(_currentBond)
-        End Sub
-#End Region
-
         Private Sub EditManCB_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles EditManCB.CheckedChanged
             If EditManCB.Checked Then
                 OtherRulesML.ReadOnly = False
@@ -1025,5 +1023,6 @@ Namespace Forms.PortfolioForm
         Private Sub DisableEveryThing()
             DoToggle(False)
         End Sub
+#End Region
     End Class
 End Namespace

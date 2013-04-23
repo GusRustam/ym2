@@ -31,7 +31,7 @@ Namespace Forms.PortfolioForm
         End Property
 
         Public Structure NewSourceDescr
-            Public Src As Source
+            Public Src As SourceBase
             Public CustomColor As String
             Public CustomName As String
             Public Condition As String
@@ -44,8 +44,8 @@ Namespace Forms.PortfolioForm
                 res.CustomColor = CustomColor
                 res.CustomName = CustomName
                 res.Condition = Condition
-                res.Include = IncludeCB.Checked
-                res.Src = If(MainTabControl.SelectedTab.Name = ChainOrListTP.Name, ChainsListsLB.SelectedItem, Nothing)
+                res.Include = (MainTabControl.SelectedTab.Name <> ChainOrListTP.Name AndAlso CustomBondsRB.Checked) OrElse IncludeCB.Checked
+                res.Src = If(MainTabControl.SelectedTab.Name = ChainOrListTP.Name, ChainsListsLB.SelectedItem, BondsDGV.SelectedRows(0).DataBoundItem)
                 Return res
             End Get
         End Property
@@ -59,9 +59,7 @@ Namespace Forms.PortfolioForm
                 CustomColorCB.Items.Add(clr)
             Next
             RefreshChainListList()
-            ' ReSharper disable ConditionalTernaryEqualBranch
-            BondsDGV.DataSource = If(IndBondsRB.Checked, Nothing, Nothing)
-            ' ReSharper restore ConditionalTernaryEqualBranch
+            BondsDGV.DataSource = If(IndBondsRB.Checked, Nothing, PortfolioManager.Instance.GetCustomBonds())
         End Sub
 
         Private Sub BondsDGV_CellClick(ByVal sender As Object, ByVal e As DataGridViewCellEventArgs) Handles BondsDGV.CellClick
@@ -92,15 +90,11 @@ Namespace Forms.PortfolioForm
 
         Private Sub RefreshSupplementaryFields()
             If MainTabControl.SelectedTab.Name = ChainOrListTP.Name Then
-                CustomNameTB.Enabled = True
-                CustomColorCB.Enabled = True
-                RandomColorB.Enabled = True
                 ConditionTB.Enabled = True
+                IncludeCB.Enabled = True
             Else
-                CustomNameTB.Enabled = False
-                CustomColorCB.Enabled = True
-                RandomColorB.Enabled = True
-                ConditionTB.Enabled = True
+                ConditionTB.Enabled = False
+                IncludeCB.Enabled = False
             End If
         End Sub
 

@@ -63,7 +63,7 @@ Namespace Bonds
         End Function
     End Class
 
-    Public MustInherit Class ReutersValueAttribute
+    Friend MustInherit Class ReutersValueAttribute
         Inherits Attribute
         Private _name As String
 
@@ -92,7 +92,7 @@ Namespace Bonds
         Public MustOverride Function IntoString(ByVal bond As ReutersBondStructure, ByVal fieldName As String) As String
     End Class
 
-    Public NotInheritable Class ReutersEmptyAttribute
+    Friend NotInheritable Class ReutersEmptyAttribute
         Inherits ReutersValueAttribute
 
         Public Sub New(ByVal name As String)
@@ -109,7 +109,7 @@ Namespace Bonds
         End Function
     End Class
 
-    Public NotInheritable Class ReutersStringAttribute
+    Friend NotInheritable Class ReutersStringAttribute
         Inherits ReutersValueAttribute
 
         Public Sub New(ByVal name As String)
@@ -137,7 +137,7 @@ Namespace Bonds
         End Function
     End Class
 
-    Public NotInheritable Class ReutersDateAttribute
+    Friend NotInheritable Class ReutersDateAttribute
         Inherits ReutersValueAttribute
 
         Public Sub New(ByVal name As String)
@@ -181,7 +181,7 @@ Namespace Bonds
 
     End Class
 
-    Public NotInheritable Class ReutersOptionAttribute
+    Friend NotInheritable Class ReutersOptionAttribute
         Inherits ReutersValueAttribute
 
         Public Sub New(ByVal name As String)
@@ -238,10 +238,6 @@ Namespace Bonds
         End Function
     End Class
 
-    Public Class PrimaryAttribute
-        Inherits Attribute
-    End Class
-
     Public Class ReutersBondStructure
         Private Shared ReadOnly Attributes As Dictionary(Of String, ReutersValueAttribute)
         Private Shared ReadOnly Fields As Dictionary(Of String, String)
@@ -255,17 +251,17 @@ Namespace Bonds
         <ReutersString("CFADJ")> Private _cashFlowAdj As String
         <ReutersString("DMC")> Private _dateMovingConvention As String
         <ReutersString("EMC")> Private _endMonthConvention As String
-        <ReutersString("FRQ")> <Primary()> Private _frequency As String
+        <ReutersString("FRQ")> Private _frequency As String
         <ReutersString("PX")> Private _priceType As String
         <ReutersString("REFDATE")> Private _referenceDate As String
         <ReutersString("YM")> Private _yieldStyleName As String
         <ReutersString("ISSUE")> Private _issueDate As String
-        <ReutersString("RATE")> <Primary()> Private _rate As String
-        <ReutersDate("AMORT")> <Primary()> Private _amortPattern As New List(Of Tuple(Of Date, Single))
-        <ReutersOption("CALL")> <Primary()> Private _callPattern As New List(Of Tuple(Of Date, Date, Single))
-        <ReutersOption("PUT")> <Primary()> Private _putPattern As New List(Of Tuple(Of Date, Date, Single))
-        <ReutersDate("STEP")> <Primary()> Private _stepCouponPattern As New List(Of Tuple(Of Date, Single))
-        <ReutersString("RT")> <Primary()> Private _reimbursementType As String
+        <ReutersString("RATE")> Private _rate As String
+        <ReutersDate("AMORT")> Private _amortPattern As New List(Of Tuple(Of Date, Single))
+        <ReutersOption("CALL")> Private _callPattern As New List(Of Tuple(Of Date, Date, Single))
+        <ReutersOption("PUT")> Private _putPattern As New List(Of Tuple(Of Date, Date, Single))
+        <ReutersDate("STEP")> Private _stepCouponPattern As New List(Of Tuple(Of Date, Single))
+        <ReutersString("RT")> Private _reimbursementType As String
         Private _bondModule As AdxBondModule
 
         Private Sub New()
@@ -508,15 +504,6 @@ Namespace Bonds
         Public Overrides Function ToString() As String
             Return Attributes.Keys.Where(AddressOf FieldNotNothing).
                 Aggregate("", Function(current, name) current + Attributes(name).IntoString(Me, Fields(name)) + " ")
-        End Function
-
-        Public Overloads Function ToString(ByVal primary As Boolean) As String
-            Return Attributes.Keys.Where(AddressOf FieldNotNothing).Where(
-                Function(elem)
-                    Dim k = GetType(ReutersBondStructure).GetField(Fields(elem), BindingFlags.Instance Or BindingFlags.NonPublic).GetCustomAttributes(GetType(PrimaryAttribute), False)
-                    Return If(primary, k.Any, Not k.Any)
-                End Function).
-            Aggregate("", Function(current, name) current + Attributes(name).IntoString(Me, Fields(name)) + " ")
         End Function
 
         Private Function FieldNotNothing(ByVal key As String) As Boolean

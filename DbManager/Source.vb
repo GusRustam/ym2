@@ -417,4 +417,20 @@ Public Class CustomBond
     Public Overrides Function ToString() As String
         Return "Custom Bond"
     End Function
+
+    Public Shared Function Load(ByVal bndId As String) As CustomBond
+        Dim node = PortfolioManager.ClassInstance.GetConfigDocument().SelectSingleNode(String.Format("/bonds/custom-bonds/bond[@id='{0}']", bndId))
+        If node Is Nothing Then Throw New NoSourceException(String.Format("Failed to find custom bond with id {0}", bndId))
+        Try
+            Dim color = node.GetAttrStrict("color")
+            Dim name = node.GetAttrStrict("name")
+            Dim code = node.GetAttrStrict("code")
+            Dim struct = node.GetAttrStrict("bondStructure")
+            Dim maturity = node.GetAttrStrict("maturity")
+            Dim coupon = node.GetAttrStrict("coupon")
+            Return New CustomBond(bndId, color, name, code, struct, maturity, coupon)
+        Catch ex As Exception
+            Throw New NoSourceException(String.Format("Failed to find list with id {0}", bndId), ex)
+        End Try
+    End Function
 End Class

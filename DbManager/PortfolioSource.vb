@@ -64,13 +64,13 @@ End Class
 Public Class PortfolioSource
     Private ReadOnly _id As String
     Private ReadOnly _portfolio As Portfolio
-    Private ReadOnly _source As Source
+    Private ReadOnly _source As SourceBase
     Private ReadOnly _condition As String
     Private ReadOnly _customName As String
     Private ReadOnly _customColor As String
     Private ReadOnly _included As Boolean
 
-    Friend Sub New(ByVal id As String, ByVal source As Source, ByVal condition As String, ByVal customName As String, ByVal customColor As String, ByVal included As Boolean, ByVal portfolio As Portfolio)
+    Friend Sub New(ByVal id As String, ByVal source As SourceBase, ByVal condition As String, ByVal customName As String, ByVal customColor As String, ByVal included As Boolean, ByVal portfolio As Portfolio)
         _id = id
         _source = source
         _condition = condition
@@ -87,7 +87,7 @@ Public Class PortfolioSource
         End Get
     End Property
 
-    Public ReadOnly Property Source As Source
+    Public ReadOnly Property Source As SourceBase
         Get
             Return _source
         End Get
@@ -167,7 +167,8 @@ Public Class PortfolioStructure
 
     Public Const List As Byte = 1
     Public Const Chain As Byte = 2
-    Public Const All As Byte = List Or Chain
+    Public Const CustomBond As Byte = 4
+    Public Const All As Byte = List Or Chain Or CustomBond
 
     Private ReadOnly _id As String
     Private ReadOnly _name As String
@@ -195,6 +196,9 @@ Public Class PortfolioStructure
             End If
             If what And Chain Then
                 data.AddRange(From src In _sources Where TypeOf src.Source Is Chain)
+            End If
+            If what And CustomBond Then
+                data.AddRange(From src In _sources Where TypeOf src.Source Is CustomBond)
             End If
             Return New ReadOnlyCollection(Of PortfolioSource)(data)
         End Get
@@ -320,7 +324,7 @@ Public Class Portfolio
         PortMan.SaveBonds()
     End Sub
 
-    Public Sub AddSource(ByVal source As Source, ByVal customName As String, ByVal customColor As String, ByVal condition As String, ByVal include As Boolean)
+    Public Sub AddSource(ByVal source As SourceBase, ByVal customName As String, ByVal customColor As String, ByVal condition As String, ByVal include As Boolean)
         If IsFolder Then Throw New PortfolioException(String.Format("Item with id {0} is a folder", Id))
         Dim xml = PortMan.GetConfigDocument()
         Dim node = xml.SelectSingleNode(String.Format("/bonds/portfolios//portfolio[@id='{0}']", Id))
