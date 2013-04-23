@@ -443,6 +443,40 @@ Namespace Bonds
             End Set
         End Property
 
+        Public Sub Load(ByVal str As String)
+            Dim items = str.Split(" ")
+            ClearArrays()
+            For Each elem In items
+                Dim element = elem.Trim.ToUpper()
+                If element = "" Then Continue For
+                Dim match = Item.Match(element)
+                If Not match.Success Then
+                    Logger.Warn(String.Format("Failed to parse item {0}", element))
+                    Continue For
+                End If
+
+                Dim name = match.Groups("name").Value
+                If name = String.Empty Then
+                    Logger.Warn(String.Format("Failed to extract name from {0}", element))
+                    Continue For
+                ElseIf Not Attributes.Keys.Contains(name) Then
+                    Logger.Warn(String.Format("Unexpected token {0}", name))
+                    Continue For
+                End If
+
+                Dim rva = Attributes(name)
+                Dim parser = rva.Parser()
+                parser(Me, rva.Name, Fields(name), element)
+            Next
+        End Sub
+
+        Private Sub ClearArrays()
+            _callPattern.Clear()
+            _putPattern.Clear()
+            _stepCouponPattern.Clear()
+            _amortPattern.Clear()
+        End Sub
+
         Public Shared Function Parse(ByVal str As String) As ReutersBondStructure
             Dim res As New ReutersBondStructure
             Dim items = str.Split(" ")
@@ -522,9 +556,9 @@ Namespace Bonds
             Private ReadOnly _amort As Double
 
             <DisplayName("Date")>
-            Public ReadOnly Property Dt() As Date
+            Public ReadOnly Property Dt() As String
                 Get
-                    Return _dt
+                    Return String.Format("{0:dd/MMM/yyyy}", _dt)
                 End Get
             End Property
 
@@ -559,9 +593,9 @@ Namespace Bonds
             End Sub
 
             <DisplayName("Date")>
-            Public ReadOnly Property Dt() As Date
+            Public ReadOnly Property Dt() As String
                 Get
-                    Return _dt
+                    Return String.Format("{0:dd/MMM/yyyy}", _dt)
                 End Get
             End Property
 
@@ -583,9 +617,9 @@ Namespace Bonds
             End Sub
 
             <DisplayName("Date")>
-            Public ReadOnly Property Dt() As Date
+            Public ReadOnly Property Dt() As String
                 Get
-                    Return _dt
+                    Return String.Format("{0:dd/MMM/yyyy}", _dt)
                 End Get
             End Property
 
@@ -615,15 +649,15 @@ Namespace Bonds
                 End Get
             End Property
 
-            Public ReadOnly Property Starts() As Date
+            Public ReadOnly Property Starts() As String
                 Get
-                    Return _starts
+                    Return String.Format("{0:dd/MMM/yyyy}", _starts)
                 End Get
             End Property
 
             Public ReadOnly Property Ends() As Date
                 Get
-                    Return _ends
+                    Return String.Format("{0:dd/MMM/yyyy}", _ends)
                 End Get
             End Property
 
@@ -657,7 +691,7 @@ Namespace Bonds
         End Function
 
         Public Function GetCouponsList() As List(Of CouponDescription)
-            Return (From elem In _stepCouponPattern Select New CouponDescription(elem.Item1, elem.Item2)).tolist()
+            Return (From elem In _stepCouponPattern Select New CouponDescription(elem.Item1, elem.Item2)).ToList()
         End Function
 
         Public Function HasAmortizationSchedule() As Boolean
@@ -669,13 +703,17 @@ Namespace Bonds
         End Function
 
         Public Function IsPerpetual() As Boolean
-            Return _reimbursementType = "PT"
+            Return _reimbursementType = "P"
+        End Function
+
+        Public Function IsAnnuity() As Boolean
+            Return _reimbursementType = "C"
         End Function
 
         Public Function GetEmbeddedOptions() As List(Of EmbdeddedOptionDescription)
             Dim res As New List(Of EmbdeddedOptionDescription)
             res.AddRange(From elem In _callPattern Select New EmbdeddedOptionDescription(elem, "Call"))
-            res.AddRange(From elem In _putPattern Select New EmbdeddedOptionDescription(elem, "Call"))
+            res.AddRange(From elem In _putPattern Select New EmbdeddedOptionDescription(elem, "Put"))
             Return res
         End Function
     End Class
