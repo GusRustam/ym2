@@ -394,8 +394,10 @@ Namespace Bonds
             Return res.Distinct().ToList()
         End Function
 
-        Private Sub OnChainData(ByVal ricOfChain As String, ByVal chainsAndRics As Dictionary(Of String, List(Of String))) Handles _chainLoader.Chain
+        Private Sub OnChainData(ByVal ricOfChain As String, ByVal chainsAndRics As Dictionary(Of String, List(Of String)), ByVal finished As Boolean) Handles _chainLoader.Chain
             RaiseEvent Progress(New ProgressEvent(MessageKind.Positive, String.Format("Chain {0} arrived", ricOfChain), New ChainProgress(ricOfChain)))
+            If Not finished Then Return
+
             If chainsAndRics.Count = 0 Then
                 Exit Sub
             End If

@@ -8,6 +8,68 @@ Imports Uitls
 
 Namespace Forms.PortfolioForm
     Public Class PortfolioForm
+
+        Private Class ProgressShower
+            Private _closed As Boolean = True
+            Private _frm As New ProgressForm
+
+            Public ReadOnly Property IsClosed() As Boolean
+                Get
+                    Return _closed
+                End Get
+            End Property
+
+            Public Sub Revitalize()
+                If Not _closed Then _frm.Close()
+                _frm = New ProgressForm()
+                AddHandler _frm.Closed, Sub() _closed = True
+                _closed = False
+                _frm.Show()
+            End Sub
+
+            Public Sub LogMessage(ByVal msg As String)
+                _frm.ListBox.Items.Add(msg)
+            End Sub
+        End Class
+
+        Private Class ProgressForm
+            Inherits Form
+
+            Private ReadOnly _listBox As New ListBox With {
+                .Location = New Point(20, 20),
+                .Size = New Point(280, 180)
+            }
+
+            Public ReadOnly Property ListBox() As ListBox
+                Get
+                    Return _listBox
+                End Get
+            End Property
+
+            Private WithEvents _close As New Button With {
+                .Location = New Point(20, 210),
+                .Size = New Point(80, 25),
+                .Text = "Close"
+            }
+
+            Public Sub New()
+                Dim sz = New Point(320, 290)
+                With Me
+                    .Size = sz
+                    .MaximumSize = sz
+                    .MinimumSize = sz
+                    .Text = "Load progress"
+                    .Controls.Add(_listBox)
+                    .Controls.Add(_close)
+                    .CancelButton = _close
+                End With
+            End Sub
+
+            Private Sub CloseClick(ByVal sender As Object, ByVal e As EventArgs) Handles _close.Click
+                Close()
+            End Sub
+        End Class
+
         Private Shared ReadOnly PortfolioManager As IPortfolioManager = DbManager.PortfolioManager.Instance()
         Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(PortfolioForm))
         Private WithEvents _loader As IBondsLoader = BondsLoader.Instance
@@ -37,6 +99,7 @@ Namespace Forms.PortfolioForm
         End Enum
 
         Private _customBondChanged As Boolean
+        Private WithEvents _progressForm As New ProgressShower
 
         Friend Property CustomBondChanged() As Boolean
             Get
@@ -50,6 +113,10 @@ Namespace Forms.PortfolioForm
 
 #Region "Common items"
         Private Sub PortfolioForm_Load(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Load
+            Initialize()
+        End Sub
+
+        Private Sub Initialize()
             BondsTableView.DataSource = _loader.GetBondsTable()
             If PortfolioTree.ImageList Is Nothing Then
                 PortfolioTree.ImageList = New ImageList
@@ -66,7 +133,7 @@ Namespace Forms.PortfolioForm
             Next
         End Sub
 
-        Private Shared Sub ColorCellFormatting(ByVal sender As Object, ByVal e As DataGridViewCellFormattingEventArgs)
+        Private Shared Sub ColorCellFormatting(ByVal sender As Object, ByVal e As DataGridViewCellFormattingEventArgs) Handles PortfolioChainsListsGrid.CellFormatting, PortfolioItemsGrid.CellFormatting, ChainsListsGrid.CellFormatting
             Dim dgv = TryCast(sender, DataGridView)
             If dgv Is Nothing Then Return
             If dgv.Columns(e.ColumnIndex).DataPropertyName = "Color" Then
@@ -86,18 +153,41 @@ Namespace Forms.PortfolioForm
                 End Select
             End If
         End Sub
+
+#End Region
+
+#Region "Menu"
+        Private Sub CloseToolStripMenuItem_Click(ByVal sender As Object, ByVal e As EventArgs) Handles CloseToolStripMenuItem.Click
+            Close()
+        End Sub
+
+        Private Sub OpenToolStripMenuItem_Click(ByVal sender As Object, ByVal e As EventArgs) Handles OpenToolStripMenuItem.Click
+            Dim a As New OpenFileDialog With {
+                .AddExtension = True,
+                .CheckFileExists = True,
+                .InitialDirectory = Utils.GetMyPath(),
+                .DefaultExt = "xml",
+                .Filter = "XML files (*.xml)|*.xml|All files (*.*)|*.*"
+            }
+            If a.ShowDialog() = DialogResult.OK Then
+                Try
+                    PortfolioManager.SelectConfigFile(a.FileName)
+                    Initialize()
+                    _progressForm.Revitalize()
+                    _loader.Initialize()
+                Catch ex As Exception
+                    PortfolioManager.SelectDefaultConfigFile()
+                End Try
+            End If
+        End Sub
 #End Region
 
 #Region "Portfolio TAB"
-
-        'Private Shared ReadOnly ErrorMessages As New List(Of String)
-
-
-        Private Sub PortSourcesCheckedChanged(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub PortSourcesCheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles ChainsCB.CheckedChanged, ListsCB.CheckedChanged, CustomBondsCB.CheckedChanged
             RefreshPortfolioData()
         End Sub
 
-        Private Sub PortItemsCheckChanged(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub PortItemsCheckChanged(ByVal sender As Object, ByVal e As EventArgs) Handles AllRB.CheckedChanged, SeparateRB.CheckedChanged
             RefreshPortfolioData()
         End Sub
 
@@ -174,7 +264,7 @@ Namespace Forms.PortfolioForm
             Return res
         End Function
 
-        Private Sub PortfolioTree_DblClick(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub PortfolioTree_DblClick(ByVal sender As Object, ByVal e As EventArgs) Handles PortfolioTree.DoubleClick
             Dim mea = TryCast(e, MouseEventArgs)
             Dim node = PortfolioTree.GetNodeAt(mea.Location)
             If node Is Nothing Then Return
@@ -211,7 +301,7 @@ Namespace Forms.PortfolioForm
             End If
         End Sub
 
-        Private Sub PortfolioTree_NodeMouseClick(ByVal sender As Object, ByVal e As TreeNodeMouseClickEventArgs)
+        Private Sub PortfolioTree_NodeMouseClick(ByVal sender As Object, ByVal e As TreeNodeMouseClickEventArgs) Handles PortfolioTree.NodeMouseClick
             If e.Button = MouseButtons.Right Then
                 PortTreeCM.Tag = e.Node
                 PortTreeCM.Show(PortfolioTree, e.Location)
@@ -226,7 +316,7 @@ Namespace Forms.PortfolioForm
             _flag = False
         End Sub
 
-        Private Sub PortfolioTree_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs)
+        Private Sub PortfolioTree_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles PortfolioTree.MouseUp
             If Not _flag Then
                 _flag = True
                 Return
@@ -287,7 +377,7 @@ Namespace Forms.PortfolioForm
             End If
         End Sub
 
-        Private Sub PortfolioTree_ItemDrag(ByVal sender As Object, ByVal e As ItemDragEventArgs)
+        Private Sub PortfolioTree_ItemDrag(ByVal sender As Object, ByVal e As ItemDragEventArgs) Handles PortfolioTree.ItemDrag
             _dragNode = e.Item
             DoDragDrop(e.Item, DragDropEffects.Copy Or DragDropEffects.Move)
         End Sub
@@ -296,7 +386,7 @@ Namespace Forms.PortfolioForm
         Private Shared Function GetKeyState(ByVal key As Keys) As Short
         End Function
 
-        Private Sub PortfolioTree_DragOver(ByVal sender As Object, ByVal e As DragEventArgs)
+        Private Sub PortfolioTree_DragOver(ByVal sender As Object, ByVal e As DragEventArgs) Handles PortfolioTree.DragOver
             Dim pos = PortfolioTree.PointToClient(New Point(e.X, e.Y))
             Dim node = PortfolioTree.GetNodeAt(pos)
             Dim copy = GetKeyState(Keys.ControlKey) < 0
@@ -326,7 +416,7 @@ Namespace Forms.PortfolioForm
             Loop
         End Function
 
-        Private Sub PortfolioTree_DragDrop(ByVal sender As Object, ByVal e As DragEventArgs)
+        Private Sub PortfolioTree_DragDrop(ByVal sender As Object, ByVal e As DragEventArgs) Handles PortfolioTree.DragDrop
             Dim dragDescr = TryCast(_dragNode.Tag, Portfolio)
             If dragDescr Is Nothing Then Return
             Dim copy = GetKeyState(Keys.ControlKey) < 0
@@ -352,7 +442,7 @@ Namespace Forms.PortfolioForm
             RefreshPortfolioTree(resId)
         End Sub
 
-        Private Sub AddChainListButton_Click(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub AddChainListButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AddChainListButton.Click
             Dim a As New AddPortfolioSource
             If a.ShowDialog() = DialogResult.OK Then
                 CurrentItem.AddSource(a.Data.Src, a.Data.CustomName, a.Data.CustomColor, a.Data.Condition, a.Data.Include)
@@ -360,7 +450,7 @@ Namespace Forms.PortfolioForm
             End If
         End Sub
 
-        Private Sub RemoveChainListButton_Click(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub RemoveChainListButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles RemoveChainListButton.Click
             If PortfolioChainsListsGrid.SelectedRows.Count <= 0 Then
                 MessageBox.Show("Please select an item to delete", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Exit Sub
@@ -378,7 +468,7 @@ Namespace Forms.PortfolioForm
             End Try
         End Sub
 
-        Private Sub EditChainListButton_Click(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub EditChainListButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles EditChainListButton.Click
             If PortfolioChainsListsGrid.SelectedRows.Count <= 0 Then
                 MessageBox.Show("Please select an item to edit", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Exit Sub
@@ -399,7 +489,7 @@ Namespace Forms.PortfolioForm
 #End Region
 
 #Region "Data TAB"
-        Private Sub TableChooserList_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub TableChooserList_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs) Handles TableChooserList.SelectedIndexChanged
             RefreshDataGrid()
         End Sub
 
@@ -418,24 +508,25 @@ Namespace Forms.PortfolioForm
             End If
         End Sub
 
-        Private Sub CleanupDataButton_Click(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub CleanupDataButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles CleanupDataButton.Click
             _loader.ClearTables()
             RefreshDataGrid()
         End Sub
 
-        Private Sub ReloadDataButton_Click(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub ReloadDataButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles ReloadDataButton.Click
             _loader.ClearTables()
+            _progressForm.Revitalize()
             _loader.Initialize()
             RefreshDataGrid()
         End Sub
 #End Region
 
 #Region "Chains and lists TAB"
-        Private Shared Sub OnCellBeginEdit(ByVal sender As Object, ByVal e As DataGridViewCellCancelEventArgs)
+        Private Shared Sub OnCellBeginEdit(ByVal sender As Object, ByVal e As DataGridViewCellCancelEventArgs) Handles ChainsListsGrid.CellBeginEdit, ChainListItemsGrid.CellBeginEdit
             e.Cancel = True
         End Sub
 
-        Private Sub ChainsListCheckedChanged(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub ChainsListCheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles ChainsButton.CheckedChanged
             Logger.Debug("Refresh...")
 
             ChainListItemsGrid.DataSource = Nothing
@@ -457,12 +548,12 @@ Namespace Forms.PortfolioForm
             End If
         End Sub
 
-        Private Sub AddCLButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AddCLTSMI.Click
+        Private Sub AddCLButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AddCLButton.Click, AddCLTSMI.Click
             Dim frm As New AddEditChainList
             If frm.ShowDialog() = DialogResult.OK Then RefreshChainsLists(frm.SaveSource())
         End Sub
 
-        Private Sub EditCLButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles EditCLTSMI.Click
+        Private Sub EditCLButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles EditCLButton.Click, EditCLTSMI.Click
             If ChainsListsGrid.SelectedRows.Count <> 1 Then
                 MessageBox.Show("Please select chain or list to edit", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Return
@@ -476,7 +567,7 @@ Namespace Forms.PortfolioForm
             End If
         End Sub
 
-        Private Sub DeleteCLButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles DeleteCLTSMI.Click
+        Private Sub DeleteCLButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles DeleteCLButton.Click, DeleteCLTSMI.Click
             If ChainsListsGrid.SelectedRows.Count <> 1 Then
                 MessageBox.Show("Please select chain or list to delete", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Return
@@ -494,7 +585,7 @@ Namespace Forms.PortfolioForm
             End If
         End Sub
 
-        Private Sub ChainsListsGrid_CellMouseClick(ByVal sender As Object, ByVal e As DataGridViewCellMouseEventArgs)
+        Private Sub ChainsListsGrid_CellMouseClick(ByVal sender As Object, ByVal e As DataGridViewCellMouseEventArgs) Handles ChainsListsGrid.CellMouseClick
             Dim elem = ChainsListsGrid.Rows(e.RowIndex).DataBoundItem
             Dim chain As Source = TryCast(elem, Source)
             If chain Is Nothing Then Return
@@ -505,28 +596,41 @@ Namespace Forms.PortfolioForm
             End If
         End Sub
 
-        Private Sub ReloadChainButtin_Click(ByVal sender As Object, ByVal e As EventArgs) Handles ReloadCLTSMI.Click
-            If ChainsListsGrid.SelectedRows.Count <> 1 Then
-                MessageBox.Show("Please select chain or list to delete", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        Private Sub ReloadChainButtin_Click(ByVal sender As Object, ByVal e As EventArgs) Handles ReloadChainButton.Click, ReloadCLTSMI.Click
+            If ChainsListsGrid.SelectedRows.Count = 0 Then
+                MessageBox.Show("Please select one or more chains to reload", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Return
             End If
-            Dim selectedItem = CType(ChainsListsGrid.SelectedRows.Item(0).DataBoundItem, Source)
-            If Not TypeOf selectedItem Is DbManager.Chain Then Return
 
-            _loader.LoadChain(CType(selectedItem, DbManager.Chain).ChainRic)
+            Dim items = (From row As DataGridViewRow In ChainsListsGrid.SelectedRows
+                         Where TypeOf row.DataBoundItem Is DbManager.Chain
+                         Select CType(row.DataBoundItem, DbManager.Chain).ChainRic).ToList()
+
+            If Not items.Any Then
+                MessageBox.Show("Please select one or more chains to reload", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Return
+            End If
+
+            _progressForm.Revitalize()
+            _loader.LoadChains(items)
         End Sub
 
         Private Sub BondsLoaderFinished(ByVal evt As ProgressEvent) Handles _loader.Progress
             Logger.Info("Got message {0}", evt.Msg)
-            If evt.Log.Success() Then
-                GuiAsync(AddressOf RefreshChainsLists)
-            ElseIf evt.Log.Failed() Then
-                MessageBox.Show(evt.Log.Entries.Select(Function(item) item.Msg).Aggregate(Function(str, item) str + Environment.NewLine + item),
-                                "Errors occured", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            If _progressForm.IsClosed Then
+                If evt.Log.Success() Then
+                    MessageBox.Show("Data updated successfully", "Success")
+                    GuiAsync(AddressOf RefreshChainsLists)
+                ElseIf evt.Log.Failed() Then
+                    MessageBox.Show(evt.Log.Entries.Select(Function(item) item.Msg).Aggregate(Function(str, item) str + Environment.NewLine + item),
+                                    "Errors occured", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                End If
+            Else
+                _progressForm.LogMessage(evt.Msg)
             End If
         End Sub
 
-        Private Sub AddItemsButton_Click(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub AddItemsButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AddItemsButton.Click
             If ChainsButton.Checked Then Return
             If ChainsListsGrid.SelectedRows.Count <= 0 Then Return
 
@@ -548,7 +652,7 @@ Namespace Forms.PortfolioForm
             Next
         End Sub
 
-        Private Sub DeleteItemsButton_Click(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub DeleteItemsButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles DeleteItemsButton.Click
             If ChainsButton.Checked Then Return
             If ChainsListsGrid.SelectedRows.Count <= 0 Then Return
 
@@ -573,7 +677,7 @@ Namespace Forms.PortfolioForm
             RefreshFieldLayoutsList()
         End Sub
 
-        Private Sub FieldsListBox_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub FieldsListBox_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs) Handles FieldsListBox.SelectedIndexChanged
             RefreshFieldLayoutsList()
         End Sub
 
@@ -588,7 +692,7 @@ Namespace Forms.PortfolioForm
             FieldsGrid.DataSource = Nothing
         End Sub
 
-        Private Sub FieldLayoutsListBox_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub FieldLayoutsListBox_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs) Handles FieldLayoutsListBox.SelectedIndexChanged
             RefreshFieldsGrid()
         End Sub
 
@@ -606,7 +710,7 @@ Namespace Forms.PortfolioForm
             End If
         End Sub
 
-        Private Sub FieldsGrid_CellEndEdit(ByVal sender As Object, ByVal e As DataGridViewCellEventArgs)
+        Private Sub FieldsGrid_CellEndEdit(ByVal sender As Object, ByVal e As DataGridViewCellEventArgs) Handles FieldsGrid.CellEndEdit
             Dim elem = TryCast(FieldsGrid.Rows(e.RowIndex).DataBoundItem, FieldDescription)
             If elem Is Nothing Then Return
             elem.Value = FieldsGrid.Rows(e.RowIndex).Cells(e.ColumnIndex).Value
@@ -623,8 +727,8 @@ Namespace Forms.PortfolioForm
             Return Nothing
         End Function
 
-        Private Sub CustomBondsList_MouseClick(ByVal sender As Object, ByVal e As MouseEventArgs)
-
+        Private Sub CustomBondsList_MouseClick(ByVal sender As Object, ByVal e As MouseEventArgs) _
+            Handles CustomBondsList.MouseClick, OptionsDGV.MouseClick, CouponScheduleDGV.Click, AmortScheduleDGV.Click
 
             If e.Button <> MouseButtons.Right Then Return
 
@@ -655,7 +759,7 @@ Namespace Forms.PortfolioForm
             End If
         End Sub
 
-        Private Sub CustomBondsList_SelectionChanged(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub CustomBondsList_SelectionChanged(ByVal sender As Object, ByVal e As EventArgs) Handles CustomBondsList.SelectionChanged
             If CustomBondsList.SelectedRows.Count = 0 Then
                 EnableEverythingComplete()
             Else
@@ -666,14 +770,14 @@ Namespace Forms.PortfolioForm
             CustomBondChanged = False
         End Sub
 
-        Private Sub RandomColorButton_Click(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub RandomColorButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles RandomColorButton.Click
             CustomBondColorCB.SelectedIndex = New Random().NextDouble() * CustomBondColorCB.Items.Count
             If _currentBond Is Nothing Then Return
             _currentBond.Color = CustomBondColorCB.SelectedItem
             CustomBondChanged = True
         End Sub
 
-        Private Sub ColorComboBox_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub ColorComboBox_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs) Handles CustomBondColorCB.SelectedIndexChanged
             If CustomBondColorCB.SelectedIndex < 0 Then
                 CustomBondColorPB.BackColor = Color.White
             Else
@@ -682,7 +786,7 @@ Namespace Forms.PortfolioForm
             CustomBondChanged = True
         End Sub
 
-        Private Sub CustomColorCB_DrawItem(ByVal sender As Object, ByVal e As DrawItemEventArgs)
+        Private Sub CustomColorCB_DrawItem(ByVal sender As Object, ByVal e As DrawItemEventArgs) Handles CustomBondColorCB.DrawItem
             Dim g As Graphics = e.Graphics
             Dim r As Rectangle = e.Bounds
             If e.Index > 0 Then
@@ -760,7 +864,7 @@ Namespace Forms.PortfolioForm
             End If
         End Sub
 
-        Private Sub UnspecifiedIssueDateCB_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub UnspecifiedIssueDateCB_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles UnspecifiedIssueDateCB.CheckedChanged
             If _locked Then Return
             IssueDateDTP.Enabled = Not UnspecifiedIssueDateCB.Checked
             If _currentBond Is Nothing Then Return
@@ -773,7 +877,7 @@ Namespace Forms.PortfolioForm
             CustomBondChanged = True
         End Sub
 
-        Private Sub MaturityDTP_ValueChanged(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub MaturityDTP_ValueChanged(ByVal sender As Object, ByVal e As EventArgs) Handles MaturityDTP.ValueChanged
             If _locked Then Return
             If _currentBond Is Nothing Then Return
             _currentBond.Struct.ReimbursementType = ""
@@ -782,7 +886,7 @@ Namespace Forms.PortfolioForm
             CustomBondChanged = True
         End Sub
 
-        Private Sub IssueDTP_ValueChanged(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub IssueDTP_ValueChanged(ByVal sender As Object, ByVal e As EventArgs) Handles IssueDateDTP.ValueChanged
             If _locked Then Return
             If _currentBond Is Nothing Then Return
             _currentBond.Struct.IssueDate = ReutersDate.DateToReuters(IssueDateDTP.Value)
@@ -791,7 +895,7 @@ Namespace Forms.PortfolioForm
         End Sub
 
 
-        Private Sub AnnuityCB_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub AnnuityCB_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles AnnuityCB.CheckedChanged
             If _locked Then Return
             If AnnuityCB.Checked Then
                 If PerpetualCB.Checked Then PerpetualCB.Checked = False
@@ -803,7 +907,7 @@ Namespace Forms.PortfolioForm
             CustomBondChanged = True
         End Sub
 
-        Private Sub PerpetualCB_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub PerpetualCB_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles PerpetualCB.CheckedChanged
             If _locked Then Return
             If _currentBond Is Nothing Then Return
             MaturityDTP.Enabled = Not PerpetualCB.Checked
@@ -819,7 +923,7 @@ Namespace Forms.PortfolioForm
             CustomBondChanged = True
         End Sub
 
-        Private Sub FrequencyCB_SelectedValueChanged(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub FrequencyCB_SelectedValueChanged(ByVal sender As Object, ByVal e As EventArgs) Handles FrequencyCB.SelectedValueChanged
             If _locked Then Return
             If _currentBond Is Nothing Then Return
             _currentBond.Struct.Frequency = FrequencyCB.SelectedItem
@@ -827,7 +931,7 @@ Namespace Forms.PortfolioForm
             CustomBondChanged = True
         End Sub
 
-        Private Sub FixedRateTB_TextChanged(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub FixedRateTB_TextChanged(ByVal sender As Object, ByVal e As EventArgs) Handles FixedRateTB.TextChanged
             If _locked Then Return
             If _currentBond Is Nothing Then Return
             If Not IsNumeric(FixedRateTB.Text) Then
@@ -1069,7 +1173,7 @@ Namespace Forms.PortfolioForm
             RecalculateCashFlows()
         End Sub
 
-        Private Sub EditManCB_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs)
+        Private Sub EditManCB_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles EditManCB.CheckedChanged
             If EditManCB.Checked Then
                 OtherRulesML.ReadOnly = False
                 OtherRulesML.Select()
@@ -1113,8 +1217,5 @@ Namespace Forms.PortfolioForm
         End Sub
 #End Region
 
-        Private Sub CustomBondsList_MouseClick(ByVal sender As System.Object, ByVal e As System.EventArgs)
-
-        End Sub
     End Class
 End Namespace

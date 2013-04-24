@@ -43,6 +43,8 @@ Public Interface IPortfolioManager
     Function GetPortfoliosBySource(ByVal selectedItem As SourceBase) As List(Of IdName(Of String))
     Sub DeleteSource(ByVal source As SourceBase)
 
+    Sub SelectConfigFile(ByVal fileName As String)
+    Sub SelectDefaultConfigFile()
 End Interface
 
 Friend Interface IPortfolioManagerLocal
@@ -52,12 +54,22 @@ Friend Interface IPortfolioManagerLocal
 End Interface
 
 Public Class PortfolioManager
-    ' TODO multiple config files
-    ' TOdO events OnLoadConfig, OnConfigFileUpdated
     Implements IPortfolioManager
     Implements IPortfolioManagerLocal
 
-    Private Const ConfigFile As String = "bonds.xml"
+    Private Const DefaultConfigFile As String = "bonds.xml"
+    Private _configFile As String = DefaultConfigFile
+
+    Public Property ConfigFile() As String
+        Get
+            Return _configFile
+        End Get
+        Set(ByVal value As String)
+            _configFile = value
+            LoadBonds()
+        End Set
+    End Property
+
     Private ReadOnly _configXml As String = Path.Combine(Utils.GetMyPath(), ConfigFile)
     Private ReadOnly _bonds As New XmlDocument
 
@@ -559,6 +571,14 @@ Public Class PortfolioManager
             Return
         End If
         SaveBonds()
+    End Sub
+
+    Public Sub SelectConfigFile(ByVal fileName As String) Implements IPortfolioManager.SelectConfigFile
+        ConfigFile = fileName
+    End Sub
+
+    Public Sub SelectDefaultConfigFile() Implements IPortfolioManager.SelectDefaultConfigFile
+        ConfigFile = DefaultConfigFile
     End Sub
 
     Public ReadOnly Property CustomBondsView() As List(Of CustomBond) Implements IPortfolioManager.CustomBondsView

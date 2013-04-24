@@ -30,16 +30,18 @@ Public Class Chain
         End RaiseEvent
     End Event
 
-    Private ReadOnly _chainHandlers As New List(Of Action(Of String, Dictionary(Of String, List(Of String))))
-    Public Custom Event Chain As Action(Of String, Dictionary(Of String, List(Of String)))
-        AddHandler(ByVal value As Action(Of String, Dictionary(Of String, List(Of String))))
+    Delegate Sub ChainHandler(ByVal ric As String, ByVal data As Dictionary(Of String, List(Of String)), ByVal done As Boolean)
+
+    Private ReadOnly _chainHandlers As New List(Of ChainHandler)
+    Public Custom Event Chain As ChainHandler
+        AddHandler(ByVal value As ChainHandler)
             _chainHandlers.Add(value)
         End AddHandler
-        RemoveHandler(ByVal value As Action(Of String, Dictionary(Of String, List(Of String))))
+        RemoveHandler(ByVal value As ChainHandler)
             _chainHandlers.Remove(value)
         End RemoveHandler
-        RaiseEvent(ByVal arg1 As String, ByVal arg2 As Dictionary(Of String, List(Of String)))
-            _chainHandlers.ForEach(Sub(handler) handler(arg1, arg2))
+        RaiseEvent(ByVal arg1 As String, ByVal arg2 As Dictionary(Of String, List(Of String)), ByVal arg3 As Boolean)
+            _chainHandlers.ForEach(Sub(handler) handler(arg1, arg2, arg3))
         End RaiseEvent
     End Event
 
@@ -97,9 +99,7 @@ Public Class Chain
                         _result(ricName) = Nothing
                         _rics.TryTake(ricName)
                     End If
-                    If Not _rics.Any Then
-                        RaiseEvent Chain(ricName, New Dictionary(Of String, List(Of String))(_result))
-                    End If
+                    RaiseEvent Chain(ricName, New Dictionary(Of String, List(Of String))(_result), Not _rics.Any)
                 Catch ex As Exception
                     Logger.ErrorException("Failed to parse chain [" + ricName + "] data", ex)
                     Logger.Error("Exception = {0}", ex.ToString())
