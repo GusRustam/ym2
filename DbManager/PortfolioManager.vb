@@ -41,7 +41,7 @@ Public Interface IPortfolioManager
     Sub AddSource(ByVal src As SourceBase)
     Sub UpdateSource(ByVal source As SourceBase)
     Function GetPortfoliosBySource(ByVal selectedItem As SourceBase) As List(Of IdName(Of String))
-    Sub DeleteSource(ByVal source As Source)
+    Sub DeleteSource(ByVal source As SourceBase)
 
 End Interface
 
@@ -529,7 +529,7 @@ Public Class PortfolioManager
         End If
     End Function
 
-    Public Sub DeleteSource(ByVal src As Source) Implements IPortfolioManager.DeleteSource
+    Public Sub DeleteSource(ByVal src As SourceBase) Implements IPortfolioManager.DeleteSource
         If TypeOf src Is Chain Then
             Dim chain = CType(src, Chain)
             Dim nodes = _bonds.SelectNodes(String.Format("/bonds/portfolios//portfolio[include[@what='chain' and @id='{0}']]", chain.ID))
@@ -546,7 +546,16 @@ Public Class PortfolioManager
             Next
             Dim elem = _bonds.SelectSingleNode(String.Format("/bonds/lists/list[@id='{0}']", src.ID))
             elem.ParentNode.RemoveChild(elem)
+        ElseIf TypeOf src Is CustomBond Then
+            Dim list = CType(src, CustomBond)
+            Dim nodes = _bonds.SelectNodes(String.Format("/bonds/portfolios//portfolio[include[@what='custom-bond' and @id='{0}']]", list.ID))
+            For Each node As XmlNode In nodes
+                node.ParentNode.RemoveChild(node)
+            Next
+            Dim elem = _bonds.SelectSingleNode(String.Format("/bonds/custom-bonds/bond[@id='{0}']", src.ID))
+            elem.ParentNode.RemoveChild(elem)
         Else
+            Logger.Warn("DeleteSource(): unsupported source type {0}", src.GetType())
             Return
         End If
         SaveBonds()

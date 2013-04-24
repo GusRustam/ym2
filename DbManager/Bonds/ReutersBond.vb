@@ -592,6 +592,20 @@ Namespace Bonds
                     Return String.Format("{0:F4}", _rate)
                 End Get
             End Property
+
+            <Browsable(False)>
+            Friend ReadOnly Property DtFriend() As Date
+                Get
+                    Return _dt
+                End Get
+            End Property
+
+            <Browsable(False)>
+            Friend ReadOnly Property RateFriend() As Single
+                Get
+                    Return _rate
+                End Get
+            End Property
         End Class
 
         Public Class AmortizationDescription
@@ -613,6 +627,20 @@ Namespace Bonds
             Public ReadOnly Property Amount() As String
                 Get
                     Return String.Format("{0:F4}", _amount)
+                End Get
+            End Property
+
+            <Browsable(False)>
+            Friend ReadOnly Property DtFriend() As Date
+                Get
+                    Return _dt
+                End Get
+            End Property
+
+            <Browsable(False)>
+            Friend ReadOnly Property AmountFriend() As Single
+                Get
+                    Return _amount
                 End Get
             End Property
         End Class
@@ -642,7 +670,7 @@ Namespace Bonds
                 End Get
             End Property
 
-            Public ReadOnly Property Ends() As Date
+            Public ReadOnly Property Ends() As String
                 Get
                     Return String.Format("{0:dd/MMM/yyyy}", _ends)
                 End Get
@@ -661,6 +689,25 @@ Namespace Bonds
                 _ends = elem.Item2
                 _price = elem.Item3
             End Sub
+
+            Friend ReadOnly Property StartsFriend() As Date
+                Get
+                    Return _starts
+                End Get
+            End Property
+
+            Friend ReadOnly Property EndsFriend() As Date
+                Get
+                    Return _ends
+                End Get
+            End Property
+
+            Friend ReadOnly Property PriceFriend() As Single
+                Get
+                    Return _price
+                End Get
+            End Property
+
         End Class
 
         Public Sub SetBondModule(ByVal adxBondModule As AdxBondModule)
@@ -703,5 +750,21 @@ Namespace Bonds
             res.AddRange(From elem In _putPattern Select New EmbdeddedOptionDescription(elem, "Put"))
             Return res
         End Function
+
+        Public Sub DeleteAmortizationItem(ByVal ad As AmortizationDescription)
+            _amortPattern.Remove(Tuple.Create(ad.DtFriend, ad.AmountFriend))
+        End Sub
+
+        Public Sub DeleteCouponItem(ByVal cd As CouponDescription)
+            _stepCouponPattern.Remove(Tuple.Create(cd.DtFriend, cd.RateFriend))
+        End Sub
+
+        Public Sub DeleteOptionItem(ByVal eod As EmbdeddedOptionDescription)
+            If eod.Type = "Call" Then
+                _callPattern.Remove(Tuple.Create(eod.StartsFriend, eod.EndsFriend, eod.PriceFriend))
+            Else
+                _putPattern.Remove(Tuple.Create(eod.StartsFriend, eod.EndsFriend, eod.PriceFriend))
+            End If
+        End Sub
     End Class
 End Namespace

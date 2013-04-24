@@ -29,6 +29,26 @@ Namespace Forms.PortfolioForm
             End Set
         End Property
 
+        Private Enum CMSSource
+            CustomBond
+            CouponSchedule
+            AmortSchedule
+            OptionList
+        End Enum
+
+        Private _customBondChanged As Boolean
+
+        Friend Property CustomBondChanged() As Boolean
+            Get
+                Return _customBondChanged
+            End Get
+            Set(ByVal value As Boolean)
+                CustomBondsPage.Text = "Custom bond" + If(value, " *", "")
+                _customBondChanged = value
+            End Set
+        End Property
+
+#Region "Common items"
         Private Sub PortfolioForm_Load(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Load
             BondsTableView.DataSource = _loader.GetBondsTable()
             If PortfolioTree.ImageList Is Nothing Then
@@ -57,6 +77,16 @@ Namespace Forms.PortfolioForm
                 End If
             End If
         End Sub
+
+        Private Sub PortfolioForm_FormClosing(ByVal sender As Object, ByVal e As FormClosingEventArgs) Handles MyBase.FormClosing
+            If CustomBondChanged Then
+                Select Case MessageBox.Show("Would you like to save changes in custom bond?", "Unsaved changes", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question)
+                    Case DialogResult.Yes : SaveCustomBond()
+                    Case DialogResult.Cancel : e.Cancel = True
+                End Select
+            End If
+        End Sub
+#End Region
 
 #Region "Portfolio TAB"
 
@@ -585,13 +615,6 @@ Namespace Forms.PortfolioForm
 #End Region
 
 #Region "Custom bond TAB"
-        Private Enum CMSSource
-            CustomBond
-            CouponSchedule
-            AmortSchedule
-            OptionList
-        End Enum
-
         Private Function GetSource(ByVal sender As Object) As CMSSource?
             If ReferenceEquals(sender, CustomBondsList) Then Return CMSSource.CustomBond
             If ReferenceEquals(sender, CouponScheduleDGV) Then Return CMSSource.CouponSchedule
@@ -612,6 +635,8 @@ Namespace Forms.PortfolioForm
 
             CustomBondListCMS.Tag = sender
             CustomBondListCMS.Show(sender, e.Location)
+
+            CustomBondChanged = False
         End Sub
 
         Private Sub RefreshCustomBondList(Optional ByVal toselect As CustomBond = Nothing)
@@ -623,27 +648,29 @@ Namespace Forms.PortfolioForm
                 If x.Any Then CustomBondsList.Rows(x.First).Selected = True
             End If
             If CustomBondsList.Rows.Count > 0 Then
+                EnableEverythingComplete()
                 RefreshBondView()
             Else
-                CleanupBondView()
+                DisableEverythingComplete()
             End If
-
         End Sub
 
         Private Sub CustomBondsList_SelectionChanged(ByVal sender As Object, ByVal e As EventArgs) Handles CustomBondsList.SelectionChanged
             If CustomBondsList.SelectedRows.Count = 0 Then
-                CleanupBondView()
+                EnableEverythingComplete()
             Else
                 If _currentBond IsNot Nothing Then PortfolioManager.UpdateSource(_currentBond)
                 _currentBond = CustomBondsList.SelectedRows(0).DataBoundItem
                 RefreshBondView()
             End If
+            CustomBondChanged = False
         End Sub
 
         Private Sub RandomColorButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles RandomColorButton.Click
             CustomBondColorCB.SelectedIndex = New Random().NextDouble() * CustomBondColorCB.Items.Count
             If _currentBond Is Nothing Then Return
             _currentBond.Color = CustomBondColorCB.SelectedItem
+            CustomBondChanged = True
         End Sub
 
         Private Sub ColorComboBox_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs) Handles CustomBondColorCB.SelectedIndexChanged
@@ -652,6 +679,7 @@ Namespace Forms.PortfolioForm
             Else
                 CustomBondColorPB.BackColor = Color.FromName(CustomBondColorCB.SelectedItem)
             End If
+            CustomBondChanged = True
         End Sub
 
         Private Sub CustomColorCB_DrawItem(ByVal sender As Object, ByVal e As DrawItemEventArgs) Handles CustomBondColorCB.DrawItem
@@ -668,12 +696,12 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub RefreshBondView()
-            LockEverything()
             If _currentBond Is Nothing Then
-                CleanupBondView()
+                DisableEverythingComplete()
                 Return
             End If
 
+            LockEverything()
             EditManCB.Checked = False
             Dim bondStructure = _currentBond.Struct
 
@@ -717,14 +745,12 @@ Namespace Forms.PortfolioForm
         Private Sub RecalculateCashFlows()
             If _locked Then Return
             Dim bondStructure = _currentBond.Struct
+            OtherRulesML.Text = bondStructure.ToString()
             If MainForm.MainForm.Connected Then
                 MessagesTB.Text = ""
                 Dim bondModule As AdxBondModule = Eikon.Sdk.CreateAdxBondModule()
                 bondStructure.SetBondModule(bondModule)
                 Try
-                    ' todo сохранять при добавлении новой облигации
-                    ' todo почему-то в новой облигации вот это вот все не сохранилось (CFADJ ...)
-                    OtherRulesML.Text = _currentBond.Struct.ToString()
                     CashFlowsDGV.DataSource = bondStructure.GetCashFlows(If(_currentBond.Maturity.HasValue, ReutersDate.DateToReuters(_currentBond.Maturity), ""), _currentBond.CurrentCouponRate)
                 Catch ex As Exception
                     MessagesTB.Text = ex.Message
@@ -744,6 +770,7 @@ Namespace Forms.PortfolioForm
                 _currentBond.Struct.IssueDate = ReutersDate.DateToReuters(IssueDateDTP.Value)
             End If
             RecalculateCashFlows()
+            CustomBondChanged = True
         End Sub
 
         Private Sub MaturityDTP_ValueChanged(ByVal sender As Object, ByVal e As EventArgs) Handles MaturityDTP.ValueChanged
@@ -752,6 +779,7 @@ Namespace Forms.PortfolioForm
             _currentBond.Struct.ReimbursementType = ""
             _currentBond.Maturity = MaturityDTP.Value
             RecalculateCashFlows()
+            CustomBondChanged = True
         End Sub
 
         Private Sub IssueDTP_ValueChanged(ByVal sender As Object, ByVal e As EventArgs) Handles IssueDateDTP.ValueChanged
@@ -759,6 +787,7 @@ Namespace Forms.PortfolioForm
             If _currentBond Is Nothing Then Return
             _currentBond.Struct.IssueDate = ReutersDate.DateToReuters(IssueDateDTP.Value)
             RecalculateCashFlows()
+            CustomBondChanged = True
         End Sub
 
 
@@ -771,6 +800,7 @@ Namespace Forms.PortfolioForm
                 _currentBond.Struct.ReimbursementType = ""
             End If
             RecalculateCashFlows()
+            CustomBondChanged = True
         End Sub
 
         Private Sub PerpetualCB_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles PerpetualCB.CheckedChanged
@@ -786,6 +816,7 @@ Namespace Forms.PortfolioForm
                 _currentBond.Struct.ReimbursementType = ""
             End If
             RecalculateCashFlows()
+            CustomBondChanged = True
         End Sub
 
         Private Sub FrequencyCB_SelectedValueChanged(ByVal sender As Object, ByVal e As EventArgs) Handles FrequencyCB.SelectedValueChanged
@@ -793,6 +824,7 @@ Namespace Forms.PortfolioForm
             If _currentBond Is Nothing Then Return
             _currentBond.Struct.Frequency = FrequencyCB.SelectedItem
             RecalculateCashFlows()
+            CustomBondChanged = True
         End Sub
 
         Private Sub FixedRateTB_TextChanged(ByVal sender As Object, ByVal e As EventArgs) Handles FixedRateTB.TextChanged
@@ -807,18 +839,7 @@ Namespace Forms.PortfolioForm
             _currentBond.CurrentCouponRate = CDbl(FixedRateTB.Text)
             _currentBond.Struct.Rate = FixedRateTB.Text
             RecalculateCashFlows()
-        End Sub
-
-        Private Sub CleanupBondView()
-            If _locked Then Return
-            CouponScheduleDGV.DataSource = Nothing
-            AmortScheduleDGV.DataSource = Nothing
-            MaturityDTP.Value = Date.Today
-            PerpetualCB.Checked = False
-            OtherRulesML.Text = ""
-            OptionsDGV.DataSource = Nothing
-            CustomBondColorCB.SelectedIndex = -1
-            CashFlowsDGV.DataSource = Nothing
+            CustomBondChanged = True
         End Sub
 
         Private Sub AddNewCustomBondTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AddNewCustomBondTSMI.Click
@@ -848,6 +869,7 @@ Namespace Forms.PortfolioForm
                     frm.AcceptButton = btnOk
 
                     If frm.ShowDialog() = DialogResult.OK Then
+                        SaveCustomBond()
                         Const struct = "ACC:A5 IC:L1 CLDR:RUS_FI SETTLE:0WD  CFADJ:NO DMC:FOLLOWING EMC:LASTDAY PX:CLEAN REFDATE:MATURITY YM:DISCA5"
                         _currentBond = New CustomBond(Color.Gray.Name, nameTb.Text, descrTb.Text, struct,
                                                       ReutersDate.DateToReuters(Date.Today.AddYears(1)), 0.1)
@@ -887,6 +909,7 @@ Namespace Forms.PortfolioForm
                                             "Please try once again", MessageBoxButtons.OK, MessageBoxIcon.Information)
                         Else
                             _currentBond.Struct.StepCouponPattern.Add(tuple.Create(sinceDateDtp.Value, CSng(newRateTb.Text)))
+                            CustomBondChanged = True
                             RefreshBondView()
                             RecalculateCashFlows()
                         End If
@@ -923,6 +946,7 @@ Namespace Forms.PortfolioForm
                                             "Please try once again", MessageBoxButtons.OK, MessageBoxIcon.Information)
                         Else
                             _currentBond.Struct.AmortPattern.Add(tuple.Create(dateDtp.Value, CSng(amountTb.Text)))
+                            CustomBondChanged = True
                             RefreshBondView()
                             RecalculateCashFlows()
                         End If
@@ -986,6 +1010,7 @@ Namespace Forms.PortfolioForm
                             Else
                                 _currentBond.Struct.PutPattern.Add(tuple.Create(startDateDtp.Value, endDateDtp.Value, CSng(priceTb.Text)))
                             End If
+                            CustomBondChanged = True
                             RefreshBondView()
                             RecalculateCashFlows()
                         End If
@@ -993,15 +1018,55 @@ Namespace Forms.PortfolioForm
             End Select
         End Sub
 
+        Private Sub SaveCustomBond()
+            If _currentBond IsNot Nothing AndAlso CustomBondChanged Then
+                PortfolioManager.UpdateSource(_currentBond)
+                CustomBondChanged = False
+            End If
+        End Sub
+
         Private Sub DeleteCustomBondTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles DeleteCustomBondTSMI.Click
+            If _currentBond Is Nothing Then Return
+
             Dim src = GetSource(CustomBondListCMS.Tag)
             If src Is Nothing Then Return
-            Select src
-                Case CMSSource.CustomBond ' todo
-                Case CMSSource.AmortSchedule ' todo
-                Case CMSSource.CouponSchedule ' todo
-                Case CMSSource.OptionList ' todo
+            Select Case src
+                Case CMSSource.CustomBond
+                    If CustomBondsList.SelectedRows.Count <= 0 Then
+                        MessageBox.Show("Please select custom bond to delete", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        Return
+                    End If
+                    Dim item = CType(CustomBondsList.SelectedRows(0).DataBoundItem, CustomBond)
+                    PortfolioManager.DeleteSource(item)
+                    RefreshCustomBondList()
+                Case CMSSource.AmortSchedule
+                    If AmortScheduleDGV.SelectedRows.Count <= 0 Then
+                        MessageBox.Show("Please select amortization item to delete", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        Return
+                    End If
+                    Dim item = CType(AmortScheduleDGV.SelectedRows(0).DataBoundItem, ReutersBondStructure.AmortizationDescription)
+                    _currentBond.Struct.DeleteAmortizationItem(item)
+                    CustomBondChanged = True
+                Case CMSSource.CouponSchedule
+                    If CouponScheduleDGV.SelectedRows.Count <= 0 Then
+                        MessageBox.Show("Please select coupon to delete", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        Return
+                    End If
+                    Dim item = CType(CouponScheduleDGV.SelectedRows(0).DataBoundItem, ReutersBondStructure.CouponDescription)
+                    _currentBond.Struct.DeleteCouponItem(item)
+                    CustomBondChanged = True
+                Case CMSSource.OptionList
+                    If OptionsDGV.SelectedRows.Count <= 0 Then
+                        MessageBox.Show("Please select option to delete", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        Return
+                    End If
+                    Dim item = CType(OptionsDGV.SelectedRows(0).DataBoundItem, ReutersBondStructure.EmbdeddedOptionDescription)
+                    _currentBond.Struct.DeleteOptionItem(item)
+                    CustomBondChanged = True
             End Select
+
+            RefreshBondView()
+            RecalculateCashFlows()
         End Sub
 
         Private Sub EditManCB_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles EditManCB.CheckedChanged
@@ -1011,6 +1076,7 @@ Namespace Forms.PortfolioForm
                 LockEverything()
                 DisableEveryThing()
             Else
+                CustomBondChanged = True
                 _currentBond.Struct.Load(OtherRulesML.Text)
                 EnableEveryThing()
                 OtherRulesML.ReadOnly = True
@@ -1020,13 +1086,24 @@ Namespace Forms.PortfolioForm
             End If
         End Sub
 
+        Private Sub DisableEverythingComplete()
+            AmortScheduleDGV.DataSource = Nothing
+            CouponScheduleDGV.DataSource = Nothing
+            OptionsDGV.DataSource = Nothing
+            DoToggle(False, True)
+        End Sub
+
+        Private Sub EnableEverythingComplete()
+            DoToggle(True, True)
+        End Sub
+
         Private Sub EnableEveryThing()
             DoToggle(True)
         End Sub
 
-        Private Sub DoToggle(ByVal b As Boolean)
+        Private Sub DoToggle(ByVal b As Boolean, Optional ByVal complete As Boolean = False)
             For Each cntrl As Control In From elem As Control In BondsSC.Panel2.Controls
-                                         Where Not {OtherRulesML.Name, EditManCB.Name}.Contains(elem.Name)
+                                         Where complete OrElse Not {OtherRulesML.Name, EditManCB.Name}.Contains(elem.Name)
                 cntrl.Enabled = b
             Next
         End Sub
@@ -1035,6 +1112,5 @@ Namespace Forms.PortfolioForm
             DoToggle(False)
         End Sub
 #End Region
-
     End Class
 End Namespace
