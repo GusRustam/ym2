@@ -153,7 +153,7 @@ Namespace Forms.ChartForm
                 .VwapField = source.Fields.Realtime.VWAP,
                 .Brokers = {"MM", ""}.ToList(),
                 .Currency = "",
-                .Color = source.Color
+                .Color = If(port.Color <> "", port.Color, source.Color)
             }
 
             ' TODO THAT'S BULLSHIT BUT CURRENTLY NECESSARY BULLSHIT

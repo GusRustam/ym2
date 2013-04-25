@@ -35,6 +35,8 @@ Namespace Forms.MainForm
             MainWindowCheckBox.Checked = Settings.ShowMainToolBar
             ChartWindowCheckBox.Checked = Settings.ShowChartToolBar
 
+            YieldCalcModeCB.SelectedText = Settings.YieldCalcMode
+
             Dim selectedFields = Settings.BondSelectorVisibleColumns.Split(",")
             ColumnsCLB.Items.Clear()
             For Each field In BondDescription.GetHideableFields()
