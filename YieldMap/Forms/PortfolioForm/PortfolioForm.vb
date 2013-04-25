@@ -8,7 +8,6 @@ Imports Uitls
 
 Namespace Forms.PortfolioForm
     Public Class PortfolioForm
-
         Private Class ProgressShower
             Private _closed As Boolean = True
             Private _frm As New ProgressForm
@@ -175,11 +174,17 @@ Namespace Forms.PortfolioForm
                     Initialize()
                     _progressForm.Revitalize()
                     _loader.Initialize()
+
+                    ' todo some notification to charts!!!!
+                    ' todo next todo is support for RICS and no RICS tablez
+
                 Catch ex As Exception
                     PortfolioManager.SelectDefaultConfigFile()
                 End Try
             End If
         End Sub
+
+
 #End Region
 
 #Region "Portfolio TAB"
@@ -512,6 +517,7 @@ Namespace Forms.PortfolioForm
             _loader.ClearTables()
             RefreshDataGrid()
         End Sub
+
 
         Private Sub ReloadDataButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles ReloadDataButton.Click
             _loader.ClearTables()

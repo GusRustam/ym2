@@ -10,6 +10,8 @@ Public Class SettingsManager
     Public Event SpreadRangeChanged As Action(Of Double?, Double?)
     Public Event ShowBidAskChanged As Action(Of Boolean)
     Public Event ShowPointSizeChanged As Action(Of Boolean)
+    Public Event YieldCalcModeChanged As Action(Of String)
+    Public Event DataSourceChanged As Action(Of String)
 
     Private Shared ReadOnly SettingsPath As String = Path.Combine(Utils.GetMyPath(), "config.xml")
     Private Shared ReadOnly Settings As New XmlDocument
@@ -167,10 +169,14 @@ Public Class SettingsManager
             Return _dataSource
         End Get
         Set(ByVal value As String)
-            SaveValue("/settings/property[@name='data-source']/@value", value.ToString())
-            _dataSource = value
+            If _dataSource <> value Then
+                SaveValue("/settings/property[@name='data-source']/@value", value.ToString())
+                _dataSource = value
+                RaiseEvent DataSourceChanged(value)
+            End If
         End Set
     End Property
+
 
     Private _lastDbUpdate As Date? = Nothing
     Public Property LastDbUpdate As Date?
@@ -180,6 +186,21 @@ Public Class SettingsManager
         Set(ByVal value As Date?)
             SaveValue("/settings/property[@name='last-db-update']/@value", If(value.HasValue, value, ""))
             _lastDbUpdate = Date.Parse(value)
+        End Set
+    End Property
+
+    Private _yieldCalcMode As String = "YTM"
+
+    Public Property YieldCalcMode() As String
+        Get
+            Return _yieldCalcMode
+        End Get
+        Set(ByVal value As String)
+            If _yieldCalcMode <> value Then
+                SaveValue("/settings/property[@name='yield-calc-mode']/@value", value)
+                _yieldCalcMode = value
+                RaiseEvent YieldCalcModeChanged(value)
+            End If
         End Set
     End Property
 
@@ -198,6 +219,7 @@ Public Class SettingsManager
         GetBoolValue("/settings/property[@name='show-main-toolbar']/@value", _showMainToolBar)
         GetBoolValue("/settings/property[@name='show-chart-toolbar']/@value", _showChartToolBar)
 
+        GetStringValue("/settings/property[@name='yield-calc-mode']/@value", _yieldCalcMode)
         GetStringValue("/settings/property[@name='visible-columns']/@value", _bondSelectorVisibleColumns)
         GetStringValue("/settings/property[@name='data-source']/@value", _dataSource)
         GetDateValue("/settings/property[@name='last-db-update']/@value", _lastDbUpdate)

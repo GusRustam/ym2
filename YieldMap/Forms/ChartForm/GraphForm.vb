@@ -13,6 +13,7 @@ Imports YieldMap.Curves
 Imports YieldMap.My.Resources
 Imports YieldMap.Commons
 Imports YieldMap.Tools
+Imports ReutersData
 Imports NLog
 Imports DbManager
 
@@ -22,13 +23,52 @@ Namespace Forms.ChartForm
 
         Private WithEvents _theSettings As SettingsManager = SettingsManager.Instance
         Private WithEvents _tableForm As TableForm.TableForm = New TableForm.TableForm()
+        Private WithEvents _bondsLoader As IBondsLoader = BondsLoader.Instance()
+        Private WithEvents _connector As EikonConnector = EikonConnector.Instance()
 
         Private ReadOnly _moneyMarketCurves As New List(Of SwapCurve)
         Private WithEvents _spreadBenchmarks As New SpreadContainer
         Private WithEvents _ansamble As New Ansamble(_spreadBenchmarks)
 
-        Public Delegate Sub PointUpdateDelegate(ByVal ric As String, ByVal yield As Double, ByVal duration As Double, ByVal lastPrice As Double)
-        'Public Event PointUpdated As PointUpdateDelegate
+        Private Sub Loader_Progress(ByVal obj As ProgressEvent) Handles _bondsLoader.Progress
+            ' todo
+        End Sub
+
+        Private Sub TheSettings_DurRangeChanged(ByVal min As Double?, ByVal max As Double?) Handles _theSettings.DurRangeChanged
+            ' todo
+        End Sub
+
+        Private Sub TheSettings_ShowBidAskChanged(ByVal show As Boolean) Handles _theSettings.ShowBidAskChanged
+            ' todo
+        End Sub
+
+        Private Sub TheSettings_ShowPointSizeChanged(ByVal show As Boolean) Handles _theSettings.ShowPointSizeChanged
+            ' todo
+        End Sub
+
+        Private Sub TheSettings_SpreadRangeChanged(ByVal min As Double?, ByVal max As Double?) Handles _theSettings.SpreadRangeChanged
+            ' todo
+        End Sub
+
+        Private Sub TheSettings_YieldRangeChanged(ByVal min As Double?, ByVal max As Double?) Handles _theSettings.YieldRangeChanged
+            ' todo
+        End Sub
+
+        Private Sub Connector_Connected() Handles _connector.Connected
+            ' todo
+        End Sub
+
+        Private Sub Connector_Disconnected() Handles _connector.Disconnected
+            ' todo
+        End Sub
+
+        Private Sub Connector_LocalMode() Handles _connector.LocalMode
+            ' todo
+        End Sub
+
+        Private Sub Connector_Offline() Handles _connector.Offline
+            ' todo
+        End Sub
 
 #Region "I) Dependent forms"
         'Private Sub TableFormShown(sender As Object, e As EventArgs) Handles _tableForm.Shown
@@ -63,7 +103,7 @@ Namespace Forms.ChartForm
                     Case FormDataStatus.Stopped
                         _ansamble.Cleanup()
 
-                        '_historicalCurves.Clear()
+                        '_historicalCurves.Clear()  ' todo where R these curves?
 
                         StatusMessage.Text = "Stopped"
                 End Select
@@ -85,7 +125,7 @@ Namespace Forms.ChartForm
                 Dim portfolioStructure = PortfolioManager.Instance().GetPortfolioStructure(currentPortID)
 
                 For Each group As Group In From port In portfolioStructure.Sources
-                                           Where TypeOf port.Source Is Chain Or TypeOf port.Source Is UserList
+                                           Where TypeOf port.Source Is DbManager.Chain Or TypeOf port.Source Is UserList
                                            Select GetGroup(port, portfolioStructure)
 
                     _ansamble.AddGroup(group)
@@ -776,14 +816,12 @@ Namespace Forms.ChartForm
                        AddHandler okButt.Click,
                            Sub()
                                If lst.SelectedItems.Count = 0 Then
-                                   If MessageBox.Show("No items selected! Would you like to continure selecting items?", "Adding items into curve", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = MsgBoxResult.No Then
+                                   If MessageBox.Show("No items selected! Would you like to continue selecting items?", "Adding items into curve", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = MsgBoxResult.No Then
                                        aForm.DialogResult = DialogResult.Cancel
                                        aForm.Close()
                                    End If
                                Else
-                                   For Each item In lst.SelectedItems
-                                       selectedItems.Add(item)
-                                   Next
+                                   selectedItems.AddRange(lst.SelectedItems.Cast(Of String))
                                    aForm.DialogResult = DialogResult.OK
                                    aForm.Close()
                                End If
@@ -822,10 +860,7 @@ Namespace Forms.ChartForm
                                    End If
                                Else
                                    ' deleting selected items
-                                   Dim toDelete As New List(Of String)
-                                   For Each rw As DataGridViewRow In aTable.SelectedRows
-                                       toDelete.Add(rw.Cells("RIC").Value)
-                                   Next
+                                   Dim toDelete As List(Of String) = (From rw As DataGridViewRow In aTable.SelectedRows Select rw.Cells("RIC").Value).Cast(Of String).ToList()
                                    If Not theCurve.RemoveItems(toDelete) Then
                                        MessageBox.Show("Failed to delete selected items", "Remove items", MessageBoxButtons.OK, MessageBoxIcon.Information)
                                    End If
@@ -1319,5 +1354,6 @@ Namespace Forms.ChartForm
         Private Sub IssuerCouponMaturityTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles IssuerCouponMaturityTSMI.Click
             SetSeriesLabel(BondSetCMS.Tag, LabelMode.IssuerCpnMat)
         End Sub
+
     End Class
 End Namespace

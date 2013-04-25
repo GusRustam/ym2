@@ -480,8 +480,6 @@ Namespace Bonds
     Public NotInheritable Class BondsLoader
         Implements IBondsLoader
 
-        'Private Shared ReadOnly Logger As Logger = GetLogger(GetType(BondsLoader))
-
         Private Shared ReadOnly RicChain As New BondsDataSet.RicChainDataTable
         Private Shared ReadOnly CouponTable As New BondsDataSet.CouponDataTable
         Private Shared ReadOnly FrnTable As New BondsDataSet.FrnDataTable

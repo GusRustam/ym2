@@ -19,13 +19,14 @@ End Class
 
 Public Class EikonConnector
     Private WithEvents _sdk As EikonDesktopDataAPI
+    Private Shared _instance As EikonConnector
 
     Public Event Connected As Action
     Public Event Disconnected As Action
     Public Event LocalMode As Action
     Public Event Offline As Action
 
-    Public Sub New(ByVal sdk As EikonDesktopDataAPI)
+    Private Sub New(ByVal sdk As EikonDesktopDataAPI)
         _sdk = sdk
     End Sub
 
@@ -49,4 +50,19 @@ Public Class EikonConnector
                 RaiseEvent Offline()
         End Select
     End Sub
+
+
+    Public Shared ReadOnly Property Instance(ByVal sdk As EikonDesktopDataAPI) As EikonConnector
+        Get
+            If _instance Is Nothing Then _instance = New EikonConnector(sdk)
+            Return _instance
+        End Get
+    End Property
+
+    Public Shared ReadOnly Property Instance() As EikonConnector
+        Get
+            Return _instance
+        End Get
+    End Property
+
 End Class

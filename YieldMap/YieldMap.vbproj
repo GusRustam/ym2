@@ -137,12 +137,6 @@
     <Compile Include="Curves\RubIRS.vb" />
     <Compile Include="Curves\SwapCurve.vb" />
     <Compile Include="Curves\YieldCurve.vb" />
-    <Compile Include="Forms\ChartForm\ChartSettingsForm.Designer.vb">
-      <DependentUpon>ChartSettingsForm.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\ChartForm\ChartSettingsForm.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Forms\MainForm\AboutForm.Designer.vb">
       <DependentUpon>AboutForm.vb</DependentUpon>
     </Compile>
@@ -258,9 +252,6 @@
     <Compile Include="Tools\YieldCalc.vb" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Forms\ChartForm\ChartSettingsForm.resx">
-      <DependentUpon>ChartSettingsForm.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\MainForm\AboutForm.resx">
       <DependentUpon>AboutForm.vb</DependentUpon>
     </EmbeddedResource>
@@ -475,7 +466,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_BuildVersioningStyle="None.MonthStamp.Increment.TimeStamp" />
+      <UserProperties BuildVersion_BuildVersioningStyle="None.MonthStamp.Increment.TimeStamp" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

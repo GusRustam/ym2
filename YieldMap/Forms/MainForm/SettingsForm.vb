@@ -66,8 +66,6 @@ Namespace Forms.MainForm
                 Settings.LogLevel = LogLevel.Off
             End If
 
-            ' Logging.ResetLoggers()
-            'SettingsManager.LogLevel = SettingsManager.LogLevel
             Logging.LoggingLevel = Settings.LogLevel
             Logger.Log(Settings.LogLevel, "Log level set to {0}", Settings.LogLevel)
 

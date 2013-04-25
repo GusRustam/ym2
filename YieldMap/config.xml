@@ -13,6 +13,8 @@
   
   <property name="visible-columns" value="ALL"/>
   
+  <property name="yield-calc-mode" value="YTA"/>
+  
   <viewport>
     <yield min="" max=""/>
     <spread min="" max =""/>
