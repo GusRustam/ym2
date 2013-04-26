@@ -1,11 +1,9 @@
 ﻿Imports System.Drawing
 Imports System.Reflection
 Imports DbManager.Bonds
-Imports DbManager
 Imports NLog
 Imports YieldMap.Tools.History
 Imports YieldMap.Tools.Lists
-Imports YieldMap.Commons
 Imports YieldMap.Curves
 
 Namespace Tools
@@ -32,7 +30,14 @@ Namespace Tools
 
 #Region "II. Groups and ansamble"
     Public Class Ansamble
+        Public Event AllQuotes As Action(Of List(Of Bond))
+        Public Event RemovedItem As Action(Of Group, String)
+        Public Event Quote As Action(Of Bond, String)
+        Public Event Volume As Action(Of Bond)
+        Public Event Clear As Action(Of Group)
+
         Private ReadOnly _groups As New List(Of Group)
+        Private ReadOnly _spreadBmk As SpreadContainer
 
         Public ReadOnly Property Groups As List(Of Group)
             Get
@@ -40,23 +45,12 @@ Namespace Tools
             End Get
         End Property
 
-        Private ReadOnly _spreadBmk As SpreadContainer
-
-        Public Event AllQuotes As Action(Of List(Of Bond))
-        Public Event RemovedItem As Action(Of Group, String)
-        Public Event Quote As Action(Of Bond, String)
-        Public Event Volume As Action(Of Bond)
-        Public Event Clear As Action(Of Group)
-
         Public ReadOnly Property SpreadBmk() As SpreadContainer
             Get
                 Return _spreadBmk
             End Get
         End Property
 
-        Public Function GetColor(ByVal instrument As String) As Color
-            Return Color.FromName(GetInstrumentGroup(instrument).Color)
-        End Function
 
         Public Sub Cleanup()
             _groups.ForEach(Sub(group)

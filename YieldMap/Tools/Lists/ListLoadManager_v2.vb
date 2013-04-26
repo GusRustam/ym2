@@ -1,9 +1,7 @@
 ﻿Imports AdfinXRtLib
 Imports System
-Imports DbManager
 Imports NLog
 Imports ReutersData
-Imports YieldMap.Commons
 
 Namespace Tools.Lists
     Public Enum ItemInfo

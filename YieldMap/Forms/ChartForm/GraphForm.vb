@@ -28,46 +28,48 @@ Namespace Forms.ChartForm
 
         Private ReadOnly _moneyMarketCurves As New List(Of SwapCurve)
         Private WithEvents _spreadBenchmarks As New SpreadContainer
+        'Private WithEvents _ansamble As New Ansamble(_spreadBenchmarks)
         Private WithEvents _ansamble As New Ansamble(_spreadBenchmarks)
 
         Private Sub Loader_Progress(ByVal obj As ProgressEvent) Handles _bondsLoader.Progress
-            ' todo
+            ' todo what to do?
         End Sub
 
         Private Sub TheSettings_DurRangeChanged(ByVal min As Double?, ByVal max As Double?) Handles _theSettings.DurRangeChanged
-            ' todo
-        End Sub
-
-        Private Sub TheSettings_ShowBidAskChanged(ByVal show As Boolean) Handles _theSettings.ShowBidAskChanged
-            ' todo
+            SetChartMinMax()
         End Sub
 
         Private Sub TheSettings_ShowPointSizeChanged(ByVal show As Boolean) Handles _theSettings.ShowPointSizeChanged
-            ' todo
+            ' todo тут надо просто все перерисовать
         End Sub
 
         Private Sub TheSettings_SpreadRangeChanged(ByVal min As Double?, ByVal max As Double?) Handles _theSettings.SpreadRangeChanged
-            ' todo
+            SetChartMinMax()
+        End Sub
+
+        Private Sub _theSettings_YieldCalcModeChanged(ByVal obj As String) Handles _theSettings.YieldCalcModeChanged
+            ' todo (а что тут туду? просто все пересчитать. хотя это не так просто - ибо у меня пересчет не упорядочен)
+            ' todo сначала надо все заморозить. потом пересчитать доходности. потом спреды. хотя.... хотя... а спредам не до лампочки ли?
         End Sub
 
         Private Sub TheSettings_YieldRangeChanged(ByVal min As Double?, ByVal max As Double?) Handles _theSettings.YieldRangeChanged
-            ' todo
+            SetChartMinMax()
         End Sub
 
         Private Sub Connector_Connected() Handles _connector.Connected
-            ' todo
+            ' todo connected means that we were disconnected. I might have to resume some activities
         End Sub
 
         Private Sub Connector_Disconnected() Handles _connector.Disconnected
-            ' todo
+            Close()
         End Sub
 
         Private Sub Connector_LocalMode() Handles _connector.LocalMode
-            ' todo
+            ' todo what to do?
         End Sub
 
         Private Sub Connector_Offline() Handles _connector.Offline
-            ' todo
+            ' todo what to do?
         End Sub
 
 #Region "I) Dependent forms"
