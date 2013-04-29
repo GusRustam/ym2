@@ -247,8 +247,6 @@
     <Compile Include="Tools\Estimation\LinearRegression.vb" />
     <Compile Include="Tools\History\HistoryLoadManager_v2.vb" />
     <Compile Include="Tools\History\HistoryLoadManager.vb" />
-    <Compile Include="Tools\Lists\ListLoadManager.vb" />
-    <Compile Include="Tools\Lists\ListLoadManager_v2.vb" />
     <Compile Include="Tools\YieldCalc.vb" />
   </ItemGroup>
   <ItemGroup>
@@ -462,11 +460,13 @@
       <Name>Uitls</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Tools\Lists\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_BuildVersioningStyle="None.MonthStamp.Increment.TimeStamp" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" />
+      <UserProperties BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_BuildVersioningStyle="None.MonthStamp.Increment.TimeStamp" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

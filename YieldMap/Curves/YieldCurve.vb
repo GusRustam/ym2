@@ -2,11 +2,10 @@
 Imports System.Drawing
 Imports AdfinXRtLib
 Imports DbManager.Bonds
-Imports DbManager
+Imports ReutersData
 Imports Uitls
 Imports YieldMap.Tools
 Imports YieldMap.Tools.History
-Imports YieldMap.Tools.Lists
 Imports YieldMap.Tools.Estimation
 Imports NLog
 Imports AdfinXAnalyticsFunctions
@@ -17,7 +16,7 @@ Namespace Curves
 
         Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(YieldCurve))
 
-        Private WithEvents _quoteLoader As New ListLoadManager
+        Private WithEvents _quoteLoader As New LiveQuotes
 
         Private ReadOnly _name As String
         Private ReadOnly _fullname As String
@@ -65,14 +64,7 @@ Namespace Curves
         End Sub
 
         Protected Overrides Sub StartRealTime()
-            If Not _quoteLoader.StartNewTask(New ListTaskDescr() With {
-                                                .Name = _name,
-                                                .Items = Descrs.Keys.ToList(),
-                                                .Fields = {_quote}.ToList()
-                                            }) Then
-                Logger.Error("Failed to start loading bonds data")
-                Throw New Exception("Failed to start loading realtime bonds data")
-            End If
+            _quoteLoader.AddItems(Descrs.Keys.ToList(), {_quote}.ToList())
         End Sub
 
         Protected Overrides Sub LoadHistory()
@@ -186,11 +178,7 @@ Namespace Curves
         End Sub
 
         Public Overrides Function GetOriginalRICs() As List(Of String)
-            Dim res As New List(Of String)
-            For Each ric In _originalRics
-                res.Add(ric)
-            Next
-            Return res
+            Return New List(Of String)(_originalRics)
         End Function
 
         Public Overrides Function GetCurrentRICs() As List(Of String)
@@ -229,7 +217,7 @@ Namespace Curves
         End Sub
 
         Public Overrides Sub Cleanup()
-            _quoteLoader.DiscardTask(_name)
+            _quoteLoader.CancelItems(Descrs.Keys.ToList())
             MyBase.Cleanup()
         End Sub
 
@@ -249,44 +237,38 @@ Namespace Curves
             Return Descrs.Values.Select(Function(elem) New Tuple(Of String, String, Double?, Double)(elem.RIC, _meta(elem.RIC).ShortName, elem.Yield, elem.Duration)).ToList()
         End Function
 
-        Private Sub OnRealTimeData(ByVal data As Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double)))) Handles _quoteLoader.OnNewData
+        Private Sub OnRealTimeData(ByVal data As Dictionary(Of String, Dictionary(Of String, Double))) Handles _quoteLoader.NewData
             Logger.Debug("OnRealTimeData")
             Dim errorList As New List(Of Exception)
-            For Each listAndRFV As KeyValuePair(Of String, Dictionary(Of String, Dictionary(Of String, Double))) In data
+            For Each rfv As KeyValuePair(Of String, Dictionary(Of String, Double)) In data
                 Try
-                    Dim list = listAndRFV.Key
-                    Dim rfv = listAndRFV.Value
+                    Dim ric = rfv.Key
+                    Dim fv = rfv.Value
 
-                    If list = _name Then
+                    If Descrs.Keys.Contains(ric) Then
                         Logger.Info(_name)
-                        For Each ricAndFieldValue As KeyValuePair(Of String, Dictionary(Of String, Double)) In rfv
-                            Dim ric = ricAndFieldValue.Key
                             Logger.Trace("Got RIC {0}", ric)
 
-                            If ricAndFieldValue.Value.Keys.Contains(_quote) AndAlso CDbl(ricAndFieldValue.Value(_quote)) > 0 Then
-                                Try
-                                    Dim price = CDbl(ricAndFieldValue.Value(_quote))
-                                    Descrs(ric).Price = price
-                                    CalculateYields(_date, _meta(ric), Descrs(ric))
-                                    NotifyUpdated(Me)
-                                Catch ex As Exception
-                                    Logger.WarnException("Failed to parse realtime data", ex)
-                                    Logger.Warn("Exception = {0}", ex.ToString())
-                                End Try
-                            Else
-                                Logger.Warn("Empty data for ric {0};  will try to load history", ric)
-                                DoLoadRIC(ric, {"DATE", _fieldNames(QuoteSource.Hist)}.ToList, _date.AddDays(-1))
-                            End If
+                        If fv.Keys.Contains(_quote) AndAlso CDbl(fv(_quote)) > 0 Then
+                            Try
+                                Dim price = CDbl(fv(_quote))
+                                Descrs(ric).Price = price
+                                CalculateYields(_date, _meta(ric), Descrs(ric))
+                                NotifyUpdated(Me)
+                            Catch ex As Exception
+                                Logger.WarnException("Failed to parse realtime data", ex)
+                                Logger.Warn("Exception = {0}", ex.ToString())
+                            End Try
+                        Else
+                            Logger.Warn("Empty data for ric {0};  will try to load history", ric)
+                            DoLoadRIC(ric, {"DATE", _fieldNames(QuoteSource.Hist)}.ToList, _date.AddDays(-1))
+                        End If
 
 #If DEBUG Then
-                            Dim fieldValue = ricAndFieldValue.Value
-                            For Each fv As KeyValuePair(Of String, Double) In fieldValue
-                                Logger.Trace("  {0} -> {1}", fv.Key, fv.Value)
-                            Next
-#End If
+                        For Each x As KeyValuePair(Of String, Double) In fv
+                            Logger.Trace("  {0} -> {1}", x.Key, x.Value)
                         Next
-                    Else
-                        Logger.Info("Will not handle unknown list {0}", list)
+#End If
                     End If
                 Catch ex As Exception
                     Logger.ErrorException("Failed to load realtime data", ex)

@@ -32,6 +32,15 @@ Public Class LiveQuotes
         End Try
     End Sub
 
+    Public Sub CancelItems(ByVal rics As List(Of String))
+        Try
+            _listManager.UnregisterItems(String.Join(",", rics))
+        Catch ex As Exception
+            Logger.ErrorException("Failed to unregister items", ex)
+            Logger.Error("Exception = {0}", ex.ToString())
+        End Try
+    End Sub
+
     Public Sub AddItems(ByVal items As List(Of String), Optional ByVal fields As List(Of String) = Nothing)
         Dim itms = items.Aggregate(Function(str, elem) str & "," & elem)
         Dim flds = If(fields IsNot Nothing, fields.Aggregate(Function(str, elem) str & "," & elem), "")
@@ -122,4 +131,5 @@ Public Class LiveQuotes
         _listManager.CloseAllLinks()
         _listManager = Nothing
     End Sub
+
 End Class

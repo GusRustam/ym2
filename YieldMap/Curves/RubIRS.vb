@@ -2,12 +2,12 @@
 Imports AdfinXRtLib
 Imports System.Text.RegularExpressions
 Imports System.Drawing
+Imports ReutersData
 Imports Uitls
 Imports YieldMap.Tools.Estimation
 Imports YieldMap.Tools
 Imports YieldMap.Tools.History
 Imports NLog
-Imports YieldMap.Tools.Lists
 
 Namespace Curves
     Public Interface IAssetSwapBenchmark
@@ -21,7 +21,7 @@ Namespace Curves
         Inherits SwapCurve
         Implements IAssetSwapBenchmark
 
-        Public Sub New(bmk As SpreadContainer)
+        Public Sub New(ByVal bmk As SpreadContainer)
             MyBase.New(bmk)
         End Sub
 
@@ -49,7 +49,7 @@ Namespace Curves
         Private _bootstrapped As Boolean
 
         '' LOADERS
-        Private WithEvents _quoteLoader As New ListLoadManager
+        Private WithEvents _quoteLoader As New LiveQuotes 'ListLoadManager
 
         '' DATA LOADING PARAMETERS
         Private _theDate As Date = Date.Today
@@ -113,23 +113,25 @@ Namespace Curves
 
         '' START LOADING REALTIME DATA
         Protected Overrides Sub StartRealTime()
-            If Not _quoteLoader.StartNewTask(New ListTaskDescr() With {
-                                                .Name = _name,
-                                                .Items = GetRICs(_broker),
-                                                .Fields = {"275", "393"}.ToList()
-                                            }) Then
-                Logger.Error("Failed to start loading {0} data", Me.GetType().Name)
-                Throw New InvalidOperationException("Failed to start loading RUBIRS data")
-            End If
+            _quoteLoader.AddItems(GetRICs(_broker), {"275", "393"}.ToList())
+            'If Not _quoteLoader.StartNewTask(New ListTaskDescr() With {
+            '                                    .Name = _name,
+            '                                    .Items = GetRICs(_broker),
+            '                                    .Fields = {"275", "393"}.ToList()
+            '                                }) Then
+            '    Logger.Error("Failed to start loading {0} data", Me.GetType().Name)
+            '    Throw New InvalidOperationException("Failed to start loading RUBIRS data")
+            'End If
             If BaseInstrument <> "" Then
-                If Not _quoteLoader.StartNewTask(New ListTaskDescr() With {
-                                                    .Name = _name + "_BASE",
-                                                    .Items = {BaseInstrument}.ToList(),
-                                                    .Fields = {"BID", "ASK"}.ToList()
-                                                }) Then
-                    Logger.Error("Failed to start loading {0}_BASE data", Me.GetType().Name)
-                    Throw New InvalidOperationException(String.Format("Failed to start loading {0}_BASE data", Me.GetType().Name))
-                End If
+                _quoteLoader.AddItems({BaseInstrument}.ToList(), {"BID", "ASK"}.ToList())
+                'If Not _quoteLoader.StartNewTask(New ListTaskDescr() With {
+                '                                    .Name = _name + "_BASE",
+                '                                    .Items = {BaseInstrument}.ToList(),
+                '                                    .Fields = {"BID", "ASK"}.ToList()
+                '                                }) Then
+                '    Logger.Error("Failed to start loading {0}_BASE data", Me.GetType().Name)
+                '    Throw New InvalidOperationException(String.Format("Failed to start loading {0}_BASE data", Me.GetType().Name))
+                'End If
             End If
         End Sub
 
@@ -174,116 +176,98 @@ Namespace Curves
         End Function
 
         Public Overrides Sub Cleanup()
-            _quoteLoader.DiscardTask(_name)
-            _quoteLoader.DiscardTask(_name + "_BASE")
+            _quoteLoader.CancelItems(GetRICs(_broker))
+            If BaseInstrument <> "" Then _quoteLoader.CancelItem(BaseInstrument)
             MyBase.Cleanup()
         End Sub
 
         '' REALTIME DATA ARRIVED
-        Private Sub OnRealTimeData(ByVal data As Dictionary(Of String, Dictionary(Of String, Dictionary(Of String, Double)))) Handles _quoteLoader.OnNewData
+        Private Sub OnRealTimeData(ByVal data As Dictionary(Of String, Dictionary(Of String, Double))) Handles _quoteLoader.NewData
             Logger.Debug("OnRealTimeData")
-            For Each listAndRFV As KeyValuePair(Of String, Dictionary(Of String, Dictionary(Of String, Double))) In data
-                Dim list = listAndRFV.Key
-                Dim rfv = listAndRFV.Value
+            For Each rfv As KeyValuePair(Of String, Dictionary(Of String, Double)) In data
+                Dim ric = rfv.Key
+                Dim fv = rfv.Value
 
-                If list = _name Then
-                    Logger.Info(Me.GetType().Name)
-                    For Each ricAndFieldValue As KeyValuePair(Of String, Dictionary(Of String, Double)) In rfv
-                        Dim ric = ricAndFieldValue.Key
-                        Logger.Trace("Got RIC {0}", ric)
-
-                        ' define yield curve elem
-                        Dim duration = GetDuration(ric)
-                        If ricAndFieldValue.Value.Keys.Contains("393") Or ricAndFieldValue.Value.Keys.Contains("275") Then
-                            Try
-                                Descrs(ric).YieldAtDate = GetDate()
-                                If _quote = "BID" Or _quote = "ASK" Then
-                                    Dim yld As Double
-                                    yld = CDbl(ricAndFieldValue.Value(IIf(_quote = "BID", "393", "275")))
-                                    If yld > 0 Then
-                                        Descrs(ric).Yield = yld / 100
-                                        Descrs(ric).Duration = duration
-                                        NotifyUpdated(Me)
-                                    End If
-                                Else
-                                    Dim bidYield = CDbl(ricAndFieldValue.Value("393")) / 100
-                                    Dim askYield = CDbl(ricAndFieldValue.Value("275")) / 100
-                                    Dim found = True
-                                    If bidYield > 0 And askYield > 0 Then
-                                        Descrs(ric).Yield = (bidYield + askYield) / 2
-                                    ElseIf bidYield > 0 Then
-                                        Descrs(ric).Yield = bidYield
-                                    ElseIf askYield > 0 Then
-                                        Descrs(ric).Yield = askYield
-                                    Else
-                                        found = False
-                                    End If
-                                    If found Then
-                                        Descrs(ric).Duration = duration
-                                        NotifyUpdated(Me)
-                                    End If
+                If GetRICs(_broker).Contains(ric) Then
+                    Logger.Trace("Got RIC {0}", ric)
+                    ' define yield curve elem
+                    Dim duration = GetDuration(ric)
+                    If fv.Keys.Contains("393") Or fv.Keys.Contains("275") Then
+                        Try
+                            Descrs(ric).YieldAtDate = GetDate()
+                            If _quote = "BID" Or _quote = "ASK" Then
+                                Dim yld As Double
+                                yld = CDbl(fv(IIf(_quote = "BID", "393", "275")))
+                                If yld > 0 Then
+                                    Descrs(ric).Yield = yld / 100
+                                    Descrs(ric).Duration = duration
+                                    NotifyUpdated(Me)
                                 End If
-                            Catch ex As Exception
-                                Logger.WarnException("Failed to parse realtime data", ex)
-                                Logger.Warn("Exception = {0}", ex.ToString())
-                            End Try
-                        End If
-
-#If DEBUG Then
-                        Dim fieldValue = ricAndFieldValue.Value
-                        For Each fv As KeyValuePair(Of String, Double) In fieldValue
-                            Logger.Trace("  {0} -> {1}", fv.Key, fv.Value)
-                        Next
-#End If
-
-                    Next
-                ElseIf list = _name + "_BASE" Then
-                    Logger.Info(Me.GetType().Name + "_BASE")
-                    If rfv.Keys.First <> BaseInstrument Then
-                        Logger.Warn("No base data in {0}", rfv.ToString())
-                    Else
-                        For Each ricAndFieldValue As KeyValuePair(Of String, Dictionary(Of String, Double)) In rfv
-                            Logger.Trace("Got base instrument {0}", BaseInstrument)
-                            If ricAndFieldValue.Value.Keys.Contains("BID") Or ricAndFieldValue.Value.Keys.Contains("ASK") Then
-                                Try
-                                    Dim found = False
-                                    If _quote = "BID" Or _quote = "ASK" Then
-                                        Dim yld As Double
-                                        yld = CDbl(ricAndFieldValue.Value(_quote))
-                                        If yld > 0 Then
-                                            BaseInstrumentPrice = yld
-                                            found = True
-                                        End If
-                                    Else
-                                        found = True
-                                        Dim bidYield = CDbl(ricAndFieldValue.Value("BID"))
-                                        Dim askYield = CDbl(ricAndFieldValue.Value("ASK"))
-                                        If bidYield > 0 And askYield > 0 Then
-                                            BaseInstrumentPrice = (bidYield + askYield) / 2
-                                        ElseIf bidYield > 0 Then
-                                            BaseInstrumentPrice = bidYield
-                                        ElseIf askYield > 0 Then
-                                            BaseInstrumentPrice = askYield
-                                        Else
-                                            found = False
-                                        End If
-                                    End If
-                                    If found Then NotifyUpdated(Me)
-                                Catch ex As Exception
-                                    Logger.WarnException("Failed to parse realtime base data", ex)
-                                    Logger.Warn("Exception = {0}", ex.ToString())
-                                End Try
+                            Else
+                                Dim bidYield = CDbl(fv("393")) / 100
+                                Dim askYield = CDbl(fv("275")) / 100
+                                Dim found = True
+                                If bidYield > 0 And askYield > 0 Then
+                                    Descrs(ric).Yield = (bidYield + askYield) / 2
+                                ElseIf bidYield > 0 Then
+                                    Descrs(ric).Yield = bidYield
+                                ElseIf askYield > 0 Then
+                                    Descrs(ric).Yield = askYield
+                                Else
+                                    found = False
+                                End If
+                                If found Then
+                                    Descrs(ric).Duration = duration
+                                    NotifyUpdated(Me)
+                                End If
                             End If
-#If DEBUG Then
-                            Dim fieldValue = ricAndFieldValue.Value
-                            For Each fv As KeyValuePair(Of String, Double) In fieldValue
-                                Logger.Trace("  {0} -> {1}", fv.Key, fv.Value)
-                            Next
-#End If
-                        Next
+                        Catch ex As Exception
+                            Logger.WarnException("Failed to parse realtime data", ex)
+                            Logger.Warn("Exception = {0}", ex.ToString())
+                        End Try
                     End If
-                Else
-                    Logger.Info("Will not handle unknown list {0}", list)
+#If DEBUG Then
+                    For Each x As KeyValuePair(Of String, Double) In fv
+                        Logger.Trace("  {0} -> {1}", x.Key, x.Value)
+                    Next
+#End If
+                ElseIf BaseInstrument = ric Then
+                    Logger.Trace("Got base instrument {0}", BaseInstrument)
+                    If fv.Keys.Contains("BID") Or fv.Keys.Contains("ASK") Then
+                        Try
+                            Dim found = False
+                            If _quote = "BID" Or _quote = "ASK" Then
+                                Dim yld As Double
+                                yld = CDbl(fv(_quote))
+                                If yld > 0 Then
+                                    BaseInstrumentPrice = yld
+                                    found = True
+                                End If
+                            Else
+                                found = True
+                                Dim bidYield = CDbl(fv("BID"))
+                                Dim askYield = CDbl(fv("ASK"))
+                                If bidYield > 0 And askYield > 0 Then
+                                    BaseInstrumentPrice = (bidYield + askYield) / 2
+                                ElseIf bidYield > 0 Then
+                                    BaseInstrumentPrice = bidYield
+                                ElseIf askYield > 0 Then
+                                    BaseInstrumentPrice = askYield
+                                Else
+                                    found = False
+                                End If
+                            End If
+                            If found Then NotifyUpdated(Me)
+                        Catch ex As Exception
+                            Logger.WarnException("Failed to parse realtime base data", ex)
+                            Logger.Warn("Exception = {0}", ex.ToString())
+                        End Try
+                    End If
+#If DEBUG Then
+                    For Each x As KeyValuePair(Of String, Double) In fv
+                        Logger.Trace("  {0} -> {1}", x.Key, x.Value)
+                    Next
+#End If
                 End If
             Next
         End Sub
@@ -292,7 +276,7 @@ Namespace Curves
             Return _bootstrapped
         End Function
 
-        Public Overrides Sub SetBootstrapped(flag As Boolean)
+        Public Overrides Sub SetBootstrapped(ByVal flag As Boolean)
             _bootstrapped = flag
             NotifyUpdated(Me)
         End Sub
@@ -424,7 +408,7 @@ Namespace Curves
 
     Public NotInheritable Class RubCCS
         Inherits RubIRS
-        Public Sub New(bmk As SpreadContainer)
+        Public Sub New(ByVal bmk As SpreadContainer)
             MyBase.New(bmk)
         End Sub
 
@@ -451,7 +435,7 @@ Namespace Curves
 
     Public NotInheritable Class RubNDF
         Inherits RubIRS
-        Public Sub New(bmk As SpreadContainer)
+        Public Sub New(ByVal bmk As SpreadContainer)
             MyBase.New(bmk)
         End Sub
 

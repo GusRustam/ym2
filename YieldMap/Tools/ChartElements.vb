@@ -1,11 +1,9 @@
 ﻿Imports System.Drawing
 Imports System.Reflection
 Imports DbManager.Bonds
-Imports DbManager
 Imports NLog
+Imports ReutersData
 Imports YieldMap.Tools.History
-Imports YieldMap.Tools.Lists
-Imports YieldMap.Commons
 Imports YieldMap.Curves
 
 Namespace Tools
@@ -32,6 +30,22 @@ Namespace Tools
 
 #Region "II. Groups and ansamble"
     Public Class Ansamble
+        Private Shared ReadOnly Identities As New HashSet(Of Long)
+
+        Public Shared Sub ReleaseID(ByVal id As Long)
+            Identities.Remove(id)
+        End Sub
+
+        Public Shared Function GenerateID() As Long
+            Dim rnd = New Random()
+            Dim num As Integer
+            Do
+                num = CLng(Math.Round((89.9999 * rnd.NextDouble() + 10) * 10000))
+            Loop While Identities.Contains(num)
+            Identities.Add(num)
+            Return num
+        End Function
+
         Private ReadOnly _groups As New List(Of Group)
 
         Public ReadOnly Property Groups As List(Of Group)
@@ -54,10 +68,6 @@ Namespace Tools
             End Get
         End Property
 
-        Public Function GetColor(ByVal instrument As String) As Color
-            Return Color.FromName(GetInstrumentGroup(instrument).Color)
-        End Function
-
         Public Sub Cleanup()
             _groups.ForEach(Sub(group)
                                 group.Cleanup()
@@ -65,7 +75,6 @@ Namespace Tools
                             End Sub)
             _groups.Clear()
         End Sub
-
 
         Public Sub StartLoadingLiveData()
             _groups.ForEach(Sub(grp) grp.StartAll())
@@ -284,6 +293,7 @@ Namespace Tools
 
     End Class
 
+    ' todo custom label
     Public Enum LabelMode
         IssuerAndSeries
         IssuerCpnMat
@@ -306,8 +316,6 @@ Namespace Tools
         Public Event Clear As Action(Of Group)
         Public Event Volume As Action(Of Bond)
         Public Event AllQuotes As Action(Of List(Of Bond))
-        Public Event LoadCriticalError As Action
-        Public Event LoadError As Action(Of WrongItemsInfo)
 
         'Public Group As GroupType
         Public SeriesName As String
@@ -333,7 +341,7 @@ Namespace Tools
         Public PortfolioID As Long
         Private _color As String
 
-        Private WithEvents _quoteLoader As New ListLoadManager_v2
+        Private WithEvents _quoteLoader As New LiveQuotes
 
         Public Property Color() As String
             Get
@@ -362,14 +370,7 @@ Namespace Tools
 
         Public Sub StartRics(ByVal rics As List(Of String))
             If rics.Count = 0 Then Return
-            Dim res = _quoteLoader.AddItems(rics, GetAllKnownFields())
-            If res Is Nothing Then
-                RaiseEvent LoadCriticalError()
-            Else
-                If res.WrongFields.Any Or res.WrongItems.Any Then
-                    RaiseEvent LoadError(res)
-                End If
-            End If
+            _quoteLoader.AddItems(rics, GetAllKnownFields())
         End Sub
 
         Private Function GetAllKnownFields() As List(Of String)
@@ -391,26 +392,11 @@ Namespace Tools
             Dim quote = New Dictionary(Of String, Double)
             quote.Add(CustomField, price)
             data.Add(ric, quote)
-            OnQuotes(data, Nothing)
+            OnQuotes(data)
         End Sub
 
-        Private Sub OnQuotes(ByVal data As Dictionary(Of String, Dictionary(Of String, Double)), ByVal errorInfo As WrongItemsInfo) Handles _quoteLoader.OnNewData
+        Private Sub OnQuotes(ByVal data As Dictionary(Of String, Dictionary(Of String, Double))) Handles _quoteLoader.NewData
             Logger.Trace("QuoteLoaderOnNewData()")
-            'If errorInfo IsNot Nothing Then
-            '    If errorInfo.WrongFields.Any Then
-            '        ' todo what? mark field as dead one for the corresponding bond
-            '    End If
-            '    If errorInfo.WrongItems.Any Then
-            '        If errorInfo.WrongItems.ContainsKey(ItemInfo.InvalidItems) Then
-            '            errorInfo.WrongItems(ItemInfo.InvalidItems).ForEach(
-            '                Sub(tuple)
-            '                    Dim ric = tuple.Item1
-            '                    Dim status = tuple.Item2
-            '                    ' todo what? mark bond as dead
-            '                End Sub)
-            '        End If
-            '    End If
-            'End If
             For Each instrAndFields As KeyValuePair(Of String, Dictionary(Of String, Double)) In data
                 Try
                     Dim instrument As String = instrAndFields.Key
