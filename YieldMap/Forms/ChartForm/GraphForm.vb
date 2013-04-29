@@ -29,7 +29,7 @@ Namespace Forms.ChartForm
         Private ReadOnly _moneyMarketCurves As New List(Of SwapCurve)
         Private WithEvents _spreadBenchmarks As New SpreadContainer
         'Private WithEvents _ansamble As New Ansamble(_spreadBenchmarks)
-        Private WithEvents _ansamble As New Ansamble(_spreadBenchmarks)
+        Private WithEvents _ansamble As New Ansamble2
 
         Private Sub Loader_Progress(ByVal obj As ProgressEvent) Handles _bondsLoader.Progress
             ' todo what to do?
@@ -126,60 +126,16 @@ Namespace Forms.ChartForm
 
                 Dim portfolioStructure = PortfolioManager.Instance().GetPortfolioStructure(currentPortID)
 
-                For Each group As Group In From port In portfolioStructure.Sources
+                For Each group As Group2 In From port In portfolioStructure.Sources
                                            Where TypeOf port.Source Is DbManager.Chain Or TypeOf port.Source Is UserList
-                                           Select GetGroup(port, portfolioStructure)
-
-                    _ansamble.AddGroup(group)
+                                           Select Group2.Create(_ansamble, port, portfolioStructure)
+                    _ansamble.Items.Add(group)
                 Next
-                _ansamble.StartLoadingLiveData()
+                _ansamble.Start()
             End Set
         End Property
 
-        Private Function GetGroup(ByVal port As PortfolioSource, ByVal portfolioStructure As PortfolioStructure) As Group
-            Dim group As Group
-
-            Dim source = TryCast(port.Source, Source)
-            If source Is Nothing Then
-                Logger.Warn("Unsupported source {0}", source)
-                Return Nothing
-            End If
-            group = New Group(_ansamble) With {
-                .SeriesName = If(port.Name <> "", port.Name, source.Name),
-                .PortfolioID = source.ID,
-                .BidField = source.Fields.Realtime.Bid,
-                .AskField = source.Fields.Realtime.Ask,
-                .LastField = source.Fields.Realtime.Hist,
-                .HistField = source.Fields.Realtime.Hist,
-                .VolumeField = source.Fields.Realtime.Volume,
-                .VwapField = source.Fields.Realtime.VWAP,
-                .Brokers = {"MM", ""}.ToList(),
-                .Currency = "",
-                .Color = If(port.Color <> "", port.Color, source.Color)
-            }
-
-            ' TODO THAT'S BULLSHIT BUT CURRENTLY NECESSARY BULLSHIT
-            Dim selectedField As String
-            If group.LastField.Trim() <> "" Then
-                selectedField = group.LastField
-            ElseIf group.VwapField.Trim() <> "" Then
-                selectedField = group.VwapField
-            ElseIf group.BidField.Trim() <> "" Then
-                selectedField = group.BidField
-            Else
-                selectedField = group.AskField
-            End If
-
-            For Each ric In portfolioStructure.Rics(port)
-                Dim descr = BondsData.Instance.GetBondInfo(ric)
-                If descr IsNot Nothing Then
-                    group.AddRic(ric, descr, selectedField)
-                Else
-                    Logger.Error("No description for bond {0} found", ric)
-                End If
-            Next
-            Return group
-        End Function
+        
 
 #End Region
 
@@ -238,8 +194,8 @@ Namespace Forms.ChartForm
                 Try
                     If htr.ChartElementType = ChartElementType.DataPoint Then
                         Dim point As DataPoint = CType(htr.Object, DataPoint)
-                        If TypeOf point.Tag Is Bond Then
-                            Dim bondDataPoint = CType(point.Tag, Bond)
+                        If TypeOf point.Tag Is Bond2 Then
+                            Dim bondDataPoint = CType(point.Tag, Bond2)
                             With BondCMS
                                 .Tag = bondDataPoint.MetaData.RIC
                                 .Show(TheChart, mouseEvent.Location)
@@ -328,8 +284,8 @@ Namespace Forms.ChartForm
                     hasShown = True
                     Dim point As DataPoint = CType(htr.Object, DataPoint)
 
-                    If TypeOf point.Tag Is Bond And Not point.IsEmpty Then
-                        Dim bondData = CType(point.Tag, Bond)
+                    If TypeOf point.Tag Is Bond2 And Not point.IsEmpty Then
+                        Dim bondData = CType(point.Tag, Bond2)
                         DscrLabel.Text = bondData.MetaData.ShortName
                         Dim calculatedYield = bondData.QuotesAndYields(bondData.SelectedQuote)
 
@@ -417,7 +373,7 @@ Namespace Forms.ChartForm
 
                     seriesDescr.ResetSelection()
                     srs.Points.ToList.ForEach(Sub(point)
-                                                  Dim tg = CType(point.Tag, Bond)
+                                                  Dim tg = CType(point.Tag, Bond2)
                                                   point.Color = If(tg.QuotesAndYields(tg.SelectedQuote).YieldSource = YieldSource.Historical, Color.LightGray, Color.White)
                                               End Sub)
                     If seriesDescr.Name = curveName AndAlso pointIndex IsNot Nothing Then
@@ -625,7 +581,7 @@ Namespace Forms.ChartForm
             Logger.Trace("ShowLabelsTSBClick")
             For Each series In From srs In TheChart.Series Where TypeOf srs.Tag Is BondSetSeries
                 Dim points = series.Points
-                For Each dataPoint In From pnt In points Where TypeOf pnt.Tag Is Bond Select {pnt, CType(pnt.Tag, Bond)}
+                For Each dataPoint In From pnt In points Where TypeOf pnt.Tag Is Bond2 Select {pnt, CType(pnt.Tag, Bond2)}
                     Dim lab As String
                     Select Case dataPoint(1).LabelMode
                         Case LabelMode.IssuerAndSeries : lab = dataPoint(1).Metadata.Label1
@@ -1168,13 +1124,13 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
-        Private Sub OnBondAllQuotes(ByVal data As List(Of Bond)) Handles _ansamble.AllQuotes
+        Private Sub OnBondAllQuotes(ByVal data As List(Of Bond2)) Handles _ansamble.AllQuotes
             Logger.Trace("OnBondAllQuotes()")
             data.Where(Function(elem) elem.QuotesAndYields.ContainsKey(elem.SelectedQuote)).ToList.ForEach(Sub(elem) OnBondQuote(elem, elem.SelectedQuote, True))
             SetChartMinMax()
         End Sub
 
-        Private Sub OnBondQuote(ByVal descr As Bond, ByVal fieldName As String, Optional ByVal raw As Boolean = False) Handles _ansamble.Quote
+        Private Sub OnBondQuote(ByVal descr As Bond2, ByVal fieldName As String, Optional ByVal raw As Boolean = False) Handles _ansamble.Quote
             Logger.Trace("OnBondQuote({0}, {1})", descr.MetaData.ShortName, descr.ParentGroup.SeriesName)
             GuiAsync(
                 Sub()
@@ -1215,10 +1171,10 @@ Namespace Forms.ChartForm
                     ' creating data point
                     Dim point As DataPoint
                     Dim yValue = _spreadBenchmarks.GetActualQuote(calc)
-                    Dim haveSuchPoint = series.Points.Any(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric)
+                    Dim haveSuchPoint = series.Points.Any(Function(pnt) CType(pnt.Tag, Bond2).MetaData.RIC = ric)
 
                     If haveSuchPoint Then
-                        point = series.Points.First(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric)
+                        point = series.Points.First(Function(pnt) CType(pnt.Tag, Bond2).MetaData.RIC = ric)
                         If yValue IsNot Nothing Then
                             point.XValue = calc.Duration
                             If Math.Abs(yValue.Value - point.YValues.First) > 0.01 Then
@@ -1257,8 +1213,8 @@ Namespace Forms.ChartForm
                 Sub()
                     Dim series As Series = TheChart.Series.FindByName(group.SeriesName)
                     If series IsNot Nothing Then
-                        While series.Points.Any(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric)
-                            series.Points.Remove(series.Points.First(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric))
+                        While series.Points.Any(Function(pnt) CType(pnt.Tag, Bond2).MetaData.RIC = ric)
+                            series.Points.Remove(series.Points.First(Function(pnt) CType(pnt.Tag, Bond2).MetaData.RIC = ric))
                         End While
                     End If
                     If series.Points.Count = 0 Then _ansamble.RemoveGroup(group.Id)
@@ -1296,7 +1252,7 @@ Namespace Forms.ChartForm
 
                 bond.LabelMode = mode
                 If ShowLabelsTSB.Checked Then
-                    TheChart.Series.FindByName(group.SeriesName).Points.First(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric).Label = bond.Label
+                    TheChart.Series.FindByName(group.SeriesName).Points.First(Function(pnt) CType(pnt.Tag, Bond2).MetaData.RIC = ric).Label = bond.Label
                 End If
             Catch ex As Exception
                 Logger.WarnException("Failed to set label mode", ex)
@@ -1328,7 +1284,7 @@ Namespace Forms.ChartForm
                     TheChart.Series.FindByName(group.SeriesName).Points.ToList.ForEach(
                         Sub(pnt)
                             Try
-                                Dim bond = CType(pnt.Tag, Bond)
+                                Dim bond = CType(pnt.Tag, Bond2)
                                 bond.LabelMode = mode
                                 pnt.Label = bond.Label
                             Catch ex As Exception

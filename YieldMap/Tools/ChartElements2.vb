@@ -1,4 +1,7 @@
-﻿Imports DbManager
+﻿Imports DbManager.Bonds
+Imports DbManager
+Imports NLog
+Imports Settings
 
 Namespace Tools
     Public MustInherit Class Entity2
@@ -51,7 +54,95 @@ Namespace Tools
     Public Class Group2
         Inherits Entity2
         Implements IGroup2
-        Private _ansamble As Ansamble
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(Group2))
+        Private _ansamble As Ansamble2
+        Private _seriesName As String
+        Private _portfolioID As String
+        Private _fields As FieldSet
+        Private _color As String
+
+        Public Shared Function Create(ByVal ans As Ansamble2, ByVal port As PortfolioSource, ByVal portfolioStructure As PortfolioStructure) As Group2
+            Dim group As Group2
+
+            Dim source = TryCast(port.Source, Source)
+            If source Is Nothing Then
+                Logger.Warn("Unsupported source {0}", source)
+                Return Nothing
+            End If
+            group = New Group2(ans) With {
+                .SeriesName = If(port.Name <> "", port.Name, source.Name),
+                .PortfolioID = source.ID,
+                .Fields = source.Fields,
+                .Color = If(port.Color <> "", port.Color, source.Color)
+            }
+
+            Dim fieldPriority = SettingsManager.Instance.FieldsPriority.Split(",")
+            Dim yieldMode = SettingsManager.Instance.YieldCalcMode
+            Dim selectedField = FindAppropriateField(fieldPriority, group.Fields.Realtime)
+
+            For Each ric In portfolioStructure.Rics(port)
+                Dim descr = BondsData.Instance.GetBondInfo(ric)
+                If descr IsNot Nothing Then
+                    group.AddRic(ric, descr, selectedField, yieldMode)
+                Else
+                    Logger.Error("No description for bond {0} found", ric)
+                End If
+            Next
+            Return group
+        End Function
+
+        Private Sub AddRic(ByVal ric As String, ByVal bondDescription As BondDescription, ByVal selectedField As String, ByVal yieldMode As String)
+            Throw New NotImplementedException()
+        End Sub
+
+        Private Shared Function FindAppropriateField(ByVal fieldPriority As String(), ByVal realtime As Fields) As String
+            Dim usefulFields = From fld In fieldPriority
+                    Let val = realtime.GetField(fld)
+                    Where val <> ""
+                    Select fld
+            If Not usefulFields.Any Then Throw New BadBondException()
+            Return usefulFields.First
+        End Function
+
+        Protected Property Color() As String
+            Get
+                Return _color
+            End Get
+            Set(ByVal value As String)
+                _color = value
+            End Set
+        End Property
+
+        Protected Property Fields() As FieldSet
+            Get
+                Return _fields
+            End Get
+            Set(ByVal value As FieldSet)
+                _fields = value
+            End Set
+        End Property
+
+        Protected Property PortfolioID() As String
+            Get
+                Return _portfolioID
+            End Get
+            Set(ByVal value As String)
+                _portfolioID = value
+            End Set
+        End Property
+
+        Protected Property SeriesName() As String
+            Get
+                Return _seriesName
+            End Get
+            Set(ByVal value As String)
+                _seriesName = value
+            End Set
+        End Property
+
+        Private Sub New(ByVal ansamble As Ansamble2)
+            _ansamble = ansamble
+        End Sub
 
         Public Sub Start() Implements IGroup2.Start
             Throw New NotImplementedException()
@@ -66,8 +157,13 @@ Namespace Tools
         End Sub
     End Class
 
+    Friend Class BadBondException
+        Inherits Exception
+    End Class
+
     Public Class Bond2
         Inherits Entity2
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(Bond2))
         Private _group As Group2
     End Class
 
@@ -81,7 +177,7 @@ Namespace Tools
     Public Class Curve2
         Inherits Entity2
         Implements IGroup2
-        Private _ansamble As Ansamble
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(Curve2))
         Private _benchmarkType As SpreadType2?
 
         Public Sub Start() Implements IGroup2.Start
@@ -97,10 +193,16 @@ Namespace Tools
         End Sub
     End Class
 
-    Class Ansamble2
+    Public Class Ansamble2
         Private Shared ReadOnly Identities As New HashSet(Of Long)
 
-        Private _items As New HashSet(Of Entity2)
+        Public ReadOnly Property Items() As HashSet(Of IGroup2)
+            Get
+                Return _items
+            End Get
+        End Property
+
+        Private ReadOnly _items As New HashSet(Of IGroup2)
 
         Public Shared Sub ReleaseID(ByVal id As Long)
             Identities.Remove(id)
@@ -127,9 +229,5 @@ Namespace Tools
         Public Sub Cleanup()
             Throw New NotImplementedException()
         End Sub
-
-        Public Function CreateGroup(ByVal descr As PortfolioSource) As Group2
-            Throw New NotImplementedException()
-        End Function
     End Class
 End Namespace

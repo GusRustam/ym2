@@ -68,6 +68,17 @@ Public Class Fields
     ' ReSharper restore ConvertToConstant.Local
     ' ReSharper restore FieldCanBeMadeReadOnly.Local
 
+    Public Function GetField(ByVal name As String)
+        Dim res = (From fld In GetType(Fields).GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
+                           Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False)
+                           Where attx.Any
+                           Let q = CType(attx.First, ConfingNameAttribute)
+                           Where q.XmlName = name
+                           Select fld.GetValue(Me))
+
+        Return res.First
+    End Function
+
     Public ReadOnly Property ID() As String
         Get
             Return _id

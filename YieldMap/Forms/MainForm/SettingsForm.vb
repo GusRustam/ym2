@@ -1,4 +1,5 @@
 ﻿Imports System.Text.RegularExpressions
+Imports System.ComponentModel
 Imports DbManager.Bonds
 Imports NLog
 Imports Settings
@@ -7,6 +8,39 @@ Namespace Forms.MainForm
     Public Class SettingsForm
         Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(SettingsForm))
         Private Shared ReadOnly Settings As SettingsManager = SettingsManager.Instance
+        Private ReadOnly _lst As New List(Of IndexedItem)
+
+        Private Class IndexedItem
+            Implements IComparable(Of IndexedItem)
+
+            Private _order As Integer
+            Private ReadOnly _name As String
+
+            Public Sub New(ByVal order As Integer, ByVal name As String)
+                _order = order
+                _name = name
+            End Sub
+
+            <Browsable(False)>
+            Public Property Order() As Integer
+                Get
+                    Return _order
+                End Get
+                Set(ByVal value As Integer)
+                    _order = value
+                End Set
+            End Property
+
+            Public ReadOnly Property Name() As String
+                Get
+                    Return _name
+                End Get
+            End Property
+
+            Public Function CompareTo(ByVal other As IndexedItem) As Integer Implements IComparable(Of IndexedItem).CompareTo
+                Return Comparer.Default.Compare(Order, other.Order)
+            End Function
+        End Class
 
         Private Sub SettingsFormLoad(ByVal sender As System.Object, ByVal e As EventArgs) Handles MyBase.Load
             Select Case Settings.LogLevel
@@ -18,6 +52,13 @@ Namespace Forms.MainForm
                 Case LogLevel.Fatal : LogFatalRadioButton.Checked = True
                 Case LogLevel.Off : LogNoneRadioButton.Checked = True
             End Select
+
+            Dim items = Settings.FieldsPriority.Split(".")
+            Dim i As Integer
+            For i = 0 To items.Count() - 1
+                _lst.Add(New IndexedItem(i, items(i)))
+            Next
+            FieldsPriorityLB.DataSource = _lst
 
             MinYieldTextBox.Text = If(Settings.MinYield.HasValue, Settings.MinYield, "")
             MaxYieldTextBox.Text = If(Settings.MaxYield.HasValue, Settings.MaxYield, "")
@@ -84,6 +125,8 @@ Namespace Forms.MainForm
             Settings.ShowMainToolBar = MainWindowCheckBox.Checked
             Settings.ShowChartToolBar = ChartWindowCheckBox.Checked
 
+            Settings.FieldsPriority = _lst.Aggregate("", Function(str, elem) str + "," + elem.Name)
+
             Dim columnsString As String = ""
 
             If AllColumnsCB.CheckState = CheckState.Checked Then
@@ -149,6 +192,28 @@ Namespace Forms.MainForm
             Else
                 AllColumnsCB.CheckState = CheckState.Indeterminate
             End If
+        End Sub
+
+        Private Sub UpButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles UpButton.Click
+            If FieldsPriorityLB.Items.Count = 1 Then Return
+            If FieldsPriorityLB.SelectedIndex <= 0 Then Return
+            Dim item1 = CType(FieldsPriorityLB.Items(FieldsPriorityLB.SelectedIndex), IndexedItem).Order
+            Dim item2 = CType(FieldsPriorityLB.Items(FieldsPriorityLB.SelectedIndex - 1), IndexedItem).Order
+            _lst(item1).Order = item2
+            _lst(item2).Order = item1
+            _lst.Sort()
+            FieldsPriorityLB.DataSource = _lst
+        End Sub
+
+        Private Sub DownButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles DownButton.Click
+            If FieldsPriorityLB.Items.Count = 1 Then Return
+            If FieldsPriorityLB.SelectedIndex >= FieldsPriorityLB.Items.Count - 1 Then Return
+            Dim item1 = CType(FieldsPriorityLB.Items(FieldsPriorityLB.SelectedIndex), IndexedItem).Order
+            Dim item2 = CType(FieldsPriorityLB.Items(FieldsPriorityLB.SelectedIndex + 1), IndexedItem).Order
+            _lst(item1).Order = item2
+            _lst(item2).Order = item1
+            _lst.Sort()
+            FieldsPriorityLB.DataSource = _lst
         End Sub
     End Class
 End Namespace

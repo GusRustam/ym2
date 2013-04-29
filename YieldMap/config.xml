@@ -10,8 +10,9 @@
   <property name="show-main-toolbar" value="True"/>
   <property name="show-point-size" value="True"/>
   <property name="show-chart-toolbar" value="True"/>
-  
+
   <property name="visible-columns" value="ALL"/>
+  <property name="fields-priority" value="LAST,MID,VWAP,BID,ASK,HIST"/>
   
   <property name="yield-calc-mode" value="YTA"/>
   
