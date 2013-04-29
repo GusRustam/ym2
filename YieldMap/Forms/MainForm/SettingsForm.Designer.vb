@@ -27,6 +27,21 @@
             Me.SaveSettingsButton = New System.Windows.Forms.Button()
             Me.MainTabControl = New System.Windows.Forms.TabControl()
             Me.MainChartPage = New System.Windows.Forms.TabPage()
+            Me.YieldCalcModeCB = New System.Windows.Forms.ComboBox()
+            Me.Label8 = New System.Windows.Forms.Label()
+            Me.MaxYieldTextBox = New System.Windows.Forms.MaskedTextBox()
+            Me.Label5 = New System.Windows.Forms.Label()
+            Me.Label6 = New System.Windows.Forms.Label()
+            Me.MaxDurTextBox = New System.Windows.Forms.MaskedTextBox()
+            Me.MinYieldTextBox = New System.Windows.Forms.MaskedTextBox()
+            Me.MinSpreadTextBox = New System.Windows.Forms.MaskedTextBox()
+            Me.MinDurTextBox = New System.Windows.Forms.MaskedTextBox()
+            Me.MaxSpreadTextBox = New System.Windows.Forms.MaskedTextBox()
+            Me.Label7 = New System.Windows.Forms.Label()
+            Me.Label4 = New System.Windows.Forms.Label()
+            Me.Label3 = New System.Windows.Forms.Label()
+            Me.ShowPointSizeCheckBox = New System.Windows.Forms.CheckBox()
+            Me.ShowBidAskCheckBox = New System.Windows.Forms.CheckBox()
             Me.MainGeneralTabPage = New System.Windows.Forms.TabPage()
             Me.Label2 = New System.Windows.Forms.Label()
             Me.ChartWindowCheckBox = New System.Windows.Forms.CheckBox()
@@ -46,23 +61,9 @@
             Me.LogErrRadioButton = New System.Windows.Forms.RadioButton()
             Me.LogNoneRadioButton = New System.Windows.Forms.RadioButton()
             Me.TheCancelButton = New System.Windows.Forms.Button()
-            Me.ShowBidAskCheckBox = New System.Windows.Forms.CheckBox()
-            Me.ShowPointSizeCheckBox = New System.Windows.Forms.CheckBox()
-            Me.Label3 = New System.Windows.Forms.Label()
-            Me.UseVWAPRadioButton = New System.Windows.Forms.RadioButton()
-            Me.UseLastRadioButton = New System.Windows.Forms.RadioButton()
-            Me.Label4 = New System.Windows.Forms.Label()
-            Me.MaxYieldTextBox = New System.Windows.Forms.MaskedTextBox()
-            Me.Label5 = New System.Windows.Forms.Label()
-            Me.Label6 = New System.Windows.Forms.Label()
-            Me.MaxDurTextBox = New System.Windows.Forms.MaskedTextBox()
-            Me.MinYieldTextBox = New System.Windows.Forms.MaskedTextBox()
-            Me.MinSpreadTextBox = New System.Windows.Forms.MaskedTextBox()
-            Me.MinDurTextBox = New System.Windows.Forms.MaskedTextBox()
-            Me.MaxSpreadTextBox = New System.Windows.Forms.MaskedTextBox()
-            Me.Label7 = New System.Windows.Forms.Label()
-            Me.Label8 = New System.Windows.Forms.Label()
-            Me.YieldCalcModeCB = New System.Windows.Forms.ComboBox()
+            Me.FieldsPriorityLB = New System.Windows.Forms.ListBox()
+            Me.UpButton = New System.Windows.Forms.Button()
+            Me.DownButton = New System.Windows.Forms.Button()
             Me.MainTableLayoutPanel.SuspendLayout()
             Me.MainTabControl.SuspendLayout()
             Me.MainChartPage.SuspendLayout()
@@ -86,12 +87,12 @@
             Me.MainTableLayoutPanel.RowCount = 2
             Me.MainTableLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
             Me.MainTableLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
-            Me.MainTableLayoutPanel.Size = New System.Drawing.Size(602, 288)
+            Me.MainTableLayoutPanel.Size = New System.Drawing.Size(544, 275)
             Me.MainTableLayoutPanel.TabIndex = 5
             '
             'SaveSettingsButton
             '
-            Me.SaveSettingsButton.Location = New System.Drawing.Point(3, 261)
+            Me.SaveSettingsButton.Location = New System.Drawing.Point(3, 248)
             Me.SaveSettingsButton.Name = "SaveSettingsButton"
             Me.SaveSettingsButton.Size = New System.Drawing.Size(155, 24)
             Me.SaveSettingsButton.TabIndex = 6
@@ -109,11 +110,14 @@
             Me.MainTabControl.Location = New System.Drawing.Point(3, 3)
             Me.MainTabControl.Name = "MainTabControl"
             Me.MainTabControl.SelectedIndex = 0
-            Me.MainTabControl.Size = New System.Drawing.Size(596, 252)
+            Me.MainTabControl.Size = New System.Drawing.Size(538, 239)
             Me.MainTabControl.TabIndex = 5
             '
             'MainChartPage
             '
+            Me.MainChartPage.Controls.Add(Me.DownButton)
+            Me.MainChartPage.Controls.Add(Me.UpButton)
+            Me.MainChartPage.Controls.Add(Me.FieldsPriorityLB)
             Me.MainChartPage.Controls.Add(Me.YieldCalcModeCB)
             Me.MainChartPage.Controls.Add(Me.Label8)
             Me.MainChartPage.Controls.Add(Me.MaxYieldTextBox)
@@ -126,18 +130,170 @@
             Me.MainChartPage.Controls.Add(Me.MaxSpreadTextBox)
             Me.MainChartPage.Controls.Add(Me.Label7)
             Me.MainChartPage.Controls.Add(Me.Label4)
-            Me.MainChartPage.Controls.Add(Me.UseVWAPRadioButton)
-            Me.MainChartPage.Controls.Add(Me.UseLastRadioButton)
             Me.MainChartPage.Controls.Add(Me.Label3)
             Me.MainChartPage.Controls.Add(Me.ShowPointSizeCheckBox)
             Me.MainChartPage.Controls.Add(Me.ShowBidAskCheckBox)
             Me.MainChartPage.Location = New System.Drawing.Point(4, 22)
             Me.MainChartPage.Name = "MainChartPage"
             Me.MainChartPage.Padding = New System.Windows.Forms.Padding(3)
-            Me.MainChartPage.Size = New System.Drawing.Size(588, 226)
+            Me.MainChartPage.Size = New System.Drawing.Size(530, 213)
             Me.MainChartPage.TabIndex = 2
             Me.MainChartPage.Text = "Chart"
             Me.MainChartPage.UseVisualStyleBackColor = True
+            '
+            'YieldCalcModeCB
+            '
+            Me.YieldCalcModeCB.FormattingEnabled = True
+            Me.YieldCalcModeCB.Items.AddRange(New Object() {"YTM", "YTW", "YTB", "YTA"})
+            Me.YieldCalcModeCB.Location = New System.Drawing.Point(148, 150)
+            Me.YieldCalcModeCB.Name = "YieldCalcModeCB"
+            Me.YieldCalcModeCB.Size = New System.Drawing.Size(160, 21)
+            Me.YieldCalcModeCB.TabIndex = 42
+            '
+            'Label8
+            '
+            Me.Label8.AutoSize = True
+            Me.Label8.Location = New System.Drawing.Point(7, 153)
+            Me.Label8.Name = "Label8"
+            Me.Label8.Size = New System.Drawing.Size(113, 13)
+            Me.Label8.TabIndex = 41
+            Me.Label8.Text = "Yield calculation mode"
+            '
+            'MaxYieldTextBox
+            '
+            Me.MaxYieldTextBox.Location = New System.Drawing.Point(231, 124)
+            Me.MaxYieldTextBox.Mask = "00 %"
+            Me.MaxYieldTextBox.Name = "MaxYieldTextBox"
+            Me.MaxYieldTextBox.Size = New System.Drawing.Size(77, 20)
+            Me.MaxYieldTextBox.TabIndex = 32
+            '
+            'Label5
+            '
+            Me.Label5.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Me.Label5.AutoSize = True
+            Me.Label5.Location = New System.Drawing.Point(10, 124)
+            Me.Label5.Margin = New System.Windows.Forms.Padding(6, 6, 0, 0)
+            Me.Label5.Name = "Label5"
+            Me.Label5.Size = New System.Drawing.Size(71, 13)
+            Me.Label5.TabIndex = 38
+            Me.Label5.Text = "By yield (in %)"
+            '
+            'Label6
+            '
+            Me.Label6.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Me.Label6.AutoSize = True
+            Me.Label6.Location = New System.Drawing.Point(10, 96)
+            Me.Label6.Margin = New System.Windows.Forms.Padding(6, 6, 0, 0)
+            Me.Label6.Name = "Label6"
+            Me.Label6.Size = New System.Drawing.Size(129, 13)
+            Me.Label6.TabIndex = 40
+            Me.Label6.Text = "By spread (in basis points)"
+            '
+            'MaxDurTextBox
+            '
+            Me.MaxDurTextBox.Location = New System.Drawing.Point(231, 63)
+            Me.MaxDurTextBox.Mask = "00 yrs"
+            Me.MaxDurTextBox.Name = "MaxDurTextBox"
+            Me.MaxDurTextBox.Size = New System.Drawing.Size(77, 20)
+            Me.MaxDurTextBox.TabIndex = 34
+            '
+            'MinYieldTextBox
+            '
+            Me.MinYieldTextBox.Location = New System.Drawing.Point(148, 124)
+            Me.MinYieldTextBox.Mask = "00 %"
+            Me.MinYieldTextBox.Name = "MinYieldTextBox"
+            Me.MinYieldTextBox.Size = New System.Drawing.Size(77, 20)
+            Me.MinYieldTextBox.TabIndex = 35
+            '
+            'MinSpreadTextBox
+            '
+            Me.MinSpreadTextBox.Location = New System.Drawing.Point(148, 93)
+            Me.MinSpreadTextBox.Mask = "#0000 b.p."
+            Me.MinSpreadTextBox.Name = "MinSpreadTextBox"
+            Me.MinSpreadTextBox.Size = New System.Drawing.Size(77, 20)
+            Me.MinSpreadTextBox.TabIndex = 36
+            '
+            'MinDurTextBox
+            '
+            Me.MinDurTextBox.Location = New System.Drawing.Point(148, 63)
+            Me.MinDurTextBox.Mask = "00 yrs"
+            Me.MinDurTextBox.Name = "MinDurTextBox"
+            Me.MinDurTextBox.Size = New System.Drawing.Size(77, 20)
+            Me.MinDurTextBox.TabIndex = 33
+            '
+            'MaxSpreadTextBox
+            '
+            Me.MaxSpreadTextBox.Location = New System.Drawing.Point(231, 93)
+            Me.MaxSpreadTextBox.Mask = "#0000 b.p."
+            Me.MaxSpreadTextBox.Name = "MaxSpreadTextBox"
+            Me.MaxSpreadTextBox.Size = New System.Drawing.Size(77, 20)
+            Me.MaxSpreadTextBox.TabIndex = 37
+            '
+            'Label7
+            '
+            Me.Label7.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Me.Label7.AutoSize = True
+            Me.Label7.Location = New System.Drawing.Point(10, 70)
+            Me.Label7.Margin = New System.Windows.Forms.Padding(6, 6, 0, 0)
+            Me.Label7.Name = "Label7"
+            Me.Label7.Size = New System.Drawing.Size(105, 13)
+            Me.Label7.TabIndex = 39
+            Me.Label7.Text = "By duration (in years)"
+            '
+            'Label4
+            '
+            Me.Label4.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Me.Label4.AutoSize = True
+            Me.Label4.Location = New System.Drawing.Point(4, 41)
+            Me.Label4.Margin = New System.Windows.Forms.Padding(6, 6, 0, 0)
+            Me.Label4.Name = "Label4"
+            Me.Label4.Size = New System.Drawing.Size(135, 13)
+            Me.Label4.TabIndex = 11
+            Me.Label4.Text = "Chart viewport default limits"
+            '
+            'Label3
+            '
+            Me.Label3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Me.Label3.AutoSize = True
+            Me.Label3.Location = New System.Drawing.Point(328, 41)
+            Me.Label3.Margin = New System.Windows.Forms.Padding(0)
+            Me.Label3.Name = "Label3"
+            Me.Label3.Size = New System.Drawing.Size(70, 13)
+            Me.Label3.TabIndex = 7
+            Me.Label3.Text = "Fields priority:"
+            Me.Label3.Visible = False
+            '
+            'ShowPointSizeCheckBox
+            '
+            Me.ShowPointSizeCheckBox.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Me.ShowPointSizeCheckBox.AutoSize = True
+            Me.ShowPointSizeCheckBox.Location = New System.Drawing.Point(214, 12)
+            Me.ShowPointSizeCheckBox.Margin = New System.Windows.Forms.Padding(0)
+            Me.ShowPointSizeCheckBox.Name = "ShowPointSizeCheckBox"
+            Me.ShowPointSizeCheckBox.Size = New System.Drawing.Size(257, 17)
+            Me.ShowPointSizeCheckBox.TabIndex = 6
+            Me.ShowPointSizeCheckBox.Text = "Set point size depending on today's trade volume"
+            Me.ShowPointSizeCheckBox.UseVisualStyleBackColor = True
+            Me.ShowPointSizeCheckBox.Visible = False
+            '
+            'ShowBidAskCheckBox
+            '
+            Me.ShowBidAskCheckBox.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Me.ShowBidAskCheckBox.AutoSize = True
+            Me.ShowBidAskCheckBox.Location = New System.Drawing.Point(8, 12)
+            Me.ShowBidAskCheckBox.Margin = New System.Windows.Forms.Padding(0)
+            Me.ShowBidAskCheckBox.Name = "ShowBidAskCheckBox"
+            Me.ShowBidAskCheckBox.Size = New System.Drawing.Size(192, 17)
+            Me.ShowBidAskCheckBox.TabIndex = 5
+            Me.ShowBidAskCheckBox.Text = "Show bid-ask yields on mouse over"
+            Me.ShowBidAskCheckBox.UseVisualStyleBackColor = True
             '
             'MainGeneralTabPage
             '
@@ -147,7 +303,7 @@
             Me.MainGeneralTabPage.Location = New System.Drawing.Point(4, 22)
             Me.MainGeneralTabPage.Name = "MainGeneralTabPage"
             Me.MainGeneralTabPage.Padding = New System.Windows.Forms.Padding(3)
-            Me.MainGeneralTabPage.Size = New System.Drawing.Size(588, 226)
+            Me.MainGeneralTabPage.Size = New System.Drawing.Size(530, 233)
             Me.MainGeneralTabPage.TabIndex = 1
             Me.MainGeneralTabPage.Text = "General"
             Me.MainGeneralTabPage.UseVisualStyleBackColor = True
@@ -187,7 +343,7 @@
             Me.MainLoadColumnsPage.Location = New System.Drawing.Point(4, 22)
             Me.MainLoadColumnsPage.Name = "MainLoadColumnsPage"
             Me.MainLoadColumnsPage.Padding = New System.Windows.Forms.Padding(3)
-            Me.MainLoadColumnsPage.Size = New System.Drawing.Size(588, 226)
+            Me.MainLoadColumnsPage.Size = New System.Drawing.Size(530, 213)
             Me.MainLoadColumnsPage.TabIndex = 3
             Me.MainLoadColumnsPage.Text = "Columns"
             Me.MainLoadColumnsPage.UseVisualStyleBackColor = True
@@ -201,7 +357,7 @@
             Me.Panel4.Location = New System.Drawing.Point(3, 3)
             Me.Panel4.Margin = New System.Windows.Forms.Padding(0)
             Me.Panel4.Name = "Panel4"
-            Me.Panel4.Size = New System.Drawing.Size(582, 220)
+            Me.Panel4.Size = New System.Drawing.Size(524, 207)
             Me.Panel4.TabIndex = 0
             '
             'AllColumnsCB
@@ -246,7 +402,7 @@
             Me.MainLogPage.Location = New System.Drawing.Point(4, 22)
             Me.MainLogPage.Name = "MainLogPage"
             Me.MainLogPage.Padding = New System.Windows.Forms.Padding(3)
-            Me.MainLogPage.Size = New System.Drawing.Size(588, 226)
+            Me.MainLogPage.Size = New System.Drawing.Size(530, 233)
             Me.MainLogPage.TabIndex = 0
             Me.MainLogPage.Text = "Logging"
             Me.MainLogPage.UseVisualStyleBackColor = True
@@ -337,196 +493,38 @@
             '
             Me.TheCancelButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
             Me.TheCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel
-            Me.TheCancelButton.Location = New System.Drawing.Point(444, 261)
+            Me.TheCancelButton.Location = New System.Drawing.Point(386, 248)
             Me.TheCancelButton.Name = "TheCancelButton"
             Me.TheCancelButton.Size = New System.Drawing.Size(155, 24)
             Me.TheCancelButton.TabIndex = 7
             Me.TheCancelButton.Text = "Cancel"
             Me.TheCancelButton.UseVisualStyleBackColor = True
             '
-            'ShowBidAskCheckBox
+            'FieldsPriorityLB
             '
-            Me.ShowBidAskCheckBox.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-            Me.ShowBidAskCheckBox.AutoSize = True
-            Me.ShowBidAskCheckBox.Location = New System.Drawing.Point(8, 12)
-            Me.ShowBidAskCheckBox.Margin = New System.Windows.Forms.Padding(0)
-            Me.ShowBidAskCheckBox.Name = "ShowBidAskCheckBox"
-            Me.ShowBidAskCheckBox.Size = New System.Drawing.Size(192, 17)
-            Me.ShowBidAskCheckBox.TabIndex = 5
-            Me.ShowBidAskCheckBox.Text = "Show bid-ask yields on mouse over"
-            Me.ShowBidAskCheckBox.UseVisualStyleBackColor = True
+            Me.FieldsPriorityLB.FormattingEnabled = True
+            Me.FieldsPriorityLB.Location = New System.Drawing.Point(331, 63)
+            Me.FieldsPriorityLB.Name = "FieldsPriorityLB"
+            Me.FieldsPriorityLB.Size = New System.Drawing.Size(140, 108)
+            Me.FieldsPriorityLB.TabIndex = 43
             '
-            'ShowPointSizeCheckBox
+            'UpButton
             '
-            Me.ShowPointSizeCheckBox.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-            Me.ShowPointSizeCheckBox.AutoSize = True
-            Me.ShowPointSizeCheckBox.Location = New System.Drawing.Point(214, 12)
-            Me.ShowPointSizeCheckBox.Margin = New System.Windows.Forms.Padding(0)
-            Me.ShowPointSizeCheckBox.Name = "ShowPointSizeCheckBox"
-            Me.ShowPointSizeCheckBox.Size = New System.Drawing.Size(257, 17)
-            Me.ShowPointSizeCheckBox.TabIndex = 6
-            Me.ShowPointSizeCheckBox.Text = "Set point size depending on today's trade volume"
-            Me.ShowPointSizeCheckBox.UseVisualStyleBackColor = True
-            Me.ShowPointSizeCheckBox.Visible = False
+            Me.UpButton.Location = New System.Drawing.Point(477, 62)
+            Me.UpButton.Name = "UpButton"
+            Me.UpButton.Size = New System.Drawing.Size(47, 23)
+            Me.UpButton.TabIndex = 44
+            Me.UpButton.Text = "Up"
+            Me.UpButton.UseVisualStyleBackColor = True
             '
-            'Label3
+            'DownButton
             '
-            Me.Label3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-            Me.Label3.AutoSize = True
-            Me.Label3.Location = New System.Drawing.Point(5, 37)
-            Me.Label3.Margin = New System.Windows.Forms.Padding(0)
-            Me.Label3.Name = "Label3"
-            Me.Label3.Size = New System.Drawing.Size(113, 13)
-            Me.Label3.TabIndex = 7
-            Me.Label3.Text = "Field to use by default:"
-            Me.Label3.Visible = False
-            '
-            'UseVWAPRadioButton
-            '
-            Me.UseVWAPRadioButton.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-            Me.UseVWAPRadioButton.AutoSize = True
-            Me.UseVWAPRadioButton.Location = New System.Drawing.Point(231, 38)
-            Me.UseVWAPRadioButton.Margin = New System.Windows.Forms.Padding(0)
-            Me.UseVWAPRadioButton.Name = "UseVWAPRadioButton"
-            Me.UseVWAPRadioButton.Size = New System.Drawing.Size(83, 17)
-            Me.UseVWAPRadioButton.TabIndex = 9
-            Me.UseVWAPRadioButton.TabStop = True
-            Me.UseVWAPRadioButton.Text = "VWAP price"
-            Me.UseVWAPRadioButton.UseVisualStyleBackColor = True
-            Me.UseVWAPRadioButton.Visible = False
-            '
-            'UseLastRadioButton
-            '
-            Me.UseLastRadioButton.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-            Me.UseLastRadioButton.AutoSize = True
-            Me.UseLastRadioButton.Location = New System.Drawing.Point(127, 37)
-            Me.UseLastRadioButton.Margin = New System.Windows.Forms.Padding(0)
-            Me.UseLastRadioButton.Name = "UseLastRadioButton"
-            Me.UseLastRadioButton.Size = New System.Drawing.Size(98, 17)
-            Me.UseLastRadioButton.TabIndex = 8
-            Me.UseLastRadioButton.TabStop = True
-            Me.UseLastRadioButton.Text = "Last trade price"
-            Me.UseLastRadioButton.UseVisualStyleBackColor = True
-            Me.UseLastRadioButton.Visible = False
-            '
-            'Label4
-            '
-            Me.Label4.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-            Me.Label4.AutoSize = True
-            Me.Label4.Location = New System.Drawing.Point(4, 62)
-            Me.Label4.Margin = New System.Windows.Forms.Padding(6, 6, 0, 0)
-            Me.Label4.Name = "Label4"
-            Me.Label4.Size = New System.Drawing.Size(135, 13)
-            Me.Label4.TabIndex = 11
-            Me.Label4.Text = "Chart viewport default limits"
-            '
-            'MaxYieldTextBox
-            '
-            Me.MaxYieldTextBox.Location = New System.Drawing.Point(231, 145)
-            Me.MaxYieldTextBox.Mask = "00 %"
-            Me.MaxYieldTextBox.Name = "MaxYieldTextBox"
-            Me.MaxYieldTextBox.Size = New System.Drawing.Size(77, 20)
-            Me.MaxYieldTextBox.TabIndex = 32
-            '
-            'Label5
-            '
-            Me.Label5.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-            Me.Label5.AutoSize = True
-            Me.Label5.Location = New System.Drawing.Point(10, 145)
-            Me.Label5.Margin = New System.Windows.Forms.Padding(6, 6, 0, 0)
-            Me.Label5.Name = "Label5"
-            Me.Label5.Size = New System.Drawing.Size(71, 13)
-            Me.Label5.TabIndex = 38
-            Me.Label5.Text = "By yield (in %)"
-            '
-            'Label6
-            '
-            Me.Label6.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-            Me.Label6.AutoSize = True
-            Me.Label6.Location = New System.Drawing.Point(10, 117)
-            Me.Label6.Margin = New System.Windows.Forms.Padding(6, 6, 0, 0)
-            Me.Label6.Name = "Label6"
-            Me.Label6.Size = New System.Drawing.Size(129, 13)
-            Me.Label6.TabIndex = 40
-            Me.Label6.Text = "By spread (in basis points)"
-            '
-            'MaxDurTextBox
-            '
-            Me.MaxDurTextBox.Location = New System.Drawing.Point(231, 84)
-            Me.MaxDurTextBox.Mask = "00 yrs"
-            Me.MaxDurTextBox.Name = "MaxDurTextBox"
-            Me.MaxDurTextBox.Size = New System.Drawing.Size(77, 20)
-            Me.MaxDurTextBox.TabIndex = 34
-            '
-            'MinYieldTextBox
-            '
-            Me.MinYieldTextBox.Location = New System.Drawing.Point(148, 145)
-            Me.MinYieldTextBox.Mask = "00 %"
-            Me.MinYieldTextBox.Name = "MinYieldTextBox"
-            Me.MinYieldTextBox.Size = New System.Drawing.Size(77, 20)
-            Me.MinYieldTextBox.TabIndex = 35
-            '
-            'MinSpreadTextBox
-            '
-            Me.MinSpreadTextBox.Location = New System.Drawing.Point(148, 114)
-            Me.MinSpreadTextBox.Mask = "#0000 b.p."
-            Me.MinSpreadTextBox.Name = "MinSpreadTextBox"
-            Me.MinSpreadTextBox.Size = New System.Drawing.Size(77, 20)
-            Me.MinSpreadTextBox.TabIndex = 36
-            '
-            'MinDurTextBox
-            '
-            Me.MinDurTextBox.Location = New System.Drawing.Point(148, 84)
-            Me.MinDurTextBox.Mask = "00 yrs"
-            Me.MinDurTextBox.Name = "MinDurTextBox"
-            Me.MinDurTextBox.Size = New System.Drawing.Size(77, 20)
-            Me.MinDurTextBox.TabIndex = 33
-            '
-            'MaxSpreadTextBox
-            '
-            Me.MaxSpreadTextBox.Location = New System.Drawing.Point(231, 114)
-            Me.MaxSpreadTextBox.Mask = "#0000 b.p."
-            Me.MaxSpreadTextBox.Name = "MaxSpreadTextBox"
-            Me.MaxSpreadTextBox.Size = New System.Drawing.Size(77, 20)
-            Me.MaxSpreadTextBox.TabIndex = 37
-            '
-            'Label7
-            '
-            Me.Label7.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-            Me.Label7.AutoSize = True
-            Me.Label7.Location = New System.Drawing.Point(10, 91)
-            Me.Label7.Margin = New System.Windows.Forms.Padding(6, 6, 0, 0)
-            Me.Label7.Name = "Label7"
-            Me.Label7.Size = New System.Drawing.Size(105, 13)
-            Me.Label7.TabIndex = 39
-            Me.Label7.Text = "By duration (in years)"
-            '
-            'Label8
-            '
-            Me.Label8.AutoSize = True
-            Me.Label8.Location = New System.Drawing.Point(7, 179)
-            Me.Label8.Name = "Label8"
-            Me.Label8.Size = New System.Drawing.Size(113, 13)
-            Me.Label8.TabIndex = 41
-            Me.Label8.Text = "Yield calculation mode"
-            '
-            'YieldCalcModeCB
-            '
-            Me.YieldCalcModeCB.FormattingEnabled = True
-            Me.YieldCalcModeCB.Items.AddRange(New Object() {"YTM", "YTW", "YTB", "YTA"})
-            Me.YieldCalcModeCB.Location = New System.Drawing.Point(148, 176)
-            Me.YieldCalcModeCB.Name = "YieldCalcModeCB"
-            Me.YieldCalcModeCB.Size = New System.Drawing.Size(160, 21)
-            Me.YieldCalcModeCB.TabIndex = 42
+            Me.DownButton.Location = New System.Drawing.Point(477, 90)
+            Me.DownButton.Name = "DownButton"
+            Me.DownButton.Size = New System.Drawing.Size(47, 23)
+            Me.DownButton.TabIndex = 44
+            Me.DownButton.Text = "Down"
+            Me.DownButton.UseVisualStyleBackColor = True
             '
             'SettingsForm
             '
@@ -534,13 +532,13 @@
             Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
             Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
             Me.CancelButton = Me.TheCancelButton
-            Me.ClientSize = New System.Drawing.Size(602, 288)
+            Me.ClientSize = New System.Drawing.Size(544, 275)
             Me.Controls.Add(Me.MainTableLayoutPanel)
             Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
             Me.MaximizeBox = False
-            Me.MaximumSize = New System.Drawing.Size(608, 313)
+            Me.MaximumSize = New System.Drawing.Size(550, 300)
             Me.MinimizeBox = False
-            Me.MinimumSize = New System.Drawing.Size(608, 313)
+            Me.MinimumSize = New System.Drawing.Size(550, 263)
             Me.Name = "SettingsForm"
             Me.Text = "Settings"
             Me.MainTableLayoutPanel.ResumeLayout(False)
@@ -590,12 +588,13 @@
         Friend WithEvents MaxSpreadTextBox As System.Windows.Forms.MaskedTextBox
         Friend WithEvents Label7 As System.Windows.Forms.Label
         Friend WithEvents Label4 As System.Windows.Forms.Label
-        Friend WithEvents UseVWAPRadioButton As System.Windows.Forms.RadioButton
-        Friend WithEvents UseLastRadioButton As System.Windows.Forms.RadioButton
         Friend WithEvents Label3 As System.Windows.Forms.Label
         Friend WithEvents ShowPointSizeCheckBox As System.Windows.Forms.CheckBox
         Friend WithEvents ShowBidAskCheckBox As System.Windows.Forms.CheckBox
         Friend WithEvents YieldCalcModeCB As System.Windows.Forms.ComboBox
         Friend WithEvents Label8 As System.Windows.Forms.Label
+        Friend WithEvents DownButton As System.Windows.Forms.Button
+        Friend WithEvents UpButton As System.Windows.Forms.Button
+        Friend WithEvents FieldsPriorityLB As System.Windows.Forms.ListBox
     End Class
 End Namespace

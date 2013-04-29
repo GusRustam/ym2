@@ -12,6 +12,7 @@ Public Class SettingsManager
     Public Event ShowPointSizeChanged As Action(Of Boolean)
     Public Event YieldCalcModeChanged As Action(Of String)
     Public Event DataSourceChanged As Action(Of String)
+    Public Event FieldsPriorityChanged As Action(Of String)
 
     Private Shared ReadOnly SettingsPath As String = Path.Combine(Utils.GetMyPath(), "config.xml")
     Private Shared ReadOnly Settings As New XmlDocument
@@ -190,7 +191,6 @@ Public Class SettingsManager
     End Property
 
     Private _yieldCalcMode As String = "YTM"
-
     Public Property YieldCalcMode() As String
         Get
             Return _yieldCalcMode
@@ -203,6 +203,21 @@ Public Class SettingsManager
             End If
         End Set
     End Property
+
+    Private _fieldsPriority As String = "LAST,MID,VWAP,BID,ASK,CLOSE"
+    Public Property FieldsPriority() As String
+        Get
+            Return _fieldsPriority
+        End Get
+        Set(ByVal value As String)
+            If _fieldsPriority <> value Then
+                SaveValue("/settings/property[@name='fields-priority']/@value", value)
+                _fieldsPriority = value
+                RaiseEvent FieldsPriorityChanged(value)
+            End If
+        End Set
+    End Property
+
 
     Sub New()
         Settings.Load(SettingsPath)
