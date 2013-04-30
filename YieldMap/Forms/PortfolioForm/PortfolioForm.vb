@@ -207,7 +207,6 @@ Namespace Forms.PortfolioForm
             Else
                 Dim descr = PortfolioManager.GetPortfolioStructure(CurrentItem.Id)
 
-                '
                 PortfolioChainsListsGrid.DataSource = descr.Sources(
                     If(ChainsCB.Checked, PortfolioStructure.Chain, 0) Or
                     If(ListsCB.Checked, PortfolioStructure.List, 0) Or
@@ -706,7 +705,7 @@ Namespace Forms.PortfolioForm
             If FieldLayoutsListBox.SelectedIndex < 0 Then
                 FieldsGrid.DataSource = Nothing
             Else
-                Dim item = TryCast(FieldLayoutsListBox.Items(FieldLayoutsListBox.SelectedIndex), Fields)
+                Dim item = TryCast(FieldLayoutsListBox.Items(FieldLayoutsListBox.SelectedIndex), FieldsDescription)
                 If item Is Nothing Then
                     FieldsGrid.DataSource = Nothing
                 Else

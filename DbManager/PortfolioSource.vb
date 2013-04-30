@@ -216,13 +216,42 @@ Public Class PortfolioStructure
         End Get
     End Property
 
-    Public ReadOnly Property Rics(ByVal source As PortfolioSource) As ReadOnlyCollection(Of String)
+    Public ReadOnly Property Rics(ByVal src As PortfolioSource) As ReadOnlyCollection(Of String)
         Get
-            If _rics.Keys.Contains(source) Then
-                Return New ReadOnlyCollection(Of String)(_rics(source))
-            Else
-                Return New ReadOnlyCollection(Of String)({})
+            Dim res As New List(Of String)
+            Dim interpreter = New FilterInterpreter(Of BondDescription)
+            Dim filter As Boolean = False
+            Dim cond = src.Condition
+            If cond <> "" Then
+                Dim parser As New FilterParser
+                Try
+                    Dim grammar As LinkedList(Of FilterParser.IGrammarElement)
+                    grammar = parser.SetFilter(cond)
+                    interpreter.SetGrammar(grammar)
+                    filter = True
+                Catch ex As Exception
+                    Logger.ErrorException(String.Format("Failed to parse condition {0}", cond), ex)
+                    Logger.Error("Exception = {0}", ex.ToString())
+                End Try
+
             End If
+            For Each ric In From item In src.Source.GetDefaultRics() Where Not _excludes.Contains(item)
+                Try
+                    Dim descr = BondsData.Instance.GetBondInfo(ric)
+                    If filter Then
+                        Try
+                            If Not interpreter.Allows(descr) Then Continue For
+                        Catch ex As Exception
+                            Logger.ErrorException(String.Format("Failed to apply filter to bond {0}", ric), ex)
+                            Logger.Error("Exception = {0}", ex.ToString())
+                        End Try
+                    End If
+                    res.Add(ric)
+                Catch ex As NoBondException
+                    Logger.Warn("No bond {0}", ric)
+                End Try
+            Next
+            Return New ReadOnlyCollection(Of String)(res)
         End Get
     End Property
 

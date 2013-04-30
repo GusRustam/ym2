@@ -71,13 +71,15 @@ Namespace Bonds
         Private ReadOnly _lastIssuerRating As RatingDescr
         Private ReadOnly _lastRating As RatingDescr
 
+        Private ReadOnly _seniorityType As String
+
         Private ReadOnly _label1 As String
         Private ReadOnly _label2 As String
         Private ReadOnly _label3 As String
         Private ReadOnly _label4 As String
 
         Sub New(ByVal ric As String, ByVal shortName As String, ByVal label As String, ByVal maturity As Date?, ByVal coupon As Double, ByVal paymentStructure As String, ByVal rateStructure As String, ByVal issueDate As Date, ByVal label1 As String, ByVal label2 As String, ByVal label3 As String, ByVal label4 As String,
-                ByVal issuerName As String, ByVal borrowerName As String, ByVal currency As String, ByVal putable As Boolean, ByVal callable As Boolean, ByVal floater As Boolean, ByVal lastIssueRating As RatingDescr, ByVal lastIssuerRating As RatingDescr, ByVal lastRating As RatingDescr)
+                ByVal issuerName As String, ByVal borrowerName As String, ByVal currency As String, ByVal putable As Boolean, ByVal callable As Boolean, ByVal floater As Boolean, ByVal lastIssueRating As RatingDescr, ByVal lastIssuerRating As RatingDescr, ByVal lastRating As RatingDescr, ByVal seniorityType As String)
             _ric = ric
             _shortName = shortName
             _label = label
@@ -100,6 +102,7 @@ Namespace Bonds
             _lastIssueRating = lastIssueRating
             _lastIssuerRating = lastIssuerRating
             _lastRating = lastRating
+            _seniorityType = seniorityType
         End Sub
 
         <Hideable()>
@@ -280,6 +283,16 @@ Namespace Bonds
         Public ReadOnly Property LastRating As RatingDescr
             Get
                 Return _lastRating
+            End Get
+        End Property
+
+        <Hideable()>
+        <DisplayName("Type of seniority")>
+        <Filterable()>
+        <Sortable()>
+        Public ReadOnly Property SeniorityType As String
+            Get
+                Return _seniorityType
             End Get
         End Property
 

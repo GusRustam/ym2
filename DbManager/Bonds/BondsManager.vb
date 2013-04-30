@@ -74,12 +74,12 @@ Namespace Bonds
         End Sub
 
         Public Function BondExists(ByVal ric As String) As Boolean Implements IBondsData.BondExists
-            'ric = SkipSlash(ric)
+            'ric = SkipSlash(ric)  todo RICSSS
             Return _subRicToRic.ContainsKey(ric)
         End Function
 
         Public Function GetBondInfo(ByVal aRic As String) As BondDescription Implements IBondsData.GetBondInfo
-            'aRic = SkipSlash(aRic)
+            'aRic = SkipSlash(aRic) todo RICSSS
             Dim items = (From row In _ldr.GetBondsTable()
                          Where _subRicToRic.Keys.Contains(aRic) AndAlso row.ric = _subRicToRic(aRic)
                          Select row).ToList()
@@ -103,6 +103,7 @@ Namespace Bonds
             Dim isCallable = Not IsDBNull(descr("isCallable")) AndAlso descr.isCallable
             Dim isFloater = Not IsDBNull(descr("isFloater")) AndAlso descr.isFloater
             Dim sN = shortName & " " & series
+            Dim seniorityType = If(Not IsDBNull(descr("seniorityType")), descr.seniorityType, "")
 
             Dim issueRatings = (From row In _ldr.GetIssueRatingsTable()
                                 Where row.ric = _subRicToRic(aRic) And Not IsDBNull(row("date")) AndAlso IsDate(row("date"))
@@ -137,7 +138,8 @@ Namespace Bonds
                                        paymentStructure, rateStructure, issueDate, sN,
                                        shortName & " " & If(coupon > 0, String.Format("{0}", coupon), "ZC"),
                                        description, series, issuerName, borrowerName, currency,
-                                       isPutable, isCallable, isFloater, lastIssueRating, lastIssuerRating, lastRating)
+                                       isPutable, isCallable, isFloater, lastIssueRating, lastIssuerRating, lastRating,
+                                       seniorityType)
         End Function
 
         'Private Shared Function SkipSlash(ByVal aRic As String) As String
@@ -255,7 +257,8 @@ Namespace Bonds
             New Dex2Field("EJV.C.BorrowerCntyCode", BondsTable.borrowerCountryColumn.ColumnName),
             New Dex2Field("EJV.C.IssuerCountry", BondsTable.issuerCountryColumn.ColumnName),
             New Dex2Field("RI.ID.ISIN", BondsTable.isinColumn.ColumnName),
-            New Dex2Field("EJV.C.ParentTicker", BondsTable.parentTickerColumn.ColumnName)
+            New Dex2Field("EJV.C.ParentTicker", BondsTable.parentTickerColumn.ColumnName),
+            New Dex2Field("EJV.C.SeniorityTypeDescription ", BondsTable.seniorityTypeColumn.ColumnName)
         }.ToList(), "RH:In")
 
         Private Shared ReadOnly QueryIssueRating As New Dex2Query({

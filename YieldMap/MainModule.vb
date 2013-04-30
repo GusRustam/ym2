@@ -25,6 +25,8 @@ Module MainModule
             End Get
         End Property
 
+        Public Event ShutdownNow As action
+
         Public Sub CloseAllCharts()
             While _charts.Any
                 _charts.First.Close()
@@ -55,6 +57,11 @@ Module MainModule
         End Sub
 
         Private Sub New()
+        End Sub
+
+        Public Sub Shutdown()
+            CloseAllCharts()
+            RaiseEvent ShutdownNow()
         End Sub
     End Class
 

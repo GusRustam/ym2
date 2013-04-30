@@ -54,6 +54,10 @@ Namespace Forms.ChartForm
             ' todo
         End Sub
 
+        Private Sub TheSettings_FieldsPriorityChanged(ByVal list As String) Handles _theSettings.FieldsPriorityChanged
+            ' todo
+        End Sub
+
         Private Sub Connector_Connected() Handles _connector.Connected
             ' todo
         End Sub
@@ -101,7 +105,7 @@ Namespace Forms.ChartForm
                     Case FormDataStatus.Running
                         StatusMessage.Text = ""
                     Case FormDataStatus.Stopped
-                        _ansamble.Cleanup()
+                        _ansamble.Groups.Cleanup()
 
                         '_historicalCurves.Clear()  ' todo where R these curves?
 
@@ -122,62 +126,17 @@ Namespace Forms.ChartForm
                     currentPortID = value
                 End If
 
-                Dim portfolioStructure = PortfolioManager.Instance().GetPortfolioStructure(currentPortID)
-
-                For Each group As Group In From port In portfolioStructure.Sources
+                Dim portfolioStructure = PortfolioManager.Instance.GetPortfolioStructure(currentPortID)
+                For Each grp As Group In From port In portfolioStructure.Sources
                                            Where TypeOf port.Source Is DbManager.Chain Or TypeOf port.Source Is UserList
-                                           Select GetGroup(port, portfolioStructure)
-
-                    _ansamble.AddGroup(group)
+                                           Select Group.Create(_ansamble, port, portfolioStructure)
+                    _ansamble.AddGroup(grp)
                 Next
-                _ansamble.StartLoadingLiveData()
+                _ansamble.Groups.Start()
             End Set
         End Property
 
-        Private Function GetGroup(ByVal port As PortfolioSource, ByVal portfolioStructure As PortfolioStructure) As Group
-            Dim group As Group
-
-            Dim source = TryCast(port.Source, Source)
-            If source Is Nothing Then
-                Logger.Warn("Unsupported source {0}", source)
-                Return Nothing
-            End If
-            group = New Group(_ansamble) With {
-                .SeriesName = If(port.Name <> "", port.Name, source.Name),
-                .PortfolioID = source.ID,
-                .BidField = source.Fields.Realtime.Bid,
-                .AskField = source.Fields.Realtime.Ask,
-                .LastField = source.Fields.Realtime.Hist,
-                .HistField = source.Fields.Realtime.Hist,
-                .VolumeField = source.Fields.Realtime.Volume,
-                .VwapField = source.Fields.Realtime.VWAP,
-                .Brokers = {"MM", ""}.ToList(),
-                .Currency = "",
-                .Color = If(port.Color <> "", port.Color, source.Color)
-            }
-
-            ' TODO THAT'S BULLSHIT BUT CURRENTLY NECESSARY BULLSHIT
-            Dim selectedField As String
-            If group.LastField.Trim() <> "" Then
-                selectedField = group.LastField
-            ElseIf group.VwapField.Trim() <> "" Then
-                selectedField = group.VwapField
-            ElseIf group.BidField.Trim() <> "" Then
-                selectedField = group.BidField
-            Else
-                selectedField = group.AskField
-            End If
-
-            For Each ric In portfolioStructure.Rics(port)
-                Dim descr = BondsData.Instance.GetBondInfo(ric)
-                If descr IsNot Nothing Then
-                    group.AddRic(ric, descr, selectedField)
-                Else
-                    Logger.Error("No description for bond {0} found", ric)
-                End If
-            Next
-            Return group
-        End Function
+        
 
 #End Region
 
@@ -204,7 +163,7 @@ Namespace Forms.ChartForm
 
         Private Sub GraphFormFormClosing(ByVal sender As Object, ByVal e As FormClosingEventArgs) Handles MyBase.FormClosing
             Logger.Trace("GraphForm_FormClosing")
-            _ansamble.Cleanup()
+            _ansamble.Groups.Cleanup()
             _moneyMarketCurves.ForEach(Sub(curve) curve.Cleanup())
             _moneyMarketCurves.Clear()
             ThisFormStatus = FormDataStatus.Stopped
@@ -248,7 +207,7 @@ Namespace Forms.ChartForm
                             bondDataPoint.QuotesAndYields.Keys.ToList.ForEach(
                                 Sub(key)
                                     Dim x = bondDataPoint.QuotesAndYields(key)
-                                    Dim newItem = ExtInfoTSMI.DropDownItems.Add(String.Format("{0}: {1:F4}, {2:P2} {3}, {4:F2}", bondDataPoint.GetFieldByKey(key), x.Price, x.Yld.Yield, x.Yld.ToWhat.Abbr, x.Duration))
+                                    Dim newItem = ExtInfoTSMI.DropDownItems.Add(String.Format("{0}: {1:F4}, {2:P2} {3}, {4:F2}", key, x.Price, x.Yld.Yield, x.Yld.ToWhat.Abbr, x.Duration))
                                     If bondDataPoint.SelectedQuote = key Then CType(newItem, ToolStripMenuItem).Checked = True
                                     AddHandler newItem.Click,
                                         Sub(sender1 As Object, e1 As EventArgs)
@@ -266,7 +225,7 @@ Namespace Forms.ChartForm
                                        Sub(sender1 As Object, e1 As EventArgs)
                                            Dim res = InputBox("Enter price", "Custom bond price")
                                            If IsNumeric(res) Then
-                                               bondDataPoint.SetCustomPrice(CDbl(res))
+                                               bondDataPoint.ParentGroup.SetCustomPrice(bondDataPoint.MetaData.RIC, CDbl(res))
                                                bondDataPoint.SelectedQuote = Group.CustomField
                                            ElseIf res <> "" Then
                                                MessageBox.Show("Invalid number")
@@ -293,7 +252,7 @@ Namespace Forms.ChartForm
                         ChartCMS.Show(TheChart, mouseEvent.Location)
                     ElseIf htr.ChartElementType = ChartElementType.LegendItem Then
                         Dim item = CType(htr.Object, LegendItem)
-                        If _ansamble.HasGroupById(item.Tag) Then
+                        If _ansamble.Groups.Exists(item.Tag) Then
                             BondSetCMS.Tag = item.Tag
                             BondSetCMS.Show(TheChart, mouseEvent.Location)
                         End If
@@ -687,15 +646,15 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub RelatedQuoteTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RelatedQuoteTSMI.Click
-            If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then RunCommand("reuters://REALTIME/verb=FullQuote/ric=" + BondCMS.Tag.ToString())
+            RunCommand("reuters://REALTIME/verb=FullQuote/ric=" + BondCMS.Tag.ToString())
         End Sub
 
         Private Sub BondDescriptionTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles BondDescriptionTSMI.Click
-            If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then RunCommand("reuters://REALTIME/verb=BondData/ric=" + BondCMS.Tag.ToString())
+            RunCommand("reuters://REALTIME/verb=BondData/ric=" + BondCMS.Tag.ToString())
         End Sub
 
         Private Sub RelatedChartTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RelatedChartTSMI.Click
-            If _ansamble.ContainsRIC(BondCMS.Tag.ToString()) Then RunCommand("reuters://REALTIME/verb=RelatedGraph/ric=" + BondCMS.Tag.ToString())
+            RunCommand("reuters://REALTIME/verb=RelatedGraph/ric=" + BondCMS.Tag.ToString())
         End Sub
 
 
@@ -880,33 +839,8 @@ Namespace Forms.ChartForm
 
         Private Sub AsTableTSBClick(ByVal sender As Object, ByVal e As EventArgs) Handles AsTableTSB.Click
             Dim bondsToShow As New List(Of BondDescr)
-            _ansamble.Groups.ForEach(
-                Sub(group)
-                    group.Elements.Keys.ToList().ForEach(
-                        Sub(elem)
-                            Dim res As New BondDescr
-                            Dim point = group.Elements(elem)
-                            res.RIC = point.MetaData.RIC
-                            res.Name = point.MetaData.ShortName
-                            res.Maturity = point.MetaData.Maturity
-                            res.Coupon = point.MetaData.Coupon
-                            If point.QuotesAndYields.ContainsKey(point.SelectedQuote) Then
-                                Dim quote = point.QuotesAndYields(point.SelectedQuote)
-                                res.Price = quote.Price
-                                res.Quote = point.SelectedQuote
-                                res.QuoteDate = quote.YieldAtDate
-                                res.State = BondDescr.StateType.Ok
-                                res.ToWhat = quote.Yld.ToWhat
-                                res.BondYield = quote.Yld.Yield
-                                res.CalcMode = BondDescr.CalculationMode.SystemPrice
-                                res.Convexity = quote.Convexity
-                                res.Duration = quote.Duration
-                                res.Live = quote.YieldAtDate = Date.Today
-                            End If
-                            bondsToShow.Add(res)
-                        End Sub)
-                End Sub)
-            _tableForm.Bonds = bondsToShow
+            
+            _tableForm.Bonds = _ansamble.Groups.AsTable
             _tableForm.ShowDialog()
         End Sub
 
@@ -1058,13 +992,12 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub RemoveFromChartTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RemoveFromChartTSMI.Click
-            If _ansamble.HasGroupById(BondSetCMS.Tag) Then
-                _ansamble.RemoveGroup(BondSetCMS.Tag)
-            End If
+            ' todo switch from tags to some container of persistent items   
+            If BondSetCMS.Tag IsNot Nothing AndAlso IsNumeric(BondSetCMS.Tag) Then _ansamble.Groups.Remove(BondSetCMS.Tag)
         End Sub
 
         Private Sub RemovePointTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RemovePointTSMI.Click
-            _ansamble.RemovePoint(BondCMS.Tag.ToString())
+            _ansamble.Groups.RemovePoint(BondCMS.Tag.ToString())
         End Sub
 
         Private Sub ShowHistoryTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles ShowHistoryTSMI.Click
@@ -1205,7 +1138,7 @@ Namespace Forms.ChartForm
                         series.SmartLabelStyle.AllowOutsidePlotArea = LabelOutsidePlotAreaStyle.No
                         TheChart.Series.Add(series)
                         Dim legendItem As New LegendItem(group.SeriesName, clr, "") With {
-                            .Tag = group.Id
+                            .Tag = group.Identity
                         }
                         TheChart.Legends(0).CustomItems.Add(legendItem)
                     End If
@@ -1259,7 +1192,7 @@ Namespace Forms.ChartForm
                             series.Points.Remove(series.Points.First(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric))
                         End While
                     End If
-                    If series.Points.Count = 0 Then _ansamble.RemoveGroup(group.Id)
+                    If series.Points.Count = 0 Then _ansamble.Groups.Remove(group.Identity)
                     SetChartMinMax()
                 End Sub)
         End Sub
@@ -1267,13 +1200,13 @@ Namespace Forms.ChartForm
         Private Sub OnBenchmarkRemoved(ByVal type As SpreadType) Handles _spreadBenchmarks.BenchmarkRemoved
             Logger.Trace("OnBenchmarkRemoved({0})", type)
             _moneyMarketCurves.ForEach(Sub(curve) curve.CleanupByType(type))
-            _ansamble.CleanupByType(type)
+            _ansamble.Groups.CleanupByType(type)
         End Sub
 
         Private Sub OnBenchmarkUpdated(ByVal type As SpreadType) Handles _spreadBenchmarks.BenchmarkUpdated
             Logger.Trace("OnBenchmarkUpdated({0})", type)
             _moneyMarketCurves.ForEach(Sub(curve) curve.RecalculateByType(type))
-            _ansamble.RecalculateByType(type)
+            _ansamble.Groups.RecalculateByType(type)
         End Sub
 
         Private Sub OnTypeSelected(ByVal newType As SpreadType, ByVal oldType As SpreadType) Handles _spreadBenchmarks.TypeSelected
@@ -1281,7 +1214,7 @@ Namespace Forms.ChartForm
             If newType <> oldType Then
                 SetYAxisMode(newType.ToString())
                 _moneyMarketCurves.ForEach(Sub(curve) curve.RecalculateByType(newType))
-                _ansamble.RecalculateByType(newType)
+                _ansamble.Groups.RecalculateByType(newType)
             End If
         End Sub
 #End Region
@@ -1289,9 +1222,8 @@ Namespace Forms.ChartForm
 
         Private Sub SetLabel(ByVal ric As String, ByVal mode As LabelMode)
             Try
-                Dim group = _ansamble.GetInstrumentGroup(ric)
-                Dim bond = group.GetElement(ric)
-
+                Dim bond = _ansamble.Groups.FindBond(ric)
+                Dim group = bond.ParentGroup
                 bond.LabelMode = mode
                 If ShowLabelsTSB.Checked Then
                     TheChart.Series.FindByName(group.SeriesName).Points.First(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric).Label = bond.Label
@@ -1320,7 +1252,7 @@ Namespace Forms.ChartForm
 
         Private Sub SetSeriesLabel(ByVal id As String, ByVal mode As LabelMode)
             Try
-                Dim group = _ansamble.GetGroupById(id)
+                Dim group = _ansamble.Groups(id)
                 group.Elements.Values.ToList.ForEach(Sub(bond) bond.LabelMode = mode)
                 If ShowLabelsTSB.Checked Then
                     TheChart.Series.FindByName(group.SeriesName).Points.ToList.ForEach(

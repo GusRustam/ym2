@@ -97,8 +97,8 @@ Namespace Forms.MainForm
             sf.ShowDialog()
         End Sub
 
-        Private Sub MainFormFormClosing(ByVal sender As Object, ByVal e As FormClosingEventArgs) Handles MyBase.FormClosing
-            Controller.CloseAllCharts()
+        Private Shared Sub MainFormFormClosing(ByVal sender As Object, ByVal e As FormClosingEventArgs) Handles MyBase.FormClosing
+            Controller.Shutdown()
         End Sub
 
         Private Shared Sub RaiseExcTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RaiseExcTSMI.Click

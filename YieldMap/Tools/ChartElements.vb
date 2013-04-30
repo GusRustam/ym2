@@ -1,8 +1,11 @@
 ﻿Imports System.Drawing
 Imports System.Reflection
+Imports DbManager
 Imports DbManager.Bonds
 Imports NLog
 Imports ReutersData
+Imports Settings
+Imports YieldMap.Forms.TableForm
 Imports YieldMap.Tools.History
 Imports YieldMap.Curves
 
@@ -29,8 +32,143 @@ Namespace Tools
 #End Region
 
 #Region "II. Groups and ansamble"
+    Public MustInherit Class Identifyable
+        Implements IEquatable(Of Identifyable)
+        Private ReadOnly _identity As Long = Ansamble.GenerateID()
+
+        Public ReadOnly Property Identity() As Long
+            Get
+                Return _identity
+            End Get
+        End Property
+
+        Public Overloads Function Equals(ByVal other As Identifyable) As Boolean Implements IEquatable(Of Identifyable).Equals
+            If ReferenceEquals(Nothing, other) Then Return False
+            If ReferenceEquals(Me, other) Then Return True
+            Return _identity = other._identity
+        End Function
+
+        Public Overloads Overrides Function Equals(ByVal obj As Object) As Boolean
+            If ReferenceEquals(Nothing, obj) Then Return False
+            If ReferenceEquals(Me, obj) Then Return True
+            If obj.GetType IsNot Me.GetType Then Return False
+            Return Equals(DirectCast(obj, Identifyable))
+        End Function
+
+        Public Overrides Function GetHashCode() As Integer
+            Return _identity.GetHashCode
+        End Function
+
+        Public Shared Operator =(ByVal left As Identifyable, ByVal right As Identifyable) As Boolean
+            Return Equals(left, right)
+        End Operator
+
+        Public Shared Operator <>(ByVal left As Identifyable, ByVal right As Identifyable) As Boolean
+            Return Not Equals(left, right)
+        End Operator
+
+        Protected Overrides Sub Finalize()
+            Ansamble.ReleaseID(_identity)
+        End Sub
+    End Class
+
+    Public Class GroupContainer
+        Private ReadOnly _groups As New Dictionary(Of Long, Group)
+
+        Default Public ReadOnly Property Data(ByVal id As Long) As Group
+            Get
+                Return _groups(id)
+            End Get
+        End Property
+
+        Public ReadOnly Property AsTable() As List(Of BondDescr)
+            Get
+                Dim result As New List(Of BondDescr)
+                For Each grp In From kvp In _groups Select kvp.Value
+                    grp.Elements.Keys.ToList().ForEach(
+                        Sub(elem)
+                            Dim res As New BondDescr
+                            Dim point = grp.Elements(elem)
+                            res.RIC = point.MetaData.RIC
+                            res.Name = point.MetaData.ShortName
+                            res.Maturity = point.MetaData.Maturity
+                            res.Coupon = point.MetaData.Coupon
+                            If point.QuotesAndYields.ContainsKey(point.SelectedQuote) Then
+                                Dim quote = point.QuotesAndYields(point.SelectedQuote)
+                                res.Price = quote.Price
+                                res.Quote = point.SelectedQuote
+                                res.QuoteDate = quote.YieldAtDate
+                                res.State = BondDescr.StateType.Ok
+                                res.ToWhat = quote.Yld.ToWhat
+                                res.BondYield = quote.Yld.Yield
+                                res.CalcMode = BondDescr.CalculationMode.SystemPrice
+                                res.Convexity = quote.Convexity
+                                res.Duration = quote.Duration
+                                res.Live = quote.YieldAtDate = Date.Today
+                            End If
+                            result.Add(res)
+                        End Sub)
+                Next
+                Return result
+            End Get
+        End Property
+
+        Public Function Exists(ByVal id As Long) As Boolean
+            Return _groups.Keys.Contains(id)
+        End Function
+
+        Public Sub RecalculateByType(ByVal type As SpreadType)
+            For Each kvp In _groups
+                kvp.Value.RecalculateByType(type)
+            Next
+        End Sub
+
+        Public Sub CleanupByType(ByVal type As SpreadType)
+            For Each kvp In _groups
+                kvp.Value.CleanupByType(type)
+            Next
+        End Sub
+
+        Public Sub Cleanup()
+            For Each kvp In _groups
+                kvp.Value.Cleanup()
+            Next
+            _groups.Clear()
+        End Sub
+
+        Public Sub Start()
+            For Each kvp In _groups
+                kvp.Value.StartAll()
+            Next
+        End Sub
+
+        Public Sub Add(ByVal group As Group)
+            _groups.Add(group.Identity, group)
+        End Sub
+
+        Public Sub Remove(ByVal id As Long)
+            _groups.Remove(id)
+        End Sub
+
+        Public Sub RemovePoint(ByVal ric As String)
+            ' todo this must be implemented using observabledictionary and default properties on BondContainer
+            While _groups.Any(Function(grp) grp.Value.HasRic(ric))
+                Dim g = _groups.First(Function(grp) grp.Value.HasRic(ric))
+                g.Value.RemoveRic(ric)
+            End While
+        End Sub
+
+        Public Function FindBond(ByVal ric As String) As Bond ' todo switch to ids instead of ric I believe?
+            For Each kvp In From elem In _groups Where elem.Value.HasRic(ric)
+                Return kvp.Value.GetElement(ric)
+            Next
+            Return Nothing
+        End Function
+    End Class
+
     Public Class Ansamble
         Private Shared ReadOnly Identities As New HashSet(Of Long)
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(Ansamble))
 
         Public Shared Sub ReleaseID(ByVal id As Long)
             Identities.Remove(id)
@@ -46,15 +184,25 @@ Namespace Tools
             Return num
         End Function
 
-        Private ReadOnly _groups As New List(Of Group)
-
-        Public ReadOnly Property Groups As List(Of Group)
+        Private ReadOnly _groups As New GroupContainer
+        Public ReadOnly Property Groups As GroupContainer
             Get
                 Return _groups
             End Get
         End Property
 
-        Private ReadOnly _spreadBmk As SpreadContainer
+        Public Sub New(ByVal bmk As SpreadContainer)
+            _spreadBmk = bmk
+        End Sub
+
+        Public Sub AddGroup(ByVal group As Group)
+            _groups.Add(group)
+            AddHandler group.Quote, Sub(bond As Bond, field As String) RaiseEvent Quote(bond, field)
+            AddHandler group.RemovedItem, Sub(grp As Group, ric As String) RaiseEvent RemovedItem(grp, ric)
+            AddHandler group.AllQuotes, Sub(obj As List(Of Bond)) RaiseEvent AllQuotes(obj)
+            AddHandler group.Volume, Sub(obj As Bond) RaiseEvent Volume(obj)
+            AddHandler group.Clear, Sub(obj As Group) RaiseEvent Clear(obj)
+        End Sub
 
         Public Event AllQuotes As Action(Of List(Of Bond))
         Public Event RemovedItem As Action(Of Group, String)
@@ -62,125 +210,17 @@ Namespace Tools
         Public Event Volume As Action(Of Bond)
         Public Event Clear As Action(Of Group)
 
+        Private ReadOnly _spreadBmk As SpreadContainer
         Public ReadOnly Property SpreadBmk() As SpreadContainer
             Get
                 Return _spreadBmk
             End Get
         End Property
 
-        Public Sub Cleanup()
-            _groups.ForEach(Sub(group)
-                                group.Cleanup()
-                                RemoveHandler group.Quote, AddressOf OnBondQuote
-                            End Sub)
-            _groups.Clear()
-        End Sub
-
-        Public Sub StartLoadingLiveData()
-            _groups.ForEach(Sub(grp) grp.StartAll())
-        End Sub
-
-        Public Sub AddGroup(ByVal group As Group)
-            _groups.Add(group)
-            AddHandler group.Quote, AddressOf OnBondQuote
-            AddHandler group.RemovedItem, AddressOf OnRemovedItem
-            AddHandler group.AllQuotes, AddressOf OnBondAllQuotes
-            AddHandler group.Volume, AddressOf OnBondVolume
-            AddHandler group.Clear, AddressOf OnGroupClear
-        End Sub
-
-        Private Sub OnRemovedItem(ByVal grp As Group, ByVal ric As String)
-            RaiseEvent RemovedItem(grp, ric)
-        End Sub
-
-        Private Sub OnBondAllQuotes(ByVal obj As List(Of Bond))
-            RaiseEvent AllQuotes(obj)
-        End Sub
-
-        Private Sub OnGroupClear(ByVal obj As Group)
-            RaiseEvent Clear(obj)
-        End Sub
-
-        Private Sub OnBondVolume(ByVal obj As Bond)
-            RaiseEvent Volume(obj)
-        End Sub
-
-        Private Sub OnBondQuote(ByVal bond As Bond, ByVal field As String)
-            RaiseEvent Quote(bond, field)
-        End Sub
-
-        Public Sub New(ByVal bmk As SpreadContainer)
-            _spreadBmk = bmk
-        End Sub
-
-#Region "Groups - these are methods that must be encapsulateds"
-        ' todo these are methods that must be encapsulated
-        Public Sub RemovePoint(ByVal ric As String)
-            While _groups.Any(Function(grp) grp.HasRic(ric))
-                Dim g = _groups.First(Function(grp) grp.HasRic(ric))
-                g.RemoveRic(ric)
-            End While
-        End Sub
-
-        Public Function GetGroupById(ByVal id As String) As Group
-            Return _groups.First(Function(grp) grp.Id = id)
-        End Function
-
-        Public Function GetGroupList() As Dictionary(Of Guid, String)
-            Dim res As New Dictionary(Of Guid, String)
-            _groups.ForEach(Sub(grp) res.Add(Guid.Parse(grp.Id), grp.SeriesName))
-            Return res
-        End Function
-
-        Public Function GetGroup(ByVal id As Guid) As Group
-            Return _groups.First(Function(grp) grp.Id = id.ToString())
-        End Function
-
-        Public Function ContainsRic(ByVal instrument As String) As Boolean
-            Return _groups.Any(Function(group) group.HasRic(instrument))
-        End Function
-
-        ''' <summary>
-        ''' Get a group containing specified bond 
-        ''' </summary>
-        ''' <param name="instrument">RIC of bond</param>
-        ''' <returns>FIRST group which contains specified element</returns>
-        ''' <remarks>There might be several groups which contain that element, 
-        ''' but they are arranged according to VisualizableGroup sorting rules</remarks>
-        Public Function GetInstrumentGroup(ByVal instrument As String) As Group
-            Dim grp = _groups.Where(Function(group) group.HasRic(instrument)).ToList()
-            grp.Sort()
-            Return grp.First
-        End Function
-
-        Public Function GetSeriesName(ByVal instrument As String) As String
-            Return GetInstrumentGroup(instrument).SeriesName
-        End Function
-#End Region
-
-        Public Sub RecalculateByType(ByVal type As SpreadType)
-            _groups.ForEach(Sub(group) group.RecalculateByType(type))
-        End Sub
-
-        Public Sub CleanupByType(ByVal type As SpreadType)
-            _groups.ForEach(Sub(group) group.CleanupByType(type))
-        End Sub
-
-        Public Sub CleanupSpread(ByVal type As SpreadType, ByRef descr As BasePointDescription)
+        Public Sub CleanupSpread(ByVal type As SpreadType, ByRef descr As BasePointDescription) ' todo very awkward
             _spreadBmk.CleanupSpread(descr, type)
         End Sub
 
-        Public Sub RemoveGroup(ByVal groupId As String)
-            While _groups.Any(Function(grp) grp.Id = groupId)
-                Dim g = _groups.First(Function(grp) grp.Id = groupId)
-                g.Cleanup()
-                _groups.Remove(g)
-            End While
-        End Sub
-
-        Public Function HasGroupById(ByVal id As String) As Boolean
-            Return _groups.Any(Function(grp) grp.Id = id)
-        End Function
     End Class
 
     Public Enum BondStatus
@@ -190,6 +230,8 @@ Namespace Tools
     End Enum
 
     Public Class Bond
+        Inherits Identifyable
+
         Private _selectedQuote As String
         Private ReadOnly _parentGroup As Group
         Private ReadOnly _metaData As BondDescription
@@ -276,21 +318,6 @@ Namespace Tools
                 _parentGroup.Ansamble.CleanupSpread(type, _quotesAndYields(_selectedQuote))
             End If
         End Sub
-
-        Function GetFieldByKey(ByVal key As String) As String
-            If ParentGroup.BidField = key Then Return "BID"
-            If ParentGroup.AskField = key Then Return "ASK"
-            If ParentGroup.LastField = key Then Return "LAST"
-            If ParentGroup.HistField = key Then Return "CLOSE"
-            If ParentGroup.VwapField = key Then Return "VWAP"
-            If Group.CustomField = key Then Return Group.CustomField
-            Return key
-        End Function
-
-        Public Sub SetCustomPrice(ByVal price As Double)
-            ParentGroup.SetCustomPrice(MetaData.RIC, price)
-        End Sub
-
     End Class
 
     ' todo custom label
@@ -306,7 +333,7 @@ Namespace Tools
     ''' </summary>
     ''' <remarks></remarks>
     Public Class Group
-        'Implements IComparable(Of Group)
+        Inherits Identifyable
         Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(Group))
 
         Private ReadOnly _ansamble As Ansamble
@@ -317,19 +344,19 @@ Namespace Tools
         Public Event Volume As Action(Of Bond)
         Public Event AllQuotes As Action(Of List(Of Bond))
 
-        'Public Group As GroupType
+
+        Public YieldMode As String
+        Public BondFields As FieldContainer
         Public SeriesName As String
-        Public Id As String = Guid.NewGuid().ToString()
-        Public BidField As String
-        Public AskField As String
-        Public LastField As String
-        Public HistField As String
-        Public VolumeField As String
-        Public VwapField As String
+
+        'Public BidField As String
+        'Public AskField As String
+        'Public LastField As String
+        'Public HistField As String
+        'Public VolumeField As String
+        'Public VwapField As String
+
         Public Const CustomField As String = "CUSTOM"
-        Public Currency As String
-        Public RicStructure As String
-        Public Brokers As New List(Of String)
 
         Private ReadOnly _elements As New Dictionary(Of String, Bond) 'ric -> datapoint
         Public ReadOnly Property Elements() As Dictionary(Of String, Bond)
@@ -358,9 +385,44 @@ Namespace Tools
             End Get
         End Property
 
-        'Public Function CompareTo(ByVal other As Group) As Integer Implements IComparable(Of Group).CompareTo
-        '    Return Group.CompareTo(other.Group)
-        'End Function
+        Public Shared Function Create(ByVal ans As Ansamble, ByVal port As PortfolioSource, ByVal portfolioStructure As PortfolioStructure) As Group
+            Dim group As Group
+
+            Dim source = TryCast(port.Source, Source)
+            If source Is Nothing Then
+                Logger.Warn("Unsupported source {0}", source)
+                Return Nothing
+            End If
+
+            group = New Group(ans) With {
+                .SeriesName = If(port.Name <> "", port.Name, source.Name),
+                .PortfolioID = source.ID,
+                .BondFields = source.Fields.Realtime.AsContainer(),
+                .Color = If(port.Color <> "", port.Color, source.Color)
+            }
+
+            Dim fieldPriority = SettingsManager.Instance.FieldsPriority.Split(",")
+            group.YieldMode = SettingsManager.Instance.YieldCalcMode
+            Dim selectedField = FindAppropriateField(fieldPriority, group.BondFields)
+
+            For Each ric In portfolioStructure.Rics(port)
+                Dim descr = BondsData.Instance.GetBondInfo(ric)
+                If descr IsNot Nothing Then
+                    group.AddRic(ric, descr, selectedField)
+                Else
+                    Logger.Error("No description for bond {0} found", ric)
+                End If
+            Next
+            Return group
+        End Function
+
+        Private Shared Function FindAppropriateField(ByVal fieldPriority As String(), ByVal realtime As FieldContainer) As String
+            Dim usefulFields = From fld In fieldPriority
+                    Let val = realtime.Name(fld)
+                    Where val <> ""
+                    Select fld
+            Return usefulFields.First
+        End Function
 
         Public Sub Cleanup()
             _quoteLoader.CancelAll()
@@ -370,18 +432,18 @@ Namespace Tools
 
         Public Sub StartRics(ByVal rics As List(Of String))
             If rics.Count = 0 Then Return
-            _quoteLoader.AddItems(rics, GetAllKnownFields())
+            _quoteLoader.AddItems(rics, BondFields.AllNames)
         End Sub
 
-        Private Function GetAllKnownFields() As List(Of String)
-            Return {BidField, AskField, LastField, VolumeField, VwapField, CustomField}.
-                Where(Function(fldName) fldName IsNot Nothing AndAlso fldName.Trim() <> "").ToList()
-        End Function
+        'Private Function GetAllKnownFields() As List(Of String)
+        '    Return {BidField, AskField, LastField, VolumeField, VwapField, CustomField}.
+        '        Where(Function(fldName) fldName IsNot Nothing AndAlso fldName.Trim() <> "").ToList()
+        'End Function
 
-        Private Function GetKnownPriceFields() As List(Of String)
-            Return {BidField, AskField, LastField, VwapField, CustomField}.
-                Where(Function(fldName) fldName IsNot Nothing AndAlso fldName.Trim() <> "").ToList()
-        End Function
+        'Private Function GetKnownPriceFields() As List(Of String)
+        '    Return {BidField, AskField, LastField, VwapField, CustomField}.
+        '        Where(Function(fldName) fldName IsNot Nothing AndAlso fldName.Trim() <> "").ToList()
+        'End Function
 
         Public Sub StartAll()
             StartRics(_elements.Keys.ToList())
@@ -411,13 +473,13 @@ Namespace Tools
                     ' now update data point
                     Dim bondDataPoint = _elements(instrument)
 
-                    If fieldsAndValues.ContainsKey(VolumeField) Then
-                        bondDataPoint.TodayVolume = fieldsAndValues(VolumeField)
+                    If fieldsAndValues.ContainsKey(BondFields.Fields.Volume) Then
+                        bondDataPoint.TodayVolume = fieldsAndValues(BondFields.Fields.Volume)
                         RaiseEvent Volume(bondDataPoint)
                     End If
 
-                    For Each fieldName In GetKnownPriceFields()
-                        If fieldsAndValues.ContainsKey(fieldName) AndAlso fieldsAndValues(fieldName) > 0 Then
+                    For Each fieldName In fieldsAndValues.Keys
+                        If BondFields.IsPriceByName(fieldName) AndAlso fieldsAndValues(fieldName) > 0 Then
                             Dim fieldValue = fieldsAndValues(fieldName)
                             Try
                                 HandleQuote(bondDataPoint, fieldName, fieldValue, Date.Today)
@@ -431,7 +493,7 @@ Namespace Tools
                             End Try
                         Else
                             If fieldName = _elements(instrument).SelectedQuote And Not bondDataPoint.QuotesAndYields.ContainsKey(fieldName) Then
-                                DoLoadHistory(bondDataPoint.MetaData, fieldName)
+                                ' todo DoLoadHistory(bondDataPoint.MetaData, fieldName)
                             End If
                         End If
                     Next
@@ -456,58 +518,58 @@ Namespace Tools
             If bondDataPoint.SelectedQuote = fieldName Then RaiseEvent Quote(bondDataPoint, fieldName)
         End Sub
 
-        Private Sub DoLoadHistory(ByVal bondDataPoint As BondDescription, ByVal fieldName As String)
-            If Not {LastField, VwapField}.Contains(fieldName) Then Exit Sub
-            Logger.Debug("Will load {0}", bondDataPoint.RIC)
+        'Private Sub DoLoadHistory(ByVal bondDataPoint As BondDescription, ByVal fieldName As String)
+        '    If Not {LastField, VwapField}.Contains(fieldName) Then Exit Sub
+        '    Logger.Debug("Will load {0}", bondDataPoint.RIC)
 
-            Dim hst = New HistoryLoadManager_v2()
-            AddHandler hst.HistoricalData, AddressOf OnHistoricalQuotes
-            hst.StartTask(bondDataPoint.RIC, "DATE,CLOSE,VWAP", DateTime.Today.AddDays(-10), DateTime.Today)
-        End Sub
+        '    Dim hst = New HistoryLoadManager_v2()
+        '    AddHandler hst.HistoricalData, AddressOf OnHistoricalQuotes
+        '    hst.StartTask(bondDataPoint.RIC, "DATE,CLOSE,VWAP", DateTime.Today.AddDays(-10), DateTime.Today)
+        'End Sub
 
-        Private Sub OnHistoricalQuotes(ByVal ric As String, ByVal status As LoaderStatus, ByVal hstatus As HistoryStatus, ByVal data As Dictionary(Of Date, HistoricalItem))
-            Logger.Trace("OnHistoricalQuotes({0})", ric)
-            If Not status.Finished Or status.Err Then
-                Logger.Warn(String.Format("{0} not finished or error!!!, hstatus = {1}, reason = {2}", ric, hstatus, status.Reason))
-            End If
-            If hstatus = HistoryStatus.Full Then
-                If data Is Nothing OrElse data.Count <= 0 Then
-                    Logger.Info("No data on {0} arrived", ric)
-                    Return
-                End If
+        'Private Sub OnHistoricalQuotes(ByVal ric As String, ByVal status As LoaderStatus, ByVal hstatus As HistoryStatus, ByVal data As Dictionary(Of Date, HistoricalItem))
+        '    Logger.Trace("OnHistoricalQuotes({0})", ric)
+        '    If Not status.Finished Or status.Err Then
+        '        Logger.Warn(String.Format("{0} not finished or error!!!, hstatus = {1}, reason = {2}", ric, hstatus, status.Reason))
+        '    End If
+        '    If hstatus = HistoryStatus.Full Then
+        '        If data Is Nothing OrElse data.Count <= 0 Then
+        '            Logger.Info("No data on {0} arrived", ric)
+        '            Return
+        '        End If
 
-                Dim maxdate As Date, maxElem As HistoricalItem
-                Try
-                    If data.Any(Function(kvp) kvp.Value.SomePrice()) Then
-                        maxdate = data.Where(Function(kvp) kvp.Value.SomePrice()).Select(Function(kvp) kvp.Key).Max
-                        maxElem = data(maxdate)
-                    Else
-                        Return
-                    End If
-                Catch ex As Exception
-                    Logger.ErrorException(String.Format("Failed to retreive max date for {0}", ric), ex)
-                    Logger.Error("Exception = {0}", ex.ToString())
-                    Return
-                End Try
+        '        Dim maxdate As Date, maxElem As HistoricalItem
+        '        Try
+        '            If data.Any(Function(kvp) kvp.Value.SomePrice()) Then
+        '                maxdate = data.Where(Function(kvp) kvp.Value.SomePrice()).Select(Function(kvp) kvp.Key).Max
+        '                maxElem = data(maxdate)
+        '            Else
+        '                Return
+        '            End If
+        '        Catch ex As Exception
+        '            Logger.ErrorException(String.Format("Failed to retreive max date for {0}", ric), ex)
+        '            Logger.Error("Exception = {0}", ex.ToString())
+        '            Return
+        '        End Try
 
-                ' checking if this bond is allowed to show up
-                If Not _elements.Keys.Contains(ric) Then
-                    Logger.Warn("Unknown instrument {0} in series {1}", ric, SeriesName)
-                    Return
-                End If
+        '        ' checking if this bond is allowed to show up
+        '        If Not _elements.Keys.Contains(ric) Then
+        '            Logger.Warn("Unknown instrument {0} in series {1}", ric, SeriesName)
+        '            Return
+        '        End If
 
-                ' now update data point
-                Dim bondDataPoint = _elements(ric)
+        '        ' now update data point
+        '        Dim bondDataPoint = _elements(ric)
 
-                If maxElem.Close > 0 Then
-                    HandleQuote(bondDataPoint, LastField, maxElem.Close, maxdate)
-                End If
+        '        If maxElem.Close > 0 Then
+        '            HandleQuote(bondDataPoint, LastField, maxElem.Close, maxdate)
+        '        End If
 
-                If maxElem.VWAP > 0 Then
-                    HandleQuote(bondDataPoint, VwapField, maxElem.Close, maxdate)
-                End If
-            End If
-        End Sub
+        '        If maxElem.VWAP > 0 Then
+        '            HandleQuote(bondDataPoint, VwapField, maxElem.Close, maxdate)
+        '        End If
+        '    End If
+        'End Sub
 
         Public Function HasRic(ByVal instrument As String) As Boolean
             Return _elements.Any(Function(elem) elem.Key = instrument)
@@ -517,7 +579,7 @@ Namespace Tools
             _elements.Add(ric, New Bond(Me, quote, descr))
         End Sub
 
-        Public Sub New(ByVal ansamble As Ansamble)
+        Private Sub New(ByVal ansamble As Ansamble)
             _ansamble = ansamble
         End Sub
 
@@ -573,7 +635,7 @@ Namespace Tools
             Get
                 Return _currentType
             End Get
-            Set(value As SpreadType)
+            Set(ByVal value As SpreadType)
                 Dim oldType = _currentType
                 _currentType = value
                 RaiseEvent TypeSelected(_currentType, oldType)
@@ -709,7 +771,7 @@ Namespace Tools
             Return mode1.Name <> mode2.Name
         End Operator
 
-        Public Shared Function IsEnabled(name As String)
+        Public Shared Function IsEnabled(ByVal name As String)
             Dim staticFields = GetType(SpreadType).GetFields(BindingFlags.Instance Or BindingFlags.Public)
             Return (From info In staticFields Let element = CType(info.GetValue(Nothing), SpreadType) Select element.Name = name And element.Enabled).FirstOrDefault()
         End Function
@@ -754,7 +816,7 @@ Namespace Tools
             Get
                 Return _selectedPointIndex
             End Get
-            Set(value As Integer?)
+            Set(ByVal value As Integer?)
                 _selectedPointIndex = value
                 RaiseEvent SelectedPointChanged(Name, value)
             End Set

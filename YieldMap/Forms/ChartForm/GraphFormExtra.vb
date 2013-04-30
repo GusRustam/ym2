@@ -411,7 +411,7 @@ Namespace Forms.ChartForm
                     Return
                 End If
 
-                Dim elem = _ansamble.GetInstrumentGroup(ric).GetElement(ric)
+                Dim elem = _ansamble.Groups.FindBond(ric)
                 Dim bondDataPoint = elem.MetaData ' todo that's awful
                 Dim points As New List(Of Tuple(Of HistPointDescription, BondDescription))
                 For Each dt In data.Keys

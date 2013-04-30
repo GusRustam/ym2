@@ -48,8 +48,8 @@ Public Class FieldNotFoundException
     End Sub
 End Class
 
-Public Class Fields
-    Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(Fields))
+Public Class FieldsDescription
+    Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(FieldsDescription))
     Private ReadOnly _id As String
     Private ReadOnly _name As String
 
@@ -57,27 +57,59 @@ Public Class Fields
     ' ReSharper disable FieldCanBeMadeReadOnly.Local
     <ConfingName("DATE")> Private _lastDate As String = ""
     <ConfingName("TIME")> Private _time As String = ""
-    <ConfingName("BID")> Private _bid As String = ""
-    <ConfingName("ASK")> Private _ask As String = ""
-    <ConfingName("LAST")> Private _last As String = ""
-    <ConfingName("VWAP")> Private _vwap As String = ""
-    <ConfingName("HIST")> Private _hist As String = ""     ' Historical Field. Corresponds to Close
+    <Price()> <ConfingName("BID")> Private _bid As String = ""
+    <Price()> <ConfingName("ASK")> Private _ask As String = ""
+    <Price()> <ConfingName("LAST")> Private _last As String = ""
+    <Price()> <ConfingName("VWAP")> Private _vwap As String = ""
+    <Price()> <ConfingName("HIST")> Private _hist As String = ""     ' Historical Field. Corresponds to Close
     <ConfingName("HIST_DATE")> Private _histDate As String = ""
     <ConfingName("VOLUME")> Private _volume As String = ""
     <ConfingName("SOURCE")> Private _src As String = ""
     ' ReSharper restore ConvertToConstant.Local
     ' ReSharper restore FieldCanBeMadeReadOnly.Local
 
-    Public Function GetField(ByVal name As String)
-        Dim res = (From fld In GetType(Fields).GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
+    Public Function GetFieldRealName(ByVal name As String)
+        ' ReSharper disable InconsistentNaming
+        Dim res = From fld In GetType(FieldsDescription).GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
                            Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False)
                            Where attx.Any
                            Let q = CType(attx.First, ConfingNameAttribute)
                            Where q.XmlName = name
-                           Select fld.GetValue(Me))
-
+                           Let Val = CStr(fld.GetValue(Me))
+                           Select q.XmlName, Val
+        ' ReSharper restore InconsistentNaming
         Return res.First
     End Function
+
+    Public Function AsContainer() As FieldContainer
+        Return New FieldContainer(Me,
+            From fld In GetType(FieldsDescription).GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
+            Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False)
+            Where attx.Any
+            Let q = CType(attx.First, ConfingNameAttribute), val = CStr(fld.GetValue(Me))
+            Let isPrice = fld.GetCustomAttributes(GetType(PriceAttribute), False).Any
+            Select tuple.Create(q.XmlName, val, isPrice))
+    End Function
+
+    Public Function GetXmlName(ByVal realName As String) As String
+        Dim res = From fld In GetType(FieldsDescription).GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
+                           Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False)
+                           Where attx.Any
+                           Let val = CStr(fld.GetValue(Me))
+                           Where val = realName
+                           Select CType(attx.First, ConfingNameAttribute).XmlName
+        Return res.First
+    End Function
+
+    Public Function IsPriceField(ByVal xmlName As String) As Boolean
+        Dim res = From fld In GetType(FieldsDescription).GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
+                           Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False).Cast(Of ConfingNameAttribute)()
+                           Where attx.Any AndAlso attx.First.XmlName = xmlName
+                           Let attxP = fld.GetCustomAttributes(GetType(PriceAttribute), False)
+                           Select attxP.Any
+        Return res.First
+    End Function
+
 
     Public ReadOnly Property ID() As String
         Get
@@ -97,6 +129,7 @@ Public Class Fields
                     Select confName = confName, value = value).ToDictionary(Function(item) item.confName, Function(item) item.value)
         PortfolioManager.Instance().UpdateFieldSet(_id, _name, list)
     End Sub
+
 
     <DisplayName("Trade date")>
     Public Property LastDate() As String
@@ -249,22 +282,96 @@ Public Class Fields
         field.SetValue(Me, value)
         Update()
     End Sub
+
+End Class
+
+Public Class FieldContainer
+    Private ReadOnly _fields As FieldsDescription
+    Private ReadOnly _nameToXml As New Dictionary(Of String, String)
+    Private ReadOnly _nameToPrice As New Dictionary(Of String, Boolean)
+    Private ReadOnly _xmlToName As New Dictionary(Of String, String)
+    Private ReadOnly _xmlToPrice As New Dictionary(Of String, Boolean)
+
+    ''' <summary>
+    ''' Initialized Field Container
+    ''' </summary>
+    ''' <param name="data">list of tuples of (string, string, bool) where
+    ''' item1 is real name
+    ''' item2 is xml name
+    ''' item3 is price flag
+    ''' </param>
+    ''' <remarks></remarks>
+    Public Sub New(ByVal fields As FieldsDescription, ByVal data As IEnumerable(Of Tuple(Of String, String, Boolean)))
+        _fields = fields
+        For Each elem In data
+            _nameToXml.Add(elem.Item1, elem.Item2)
+            _xmlToName.Add(elem.Item2, elem.Item1)
+            _nameToPrice.Add(elem.Item1, elem.Item3)
+            _xmlToPrice.Add(elem.Item2, elem.Item3)
+        Next
+    End Sub
+
+    Public ReadOnly Property AllNames() As List(Of String)
+        Get
+            Return _nameToXml.Keys.ToList()
+        End Get
+    End Property
+
+    Public ReadOnly Property AllXmlNames() As List(Of String)
+        Get
+            Return _xmlToName.Keys.ToList()
+        End Get
+    End Property
+
+    Public ReadOnly Property XmlName(ByVal nm As String) As String
+        Get
+            Return _nameToXml(nm)
+        End Get
+    End Property
+
+    Public ReadOnly Property Name(ByVal xName As String) As String
+        Get
+            Return _xmlToName(xName)
+        End Get
+    End Property
+
+    Public ReadOnly Property Fields As FieldsDescription
+        Get
+            Return _fields
+        End Get
+    End Property
+
+    Public ReadOnly Property IsPriceByName(ByVal nm As String) As Boolean
+        Get
+            Return _nameToPrice(nm)
+        End Get
+    End Property
+
+    Public ReadOnly Property IsPriceByXmlName(ByVal xName As String) As Boolean
+        Get
+            Return _xmlToPrice(xName)
+        End Get
+    End Property
+End Class
+
+Friend Class PriceAttribute
+    Inherits Attribute
 End Class
 
 Public Class FieldDescription
     Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(FieldDescription))
     Private ReadOnly _configName As String
     Private _value As String
-    Private ReadOnly _parent As Fields
+    Private ReadOnly _parent As FieldsDescription
 
     <Browsable(False)>
-    Public ReadOnly Property Parent() As Fields
+    Public ReadOnly Property Parent() As FieldsDescription
         Get
             Return _parent
         End Get
     End Property
 
-    Public Sub New(ByVal configName As String, ByVal value As String, ByVal parent As Fields)
+    Public Sub New(ByVal configName As String, ByVal value As String, ByVal parent As FieldsDescription)
         _configName = configName
         _value = value
         _parent = parent
@@ -295,8 +402,8 @@ End Class
 
 Public Class FieldSet
     Private ReadOnly _name As String
-    Private ReadOnly _history As Fields
-    Private ReadOnly _realtime As Fields
+    Private ReadOnly _history As FieldsDescription
+    Private ReadOnly _realtime As FieldsDescription
     Private ReadOnly _id As String
 
     Public Sub New(ByVal id As String, Optional ByVal doc As XmlDocument = Nothing)
@@ -305,8 +412,8 @@ Public Class FieldSet
         Dim node = doc.SelectSingleNode(String.Format("/bonds/field-sets/field-set[@id='{0}']", id))
         If node Is Nothing Then Throw New Exception(String.Format("Failed to find field set with id {0}", id))
         _name = node.Attributes("name").Value
-        _realtime = New Fields(id, node, "realtime")
-        _history = New Fields(id, node, "historical")
+        _realtime = New FieldsDescription(id, node, "realtime")
+        _history = New FieldsDescription(id, node, "historical")
     End Sub
 
     Public Overrides Function ToString() As String
@@ -319,21 +426,21 @@ Public Class FieldSet
         End Get
     End Property
 
-    Public ReadOnly Property History As Fields
+    Public ReadOnly Property History As FieldsDescription
         Get
             Return _history
         End Get
     End Property
 
-    Public ReadOnly Property Realtime As Fields
+    Public ReadOnly Property Realtime As FieldsDescription
         Get
             Return _realtime
         End Get
     End Property
 
-    Public ReadOnly Property AsDataSource() As List(Of Fields)
+    Public ReadOnly Property AsDataSource() As List(Of FieldsDescription)
         Get
-            Return New List(Of Fields)({_history, _realtime})
+            Return New List(Of FieldsDescription)({_history, _realtime})
         End Get
     End Property
 

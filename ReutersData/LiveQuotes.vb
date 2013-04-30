@@ -11,8 +11,7 @@ Public Class LiveQuotes
     Private WithEvents _listManager As AdxRtList = Eikon.Sdk.CreateAdxRtList()
 
     ' TODO В главном менеджере сделать главное событие- завершение работы приложения!
-    ' TODO Его ловить вот в таких вот классах и 
-
+    ' TODO Его ловить вот в таких вот классах и корректно убивать все объекты
 
     Public Sub CancelAll()
         Try
@@ -44,7 +43,7 @@ Public Class LiveQuotes
     Public Sub AddItems(ByVal items As List(Of String), Optional ByVal fields As List(Of String) = Nothing)
         Dim itms = items.Aggregate(Function(str, elem) str & "," & elem)
         Dim flds = If(fields IsNot Nothing, fields.Aggregate(Function(str, elem) str & "," & elem), "")
-        Logger.Debug("StartNewTask({0}, {1})", itms, flds)
+        Logger.Debug("AddItems({0}, {1})", itms, flds)
         Try
             For Each item In From elem In items Where Not _listManager.IsRegisteredItem(elem)
                 _listManager.RegisterItems(item, flds)
@@ -52,6 +51,8 @@ Public Class LiveQuotes
         Catch ex As Exception
             Logger.WarnException("Failed to start loading items", ex)
             Logger.Warn("Exception = {0}", ex.ToString())
+            ' todo по идее, можно регистрировать элементы по одному и возвращать список 
+            ' todo тех, кого зарегистрировать не получилось
         End Try
     End Sub
 
@@ -81,7 +82,7 @@ Public Class LiveQuotes
                     Dim aItemName As String = items.GetValue(k, 0)
 
                     Dim status = _listManager.ItemStatus(aItemName)
-                    If status = RT_DataStatus.RT_DS_FULL Then
+                    If {RT_ItemStatus.RT_ITEM_OK, RT_ItemStatus.RT_ITEM_DELAYED}.Contains(status) Then
                         Dim fields As Array = _listManager.ListFields(aItemName, RT_FieldRowView.RT_FRV_UPDATED, RT_FieldColumnView.RT_FCV_VALUE)
                         If fields Is Nothing Then Continue For
 
@@ -131,5 +132,4 @@ Public Class LiveQuotes
         _listManager.CloseAllLinks()
         _listManager = Nothing
     End Sub
-
 End Class
