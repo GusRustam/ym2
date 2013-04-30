@@ -13,6 +13,7 @@
   
   <property name="visible-columns" value="ALL"/>
   <property name="fields-priority" value="LAST,MID,VWAP,BID,ASK,HIST"/>
+  <property name="forbidden-fields" value=""/>
   <property name="yield-calc-mode" value="YTA"/>
   
   <viewport>

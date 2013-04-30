@@ -39,9 +39,17 @@
             Me.MaxSpreadTextBox = New System.Windows.Forms.MaskedTextBox()
             Me.Label7 = New System.Windows.Forms.Label()
             Me.Label4 = New System.Windows.Forms.Label()
-            Me.Label3 = New System.Windows.Forms.Label()
             Me.ShowPointSizeCheckBox = New System.Windows.Forms.CheckBox()
             Me.ShowBidAskCheckBox = New System.Windows.Forms.CheckBox()
+            Me.FieldPriorityTabPage = New System.Windows.Forms.TabPage()
+            Me.DownButton = New System.Windows.Forms.Button()
+            Me.MoveToHiddenButton = New System.Windows.Forms.Button()
+            Me.MoveToShownButton = New System.Windows.Forms.Button()
+            Me.UpButton = New System.Windows.Forms.Button()
+            Me.HiddenFieldsListBox = New System.Windows.Forms.ListBox()
+            Me.FieldsPriorityLB = New System.Windows.Forms.ListBox()
+            Me.Label9 = New System.Windows.Forms.Label()
+            Me.Label3 = New System.Windows.Forms.Label()
             Me.MainGeneralTabPage = New System.Windows.Forms.TabPage()
             Me.Label2 = New System.Windows.Forms.Label()
             Me.ChartWindowCheckBox = New System.Windows.Forms.CheckBox()
@@ -61,12 +69,10 @@
             Me.LogErrRadioButton = New System.Windows.Forms.RadioButton()
             Me.LogNoneRadioButton = New System.Windows.Forms.RadioButton()
             Me.TheCancelButton = New System.Windows.Forms.Button()
-            Me.FieldsPriorityLB = New System.Windows.Forms.ListBox()
-            Me.UpButton = New System.Windows.Forms.Button()
-            Me.DownButton = New System.Windows.Forms.Button()
             Me.MainTableLayoutPanel.SuspendLayout()
             Me.MainTabControl.SuspendLayout()
             Me.MainChartPage.SuspendLayout()
+            Me.FieldPriorityTabPage.SuspendLayout()
             Me.MainGeneralTabPage.SuspendLayout()
             Me.MainLoadColumnsPage.SuspendLayout()
             Me.Panel4.SuspendLayout()
@@ -103,6 +109,7 @@
             '
             Me.MainTableLayoutPanel.SetColumnSpan(Me.MainTabControl, 2)
             Me.MainTabControl.Controls.Add(Me.MainChartPage)
+            Me.MainTabControl.Controls.Add(Me.FieldPriorityTabPage)
             Me.MainTabControl.Controls.Add(Me.MainGeneralTabPage)
             Me.MainTabControl.Controls.Add(Me.MainLoadColumnsPage)
             Me.MainTabControl.Controls.Add(Me.MainLogPage)
@@ -115,9 +122,6 @@
             '
             'MainChartPage
             '
-            Me.MainChartPage.Controls.Add(Me.DownButton)
-            Me.MainChartPage.Controls.Add(Me.UpButton)
-            Me.MainChartPage.Controls.Add(Me.FieldsPriorityLB)
             Me.MainChartPage.Controls.Add(Me.YieldCalcModeCB)
             Me.MainChartPage.Controls.Add(Me.Label8)
             Me.MainChartPage.Controls.Add(Me.MaxYieldTextBox)
@@ -130,7 +134,6 @@
             Me.MainChartPage.Controls.Add(Me.MaxSpreadTextBox)
             Me.MainChartPage.Controls.Add(Me.Label7)
             Me.MainChartPage.Controls.Add(Me.Label4)
-            Me.MainChartPage.Controls.Add(Me.Label3)
             Me.MainChartPage.Controls.Add(Me.ShowPointSizeCheckBox)
             Me.MainChartPage.Controls.Add(Me.ShowBidAskCheckBox)
             Me.MainChartPage.Location = New System.Drawing.Point(4, 22)
@@ -255,19 +258,6 @@
             Me.Label4.TabIndex = 11
             Me.Label4.Text = "Chart viewport default limits"
             '
-            'Label3
-            '
-            Me.Label3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-            Me.Label3.AutoSize = True
-            Me.Label3.Location = New System.Drawing.Point(328, 41)
-            Me.Label3.Margin = New System.Windows.Forms.Padding(0)
-            Me.Label3.Name = "Label3"
-            Me.Label3.Size = New System.Drawing.Size(70, 13)
-            Me.Label3.TabIndex = 7
-            Me.Label3.Text = "Fields priority:"
-            Me.Label3.Visible = False
-            '
             'ShowPointSizeCheckBox
             '
             Me.ShowPointSizeCheckBox.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
@@ -295,6 +285,102 @@
             Me.ShowBidAskCheckBox.Text = "Show bid-ask yields on mouse over"
             Me.ShowBidAskCheckBox.UseVisualStyleBackColor = True
             '
+            'FieldPriorityTabPage
+            '
+            Me.FieldPriorityTabPage.Controls.Add(Me.DownButton)
+            Me.FieldPriorityTabPage.Controls.Add(Me.MoveToHiddenButton)
+            Me.FieldPriorityTabPage.Controls.Add(Me.MoveToShownButton)
+            Me.FieldPriorityTabPage.Controls.Add(Me.UpButton)
+            Me.FieldPriorityTabPage.Controls.Add(Me.HiddenFieldsListBox)
+            Me.FieldPriorityTabPage.Controls.Add(Me.FieldsPriorityLB)
+            Me.FieldPriorityTabPage.Controls.Add(Me.Label9)
+            Me.FieldPriorityTabPage.Controls.Add(Me.Label3)
+            Me.FieldPriorityTabPage.Location = New System.Drawing.Point(4, 22)
+            Me.FieldPriorityTabPage.Name = "FieldPriorityTabPage"
+            Me.FieldPriorityTabPage.Padding = New System.Windows.Forms.Padding(3)
+            Me.FieldPriorityTabPage.Size = New System.Drawing.Size(530, 213)
+            Me.FieldPriorityTabPage.TabIndex = 4
+            Me.FieldPriorityTabPage.Text = "Field priorities"
+            Me.FieldPriorityTabPage.UseVisualStyleBackColor = True
+            '
+            'DownButton
+            '
+            Me.DownButton.Location = New System.Drawing.Point(152, 61)
+            Me.DownButton.Name = "DownButton"
+            Me.DownButton.Size = New System.Drawing.Size(47, 23)
+            Me.DownButton.TabIndex = 47
+            Me.DownButton.Text = "Down"
+            Me.DownButton.UseVisualStyleBackColor = True
+            '
+            'MoveToHiddenButton
+            '
+            Me.MoveToHiddenButton.Location = New System.Drawing.Point(281, 33)
+            Me.MoveToHiddenButton.Name = "MoveToHiddenButton"
+            Me.MoveToHiddenButton.Size = New System.Drawing.Size(47, 23)
+            Me.MoveToHiddenButton.TabIndex = 48
+            Me.MoveToHiddenButton.Text = ">>"
+            Me.MoveToHiddenButton.UseVisualStyleBackColor = True
+            '
+            'MoveToShownButton
+            '
+            Me.MoveToShownButton.Location = New System.Drawing.Point(228, 33)
+            Me.MoveToShownButton.Name = "MoveToShownButton"
+            Me.MoveToShownButton.Size = New System.Drawing.Size(47, 23)
+            Me.MoveToShownButton.TabIndex = 48
+            Me.MoveToShownButton.Text = "<<"
+            Me.MoveToShownButton.UseVisualStyleBackColor = True
+            '
+            'UpButton
+            '
+            Me.UpButton.Location = New System.Drawing.Point(152, 33)
+            Me.UpButton.Name = "UpButton"
+            Me.UpButton.Size = New System.Drawing.Size(47, 23)
+            Me.UpButton.TabIndex = 48
+            Me.UpButton.Text = "Up"
+            Me.UpButton.UseVisualStyleBackColor = True
+            '
+            'HiddenFieldsListBox
+            '
+            Me.HiddenFieldsListBox.FormattingEnabled = True
+            Me.HiddenFieldsListBox.Location = New System.Drawing.Point(379, 34)
+            Me.HiddenFieldsListBox.Name = "HiddenFieldsListBox"
+            Me.HiddenFieldsListBox.Size = New System.Drawing.Size(140, 160)
+            Me.HiddenFieldsListBox.TabIndex = 46
+            '
+            'FieldsPriorityLB
+            '
+            Me.FieldsPriorityLB.FormattingEnabled = True
+            Me.FieldsPriorityLB.Location = New System.Drawing.Point(6, 34)
+            Me.FieldsPriorityLB.Name = "FieldsPriorityLB"
+            Me.FieldsPriorityLB.Size = New System.Drawing.Size(140, 160)
+            Me.FieldsPriorityLB.TabIndex = 46
+            '
+            'Label9
+            '
+            Me.Label9.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Me.Label9.AutoSize = True
+            Me.Label9.Location = New System.Drawing.Point(376, 18)
+            Me.Label9.Margin = New System.Windows.Forms.Padding(0)
+            Me.Label9.Name = "Label9"
+            Me.Label9.Size = New System.Drawing.Size(135, 13)
+            Me.Label9.TabIndex = 45
+            Me.Label9.Text = "Fields not shown by default"
+            Me.Label9.Visible = False
+            '
+            'Label3
+            '
+            Me.Label3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Me.Label3.AutoSize = True
+            Me.Label3.Location = New System.Drawing.Point(3, 12)
+            Me.Label3.Margin = New System.Windows.Forms.Padding(0)
+            Me.Label3.Name = "Label3"
+            Me.Label3.Size = New System.Drawing.Size(70, 13)
+            Me.Label3.TabIndex = 45
+            Me.Label3.Text = "Fields priority:"
+            Me.Label3.Visible = False
+            '
             'MainGeneralTabPage
             '
             Me.MainGeneralTabPage.Controls.Add(Me.Label2)
@@ -303,7 +389,7 @@
             Me.MainGeneralTabPage.Location = New System.Drawing.Point(4, 22)
             Me.MainGeneralTabPage.Name = "MainGeneralTabPage"
             Me.MainGeneralTabPage.Padding = New System.Windows.Forms.Padding(3)
-            Me.MainGeneralTabPage.Size = New System.Drawing.Size(530, 233)
+            Me.MainGeneralTabPage.Size = New System.Drawing.Size(530, 213)
             Me.MainGeneralTabPage.TabIndex = 1
             Me.MainGeneralTabPage.Text = "General"
             Me.MainGeneralTabPage.UseVisualStyleBackColor = True
@@ -402,7 +488,7 @@
             Me.MainLogPage.Location = New System.Drawing.Point(4, 22)
             Me.MainLogPage.Name = "MainLogPage"
             Me.MainLogPage.Padding = New System.Windows.Forms.Padding(3)
-            Me.MainLogPage.Size = New System.Drawing.Size(530, 233)
+            Me.MainLogPage.Size = New System.Drawing.Size(530, 213)
             Me.MainLogPage.TabIndex = 0
             Me.MainLogPage.Text = "Logging"
             Me.MainLogPage.UseVisualStyleBackColor = True
@@ -500,32 +586,6 @@
             Me.TheCancelButton.Text = "Cancel"
             Me.TheCancelButton.UseVisualStyleBackColor = True
             '
-            'FieldsPriorityLB
-            '
-            Me.FieldsPriorityLB.FormattingEnabled = True
-            Me.FieldsPriorityLB.Location = New System.Drawing.Point(331, 63)
-            Me.FieldsPriorityLB.Name = "FieldsPriorityLB"
-            Me.FieldsPriorityLB.Size = New System.Drawing.Size(140, 108)
-            Me.FieldsPriorityLB.TabIndex = 43
-            '
-            'UpButton
-            '
-            Me.UpButton.Location = New System.Drawing.Point(477, 62)
-            Me.UpButton.Name = "UpButton"
-            Me.UpButton.Size = New System.Drawing.Size(47, 23)
-            Me.UpButton.TabIndex = 44
-            Me.UpButton.Text = "Up"
-            Me.UpButton.UseVisualStyleBackColor = True
-            '
-            'DownButton
-            '
-            Me.DownButton.Location = New System.Drawing.Point(477, 90)
-            Me.DownButton.Name = "DownButton"
-            Me.DownButton.Size = New System.Drawing.Size(47, 23)
-            Me.DownButton.TabIndex = 44
-            Me.DownButton.Text = "Down"
-            Me.DownButton.UseVisualStyleBackColor = True
-            '
             'SettingsForm
             '
             Me.AcceptButton = Me.SaveSettingsButton
@@ -545,6 +605,8 @@
             Me.MainTabControl.ResumeLayout(False)
             Me.MainChartPage.ResumeLayout(False)
             Me.MainChartPage.PerformLayout()
+            Me.FieldPriorityTabPage.ResumeLayout(False)
+            Me.FieldPriorityTabPage.PerformLayout()
             Me.MainGeneralTabPage.ResumeLayout(False)
             Me.MainGeneralTabPage.PerformLayout()
             Me.MainLoadColumnsPage.ResumeLayout(False)
@@ -588,13 +650,18 @@
         Friend WithEvents MaxSpreadTextBox As System.Windows.Forms.MaskedTextBox
         Friend WithEvents Label7 As System.Windows.Forms.Label
         Friend WithEvents Label4 As System.Windows.Forms.Label
-        Friend WithEvents Label3 As System.Windows.Forms.Label
         Friend WithEvents ShowPointSizeCheckBox As System.Windows.Forms.CheckBox
         Friend WithEvents ShowBidAskCheckBox As System.Windows.Forms.CheckBox
         Friend WithEvents YieldCalcModeCB As System.Windows.Forms.ComboBox
         Friend WithEvents Label8 As System.Windows.Forms.Label
+        Friend WithEvents FieldPriorityTabPage As System.Windows.Forms.TabPage
         Friend WithEvents DownButton As System.Windows.Forms.Button
+        Friend WithEvents MoveToHiddenButton As System.Windows.Forms.Button
+        Friend WithEvents MoveToShownButton As System.Windows.Forms.Button
         Friend WithEvents UpButton As System.Windows.Forms.Button
+        Friend WithEvents HiddenFieldsListBox As System.Windows.Forms.ListBox
         Friend WithEvents FieldsPriorityLB As System.Windows.Forms.ListBox
+        Friend WithEvents Label9 As System.Windows.Forms.Label
+        Friend WithEvents Label3 As System.Windows.Forms.Label
     End Class
 End Namespace

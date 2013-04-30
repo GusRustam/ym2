@@ -1,5 +1,4 @@
 ﻿Imports System.Text.RegularExpressions
-Imports System.ComponentModel
 Imports DbManager.Bonds
 Imports NLog
 Imports Settings
@@ -60,6 +59,9 @@ Namespace Forms.MainForm
             FieldsPriorityLB.DataSource = _lst
             FieldsPriorityLB.DisplayMember = "Name"
             FieldsPriorityLB.ValueMember = "Order"
+
+            Dim strings = Settings.ForbiddenFields.Split(",")
+            HiddenFieldsListBox.Items.AddRange((From anStr In strings Where anStr <> "").ToArray())
 
             MinYieldTextBox.Text = If(Settings.MinYield.HasValue, Settings.MinYield, "")
             MaxYieldTextBox.Text = If(Settings.MaxYield.HasValue, Settings.MaxYield, "")
@@ -127,6 +129,7 @@ Namespace Forms.MainForm
             Settings.ShowChartToolBar = ChartWindowCheckBox.Checked
 
             Settings.FieldsPriority = String.Join(",", From elem In _lst Select elem.Name)
+            Settings.ForbiddenFields = String.Join(",", HiddenFieldsListBox.Items.Cast(Of String))
 
             Dim columnsString As String = ""
 
@@ -223,6 +226,28 @@ Namespace Forms.MainForm
             FieldsPriorityLB.DisplayMember = "Name"
             FieldsPriorityLB.ValueMember = "Order"
             FieldsPriorityLB.SelectedIndex = FieldsPriorityLB.SelectedIndex + 1
+        End Sub
+
+        Private Sub MoveToShownButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles MoveToHiddenButton.Click
+            If FieldsPriorityLB.SelectedIndex < 0 Then Return
+            Dim item = CType(FieldsPriorityLB.Items(FieldsPriorityLB.SelectedIndex), IndexedItem)
+            _lst.Remove(item)
+            HiddenFieldsListBox.Items.Add(item.Name)
+            FieldsPriorityLB.DataSource = Nothing
+            FieldsPriorityLB.DataSource = _lst
+            FieldsPriorityLB.DisplayMember = "Name"
+            FieldsPriorityLB.ValueMember = "Order"
+        End Sub
+
+        Private Sub MoveToHiddenButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles MoveToShownButton.Click
+            If HiddenFieldsListBox.SelectedIndex < 0 Then Return
+            Dim item = CStr(HiddenFieldsListBox.Items(HiddenFieldsListBox.SelectedIndex))
+            HiddenFieldsListBox.Items.RemoveAt(HiddenFieldsListBox.SelectedIndex)
+            _lst.Add(New IndexedItem(_lst.Last.Order + 1, item))
+            FieldsPriorityLB.DataSource = Nothing
+            FieldsPriorityLB.DataSource = _lst
+            FieldsPriorityLB.DisplayMember = "Name"
+            FieldsPriorityLB.ValueMember = "Order"
         End Sub
     End Class
 End Namespace

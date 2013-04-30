@@ -2,6 +2,7 @@
 Imports NLog
 Imports System.Reflection
 Imports System.Xml
+Imports Settings
 
 Public Class ConfingNameAttribute
     Inherits Attribute
@@ -55,6 +56,8 @@ Public Class FieldsDescription
 
     ' ReSharper disable ConvertToConstant.Local
     ' ReSharper disable FieldCanBeMadeReadOnly.Local
+    <Price()> <ConfingName("CUSTOM")> Private _custom As String = "CUSTOM"
+    <Price()> <ConfingName("MID")> Private _mid As String = "MID"
     <ConfingName("DATE")> Private _lastDate As String = ""
     <ConfingName("TIME")> Private _time As String = ""
     <Price()> <ConfingName("BID")> Private _bid As String = ""
@@ -68,19 +71,6 @@ Public Class FieldsDescription
     ' ReSharper restore ConvertToConstant.Local
     ' ReSharper restore FieldCanBeMadeReadOnly.Local
 
-    Public Function GetFieldRealName(ByVal name As String)
-        ' ReSharper disable InconsistentNaming
-        Dim res = From fld In GetType(FieldsDescription).GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
-                           Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False)
-                           Where attx.Any
-                           Let q = CType(attx.First, ConfingNameAttribute)
-                           Where q.XmlName = name
-                           Let Val = CStr(fld.GetValue(Me))
-                           Select q.XmlName, Val
-        ' ReSharper restore InconsistentNaming
-        Return res.First
-    End Function
-
     Public Function AsContainer() As FieldContainer
         Return New FieldContainer(Me,
             From fld In GetType(FieldsDescription).GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
@@ -88,28 +78,8 @@ Public Class FieldsDescription
             Where attx.Any
             Let q = CType(attx.First, ConfingNameAttribute), val = CStr(fld.GetValue(Me))
             Let isPrice = fld.GetCustomAttributes(GetType(PriceAttribute), False).Any
-            Select tuple.Create(q.XmlName, val, isPrice))
+            Select tuple.Create(val, q.XmlName, isPrice))
     End Function
-
-    Public Function GetXmlName(ByVal realName As String) As String
-        Dim res = From fld In GetType(FieldsDescription).GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
-                           Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False)
-                           Where attx.Any
-                           Let val = CStr(fld.GetValue(Me))
-                           Where val = realName
-                           Select CType(attx.First, ConfingNameAttribute).XmlName
-        Return res.First
-    End Function
-
-    Public Function IsPriceField(ByVal xmlName As String) As Boolean
-        Dim res = From fld In GetType(FieldsDescription).GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
-                           Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False).Cast(Of ConfingNameAttribute)()
-                           Where attx.Any AndAlso attx.First.XmlName = xmlName
-                           Let attxP = fld.GetCustomAttributes(GetType(PriceAttribute), False)
-                           Select attxP.Any
-        Return res.First
-    End Function
-
 
     Public ReadOnly Property ID() As String
         Get
@@ -130,6 +100,25 @@ Public Class FieldsDescription
         PortfolioManager.Instance().UpdateFieldSet(_id, _name, list)
     End Sub
 
+    <Browsable(False)>
+    Public Property [Mid]() As String
+        Get
+            Return _mid
+        End Get
+        Set(ByVal value As String)
+            _mid = value
+        End Set
+    End Property
+
+    <Browsable(False)>
+    Public Property [Custom]() As String
+        Get
+            Return _custom
+        End Get
+        Set(ByVal value As String)
+            _custom = value
+        End Set
+    End Property
 
     <DisplayName("Trade date")>
     Public Property LastDate() As String
@@ -291,6 +280,7 @@ Public Class FieldContainer
     Private ReadOnly _nameToPrice As New Dictionary(Of String, Boolean)
     Private ReadOnly _xmlToName As New Dictionary(Of String, String)
     Private ReadOnly _xmlToPrice As New Dictionary(Of String, Boolean)
+    Private ReadOnly _xmlNameToPriority As New Dictionary(Of String, Integer)
 
     ''' <summary>
     ''' Initialized Field Container
@@ -302,8 +292,14 @@ Public Class FieldContainer
     ''' </param>
     ''' <remarks></remarks>
     Public Sub New(ByVal fields As FieldsDescription, ByVal data As IEnumerable(Of Tuple(Of String, String, Boolean)))
+        Dim fieldPriority = SettingsManager.Instance.FieldsPriority.Split(",")
+        Dim i As Integer
+        For i = 0 To fieldPriority.Count - 1
+            _xmlNameToPriority.Add(fieldPriority(i), i)
+        Next
+
         _fields = fields
-        For Each elem In data
+        For Each elem In From item In data Where item.Item1 <> ""
             _nameToXml.Add(elem.Item1, elem.Item2)
             _xmlToName.Add(elem.Item2, elem.Item1)
             _nameToPrice.Add(elem.Item1, elem.Item3)
@@ -325,13 +321,13 @@ Public Class FieldContainer
 
     Public ReadOnly Property XmlName(ByVal nm As String) As String
         Get
-            Return _nameToXml(nm)
+            Return If(_nameToXml.Keys.Contains(nm), _nameToXml(nm), "")
         End Get
     End Property
 
     Public ReadOnly Property Name(ByVal xName As String) As String
         Get
-            Return _xmlToName(xName)
+            Return If(_xmlToName.Keys.Contains(xName), _xmlToName(xName), "")
         End Get
     End Property
 
@@ -343,15 +339,19 @@ Public Class FieldContainer
 
     Public ReadOnly Property IsPriceByName(ByVal nm As String) As Boolean
         Get
-            Return _nameToPrice(nm)
+            Return _nameToPrice.Keys.Contains(nm) AndAlso _nameToPrice(nm)
         End Get
     End Property
 
     Public ReadOnly Property IsPriceByXmlName(ByVal xName As String) As Boolean
         Get
-            Return _xmlToPrice(xName)
+            Return _xmlToPrice.Keys.Contains(xName) AndAlso _xmlToPrice(xName)
         End Get
     End Property
+
+    Public Function IsMaximumPriority(ByVal whatXmlName As String, ByVal xmlNames As IEnumerable(Of String))
+        Return _xmlNameToPriority(whatXmlName) >= (From key In xmlNames Select _xmlNameToPriority(key)).Max
+    End Function
 End Class
 
 Friend Class PriceAttribute

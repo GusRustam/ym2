@@ -208,10 +208,10 @@ Namespace Forms.ChartForm
                                 Sub(key)
                                     Dim x = bondDataPoint.QuotesAndYields(key)
                                     Dim newItem = ExtInfoTSMI.DropDownItems.Add(String.Format("{0}: {1:F4}, {2:P2} {3}, {4:F2}", key, x.Price, x.Yld.Yield, x.Yld.ToWhat.Abbr, x.Duration))
-                                    If bondDataPoint.SelectedQuote = key Then CType(newItem, ToolStripMenuItem).Checked = True
+                                    If bondDataPoint.UserSelectedQuote = key Then CType(newItem, ToolStripMenuItem).Checked = True
                                     AddHandler newItem.Click,
                                         Sub(sender1 As Object, e1 As EventArgs)
-                                            bondDataPoint.SelectedQuote = key
+                                            bondDataPoint.UserSelectedQuote = key
                                         End Sub
                                 End Sub)
 
@@ -226,7 +226,6 @@ Namespace Forms.ChartForm
                                            Dim res = InputBox("Enter price", "Custom bond price")
                                            If IsNumeric(res) Then
                                                bondDataPoint.ParentGroup.SetCustomPrice(bondDataPoint.MetaData.RIC, CDbl(res))
-                                               bondDataPoint.SelectedQuote = Group.CustomField
                                            ElseIf res <> "" Then
                                                MessageBox.Show("Invalid number")
                                            End If
@@ -288,7 +287,7 @@ Namespace Forms.ChartForm
                     If TypeOf point.Tag Is Bond And Not point.IsEmpty Then
                         Dim bondData = CType(point.Tag, Bond)
                         DscrLabel.Text = bondData.MetaData.ShortName
-                        Dim calculatedYield = bondData.QuotesAndYields(bondData.SelectedQuote)
+                        Dim calculatedYield = bondData.QuotesAndYields(bondData.UserSelectedQuote)
 
                         SpreadLabel.Text = If(calculatedYield.PointSpread IsNot Nothing, String.Format("{0:F0} b.p.", calculatedYield.PointSpread), N_A)
                         ZSpreadLabel.Text = If(calculatedYield.ZSpread IsNot Nothing, String.Format("{0:F0} b.p.", calculatedYield.ZSpread), N_A)
@@ -375,7 +374,7 @@ Namespace Forms.ChartForm
                     seriesDescr.ResetSelection()
                     srs.Points.ToList.ForEach(Sub(point)
                                                   Dim tg = CType(point.Tag, Bond)
-                                                  point.Color = If(tg.QuotesAndYields(tg.SelectedQuote).YieldSource = YieldSource.Historical, Color.LightGray, Color.White)
+                                                  point.Color = If(tg.QuotesAndYields(tg.UserSelectedQuote).YieldSource = YieldSource.Historical, Color.LightGray, Color.White)
                                               End Sub)
                     If seriesDescr.Name = curveName AndAlso pointIndex IsNot Nothing Then
                         srs.Points(pointIndex).Color = Color.Red
@@ -1101,7 +1100,7 @@ Namespace Forms.ChartForm
 
         Private Sub OnBondAllQuotes(ByVal data As List(Of Bond)) Handles _ansamble.AllQuotes
             Logger.Trace("OnBondAllQuotes()")
-            data.Where(Function(elem) elem.QuotesAndYields.ContainsKey(elem.SelectedQuote)).ToList.ForEach(Sub(elem) OnBondQuote(elem, elem.SelectedQuote, True))
+            data.Where(Function(elem) elem.QuotesAndYields.ContainsKey(elem.UserSelectedQuote)).ToList.ForEach(Sub(elem) OnBondQuote(elem, elem.UserSelectedQuote, True))
             SetChartMinMax()
         End Sub
 
@@ -1156,12 +1155,11 @@ Namespace Forms.ChartForm
                                 Logger.Trace("{0}: delta is {1}", ric, yValue.Value - point.YValues.First)
                             End If
                             point.YValues = {yValue.Value}
-                            point.Color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.LightGray)
-                            point.MarkerStyle = IIf(fieldName <> group.CustomField,
+                            point.Color = If(calc.YieldSource.Belongs(YieldSource.Realtime, YieldSource.Synthetic), Color.White, Color.LightGray)
+                            point.MarkerStyle = IIf(calc.YieldSource <> YieldSource.Synthetic,
                                                IIf(calc.Yld.ToWhat.Equals(YieldToWhat.Maturity), MarkerStyle.Circle, MarkerStyle.Triangle),
                                                MarkerStyle.Square)
                             If ShowLabelsTSB.Checked Then point.Label = descr.Label
-
                         Else
                             series.Points.Remove(point)
                         End If
@@ -1171,7 +1169,7 @@ Namespace Forms.ChartForm
                             .Tag = descr,
                             .ToolTip = descr.MetaData.ShortName,
                             .Color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.LightGray),
-                            .MarkerStyle = IIf(fieldName <> group.CustomField,
+                            .MarkerStyle = IIf(calc.YieldSource <> YieldSource.Synthetic,
                                                IIf(calc.Yld.ToWhat.Equals(YieldToWhat.Maturity), MarkerStyle.Circle, MarkerStyle.Triangle),
                                                MarkerStyle.Square)
                         }

@@ -180,6 +180,16 @@ End Class
 
 Public Module Extensions
     <Extension()>
+    Public Function Belongs(Of T)(ByVal x As T, ByVal whereTo As IEnumerable(Of T)) As Boolean
+        Return whereTo.Contains(x)
+    End Function
+
+    <Extension()>
+    Public Function Belongs(Of T)(ByVal x As T, ByVal ParamArray whereTo As T()) As Boolean
+        Return whereTo.Cast(Of T).Contains(x)
+    End Function
+
+    <Extension()>
     Public Sub Import(Of T)(ByVal this As HashSet(Of T), ByVal what As HashSet(Of T))
         For Each elem In what
             this.Add(elem)

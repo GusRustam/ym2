@@ -311,7 +311,7 @@ Namespace Forms.ChartForm
                     seriesDescr.ResetSelection()
                     srs.Points.ToList.ForEach(Sub(point)
                                                   Dim tg = CType(point.Tag, Bond)
-                                                  point.Color = If(tg.QuotesAndYields(tg.SelectedQuote).YieldSource = YieldSource.Historical, Color.LightGray, Color.White)
+                                                  point.Color = If(tg.QuotesAndYields(tg.UserSelectedQuote).YieldSource = YieldSource.Historical, Color.LightGray, Color.White)
                                               End Sub)
                 End Sub)
         End Sub

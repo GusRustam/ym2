@@ -13,6 +13,7 @@ Public Class SettingsManager
     Public Event YieldCalcModeChanged As Action(Of String)
     Public Event DataSourceChanged As Action(Of String)
     Public Event FieldsPriorityChanged As Action(Of String)
+    Public Event ForbiddenFieldsChanged As Action(Of String)
 
     Private Shared ReadOnly SettingsPath As String = Path.Combine(Utils.GetMyPath(), "config.xml")
     Private Shared ReadOnly Settings As New XmlDocument
@@ -218,6 +219,20 @@ Public Class SettingsManager
         End Set
     End Property
 
+    Private _forbiddenFields As String = ""
+    Public Property ForbiddenFields() As String
+        Get
+            Return _forbiddenFields
+        End Get
+        Set(ByVal value As String)
+            If _forbiddenFields <> value Then
+                SaveValue("/settings/property[@name='forbidden-fields']/@value", value)
+                _forbiddenFields = value
+                RaiseEvent ForbiddenFieldsChanged(value)
+            End If
+        End Set
+    End Property
+
 
     Sub New()
         Settings.Load(SettingsPath)
@@ -234,6 +249,8 @@ Public Class SettingsManager
         GetBoolValue("/settings/property[@name='show-main-toolbar']/@value", _showMainToolBar)
         GetBoolValue("/settings/property[@name='show-chart-toolbar']/@value", _showChartToolBar)
 
+        GetStringValue("/settings/property[@name='fields-priority']/@value", _fieldsPriority)
+        GetStringValue("/settings/property[@name='forbidden-fields']/@value", _forbiddenFields)
         GetStringValue("/settings/property[@name='yield-calc-mode']/@value", _yieldCalcMode)
         GetStringValue("/settings/property[@name='visible-columns']/@value", _bondSelectorVisibleColumns)
         GetStringValue("/settings/property[@name='data-source']/@value", _dataSource)

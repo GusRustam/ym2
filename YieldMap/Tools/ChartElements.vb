@@ -5,8 +5,8 @@ Imports DbManager.Bonds
 Imports NLog
 Imports ReutersData
 Imports Settings
+Imports Uitls
 Imports YieldMap.Forms.TableForm
-Imports YieldMap.Tools.History
 Imports YieldMap.Curves
 
 Namespace Tools
@@ -93,10 +93,10 @@ Namespace Tools
                             res.Name = point.MetaData.ShortName
                             res.Maturity = point.MetaData.Maturity
                             res.Coupon = point.MetaData.Coupon
-                            If point.QuotesAndYields.ContainsKey(point.SelectedQuote) Then
-                                Dim quote = point.QuotesAndYields(point.SelectedQuote)
+                            If point.QuotesAndYields.ContainsKey(point.UserSelectedQuote) Then
+                                Dim quote = point.QuotesAndYields(point.UserSelectedQuote)
                                 res.Price = quote.Price
-                                res.Quote = point.SelectedQuote
+                                res.Quote = point.UserSelectedQuote
                                 res.QuoteDate = quote.YieldAtDate
                                 res.State = BondDescr.StateType.Ok
                                 res.ToWhat = quote.Yld.ToWhat
@@ -232,7 +232,7 @@ Namespace Tools
     Public Class Bond
         Inherits Identifyable
 
-        Private _selectedQuote As String
+        Private _userSelectedQuote As String
         Private ReadOnly _parentGroup As Group
         Private ReadOnly _metaData As BondDescription
         Private ReadOnly _quotesAndYields As New Dictionary(Of String, BondPointDescription)
@@ -250,10 +250,10 @@ Namespace Tools
             End Set
         End Property
 
-        Sub New(ByVal parentGroup As Group, ByVal selectedQuote As String, ByVal metaData As BondDescription)
+        Sub New(ByVal parentGroup As Group, ByVal userSelectedQuote As String, ByVal metaData As BondDescription)
             _parentGroup = parentGroup
             _metaData = metaData
-            _selectedQuote = selectedQuote
+            _userSelectedQuote = userSelectedQuote
         End Sub
 
         Public ReadOnly Property ParentGroup As Group
@@ -262,12 +262,12 @@ Namespace Tools
             End Get
         End Property
 
-        Public Property SelectedQuote As String
+        Public Property UserSelectedQuote As String
             Get
-                Return _selectedQuote
+                Return _userSelectedQuote
             End Get
             Set(ByVal value As String)
-                _selectedQuote = value
+                _userSelectedQuote = value
                 ParentGroup.NotifyQuote(Me)
             End Set
         End Property
@@ -308,14 +308,14 @@ Namespace Tools
         End Property
 
         Public Sub RecalculateByType(ByVal type As SpreadType)
-            If _quotesAndYields.ContainsKey(_selectedQuote) Then
-                _parentGroup.Ansamble.SpreadBmk.CalcAllSpreads(_quotesAndYields(_selectedQuote), _metaData, type)
+            If _quotesAndYields.ContainsKey(_userSelectedQuote) Then
+                _parentGroup.Ansamble.SpreadBmk.CalcAllSpreads(_quotesAndYields(_userSelectedQuote), _metaData, type)
             End If
         End Sub
 
         Public Sub CleanupByType(ByVal type As SpreadType)
-            If _quotesAndYields.ContainsKey(_selectedQuote) Then
-                _parentGroup.Ansamble.CleanupSpread(type, _quotesAndYields(_selectedQuote))
+            If _quotesAndYields.ContainsKey(_userSelectedQuote) Then
+                _parentGroup.Ansamble.CleanupSpread(type, _quotesAndYields(_userSelectedQuote))
             End If
         End Sub
     End Class
@@ -348,15 +348,6 @@ Namespace Tools
         Public YieldMode As String
         Public BondFields As FieldContainer
         Public SeriesName As String
-
-        'Public BidField As String
-        'Public AskField As String
-        'Public LastField As String
-        'Public HistField As String
-        'Public VolumeField As String
-        'Public VwapField As String
-
-        Public Const CustomField As String = "CUSTOM"
 
         Private ReadOnly _elements As New Dictionary(Of String, Bond) 'ric -> datapoint
         Public ReadOnly Property Elements() As Dictionary(Of String, Bond)
@@ -401,9 +392,9 @@ Namespace Tools
                 .Color = If(port.Color <> "", port.Color, source.Color)
             }
 
-            Dim fieldPriority = SettingsManager.Instance.FieldsPriority.Split(",")
             group.YieldMode = SettingsManager.Instance.YieldCalcMode
-            Dim selectedField = FindAppropriateField(fieldPriority, group.BondFields)
+            Dim selectedField = FindAppropriateField(group.BondFields)
+            If selectedField = "" Then Throw New InvalidOperationException("No price field found")
 
             For Each ric In portfolioStructure.Rics(port)
                 Dim descr = BondsData.Instance.GetBondInfo(ric)
@@ -416,12 +407,13 @@ Namespace Tools
             Return group
         End Function
 
-        Private Shared Function FindAppropriateField(ByVal fieldPriority As String(), ByVal realtime As FieldContainer) As String
-            Dim usefulFields = From fld In fieldPriority
+        Private Shared Function FindAppropriateField(ByVal realtime As FieldContainer) As String
+            Dim fieldPriority = SettingsManager.Instance.FieldsPriority.Split(",")
+            Dim usefulFields = (From fld In fieldPriority
                     Let val = realtime.Name(fld)
                     Where val <> ""
-                    Select fld
-            Return usefulFields.First
+                    Select fld).ToList()
+            Return If(usefulFields.Any, usefulFields.First, "")
         End Function
 
         Public Sub Cleanup()
@@ -435,26 +427,16 @@ Namespace Tools
             _quoteLoader.AddItems(rics, BondFields.AllNames)
         End Sub
 
-        'Private Function GetAllKnownFields() As List(Of String)
-        '    Return {BidField, AskField, LastField, VolumeField, VwapField, CustomField}.
-        '        Where(Function(fldName) fldName IsNot Nothing AndAlso fldName.Trim() <> "").ToList()
-        'End Function
-
-        'Private Function GetKnownPriceFields() As List(Of String)
-        '    Return {BidField, AskField, LastField, VwapField, CustomField}.
-        '        Where(Function(fldName) fldName IsNot Nothing AndAlso fldName.Trim() <> "").ToList()
-        'End Function
-
         Public Sub StartAll()
             StartRics(_elements.Keys.ToList())
         End Sub
 
         Public Sub SetCustomPrice(ByVal ric As String, ByVal price As Double)
-            Dim data = New Dictionary(Of String, Dictionary(Of String, Double))
-            Dim quote = New Dictionary(Of String, Double)
-            quote.Add(CustomField, price)
-            data.Add(ric, quote)
-            OnQuotes(data)
+            Dim bondDataPoint = _elements(ric)
+            If price > 0 Then
+                HandleQuote(bondDataPoint, BondFields.Fields.Custom, price, Date.Today)
+                bondDataPoint.UserSelectedQuote = BondFields.Fields.Custom
+            End If
         End Sub
 
         Private Sub OnQuotes(ByVal data As Dictionary(Of String, Dictionary(Of String, Double))) Handles _quoteLoader.NewData
@@ -484,6 +466,26 @@ Namespace Tools
                             Try
                                 HandleQuote(bondDataPoint, fieldName, fieldValue, Date.Today)
                                 bondDataPoint.Status = BondStatus.Ok
+                                If fieldName.Belongs(BondFields.Fields.Bid, BondFields.Fields.Ask) Then
+                                    Dim bidPrice As Double
+                                    If bondDataPoint.QuotesAndYields.ContainsKey(BondFields.Fields.Bid) Then
+                                        bidPrice = bondDataPoint.QuotesAndYields(BondFields.Fields.Bid).Price
+                                    End If
+                                    Dim askPrice As Double
+                                    If bondDataPoint.QuotesAndYields.ContainsKey(BondFields.Fields.Ask) Then
+                                        askPrice = bondDataPoint.QuotesAndYields(BondFields.Fields.Ask).Price
+                                    End If
+                                    Dim midPrice As Double
+                                    If bidPrice > 0 And askPrice > 0 Then
+                                        midPrice = (bidPrice + askPrice) / 2
+                                    ElseIf bidPrice > 0 Then
+                                        midPrice = bidPrice
+                                    ElseIf askPrice > 0 Then
+                                        midPrice = askPrice
+                                    End If
+
+                                    If midPrice > 0 Then HandleQuote(bondDataPoint, BondFields.Fields.Mid, midPrice, Date.Today)
+                                End If
                             Catch ex As Exception
                                 Logger.WarnException("Failed to plot the point", ex)
                                 Logger.Warn("Exception = {0}", ex.ToString())
@@ -491,10 +493,6 @@ Namespace Tools
                                     bondDataPoint.Status = BondStatus.Err
                                 End If
                             End Try
-                        Else
-                            If fieldName = _elements(instrument).SelectedQuote And Not bondDataPoint.QuotesAndYields.ContainsKey(fieldName) Then
-                                ' todo DoLoadHistory(bondDataPoint.MetaData, fieldName)
-                            End If
                         End If
                     Next
                 Catch ex As Exception
@@ -507,69 +505,27 @@ Namespace Tools
         Private Sub HandleQuote(ByRef bondDataPoint As Bond, ByVal fieldName As String, ByVal fieldVal As Double?, ByVal calcDate As Date)
             Dim calculation As New BondPointDescription
             calculation.Price = fieldVal
-            calculation.YieldSource = If(calcDate = Date.Today, YieldSource.Realtime, YieldSource.Historical)
+            calculation.YieldSource = If(fieldName <> BondFields.Fields.Custom, If(fieldName <> BondFields.Fields.Hist, YieldSource.Realtime, YieldSource.Historical), YieldSource.Synthetic)
             CalculateYields(calcDate, bondDataPoint.MetaData, calculation)
 
             Dim container = _ansamble.SpreadBmk
             For i = 0 To container.Benchmarks.Keys.Count
                 container.CalcAllSpreads(calculation, bondDataPoint.MetaData, container.Benchmarks.Keys(i))
             Next
-            bondDataPoint.QuotesAndYields(fieldName) = calculation
-            If bondDataPoint.SelectedQuote = fieldName Then RaiseEvent Quote(bondDataPoint, fieldName)
+            bondDataPoint.QuotesAndYields(BondFields.XmlName(fieldName)) = calculation
+
+            Dim xmlNames As New List(Of String)
+            For Each key In bondDataPoint.QuotesAndYields.Keys
+                If bondDataPoint.QuotesAndYields(key).Price > 0 Then
+                    xmlNames.Add(key)
+                End If
+            Next
+
+            If BondFields.IsMaximumPriority(BondFields.XmlName(fieldName),
+                                            xmlNames) Then
+                RaiseEvent Quote(bondDataPoint, fieldName)
+            End If
         End Sub
-
-        'Private Sub DoLoadHistory(ByVal bondDataPoint As BondDescription, ByVal fieldName As String)
-        '    If Not {LastField, VwapField}.Contains(fieldName) Then Exit Sub
-        '    Logger.Debug("Will load {0}", bondDataPoint.RIC)
-
-        '    Dim hst = New HistoryLoadManager_v2()
-        '    AddHandler hst.HistoricalData, AddressOf OnHistoricalQuotes
-        '    hst.StartTask(bondDataPoint.RIC, "DATE,CLOSE,VWAP", DateTime.Today.AddDays(-10), DateTime.Today)
-        'End Sub
-
-        'Private Sub OnHistoricalQuotes(ByVal ric As String, ByVal status As LoaderStatus, ByVal hstatus As HistoryStatus, ByVal data As Dictionary(Of Date, HistoricalItem))
-        '    Logger.Trace("OnHistoricalQuotes({0})", ric)
-        '    If Not status.Finished Or status.Err Then
-        '        Logger.Warn(String.Format("{0} not finished or error!!!, hstatus = {1}, reason = {2}", ric, hstatus, status.Reason))
-        '    End If
-        '    If hstatus = HistoryStatus.Full Then
-        '        If data Is Nothing OrElse data.Count <= 0 Then
-        '            Logger.Info("No data on {0} arrived", ric)
-        '            Return
-        '        End If
-
-        '        Dim maxdate As Date, maxElem As HistoricalItem
-        '        Try
-        '            If data.Any(Function(kvp) kvp.Value.SomePrice()) Then
-        '                maxdate = data.Where(Function(kvp) kvp.Value.SomePrice()).Select(Function(kvp) kvp.Key).Max
-        '                maxElem = data(maxdate)
-        '            Else
-        '                Return
-        '            End If
-        '        Catch ex As Exception
-        '            Logger.ErrorException(String.Format("Failed to retreive max date for {0}", ric), ex)
-        '            Logger.Error("Exception = {0}", ex.ToString())
-        '            Return
-        '        End Try
-
-        '        ' checking if this bond is allowed to show up
-        '        If Not _elements.Keys.Contains(ric) Then
-        '            Logger.Warn("Unknown instrument {0} in series {1}", ric, SeriesName)
-        '            Return
-        '        End If
-
-        '        ' now update data point
-        '        Dim bondDataPoint = _elements(ric)
-
-        '        If maxElem.Close > 0 Then
-        '            HandleQuote(bondDataPoint, LastField, maxElem.Close, maxdate)
-        '        End If
-
-        '        If maxElem.VWAP > 0 Then
-        '            HandleQuote(bondDataPoint, VwapField, maxElem.Close, maxdate)
-        '        End If
-        '    End If
-        'End Sub
 
         Public Function HasRic(ByVal instrument As String) As Boolean
             Return _elements.Any(Function(elem) elem.Key = instrument)
@@ -591,7 +547,7 @@ Namespace Tools
             _elements.Keys.ToList().ForEach(
                 Sub(ric)
                     Dim elem = _elements(ric)
-                    If elem.QuotesAndYields.ContainsKey(elem.SelectedQuote) Then
+                    If elem.QuotesAndYields.ContainsKey(elem.UserSelectedQuote) Then
                         elem.RecalculateByType(type)
                     End If
                 End Sub)
@@ -602,7 +558,7 @@ Namespace Tools
             _elements.Keys.ToList().ForEach(
                 Sub(ric)
                     Dim elem = _elements(ric)
-                    If elem.QuotesAndYields.ContainsKey(elem.SelectedQuote) Then
+                    If elem.QuotesAndYields.ContainsKey(elem.UserSelectedQuote) Then
                         elem.CleanupByType(type)
                     End If
                 End Sub)
@@ -617,7 +573,7 @@ Namespace Tools
         End Sub
 
         Public Sub NotifyQuote(ByVal bond As Bond)
-            RaiseEvent Quote(bond, bond.SelectedQuote)
+            RaiseEvent Quote(bond, bond.UserSelectedQuote)
         End Sub
     End Class
 #End Region
