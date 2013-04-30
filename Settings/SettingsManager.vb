@@ -132,6 +132,17 @@ Public Class SettingsManager
         End Set
     End Property
 
+    Private _midIfBoth As Boolean = False
+    Public Property MidIfBoth() As Boolean
+        Get
+            Return _midIfBoth
+        End Get
+        Set(ByVal value As Boolean)
+            SaveValue("/settings/property[@name='mid-if-both']/@value", value.ToString())
+            _midIfBoth = value
+        End Set
+    End Property
+
     Private _showMainToolBar As Boolean = True
     Public Property ShowMainToolBar() As Boolean
         Get
@@ -244,6 +255,7 @@ Public Class SettingsManager
         GetDoubleValue("/settings/viewport/duration/@max", _maxDur)
         GetDoubleValue("/settings/viewport/duration/@min", _minDur)
 
+        GetBoolValue("/settings/property[@name='mid-if-both']/@value", _midIfBoth)
         GetBoolValue("/settings/property[@name='show-bid-ask']/@value", _showBidAsk)
         GetBoolValue("/settings/property[@name='show-point-size']/@value", _showPointSize)
         GetBoolValue("/settings/property[@name='show-main-toolbar']/@value", _showMainToolBar)

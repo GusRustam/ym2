@@ -80,6 +80,7 @@ Namespace Forms.MainForm
             ChartWindowCheckBox.Checked = Settings.ShowChartToolBar
 
             YieldCalcModeCB.SelectedText = Settings.YieldCalcMode
+            MidIfBothCB.Checked = Settings.MidIfBoth
 
             Dim selectedFields = Settings.BondSelectorVisibleColumns.Split(",")
             ColumnsCLB.Items.Clear()
@@ -130,6 +131,7 @@ Namespace Forms.MainForm
 
             Settings.FieldsPriority = String.Join(",", From elem In _lst Select elem.Name)
             Settings.ForbiddenFields = String.Join(",", HiddenFieldsListBox.Items.Cast(Of String))
+            Settings.MidIfBoth = MidIfBothCB.Checked
 
             Dim columnsString As String = ""
 
@@ -232,6 +234,10 @@ Namespace Forms.MainForm
             If FieldsPriorityLB.SelectedIndex < 0 Then Return
             Dim item = CType(FieldsPriorityLB.Items(FieldsPriorityLB.SelectedIndex), IndexedItem)
             _lst.Remove(item)
+            Dim i As Integer
+            For i = 0 To _lst.Count - 1
+                _lst(i).Order = i
+            Next
             HiddenFieldsListBox.Items.Add(item.Name)
             FieldsPriorityLB.DataSource = Nothing
             FieldsPriorityLB.DataSource = _lst
@@ -244,6 +250,10 @@ Namespace Forms.MainForm
             Dim item = CStr(HiddenFieldsListBox.Items(HiddenFieldsListBox.SelectedIndex))
             HiddenFieldsListBox.Items.RemoveAt(HiddenFieldsListBox.SelectedIndex)
             _lst.Add(New IndexedItem(_lst.Last.Order + 1, item))
+            Dim i As Integer
+            For i = 0 To _lst.Count - 1
+                _lst(i).Order = i
+            Next
             FieldsPriorityLB.DataSource = Nothing
             FieldsPriorityLB.DataSource = _lst
             FieldsPriorityLB.DisplayMember = "Name"

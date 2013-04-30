@@ -60,7 +60,9 @@
         Public Convexity As Double
         Public PVBP As Double
 
+        Public BackColor As String
         Public YieldSource As YieldSource
+
         Public Overrides Function GetYield() As Double?
             Return Yld.Yield
         End Function

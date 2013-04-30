@@ -1,24 +1,20 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <settings>
-  <property name="data-source" value="IDN"/>
-  
-  <property name="last-db-update" value=""/>
-  
-  <property name="log-level" value="Trace"/>
-  
-  <property name="show-bid-ask" value="True"/>
-  <property name="show-main-toolbar" value="True"/>
-  <property name="show-point-size" value="True"/>
-  <property name="show-chart-toolbar" value="True"/>
-  
-  <property name="visible-columns" value="ALL"/>
-  <property name="fields-priority" value="LAST,MID,VWAP,BID,ASK,HIST"/>
-  <property name="forbidden-fields" value=""/>
-  <property name="yield-calc-mode" value="YTA"/>
-  
+  <property name="data-source" value="IDN" />
+  <property name="last-db-update" value="" />
+  <property name="log-level" value="Trace" />
+  <property name="mid-if-both" value="False" />
+  <property name="show-bid-ask" value="True" />
+  <property name="show-main-toolbar" value="True" />
+  <property name="show-point-size" value="True" />
+  <property name="show-chart-toolbar" value="True" />
+  <property name="visible-columns" value="ALL" />
+  <property name="fields-priority" value="LAST,VWAP,HIST,MID" />
+  <property name="forbidden-fields" value="BID,ASK" />
+  <property name="yield-calc-mode" value="YTA" />
   <viewport>
-    <yield min="" max=""/>
-    <spread min="" max =""/>
-    <duration min="" max=""/>
+    <yield min="" max="" />
+    <spread min="" max="" />
+    <duration min="" max="" />
   </viewport>
 </settings>

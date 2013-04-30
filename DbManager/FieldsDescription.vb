@@ -50,21 +50,23 @@ Public Class FieldNotFoundException
 End Class
 
 Public Class FieldsDescription
+
+
     Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(FieldsDescription))
     Private ReadOnly _id As String
     Private ReadOnly _name As String
 
     ' ReSharper disable ConvertToConstant.Local
     ' ReSharper disable FieldCanBeMadeReadOnly.Local
-    <Price()> <ConfingName("CUSTOM")> Private _custom As String = "CUSTOM"
-    <Price()> <ConfingName("MID")> Private _mid As String = "MID"
+    <Price("White")> <ConfingName("CUSTOM")> Private _custom As String = "CUSTOM"
+    <Price("White")> <ConfingName("MID")> Private _mid As String = "MID"
     <ConfingName("DATE")> Private _lastDate As String = ""
     <ConfingName("TIME")> Private _time As String = ""
-    <Price()> <ConfingName("BID")> Private _bid As String = ""
-    <Price()> <ConfingName("ASK")> Private _ask As String = ""
-    <Price()> <ConfingName("LAST")> Private _last As String = ""
-    <Price()> <ConfingName("VWAP")> Private _vwap As String = ""
-    <Price()> <ConfingName("HIST")> Private _hist As String = ""     ' Historical Field. Corresponds to Close
+    <Price("White")> <ConfingName("BID")> Private _bid As String = ""
+    <Price("White")> <ConfingName("ASK")> Private _ask As String = ""
+    <Price("White")> <ConfingName("LAST")> Private _last As String = ""
+    <Price("White")> <ConfingName("VWAP")> Private _vwap As String = ""
+    <Price("LightGray")> <ConfingName("HIST")> Private _hist As String = ""     ' Historical Field. Corresponds to Close
     <ConfingName("HIST_DATE")> Private _histDate As String = ""
     <ConfingName("VOLUME")> Private _volume As String = ""
     <ConfingName("SOURCE")> Private _src As String = ""
@@ -272,6 +274,14 @@ Public Class FieldsDescription
         Update()
     End Sub
 
+    Public Function BackColor(ByVal fieldName As String) As String
+        Return (From fld In Me.GetType().GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
+                Let attxU = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False).Cast(Of ConfingNameAttribute)()
+                Where attxU.Any AndAlso attxU.First.XmlName = fieldName
+                Let attx = fld.GetCustomAttributes(GetType(PriceAttribute), False).Cast(Of PriceAttribute)()
+                Where attx.Any
+                Select attx.First.Color).First
+    End Function
 End Class
 
 Public Class FieldContainer
@@ -349,13 +359,24 @@ Public Class FieldContainer
         End Get
     End Property
 
-    Public Function IsMaximumPriority(ByVal whatXmlName As String, ByVal xmlNames As IEnumerable(Of String))
-        Return _xmlNameToPriority(whatXmlName) >= (From key In xmlNames Select _xmlNameToPriority(key)).Max
-    End Function
+    'Public Function IsMaximumPriority(ByVal whatXmlName As String, ByVal xmlNames As IEnumerable(Of String))
+    '    Return _xmlNameToPriority(whatXmlName) >= (From key In xmlNames Select _xmlNameToPriority(key)).Max
+    'End Function
 End Class
 
 Friend Class PriceAttribute
     Inherits Attribute
+    Private ReadOnly _color As String
+
+    Sub New(ByVal color As String)
+        _color = color
+    End Sub
+
+    Public ReadOnly Property Color As String
+        Get
+            Return _color
+        End Get
+    End Property
 End Class
 
 Public Class FieldDescription

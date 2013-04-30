@@ -93,10 +93,10 @@ Namespace Tools
                             res.Name = point.MetaData.ShortName
                             res.Maturity = point.MetaData.Maturity
                             res.Coupon = point.MetaData.Coupon
-                            If point.QuotesAndYields.ContainsKey(point.UserSelectedQuote) Then
-                                Dim quote = point.QuotesAndYields(point.UserSelectedQuote)
+                            If point.QuotesAndYields.ContainsKey(point.MaxPriorityField) Then
+                                Dim quote = point.QuotesAndYields(point.MaxPriorityField)
                                 res.Price = quote.Price
-                                res.Quote = point.UserSelectedQuote
+                                res.Quote = point.MaxPriorityField
                                 res.QuoteDate = quote.YieldAtDate
                                 res.State = BondDescr.StateType.Ok
                                 res.ToWhat = quote.Yld.ToWhat
@@ -197,7 +197,7 @@ Namespace Tools
 
         Public Sub AddGroup(ByVal group As Group)
             _groups.Add(group)
-            AddHandler group.Quote, Sub(bond As Bond, field As String) RaiseEvent Quote(bond, field)
+            AddHandler group.Quote, Sub(bond As Bond) RaiseEvent Quote(bond)
             AddHandler group.RemovedItem, Sub(grp As Group, ric As String) RaiseEvent RemovedItem(grp, ric)
             AddHandler group.AllQuotes, Sub(obj As List(Of Bond)) RaiseEvent AllQuotes(obj)
             AddHandler group.Volume, Sub(obj As Bond) RaiseEvent Volume(obj)
@@ -206,7 +206,7 @@ Namespace Tools
 
         Public Event AllQuotes As Action(Of List(Of Bond))
         Public Event RemovedItem As Action(Of Group, String)
-        Public Event Quote As Action(Of Bond, String)
+        Public Event Quote As Action(Of Bond)
         Public Event Volume As Action(Of Bond)
         Public Event Clear As Action(Of Group)
 
@@ -250,10 +250,9 @@ Namespace Tools
             End Set
         End Property
 
-        Sub New(ByVal parentGroup As Group, ByVal userSelectedQuote As String, ByVal metaData As BondDescription)
+        Sub New(ByVal parentGroup As Group, ByVal metaData As BondDescription)
             _parentGroup = parentGroup
             _metaData = metaData
-            _userSelectedQuote = userSelectedQuote
         End Sub
 
         Public ReadOnly Property ParentGroup As Group
@@ -307,6 +306,23 @@ Namespace Tools
             End Get
         End Property
 
+        Public ReadOnly Property MaxPriorityField() As String
+            Get
+                If UserSelectedQuote <> "" Then Return UserSelectedQuote
+                Dim forbiddenFields = SettingsManager.Instance.ForbiddenFields.Split(",")
+                Dim existingFields = (From item In QuotesAndYields.Keys
+                                  Where QuotesAndYields(item).Price > 0 AndAlso Not forbiddenFields.Contains(item)).ToList()
+                Dim allowedFields = SettingsManager.Instance.FieldsPriority.Split(",")
+                If Not allowedFields.Any OrElse Not existingFields.Any Then Return ""
+
+                Dim i As Integer
+                For i = 0 To allowedFields.Count() - 1
+                    If existingFields.Contains(allowedFields(i)) Then Return allowedFields(i)
+                Next
+                Return ""
+            End Get
+        End Property
+
         Public Sub RecalculateByType(ByVal type As SpreadType)
             If _quotesAndYields.ContainsKey(_userSelectedQuote) Then
                 _parentGroup.Ansamble.SpreadBmk.CalcAllSpreads(_quotesAndYields(_userSelectedQuote), _metaData, type)
@@ -338,7 +354,7 @@ Namespace Tools
 
         Private ReadOnly _ansamble As Ansamble
 
-        Public Event Quote As Action(Of Bond, String)
+        Public Event Quote As Action(Of Bond)
         Public Event RemovedItem As Action(Of Group, String)
         Public Event Clear As Action(Of Group)
         Public Event Volume As Action(Of Bond)
@@ -393,13 +409,13 @@ Namespace Tools
             }
 
             group.YieldMode = SettingsManager.Instance.YieldCalcMode
-            Dim selectedField = FindAppropriateField(group.BondFields)
-            If selectedField = "" Then Throw New InvalidOperationException("No price field found")
+            'Dim selectedField = FindAppropriateField(group.BondFields)
+            'If selectedField = "" Then Throw New InvalidOperationException("No price field found")
 
             For Each ric In portfolioStructure.Rics(port)
                 Dim descr = BondsData.Instance.GetBondInfo(ric)
                 If descr IsNot Nothing Then
-                    group.AddRic(ric, descr, selectedField)
+                    group.AddRic(ric, descr)
                 Else
                     Logger.Error("No description for bond {0} found", ric)
                 End If
@@ -407,14 +423,14 @@ Namespace Tools
             Return group
         End Function
 
-        Private Shared Function FindAppropriateField(ByVal realtime As FieldContainer) As String
-            Dim fieldPriority = SettingsManager.Instance.FieldsPriority.Split(",")
-            Dim usefulFields = (From fld In fieldPriority
-                    Let val = realtime.Name(fld)
-                    Where val <> ""
-                    Select fld).ToList()
-            Return If(usefulFields.Any, usefulFields.First, "")
-        End Function
+        'Private Shared Function FindAppropriateField(ByVal realtime As FieldContainer) As String
+        '    Dim fieldPriority = SettingsManager.Instance.FieldsPriority.Split(",")
+        '    Dim usefulFields = (From fld In fieldPriority
+        '            Let val = realtime.Name(fld)
+        '            Where val <> ""
+        '            Select fld).ToList()
+        '    Return If(usefulFields.Any, usefulFields.First, "")
+        'End Function
 
         Public Sub Cleanup()
             _quoteLoader.CancelAll()
@@ -466,22 +482,28 @@ Namespace Tools
                             Try
                                 HandleQuote(bondDataPoint, fieldName, fieldValue, Date.Today)
                                 bondDataPoint.Status = BondStatus.Ok
-                                If fieldName.Belongs(BondFields.Fields.Bid, BondFields.Fields.Ask) Then
+                                Dim bid  = BondFields.Fields.Bid
+                                Dim ask  = BondFields.Fields.Ask
+                                If fieldName.Belongs(bid, ask) Then
                                     Dim bidPrice As Double
-                                    If bondDataPoint.QuotesAndYields.ContainsKey(BondFields.Fields.Bid) Then
-                                        bidPrice = bondDataPoint.QuotesAndYields(BondFields.Fields.Bid).Price
+                                    Dim xmlBid  = BondFields.XmlName(bid)
+                                    If bondDataPoint.QuotesAndYields.ContainsKey(xmlBid) Then
+                                        bidPrice = bondDataPoint.QuotesAndYields(xmlBid).Price
                                     End If
                                     Dim askPrice As Double
-                                    If bondDataPoint.QuotesAndYields.ContainsKey(BondFields.Fields.Ask) Then
-                                        askPrice = bondDataPoint.QuotesAndYields(BondFields.Fields.Ask).Price
+                                    Dim xmlAsk = BondFields.XmlName(ask)
+                                    If bondDataPoint.QuotesAndYields.ContainsKey(xmlAsk) Then
+                                        askPrice = bondDataPoint.QuotesAndYields(xmlAsk).Price
                                     End If
                                     Dim midPrice As Double
                                     If bidPrice > 0 And askPrice > 0 Then
                                         midPrice = (bidPrice + askPrice) / 2
-                                    ElseIf bidPrice > 0 Then
-                                        midPrice = bidPrice
-                                    ElseIf askPrice > 0 Then
-                                        midPrice = askPrice
+                                    ElseIf Not SettingsManager.Instance.MidIfBoth Then
+                                        If bidPrice > 0 Then
+                                            midPrice = bidPrice
+                                        ElseIf askPrice > 0 Then
+                                            midPrice = askPrice
+                                        End If
                                     End If
 
                                     If midPrice > 0 Then HandleQuote(bondDataPoint, BondFields.Fields.Mid, midPrice, Date.Today)
@@ -504,6 +526,8 @@ Namespace Tools
 
         Private Sub HandleQuote(ByRef bondDataPoint As Bond, ByVal fieldName As String, ByVal fieldVal As Double?, ByVal calcDate As Date)
             Dim calculation As New BondPointDescription
+            Dim xmlName = BondFields.XmlName(fieldName)
+            calculation.BackColor = BondFields.Fields.BackColor(xmlName)
             calculation.Price = fieldVal
             calculation.YieldSource = If(fieldName <> BondFields.Fields.Custom, If(fieldName <> BondFields.Fields.Hist, YieldSource.Realtime, YieldSource.Historical), YieldSource.Synthetic)
             CalculateYields(calcDate, bondDataPoint.MetaData, calculation)
@@ -512,7 +536,7 @@ Namespace Tools
             For i = 0 To container.Benchmarks.Keys.Count
                 container.CalcAllSpreads(calculation, bondDataPoint.MetaData, container.Benchmarks.Keys(i))
             Next
-            bondDataPoint.QuotesAndYields(BondFields.XmlName(fieldName)) = calculation
+            bondDataPoint.QuotesAndYields(xmlName) = calculation
 
             Dim xmlNames As New List(Of String)
             For Each key In bondDataPoint.QuotesAndYields.Keys
@@ -521,18 +545,18 @@ Namespace Tools
                 End If
             Next
 
-            If BondFields.IsMaximumPriority(BondFields.XmlName(fieldName),
-                                            xmlNames) Then
-                RaiseEvent Quote(bondDataPoint, fieldName)
-            End If
+            'If BondFields.IsMaximumPriority(BondFields.XmlName(fieldName),
+            '                                xmlNames) Then
+            RaiseEvent Quote(bondDataPoint)
+            'End If
         End Sub
 
         Public Function HasRic(ByVal instrument As String) As Boolean
             Return _elements.Any(Function(elem) elem.Key = instrument)
         End Function
 
-        Public Sub AddRic(ByVal ric As String, ByVal descr As BondDescription, ByVal quote As String)
-            _elements.Add(ric, New Bond(Me, quote, descr))
+        Public Sub AddRic(ByVal ric As String, ByVal descr As BondDescription)
+            _elements.Add(ric, New Bond(Me, descr))
         End Sub
 
         Private Sub New(ByVal ansamble As Ansamble)
@@ -547,9 +571,10 @@ Namespace Tools
             _elements.Keys.ToList().ForEach(
                 Sub(ric)
                     Dim elem = _elements(ric)
-                    If elem.QuotesAndYields.ContainsKey(elem.UserSelectedQuote) Then
-                        elem.RecalculateByType(type)
-                    End If
+                    'If elem.QuotesAndYields.ContainsKey(elem.UserSelectedQuote) Then
+                    ' TODO NOT SURE IF ITS OK
+                    elem.RecalculateByType(type)
+                    'End If
                 End Sub)
             If _ansamble.SpreadBmk.CurrentType = type Then RaiseEvent AllQuotes(_elements.Values.ToList())
         End Sub
@@ -558,9 +583,10 @@ Namespace Tools
             _elements.Keys.ToList().ForEach(
                 Sub(ric)
                     Dim elem = _elements(ric)
-                    If elem.QuotesAndYields.ContainsKey(elem.UserSelectedQuote) Then
-                        elem.CleanupByType(type)
-                    End If
+                    'If elem.QuotesAndYields.ContainsKey(elem.UserSelectedQuote) Then
+                    ' TODO NOT SURE IF ITS OK
+                    elem.CleanupByType(type)
+                    'End If
                 End Sub)
         End Sub
 
@@ -573,7 +599,7 @@ Namespace Tools
         End Sub
 
         Public Sub NotifyQuote(ByVal bond As Bond)
-            RaiseEvent Quote(bond, bond.UserSelectedQuote)
+            RaiseEvent Quote(bond)
         End Sub
     End Class
 #End Region

@@ -83,6 +83,9 @@
         <exclude what="chain" id="2" />
         <include what="custom-bond" id="1" />
       </portfolio>
+      <portfolio id="76699" name="EUR">
+        <include what="chain" id="5" name="Russia Eur" color="ForestGreen" />
+      </portfolio>
     </folder>
   </portfolios>
   <curves>

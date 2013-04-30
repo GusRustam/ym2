@@ -208,10 +208,14 @@ Namespace Forms.ChartForm
                                 Sub(key)
                                     Dim x = bondDataPoint.QuotesAndYields(key)
                                     Dim newItem = ExtInfoTSMI.DropDownItems.Add(String.Format("{0}: {1:F4}, {2:P2} {3}, {4:F2}", key, x.Price, x.Yld.Yield, x.Yld.ToWhat.Abbr, x.Duration))
-                                    If bondDataPoint.UserSelectedQuote = key Then CType(newItem, ToolStripMenuItem).Checked = True
+                                    If bondDataPoint.MaxPriorityField = key Then CType(newItem, ToolStripMenuItem).Checked = True
                                     AddHandler newItem.Click,
                                         Sub(sender1 As Object, e1 As EventArgs)
-                                            bondDataPoint.UserSelectedQuote = key
+                                            If key <> bondDataPoint.UserSelectedQuote Then
+                                                bondDataPoint.UserSelectedQuote = key
+                                            Else
+                                                bondDataPoint.UserSelectedQuote = ""
+                                            End If
                                         End Sub
                                 End Sub)
 
@@ -287,7 +291,7 @@ Namespace Forms.ChartForm
                     If TypeOf point.Tag Is Bond And Not point.IsEmpty Then
                         Dim bondData = CType(point.Tag, Bond)
                         DscrLabel.Text = bondData.MetaData.ShortName
-                        Dim calculatedYield = bondData.QuotesAndYields(bondData.UserSelectedQuote)
+                        Dim calculatedYield = bondData.QuotesAndYields(bondData.MaxPriorityField)
 
                         SpreadLabel.Text = If(calculatedYield.PointSpread IsNot Nothing, String.Format("{0:F0} b.p.", calculatedYield.PointSpread), N_A)
                         ZSpreadLabel.Text = If(calculatedYield.ZSpread IsNot Nothing, String.Format("{0:F0} b.p.", calculatedYield.ZSpread), N_A)
@@ -374,7 +378,7 @@ Namespace Forms.ChartForm
                     seriesDescr.ResetSelection()
                     srs.Points.ToList.ForEach(Sub(point)
                                                   Dim tg = CType(point.Tag, Bond)
-                                                  point.Color = If(tg.QuotesAndYields(tg.UserSelectedQuote).YieldSource = YieldSource.Historical, Color.LightGray, Color.White)
+                                                  point.Color = Color.FromName(tg.QuotesAndYields(tg.MaxPriorityField).BackColor)
                                               End Sub)
                     If seriesDescr.Name = curveName AndAlso pointIndex IsNot Nothing Then
                         srs.Points(pointIndex).Color = Color.Red
@@ -1100,16 +1104,18 @@ Namespace Forms.ChartForm
 
         Private Sub OnBondAllQuotes(ByVal data As List(Of Bond)) Handles _ansamble.AllQuotes
             Logger.Trace("OnBondAllQuotes()")
-            data.Where(Function(elem) elem.QuotesAndYields.ContainsKey(elem.UserSelectedQuote)).ToList.ForEach(Sub(elem) OnBondQuote(elem, elem.UserSelectedQuote, True))
+            data.ForEach(Sub(elem) OnBondQuote(elem, True))
             SetChartMinMax()
         End Sub
 
-        Private Sub OnBondQuote(ByVal descr As Bond, ByVal fieldName As String, Optional ByVal raw As Boolean = False) Handles _ansamble.Quote
+        Private Sub OnBondQuote(ByVal descr As Bond, Optional ByVal raw As Boolean = False) Handles _ansamble.Quote
             Logger.Trace("OnBondQuote({0}, {1})", descr.MetaData.ShortName, descr.ParentGroup.SeriesName)
             GuiAsync(
                 Sub()
                     Dim group = descr.ParentGroup
-                    Dim calc = descr.QuotesAndYields(fieldName)
+                    Dim maxPriorityField = descr.MaxPriorityField
+                    If maxPriorityField = "" Then Return
+                    Dim calc = descr.QuotesAndYields(maxPriorityField)
                     Dim ric = descr.MetaData.RIC
 
                     Dim series As Series = TheChart.Series.FindByName(group.SeriesName)

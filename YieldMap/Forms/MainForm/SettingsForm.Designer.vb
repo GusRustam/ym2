@@ -69,6 +69,7 @@
             Me.LogErrRadioButton = New System.Windows.Forms.RadioButton()
             Me.LogNoneRadioButton = New System.Windows.Forms.RadioButton()
             Me.TheCancelButton = New System.Windows.Forms.Button()
+            Me.MidIfBothCB = New System.Windows.Forms.CheckBox()
             Me.MainTableLayoutPanel.SuspendLayout()
             Me.MainTabControl.SuspendLayout()
             Me.MainChartPage.SuspendLayout()
@@ -135,6 +136,7 @@
             Me.MainChartPage.Controls.Add(Me.Label7)
             Me.MainChartPage.Controls.Add(Me.Label4)
             Me.MainChartPage.Controls.Add(Me.ShowPointSizeCheckBox)
+            Me.MainChartPage.Controls.Add(Me.MidIfBothCB)
             Me.MainChartPage.Controls.Add(Me.ShowBidAskCheckBox)
             Me.MainChartPage.Location = New System.Drawing.Point(4, 22)
             Me.MainChartPage.Name = "MainChartPage"
@@ -586,6 +588,19 @@
             Me.TheCancelButton.Text = "Cancel"
             Me.TheCancelButton.UseVisualStyleBackColor = True
             '
+            'MidIfBothCB
+            '
+            Me.MidIfBothCB.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Me.MidIfBothCB.AutoSize = True
+            Me.MidIfBothCB.Location = New System.Drawing.Point(7, 177)
+            Me.MidIfBothCB.Margin = New System.Windows.Forms.Padding(0)
+            Me.MidIfBothCB.Name = "MidIfBothCB"
+            Me.MidIfBothCB.Size = New System.Drawing.Size(269, 17)
+            Me.MidIfBothCB.TabIndex = 5
+            Me.MidIfBothCB.Text = "Calculate MID only if both BID and ASK are present"
+            Me.MidIfBothCB.UseVisualStyleBackColor = True
+            '
             'SettingsForm
             '
             Me.AcceptButton = Me.SaveSettingsButton
@@ -663,5 +678,6 @@
         Friend WithEvents FieldsPriorityLB As System.Windows.Forms.ListBox
         Friend WithEvents Label9 As System.Windows.Forms.Label
         Friend WithEvents Label3 As System.Windows.Forms.Label
+        Friend WithEvents MidIfBothCB As System.Windows.Forms.CheckBox
     End Class
 End Namespace
