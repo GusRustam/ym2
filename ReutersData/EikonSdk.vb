@@ -1,4 +1,6 @@
 ﻿Imports EikonDesktopDataAPILib
+Imports System.Threading
+Imports NLog
 
 Public Class Eikon
     Private Shared _myEikonDesktopSdk As New EikonDesktopDataAPI
@@ -18,13 +20,17 @@ Public Class Eikon
 End Class
 
 Public Class EikonConnector
+    Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(EikonConnector))
     Private WithEvents _sdk As EikonDesktopDataAPI
     Private Shared _instance As EikonConnector
+
+    Private _timeOutFlag As Long = 0
 
     Public Event Connected As Action
     Public Event Disconnected As Action
     Public Event LocalMode As Action
     Public Event Offline As Action
+    Public Event Timeout As Action
 
     Private Sub New(ByVal sdk As EikonDesktopDataAPI)
         _sdk = sdk
@@ -33,12 +39,31 @@ Public Class EikonConnector
     Public Sub ConnectToEikon()
         Dim lResult = _sdk.Initialize()
         If lResult <> EEikonDataAPIInitializeResult.Succeed Then
+            Logger.Warn("Failed to connect, result is {0}", lResult)
             RaiseEvent Disconnected()
         End If
-        ' todo run waiter thread ?
+
+        ThreadPool.QueueUserWorkItem(
+            Sub()
+                Logger.Info("Connection waiter started")
+                Thread.Sleep(TimeSpan.FromSeconds(20))
+                Logger.Info("Connection wait finished")
+                If Interlocked.Read(_timeOutFlag) = 0 Then
+                    Logger.Warn("Connection was unsuccessful")
+                    Interlocked.Increment(_timeOutFlag)
+                    RaiseEvent Timeout()
+                Else
+                    Logger.Info("Connection was successful")
+                End If
+            End Sub)
     End Sub
 
     Public Sub OnStatusChanged(ByVal eStatus As EEikonStatus) Handles _sdk.OnStatusChanged
+        If Interlocked.Read(_timeOutFlag) = 0 Then
+            Logger.Warn("Connection message arrived after timeout, status = {0}", eStatus)
+            Return
+        End If
+        Interlocked.Increment(_timeOutFlag)
         Select Case eStatus
             Case EEikonStatus.Connected
                 RaiseEvent Connected()

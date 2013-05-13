@@ -317,42 +317,4 @@
             End If
         End Function
     End Class
-
-    '' todo currently unused
-    'Public Class BondRating
-    '    Private _issueRating As RatingDescr
-    '    Private _issuerRating As RatingDescr
-
-    '    Sub New(ByVal issueRating As RatingDescr, ByVal issuerRating As RatingDescr)
-    '        Me.IssueRating = issueRating
-    '        Me.IssuerRating = issuerRating
-    '    End Sub
-
-    '    Public Property IssuerRating As RatingDescr
-    '        Get
-    '            Return _issuerRating
-    '        End Get
-    '        Set(ByVal value As RatingDescr)
-    '            _issuerRating = value
-    '        End Set
-    '    End Property
-
-    '    Public Property IssueRating As RatingDescr
-    '        Get
-    '            Return _issueRating
-    '        End Get
-    '        Set(ByVal value As RatingDescr)
-    '            _issueRating = value
-    '        End Set
-    '    End Property
-    'End Class
-
-    'Public Class RatingComparer
-    '    Implements IComparer(Of RatingDescr)
-
-    '    Public Function Compare(ByVal x As RatingDescr, ByVal y As RatingDescr) As Integer Implements IComparer(Of RatingDescr).Compare
-    '        Throw New NotImplementedException()
-    '    End Function
-    'End Class
-
 End Namespace

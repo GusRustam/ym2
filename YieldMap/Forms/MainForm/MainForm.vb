@@ -8,7 +8,6 @@ Imports NLog
 Imports Logging
 Imports YieldMap.Commons
 
-
 Namespace Forms.MainForm
     Public Class MainForm
         Private Shared ReadOnly Logger As Logger = GetLogger(GetType(MainForm))
@@ -118,6 +117,15 @@ Namespace Forms.MainForm
 #Region "II. Connecting to Eikon"
         Private Sub ConnectToEikon()
             _connector.ConnectToEikon()
+        End Sub
+
+        Private Sub ConnectorTimeout() Handles _connector.Timeout
+            _connected = False
+            ConnectTSMI.Enabled = True
+            ConnectButton.Enabled = True
+            YieldMapButton.Enabled = False
+            StatusPicture.Image = Red
+            StatusLabel.Text = "Connection timeout"
         End Sub
 
         Private Sub ConnectorConnected() Handles _connector.Connected
