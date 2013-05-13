@@ -58,6 +58,10 @@ Namespace Forms.ChartForm
             ' todo
         End Sub
 
+        Private Sub Connector_Timeout() Handles _connector.Timeout
+            ' todo
+        End Sub
+
         Private Sub Connector_Connected() Handles _connector.Connected
             ' todo
         End Sub

@@ -394,8 +394,8 @@ Namespace Tools
 
         Public Shared Function Create(ByVal ans As Ansamble, ByVal port As PortfolioSource, ByVal portfolioStructure As PortfolioStructure) As Group
             Dim group As Group
-
             Dim source = TryCast(port.Source, Source)
+
             If source Is Nothing Then
                 Logger.Warn("Unsupported source {0}", source)
                 Return Nothing

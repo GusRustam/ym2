@@ -120,12 +120,14 @@ Namespace Forms.MainForm
         End Sub
 
         Private Sub ConnectorTimeout() Handles _connector.Timeout
-            _connected = False
-            ConnectTSMI.Enabled = True
-            ConnectButton.Enabled = True
-            YieldMapButton.Enabled = False
-            StatusPicture.Image = Red
-            StatusLabel.Text = "Connection timeout"
+            GuiAsync(Sub()
+                         _connected = False
+                         ConnectTSMI.Enabled = True
+                         ConnectButton.Enabled = True
+                         YieldMapButton.Enabled = False
+                         StatusPicture.Image = Red
+                         StatusLabel.Text = "Connection timeout"
+                     End Sub)
         End Sub
 
         Private Sub ConnectorConnected() Handles _connector.Connected
