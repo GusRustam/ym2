@@ -40,6 +40,7 @@
             Me.Label7 = New System.Windows.Forms.Label()
             Me.Label4 = New System.Windows.Forms.Label()
             Me.ShowPointSizeCheckBox = New System.Windows.Forms.CheckBox()
+            Me.MidIfBothCB = New System.Windows.Forms.CheckBox()
             Me.ShowBidAskCheckBox = New System.Windows.Forms.CheckBox()
             Me.FieldPriorityTabPage = New System.Windows.Forms.TabPage()
             Me.DownButton = New System.Windows.Forms.Button()
@@ -69,7 +70,9 @@
             Me.LogErrRadioButton = New System.Windows.Forms.RadioButton()
             Me.LogNoneRadioButton = New System.Windows.Forms.RadioButton()
             Me.TheCancelButton = New System.Windows.Forms.Button()
-            Me.MidIfBothCB = New System.Windows.Forms.CheckBox()
+            Me.LoadRicsCB = New System.Windows.Forms.CheckBox()
+            Me.Label10 = New System.Windows.Forms.Label()
+            Me.LoadRicsButton = New System.Windows.Forms.Button()
             Me.MainTableLayoutPanel.SuspendLayout()
             Me.MainTabControl.SuspendLayout()
             Me.MainChartPage.SuspendLayout()
@@ -274,6 +277,19 @@
             Me.ShowPointSizeCheckBox.UseVisualStyleBackColor = True
             Me.ShowPointSizeCheckBox.Visible = False
             '
+            'MidIfBothCB
+            '
+            Me.MidIfBothCB.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Me.MidIfBothCB.AutoSize = True
+            Me.MidIfBothCB.Location = New System.Drawing.Point(7, 177)
+            Me.MidIfBothCB.Margin = New System.Windows.Forms.Padding(0)
+            Me.MidIfBothCB.Name = "MidIfBothCB"
+            Me.MidIfBothCB.Size = New System.Drawing.Size(269, 17)
+            Me.MidIfBothCB.TabIndex = 5
+            Me.MidIfBothCB.Text = "Calculate MID only if both BID and ASK are present"
+            Me.MidIfBothCB.UseVisualStyleBackColor = True
+            '
             'ShowBidAskCheckBox
             '
             Me.ShowBidAskCheckBox.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
@@ -316,7 +332,7 @@
             '
             'MoveToHiddenButton
             '
-            Me.MoveToHiddenButton.Location = New System.Drawing.Point(281, 33)
+            Me.MoveToHiddenButton.Location = New System.Drawing.Point(152, 119)
             Me.MoveToHiddenButton.Name = "MoveToHiddenButton"
             Me.MoveToHiddenButton.Size = New System.Drawing.Size(47, 23)
             Me.MoveToHiddenButton.TabIndex = 48
@@ -325,7 +341,7 @@
             '
             'MoveToShownButton
             '
-            Me.MoveToShownButton.Location = New System.Drawing.Point(228, 33)
+            Me.MoveToShownButton.Location = New System.Drawing.Point(152, 90)
             Me.MoveToShownButton.Name = "MoveToShownButton"
             Me.MoveToShownButton.Size = New System.Drawing.Size(47, 23)
             Me.MoveToShownButton.TabIndex = 48
@@ -344,7 +360,7 @@
             'HiddenFieldsListBox
             '
             Me.HiddenFieldsListBox.FormattingEnabled = True
-            Me.HiddenFieldsListBox.Location = New System.Drawing.Point(379, 34)
+            Me.HiddenFieldsListBox.Location = New System.Drawing.Point(205, 34)
             Me.HiddenFieldsListBox.Name = "HiddenFieldsListBox"
             Me.HiddenFieldsListBox.Size = New System.Drawing.Size(140, 160)
             Me.HiddenFieldsListBox.TabIndex = 46
@@ -362,7 +378,7 @@
             Me.Label9.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                         Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
             Me.Label9.AutoSize = True
-            Me.Label9.Location = New System.Drawing.Point(376, 18)
+            Me.Label9.Location = New System.Drawing.Point(202, 12)
             Me.Label9.Margin = New System.Windows.Forms.Padding(0)
             Me.Label9.Name = "Label9"
             Me.Label9.Size = New System.Drawing.Size(135, 13)
@@ -385,6 +401,9 @@
             '
             'MainGeneralTabPage
             '
+            Me.MainGeneralTabPage.Controls.Add(Me.LoadRicsButton)
+            Me.MainGeneralTabPage.Controls.Add(Me.LoadRicsCB)
+            Me.MainGeneralTabPage.Controls.Add(Me.Label10)
             Me.MainGeneralTabPage.Controls.Add(Me.Label2)
             Me.MainGeneralTabPage.Controls.Add(Me.ChartWindowCheckBox)
             Me.MainGeneralTabPage.Controls.Add(Me.MainWindowCheckBox)
@@ -408,21 +427,21 @@
             'ChartWindowCheckBox
             '
             Me.ChartWindowCheckBox.AutoSize = True
-            Me.ChartWindowCheckBox.Location = New System.Drawing.Point(12, 52)
+            Me.ChartWindowCheckBox.Location = New System.Drawing.Point(20, 51)
             Me.ChartWindowCheckBox.Name = "ChartWindowCheckBox"
-            Me.ChartWindowCheckBox.Size = New System.Drawing.Size(90, 17)
+            Me.ChartWindowCheckBox.Size = New System.Drawing.Size(106, 17)
             Me.ChartWindowCheckBox.TabIndex = 0
-            Me.ChartWindowCheckBox.Text = "Chart window"
+            Me.ChartWindowCheckBox.Text = "On chart window"
             Me.ChartWindowCheckBox.UseVisualStyleBackColor = True
             '
             'MainWindowCheckBox
             '
             Me.MainWindowCheckBox.AutoSize = True
-            Me.MainWindowCheckBox.Location = New System.Drawing.Point(12, 29)
+            Me.MainWindowCheckBox.Location = New System.Drawing.Point(20, 28)
             Me.MainWindowCheckBox.Name = "MainWindowCheckBox"
-            Me.MainWindowCheckBox.Size = New System.Drawing.Size(88, 17)
+            Me.MainWindowCheckBox.Size = New System.Drawing.Size(104, 17)
             Me.MainWindowCheckBox.TabIndex = 0
-            Me.MainWindowCheckBox.Text = "Main window"
+            Me.MainWindowCheckBox.Text = "On main window"
             Me.MainWindowCheckBox.UseVisualStyleBackColor = True
             '
             'MainLoadColumnsPage
@@ -588,18 +607,37 @@
             Me.TheCancelButton.Text = "Cancel"
             Me.TheCancelButton.UseVisualStyleBackColor = True
             '
-            'MidIfBothCB
+            'LoadRicsCB
             '
-            Me.MidIfBothCB.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-            Me.MidIfBothCB.AutoSize = True
-            Me.MidIfBothCB.Location = New System.Drawing.Point(7, 177)
-            Me.MidIfBothCB.Margin = New System.Windows.Forms.Padding(0)
-            Me.MidIfBothCB.Name = "MidIfBothCB"
-            Me.MidIfBothCB.Size = New System.Drawing.Size(269, 17)
-            Me.MidIfBothCB.TabIndex = 5
-            Me.MidIfBothCB.Text = "Calculate MID only if both BID and ASK are present"
-            Me.MidIfBothCB.UseVisualStyleBackColor = True
+            Me.LoadRicsCB.AutoSize = True
+            Me.LoadRicsCB.Location = New System.Drawing.Point(10, 84)
+            Me.LoadRicsCB.Name = "LoadRicsCB"
+            Me.LoadRicsCB.Size = New System.Drawing.Size(132, 17)
+            Me.LoadRicsCB.TabIndex = 2
+            Me.LoadRicsCB.Text = "Load contributed RICs"
+            Me.LoadRicsCB.UseVisualStyleBackColor = True
+            '
+            'Label10
+            '
+            Me.Label10.AutoSize = True
+            Me.Label10.Location = New System.Drawing.Point(7, 120)
+            Me.Label10.Name = "Label10"
+            Me.Label10.Size = New System.Drawing.Size(417, 39)
+            Me.Label10.TabIndex = 1
+            Me.Label10.Text = "If you want to start using contributed rics immediately, please set the above che" & _
+                "ckbox " & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "and press button ""Save settings and load contributed rics"". Otherwise it" & _
+                " will take effect " & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "after restart"
+            Me.Label10.Visible = False
+            '
+            'Button1
+            '
+            Me.LoadRicsButton.Location = New System.Drawing.Point(148, 80)
+            Me.LoadRicsButton.Name = "LoadRicsButton"
+            Me.LoadRicsButton.Size = New System.Drawing.Size(210, 23)
+            Me.LoadRicsButton.TabIndex = 3
+            Me.LoadRicsButton.Text = "Save settings and load contributed rics"
+            Me.LoadRicsButton.UseVisualStyleBackColor = True
+            Me.LoadRicsButton.Visible = False
             '
             'SettingsForm
             '
@@ -679,5 +717,8 @@
         Friend WithEvents Label9 As System.Windows.Forms.Label
         Friend WithEvents Label3 As System.Windows.Forms.Label
         Friend WithEvents MidIfBothCB As System.Windows.Forms.CheckBox
+        Friend WithEvents LoadRicsCB As System.Windows.Forms.CheckBox
+        Friend WithEvents LoadRicsButton As System.Windows.Forms.Button
+        Friend WithEvents Label10 As System.Windows.Forms.Label
     End Class
 End Namespace

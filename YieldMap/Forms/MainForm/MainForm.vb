@@ -127,6 +127,7 @@ Namespace Forms.MainForm
                          YieldMapButton.Enabled = False
                          StatusPicture.Image = Red
                          StatusLabel.Text = "Connection timeout"
+                         MessageBox.Show("Connection timed out. Please try to connect again or restart Eikon and this app manually", "Connection Timeout", MessageBoxButtons.OK, MessageBoxIcon.Information)
                      End Sub)
         End Sub
 

@@ -75,6 +75,7 @@ Namespace Forms.MainForm
             ShowBidAskCheckBox.Checked = Settings.ShowBidAsk
             ShowPointSizeCheckBox.Checked = Settings.ShowPointSize
 
+            LoadRicsCB.Checked = Settings.LoadRics
 
             MainWindowCheckBox.Checked = Settings.ShowMainToolBar
             ChartWindowCheckBox.Checked = Settings.ShowChartToolBar
@@ -132,6 +133,7 @@ Namespace Forms.MainForm
             Settings.FieldsPriority = String.Join(",", From elem In _lst Select elem.Name)
             Settings.ForbiddenFields = String.Join(",", HiddenFieldsListBox.Items.Cast(Of String))
             Settings.MidIfBoth = MidIfBothCB.Checked
+            Settings.LoadRics = LoadRicsCB.Checked
 
             Dim columnsString As String = ""
 
@@ -258,6 +260,10 @@ Namespace Forms.MainForm
             FieldsPriorityLB.DataSource = _lst
             FieldsPriorityLB.DisplayMember = "Name"
             FieldsPriorityLB.ValueMember = "Order"
+        End Sub
+
+        Private Sub LoadRicsButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles LoadRicsButton.Click
+            ' todo loading rics on the fly 
         End Sub
     End Class
 End Namespace

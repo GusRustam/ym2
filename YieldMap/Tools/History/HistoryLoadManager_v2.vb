@@ -1,10 +1,7 @@
 ﻿Imports AdfinXRtLib
 Imports System.Globalization
 Imports System.Threading
-Imports DbManager
 Imports ReutersData
-Imports Uitls
-Imports YieldMap.Commons
 Imports NLog
 
 Namespace Tools.History

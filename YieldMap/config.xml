@@ -12,6 +12,7 @@
   <property name="fields-priority" value="LAST,VWAP,HIST,MID" />
   <property name="forbidden-fields" value="BID,ASK" />
   <property name="yield-calc-mode" value="YTA" />
+  <property name="load-rics" value="False" />
   <viewport>
     <yield min="" max="" />
     <spread min="" max="" />

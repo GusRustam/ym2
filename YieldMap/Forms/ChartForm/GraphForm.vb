@@ -569,6 +569,18 @@ Namespace Forms.ChartForm
             _moneyMarketCurves.Add(rubIRS)
         End Sub
 
+        Private Sub UsdIRS_TSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles UsdIRSTSMI.Click
+            Logger.Debug("UsdIRS_TSMIClick()")
+            Dim usdIRS = New UsdIRS(_spreadBenchmarks)
+            AddHandler usdIRS.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
+            AddHandler usdIRS.Cleared, AddressOf CurveDeleted
+            AddHandler usdIRS.Recalculated, AddressOf OnCurveRecalculated
+            AddHandler usdIRS.Updated, AddressOf OnCurvePaint
+
+            usdIRS.Subscribe()
+            _moneyMarketCurves.Add(usdIRS)
+        End Sub
+
         Private Sub NDFTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles NDFTSMI.Click
             Logger.Debug("NDFTSMI_Click()")
             Dim rubNDF = New RubNDF(_spreadBenchmarks)

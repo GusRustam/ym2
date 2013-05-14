@@ -244,6 +244,16 @@ Public Class SettingsManager
         End Set
     End Property
 
+    Private _loadRics As Boolean = False
+    Public Property LoadRics() As Boolean
+        Get
+            Return _loadRics
+        End Get
+        Set(ByVal value As Boolean)
+            SaveValue("/settings/property[@name='load-rics']/@value", value.ToString())
+            _loadRics = value
+        End Set
+    End Property
 
     Sub New()
         Settings.Load(SettingsPath)
@@ -260,6 +270,7 @@ Public Class SettingsManager
         GetBoolValue("/settings/property[@name='show-point-size']/@value", _showPointSize)
         GetBoolValue("/settings/property[@name='show-main-toolbar']/@value", _showMainToolBar)
         GetBoolValue("/settings/property[@name='show-chart-toolbar']/@value", _showChartToolBar)
+        GetBoolValue("/settings/property[@name='load-rics']/@value", _loadRics)
 
         GetStringValue("/settings/property[@name='fields-priority']/@value", _fieldsPriority)
         GetStringValue("/settings/property[@name='forbidden-fields']/@value", _forbiddenFields)

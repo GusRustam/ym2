@@ -29,12 +29,19 @@ Namespace Curves
         Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(RubIRS))
 
         '' SWAP STRUCTURES
-        Private Shared ReadOnly Struct =
+        '' SWAP STRUCTURES
+        Private Shared ReadOnly SwapStructure =
             "LBOTH CLDR:RUS ARND:NO CFADJ:YES CRND:NO DMC:MODIFIED EMC:SAMEDAY IC:S1 " +
             "PDELAY:0 REFDATE:MATURITY RP:1 XD:NO LPAID LTYPE:FIXED CCM:A5P FRQ:Y " +
             "LRECEIVED LTYPE:FLOAT CCM:MMAA FRQ:Q"
 
-        Private Shared ReadOnly FloatLeg =
+        Protected Overridable ReadOnly Property Struct() As String
+            Get
+                Return SwapStructure
+            End Get
+        End Property
+
+        Private Shared ReadOnly SwapFloatLeg =
             "CLDR:RUS ARND:NO CCM:MMAA CFADJ:YES CRND:NO DMC:MODIFIED EMC:SAMEDAY IC:S1 " +
             "PDELAY:0 REFDATE:MATURITY RP:1 RT:BULLET XD:NO FRQ:Q "
 
@@ -395,7 +402,7 @@ Namespace Curves
 
         Public Overridable ReadOnly Property FloatLegStructure() As String Implements IAssetSwapBenchmark.FloatLegStructure
             Get
-                Return FloatLeg
+                Return SwapFloatLeg
             End Get
         End Property
 
@@ -471,5 +478,58 @@ Namespace Curves
         Protected Overrides Function GetRICs(ByVal broker As String) As List(Of String)
             Return AllowedTenors.Select(Function(item) String.Format("{0}{1}ID={2}", InstrumentName, item, broker)).ToList()
         End Function
+    End Class
+
+    Public NotInheritable Class UsdIRS
+        Inherits RubIRS
+        Public Sub New(ByVal bmk As SpreadContainer)
+            MyBase.New(bmk)
+        End Sub
+
+        Protected Overrides Property InstrumentName() As String = "USDAM3L"
+        Protected Overrides Property AllowedTenors() As String() = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "20", "25", "30"}
+        Protected Overrides Property Brokers() As String() = {"TRDL", "ICAP", ""}
+        Protected Overrides Property BaseInstrument As String = "USD3MFSR="
+
+        Public Overrides Function GetOuterColor() As Color
+            Return Color.DarkKhaki
+        End Function
+
+        Public Overrides Function GetInnerColor() As Color
+            Return Color.Khaki
+        End Function
+
+        Public Overrides Function BootstrappingEnabled() As Boolean
+            Return True
+        End Function
+
+        Protected Overrides ReadOnly Property Struct() As String
+            Get
+                Return "LBOTH CLDR:USA ARND:NO CFADJ:YES CRND:NO DMC:MODIFIED EMC:SAMEDAY IC:S1 PDELAY:0 REFDATE:MATURITY RP:1 XD:NO LPAID LTYPE:FIXED CCM:BB00 FRQ:S LRECEIVED LTYPE:FLOAT CCM:MMA0 FRQ:Q"
+            End Get
+        End Property
+
+        Public Overrides Function GetDuration(ByVal ric As String) As Double
+            Dim match = Regex.Match(ric, String.Format("{0}(?<term>[0-9]+?Y)=.*", InstrumentName))
+            Dim term = match.Groups("term").Value
+            Dim dateModule As New AdxDateModule
+            Dim aDate As Array = dateModule.DfAddPeriod("RUS", GetDate(), term, "")
+            Return dateModule.DfCountYears(GetDate(), Utils.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
+        End Function
+
+        Public Overrides Function BenchmarkEnabled() As Boolean
+            Return True
+        End Function
+
+        Protected Overrides Function GetRICs(ByVal broker As String) As List(Of String)
+            Return AllowedTenors.Select(Function(item) String.Format("{0}{1}Y={2}", InstrumentName, item, broker)).ToList()
+        End Function
+
+        Public Overrides ReadOnly Property FloatLegStructure() As String
+            Get
+                Return "CLDR:USA  ARND:NO CCM:MMA0 CFADJ:YES CRND:NO DMC:MODIFIED EMC:SAMEDAY IC:S1 PDELAY:0  REFDATE:MATURITY RP:1 XD:NO FRQ:Q"
+            End Get
+        End Property
+
     End Class
 End Namespace

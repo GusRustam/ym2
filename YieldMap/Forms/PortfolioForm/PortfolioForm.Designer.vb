@@ -108,8 +108,6 @@
             Me.DeleteItemsButton = New System.Windows.Forms.Button()
             Me.Label2 = New System.Windows.Forms.Label()
             Me.ChainListItemsGrid = New System.Windows.Forms.DataGridView()
-            Me.CurvesPage = New System.Windows.Forms.TabPage()
-            Me.TableLayoutPanel5 = New System.Windows.Forms.TableLayoutPanel()
             Me.CustomBondsPage = New System.Windows.Forms.TabPage()
             Me.BondsSC = New System.Windows.Forms.SplitContainer()
             Me.TableLayoutPanel3 = New System.Windows.Forms.TableLayoutPanel()
@@ -193,7 +191,6 @@
             Me.TableLayoutPanel9.SuspendLayout()
             Me.FlowLayoutPanel2.SuspendLayout()
             CType(Me.ChainListItemsGrid, System.ComponentModel.ISupportInitialize).BeginInit()
-            Me.CurvesPage.SuspendLayout()
             Me.CustomBondsPage.SuspendLayout()
             CType(Me.BondsSC, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.BondsSC.Panel1.SuspendLayout()
@@ -418,7 +415,6 @@
             '
             Me.MainTabControl.Controls.Add(Me.PortfoliosPage)
             Me.MainTabControl.Controls.Add(Me.ChainsPage)
-            Me.MainTabControl.Controls.Add(Me.CurvesPage)
             Me.MainTabControl.Controls.Add(Me.CustomBondsPage)
             Me.MainTabControl.Controls.Add(Me.FieldsPage)
             Me.MainTabControl.Controls.Add(Me.DataPage)
@@ -984,31 +980,6 @@
             Me.ChainListItemsGrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
             Me.ChainListItemsGrid.Size = New System.Drawing.Size(531, 517)
             Me.ChainListItemsGrid.TabIndex = 3
-            '
-            'CurvesPage
-            '
-            Me.CurvesPage.Controls.Add(Me.TableLayoutPanel5)
-            Me.CurvesPage.Location = New System.Drawing.Point(4, 22)
-            Me.CurvesPage.Name = "CurvesPage"
-            Me.CurvesPage.Padding = New System.Windows.Forms.Padding(3)
-            Me.CurvesPage.Size = New System.Drawing.Size(899, 574)
-            Me.CurvesPage.TabIndex = 5
-            Me.CurvesPage.Text = "Curves"
-            Me.CurvesPage.UseVisualStyleBackColor = True
-            '
-            'TableLayoutPanel5
-            '
-            Me.TableLayoutPanel5.ColumnCount = 2
-            Me.TableLayoutPanel5.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-            Me.TableLayoutPanel5.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-            Me.TableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.TableLayoutPanel5.Location = New System.Drawing.Point(3, 3)
-            Me.TableLayoutPanel5.Name = "TableLayoutPanel5"
-            Me.TableLayoutPanel5.RowCount = 2
-            Me.TableLayoutPanel5.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-            Me.TableLayoutPanel5.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-            Me.TableLayoutPanel5.Size = New System.Drawing.Size(893, 568)
-            Me.TableLayoutPanel5.TabIndex = 0
             '
             'CustomBondsPage
             '
@@ -1579,7 +1550,6 @@
             Me.TableLayoutPanel9.PerformLayout()
             Me.FlowLayoutPanel2.ResumeLayout(False)
             CType(Me.ChainListItemsGrid, System.ComponentModel.ISupportInitialize).EndInit()
-            Me.CurvesPage.ResumeLayout(False)
             Me.CustomBondsPage.ResumeLayout(False)
             Me.BondsSC.Panel1.ResumeLayout(False)
             Me.BondsSC.Panel2.ResumeLayout(False)
@@ -1661,8 +1631,6 @@
         Friend WithEvents DeleteItemsButton As System.Windows.Forms.Button
         Friend WithEvents Label2 As System.Windows.Forms.Label
         Friend WithEvents ChainListItemsGrid As System.Windows.Forms.DataGridView
-        Friend WithEvents CurvesPage As System.Windows.Forms.TabPage
-        Friend WithEvents TableLayoutPanel5 As System.Windows.Forms.TableLayoutPanel
         Friend WithEvents CustomBondsPage As System.Windows.Forms.TabPage
         Friend WithEvents BondsSC As System.Windows.Forms.SplitContainer
         Friend WithEvents TableLayoutPanel3 As System.Windows.Forms.TableLayoutPanel
