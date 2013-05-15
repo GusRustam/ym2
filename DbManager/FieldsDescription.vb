@@ -56,18 +56,44 @@ Public Class FieldsDescription
 
     ' ReSharper disable ConvertToConstant.Local
     ' ReSharper disable FieldCanBeMadeReadOnly.Local
-    <Price("White")> <ConfingName("CUSTOM")> Private _custom As String = "CUSTOM"
-    <Price("White")> <ConfingName("MID")> Private _mid As String = "MID"
-    <ConfingName("DATE")> Private _lastDate As String = ""
-    <ConfingName("TIME")> Private _time As String = ""
-    <Price("White")> <ConfingName("BID")> Private _bid As String = ""
-    <Price("White")> <ConfingName("ASK")> Private _ask As String = ""
-    <Price("White")> <ConfingName("LAST")> Private _last As String = ""
-    <Price("White")> <ConfingName("VWAP")> Private _vwap As String = ""
-    <Price("LightGray")> <ConfingName("HIST")> Private _hist As String = ""     ' Historical Field. Corresponds to Close
-    <ConfingName("HIST_DATE")> Private _histDate As String = ""
-    <ConfingName("VOLUME")> Private _volume As String = ""
-    <ConfingName("SOURCE")> Private _src As String = ""
+    <MarkerStyle("Square")>
+    <Price("White")>
+    <ConfingName("CUSTOM")>
+    Private _custom As String = "CUSTOM"
+
+    <ConfingName("MID")>
+    Private _mid As String = "MID"
+
+    <ConfingName("DATE")>
+    Private _lastDate As String = ""
+
+    <ConfingName("TIME")>
+    Private _time As String = ""
+
+    <ConfingName("BID")>
+    Private _bid As String = ""
+
+    <ConfingName("ASK")>
+    Private _ask As String = ""
+
+    <ConfingName("LAST")>
+    Private _last As String = ""
+
+    <ConfingName("VWAP")>
+    Private _vwap As String = ""
+
+    <Price("LightGray")>
+    <ConfingName("HIST")>
+    Private _hist As String = ""     ' Historical Field. Corresponds to Close
+
+    <ConfingName("HIST_DATE")>
+    Private _histDate As String = ""
+
+    <ConfingName("VOLUME")>
+    Private _volume As String = ""
+
+    <ConfingName("SOURCE")>
+    Private _src As String = ""
     ' ReSharper restore ConvertToConstant.Local
     ' ReSharper restore FieldCanBeMadeReadOnly.Local
 
@@ -273,12 +299,25 @@ Public Class FieldsDescription
     End Sub
 
     Public Function BackColor(ByVal fieldName As String) As String
-        Return (From fld In Me.GetType().GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
+        Dim items = (From fld In Me.GetType().GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
                 Let attxU = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False).Cast(Of ConfingNameAttribute)()
                 Where attxU.Any AndAlso attxU.First.XmlName = fieldName
                 Let attx = fld.GetCustomAttributes(GetType(PriceAttribute), False).Cast(Of PriceAttribute)()
                 Where attx.Any
-                Select attx.First.Color).First
+                Select attx.First.Color).ToList()
+
+        Return If(items.Any, items.First, "White")
+    End Function
+
+    Public Function MarkerStyle(ByVal fieldName As String) As String
+        Dim items = (From fld In Me.GetType().GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
+                Let attxU = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False).Cast(Of ConfingNameAttribute)()
+                Where attxU.Any AndAlso attxU.First.XmlName = fieldName
+                Let attx = fld.GetCustomAttributes(GetType(MarkerStyleAttribute), False).Cast(Of MarkerStyleAttribute)()
+                Where attx.Any
+                Select attx.First.Style).ToList()
+
+        Return If(items.Any, items.First, "")
     End Function
 
     Public Function IsPrice(ByVal configName As String) As Boolean
@@ -390,6 +429,21 @@ Friend Class PriceAttribute
     Public ReadOnly Property Color As String
         Get
             Return _color
+        End Get
+    End Property
+End Class
+
+Friend Class MarkerStyleAttribute
+    Inherits Attribute
+    Private ReadOnly _style As String
+
+    Sub New(ByVal style As String)
+        _style = style
+    End Sub
+
+    Public ReadOnly Property Style As String
+        Get
+            Return _style
         End Get
     End Property
 End Class
