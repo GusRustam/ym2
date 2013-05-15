@@ -26,7 +26,7 @@ Namespace Forms.ChartForm
 
         Private ReadOnly _moneyMarketCurves As New List(Of SwapCurve)
         Private WithEvents _spreadBenchmarks As New SpreadContainer
-        Private WithEvents _ansamble As New Ansamble(_spreadBenchmarks)
+        Private WithEvents _ansamble As New Ansamble '(_spreadBenchmarks)
 
         Private Sub Loader_Progress(ByVal obj As ProgressEvent) Handles _bondsLoader.Progress
             ' todo it might be useful if one would like to load bond on the fly
@@ -99,7 +99,7 @@ Namespace Forms.ChartForm
                 Dim portfolioStructure = PortfolioManager.Instance.GetPortfolioStructure(currentPortID)
                 For Each grp As Group In From port In portfolioStructure.Sources
                                            Where TypeOf port.Source Is Chain Or TypeOf port.Source Is UserList
-                                           Select Group.Create(_ansamble, port, portfolioStructure)
+                                           Select New Group(_ansamble, port, portfolioStructure)
                     ' todo add custom bonds
                     _ansamble.AddGroup(grp)
                 Next
@@ -900,16 +900,11 @@ Namespace Forms.ChartForm
 
         Private Sub AddBondCurveNewTSMIClick(ByVal sender As Object, ByVal e As EventArgs)
             Logger.Info("AddBondCurve-New-TSMIClick")
-            Dim selectedItem = CType(CType(sender, ToolStripMenuItem).Tag, Source)
-            Dim newCurve = New BondCurve(selectedItem, _spreadBenchmarks)
+            Dim src = CType(CType(sender, ToolStripMenuItem).Tag, Source)
 
-            AddHandler newCurve.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
-            AddHandler newCurve.Cleared, AddressOf CurveDeleted
-            AddHandler newCurve.Recalculated, AddressOf OnCurveRecalculated
-            AddHandler newCurve.Updated, AddressOf OnCurvePaint
-
-            _bondCurves.Add(newCurve)
-            newCurve.Subscribe()
+            Dim curve = New BondCurve(_ansamble, src)
+            _ansamble.AddBondCurve(curve)
+            curve.Start()
         End Sub
 
         Private Sub SelDateTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles SelDateTSMI.Click
@@ -1101,11 +1096,11 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
-        Private Sub OnBondAllQuotes(ByVal data As List(Of Bond)) Handles _ansamble.AllQuotes
-            Logger.Trace("OnBondAllQuotes()")
-            data.ForEach(Sub(elem) OnBondQuote(elem, True))
-            SetChartMinMax()
-        End Sub
+        'Private Sub OnBondAllQuotes(ByVal data As List(Of Bond)) Handles _ansamble.AllQuotes
+        '    Logger.Trace("OnBondAllQuotes()")
+        '    data.ForEach(Sub(elem) OnBondQuote(elem, True))
+        '    SetChartMinMax()
+        'End Sub
 
         Private Sub OnBondQuote(ByVal descr As Bond, Optional ByVal raw As Boolean = False) Handles _ansamble.Quote
             Logger.Trace("OnBondQuote({0}, {1})", descr.MetaData.ShortName, descr.ParentGroup.SeriesName)
@@ -1126,12 +1121,12 @@ Namespace Forms.ChartForm
                             .YValuesPerPoint = 1,
                             .ChartType = SeriesChartType.Point,
                             .IsVisibleInLegend = False,
-                            .color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.Black),
+                            .color = Color.FromName(calc.BackColor),
                             .markerSize = 8,
                             .markerBorderWidth = 2,
                             .markerBorderColor = clr,
                             .markerStyle = MarkerStyle.Circle,
-                            .Tag = seriesDescr
+                        .Tag = seriesDescr
                         }
                         With series.EmptyPointStyle
                             .BorderWidth = 0
@@ -1160,10 +1155,16 @@ Namespace Forms.ChartForm
                                 Logger.Trace("{0}: delta is {1}", ric, yValue.Value - point.YValues.First)
                             End If
                             point.YValues = {yValue.Value}
-                            point.Color = If(calc.YieldSource.Belongs(YieldSource.Realtime, YieldSource.Synthetic), Color.White, Color.LightGray)
-                            point.MarkerStyle = IIf(calc.YieldSource <> YieldSource.Synthetic,
-                                               IIf(calc.Yld.ToWhat.Equals(YieldToWhat.Maturity), MarkerStyle.Circle, MarkerStyle.Triangle),
-                                               MarkerStyle.Square)
+                            point.Color = Color.FromName(calc.BackColor) 'If(calc.YieldSource.Belongs(YieldSource.Realtime, YieldSource.Synthetic), Color.White, Color.LightGray)
+                            Dim style As MarkerStyle
+                            If MarkerStyle.TryParse(calc.MarkerStyle, style) Then
+                                point.MarkerStyle = style
+                            Else
+                                point.MarkerStyle = IIf(calc.Yld.ToWhat.Equals(YieldToWhat.Maturity), MarkerStyle.Circle, MarkerStyle.Triangle)
+                            End If
+                            'point.MarkerStyle = IIf(calc.YieldSource <> YieldSource.Synthetic,
+                            '                                               IIf(calc.Yld.ToWhat.Equals(YieldToWhat.Maturity), MarkerStyle.Circle, MarkerStyle.Triangle),
+                            '                                               MarkerStyle.Square)
                             If ShowLabelsTSB.Checked Then point.Label = descr.Label
                         Else
                             series.Points.Remove(point)
@@ -1173,11 +1174,14 @@ Namespace Forms.ChartForm
                             .Name = descr.MetaData.RIC,
                             .Tag = descr,
                             .ToolTip = descr.MetaData.ShortName,
-                            .Color = If(calc.YieldSource = YieldSource.Realtime, Color.White, Color.LightGray),
-                            .MarkerStyle = IIf(calc.YieldSource <> YieldSource.Synthetic,
-                                               IIf(calc.Yld.ToWhat.Equals(YieldToWhat.Maturity), MarkerStyle.Circle, MarkerStyle.Triangle),
-                                               MarkerStyle.Square)
+                            .Color = Color.FromName(calc.BackColor)
                         }
+                        Dim style As MarkerStyle
+                        If MarkerStyle.TryParse(calc.MarkerStyle, style) Then
+                            point.MarkerStyle = style
+                        Else
+                            point.MarkerStyle = IIf(calc.Yld.ToWhat.Equals(YieldToWhat.Maturity), MarkerStyle.Circle, MarkerStyle.Triangle)
+                        End If
                         If ShowLabelsTSB.Checked Then point.Label = descr.MetaData.ShortName
                         series.Points.Add(point)
                     End If
@@ -1203,13 +1207,13 @@ Namespace Forms.ChartForm
         Private Sub OnBenchmarkRemoved(ByVal type As SpreadType) Handles _spreadBenchmarks.BenchmarkRemoved
             Logger.Trace("OnBenchmarkRemoved({0})", type)
             _moneyMarketCurves.ForEach(Sub(curve) curve.CleanupByType(type))
-            _ansamble.Groups.CleanupByType(type)
+            '_ansamble.Groups.CleanupByType(type)
         End Sub
 
         Private Sub OnBenchmarkUpdated(ByVal type As SpreadType) Handles _spreadBenchmarks.BenchmarkUpdated
             Logger.Trace("OnBenchmarkUpdated({0})", type)
             _moneyMarketCurves.ForEach(Sub(curve) curve.RecalculateByType(type))
-            _ansamble.Groups.RecalculateByType(type)
+            '_ansamble.Groups.RecalculateByType(type)
         End Sub
 
         Private Sub OnTypeSelected(ByVal newType As SpreadType, ByVal oldType As SpreadType) Handles _spreadBenchmarks.TypeSelected
@@ -1217,7 +1221,7 @@ Namespace Forms.ChartForm
             If newType <> oldType Then
                 SetYAxisMode(newType.ToString())
                 _moneyMarketCurves.ForEach(Sub(curve) curve.RecalculateByType(newType))
-                _ansamble.Groups.RecalculateByType(newType)
+                '_ansamble.Groups.RecalculateByType(newType)
             End If
         End Sub
 #End Region

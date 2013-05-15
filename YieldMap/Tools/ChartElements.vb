@@ -2,6 +2,7 @@
 Imports System.Reflection
 Imports DbManager
 Imports DbManager.Bonds
+Imports YieldMap.Tools.Estimation
 Imports NLog
 Imports ReutersData
 Imports Settings
@@ -11,23 +12,11 @@ Imports YieldMap.Curves
 
 Namespace Tools
 #Region "I. Enumerations"
-    Public Enum YieldSource
-        Realtime
-        Historical
-        Synthetic
-    End Enum
-
     Public Enum QuoteSource
         Bid
         Ask
         Last
         Hist
-    End Enum
-
-    Public Enum GroupType
-        Chain
-        List
-        Bond
     End Enum
 #End Region
 
@@ -72,10 +61,10 @@ Namespace Tools
         End Sub
     End Class
 
-    Public Class GroupContainer
-        Private ReadOnly _groups As New Dictionary(Of Long, Group)
+    Public Class GroupContainer(Of T As BaseGroup)
+        Private ReadOnly _groups As New Dictionary(Of Long, T)
 
-        Default Public ReadOnly Property Data(ByVal id As Long) As Group
+        Default Public ReadOnly Property Data(ByVal id As Long) As T
             Get
                 Return _groups(id)
             End Get
@@ -117,18 +106,6 @@ Namespace Tools
             Return _groups.Keys.Contains(id)
         End Function
 
-        Public Sub RecalculateByType(ByVal type As SpreadType)
-            For Each kvp In _groups
-                kvp.Value.RecalculateByType(type)
-            Next
-        End Sub
-
-        Public Sub CleanupByType(ByVal type As SpreadType)
-            For Each kvp In _groups
-                kvp.Value.CleanupByType(type)
-            Next
-        End Sub
-
         Public Sub Cleanup()
             For Each kvp In _groups
                 kvp.Value.Cleanup()
@@ -142,7 +119,7 @@ Namespace Tools
             Next
         End Sub
 
-        Public Sub Add(ByVal group As Group)
+        Public Sub Add(ByVal group As T)
             _groups.Add(group.Identity, group)
         End Sub
 
@@ -184,53 +161,46 @@ Namespace Tools
             Return num
         End Function
 
-        Private ReadOnly _groups As New GroupContainer
-        Public ReadOnly Property Groups As GroupContainer
+        Private ReadOnly _groups As New GroupContainer(Of Group)
+        Public ReadOnly Property Groups As GroupContainer(Of Group)
             Get
                 Return _groups
             End Get
         End Property
-
-        Public Sub New(ByVal bmk As SpreadContainer)
-            _spreadBmk = bmk
-        End Sub
+        Private ReadOnly _curves As New GroupContainer(Of BondCurve)
+        Public ReadOnly Property BondCurves As GroupContainer(Of BondCurve)
+            Get
+                Return _curves
+            End Get
+        End Property
 
         Public Sub AddGroup(ByVal group As Group)
             _groups.Add(group)
             AddHandler group.Quote, Sub(bond As Bond) RaiseEvent Quote(bond)
             AddHandler group.RemovedItem, Sub(grp As Group, ric As String) RaiseEvent RemovedItem(grp, ric)
-            AddHandler group.AllQuotes, Sub(obj As List(Of Bond)) RaiseEvent AllQuotes(obj)
             AddHandler group.Volume, Sub(obj As Bond) RaiseEvent Volume(obj)
             AddHandler group.Clear, Sub(obj As Group) RaiseEvent Clear(obj)
         End Sub
 
-        Public Event AllQuotes As Action(Of List(Of Bond))
+
+        Public Sub AddBondCurve(ByVal curve As BondCurve)
+            _curves.Add(curve)
+            'AddHandler curve.Updated, Sub(bond As Bond) RaiseEvent Quote(bond)
+            'AddHandler curve.RemovedItem, Sub(grp As Group, ric As String) RaiseEvent RemovedItem(grp, ric)
+            'AddHandler curve.Volume, Sub(obj As Bond) RaiseEvent Volume(obj)
+            'AddHandler curve.Clear, Sub(obj As Group) RaiseEvent Clear(obj)
+        End Sub
+
         Public Event RemovedItem As Action(Of Group, String)
         Public Event Quote As Action(Of Bond)
         Public Event Volume As Action(Of Bond)
         Public Event Clear As Action(Of Group)
 
-        Private ReadOnly _spreadBmk As SpreadContainer
-        Public ReadOnly Property SpreadBmk() As SpreadContainer
-            Get
-                Return _spreadBmk
-            End Get
-        End Property
-
-        Public Sub CleanupSpread(ByVal type As SpreadType, ByRef descr As BasePointDescription) ' todo very awkward
-            _spreadBmk.CleanupSpread(descr, type)
-        End Sub
-
         Public Sub Recalculate()
-            ' todo this means just to raise events with all my data once again
+            ' todo something might have changed, I dunno what
         End Sub
-    End Class
 
-    'Public Enum BondStatus
-    '    Ok
-    '    Empty
-    '    Err
-    'End Enum
+    End Class
 
     Public Class Bond
         Inherits Identifyable
@@ -241,8 +211,19 @@ Namespace Tools
         Private ReadOnly _quotesAndYields As New Dictionary(Of String, BondPointDescription)
         Public TodayVolume As Double
 
+        Private _usedDefinedSpread As Double
+
+        Public Property UsedDefinedSpread() As Double
+            Get
+                Return _usedDefinedSpread
+            End Get
+            Set(ByVal value As Double)
+                _usedDefinedSpread = value
+                ' todo update all yields and spreads now!
+            End Set
+        End Property
+
         Private _labelMode As LabelMode = LabelMode.IssuerAndSeries
-        'Private _status As BondStatus = BondStatus.Empty
 
         Public Property LabelMode As LabelMode
             Get
@@ -274,7 +255,6 @@ Namespace Tools
             End Set
         End Property
 
-
         Public ReadOnly Property MetaData As BondDescription
             Get
                 Return _metaData
@@ -286,15 +266,6 @@ Namespace Tools
                 Return _quotesAndYields
             End Get
         End Property
-
-        'Public Property Status() As BondStatus
-        '    Get
-        '        Return _status
-        '    End Get
-        '    Set(ByVal value As BondStatus)
-        '        _status = value
-        '    End Set
-        'End Property
 
         Public ReadOnly Property Label() As String
             Get
@@ -326,17 +297,17 @@ Namespace Tools
             End Get
         End Property
 
-        Public Sub RecalculateByType(ByVal type As SpreadType)
-            If _quotesAndYields.ContainsKey(_userSelectedQuote) Then
-                _parentGroup.Ansamble.SpreadBmk.CalcAllSpreads(_quotesAndYields(_userSelectedQuote), _metaData, type)
-            End If
-        End Sub
+        'Public Sub RecalculateByType(ByVal type As SpreadType)
+        '    'If _quotesAndYields.ContainsKey(_userSelectedQuote) Then
+        '    '    '_parentGroup.Ansamble.SpreadBmk.CalcAllSpreads(_quotesAndYields(_userSelectedQuote), _metaData, type)
+        '    'End If
+        'End Sub
 
-        Public Sub CleanupByType(ByVal type As SpreadType)
-            If _quotesAndYields.ContainsKey(_userSelectedQuote) Then
-                _parentGroup.Ansamble.CleanupSpread(type, _quotesAndYields(_userSelectedQuote))
-            End If
-        End Sub
+        'Public Sub CleanupByType(ByVal type As SpreadType)
+        '    If _quotesAndYields.ContainsKey(_userSelectedQuote) Then
+        '        _parentGroup.Ansamble.CleanupSpread(type, _quotesAndYields(_userSelectedQuote))
+        '    End If
+        'End Sub
     End Class
 
     ' todo custom label
@@ -351,21 +322,18 @@ Namespace Tools
     ''' Represents separate series on the chart
     ''' </summary>
     ''' <remarks></remarks>
-    Public Class Group
+    Public MustInherit Class BaseGroup
         Inherits Identifyable
-        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(Group))
+        Protected Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(BaseGroup))
 
         Private ReadOnly _ansamble As Ansamble
 
-        Public Event Quote As Action(Of Bond)
-        Public Event RemovedItem As Action(Of Group, String)
-        Public Event Clear As Action(Of Group)
+        Public Event RemovedItem As Action(Of BaseGroup, String)
+        Public Event Clear As Action(Of BaseGroup)
         Public Event Volume As Action(Of Bond)
-        Public Event AllQuotes As Action(Of List(Of Bond))
 
-
-        Public YieldMode As String
-        Public BondFields As FieldContainer
+        Public YieldMode As String ' todo currently unused
+        Protected BondFields As FieldContainer
         Public SeriesName As String
 
         Private ReadOnly _elements As New Dictionary(Of String, Bond) 'ric -> datapoint
@@ -395,34 +363,6 @@ Namespace Tools
             End Get
         End Property
 
-        Public Shared Function Create(ByVal ans As Ansamble, ByVal port As PortfolioSource, ByVal portfolioStructure As PortfolioStructure) As Group
-            Dim group As Group
-            Dim source = TryCast(port.Source, Source)
-
-            If source Is Nothing Then
-                Logger.Warn("Unsupported source {0}", source)
-                Return Nothing
-            End If
-
-            group = New Group(ans) With {
-                .SeriesName = If(port.Name <> "", port.Name, source.Name),
-                .PortfolioID = source.ID,
-                .BondFields = source.Fields.Realtime.AsContainer(),
-                .Color = If(port.Color <> "", port.Color, source.Color)
-            }
-
-            group.YieldMode = SettingsManager.Instance.YieldCalcMode
-
-            For Each ric In portfolioStructure.Rics(port)
-                Dim descr = BondsData.Instance.GetBondInfo(ric)
-                If descr IsNot Nothing Then
-                    group.AddRic(ric, descr)
-                Else
-                    Logger.Error("No description for bond {0} found", ric)
-                End If
-            Next
-            Return group
-        End Function
 
         Public Sub Cleanup()
             _quoteLoader.CancelAll()
@@ -473,9 +413,8 @@ Namespace Tools
                             Dim fieldValue = fieldsAndValues(fieldName)
                             Try
                                 HandleQuote(bondDataPoint, fieldName, fieldValue, Date.Today)
-                                'bondDataPoint.Status = BondStatus.Ok
-                                Dim bid  = BondFields.Fields.Bid
-                                Dim ask  = BondFields.Fields.Ask
+                                Dim bid = BondFields.Fields.Bid
+                                Dim ask = BondFields.Fields.Ask
                                 If fieldName.Belongs(bid, ask) Then
                                     Dim bidPrice As Double
                                     Dim xmlBid = BondFields.XmlName(bid)
@@ -503,9 +442,6 @@ Namespace Tools
                             Catch ex As Exception
                                 Logger.WarnException("Failed to plot the point", ex)
                                 Logger.Warn("Exception = {0}", ex.ToString())
-                                'If bondDataPoint.Status = BondStatus.Empty Then
-                                '    bondDataPoint.Status = BondStatus.Err
-                                'End If
                             End Try
                         End If
                     Next
@@ -520,64 +456,48 @@ Namespace Tools
             Dim calculation As New BondPointDescription
             Dim xmlName = BondFields.XmlName(fieldName)
             calculation.BackColor = BondFields.Fields.BackColor(xmlName)
+            calculation.MarkerStyle = BondFields.Fields.MarkerStyle(xmlName)
             calculation.Price = fieldVal
-            calculation.YieldSource = If(fieldName <> BondFields.Fields.Custom, If(fieldName <> BondFields.Fields.Hist, YieldSource.Realtime, YieldSource.Historical), YieldSource.Synthetic)
-            CalculateYields(calcDate, bondDataPoint.MetaData, calculation)
+            CalculateYields(calcDate, bondDataPoint.MetaData, calculation) ' todo add userDefinedSpread
 
-            Dim container = _ansamble.SpreadBmk
-            For i = 0 To container.Benchmarks.Keys.Count
-                container.CalcAllSpreads(calculation, bondDataPoint.MetaData, container.Benchmarks.Keys(i))
-            Next
             bondDataPoint.QuotesAndYields(xmlName) = calculation
 
-            Dim xmlNames As New List(Of String)
-            For Each key In bondDataPoint.QuotesAndYields.Keys
-                If bondDataPoint.QuotesAndYields(key).Price > 0 Then
-                    xmlNames.Add(key)
-                End If
-            Next
+            'Dim xmlNames As New List(Of String)
+            'For Each key In bondDataPoint.QuotesAndYields.Keys
+            '    If bondDataPoint.QuotesAndYields(key).Price > 0 Then
+            '        xmlNames.Add(key)
+            '    End If
+            'Next
 
-            RaiseEvent Quote(bondDataPoint)
+            NotifyQuote(bondDataPoint)
         End Sub
 
         Public Function HasRic(ByVal instrument As String) As Boolean
             Return _elements.Any(Function(elem) elem.Key = instrument)
         End Function
 
-        Public Sub AddRic(ByVal ric As String, ByVal descr As BondDescription)
-            _elements.Add(ric, New Bond(Me, descr))
+        Public Sub AddRic(ByVal ric As String)
+            Dim descr = BondsData.Instance.GetBondInfo(ric)
+            If descr IsNot Nothing Then
+                _elements.Add(ric, New Bond(Me, descr))
+            Else
+                Logger.Error("No description for bond {0} found", ric)
+            End If
         End Sub
 
-        Private Sub New(ByVal ansamble As Ansamble)
+        Public Sub AddRics(ByVal rics As IEnumerable(Of String))
+            For Each ric In rics
+                AddRic(ric)
+            Next
+        End Sub
+
+        Protected Sub New(ByVal ansamble As Ansamble)
             _ansamble = ansamble
         End Sub
 
         Public Function GetElement(ByVal ric As String) As Bond
             Return _elements(ric)
         End Function
-
-        Public Sub RecalculateByType(ByVal type As SpreadType)
-            _elements.Keys.ToList().ForEach(
-                Sub(ric)
-                    Dim elem = _elements(ric)
-                    'If elem.QuotesAndYields.ContainsKey(elem.UserSelectedQuote) Then
-                    ' TODO NOT SURE IF ITS OK
-                    elem.RecalculateByType(type)
-                    'End If
-                End Sub)
-            If _ansamble.SpreadBmk.CurrentType = type Then RaiseEvent AllQuotes(_elements.Values.ToList())
-        End Sub
-
-        Public Sub CleanupByType(ByVal type As SpreadType)
-            _elements.Keys.ToList().ForEach(
-                Sub(ric)
-                    Dim elem = _elements(ric)
-                    'If elem.QuotesAndYields.ContainsKey(elem.UserSelectedQuote) Then
-                    ' TODO NOT SURE IF ITS OK
-                    elem.CleanupByType(type)
-                    'End If
-                End Sub)
-        End Sub
 
         Public Sub RemoveRic(ByVal ric As String)
             _quoteLoader.CancelItem(ric)
@@ -587,8 +507,61 @@ Namespace Tools
             RaiseEvent RemovedItem(Me, ric)
         End Sub
 
-        Public Sub NotifyQuote(ByVal bond As Bond)
+        Public Overridable Sub NotifyQuote(ByVal bond As Bond)
+        End Sub
+    End Class
+
+    Public Class Group
+        Inherits BaseGroup
+
+        Public Event Quote As Action(Of Bond)
+
+        Public Sub New(ByVal ans As Ansamble, ByVal port As PortfolioSource, ByVal portfolioStructure As PortfolioStructure)
+            MyBase.new(ans)
+            Dim source = TryCast(port.Source, Source)
+
+            If source Is Nothing Then
+                Logger.Warn("Unsupported source {0}", source)
+                Throw New InvalidOperationException(String.Format("Unsupported source {0}", source))
+            End If
+
+            SeriesName = If(port.Name <> "", port.Name, source.Name)
+            PortfolioID = source.ID
+            BondFields = source.Fields.Realtime.AsContainer()
+            Color = If(port.Color <> "", port.Color, source.Color)
+
+            YieldMode = SettingsManager.Instance.YieldCalcMode
+
+            AddRics(portfolioStructure.Rics(port))
+        End Sub
+
+        Public Overrides Sub NotifyQuote(ByVal bond As Bond)
             RaiseEvent Quote(bond)
+        End Sub
+    End Class
+
+    Public Class BondCurve
+        Inherits BaseGroup
+
+        Public Event Updated As Action(Of List(Of XY))
+
+        Private _histFields As FieldContainer
+
+        Public Sub New(ByVal ansamble As Ansamble, ByVal src As Source)
+            MyBase.new(ansamble)
+
+            SeriesName = src.Name
+            PortfolioID = src.ID
+            BondFields = src.Fields.Realtime.AsContainer()
+            Color = src.Color
+            _histFields = src.Fields.History.AsContainer()
+
+            YieldMode = SettingsManager.Instance.YieldCalcMode
+            AddRics(src.GetDefaultRics())
+        End Sub
+
+        Public Overrides Sub NotifyQuote(ByVal bond As Bond)
+            ' todo here I haffto do all recalculations so that to return wut user wants to see
         End Sub
     End Class
 #End Region
