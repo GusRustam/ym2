@@ -13,7 +13,6 @@ Imports YieldMap.Curves
 Imports YieldMap.My.Resources
 Imports YieldMap.Commons
 Imports YieldMap.Tools
-Imports ReutersData
 Imports NLog
 Imports DbManager
 
@@ -24,58 +23,25 @@ Namespace Forms.ChartForm
         Private WithEvents _theSettings As SettingsManager = SettingsManager.Instance
         Private WithEvents _tableForm As TableForm.TableForm = New TableForm.TableForm()
         Private WithEvents _bondsLoader As IBondsLoader = BondsLoader.Instance()
-        Private WithEvents _connector As EikonConnector = EikonConnector.Instance()
 
         Private ReadOnly _moneyMarketCurves As New List(Of SwapCurve)
         Private WithEvents _spreadBenchmarks As New SpreadContainer
         Private WithEvents _ansamble As New Ansamble(_spreadBenchmarks)
 
         Private Sub Loader_Progress(ByVal obj As ProgressEvent) Handles _bondsLoader.Progress
-            ' todo
+            ' todo it might be useful if one would like to load bond on the fly
         End Sub
 
-        Private Sub TheSettings_DurRangeChanged(ByVal min As Double?, ByVal max As Double?) Handles _theSettings.DurRangeChanged
-            ' todo
-        End Sub
-
-        Private Sub TheSettings_ShowBidAskChanged(ByVal show As Boolean) Handles _theSettings.ShowBidAskChanged
-            ' todo
+        Private Sub TheSettings_DurRangeChanged() Handles _theSettings.DurRangeChanged, _theSettings.SpreadRangeChanged, _theSettings.YieldRangeChanged
+            SetChartMinMax()
         End Sub
 
         Private Sub TheSettings_ShowPointSizeChanged(ByVal show As Boolean) Handles _theSettings.ShowPointSizeChanged
-            ' todo
-        End Sub
-
-        Private Sub TheSettings_SpreadRangeChanged(ByVal min As Double?, ByVal max As Double?) Handles _theSettings.SpreadRangeChanged
-            ' todo
-        End Sub
-
-        Private Sub TheSettings_YieldRangeChanged(ByVal min As Double?, ByVal max As Double?) Handles _theSettings.YieldRangeChanged
-            ' todo
+            ' todo some refresh
         End Sub
 
         Private Sub TheSettings_FieldsPriorityChanged(ByVal list As String) Handles _theSettings.FieldsPriorityChanged
-            ' todo
-        End Sub
-
-        Private Sub Connector_Timeout() Handles _connector.Timeout
-            ' todo
-        End Sub
-
-        Private Sub Connector_Connected() Handles _connector.Connected
-            ' todo
-        End Sub
-
-        Private Sub Connector_Disconnected() Handles _connector.Disconnected
-            ' todo
-        End Sub
-
-        Private Sub Connector_LocalMode() Handles _connector.LocalMode
-            ' todo
-        End Sub
-
-        Private Sub Connector_Offline() Handles _connector.Offline
-            ' todo
+            _ansamble.Recalculate()
         End Sub
 
 #Region "I) Dependent forms"
@@ -132,16 +98,14 @@ Namespace Forms.ChartForm
 
                 Dim portfolioStructure = PortfolioManager.Instance.GetPortfolioStructure(currentPortID)
                 For Each grp As Group In From port In portfolioStructure.Sources
-                                           Where TypeOf port.Source Is DbManager.Chain Or TypeOf port.Source Is UserList
+                                           Where TypeOf port.Source Is Chain Or TypeOf port.Source Is UserList
                                            Select Group.Create(_ansamble, port, portfolioStructure)
+                    ' todo add custom bonds
                     _ansamble.AddGroup(grp)
                 Next
                 _ansamble.Groups.Start()
             End Set
         End Property
-
-        
-
 #End Region
 
 #Region "III) Event handling"
@@ -893,9 +857,14 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub CurvesTSMIDropDownOpening(ByVal sender As Object, ByVal e As EventArgs) Handles CurvesTSMI.DropDownOpening
+            Dim portfolioManager = DbManager.PortfolioManager.Instance
             BondCurvesTSMI.DropDownItems.Clear()
-            DoAdd(From chain In PortfolioManager.Instance.ChainsView Where chain.Curve)
-            DoAdd(From list In PortfolioManager.Instance.UserListsView Where list.Curve)
+            DoAdd(From chain In portfolioManager.ChainsView Where chain.Curve)
+            DoAdd(From list In portfolioManager.UserListsView Where list.Curve)
+
+            BondCurvesNewTSMI.DropDownItems.Clear()
+            DoAddNew(From chain In portfolioManager.ChainsView Where chain.Curve)
+            DoAddNew(From list In portfolioManager.UserListsView Where list.Curve)
         End Sub
 
         Private Sub AddBondCurveTSMIClick(ByVal sender As Object, ByVal e As EventArgs)
@@ -926,6 +895,20 @@ Namespace Forms.ChartForm
             AddHandler newCurve.Faulted, AddressOf OnCurveFault
 
             _moneyMarketCurves.Add(newCurve)
+            newCurve.Subscribe()
+        End Sub
+
+        Private Sub AddBondCurveNewTSMIClick(ByVal sender As Object, ByVal e As EventArgs)
+            Logger.Info("AddBondCurve-New-TSMIClick")
+            Dim selectedItem = CType(CType(sender, ToolStripMenuItem).Tag, Source)
+            Dim newCurve = New BondCurve(selectedItem, _spreadBenchmarks)
+
+            AddHandler newCurve.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
+            AddHandler newCurve.Cleared, AddressOf CurveDeleted
+            AddHandler newCurve.Recalculated, AddressOf OnCurveRecalculated
+            AddHandler newCurve.Updated, AddressOf OnCurvePaint
+
+            _bondCurves.Add(newCurve)
             newCurve.Subscribe()
         End Sub
 

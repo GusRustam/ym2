@@ -346,6 +346,12 @@ Namespace Forms.ChartForm
             Next
         End Sub
 
+        Private Sub DoAddNew(ByVal curves As IEnumerable(Of Source))
+            For Each curve In curves
+                Dim item = BondCurvesNewTSMI.DropDownItems.Add(curve.Name, Nothing, AddressOf AddBondCurveNewTSMIClick)
+                item.Tag = curve
+            Next
+        End Sub
         Private Sub PaintSwapCurve(ByVal curve As SwapCurve, raw As Boolean)
             Logger.Debug("PaintSwapCurve({0}, {1})", curve.GetName(), raw)
             Dim points As List(Of SwapPointDescription)

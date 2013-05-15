@@ -221,13 +221,16 @@ Namespace Tools
             _spreadBmk.CleanupSpread(descr, type)
         End Sub
 
+        Public Sub Recalculate()
+            ' todo this means just to raise events with all my data once again
+        End Sub
     End Class
 
-    Public Enum BondStatus
-        Ok
-        Empty
-        Err
-    End Enum
+    'Public Enum BondStatus
+    '    Ok
+    '    Empty
+    '    Err
+    'End Enum
 
     Public Class Bond
         Inherits Identifyable
@@ -239,7 +242,7 @@ Namespace Tools
         Public TodayVolume As Double
 
         Private _labelMode As LabelMode = LabelMode.IssuerAndSeries
-        Private _status As BondStatus = BondStatus.Empty
+        'Private _status As BondStatus = BondStatus.Empty
 
         Public Property LabelMode As LabelMode
             Get
@@ -284,14 +287,14 @@ Namespace Tools
             End Get
         End Property
 
-        Public Property Status() As BondStatus
-            Get
-                Return _status
-            End Get
-            Set(ByVal value As BondStatus)
-                _status = value
-            End Set
-        End Property
+        'Public Property Status() As BondStatus
+        '    Get
+        '        Return _status
+        '    End Get
+        '    Set(ByVal value As BondStatus)
+        '        _status = value
+        '    End Set
+        'End Property
 
         Public ReadOnly Property Label() As String
             Get
@@ -409,8 +412,6 @@ Namespace Tools
             }
 
             group.YieldMode = SettingsManager.Instance.YieldCalcMode
-            'Dim selectedField = FindAppropriateField(group.BondFields)
-            'If selectedField = "" Then Throw New InvalidOperationException("No price field found")
 
             For Each ric In portfolioStructure.Rics(port)
                 Dim descr = BondsData.Instance.GetBondInfo(ric)
@@ -422,15 +423,6 @@ Namespace Tools
             Next
             Return group
         End Function
-
-        'Private Shared Function FindAppropriateField(ByVal realtime As FieldContainer) As String
-        '    Dim fieldPriority = SettingsManager.Instance.FieldsPriority.Split(",")
-        '    Dim usefulFields = (From fld In fieldPriority
-        '            Let val = realtime.Name(fld)
-        '            Where val <> ""
-        '            Select fld).ToList()
-        '    Return If(usefulFields.Any, usefulFields.First, "")
-        'End Function
 
         Public Sub Cleanup()
             _quoteLoader.CancelAll()
@@ -464,7 +456,7 @@ Namespace Tools
 
                     ' checking if this bond is allowed to show up
                     If Not _elements.Keys.Contains(instrument) Then
-                        Logger.Warn("Unknown instrument {0} in series {1}", instrument, SeriesName)
+                        Logger.Warn("Instrument {0} does not belong to serie {1}", instrument, SeriesName)
                         Continue For
                     End If
 
@@ -481,12 +473,12 @@ Namespace Tools
                             Dim fieldValue = fieldsAndValues(fieldName)
                             Try
                                 HandleQuote(bondDataPoint, fieldName, fieldValue, Date.Today)
-                                bondDataPoint.Status = BondStatus.Ok
+                                'bondDataPoint.Status = BondStatus.Ok
                                 Dim bid  = BondFields.Fields.Bid
                                 Dim ask  = BondFields.Fields.Ask
                                 If fieldName.Belongs(bid, ask) Then
                                     Dim bidPrice As Double
-                                    Dim xmlBid  = BondFields.XmlName(bid)
+                                    Dim xmlBid = BondFields.XmlName(bid)
                                     If bondDataPoint.QuotesAndYields.ContainsKey(xmlBid) Then
                                         bidPrice = bondDataPoint.QuotesAndYields(xmlBid).Price
                                     End If
@@ -511,9 +503,9 @@ Namespace Tools
                             Catch ex As Exception
                                 Logger.WarnException("Failed to plot the point", ex)
                                 Logger.Warn("Exception = {0}", ex.ToString())
-                                If bondDataPoint.Status = BondStatus.Empty Then
-                                    bondDataPoint.Status = BondStatus.Err
-                                End If
+                                'If bondDataPoint.Status = BondStatus.Empty Then
+                                '    bondDataPoint.Status = BondStatus.Err
+                                'End If
                             End Try
                         End If
                     Next
@@ -545,10 +537,7 @@ Namespace Tools
                 End If
             Next
 
-            'If BondFields.IsMaximumPriority(BondFields.XmlName(fieldName),
-            '                                xmlNames) Then
             RaiseEvent Quote(bondDataPoint)
-            'End If
         End Sub
 
         Public Function HasRic(ByVal instrument As String) As Boolean

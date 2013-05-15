@@ -1,7 +1,6 @@
 ﻿Imports EikonDesktopDataAPILib
 Imports System.Threading
 Imports NLog
-Imports Uitls
 
 Public Class Eikon
     Private Shared _myEikonDesktopSdk As New EikonDesktopDataAPI
@@ -26,7 +25,7 @@ Public Class EikonConnector
     Private Shared _instance As EikonConnector
 
     Private ReadOnly _lock As New Object
-    Private _timeOutFlag As InterlockedState = InterlockedState.BrandNew
+    Private _timeOutState As InterlockedState = InterlockedState.BrandNew
 
     Public Event Connected As Action
     Public Event Disconnected As Action
@@ -46,11 +45,11 @@ Public Class EikonConnector
 
     Public Sub ConnectToEikon()
         SyncLock _lock
-            If _timeOutFlag = InterlockedState.Waiter Then
+            If _timeOutState = InterlockedState.Waiter Then
                 Logger.Info("Unable to reconnect while waiter is alive")
                 Return
             Else
-                _timeOutFlag = InterlockedState.BrandNew
+                _timeOutState = InterlockedState.BrandNew
             End If
         End SyncLock
         Dim lResult = _sdk.Initialize()
@@ -63,30 +62,30 @@ Public Class EikonConnector
         ThreadPool.QueueUserWorkItem(
             Sub()
                 SyncLock _lock
-                    _timeOutFlag = InterlockedState.Waiter
+                    _timeOutState = InterlockedState.Waiter
                 End SyncLock
                 Logger.Info("Connection waiter started")
                 Thread.Sleep(TimeSpan.FromSeconds(20))
                 SyncLock _lock
                     Logger.Info("Connection wait finished")
-                    If _timeOutFlag = InterlockedState.Waiter Then
+                    If _timeOutState = InterlockedState.Waiter Then
                         Logger.Warn("Connection was unsuccessful")
-                        _timeOutFlag = InterlockedState.WaiterFinished
+                        _timeOutState = InterlockedState.WaiterFinished
                         RaiseEvent Timeout()
                     Else
-                        Logger.Info("Connection was successful, status is {0}", _timeOutFlag)
+                        Logger.Info("Connection was successful, status is {0}", _timeOutState)
                     End If
                 End SyncLock
 
             End Sub)
     End Sub
 
-
     Public Sub OnStatusChanged(ByVal eStatus As EEikonStatus) Handles _sdk.OnStatusChanged
         SyncLock _lock
-            If _timeOutFlag = InterlockedState.WaiterFinished Then
+            If _timeOutState = InterlockedState.WaiterFinished Then
                 Logger.Warn("Connection message arrived after timeout, status = {0}", eStatus)
             Else
+                _timeOutState = InterlockedState.WaiterFinished
                 Logger.Info("Connection message arrived before timeout")
             End If
         End SyncLock

@@ -39,6 +39,7 @@
             Me.RubIRSTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.RubCCSTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.NDFTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.UsdIRSTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
             Me.ShowLegendTSB = New System.Windows.Forms.ToolStripButton()
             Me.ShowLabelsTSB = New System.Windows.Forms.ToolStripButton()
@@ -133,13 +134,15 @@
             Me.YAxisCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.BondSetCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.RemoveFromChartTSMI = New System.Windows.Forms.ToolStripMenuItem()
-            Me.ToolStripSeparator7 = New System.Windows.Forms.ToolStripSeparator()
             Me.LabelToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Me.SeriesIssuerNameAndSeriesTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.IssuerCouponMaturityTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.SeriesDescriptionTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.SeriesSeriesOnlyTSMI = New System.Windows.Forms.ToolStripMenuItem()
-            Me.UsdIRSTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.CloneToCurveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.CloneBondCurveTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.ConvertBondCurveTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.BondCurvesNewTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.TheStatusStrip.SuspendLayout()
             Me.TheToolStrip.SuspendLayout()
             Me.BondCMS.SuspendLayout()
@@ -214,7 +217,7 @@
             '
             'CurvesTSMI
             '
-            Me.CurvesTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BondCurvesTSMI, Me.ToolStripMenuItem1})
+            Me.CurvesTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BondCurvesTSMI, Me.BondCurvesNewTSMI, Me.ToolStripMenuItem1})
             Me.CurvesTSMI.Image = Global.YieldMap.My.Resources.Resources.graph_edge_curved
             Me.CurvesTSMI.ImageTransparentColor = System.Drawing.Color.Magenta
             Me.CurvesTSMI.Name = "CurvesTSMI"
@@ -224,33 +227,39 @@
             'BondCurvesTSMI
             '
             Me.BondCurvesTSMI.Name = "BondCurvesTSMI"
-            Me.BondCurvesTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.BondCurvesTSMI.Size = New System.Drawing.Size(156, 22)
             Me.BondCurvesTSMI.Text = "Bond curves"
             '
             'ToolStripMenuItem1
             '
             Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RubIRSTSMI, Me.RubCCSTSMI, Me.NDFTSMI, Me.UsdIRSTSMI})
             Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(152, 22)
+            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(156, 22)
             Me.ToolStripMenuItem1.Text = "IR curves"
             '
             'RubIRSTSMI
             '
             Me.RubIRSTSMI.Name = "RubIRSTSMI"
-            Me.RubIRSTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.RubIRSTSMI.Size = New System.Drawing.Size(116, 22)
             Me.RubIRSTSMI.Text = "Rub IRS"
             '
             'RubCCSTSMI
             '
             Me.RubCCSTSMI.Name = "RubCCSTSMI"
-            Me.RubCCSTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.RubCCSTSMI.Size = New System.Drawing.Size(116, 22)
             Me.RubCCSTSMI.Text = "Rub CCS"
             '
             'NDFTSMI
             '
             Me.NDFTSMI.Name = "NDFTSMI"
-            Me.NDFTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.NDFTSMI.Size = New System.Drawing.Size(116, 22)
             Me.NDFTSMI.Text = "NDF"
+            '
+            'UsdIRSTSMI
+            '
+            Me.UsdIRSTSMI.Name = "UsdIRSTSMI"
+            Me.UsdIRSTSMI.Size = New System.Drawing.Size(116, 22)
+            Me.UsdIRSTSMI.Text = "Usd IRS"
             '
             'ToolStripSeparator2
             '
@@ -1032,27 +1041,22 @@
             '
             'BondSetCMS
             '
-            Me.BondSetCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RemoveFromChartTSMI, Me.ToolStripSeparator7, Me.LabelToolStripMenuItem})
+            Me.BondSetCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LabelToolStripMenuItem, Me.CloneToCurveToolStripMenuItem, Me.RemoveFromChartTSMI})
             Me.BondSetCMS.Name = "BondSetCMS"
-            Me.BondSetCMS.Size = New System.Drawing.Size(167, 54)
+            Me.BondSetCMS.Size = New System.Drawing.Size(143, 70)
             '
             'RemoveFromChartTSMI
             '
             Me.RemoveFromChartTSMI.Name = "RemoveFromChartTSMI"
-            Me.RemoveFromChartTSMI.Size = New System.Drawing.Size(166, 22)
-            Me.RemoveFromChartTSMI.Text = "Remove from chart"
-            '
-            'ToolStripSeparator7
-            '
-            Me.ToolStripSeparator7.Name = "ToolStripSeparator7"
-            Me.ToolStripSeparator7.Size = New System.Drawing.Size(163, 6)
+            Me.RemoveFromChartTSMI.Size = New System.Drawing.Size(142, 22)
+            Me.RemoveFromChartTSMI.Text = "Remove"
             '
             'LabelToolStripMenuItem
             '
             Me.LabelToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SeriesIssuerNameAndSeriesTSMI, Me.IssuerCouponMaturityTSMI, Me.SeriesDescriptionTSMI, Me.SeriesSeriesOnlyTSMI})
             Me.LabelToolStripMenuItem.Name = "LabelToolStripMenuItem"
-            Me.LabelToolStripMenuItem.Size = New System.Drawing.Size(166, 22)
-            Me.LabelToolStripMenuItem.Text = "Labels"
+            Me.LabelToolStripMenuItem.Size = New System.Drawing.Size(142, 22)
+            Me.LabelToolStripMenuItem.Text = "Labeling mode"
             '
             'SeriesIssuerNameAndSeriesTSMI
             '
@@ -1078,11 +1082,30 @@
             Me.SeriesSeriesOnlyTSMI.Size = New System.Drawing.Size(188, 22)
             Me.SeriesSeriesOnlyTSMI.Text = "Series Only"
             '
-            'UsdIRSTSMI
+            'CloneToCurveToolStripMenuItem
             '
-            Me.UsdIRSTSMI.Name = "UsdIRSTSMI"
-            Me.UsdIRSTSMI.Size = New System.Drawing.Size(152, 22)
-            Me.UsdIRSTSMI.Text = "Usd IRS"
+            Me.CloneToCurveToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CloneBondCurveTSMI, Me.ConvertBondCurveTSMI})
+            Me.CloneToCurveToolStripMenuItem.Name = "CloneToCurveToolStripMenuItem"
+            Me.CloneToCurveToolStripMenuItem.Size = New System.Drawing.Size(142, 22)
+            Me.CloneToCurveToolStripMenuItem.Text = "Bond curve"
+            '
+            'CloneBondCurveTSMI
+            '
+            Me.CloneBondCurveTSMI.Name = "CloneBondCurveTSMI"
+            Me.CloneBondCurveTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.CloneBondCurveTSMI.Text = "Clone"
+            '
+            'ConvertBondCurveTSMI
+            '
+            Me.ConvertBondCurveTSMI.Name = "ConvertBondCurveTSMI"
+            Me.ConvertBondCurveTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.ConvertBondCurveTSMI.Text = "Convert"
+            '
+            'BondCurvesNewTSMI
+            '
+            Me.BondCurvesNewTSMI.Name = "BondCurvesNewTSMI"
+            Me.BondCurvesNewTSMI.Size = New System.Drawing.Size(156, 22)
+            Me.BondCurvesNewTSMI.Text = "Bond curves new"
             '
             'GraphForm
             '
@@ -1213,7 +1236,6 @@
         Friend WithEvents DescriptionTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents SeriesOnlyTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents ToolStripSeparator5 As System.Windows.Forms.ToolStripSeparator
-        Friend WithEvents ToolStripSeparator7 As System.Windows.Forms.ToolStripSeparator
         Friend WithEvents LabelToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents SeriesIssuerNameAndSeriesTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents SeriesDescriptionTSMI As System.Windows.Forms.ToolStripMenuItem
@@ -1232,5 +1254,9 @@
         Friend WithEvents VasicekCurveTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents CIRCurveTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents UsdIRSTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents CloneToCurveToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents CloneBondCurveTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents ConvertBondCurveTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents BondCurvesNewTSMI As System.Windows.Forms.ToolStripMenuItem
     End Class
 End Namespace

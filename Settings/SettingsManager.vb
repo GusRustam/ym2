@@ -5,10 +5,9 @@ Imports System.Xml
 Imports Uitls
 
 Public Class SettingsManager
-    Public Event YieldRangeChanged As Action(Of Double?, Double?)
-    Public Event DurRangeChanged As Action(Of Double?, Double?)
-    Public Event SpreadRangeChanged As Action(Of Double?, Double?)
-    Public Event ShowBidAskChanged As Action(Of Boolean)
+    Public Event YieldRangeChanged As Action
+    Public Event DurRangeChanged As Action
+    Public Event SpreadRangeChanged As Action
     Public Event ShowPointSizeChanged As Action(Of Boolean)
     Public Event YieldCalcModeChanged As Action(Of String)
     Public Event DataSourceChanged As Action(Of String)
@@ -30,7 +29,7 @@ Public Class SettingsManager
         Set(ByVal value As Double?)
             SaveValue("/settings/viewport/yield/@min", If(value.HasValue, value.Value.ToString("F2"), ""))
             _minYield = value
-            RaiseEvent YieldRangeChanged(_minYield, _maxYield)
+            RaiseEvent YieldRangeChanged()
         End Set
         Get
             Return _minYield
@@ -42,7 +41,7 @@ Public Class SettingsManager
         Set(ByVal value As Double?)
             SaveValue("/settings/viewport/yield/@max", If(value.HasValue, value.Value.ToString("F2"), ""))
             _maxYield = value
-            RaiseEvent YieldRangeChanged(_minYield, _maxYield)
+            RaiseEvent YieldRangeChanged()
         End Set
         Get
             Return _maxYield
@@ -54,7 +53,7 @@ Public Class SettingsManager
         Set(ByVal value As Double?)
             SaveValue("/settings/viewport/duration/@min", If(value.HasValue, value.Value.ToString("F2"), ""))
             _minDur = value
-            RaiseEvent DurRangeChanged(_minDur, _maxDur)
+            RaiseEvent DurRangeChanged()
         End Set
         Get
             Return _minDur
@@ -66,7 +65,7 @@ Public Class SettingsManager
         Set(ByVal value As Double?)
             SaveValue("/settings/viewport/duration/@max", If(value.HasValue, value.Value.ToString("F2"), ""))
             _maxDur = value
-            RaiseEvent DurRangeChanged(_minDur, _maxDur)
+            RaiseEvent DurRangeChanged()
         End Set
         Get
             Return _maxDur
@@ -78,7 +77,7 @@ Public Class SettingsManager
         Set(ByVal value As Double?)
             SaveValue("/settings/viewport/spread/@min", If(value.HasValue, value.Value.ToString("F2"), ""))
             _minSpread = value
-            RaiseEvent SpreadRangeChanged(_minSpread, _maxSpread)
+            RaiseEvent SpreadRangeChanged()
         End Set
         Get
             Return _minSpread
@@ -90,7 +89,7 @@ Public Class SettingsManager
         Set(ByVal value As Double?)
             SaveValue("/settings/viewport/spread/@max", If(value.HasValue, value.Value.ToString("F2"), ""))
             _maxSpread = value
-            RaiseEvent SpreadRangeChanged(_minSpread, _maxSpread)
+            RaiseEvent SpreadRangeChanged()
         End Set
         Get
             Return _maxSpread
@@ -115,7 +114,6 @@ Public Class SettingsManager
         End Get
         Set(ByVal value As Boolean)
             SaveValue("/settings/property[@name='show-bid-ask']/@value", value.ToString())
-            If value <> _showBidAsk Then RaiseEvent ShowBidAskChanged(value)
             _showBidAsk = value
         End Set
     End Property

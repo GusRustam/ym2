@@ -2,6 +2,7 @@
 Imports Logging
 Imports NLog
 Imports ReutersData
+Imports Settings
 Imports Uitls
 
 Namespace Bonds
@@ -84,7 +85,7 @@ Namespace Bonds
                          Where _subRicToRic.Keys.Contains(aRic) AndAlso row.ric = _subRicToRic(aRic)
                          Select row).ToList()
 
-            If Not items.Any Then Throw New NoBondException(aRic) ' todo catch it :)
+            If Not items.Any Then Throw New NoBondException(aRic) ' todo will anybody catch it?
             Dim descr As BondsDataSet.BondRow = items.First()
 
             Dim coupon = If(Not IsDBNull(descr("currentCoupon")) AndAlso IsNumeric(descr.currentCoupon), CDbl(descr.currentCoupon), 0)
@@ -368,14 +369,17 @@ Namespace Bonds
         End Sub
 
         Private Sub LoadStep5()
-            'Logger.Info("LoadAllRics")
-            'LoadGeneral(RicsTable, QueryRics, "Loading all rics",
-            '             Sub(data As LinkedList(Of Dictionary(Of String, Object)))
-            '                 ImportData(data, RicsTable, QueryRics)
-            '                 BondsData.Instance.Refresh()
-            '                 RaiseEvent Progress(New ProgressEvent(MessageKind.Finished, "All data loaded"))
-            '             End Sub)
-            RaiseEvent Progress(New ProgressEvent(MessageKind.Finished, "All data loaded"))
+            If SettingsManager.Instance.LoadRics Then
+                Logger.Info("LoadAllRics")
+                LoadGeneral(RicsTable, QueryRics, "Loading all rics",
+                             Sub(data As LinkedList(Of Dictionary(Of String, Object)))
+                                 ImportData(data, RicsTable, QueryRics)
+                                 BondsData.Instance.Refresh()
+                                 RaiseEvent Progress(New ProgressEvent(MessageKind.Finished, "All data loaded"))
+                             End Sub)
+            Else
+                RaiseEvent Progress(New ProgressEvent(MessageKind.Finished, "All data loaded"))
+            End If
         End Sub
 
 

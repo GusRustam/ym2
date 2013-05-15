@@ -50,8 +50,6 @@ Public Class FieldNotFoundException
 End Class
 
 Public Class FieldsDescription
-
-
     Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(FieldsDescription))
     Private ReadOnly _id As String
     Private ReadOnly _name As String
@@ -233,11 +231,11 @@ Public Class FieldsDescription
         _id = id
         'Logger.Trace(String.Format("FieldSet({0}, {1})", node.Name, subnode))
         For Each info In (From fld In Me.GetType().GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
-                           Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False)
+                           Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False).Cast(Of ConfingNameAttribute)()
                            Where attx.Any
                            Select fld, attx)
 
-            Dim xmlName = CType(info.attx(0), ConfingNameAttribute).XmlName
+            Dim xmlName = info.attx(0).XmlName
             'Logger.Trace(" ---> found node named {0}", xmlName)
             Dim item = node.SelectSingleNode(String.Format("{0}/field[@type='{1}']", subnode, xmlName))
             If item IsNot Nothing Then
@@ -255,17 +253,17 @@ Public Class FieldsDescription
 
     Public Function AsDataSource() As List(Of FieldDescription)
         Return (From fld In Me.GetType().GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
-            Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False)
+            Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False).Cast(Of ConfingNameAttribute)()
             Where attx.Any
-            Let xmlName = CType(attx(0), ConfingNameAttribute).XmlName, value = fld.GetValue(Me).ToString()
+            Let xmlName = attx(0).XmlName, value = fld.GetValue(Me).ToString()
             Select New FieldDescription(xmlName, value, Me)).ToList()
     End Function
 
-    Public Sub UpdateField(ByVal configName As String, ByVal value As String)
+    Friend Sub UpdateField(ByVal configName As String, ByVal value As String)
         Logger.Trace("UpdateField({0},{1})", configName, value)
         Dim fields = (From fld In Me.GetType().GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
-            Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False)
-            Where attx.Any AndAlso CType(attx(0), ConfingNameAttribute).XmlName = configName
+            Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False).Cast(Of ConfingNameAttribute)()
+            Where attx.Any AndAlso attx(0).XmlName = configName
             Select fld).ToList()
         If Not fields.Any Then Throw New FieldNotFoundException(String.Format("Field with name {0} not found", configName))
         If fields.Count > 1 Then Throw New FieldException(String.Format("There's more than one field with name {0}", configName))
@@ -281,6 +279,23 @@ Public Class FieldsDescription
                 Let attx = fld.GetCustomAttributes(GetType(PriceAttribute), False).Cast(Of PriceAttribute)()
                 Where attx.Any
                 Select attx.First.Color).First
+    End Function
+
+    Public Function IsPrice(ByVal configName As String) As Boolean
+        Return (From fld In Me.GetType().GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
+            Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False).Cast(Of ConfingNameAttribute)()
+            Where attx.Any AndAlso attx(0).XmlName = configName
+            Let attxP = fld.GetCustomAttributes(GetType(PriceAttribute), False)
+            Where attxP.Any).Any
+    End Function
+
+    Public Function GetPriceFieldNames() As List(Of String)
+        Return (From fld In Me.GetType().GetFields(BindingFlags.NonPublic Or BindingFlags.Instance)
+            Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False).Cast(Of ConfingNameAttribute)()
+            Where attx.Any
+            Let attxP = fld.GetCustomAttributes(GetType(PriceAttribute), False)
+            Where attxP.Any
+            Select fld.GetValue(Me)).Cast(Of String).ToList()
     End Function
 End Class
 
@@ -389,6 +404,13 @@ Public Class FieldDescription
     Public ReadOnly Property Parent() As FieldsDescription
         Get
             Return _parent
+        End Get
+    End Property
+
+    <DisplayName("Is price")>
+    Public ReadOnly Property IsPrice() As Boolean
+        Get
+            Return _parent.IsPrice(_configName)
         End Get
     End Property
 
