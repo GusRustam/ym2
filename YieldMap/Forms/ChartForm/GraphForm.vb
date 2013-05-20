@@ -172,20 +172,20 @@ Namespace Forms.ChartForm
                             MainInfoLine1TSMI.Text = point.ToolTip
 
                             ExtInfoTSMI.DropDownItems.Clear()
-                            bondDataPoint.QuotesAndYields.Keys.ToList.ForEach(
-                                Sub(key)
-                                    Dim x = bondDataPoint.QuotesAndYields(key)
-                                    Dim newItem = ExtInfoTSMI.DropDownItems.Add(String.Format("{0}: {1:F4}, {2:P2} {3}, {4:F2}", key, x.Price, x.Yld.Yield, x.Yld.ToWhat.Abbr, x.Duration))
-                                    If bondDataPoint.MaxPriorityField = key Then CType(newItem, ToolStripMenuItem).Checked = True
-                                    AddHandler newItem.Click,
-                                        Sub(sender1 As Object, e1 As EventArgs)
-                                            If key <> bondDataPoint.UserSelectedQuote Then
-                                                bondDataPoint.UserSelectedQuote = key
-                                            Else
-                                                bondDataPoint.UserSelectedQuote = ""
-                                            End If
-                                        End Sub
-                                End Sub)
+                            For Each key In bondDataPoint.QuotesAndYields
+                                Dim x = bondDataPoint.QuotesAndYields(key)
+                                Dim newItem = ExtInfoTSMI.DropDownItems.Add(String.Format("{0}: {1:F4}, {2:P2} {3}, {4:F2}", key, x.Price, x.Yld.Yield, x.Yld.ToWhat.Abbr, x.Duration))
+                                If bondDataPoint.QuotesAndYields.MaxPriorityField = key Then CType(newItem, ToolStripMenuItem).Checked = True
+                                AddHandler newItem.Click,
+                                    Sub(sender1 As Object, e1 As EventArgs)
+                                        If key <> bondDataPoint.UserSelectedQuote Then
+                                            bondDataPoint.UserSelectedQuote = key
+                                        Else
+                                            bondDataPoint.UserSelectedQuote = ""
+                                        End If
+                                    End Sub
+                            Next
+
 
                             Dim newItem1 As ToolStripMenuItem
 
@@ -197,7 +197,7 @@ Namespace Forms.ChartForm
                                        Sub(sender1 As Object, e1 As EventArgs)
                                            Dim res = InputBox("Enter price", "Custom bond price")
                                            If IsNumeric(res) Then
-                                               bondDataPoint.ParentGroup.SetCustomPrice(bondDataPoint.MetaData.RIC, CDbl(res))
+                                               bondDataPoint.Parent.SetCustomPrice(bondDataPoint.MetaData.RIC, CDbl(res))
                                            ElseIf res <> "" Then
                                                MessageBox.Show("Invalid number")
                                            End If
@@ -259,7 +259,7 @@ Namespace Forms.ChartForm
                     If TypeOf point.Tag Is Bond And Not point.IsEmpty Then
                         Dim bondData = CType(point.Tag, Bond)
                         DscrLabel.Text = bondData.MetaData.ShortName
-                        Dim calculatedYield = bondData.QuotesAndYields(bondData.MaxPriorityField)
+                        Dim calculatedYield = bondData.QuotesAndYields.Main
 
                         SpreadLabel.Text = If(calculatedYield.PointSpread IsNot Nothing, String.Format("{0:F0} b.p.", calculatedYield.PointSpread), N_A)
                         ZSpreadLabel.Text = If(calculatedYield.ZSpread IsNot Nothing, String.Format("{0:F0} b.p.", calculatedYield.ZSpread), N_A)
@@ -346,7 +346,7 @@ Namespace Forms.ChartForm
                     seriesDescr.ResetSelection()
                     srs.Points.ToList.ForEach(Sub(point)
                                                   Dim tg = CType(point.Tag, Bond)
-                                                  point.Color = Color.FromName(tg.QuotesAndYields(tg.MaxPriorityField).BackColor)
+                                                  point.Color = Color.FromName(tg.QuotesAndYields.Main.BackColor)
                                               End Sub)
                     If seriesDescr.Name = curveName AndAlso pointIndex IsNot Nothing Then
                         srs.Points(pointIndex).Color = Color.Red
@@ -667,10 +667,10 @@ Namespace Forms.ChartForm
 
             Dim aToolBar = New ToolStrip
             aToolBar.Dock = DockStyle.Fill
-            Dim addButton = aToolBar.Items.Add("Add items...")
-            addButton.Enabled = TypeOf theCurve Is YieldCurve
-            Dim removeButton = aToolBar.Items.Add("Remove selected")
-            removeButton.Enabled = TypeOf theCurve Is YieldCurve
+            'Dim addButton = aToolBar.Items.Add("Add items...")
+            'addButton.Enabled = TypeOf theCurve Is YieldCurve
+            'Dim removeButton = aToolBar.Items.Add("Remove selected")
+            'removeButton.Enabled = TypeOf theCurve Is YieldCurve
 
             tl.Controls.Add(aToolBar, 0, 0)
 
@@ -699,12 +699,12 @@ Namespace Forms.ChartForm
             tl.Controls.Add(aTable, 0, 1)
 
             Dim rmHandler = GetRemoveHandler(aForm, aTable, theCurve)
-            AddHandler removeButton.Click, rmHandler
-            AddHandler addButton.Click, GetAddHandler(theCurve)
+            'AddHandler removeButton.Click, rmHandler
+            'AddHandler addButton.Click, GetAddHandler(theCurve)
 
             AddHandler aTable.RowHeaderMouseClick,
                 Sub(sender1 As Object, args As MouseEventArgs)
-                    If Not TypeOf theCurve Is YieldCurve Then Return
+                    'If Not TypeOf theCurve Is YieldCurve Then Return
 
                     If args.Button = MouseButtons.Right Then
                         Dim cms As New ContextMenuStrip
@@ -867,44 +867,46 @@ Namespace Forms.ChartForm
             DoAddNew(From list In portfolioManager.UserListsView Where list.Curve)
         End Sub
 
-        Private Sub AddBondCurveTSMIClick(ByVal sender As Object, ByVal e As EventArgs)
-            Logger.Info("AddBondCurveTSMIClick")
-            Dim selectedItem = CType(CType(sender, ToolStripMenuItem).Tag, Source)
-            Dim fieldNames As New Dictionary(Of QuoteSource, String)
-            Dim ricsInCurve = selectedItem.GetDefaultRics()
+        'Private Sub AddBondCurveTSMIClick(ByVal sender As Object, ByVal e As EventArgs)
+        '    Logger.Info("AddBondCurveTSMIClick")
+        '    Dim selectedItem = CType(CType(sender, ToolStripMenuItem).Tag, Source)
+        '    Dim fieldNames As New Dictionary(Of QuoteSource, String)
+        '    Dim ricsInCurve = selectedItem.GetDefaultRics()
 
-            If Not ricsInCurve.Any() Then
-                MsgBox("Empty curve selected!")
-                Return
-            End If
+        '    If Not ricsInCurve.Any() Then
+        '        MsgBox("Empty curve selected!")
+        '        Return
+        '    End If
 
-            Dim fields = New FieldSet(selectedItem.FieldSetId)
+        '    Dim fields = New FieldSet(selectedItem.FieldSetId)
 
-            fieldNames.Add(QuoteSource.Bid, fields.Realtime.Bid)
-            fieldNames.Add(QuoteSource.Ask, fields.Realtime.Ask)
-            fieldNames.Add(QuoteSource.Last, fields.Realtime.Last)
-            fieldNames.Add(QuoteSource.Hist, fields.History.Last)
+        '    fieldNames.Add(QuoteSource.Bid, fields.Realtime.Bid)
+        '    fieldNames.Add(QuoteSource.Ask, fields.Realtime.Ask)
+        '    fieldNames.Add(QuoteSource.Last, fields.Realtime.Last)
+        '    fieldNames.Add(QuoteSource.Hist, fields.History.Last)
 
 
-            Dim newCurve = New YieldCurve(selectedItem.Name, ricsInCurve, selectedItem.Color, fieldNames, _spreadBenchmarks)
+        '    Dim newCurve = New YieldCurve(selectedItem.Name, ricsInCurve, selectedItem.Color, fieldNames, _spreadBenchmarks)
 
-            AddHandler newCurve.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
-            AddHandler newCurve.Cleared, AddressOf CurveDeleted
-            AddHandler newCurve.Recalculated, AddressOf OnCurveRecalculated
-            AddHandler newCurve.Updated, AddressOf OnCurvePaint
-            AddHandler newCurve.Faulted, AddressOf OnCurveFault
+        '    AddHandler newCurve.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
+        '    AddHandler newCurve.Cleared, AddressOf CurveDeleted
+        '    AddHandler newCurve.Recalculated, AddressOf OnCurveRecalculated
+        '    AddHandler newCurve.Updated, AddressOf OnCurvePaint
+        '    AddHandler newCurve.Faulted, AddressOf OnCurveFault
 
-            _moneyMarketCurves.Add(newCurve)
-            newCurve.Subscribe()
-        End Sub
+        '    _moneyMarketCurves.Add(newCurve)
+        '    newCurve.Subscribe()
+        'End Sub
 
         Private Sub AddBondCurveNewTSMIClick(ByVal sender As Object, ByVal e As EventArgs)
             Logger.Info("AddBondCurve-New-TSMIClick")
             Dim src = CType(CType(sender, ToolStripMenuItem).Tag, Source)
 
             Dim curve = New BondCurve(_ansamble, src)
+            AddHandler curve.Clear, AddressOf NewCurveDeleted
+            AddHandler curve.Updated, AddressOf OnNewCurvePaint
             _ansamble.AddBondCurve(curve)
-            curve.Start()
+            curve.StartAll()
         End Sub
 
         Private Sub SelDateTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles SelDateTSMI.Click
@@ -1103,11 +1105,11 @@ Namespace Forms.ChartForm
         'End Sub
 
         Private Sub OnBondQuote(ByVal descr As Bond, Optional ByVal raw As Boolean = False) Handles _ansamble.Quote
-            Logger.Trace("OnBondQuote({0}, {1})", descr.MetaData.ShortName, descr.ParentGroup.SeriesName)
+            Logger.Trace("OnBondQuote({0}, {1})", descr.MetaData.ShortName, descr.Parent.SeriesName)
             GuiAsync(
                 Sub()
-                    Dim group = descr.ParentGroup
-                    Dim maxPriorityField = descr.MaxPriorityField
+                    Dim group = descr.Parent
+                    Dim maxPriorityField = descr.QuotesAndYields.MaxPriorityField
                     If maxPriorityField = "" Then Return
                     Dim calc = descr.QuotesAndYields(maxPriorityField)
                     Dim ric = descr.MetaData.RIC
@@ -1126,7 +1128,7 @@ Namespace Forms.ChartForm
                             .markerBorderWidth = 2,
                             .markerBorderColor = clr,
                             .markerStyle = MarkerStyle.Circle,
-                        .Tag = seriesDescr
+                            .Tag = seriesDescr
                         }
                         With series.EmptyPointStyle
                             .BorderWidth = 0
@@ -1155,16 +1157,13 @@ Namespace Forms.ChartForm
                                 Logger.Trace("{0}: delta is {1}", ric, yValue.Value - point.YValues.First)
                             End If
                             point.YValues = {yValue.Value}
-                            point.Color = Color.FromName(calc.BackColor) 'If(calc.YieldSource.Belongs(YieldSource.Realtime, YieldSource.Synthetic), Color.White, Color.LightGray)
+                            point.Color = Color.FromName(calc.BackColor)
                             Dim style As MarkerStyle
                             If MarkerStyle.TryParse(calc.MarkerStyle, style) Then
                                 point.MarkerStyle = style
                             Else
                                 point.MarkerStyle = IIf(calc.Yld.ToWhat.Equals(YieldToWhat.Maturity), MarkerStyle.Circle, MarkerStyle.Triangle)
                             End If
-                            'point.MarkerStyle = IIf(calc.YieldSource <> YieldSource.Synthetic,
-                            '                                               IIf(calc.Yld.ToWhat.Equals(YieldToWhat.Maturity), MarkerStyle.Circle, MarkerStyle.Triangle),
-                            '                                               MarkerStyle.Square)
                             If ShowLabelsTSB.Checked Then point.Label = descr.Label
                         Else
                             series.Points.Remove(point)
@@ -1230,7 +1229,7 @@ Namespace Forms.ChartForm
         Private Sub SetLabel(ByVal ric As String, ByVal mode As LabelMode)
             Try
                 Dim bond = _ansamble.Groups.FindBond(ric)
-                Dim group = bond.ParentGroup
+                Dim group = bond.Parent
                 bond.LabelMode = mode
                 If ShowLabelsTSB.Checked Then
                     TheChart.Series.FindByName(group.SeriesName).Points.First(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric).Label = bond.Label

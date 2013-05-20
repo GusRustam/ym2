@@ -61,6 +61,7 @@ Public Class FieldsDescription
     <ConfingName("CUSTOM")>
     Private _custom As String = "CUSTOM"
 
+    <Price("White")>
     <ConfingName("MID")>
     Private _mid As String = "MID"
 
@@ -70,15 +71,19 @@ Public Class FieldsDescription
     <ConfingName("TIME")>
     Private _time As String = ""
 
+    <Price("White")>
     <ConfingName("BID")>
     Private _bid As String = ""
 
+    <Price("White")>
     <ConfingName("ASK")>
     Private _ask As String = ""
 
+    <Price("White")>
     <ConfingName("LAST")>
     Private _last As String = ""
 
+    <Price("White")>
     <ConfingName("VWAP")>
     Private _vwap As String = ""
 

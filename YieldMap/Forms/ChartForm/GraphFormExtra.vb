@@ -134,7 +134,7 @@ Namespace Forms.ChartForm
 
         Private Sub PlotBidAsk(ByVal bond As Bond)
             If Not _theSettings.ShowBidAsk Then Return
-            If Not (bond.QuotesAndYields.ContainsKey(QuoteSource.Bid.ToString.ToUpper()) Or bond.QuotesAndYields.ContainsKey(QuoteSource.Ask.ToString.ToUpper())) Then Return
+            If Not (bond.QuotesAndYields.Has(bond.Fields.Bid) Or bond.QuotesAndYields.Has(bond.Fields.Ask)) Then Return
             Dim bidAskSeries = TheChart.Series.FindByName("BidAskSeries")
             Dim minX = TheChart.ChartAreas(0).AxisX.Minimum
             Dim maxX = TheChart.ChartAreas(0).AxisX.Maximum
@@ -145,20 +145,20 @@ Namespace Forms.ChartForm
                             .YValuesPerPoint = 1,
                             .ChartType = SeriesChartType.Line,
                             .IsVisibleInLegend = False,
-                            .color = Color.FromName(bond.ParentGroup.Color),
+                            .color = Color.FromName(bond.Parent.Color),
                             .markerSize = 4,
                             .markerStyle = MarkerStyle.Circle
                         }
                 TheChart.Series.Add(bidAskSeries)
             End If
             bidAskSeries.Points.Clear()
-            If bond.QuotesAndYields.ContainsKey(QuoteSource.Bid.ToString.ToUpper()) Then
-                Dim calc = bond.QuotesAndYields(QuoteSource.Bid.ToString.ToUpper())
+            If bond.QuotesAndYields.Has(bond.Fields.Bid) Then
+                Dim calc = bond.QuotesAndYields(bond.Fields.Bid)
                 Dim yValue = _spreadBenchmarks.GetActualQuote(calc)
                 bidAskSeries.Points.Add(New DataPoint(calc.Duration, yValue.Value))
             End If
-            If bond.QuotesAndYields.ContainsKey(QuoteSource.Ask.ToString.ToUpper()) Then
-                Dim calc = bond.QuotesAndYields(QuoteSource.Ask.ToString.ToUpper())
+            If bond.QuotesAndYields.Has(bond.Fields.Ask) Then
+                Dim calc = bond.QuotesAndYields(bond.Fields.Ask)
                 Dim yValue = _spreadBenchmarks.GetActualQuote(calc)
                 bidAskSeries.Points.Add(New DataPoint(calc.Duration, yValue.Value))
             End If
@@ -286,7 +286,7 @@ Namespace Forms.ChartForm
             End With
         End Sub
 
-        Private Sub ShowCurveCMS(nm As String, ByVal refCurve As SwapCurve)
+        Private Sub ShowCurveCMS(ByVal nm As String, ByVal refCurve As SwapCurve)
             SpreadCMS.Items.Clear()
             SpreadCMS.Tag = nm
             'If Not _moneyMarketCurves.Any() Then Return
@@ -311,7 +311,7 @@ Namespace Forms.ChartForm
                     seriesDescr.ResetSelection()
                     srs.Points.ToList.ForEach(Sub(point)
                                                   Dim tg = CType(point.Tag, Bond)
-                                                  point.Color = Color.FromName(tg.QuotesAndYields(tg.MaxPriorityField).BackColor)
+                                                  point.Color = Color.FromName(tg.QuotesAndYields.Main.BackColor)
                                               End Sub)
                 End Sub)
         End Sub
@@ -340,10 +340,10 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub DoAdd(ByVal curves As IEnumerable(Of Source))
-            For Each curve In curves
-                Dim item = BondCurvesTSMI.DropDownItems.Add(curve.Name, Nothing, AddressOf AddBondCurveTSMIClick)
-                item.Tag = curve
-            Next
+            'For Each curve In curves
+            '    Dim item = BondCurvesTSMI.DropDownItems.Add(curve.Name, Nothing, AddressOf AddBondCurveTSMIClick)
+            '    item.Tag = curve
+            'Next
         End Sub
 
         Private Sub DoAddNew(ByVal curves As IEnumerable(Of Source))
@@ -352,7 +352,8 @@ Namespace Forms.ChartForm
                 item.Tag = curve
             Next
         End Sub
-        Private Sub PaintSwapCurve(ByVal curve As SwapCurve, raw As Boolean)
+
+        Private Sub PaintSwapCurve(ByVal curve As SwapCurve, ByVal raw As Boolean)
             Logger.Debug("PaintSwapCurve({0}, {1})", curve.GetName(), raw)
             Dim points As List(Of SwapPointDescription)
             points = curve.GetCurveData(raw)
@@ -442,9 +443,9 @@ Namespace Forms.ChartForm
                                 .Name = bondDataPoint.Label,
                                 .legendText = bondDataPoint.Label & " history",
                                 .ChartType = SeriesChartType.Line,
-                                .color = Color.FromName(elem.ParentGroup.Color),
+                                .color = Color.FromName(elem.Parent.Color),
                                 .markerColor = Color.Wheat,
-                                .markerBorderColor = Color.FromName(elem.ParentGroup.Color),
+                                .markerBorderColor = Color.FromName(elem.Parent.Color),
                                 .borderWidth = 1,
                                 .markerStyle = MarkerStyle.Circle,
                                 .markerSize = 4,
@@ -470,6 +471,29 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Shared Sub CurveDeleted(ByVal obj As SwapCurve)
+        End Sub
+
+        Private Sub NewCurveDeleted(ByVal obj As BaseGroup)
+            'Throw New NotImplementedException()
+        End Sub
+
+        Private Sub OnNewCurvePaint(ByVal obj As List(Of BondCurve.CurveItem))
+            If Not obj.Any Then Return
+            Dim crv = CType(obj.First.Bond.Parent, BondCurve)
+            Dim srs = TheChart.Series.FindByName(crv.Identity)
+            If srs IsNot Nothing Then TheChart.Series.Remove(srs)
+            srs = New Series() With {
+                .Name = crv.Identity,
+                .legendText = crv.SeriesName,
+                .ChartType = SeriesChartType.Line,
+                .color = Color.FromName(crv.Color),
+                .Tag = crv.Identity
+            }
+            TheChart.Series.Add(srs)
+            For Each point In obj
+                Dim pnt = New DataPoint(point.X, point.Y) With {.Tag = point.Bond}
+                srs.Points.Add(pnt)
+            Next
         End Sub
     End Class
 End Namespace

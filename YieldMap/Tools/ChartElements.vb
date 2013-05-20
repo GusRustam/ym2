@@ -12,11 +12,16 @@ Imports YieldMap.Curves
 
 Namespace Tools
 #Region "I. Enumerations"
-    Public Enum QuoteSource
-        Bid
-        Ask
-        Last
-        Hist
+    'Public Enum QuoteSource
+    '    Bid
+    '    Ask
+    '    Last
+    '    Hist
+    'End Enum
+
+    Public Enum XSource
+        Duration
+        Maturity
     End Enum
 #End Region
 
@@ -61,6 +66,10 @@ Namespace Tools
         End Sub
     End Class
 
+    Friend Class InternalSpreadContainer
+        Private _benchmarks As New Dictionary(Of SpreadType, BondCurve)
+    End Class
+
     Public Class GroupContainer(Of T As BaseGroup)
         Private ReadOnly _groups As New Dictionary(Of Long, T)
 
@@ -82,10 +91,11 @@ Namespace Tools
                             res.Name = point.MetaData.ShortName
                             res.Maturity = point.MetaData.Maturity
                             res.Coupon = point.MetaData.Coupon
-                            If point.QuotesAndYields.ContainsKey(point.MaxPriorityField) Then
-                                Dim quote = point.QuotesAndYields(point.MaxPriorityField)
+                            Dim fieldName = point.QuotesAndYields.MaxPriorityField
+                            Dim quote = point.QuotesAndYields(fieldName)
+                            If quote IsNot Nothing Then
                                 res.Price = quote.Price
-                                res.Quote = point.MaxPriorityField
+                                res.Quote = fieldName
                                 res.QuoteDate = quote.YieldAtDate
                                 res.State = BondDescr.StateType.Ok
                                 res.ToWhat = quote.Yld.ToWhat
@@ -137,7 +147,7 @@ Namespace Tools
 
         Public Function FindBond(ByVal ric As String) As Bond ' todo switch to ids instead of ric I believe?
             For Each kvp In From elem In _groups Where elem.Value.HasRic(ric)
-                Return kvp.Value.GetElement(ric)
+                Return kvp.Value.GetBond(ric)
             Next
             Return Nothing
         End Function
@@ -161,12 +171,36 @@ Namespace Tools
             Return num
         End Function
 
+        Private _xSource As XSource
+
+        Public Property XSource() As XSource
+            Get
+                Return _xSource
+            End Get
+            Set(ByVal value As XSource)
+                _xSource = value
+                ' todo recalculating, guys
+            End Set
+        End Property
+
+        Private _chartSpreadType As SpreadType = SpreadType.Yield
+        Public Property ChartSpreadType() As SpreadType
+            Get
+                Return _chartSpreadType
+            End Get
+            Set(ByVal value As SpreadType)
+                _chartSpreadType = value
+                ' todo recalculating, guys
+            End Set
+        End Property
+
         Private ReadOnly _groups As New GroupContainer(Of Group)
         Public ReadOnly Property Groups As GroupContainer(Of Group)
             Get
                 Return _groups
             End Get
         End Property
+
         Private ReadOnly _curves As New GroupContainer(Of BondCurve)
         Public ReadOnly Property BondCurves As GroupContainer(Of BondCurve)
             Get
@@ -191,6 +225,7 @@ Namespace Tools
             'AddHandler curve.Clear, Sub(obj As Group) RaiseEvent Clear(obj)
         End Sub
 
+        'todo that's a shame!
         Public Event RemovedItem As Action(Of Group, String)
         Public Event Quote As Action(Of Bond)
         Public Event Volume As Action(Of Bond)
@@ -199,17 +234,26 @@ Namespace Tools
         Public Sub Recalculate()
             ' todo something might have changed, I dunno what
         End Sub
-
     End Class
 
     Public Class Bond
         Inherits Identifyable
 
-        Private _userSelectedQuote As String
-        Private ReadOnly _parentGroup As Group
+        Private ReadOnly _parent As BaseGroup
         Private ReadOnly _metaData As BondDescription
-        Private ReadOnly _quotesAndYields As New Dictionary(Of String, BondPointDescription)
+        'Private ReadOnly _quotesAndYields As New Dictionary(Of String, BondPointDescription)
         Public TodayVolume As Double
+
+        Private _userSelectedQuote As String
+        Public Property UserSelectedQuote As String
+            Get
+                Return _userSelectedQuote
+            End Get
+            Set(ByVal value As String)
+                _userSelectedQuote = value
+                Parent.NotifyQuote(Me)
+            End Set
+        End Property
 
         Private _usedDefinedSpread As Double
 
@@ -219,7 +263,7 @@ Namespace Tools
             End Get
             Set(ByVal value As Double)
                 _usedDefinedSpread = value
-                ' todo update all yields and spreads now!
+                ' todo recalculate all! yields as spreads, fire event
             End Set
         End Property
 
@@ -234,26 +278,17 @@ Namespace Tools
             End Set
         End Property
 
-        Sub New(ByVal parentGroup As Group, ByVal metaData As BondDescription)
-            _parentGroup = parentGroup
+        Sub New(ByVal parent As BaseGroup, ByVal metaData As BondDescription)
+            _parent = parent
             _metaData = metaData
         End Sub
 
-        Public ReadOnly Property ParentGroup As Group
+        Public ReadOnly Property Parent As BaseGroup
             Get
-                Return _parentGroup
+                Return _parent
             End Get
         End Property
 
-        Public Property UserSelectedQuote As String
-            Get
-                Return _userSelectedQuote
-            End Get
-            Set(ByVal value As String)
-                _userSelectedQuote = value
-                ParentGroup.NotifyQuote(Me)
-            End Set
-        End Property
 
         Public ReadOnly Property MetaData As BondDescription
             Get
@@ -261,12 +296,76 @@ Namespace Tools
             End Get
         End Property
 
-        Public ReadOnly Property QuotesAndYields As Dictionary(Of String, BondPointDescription)
+        Public Class QyContainer
+            Implements IEnumerable(Of String)
+            Private ReadOnly _parent As Bond
+            Private ReadOnly _quotesAndYields As New Dictionary(Of String, BondPointDescription)
+
+            Sub New(ByVal parent As Bond)
+                _parent = parent
+            End Sub
+
+            Default Public Property Val(ByVal key As String) As BondPointDescription
+                Get
+                    Return If(_quotesAndYields.ContainsKey(key), _quotesAndYields(key), Nothing)
+                End Get
+                Set(ByVal value As BondPointDescription)
+                    _quotesAndYields(key) = value
+                End Set
+            End Property
+
+            Public ReadOnly Property MaxPriorityField() As String
+                Get
+                    If _parent.UserSelectedQuote <> "" Then Return _parent.UserSelectedQuote
+                    Dim forbiddenFields = SettingsManager.Instance.ForbiddenFields.Split(",")
+                    Dim existingFields = (From item In _quotesAndYields.Keys
+                                      Where _quotesAndYields(item).Price > 0 AndAlso Not forbiddenFields.Contains(item)).ToList()
+                    Dim allowedFields = SettingsManager.Instance.FieldsPriority.Split(",")
+                    If Not allowedFields.Any OrElse Not existingFields.Any Then Return ""
+
+                    Dim i As Integer
+                    For i = 0 To allowedFields.Count() - 1
+                        If existingFields.Contains(allowedFields(i)) Then Return allowedFields(i)
+                    Next
+                    Return ""
+                End Get
+            End Property
+
+            Public Function Has(ByVal key As String) As Boolean
+                Return _quotesAndYields.ContainsKey(key)
+            End Function
+
+            Public Function IEnumerable_GetEnumerator() As IEnumerator(Of String) Implements IEnumerable(Of String).GetEnumerator
+                Return _quotesAndYields.Keys.GetEnumerator()
+            End Function
+
+            Public Function GetEnumerator() As IEnumerator Implements IEnumerable.GetEnumerator
+                Return _quotesAndYields.Keys.GetEnumerator()
+            End Function
+
+            Public ReadOnly Property Main() As BondPointDescription
+                Get
+                    Dim priorityField = MaxPriorityField
+                    Return If(priorityField <> "", _quotesAndYields(priorityField), Nothing)
+                End Get
+            End Property
+        End Class
+
+        ' todo make it a container. In this case it would be much easier to operate.
+        ' we would do new quote like this: bond.Q&Y(xmlName).Price = xxx
+        ' and this bullshit does recalculation and so on
+        ' and how would it look like for spread (used-defined)?  I dunno, I'll just say Q&Y.Recalculate maybe?
+        'Public ReadOnly Property QuotesAndYields1 As Dictionary(Of String, BondPointDescription)
+        '    Get
+        '        Return _quotesAndYields
+        '    End Get
+        'End Property
+        Private ReadOnly _quotesAndYields As New QyContainer(Me)
+        Public ReadOnly Property QuotesAndYields As QyContainer
             Get
                 Return _quotesAndYields
             End Get
         End Property
-
         Public ReadOnly Property Label() As String
             Get
                 Dim lab As String
@@ -280,34 +379,11 @@ Namespace Tools
             End Get
         End Property
 
-        Public ReadOnly Property MaxPriorityField() As String
+        Public ReadOnly Property Fields() As FieldsDescription
             Get
-                If UserSelectedQuote <> "" Then Return UserSelectedQuote
-                Dim forbiddenFields = SettingsManager.Instance.ForbiddenFields.Split(",")
-                Dim existingFields = (From item In QuotesAndYields.Keys
-                                  Where QuotesAndYields(item).Price > 0 AndAlso Not forbiddenFields.Contains(item)).ToList()
-                Dim allowedFields = SettingsManager.Instance.FieldsPriority.Split(",")
-                If Not allowedFields.Any OrElse Not existingFields.Any Then Return ""
-
-                Dim i As Integer
-                For i = 0 To allowedFields.Count() - 1
-                    If existingFields.Contains(allowedFields(i)) Then Return allowedFields(i)
-                Next
-                Return ""
+                Return Parent.BondFields.Fields
             End Get
         End Property
-
-        'Public Sub RecalculateByType(ByVal type As SpreadType)
-        '    'If _quotesAndYields.ContainsKey(_userSelectedQuote) Then
-        '    '    '_parentGroup.Ansamble.SpreadBmk.CalcAllSpreads(_quotesAndYields(_userSelectedQuote), _metaData, type)
-        '    'End If
-        'End Sub
-
-        'Public Sub CleanupByType(ByVal type As SpreadType)
-        '    If _quotesAndYields.ContainsKey(_userSelectedQuote) Then
-        '        _parentGroup.Ansamble.CleanupSpread(type, _quotesAndYields(_userSelectedQuote))
-        '    End If
-        'End Sub
     End Class
 
     ' todo custom label
@@ -333,7 +409,7 @@ Namespace Tools
         Public Event Volume As Action(Of Bond)
 
         Public YieldMode As String ' todo currently unused
-        Protected BondFields As FieldContainer
+        Friend BondFields As FieldContainer
         Public SeriesName As String
 
         Private ReadOnly _elements As New Dictionary(Of String, Bond) 'ric -> datapoint
@@ -347,6 +423,7 @@ Namespace Tools
         Private _color As String
 
         Private WithEvents _quoteLoader As New LiveQuotes
+
 
         Public Property Color() As String
             Get
@@ -363,20 +440,16 @@ Namespace Tools
             End Get
         End Property
 
-
         Public Sub Cleanup()
             _quoteLoader.CancelAll()
             _elements.Clear()
             RaiseEvent Clear(Me)
         End Sub
 
-        Public Sub StartRics(ByVal rics As List(Of String))
+        Public Sub StartAll()
+            Dim rics As List(Of String) = _elements.Keys.ToList()
             If rics.Count = 0 Then Return
             _quoteLoader.AddItems(rics, BondFields.AllNames)
-        End Sub
-
-        Public Sub StartAll()
-            StartRics(_elements.Keys.ToList())
         End Sub
 
         Public Sub SetCustomPrice(ByVal ric As String, ByVal price As Double)
@@ -418,12 +491,12 @@ Namespace Tools
                                 If fieldName.Belongs(bid, ask) Then
                                     Dim bidPrice As Double
                                     Dim xmlBid = BondFields.XmlName(bid)
-                                    If bondDataPoint.QuotesAndYields.ContainsKey(xmlBid) Then
+                                    If bondDataPoint.QuotesAndYields.Has(xmlBid) Then
                                         bidPrice = bondDataPoint.QuotesAndYields(xmlBid).Price
                                     End If
                                     Dim askPrice As Double
                                     Dim xmlAsk = BondFields.XmlName(ask)
-                                    If bondDataPoint.QuotesAndYields.ContainsKey(xmlAsk) Then
+                                    If bondDataPoint.QuotesAndYields.Has(xmlAsk) Then
                                         askPrice = bondDataPoint.QuotesAndYields(xmlAsk).Price
                                     End If
                                     Dim midPrice As Double
@@ -461,14 +534,6 @@ Namespace Tools
             CalculateYields(calcDate, bondDataPoint.MetaData, calculation) ' todo add userDefinedSpread
 
             bondDataPoint.QuotesAndYields(xmlName) = calculation
-
-            'Dim xmlNames As New List(Of String)
-            'For Each key In bondDataPoint.QuotesAndYields.Keys
-            '    If bondDataPoint.QuotesAndYields(key).Price > 0 Then
-            '        xmlNames.Add(key)
-            '    End If
-            'Next
-
             NotifyQuote(bondDataPoint)
         End Sub
 
@@ -476,18 +541,14 @@ Namespace Tools
             Return _elements.Any(Function(elem) elem.Key = instrument)
         End Function
 
-        Public Sub AddRic(ByVal ric As String)
-            Dim descr = BondsData.Instance.GetBondInfo(ric)
-            If descr IsNot Nothing Then
-                _elements.Add(ric, New Bond(Me, descr))
-            Else
-                Logger.Error("No description for bond {0} found", ric)
-            End If
-        End Sub
-
         Public Sub AddRics(ByVal rics As IEnumerable(Of String))
             For Each ric In rics
-                AddRic(ric)
+                Dim descr = BondsData.Instance.GetBondInfo(ric)
+                If descr IsNot Nothing Then
+                    _elements.Add(ric, New Bond(Me, descr))
+                Else
+                    Logger.Error("No description for bond {0} found", ric)
+                End If
             Next
         End Sub
 
@@ -495,7 +556,7 @@ Namespace Tools
             _ansamble = ansamble
         End Sub
 
-        Public Function GetElement(ByVal ric As String) As Bond
+        Friend Function GetBond(ByVal ric As String) As Bond
             Return _elements(ric)
         End Function
 
@@ -543,9 +604,69 @@ Namespace Tools
     Public Class BondCurve
         Inherits BaseGroup
 
-        Public Event Updated As Action(Of List(Of XY))
+        Public Class CurveItem
+            Implements IComparable(Of CurveItem)
+            Private ReadOnly _x As Double
+            Private ReadOnly _y As Double
+            Private ReadOnly _bond As Bond
+
+            Public ReadOnly Property X() As Double
+                Get
+                    Return _x
+                End Get
+            End Property
+
+            Public ReadOnly Property Y() As Double
+                Get
+                    Return _y
+                End Get
+            End Property
+
+            Public ReadOnly Property Bond() As Bond
+                Get
+                    Return _bond
+                End Get
+            End Property
+
+            Public Sub New(ByVal x As Double, ByVal y As Double, ByVal bond As Bond)
+                _x = x
+                _y = y
+                _bond = bond
+            End Sub
+
+            Public Function CompareTo(ByVal other As CurveItem) As Integer Implements IComparable(Of CurveItem).CompareTo
+                Return _x.CompareTo(other._x)
+            End Function
+        End Class
+
+        Private _bootstrapped As Boolean
+        Private _interpolated As Boolean
+        Private _historicalDate As Date?
+        Private _history As Boolean = False
+
+        Public Event Updated As Action(Of List(Of CurveItem))
 
         Private _histFields As FieldContainer
+
+        Public Property Bootstrapped() As Boolean
+            Get
+                Return _bootstrapped
+            End Get
+            Set(ByVal value As Boolean)
+                _bootstrapped = value
+                NotifyQuote(Nothing)
+            End Set
+        End Property
+
+        Public Property Interpolated() As Boolean
+            Get
+                Return _interpolated
+            End Get
+            Set(ByVal value As Boolean)
+                _interpolated = value
+                NotifyQuote(Nothing)
+            End Set
+        End Property
 
         Public Sub New(ByVal ansamble As Ansamble, ByVal src As Source)
             MyBase.new(ansamble)
@@ -561,7 +682,40 @@ Namespace Tools
         End Sub
 
         Public Overrides Sub NotifyQuote(ByVal bond As Bond)
-            ' todo here I haffto do all recalculations so that to return wut user wants to see
+            Dim res As New List(Of CurveItem)
+            ' Я хочу построить полностью ту кривую, которая будет рисоваться и выдать ее
+            If Ansamble.ChartSpreadType = SpreadType.Yield Then
+                If _bootstrapped Then
+                    ' todo bootstrapping
+                End If
+
+                For Each bnd In Elements.Values
+                    Dim x As Double, y As Double
+                    Dim description = bnd.QuotesAndYields.Main
+                    If description Is Nothing Then Continue For
+
+                    Select Case Ansamble.XSource
+                        Case XSource.Duration
+                            x = description.Duration
+                        Case XSource.Maturity
+                            x = (bnd.MetaData.Maturity.Value - Date.Today).Days / 365
+                    End Select
+
+                    y = description.GetYield()
+                    If x > 0 And y > 0 Then res.Add(New CurveItem(x, y, bnd))
+
+                    res.Sort()
+                Next
+                RaiseEvent Updated(res)
+
+                If _interpolated Then
+                    ' todo interpolation
+                End If
+            ElseIf Ansamble.ChartSpreadType.Belongs(SpreadType.ASWSpread, SpreadType.OASpread, SpreadType.ZSpread, SpreadType.PointSpread) Then
+                ' todo plotting spreads
+            Else
+                Logger.Warn("Unknown spread type {0}", Ansamble.ChartSpreadType)
+            End If
         End Sub
     End Class
 #End Region
