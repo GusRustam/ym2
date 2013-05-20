@@ -604,12 +604,10 @@ Namespace Tools
     Public Class BondCurve
         Inherits BaseGroup
 
-        Public Class CurveItem
+        Public MustInherit Class CurveItem
             Implements IComparable(Of CurveItem)
             Private ReadOnly _x As Double
             Private ReadOnly _y As Double
-            Private ReadOnly _bond As Bond
-
             Public ReadOnly Property X() As Double
                 Get
                     Return _x
@@ -622,6 +620,20 @@ Namespace Tools
                 End Get
             End Property
 
+            Public Function CompareTo(ByVal other As CurveItem) As Integer Implements IComparable(Of CurveItem).CompareTo
+                Return _x.CompareTo(other._x)
+            End Function
+
+            Public Sub New(ByVal x As Double, ByVal y As Double)
+                _x = x
+                _y = y
+            End Sub
+        End Class
+
+        Public Class BondCurveItem
+            Inherits CurveItem
+            Private ReadOnly _bond As Bond
+
             Public ReadOnly Property Bond() As Bond
                 Get
                     Return _bond
@@ -629,14 +641,26 @@ Namespace Tools
             End Property
 
             Public Sub New(ByVal x As Double, ByVal y As Double, ByVal bond As Bond)
-                _x = x
-                _y = y
+                MyBase.new(x, y)
                 _bond = bond
             End Sub
 
-            Public Function CompareTo(ByVal other As CurveItem) As Integer Implements IComparable(Of CurveItem).CompareTo
-                Return _x.CompareTo(other._x)
-            End Function
+        End Class
+
+        Public Class PointCurveItem
+            Inherits CurveItem
+            Private ReadOnly _curve As BondCurve
+
+            Public ReadOnly Property Curve() As BondCurve
+                Get
+                    Return _curve
+                End Get
+            End Property
+
+            Public Sub New(ByVal x As Double, ByVal y As Double, ByVal curve As BondCurve)
+                MyBase.New(x, y)
+                _curve = curve
+            End Sub
         End Class
 
         Private _bootstrapped As Boolean
@@ -683,7 +707,6 @@ Namespace Tools
 
         Public Overrides Sub NotifyQuote(ByVal bond As Bond)
             Dim res As New List(Of CurveItem)
-            ' Я хочу построить полностью ту кривую, которая будет рисоваться и выдать ее
             If Ansamble.ChartSpreadType = SpreadType.Yield Then
                 If _bootstrapped Then
                     ' todo bootstrapping
@@ -702,7 +725,8 @@ Namespace Tools
                     End Select
 
                     y = description.GetYield()
-                    If x > 0 And y > 0 Then res.Add(New CurveItem(x, y, bnd))
+                    ' todo if interpolation use curveitem or even xy
+                    If x > 0 And y > 0 Then res.Add(New BondCurveItem(x, y, bnd))
 
                     res.Sort()
                 Next

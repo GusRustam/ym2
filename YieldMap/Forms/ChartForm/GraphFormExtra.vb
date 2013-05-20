@@ -339,13 +339,6 @@ Namespace Forms.ChartForm
             TheChart.BringToFront()
         End Sub
 
-        Private Sub DoAdd(ByVal curves As IEnumerable(Of Source))
-            'For Each curve In curves
-            '    Dim item = BondCurvesTSMI.DropDownItems.Add(curve.Name, Nothing, AddressOf AddBondCurveTSMIClick)
-            '    item.Tag = curve
-            'Next
-        End Sub
-
         Private Sub DoAddNew(ByVal curves As IEnumerable(Of Source))
             For Each curve In curves
                 Dim item = BondCurvesNewTSMI.DropDownItems.Add(curve.Name, Nothing, AddressOf AddBondCurveNewTSMIClick)
@@ -470,16 +463,22 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Shared Sub CurveDeleted(ByVal obj As SwapCurve)
-        End Sub
-
         Private Sub NewCurveDeleted(ByVal obj As BaseGroup)
-            'Throw New NotImplementedException()
+            Dim srs = TheChart.Series.FindByName(obj.Identity)
+            If srs IsNot Nothing Then TheChart.Series.Remove(srs)
         End Sub
 
         Private Sub OnNewCurvePaint(ByVal obj As List(Of BondCurve.CurveItem))
             If Not obj.Any Then Return
-            Dim crv = CType(obj.First.Bond.Parent, BondCurve)
+            Dim crv As BondCurve
+            Dim itsBond As Boolean
+            If TypeOf obj.First Is BondCurve.BondCurveItem Then
+                crv = CType(CType(obj.First, BondCurve.BondCurveItem).Bond.Parent, BondCurve)
+                itsBond = True
+            ElseIf TypeOf obj.First Is BondCurve.PointCurveItem Then
+                crv = CType(obj.First, BondCurve.PointCurveItem).Curve
+                itsBond = False
+            End If
             Dim srs = TheChart.Series.FindByName(crv.Identity)
             If srs IsNot Nothing Then TheChart.Series.Remove(srs)
             srs = New Series() With {
@@ -487,13 +486,22 @@ Namespace Forms.ChartForm
                 .legendText = crv.SeriesName,
                 .ChartType = SeriesChartType.Line,
                 .color = Color.FromName(crv.Color),
+                .borderWidth = 1,
                 .Tag = crv.Identity
             }
             TheChart.Series.Add(srs)
-            For Each point In obj
-                Dim pnt = New DataPoint(point.X, point.Y) With {.Tag = point.Bond}
-                srs.Points.Add(pnt)
-            Next
+            If itsBond Then
+                For Each point In obj.Cast(Of BondCurve.BondCurveItem)()
+                    Dim pnt = New DataPoint(point.X, point.Y) With {.Tag = point.Bond, .ToolTip = point.Bond.Label}
+                    srs.Points.Add(pnt)
+                Next
+            Else
+                For Each point In obj.Cast(Of BondCurve.PointCurveItem)()
+                    Dim pnt = New DataPoint(point.X, point.Y) With {.Tag = point.Curve}
+                    srs.Points.Add(pnt)
+                Next
+            End If
+
         End Sub
     End Class
 End Namespace

@@ -165,6 +165,15 @@ Namespace Forms.ChartForm
                         Dim point As DataPoint = CType(htr.Object, DataPoint)
                         If TypeOf point.Tag Is Bond Then
                             Dim bondDataPoint = CType(point.Tag, Bond)
+                            If TypeOf bondDataPoint.Parent Is BondCurve Then
+                                BondCurveTSMI.Visible = True
+                                BondCurveTSMI.DropDownItems.Clear()
+                                For Each item In BondCurveCMS.Items
+                                    BondCurveTSMI.DropDownItems.Add(item)
+                                Next
+                            Else
+                                BondCurveTSMI.Visible = False
+                            End If
                             With BondCMS
                                 .Tag = bondDataPoint.MetaData.RIC
                                 .Show(TheChart, mouseEvent.Location)
@@ -185,7 +194,6 @@ Namespace Forms.ChartForm
                                         End If
                                     End Sub
                             Next
-
 
                             Dim newItem1 As ToolStripMenuItem
 
@@ -218,6 +226,9 @@ Namespace Forms.ChartForm
                             Dim histDataPoint = CType(point.Tag, HistoryPoint)
                             HistoryCMS.Tag = histDataPoint
                             HistoryCMS.Show(TheChart, mouseEvent.Location)
+
+                        ElseIf TypeOf point.Tag Is BondCurve Then
+
                         End If
                     ElseIf htr.ChartElementType = ChartElementType.PlottingArea Or htr.ChartElementType = ChartElementType.Gridlines Then
                         ChartCMS.Show(TheChart, mouseEvent.Location)
@@ -513,7 +524,6 @@ Namespace Forms.ChartForm
             Dim rubCCS = New RubCCS(_spreadBenchmarks)
 
             AddHandler rubCCS.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
-            AddHandler rubCCS.Cleared, AddressOf CurveDeleted
             AddHandler rubCCS.Recalculated, AddressOf OnCurveRecalculated
             AddHandler rubCCS.Updated, AddressOf OnCurvePaint
 
@@ -525,7 +535,6 @@ Namespace Forms.ChartForm
             Logger.Debug("RubIRSTSMIClick()")
             Dim rubIRS = New RubIRS(_spreadBenchmarks)
             AddHandler rubIRS.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
-            AddHandler rubIRS.Cleared, AddressOf CurveDeleted
             AddHandler rubIRS.Recalculated, AddressOf OnCurveRecalculated
             AddHandler rubIRS.Updated, AddressOf OnCurvePaint
 
@@ -537,7 +546,6 @@ Namespace Forms.ChartForm
             Logger.Debug("UsdIRS_TSMIClick()")
             Dim usdIRS = New UsdIRS(_spreadBenchmarks)
             AddHandler usdIRS.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
-            AddHandler usdIRS.Cleared, AddressOf CurveDeleted
             AddHandler usdIRS.Recalculated, AddressOf OnCurveRecalculated
             AddHandler usdIRS.Updated, AddressOf OnCurvePaint
 
@@ -549,7 +557,6 @@ Namespace Forms.ChartForm
             Logger.Debug("NDFTSMI_Click()")
             Dim rubNDF = New RubNDF(_spreadBenchmarks)
             AddHandler rubNDF.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
-            AddHandler rubNDF.Cleared, AddressOf CurveDeleted
             AddHandler rubNDF.Recalculated, AddressOf OnCurveRecalculated
             AddHandler rubNDF.Updated, AddressOf OnCurvePaint
 
@@ -858,53 +865,19 @@ Namespace Forms.ChartForm
 
         Private Sub CurvesTSMIDropDownOpening(ByVal sender As Object, ByVal e As EventArgs) Handles CurvesTSMI.DropDownOpening
             Dim portfolioManager = DbManager.PortfolioManager.Instance
-            BondCurvesTSMI.DropDownItems.Clear()
-            DoAdd(From chain In portfolioManager.ChainsView Where chain.Curve)
-            DoAdd(From list In portfolioManager.UserListsView Where list.Curve)
 
             BondCurvesNewTSMI.DropDownItems.Clear()
             DoAddNew(From chain In portfolioManager.ChainsView Where chain.Curve)
             DoAddNew(From list In portfolioManager.UserListsView Where list.Curve)
         End Sub
 
-        'Private Sub AddBondCurveTSMIClick(ByVal sender As Object, ByVal e As EventArgs)
-        '    Logger.Info("AddBondCurveTSMIClick")
-        '    Dim selectedItem = CType(CType(sender, ToolStripMenuItem).Tag, Source)
-        '    Dim fieldNames As New Dictionary(Of QuoteSource, String)
-        '    Dim ricsInCurve = selectedItem.GetDefaultRics()
-
-        '    If Not ricsInCurve.Any() Then
-        '        MsgBox("Empty curve selected!")
-        '        Return
-        '    End If
-
-        '    Dim fields = New FieldSet(selectedItem.FieldSetId)
-
-        '    fieldNames.Add(QuoteSource.Bid, fields.Realtime.Bid)
-        '    fieldNames.Add(QuoteSource.Ask, fields.Realtime.Ask)
-        '    fieldNames.Add(QuoteSource.Last, fields.Realtime.Last)
-        '    fieldNames.Add(QuoteSource.Hist, fields.History.Last)
-
-
-        '    Dim newCurve = New YieldCurve(selectedItem.Name, ricsInCurve, selectedItem.Color, fieldNames, _spreadBenchmarks)
-
-        '    AddHandler newCurve.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
-        '    AddHandler newCurve.Cleared, AddressOf CurveDeleted
-        '    AddHandler newCurve.Recalculated, AddressOf OnCurveRecalculated
-        '    AddHandler newCurve.Updated, AddressOf OnCurvePaint
-        '    AddHandler newCurve.Faulted, AddressOf OnCurveFault
-
-        '    _moneyMarketCurves.Add(newCurve)
-        '    newCurve.Subscribe()
-        'End Sub
-
         Private Sub AddBondCurveNewTSMIClick(ByVal sender As Object, ByVal e As EventArgs)
             Logger.Info("AddBondCurve-New-TSMIClick")
             Dim src = CType(CType(sender, ToolStripMenuItem).Tag, Source)
 
             Dim curve = New BondCurve(_ansamble, src)
-            AddHandler curve.Clear, AddressOf NewCurveDeleted
             AddHandler curve.Updated, AddressOf OnNewCurvePaint
+            AddHandler curve.Clear, AddressOf NewCurveDeleted
             _ansamble.AddBondCurve(curve)
             curve.StartAll()
         End Sub
@@ -965,16 +938,16 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub OnFitSelected(ByVal sender As Object, ByVal e As EventArgs) Handles LinearRegressionTSMI.Click, LogarithmicRegressionTSMI.Click, InverseRegressionTSMI.Click, PowerRegressionTSMI.Click, Poly6RegressionTSMI.Click, NelsonSiegelSvenssonTSMI.Click, LinearInterpolationTSMI.Click, CubicSplineTSMI.Click, VasicekCurveTSMI.Click, CIRCurveTSMI.Click
+        Private Sub OnFitSelected(ByVal sender As Object, ByVal e As EventArgs) Handles _
+            LinearRegressionTSMI.Click, LogarithmicRegressionTSMI.Click, InverseRegressionTSMI.Click, PowerRegressionTSMI.Click, _
+            Poly6RegressionTSMI.Click, NelsonSiegelSvenssonTSMI.Click, LinearInterpolationTSMI.Click, CubicSplineTSMI.Click, _
+            VasicekCurveTSMI.Click, CIRCurveTSMI.Click
+
             Logger.Debug("OnFitSelected()")
             Dim snd = CType(sender, ToolStripMenuItem)
             Dim curve = _moneyMarketCurves.First(Function(item) item.GetName() = MoneyCurveCMS.Tag.ToString())
             If curve Is Nothing Then Return
             curve.SetFitMode(snd.Tag)
-        End Sub
-
-        Private Shared Sub OnCurveFault(ByVal curve As SwapCurve, ByVal ex As Exception)
-            MessageBox.Show(ex.Message, "Curve error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Sub
 
         Private Sub OnCurvePaint(ByVal curve As SwapCurve)
@@ -1025,55 +998,7 @@ Namespace Forms.ChartForm
         Private Sub SelectFromAListTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SelectFromAListTSMI.Click
             Dim bondSelector As New BondSelectorForm
             If bondSelector.ShowDialog() = DialogResult.OK AndAlso bondSelector.SelectedRICs.Any Then
-                '    Dim groupSelector As New GroupSelectForm
-                '    groupSelector.InitGroupList(_ansamble.GetGroupList())
-                '    If groupSelector.ShowDialog() = DialogResult.OK Then
-                '        Dim grp As Group
-                '        If groupSelector.UseNew Then
-                '            grp = New Group(_ansamble)
-                '            grp.Color = groupSelector.NewColor.ToString()
-                '            grp.SeriesName = groupSelector.NewName
-
-                '            Dim layout As New field_layoutTableAdapter
-                '            Dim setInfo = layout.GetData().Where(Function(row) row.field_set_id = groupSelector.LayoutId)
-                '            Dim rw = setInfo.First(Function(row) row.is_realtime = 1)
-
-                '            grp.AskField = rw.ask_field
-                '            grp.BidField = rw.bid_field
-                '            grp.LastField = rw.last_field
-                '            grp.VwapField = rw.vwap_field
-                '            grp.VolumeField = rw.volume_field
-
-                '            rw = setInfo.First(Function(row) row.is_realtime = 0)
-                '            grp.HistField = rw.last_field
-
-                '            _ansamble.AddGroup(grp)
-                '        Else
-                '            grp = _ansamble.GetGroup(groupSelector.ExistingGroupId)
-                '        End If
-
-                '        ' TODO BULLSHIT AGAIN!!!
-                '        Dim selectedField As String
-                '        If grp.LastField.Trim() <> "" Then
-                '            selectedField = grp.LastField
-                '        ElseIf grp.VwapField.Trim() <> "" Then
-                '            selectedField = grp.VwapField
-                '        ElseIf grp.BidField.Trim() <> "" Then
-                '            selectedField = grp.BidField
-                '        Else
-                '            selectedField = grp.AskField
-                '        End If
-
-                '        bondSelector.SelectedRICs.ForEach(
-                '            Sub(aRic)
-                '                Dim descr = DbInitializer.GetBondInfo(aRic)
-                '                If descr IsNot Nothing Then
-                '                    grp.AddRic(aRic, descr, selectedField)
-                '                End If
-                '            End Sub)
-                '        grp.StartRics(bondSelector.SelectedRICs)
-                '    End If
-
+                ' todo create group using selected bonds and show it
             End If
         End Sub
 #End Region
