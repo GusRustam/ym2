@@ -1260,7 +1260,7 @@ Namespace Forms.ChartForm
 
         Private Sub LinRegTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles _
             LinRegTSMI.Click, LogRegTSMI.Click, InvRegTSMI.Click, PowRegTSMI.Click, _
-            PolyRegTSMI.Click, NelsonSiegelSvenssonTSMI.Click, CubSplineTSMI.Click, _
+            PolyRegTSMI.Click, NSSRegTSMI.Click, CubSplineTSMI.Click, _
             VasicekTSMI.Click, CIRRTSMI.Click
 
             If BondCurveCMS.Tag Is Nothing Then Return

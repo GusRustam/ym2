@@ -24,8 +24,8 @@
         <System.Diagnostics.DebuggerStepThrough()> _
         Private Sub InitializeComponent()
             Me.components = New System.ComponentModel.Container()
-            Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-            Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+            Dim ChartArea3 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+            Dim Legend3 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
             Me.TheStatusStrip = New System.Windows.Forms.StatusStrip()
             Me.StatusMessage = New System.Windows.Forms.ToolStripStatusLabel()
             Me.TheToolStrip = New System.Windows.Forms.ToolStrip()
@@ -810,12 +810,12 @@
             '
             'TheChart
             '
-            ChartArea1.Name = "ChartArea1"
-            Me.TheChart.ChartAreas.Add(ChartArea1)
+            ChartArea3.Name = "ChartArea1"
+            Me.TheChart.ChartAreas.Add(ChartArea3)
             Me.TheChart.Dock = System.Windows.Forms.DockStyle.Fill
-            Legend1.Enabled = False
-            Legend1.Name = "Legend1"
-            Me.TheChart.Legends.Add(Legend1)
+            Legend3.Enabled = False
+            Legend3.Name = "Legend1"
+            Me.TheChart.Legends.Add(Legend3)
             Me.TheChart.Location = New System.Drawing.Point(0, 0)
             Me.TheChart.Name = "TheChart"
             Me.TheChart.Size = New System.Drawing.Size(778, 417)
@@ -1178,7 +1178,7 @@
             '
             Me.PolyRegTSMI.Name = "PolyRegTSMI"
             Me.PolyRegTSMI.Size = New System.Drawing.Size(188, 22)
-            Me.PolyRegTSMI.Tag = "Poly"
+            Me.PolyRegTSMI.Tag = "Poly6"
             Me.PolyRegTSMI.Text = "Polynomial regression"
             '
             'InvRegTSMI
@@ -1199,7 +1199,7 @@
             '
             Me.CubSplineTSMI.Name = "CubSplineTSMI"
             Me.CubSplineTSMI.Size = New System.Drawing.Size(188, 22)
-            Me.CubSplineTSMI.Tag = "CubSpline"
+            Me.CubSplineTSMI.Tag = "CubicSpline"
             Me.CubSplineTSMI.Text = "Cubic spline"
             '
             'ToolStripMenuItem5
@@ -1211,7 +1211,7 @@
             '
             Me.VasicekTSMI.Name = "VasicekTSMI"
             Me.VasicekTSMI.Size = New System.Drawing.Size(188, 22)
-            Me.VasicekTSMI.Tag = "Vas"
+            Me.VasicekTSMI.Tag = "Vasicek"
             Me.VasicekTSMI.Text = "Vasicek curve"
             '
             'CIRRTSMI

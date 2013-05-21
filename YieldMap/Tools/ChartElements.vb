@@ -612,13 +612,28 @@ Namespace Tools
             Implements IComparable(Of CurveItem)
             Private ReadOnly _x As Double
             Private ReadOnly _y As Double
-            Public ReadOnly Property X() As Double
+
+            Public ReadOnly Property X() As String
+                Get
+                    Return String.Format("{0:F2}", _x)
+                End Get
+            End Property
+
+            Public ReadOnly Property Y() As String
+                Get
+                    Return String.Format("{0:P2}", _y)
+                End Get
+            End Property
+
+            <Browsable(False)>
+            Public ReadOnly Property TheX() As Double
                 Get
                     Return _x
                 End Get
             End Property
 
-            Public ReadOnly Property Y() As Double
+            <Browsable(False)>
+            Public ReadOnly Property TheY() As Double
                 Get
                     Return _y
                 End Get
@@ -778,7 +793,7 @@ Namespace Tools
                 If _estModel IsNot Nothing Then
                     Dim est As New Estimator(_estModel)
                     Dim tmp = New List(Of CurveItem)(result)
-                    Dim list As List(Of XY) = (From item In tmp Select New XY(item.X, item.Y)).ToList()
+                    Dim list As List(Of XY) = (From item In tmp Select New XY(item.theX, item.theY)).ToList()
                     Dim apprXY = est.Approximate(list)
                     result = (From item In apprXY Select New PointCurveItem(item.X, item.Y, Me)).Cast(Of CurveItem).ToList()
                 End If
@@ -835,21 +850,21 @@ Namespace Tools
                     End Get
                 End Property
 
-                Public ReadOnly Property Yield() As Double
+                Public ReadOnly Property Yield() As String
                     Get
-                        Return _yield
+                        Return String.Format("{0:P2}", _yield)
                     End Get
                 End Property
 
-                Public ReadOnly Property Duration() As Double
+                Public ReadOnly Property Duration() As String
                     Get
-                        Return _duration
+                        Return String.Format("{0:F2}", _duration)
                     End Get
                 End Property
 
-                Public ReadOnly Property Price() As Double
+                Public ReadOnly Property Price() As String
                     Get
-                        Return _price
+                        Return String.Format("{0:F4}", _price)
                     End Get
                 End Property
 
@@ -892,11 +907,7 @@ Namespace Tools
 
         Public Sub SetFitMode(ByVal mode As String)
             Dim model = EstimationModel.FromName(mode)
-            If model Is Nothing OrElse (EstModel IsNot Nothing AndAlso EstModel = model) Then
-                EstModel = Nothing
-                Return
-            End If
-            EstModel = model
+            EstModel = If(model Is Nothing OrElse (EstModel IsNot Nothing AndAlso EstModel = model), Nothing, model)
         End Sub
     End Class
 #End Region

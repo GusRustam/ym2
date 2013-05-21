@@ -495,12 +495,12 @@ Namespace Forms.ChartForm
             TheChart.Series.Add(srs)
             If itsBond Then
                 For Each point In obj.Cast(Of BondCurve.BondCurveItem)()
-                    Dim pnt = New DataPoint(point.X, point.Y) With {.Tag = point.Bond, .ToolTip = point.Bond.Label}
+                    Dim pnt = New DataPoint(point.theX, point.theY) With {.Tag = point.Bond, .ToolTip = point.Bond.Label}
                     srs.Points.Add(pnt)
                 Next
             Else
                 For Each point In obj.Cast(Of BondCurve.PointCurveItem)()
-                    Dim pnt = New DataPoint(point.X, point.Y) With {.Tag = point.Curve}
+                    Dim pnt = New DataPoint(point.theX, point.theY) With {.Tag = point.Curve}
                     srs.Points.Add(pnt)
                 Next
             End If
