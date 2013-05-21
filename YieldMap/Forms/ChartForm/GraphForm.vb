@@ -202,7 +202,7 @@ Namespace Forms.ChartForm
                                        Sub(sender1 As Object, e1 As EventArgs)
                                            Dim res = InputBox("Enter price", "Custom bond price")
                                            If IsNumeric(res) Then
-                                               bondDataPoint.Parent.SetCustomPrice(bondDataPoint.MetaData.RIC, CDbl(res))
+                                               bondDataPoint.SetCustomPrice(CDbl(res))
                                            ElseIf res <> "" Then
                                                MessageBox.Show("Invalid number")
                                            End If
@@ -1197,7 +1197,7 @@ Namespace Forms.ChartForm
         Private Sub SetSeriesLabel(ByVal id As String, ByVal mode As LabelMode)
             Try
                 Dim group = _ansamble.Groups(id)
-                group.Elements.Values.ToList.ForEach(Sub(bond) bond.LabelMode = mode)
+                group.Elements.ForEach(Sub(bond) bond.LabelMode = mode)
                 If ShowLabelsTSB.Checked Then
                     TheChart.Series.FindByName(group.SeriesName).Points.ToList.ForEach(
                         Sub(pnt)
@@ -1251,11 +1251,9 @@ Namespace Forms.ChartForm
 
         Private Sub ShowBondCurveItemsTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles ShowBondCurveItemsTSMI.Click
             If BondCurveCMS.Tag Is Nothing Then Return
-            Dim curveData = CType(BondCurveCMS.Tag, BondCurve).GetSnapshot()
             Dim frm As New BondCurveItemsForm
-            frm.BondsDGV.DataSource = curveData.Elements
-            frm.CurrentDGV.DataSource = curveData.Current
-            frm.ShowDialog()
+            frm.Curve = CType(BondCurveCMS.Tag, BondCurve)
+            frm.Show()
         End Sub
 
         Private Sub LinRegTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles _

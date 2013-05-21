@@ -10,6 +10,10 @@ Namespace Tools.Estimation
         Estimation
     End Enum
 
+    Public Interface IFormulable
+        Function GetFormula() As String
+    End Interface
+
     Public Class EstimationModel
         Implements IComparable(Of EstimationModel)
         Public Shared ReadOnly Lin As New EstimationModel(EstimationType.Estimation, "Lin", "Linear regression", True)
@@ -110,6 +114,7 @@ Namespace Tools.Estimation
 
 #Region "Regression models"
     Public Class LinearRegression
+        Implements IFormulable
         Protected A As Double
         Protected B As Double
 
@@ -151,7 +156,7 @@ Namespace Tools.Estimation
             Return A + B * x
         End Function
 
-        Overridable Function GetFormula() As String
+        Public Overridable Function GetFormula() As String Implements IFormulable.GetFormula
             Return String.Format("Y = {0:F4} + {1:F4}*X ", A, B)
         End Function
     End Class
@@ -175,7 +180,7 @@ Namespace Tools.Estimation
             Return A + B * Math.Log(1 + x)
         End Function
 
-        Overrides Function GetFormula() As String
+        Public Overrides Function GetFormula() As String
             Return String.Format("Y = {0:F4} + {1:F4}*Log(1 + X) ", A, B)
         End Function
     End Class
@@ -200,7 +205,7 @@ Namespace Tools.Estimation
             ' y = a * b^x => ln(y) = ln(a) + ln(b)x = a' + b'x => y = exp(a'+b'x)
         End Function
 
-        Overrides Function GetFormula() As String
+        Public Overrides Function GetFormula() As String
             Return String.Format("Y = {0:F4}*{1:F4}^X", Math.Exp(A), Math.Exp(B))
         End Function
     End Class
@@ -224,7 +229,7 @@ Namespace Tools.Estimation
             Return 1 / (A + B * x)
         End Function
 
-        Overrides Function GetFormula() As String
+        Public Overrides Function GetFormula() As String
             Return String.Format("Y = 1/({0:F4} + {1:F4}*X)", A, B)
         End Function
     End Class
@@ -290,6 +295,7 @@ Namespace Tools.Estimation
     End Class
 
     Public Class NelsonSiegelSvensson
+        Implements IFormulable
         Private _xv, _yv As List(Of Double)
         Private _n As Double
 
@@ -383,9 +389,14 @@ Namespace Tools.Estimation
 
             Return GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = avgY * NSS(anX, minimum) / 10}).ToList()
         End Function
+
+        Public Function GetFormula() As String Implements IFormulable.GetFormula
+            Return "N/A"
+        End Function
     End Class
 
     Public Class VasicekEstimation1
+        Implements IFormulable
         Private _xv, _yv As List(Of Double)
         Private Shared _r0 As Double
         Private _n As Double
@@ -428,12 +439,12 @@ Namespace Tools.Estimation
 
             Dim ymin = y.Min(), ymax = y.Max()
             _yv = y.Select(Function(yValue) (yValue - ymin) / (ymax - ymin)).ToList()
-            Dim minByRange = Simplex.ComputeMin(AddressOf VasicekCost, vars)
+            Dim minByRange = simplex.ComputeMin(AddressOf VasicekCost, vars)
             Dim valByRange = VasicekCostRel(minByRange, Function(val) ymin + (ymax - ymin) * val)
 
             Dim yavg = y.Average()
             _yv = y.Select(Function(yValue) 10 * yValue / yavg).ToList()
-            Dim minByAvg = Simplex.ComputeMin(AddressOf VasicekCost, vars)
+            Dim minByAvg = simplex.ComputeMin(AddressOf VasicekCost, vars)
             Dim valByAvg = VasicekCostRel(minByAvg, Function(val) yavg * val / 10)
 
             If valByAvg < valByRange Then
@@ -442,9 +453,14 @@ Namespace Tools.Estimation
                 Return GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = ymin + (ymax - ymin) * Vasicek(anX, minByRange)}).ToList()
             End If
         End Function
+
+        Public Function GetFormula() As String Implements IFormulable.GetFormula
+            Return "N/A"
+        End Function
     End Class
 
     Public Class CoxIngersollRossEstimation
+        Implements IFormulable
         Private _xv, _yv As List(Of Double)
         Private Shared _r0 As Double
         Private _n As Double
@@ -493,7 +509,7 @@ Namespace Tools.Estimation
             _yv = y.Select(Function(yValue) (yValue - ymin) / (ymax - ymin)).ToList()
             Dim minByRange = simplex.ComputeMin(AddressOf CIRCost, vars)
             Dim valByRange = CIRCostRel(minByRange, Function(val) ymin + (ymax - ymin) * val)
-            
+
             Dim yavg = y.Average()
             _yv = y.Select(Function(yValue) 10 * yValue / yavg).ToList()
             Dim minByAvg = simplex.ComputeMin(AddressOf CIRCost, vars)
@@ -504,6 +520,10 @@ Namespace Tools.Estimation
             Else
                 Return GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = ymin + (ymax - ymin) * CIR(anX, minByRange)}).ToList()
             End If
+        End Function
+
+        Public Function GetFormula() As String Implements IFormulable.GetFormula
+            Return "N/A"
         End Function
     End Class
 
@@ -586,6 +606,10 @@ Namespace Tools.Estimation
             Public Regression As LinearRegression
             Public SSE As Double
         End Class
+
+        Public Function GetFormula() As String
+            Return If(_regression IsNot Nothing, _regression.GetFormula(), "N/A")
+        End Function
     End Class
 
     Public Class XY

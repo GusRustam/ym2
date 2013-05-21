@@ -90,16 +90,15 @@ Namespace Tools
             Get
                 Dim result As New List(Of BondDescr)
                 For Each grp In From kvp In _groups Select kvp.Value
-                    grp.Elements.Keys.ToList().ForEach(
+                    grp.Elements.ForEach(
                         Sub(elem)
                             Dim res As New BondDescr
-                            Dim point = grp.Elements(elem)
-                            res.RIC = point.MetaData.RIC
-                            res.Name = point.MetaData.ShortName
-                            res.Maturity = point.MetaData.Maturity
-                            res.Coupon = point.MetaData.Coupon
-                            Dim fieldName = point.QuotesAndYields.MaxPriorityField
-                            Dim quote = point.QuotesAndYields(fieldName)
+                            res.RIC = elem.MetaData.RIC
+                            res.Name = elem.MetaData.ShortName
+                            res.Maturity = elem.MetaData.Maturity
+                            res.Coupon = elem.MetaData.Coupon
+                            Dim fieldName = elem.QuotesAndYields.MaxPriorityField
+                            Dim quote = elem.QuotesAndYields(fieldName)
                             If quote IsNot Nothing Then
                                 res.Price = quote.Price
                                 res.Quote = fieldName
@@ -248,6 +247,17 @@ Namespace Tools
     Public Class Bond
         Inherits Identifyable
 
+        Private _enabled As Boolean = True
+
+        Public Property Enabled() As Boolean
+            Get
+                Return _enabled
+            End Get
+            Set(ByVal value As Boolean)
+                _enabled = value
+            End Set
+        End Property
+
         Private ReadOnly _parent As BaseGroup
         Private ReadOnly _metaData As BondDescription
         Public TodayVolume As Double
@@ -296,7 +306,6 @@ Namespace Tools
                 Return _parent
             End Get
         End Property
-
 
         Public ReadOnly Property MetaData As BondDescription
             Get
@@ -385,10 +394,29 @@ Namespace Tools
             End Get
         End Property
 
-        Public Sub Annihilate()
-            Parent.Elements.Remove(MetaData.RIC)
+        Public Sub Disable()
+            Enabled = False
             Parent.NotifyRemoved(Me)
         End Sub
+
+        Public Sub Enable()
+            Enabled = True
+            Parent.NotifyQuote(Me)
+        End Sub
+
+        Public Sub Annihilate()
+            Parent.Elements.Remove(Me)
+            Parent.NotifyRemoved(Me)
+        End Sub
+
+        Sub SetCustomPrice(ByVal price As Double)
+            If price > 0 Then
+                UserSelectedQuote = Fields.Custom
+                QuotesAndYields(Fields.Custom).Price = price ' todo <<<
+                Parent.NotifyQuote(Me)
+            End If
+        End Sub
+
     End Class
 
     ' todo custom label
@@ -418,10 +446,22 @@ Namespace Tools
         Friend BondFields As FieldContainer
         Public SeriesName As String
 
-        Private ReadOnly _elements As New Dictionary(Of String, Bond) 'ric -> datapoint
-        Public ReadOnly Property Elements() As Dictionary(Of String, Bond)
+        Private ReadOnly _elements As New List(Of Bond) 'ric -> datapoint
+        Public ReadOnly Property Elements() As List(Of Bond)
+            Get
+                Return (From elem In _elements Where elem.Enabled).ToList()
+            End Get
+        End Property
+
+        Public ReadOnly Property AllElements() As List(Of Bond)
             Get
                 Return _elements
+            End Get
+        End Property
+
+        Public ReadOnly Property DisabledElements() As List(Of Bond)
+            Get
+                Return (From elem In _elements Where Not elem.Enabled).ToList()
             End Get
         End Property
 
@@ -452,17 +492,9 @@ Namespace Tools
         End Sub
 
         Public Sub StartAll()
-            Dim rics As List(Of String) = _elements.Keys.ToList()
+            Dim rics As List(Of String) = (From elem In _elements Select elem.MetaData.RIC).ToList()
             If rics.Count = 0 Then Return
             _quoteLoader.AddItems(rics, BondFields.AllNames)
-        End Sub
-
-        Public Sub SetCustomPrice(ByVal ric As String, ByVal price As Double)
-            Dim bondDataPoint = _elements(ric)
-            If price > 0 Then
-                HandleQuote(bondDataPoint, BondFields.Fields.Custom, price, Date.Today)
-                bondDataPoint.UserSelectedQuote = BondFields.Fields.Custom
-            End If
         End Sub
 
         Private Sub OnQuotes(ByVal data As Dictionary(Of String, Dictionary(Of String, Double))) Handles _quoteLoader.NewData
@@ -473,13 +505,14 @@ Namespace Tools
                     Dim fieldsAndValues As Dictionary(Of String, Double) = instrAndFields.Value
 
                     ' checking if this bond is allowed to show up
-                    If Not _elements.Keys.Contains(instrument) Then
+                    Dim bonds  = (From elem In _elements Where elem.MetaData.RIC = instrument)
+                    If Not bonds.Any Then
                         Logger.Warn("Instrument {0} does not belong to serie {1}", instrument, SeriesName)
                         Continue For
                     End If
 
                     ' now update data point
-                    Dim bondDataPoint = _elements(instrument)
+                    Dim bondDataPoint = bonds.First()
 
                     If fieldsAndValues.ContainsKey(BondFields.Fields.Volume) Then
                         bondDataPoint.TodayVolume = fieldsAndValues(BondFields.Fields.Volume)
@@ -543,14 +576,14 @@ Namespace Tools
         End Sub
 
         Public Function HasRic(ByVal instrument As String) As Boolean
-            Return _elements.Any(Function(elem) elem.Key = instrument)
+            Return _elements.Any(Function(elem) elem.MetaData.RIC = instrument)
         End Function
 
         Public Sub AddRics(ByVal rics As IEnumerable(Of String))
             For Each ric In rics
                 Dim descr = BondsData.Instance.GetBondInfo(ric)
                 If descr IsNot Nothing Then
-                    _elements.Add(ric, New Bond(Me, descr))
+                    _elements.Add(New Bond(Me, descr))
                 Else
                     Logger.Error("No description for bond {0} found", ric)
                 End If
@@ -578,6 +611,27 @@ Namespace Tools
             _ansamble.BondCurves.Remove(Identity)
             _ansamble.Groups.Remove(Identity)
             RaiseEvent Clear(Me)
+        End Sub
+
+        Public Sub Disable(ByVal ric As String)
+            For Each item In (From elem In _elements Where elem.MetaData.RIC = ric)
+                item.Enabled = False
+                NotifyRemoved(item)
+            Next
+        End Sub
+
+        Public Sub Disable(ByVal rics As List(Of String))
+            For Each item In (From elem In _elements Where rics.Contains(elem.MetaData.RIC))
+                item.Enabled = False
+                NotifyRemoved(item)
+            Next
+        End Sub
+
+        Public Sub Enable(ByVal ric As String)
+            For Each item In (From elem In _elements Where elem.MetaData.RIC = ric)
+                item.Enabled = True
+                NotifyQuote(item)
+            Next
         End Sub
     End Class
 
@@ -733,6 +787,13 @@ Namespace Tools
         End Sub
 
         Private _lastCurve As List(Of CurveItem)
+        Private _formula As String
+
+        Public ReadOnly Property Formula() As String
+            Get
+                Return _formula
+            End Get
+        End Property
 
         Public Overrides Sub NotifyQuote(ByVal bond As Bond)
             If Ansamble.ChartSpreadType = SpreadType.Yield Then
@@ -740,7 +801,7 @@ Namespace Tools
                 If _bootstrapped Then
                     Try
                         ' todo use date of curve instead of today
-                        Dim data = (From elem In Elements.Values
+                        Dim data = (From elem In Elements
                                     Where elem.MetaData.IssueDate <= Today And
                                             elem.MetaData.Maturity > Today And
                                             elem.QuotesAndYields.Any()).ToList()
@@ -772,7 +833,7 @@ Namespace Tools
                         Return
                     End Try
                 Else
-                    For Each bnd In Elements.Values
+                    For Each bnd In Elements
                         Dim x As Double, y As Double
                         Dim description = bnd.QuotesAndYields.Main
                         If description Is Nothing Then Continue For
@@ -792,6 +853,7 @@ Namespace Tools
 
                 If _estModel IsNot Nothing Then
                     Dim est As New Estimator(_estModel)
+                    _formula = est.GetFormula()
                     Dim tmp = New List(Of CurveItem)(result)
                     Dim list As List(Of XY) = (From item In tmp Select New XY(item.theX, item.theY)).ToList()
                     Dim apprXY = est.Approximate(list)
@@ -893,9 +955,9 @@ Namespace Tools
                 End Get
             End Property
 
-            Public Sub New(ByVal bonds As Dictionary(Of String, Bond), ByVal items As List(Of CurveItem))
+            Public Sub New(ByVal bonds As List(Of Bond), ByVal items As List(Of CurveItem))
                 _elements = New List(Of BondCurveElement)
-                For Each bond In bonds.Values
+                For Each bond In bonds
                     Dim mainQuote = bond.QuotesAndYields.Main
                     If mainQuote Is Nothing Then Continue For
                     _elements.Add(New BondCurveElement(bond.MetaData.RIC, bond.Label, mainQuote.GetYield(), mainQuote.Duration, mainQuote.Price, bond.QuotesAndYields.MaxPriorityField))
@@ -909,6 +971,7 @@ Namespace Tools
             Dim model = EstimationModel.FromName(mode)
             EstModel = If(model Is Nothing OrElse (EstModel IsNot Nothing AndAlso EstModel = model), Nothing, model)
         End Sub
+
     End Class
 #End Region
 

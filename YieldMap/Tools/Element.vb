@@ -1,10 +1,10 @@
 ﻿Namespace Tools
     Public MustInherit Class BasePointDescription
         Implements IComparable(Of BasePointDescription)
+
         Public Duration As Double
         Public Price As Double
         Public YieldAtDate As Date
-
         Public PointSpread As Double?
         Public ZSpread As Double?
         Public ASWSpread As Double?

@@ -468,15 +468,15 @@ Namespace Forms.ChartForm
             If srs IsNot Nothing Then TheChart.Series.Remove(srs)
         End Sub
 
-        Private Sub OnNewCurvePaint(ByVal obj As List(Of BondCurve.CurveItem))
-            If Not obj.Any Then Return
+        Private Sub OnNewCurvePaint(ByVal data As List(Of BondCurve.CurveItem))
+            If Not Data.Any Then Return
             Dim crv As BondCurve
             Dim itsBond As Boolean
-            If TypeOf obj.First Is BondCurve.BondCurveItem Then
-                crv = CType(CType(obj.First, BondCurve.BondCurveItem).Bond.Parent, BondCurve)
+            If TypeOf Data.First Is BondCurve.BondCurveItem Then
+                crv = CType(CType(Data.First, BondCurve.BondCurveItem).Bond.Parent, BondCurve)
                 itsBond = True
-            ElseIf TypeOf obj.First Is BondCurve.PointCurveItem Then
-                crv = CType(obj.First, BondCurve.PointCurveItem).Curve
+            ElseIf TypeOf Data.First Is BondCurve.PointCurveItem Then
+                crv = CType(Data.First, BondCurve.PointCurveItem).Curve
                 itsBond = False
             Else
                 Logger.Warn("Unexpected items type for a bond-based curve")
@@ -494,12 +494,12 @@ Namespace Forms.ChartForm
             }
             TheChart.Series.Add(srs)
             If itsBond Then
-                For Each point In obj.Cast(Of BondCurve.BondCurveItem)()
+                For Each point In Data.Cast(Of BondCurve.BondCurveItem)()
                     Dim pnt = New DataPoint(point.theX, point.theY) With {.Tag = point.Bond, .ToolTip = point.Bond.Label}
                     srs.Points.Add(pnt)
                 Next
             Else
-                For Each point In obj.Cast(Of BondCurve.PointCurveItem)()
+                For Each point In Data.Cast(Of BondCurve.PointCurveItem)()
                     Dim pnt = New DataPoint(point.theX, point.theY) With {.Tag = point.Curve}
                     srs.Points.Add(pnt)
                 Next
