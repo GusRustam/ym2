@@ -1260,13 +1260,21 @@ Namespace Forms.ChartForm
 
         Private Sub LinRegTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles _
             LinRegTSMI.Click, LogRegTSMI.Click, InvRegTSMI.Click, PowRegTSMI.Click, _
-            PolyRegTSMI.Click, NelsonSiegelSvenssonTSMI.Click, LinInterpTSMI.Click, CubSplineTSMI.Click, _
+            PolyRegTSMI.Click, NelsonSiegelSvenssonTSMI.Click, CubSplineTSMI.Click, _
             VasicekTSMI.Click, CIRRTSMI.Click
 
             If BondCurveCMS.Tag Is Nothing Then Return
             Dim curve = CType(BondCurveCMS.Tag, BondCurve)
             Dim snd = CType(sender, ToolStripMenuItem)
-            'curve.SetFitMode(snd.Tag)
+            curve.SetFitMode(snd.Tag.ToString())
+        End Sub
+
+        Private Sub BondCurveCMS_Opening(ByVal sender As Object, ByVal e As CancelEventArgs) Handles BondCurveCMS.Opening
+            If BondCurveCMS.Tag Is Nothing Then Return
+            Dim curve = CType(BondCurveCMS.Tag, BondCurve)
+            For Each item As ToolStripMenuItem In (From elem In InterpolationTSMI.DropDownItems Where TypeOf elem Is ToolStripMenuItem)
+                item.Checked = curve.EstModel IsNot Nothing AndAlso item.Tag = curve.EstModel.ItemName
+            Next
         End Sub
     End Class
 End Namespace

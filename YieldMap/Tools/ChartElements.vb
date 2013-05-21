@@ -4,6 +4,7 @@ Imports AdfinXAnalyticsFunctions
 Imports System.ComponentModel
 Imports DbManager
 Imports DbManager.Bonds
+Imports YieldMap.Tools.Estimation
 Imports NLog
 Imports ReutersData
 Imports Settings
@@ -674,8 +675,6 @@ Namespace Tools
             End Sub
         End Class
 
-        Private _bootstrapped As Boolean
-        Private _interpolated As Boolean
         Private _historicalDate As Date?
         Private _history As Boolean = False
 
@@ -683,6 +682,7 @@ Namespace Tools
 
         Private _histFields As FieldContainer
 
+        Private _bootstrapped As Boolean
         Public Property Bootstrapped() As Boolean
             Get
                 Return _bootstrapped
@@ -693,12 +693,13 @@ Namespace Tools
             End Set
         End Property
 
-        Public Property Interpolated() As Boolean
+        Private _estModel As EstimationModel
+        Public Property EstModel() As EstimationModel
             Get
-                Return _interpolated
+                Return _estModel
             End Get
-            Set(ByVal value As Boolean)
-                _interpolated = value
+            Set(ByVal value As EstimationModel)
+                _estModel = value
                 NotifyQuote(Nothing)
             End Set
         End Property
@@ -755,7 +756,6 @@ Namespace Tools
                         Logger.Error("Exception = {0}", ex.ToString())
                         Return
                     End Try
-
                 Else
                     For Each bnd In Elements.Values
                         Dim x As Double, y As Double
@@ -771,13 +771,16 @@ Namespace Tools
 
                         y = description.GetYield()
                         If x > 0 And y > 0 Then result.Add(New BondCurveItem(x, y, bnd))
-
-                        result.Sort()
                     Next
                 End If
+                result.Sort()
 
-                If _interpolated Then
-                    ' todo interpolation
+                If _estModel IsNot Nothing Then
+                    Dim est As New Estimator(_estModel)
+                    Dim tmp = New List(Of CurveItem)(result)
+                    Dim list As List(Of XY) = (From item In tmp Select New XY(item.X, item.Y)).ToList()
+                    Dim apprXY = est.Approximate(list)
+                    result = (From item In apprXY Select New PointCurveItem(item.X, item.Y, Me)).Cast(Of CurveItem).ToList()
                 End If
 
                 _lastCurve = New List(Of CurveItem)(result)
@@ -886,6 +889,15 @@ Namespace Tools
                 _current = New List(Of CurveItem)(items)
             End Sub
         End Class
+
+        Public Sub SetFitMode(ByVal mode As String)
+            Dim model = EstimationModel.FromName(mode)
+            If model Is Nothing OrElse (EstModel IsNot Nothing AndAlso EstModel = model) Then
+                EstModel = Nothing
+                Return
+            End If
+            EstModel = model
+        End Sub
     End Class
 #End Region
 
