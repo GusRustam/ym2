@@ -478,6 +478,9 @@ Namespace Forms.ChartForm
             ElseIf TypeOf obj.First Is BondCurve.PointCurveItem Then
                 crv = CType(obj.First, BondCurve.PointCurveItem).Curve
                 itsBond = False
+            Else
+                Logger.Warn("Unexpected items type for a bond-based curve")
+                Return
             End If
             Dim srs = TheChart.Series.FindByName(crv.Identity)
             If srs IsNot Nothing Then TheChart.Series.Remove(srs)
@@ -501,7 +504,6 @@ Namespace Forms.ChartForm
                     srs.Points.Add(pnt)
                 Next
             End If
-
         End Sub
     End Class
 End Namespace

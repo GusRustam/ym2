@@ -1,8 +1,9 @@
 ﻿Imports System.Drawing
 Imports System.Reflection
+Imports AdfinXAnalyticsFunctions
+Imports System.ComponentModel
 Imports DbManager
 Imports DbManager.Bonds
-Imports YieldMap.Tools.Estimation
 Imports NLog
 Imports ReutersData
 Imports Settings
@@ -73,6 +74,11 @@ Namespace Tools
     Public Class GroupContainer(Of T As BaseGroup)
         Private ReadOnly _groups As New Dictionary(Of Long, T)
 
+        Public Event RemovedItem As Action(Of T, String)
+        Public Event Quote As Action(Of Bond)
+        Public Event Volume As Action(Of Bond)
+        Public Event Cleared As Action(Of T)
+
         Default Public ReadOnly Property Data(ByVal id As Long) As T
             Get
                 Return _groups(id)
@@ -131,18 +137,14 @@ Namespace Tools
 
         Public Sub Add(ByVal group As T)
             _groups.Add(group.Identity, group)
+            AddHandler group.Clear, Sub(base As BaseGroup) RaiseEvent Cleared(base)
+            AddHandler group.Quote, Sub(bond As Bond) RaiseEvent Quote(bond)
+            AddHandler group.RemovedItem, Sub(grp As BaseGroup, ric As String) RaiseEvent RemovedItem(grp, ric)
+            AddHandler group.Volume, Sub(bond As Bond) RaiseEvent Volume(bond)
         End Sub
 
         Public Sub Remove(ByVal id As Long)
             _groups.Remove(id)
-        End Sub
-
-        Public Sub RemovePoint(ByVal ric As String)
-            ' todo this must be implemented using observabledictionary and default properties on BondContainer
-            While _groups.Any(Function(grp) grp.Value.HasRic(ric))
-                Dim g = _groups.First(Function(grp) grp.Value.HasRic(ric))
-                g.Value.RemoveRic(ric)
-            End While
         End Sub
 
         Public Function FindBond(ByVal ric As String) As Bond ' todo switch to ids instead of ric I believe?
@@ -155,7 +157,6 @@ Namespace Tools
 
     Public Class Ansamble
         Private Shared ReadOnly Identities As New HashSet(Of Long)
-        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(Ansamble))
 
         Public Shared Sub ReleaseID(ByVal id As Long)
             Identities.Remove(id)
@@ -172,7 +173,6 @@ Namespace Tools
         End Function
 
         Private _xSource As XSource
-
         Public Property XSource() As XSource
             Get
                 Return _xSource
@@ -194,45 +194,53 @@ Namespace Tools
             End Set
         End Property
 
-        Private ReadOnly _groups As New GroupContainer(Of Group)
+        Private WithEvents _groups As New GroupContainer(Of Group)
         Public ReadOnly Property Groups As GroupContainer(Of Group)
             Get
                 Return _groups
             End Get
         End Property
 
-        Private ReadOnly _curves As New GroupContainer(Of BondCurve)
+        Private WithEvents _curves As New GroupContainer(Of BondCurve)
         Public ReadOnly Property BondCurves As GroupContainer(Of BondCurve)
             Get
                 Return _curves
             End Get
         End Property
 
-        Public Sub AddGroup(ByVal group As Group)
-            _groups.Add(group)
-            AddHandler group.Quote, Sub(bond As Bond) RaiseEvent Quote(bond)
-            AddHandler group.RemovedItem, Sub(grp As Group, ric As String) RaiseEvent RemovedItem(grp, ric)
-            AddHandler group.Volume, Sub(obj As Bond) RaiseEvent Volume(obj)
-            AddHandler group.Clear, Sub(obj As Group) RaiseEvent Clear(obj)
-        End Sub
-
-
-        Public Sub AddBondCurve(ByVal curve As BondCurve)
-            _curves.Add(curve)
-            'AddHandler curve.Updated, Sub(bond As Bond) RaiseEvent Quote(bond)
-            'AddHandler curve.RemovedItem, Sub(grp As Group, ric As String) RaiseEvent RemovedItem(grp, ric)
-            'AddHandler curve.Volume, Sub(obj As Bond) RaiseEvent Volume(obj)
-            'AddHandler curve.Clear, Sub(obj As Group) RaiseEvent Clear(obj)
-        End Sub
-
-        'todo that's a shame!
-        Public Event RemovedItem As Action(Of Group, String)
-        Public Event Quote As Action(Of Bond)
-        Public Event Volume As Action(Of Bond)
-        Public Event Clear As Action(Of Group)
-
         Public Sub Recalculate()
             ' todo something might have changed, I dunno what
+        End Sub
+
+        Private Sub _curves_Cleared(ByVal obj As BondCurve) Handles _curves.Cleared
+            RaiseEvent CurveCleared(obj)
+        End Sub
+
+        Public Event CurveCleared As Action(Of BondCurve)
+        Public Event CurveQuote As Action(Of BaseGroup)
+        Public Event GroupCleared As Action(Of Group)
+        Public Event BondQuote As Action(Of Bond)
+        Public Event BondRemoved As Action(Of Group, String)
+        Public Event BondVolume As Action(Of Bond)
+
+        Private Sub _curves_Quote(ByVal obj As Bond) Handles _curves.Quote
+            RaiseEvent CurveQuote(obj.Parent)
+        End Sub
+
+        Private Sub _groups_Cleared(ByVal obj As Group) Handles _groups.Cleared
+            RaiseEvent GroupCleared(obj)
+        End Sub
+
+        Private Sub _groups_Quote(ByVal obj As Bond) Handles _groups.Quote
+            RaiseEvent BondQuote(obj)
+        End Sub
+
+        Private Sub _groups_RemovedItem(ByVal arg1 As Group, ByVal arg2 As String) Handles _groups.RemovedItem
+            RaiseEvent BondRemoved(arg1, arg2)
+        End Sub
+
+        Private Sub _groups_Volume(ByVal obj As Bond) Handles _groups.Volume
+            RaiseEvent BondVolume(obj)
         End Sub
     End Class
 
@@ -241,7 +249,6 @@ Namespace Tools
 
         Private ReadOnly _parent As BaseGroup
         Private ReadOnly _metaData As BondDescription
-        'Private ReadOnly _quotesAndYields As New Dictionary(Of String, BondPointDescription)
         Public TodayVolume As Double
 
         Private _userSelectedQuote As String
@@ -351,21 +358,13 @@ Namespace Tools
             End Property
         End Class
 
-        ' todo make it a container. In this case it would be much easier to operate.
-        ' we would do new quote like this: bond.Q&Y(xmlName).Price = xxx
-        ' and this bullshit does recalculation and so on
-        ' and how would it look like for spread (used-defined)?  I dunno, I'll just say Q&Y.Recalculate maybe?
-        'Public ReadOnly Property QuotesAndYields1 As Dictionary(Of String, BondPointDescription)
-        '    Get
-        '        Return _quotesAndYields
-        '    End Get
-        'End Property
         Private ReadOnly _quotesAndYields As New QyContainer(Me)
         Public ReadOnly Property QuotesAndYields As QyContainer
             Get
                 Return _quotesAndYields
             End Get
         End Property
+
         Public ReadOnly Property Label() As String
             Get
                 Dim lab As String
@@ -384,6 +383,11 @@ Namespace Tools
                 Return Parent.BondFields.Fields
             End Get
         End Property
+
+        Public Sub Annihilate()
+            Parent.Elements.Remove(MetaData.RIC)
+            Parent.NotifyRemoved(Me)
+        End Sub
     End Class
 
     ' todo custom label
@@ -404,6 +408,7 @@ Namespace Tools
 
         Private ReadOnly _ansamble As Ansamble
 
+        Public Event Quote As Action(Of Bond)
         Public Event RemovedItem As Action(Of BaseGroup, String)
         Public Event Clear As Action(Of BaseGroup)
         Public Event Volume As Action(Of Bond)
@@ -420,11 +425,10 @@ Namespace Tools
         End Property
 
         Public PortfolioID As Long
-        Private _color As String
 
         Private WithEvents _quoteLoader As New LiveQuotes
 
-
+        Private _color As String
         Public Property Color() As String
             Get
                 Return _color
@@ -560,22 +564,25 @@ Namespace Tools
             Return _elements(ric)
         End Function
 
-        Public Sub RemoveRic(ByVal ric As String)
-            _quoteLoader.CancelItem(ric)
-            While _elements.Any(Function(elem) elem.Key = ric)
-                _elements.Remove(ric)
-            End While
-            RaiseEvent RemovedItem(Me, ric)
+        Public Overridable Sub NotifyQuote(ByVal bond As Bond)
+            RaiseEvent Quote(bond)
         End Sub
 
-        Public Overridable Sub NotifyQuote(ByVal bond As Bond)
+        Public Overridable Sub NotifyRemoved(ByVal bond As Bond)
+            RaiseEvent RemovedItem(Me, bond.MetaData.RIC)
+        End Sub
+
+        Public Sub Annihilate()
+            _elements.Clear()
+            _ansamble.BondCurves.Remove(Identity)
+            _ansamble.Groups.Remove(Identity)
+            RaiseEvent Clear(Me)
         End Sub
     End Class
 
     Public Class Group
         Inherits BaseGroup
 
-        Public Event Quote As Action(Of Bond)
 
         Public Sub New(ByVal ans As Ansamble, ByVal port As PortfolioSource, ByVal portfolioStructure As PortfolioStructure)
             MyBase.new(ans)
@@ -594,10 +601,6 @@ Namespace Tools
             YieldMode = SettingsManager.Instance.YieldCalcMode
 
             AddRics(portfolioStructure.Rics(port))
-        End Sub
-
-        Public Overrides Sub NotifyQuote(ByVal bond As Bond)
-            RaiseEvent Quote(bond)
         End Sub
     End Class
 
@@ -634,9 +637,16 @@ Namespace Tools
             Inherits CurveItem
             Private ReadOnly _bond As Bond
 
+            <Browsable(False)>
             Public ReadOnly Property Bond() As Bond
                 Get
                     Return _bond
+                End Get
+            End Property
+
+            Public ReadOnly Property Ric() As String
+                Get
+                    Return _bond.MetaData.RIC
                 End Get
             End Property
 
@@ -651,6 +661,7 @@ Namespace Tools
             Inherits CurveItem
             Private ReadOnly _curve As BondCurve
 
+            <Browsable(False)>
             Public ReadOnly Property Curve() As BondCurve
                 Get
                     Return _curve
@@ -705,42 +716,176 @@ Namespace Tools
             AddRics(src.GetDefaultRics())
         End Sub
 
+        Private _lastCurve As List(Of CurveItem)
+
         Public Overrides Sub NotifyQuote(ByVal bond As Bond)
-            Dim res As New List(Of CurveItem)
             If Ansamble.ChartSpreadType = SpreadType.Yield Then
+                Dim result As New List(Of CurveItem)
                 If _bootstrapped Then
-                    ' todo bootstrapping
+                    Try
+                        ' todo use date of curve instead of today
+                        Dim data = (From elem In Elements.Values
+                                    Where elem.MetaData.IssueDate <= Today And
+                                            elem.MetaData.Maturity > Today And
+                                            elem.QuotesAndYields.Any()).ToList()
+
+                        Dim params(0 To data.Count() - 1, 5) As Object
+                        For i = 0 To data.Count - 1
+                            Dim meta = data(i).MetaData
+                            params(i, 0) = "B"
+                            params(i, 1) = Today ' todo date
+                            params(i, 2) = meta.Maturity
+                            params(i, 3) = meta.GetCouponByDate(Today) ' todo date
+                            params(i, 4) = data(i).QuotesAndYields.Main.Price / 100.0 ' todo local fields priorities???
+                            params(i, 5) = meta.PaymentStructure
+                        Next
+                        Dim curveModule = New AdxYieldCurveModule
+
+                        Dim termStructure As Array = curveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
+                        For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
+                            Dim matDate = Utils.FromExcelSerialDate(termStructure.GetValue(i, 1))
+                            Dim dur = (matDate - Today).TotalDays / 365.0 ' todo date
+                            Dim yld = termStructure.GetValue(i, 2)
+                            If dur > 0 And yld > 0 Then
+                                result.Add(New PointCurveItem(dur, yld, Me))
+                            End If
+                        Next
+                    Catch ex As Exception
+                        Logger.ErrorException("Failed to bootstrap", ex)
+                        Logger.Error("Exception = {0}", ex.ToString())
+                        Return
+                    End Try
+
+                Else
+                    For Each bnd In Elements.Values
+                        Dim x As Double, y As Double
+                        Dim description = bnd.QuotesAndYields.Main
+                        If description Is Nothing Then Continue For
+
+                        Select Case Ansamble.XSource
+                            Case XSource.Duration
+                                x = description.Duration
+                            Case XSource.Maturity
+                                x = (bnd.MetaData.Maturity.Value - Date.Today).Days / 365
+                        End Select
+
+                        y = description.GetYield()
+                        If x > 0 And y > 0 Then result.Add(New BondCurveItem(x, y, bnd))
+
+                        result.Sort()
+                    Next
                 End If
-
-                For Each bnd In Elements.Values
-                    Dim x As Double, y As Double
-                    Dim description = bnd.QuotesAndYields.Main
-                    If description Is Nothing Then Continue For
-
-                    Select Case Ansamble.XSource
-                        Case XSource.Duration
-                            x = description.Duration
-                        Case XSource.Maturity
-                            x = (bnd.MetaData.Maturity.Value - Date.Today).Days / 365
-                    End Select
-
-                    y = description.GetYield()
-                    ' todo if interpolation use curveitem or even xy
-                    If x > 0 And y > 0 Then res.Add(New BondCurveItem(x, y, bnd))
-
-                    res.Sort()
-                Next
-                RaiseEvent Updated(res)
 
                 If _interpolated Then
                     ' todo interpolation
                 End If
+
+                _lastCurve = New List(Of CurveItem)(result)
+                RaiseEvent Updated(result)
             ElseIf Ansamble.ChartSpreadType.Belongs(SpreadType.ASWSpread, SpreadType.OASpread, SpreadType.ZSpread, SpreadType.PointSpread) Then
                 ' todo plotting spreads
             Else
                 Logger.Warn("Unknown spread type {0}", Ansamble.ChartSpreadType)
             End If
         End Sub
+
+        Public Overrides Sub NotifyRemoved(ByVal bond As Bond)
+            NotifyQuote(Nothing)
+        End Sub
+
+        Public Sub Bootstrap()
+            Bootstrapped = Not Bootstrapped
+        End Sub
+
+        Public Function GetSnapshot() As BondCurveSnapshot
+            Return New BondCurveSnapshot(Elements, _lastCurve)
+        End Function
+
+        Public Class BondCurveSnapshot
+            Public Class BondCurveElement
+                Implements IComparable(Of BondCurveElement)
+                Private ReadOnly _ric As String
+                Private ReadOnly _descr As String
+                Private ReadOnly _yield As Double
+                Private ReadOnly _duration As Double
+                Private ReadOnly _price As Double
+                Private ReadOnly _quote As String
+
+                Public Sub New(ByVal ric As String, ByVal descr As String, ByVal [yield] As Double, ByVal duration As Double, ByVal price As Double, ByVal quote As String)
+                    _ric = ric
+                    _descr = descr
+                    _yield = yield
+                    _duration = duration
+                    _price = price
+                    _quote = quote
+                End Sub
+
+                Public ReadOnly Property RIC() As String
+                    Get
+                        Return _ric
+                    End Get
+                End Property
+
+                Public ReadOnly Property Descr() As String
+                    Get
+                        Return _descr
+                    End Get
+                End Property
+
+                Public ReadOnly Property Yield() As Double
+                    Get
+                        Return _yield
+                    End Get
+                End Property
+
+                Public ReadOnly Property Duration() As Double
+                    Get
+                        Return _duration
+                    End Get
+                End Property
+
+                Public ReadOnly Property Price() As Double
+                    Get
+                        Return _price
+                    End Get
+                End Property
+
+                Public ReadOnly Property Quote() As String
+                    Get
+                        Return _quote
+                    End Get
+                End Property
+
+                Public Function CompareTo(ByVal other As BondCurveElement) As Integer Implements IComparable(Of BondCurveElement).CompareTo
+                    Return _duration.CompareTo(other._duration)
+                End Function
+            End Class
+
+            Private ReadOnly _current As List(Of CurveItem)
+            Public ReadOnly Property Current() As List(Of CurveItem)
+                Get
+                    Return _current
+                End Get
+            End Property
+
+            Private ReadOnly _elements As List(Of BondCurveElement)
+            Public ReadOnly Property Elements() As List(Of BondCurveElement)
+                Get
+                    Return _elements
+                End Get
+            End Property
+
+            Public Sub New(ByVal bonds As Dictionary(Of String, Bond), ByVal items As List(Of CurveItem))
+                _elements = New List(Of BondCurveElement)
+                For Each bond In bonds.Values
+                    Dim mainQuote = bond.QuotesAndYields.Main
+                    If mainQuote Is Nothing Then Continue For
+                    _elements.Add(New BondCurveElement(bond.MetaData.RIC, bond.Label, mainQuote.GetYield(), mainQuote.Duration, mainQuote.Price, bond.QuotesAndYields.MaxPriorityField))
+                Next
+                _elements.Sort()
+                _current = New List(Of CurveItem)(items)
+            End Sub
+        End Class
     End Class
 #End Region
 

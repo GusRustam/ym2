@@ -101,7 +101,7 @@ Namespace Forms.ChartForm
                                            Where TypeOf port.Source Is Chain Or TypeOf port.Source Is UserList
                                            Select New Group(_ansamble, port, portfolioStructure)
                     ' todo add custom bonds
-                    _ansamble.AddGroup(grp)
+                    _ansamble.Groups.Add(grp)
                 Next
                 _ansamble.Groups.Start()
             End Set
@@ -167,28 +167,25 @@ Namespace Forms.ChartForm
                             Dim bondDataPoint = CType(point.Tag, Bond)
                             If TypeOf bondDataPoint.Parent Is BondCurve Then
                                 BondCurveTSMI.Visible = True
-                                BondCurveTSMI.DropDownItems.Clear()
-                                For Each item In BondCurveCMS.Items
-                                    BondCurveTSMI.DropDownItems.Add(item)
-                                Next
                             Else
                                 BondCurveTSMI.Visible = False
                             End If
                             With BondCMS
-                                .Tag = bondDataPoint.MetaData.RIC
+                                .Tag = bondDataPoint
                                 .Show(TheChart, mouseEvent.Location)
                             End With
                             MainInfoLine1TSMI.Text = point.ToolTip
 
                             ExtInfoTSMI.DropDownItems.Clear()
                             For Each key In bondDataPoint.QuotesAndYields
+                                Dim currentKey = key
                                 Dim x = bondDataPoint.QuotesAndYields(key)
                                 Dim newItem = ExtInfoTSMI.DropDownItems.Add(String.Format("{0}: {1:F4}, {2:P2} {3}, {4:F2}", key, x.Price, x.Yld.Yield, x.Yld.ToWhat.Abbr, x.Duration))
                                 If bondDataPoint.QuotesAndYields.MaxPriorityField = key Then CType(newItem, ToolStripMenuItem).Checked = True
                                 AddHandler newItem.Click,
                                     Sub(sender1 As Object, e1 As EventArgs)
-                                        If key <> bondDataPoint.UserSelectedQuote Then
-                                            bondDataPoint.UserSelectedQuote = key
+                                        If currentKey <> bondDataPoint.UserSelectedQuote Then
+                                            bondDataPoint.UserSelectedQuote = currentKey
                                         Else
                                             bondDataPoint.UserSelectedQuote = ""
                                         End If
@@ -228,7 +225,8 @@ Namespace Forms.ChartForm
                             HistoryCMS.Show(TheChart, mouseEvent.Location)
 
                         ElseIf TypeOf point.Tag Is BondCurve Then
-
+                            BondCurveCMS.Tag = point.Tag
+                            BondCurveCMS.Show(TheChart, mouseEvent.Location)
                         End If
                     ElseIf htr.ChartElementType = ChartElementType.PlottingArea Or htr.ChartElementType = ChartElementType.Gridlines Then
                         ChartCMS.Show(TheChart, mouseEvent.Location)
@@ -636,18 +634,34 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub RelatedQuoteTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RelatedQuoteTSMI.Click
-            RunCommand("reuters://REALTIME/verb=FullQuote/ric=" + BondCMS.Tag.ToString())
+            If BondCMS.Tag Is Nothing Then Return
+            Dim ric = CType(BondCMS.Tag, Bond).MetaData.RIC
+            Try
+                RunCommand("reuters://REALTIME/verb=FullQuote/ric=" + ric)
+            Catch ex As Exception
+                MessageBox.Show("No permission to run external applications", "Cannot perform operation", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+            End Try
         End Sub
 
         Private Sub BondDescriptionTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles BondDescriptionTSMI.Click
-            RunCommand("reuters://REALTIME/verb=BondData/ric=" + BondCMS.Tag.ToString())
+            If BondCMS.Tag Is Nothing Then Return
+            Dim ric = CType(BondCMS.Tag, Bond).MetaData.RIC
+            Try
+                RunCommand("reuters://REALTIME/verb=BondData/ric=" + ric)
+            Catch ex As Exception
+                MessageBox.Show("No permission to run external applications", "Cannot perform operation", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+            End Try
         End Sub
 
         Private Sub RelatedChartTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RelatedChartTSMI.Click
-            RunCommand("reuters://REALTIME/verb=RelatedGraph/ric=" + BondCMS.Tag.ToString())
+            If BondCMS.Tag Is Nothing Then Return
+            Dim ric = CType(BondCMS.Tag, Bond).MetaData.RIC
+            Try
+                RunCommand("reuters://REALTIME/verb=RelatedGraph/ric=" + ric)
+            Catch ex As Exception
+                MessageBox.Show("No permission to run external applications", "Cannot perform operation", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+            End Try
         End Sub
-
-
 
         Private Sub ShowCurveItemsTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles ShowCurveItemsTSMI.Click
             Dim aTable As DataGridView
@@ -705,21 +719,21 @@ Namespace Forms.ChartForm
 
             tl.Controls.Add(aTable, 0, 1)
 
-            Dim rmHandler = GetRemoveHandler(aForm, aTable, theCurve)
-            'AddHandler removeButton.Click, rmHandler
-            'AddHandler addButton.Click, GetAddHandler(theCurve)
+            'Dim rmHandler = GetRemoveHandler(aForm, aTable, theCurve)
+            ''AddHandler removeButton.Click, rmHandler
+            ''AddHandler addButton.Click, GetAddHandler(theCurve)
 
-            AddHandler aTable.RowHeaderMouseClick,
-                Sub(sender1 As Object, args As MouseEventArgs)
-                    'If Not TypeOf theCurve Is YieldCurve Then Return
+            'AddHandler aTable.RowHeaderMouseClick,
+            '    Sub(sender1 As Object, args As MouseEventArgs)
+            '        'If Not TypeOf theCurve Is YieldCurve Then Return
 
-                    If args.Button = MouseButtons.Right Then
-                        Dim cms As New ContextMenuStrip
-                        Dim removeItemTSMI = cms.Items.Add("Remove item from curve")
-                        AddHandler removeItemTSMI.Click, rmHandler
-                        cms.Show(MousePosition)
-                    End If
-                End Sub
+            '        If args.Button = MouseButtons.Right Then
+            '            Dim cms As New ContextMenuStrip
+            '            Dim removeItemTSMI = cms.Items.Add("Remove item from curve")
+            '            AddHandler removeItemTSMI.Click, rmHandler
+            '            cms.Show(MousePosition)
+            '        End If
+            '    End Sub
             aForm.ShowDialog()
         End Sub
 
@@ -878,7 +892,7 @@ Namespace Forms.ChartForm
             Dim curve = New BondCurve(_ansamble, src)
             AddHandler curve.Updated, AddressOf OnNewCurvePaint
             AddHandler curve.Clear, AddressOf NewCurveDeleted
-            _ansamble.AddBondCurve(curve)
+            _ansamble.BondCurves.Add(curve)
             curve.StartAll()
         End Sub
 
@@ -969,7 +983,8 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub RemovePointTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RemovePointTSMI.Click
-            _ansamble.Groups.RemovePoint(BondCMS.Tag.ToString())
+            If BondCMS.Tag Is Nothing Then Return
+            CType(BondCMS.Tag, Bond).Annihilate()
         End Sub
 
         Private Sub ShowHistoryTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles ShowHistoryTSMI.Click
@@ -977,7 +992,8 @@ Namespace Forms.ChartForm
             Try
                 Dim historyLoader As New HistoryLoadManager_v2
                 AddHandler historyLoader.HistoricalData, AddressOf OnHistoricalData
-                historyLoader.StartTask(BondCMS.Tag, "DATE, CLOSE", DateTime.Today.AddDays(-90), DateTime.Today, timeOut:=15)
+                Dim item = CType(BondCMS.Tag, Bond)
+                historyLoader.StartTask(item.MetaData.RIC, "DATE, CLOSE", DateTime.Today.AddDays(-90), DateTime.Today, timeOut:=15)
             Catch ex As Exception
                 Logger.ErrorException("Got exception", ex)
                 Logger.Error("Exception = {0}", ex.ToString())
@@ -1004,7 +1020,7 @@ Namespace Forms.ChartForm
 #End Region
 
 #Region "e) Assembly and curves events"
-        Private Sub OnGroupClear(ByVal group As Group) Handles _ansamble.Clear
+        Private Sub OnGroupClear(ByVal group As Group) Handles _ansamble.GroupCleared
             Logger.Trace("OnGroupClear()")
             GuiAsync(
                 Sub()
@@ -1023,21 +1039,15 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
-        'Private Sub OnBondAllQuotes(ByVal data As List(Of Bond)) Handles _ansamble.AllQuotes
-        '    Logger.Trace("OnBondAllQuotes()")
-        '    data.ForEach(Sub(elem) OnBondQuote(elem, True))
-        '    SetChartMinMax()
-        'End Sub
-
-        Private Sub OnBondQuote(ByVal descr As Bond, Optional ByVal raw As Boolean = False) Handles _ansamble.Quote
-            Logger.Trace("OnBondQuote({0}, {1})", descr.MetaData.ShortName, descr.Parent.SeriesName)
+        Private Sub OnBondQuote(ByVal bnd As Bond, Optional ByVal raw As Boolean = False) Handles _ansamble.BondQuote
+            Logger.Trace("OnBondQuote({0}, {1})", bnd.MetaData.ShortName, bnd.Parent.SeriesName)
             GuiAsync(
                 Sub()
-                    Dim group = descr.Parent
-                    Dim maxPriorityField = descr.QuotesAndYields.MaxPriorityField
+                    Dim group = bnd.Parent
+                    Dim maxPriorityField = bnd.QuotesAndYields.MaxPriorityField
                     If maxPriorityField = "" Then Return
-                    Dim calc = descr.QuotesAndYields(maxPriorityField)
-                    Dim ric = descr.MetaData.RIC
+                    Dim calc = bnd.QuotesAndYields(maxPriorityField)
+                    Dim ric = bnd.MetaData.RIC
 
                     Dim series As Series = TheChart.Series.FindByName(group.SeriesName)
                     Dim clr = Color.FromName(group.Color)
@@ -1089,15 +1099,15 @@ Namespace Forms.ChartForm
                             Else
                                 point.MarkerStyle = IIf(calc.Yld.ToWhat.Equals(YieldToWhat.Maturity), MarkerStyle.Circle, MarkerStyle.Triangle)
                             End If
-                            If ShowLabelsTSB.Checked Then point.Label = descr.Label
+                            If ShowLabelsTSB.Checked Then point.Label = bnd.Label
                         Else
                             series.Points.Remove(point)
                         End If
                     ElseIf yValue IsNot Nothing Then
                         point = New DataPoint(calc.Duration, yValue.Value) With {
-                            .Name = descr.MetaData.RIC,
-                            .Tag = descr,
-                            .ToolTip = descr.MetaData.ShortName,
+                            .Name = bnd.MetaData.RIC,
+                            .Tag = bnd,
+                            .ToolTip = bnd.MetaData.ShortName,
                             .Color = Color.FromName(calc.BackColor)
                         }
                         Dim style As MarkerStyle
@@ -1106,14 +1116,14 @@ Namespace Forms.ChartForm
                         Else
                             point.MarkerStyle = IIf(calc.Yld.ToWhat.Equals(YieldToWhat.Maturity), MarkerStyle.Circle, MarkerStyle.Triangle)
                         End If
-                        If ShowLabelsTSB.Checked Then point.Label = descr.MetaData.ShortName
+                        If ShowLabelsTSB.Checked Then point.Label = bnd.MetaData.ShortName
                         series.Points.Add(point)
                     End If
                     If Not raw Then SetChartMinMax()
                 End Sub)
         End Sub
 
-        Private Sub OnRemovedItem(ByVal group As Group, ByVal ric As String) Handles _ansamble.RemovedItem
+        Private Sub OnRemovedItem(ByVal group As Group, ByVal ric As String) Handles _ansamble.BondRemoved
             Logger.Trace("OnRemovedItem({0})", ric)
             GuiAsync(
                 Sub()
@@ -1151,13 +1161,12 @@ Namespace Forms.ChartForm
 #End Region
 #End Region
 
-        Private Sub SetLabel(ByVal ric As String, ByVal mode As LabelMode)
+        Private Sub SetLabel(ByVal bond As Bond, ByVal mode As LabelMode)
             Try
-                Dim bond = _ansamble.Groups.FindBond(ric)
                 Dim group = bond.Parent
                 bond.LabelMode = mode
                 If ShowLabelsTSB.Checked Then
-                    TheChart.Series.FindByName(group.SeriesName).Points.First(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric).Label = bond.Label
+                    TheChart.Series.FindByName(group.Identity).Points.First(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = bond.MetaData.RIC).Label = bond.Label
                 End If
             Catch ex As Exception
                 Logger.WarnException("Failed to set label mode", ex)
@@ -1166,18 +1175,22 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub IssuerNameSeriesTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles IssuerNameSeriesTSMI.Click
+            If BondCMS.Tag Is Nothing Then Return
             SetLabel(BondCMS.Tag, LabelMode.IssuerAndSeries)
         End Sub
 
         Private Sub ShortNameTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles ShortNameTSMI.Click
+            If BondCMS.Tag Is Nothing Then Return
             SetLabel(BondCMS.Tag, LabelMode.IssuerCpnMat)
         End Sub
 
         Private Sub DescriptionTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles DescriptionTSMI.Click
+            If BondCMS.Tag Is Nothing Then Return
             SetLabel(BondCMS.Tag, LabelMode.Description)
         End Sub
 
         Private Sub SeriesOnlyTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SeriesOnlyTSMI.Click
+            If BondCMS.Tag Is Nothing Then Return
             SetLabel(BondCMS.Tag, LabelMode.SeriesOnly)
         End Sub
 
@@ -1218,5 +1231,42 @@ Namespace Forms.ChartForm
             SetSeriesLabel(BondSetCMS.Tag, LabelMode.IssuerCpnMat)
         End Sub
 
+        Private Sub BondCurveTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BondCurveTSMI.Click
+            If BondCMS.Tag Is Nothing Then Return
+            BondCurveCMS.Tag = CType(BondCMS.Tag, Bond).Parent
+            BondCurveCMS.Show(MousePosition)
+        End Sub
+
+        Private Sub DeleteBondCurveTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles DeleteBondCurveTSMI.Click
+            If BondCurveCMS.Tag Is Nothing Then Return
+            Dim crv = CType(BondCurveCMS.Tag, BondCurve)
+            crv.Annihilate()
+        End Sub
+
+        Private Sub BootstrappingToolStripMenuItem_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BootstrappingToolStripMenuItem.Click
+            If BondCurveCMS.Tag Is Nothing Then Return
+            Dim crv = CType(BondCurveCMS.Tag, BondCurve)
+            crv.Bootstrap()
+        End Sub
+
+        Private Sub ShowBondCurveItemsTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles ShowBondCurveItemsTSMI.Click
+            If BondCurveCMS.Tag Is Nothing Then Return
+            Dim curveData = CType(BondCurveCMS.Tag, BondCurve).GetSnapshot()
+            Dim frm As New BondCurveItemsForm
+            frm.BondsDGV.DataSource = curveData.Elements
+            frm.CurrentDGV.DataSource = curveData.Current
+            frm.ShowDialog()
+        End Sub
+
+        Private Sub LinRegTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles _
+            LinRegTSMI.Click, LogRegTSMI.Click, InvRegTSMI.Click, PowRegTSMI.Click, _
+            PolyRegTSMI.Click, NelsonSiegelSvenssonTSMI.Click, LinInterpTSMI.Click, CubSplineTSMI.Click, _
+            VasicekTSMI.Click, CIRRTSMI.Click
+
+            If BondCurveCMS.Tag Is Nothing Then Return
+            Dim curve = CType(BondCurveCMS.Tag, BondCurve)
+            Dim snd = CType(sender, ToolStripMenuItem)
+            'curve.SetFitMode(snd.Tag)
+        End Sub
     End Class
 End Namespace
