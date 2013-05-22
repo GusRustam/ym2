@@ -4,6 +4,7 @@ Imports System.Drawing
 Imports AdfinXAnalyticsFunctions
 Imports System.ComponentModel
 Imports DbManager.Bonds
+Imports YieldMap.Tools.Elements
 Imports YieldMap.Forms.PortfolioForm
 Imports Settings
 Imports Uitls

@@ -1,0 +1,180 @@
+Imports DbManager
+Imports DbManager.Bonds
+Imports Settings
+
+Namespace Tools.Elements
+    Public Class Bond
+        Inherits Identifyable
+
+        Private _enabled As Boolean = True
+
+        Public Property Enabled() As Boolean
+            Get
+                Return _enabled
+            End Get
+            Set(ByVal value As Boolean)
+                _enabled = value
+            End Set
+        End Property
+
+        Private ReadOnly _parent As BaseGroup
+        Private ReadOnly _metaData As BondDescription
+        Public TodayVolume As Double
+
+        Private _userSelectedQuote As String
+        Public Property UserSelectedQuote As String
+            Get
+                Return _userSelectedQuote
+            End Get
+            Set(ByVal value As String)
+                _userSelectedQuote = value
+                Parent.NotifyQuote(Me)
+            End Set
+        End Property
+
+        Private _usedDefinedSpread As Double
+
+        Public Property UsedDefinedSpread() As Double
+            Get
+                Return _usedDefinedSpread
+            End Get
+            Set(ByVal value As Double)
+                _usedDefinedSpread = value
+                Parent.NotifyQuote(Me)
+            End Set
+        End Property
+
+        Private _labelMode As LabelMode = LabelMode.IssuerAndSeries
+
+        Public Property LabelMode As LabelMode
+            Get
+                Return _labelMode
+            End Get
+            Set(ByVal value As LabelMode)
+                _labelMode = value
+            End Set
+        End Property
+
+        Sub New(ByVal parent As BaseGroup, ByVal metaData As BondDescription)
+            _parent = parent
+            _metaData = metaData
+        End Sub
+
+        Public ReadOnly Property Parent As BaseGroup
+            Get
+                Return _parent
+            End Get
+        End Property
+
+        Public ReadOnly Property MetaData As BondDescription
+            Get
+                Return _metaData
+            End Get
+        End Property
+
+        Public Class QyContainer
+            Implements IEnumerable(Of String)
+            Private ReadOnly _parent As Bond
+            Private ReadOnly _quotesAndYields As New Dictionary(Of String, BondPointDescription)
+
+            Sub New(ByVal parent As Bond)
+                _parent = parent
+            End Sub
+
+            Default Public Property Val(ByVal key As String) As BondPointDescription
+                Get
+                    Return If(_quotesAndYields.ContainsKey(key), _quotesAndYields(key), Nothing)
+                End Get
+                Set(ByVal value As BondPointDescription)
+                    _quotesAndYields(key) = value
+                End Set
+            End Property
+
+            Public ReadOnly Property MaxPriorityField() As String
+                Get
+                    If _parent.UserSelectedQuote <> "" Then Return _parent.UserSelectedQuote
+                    Dim forbiddenFields = SettingsManager.Instance.ForbiddenFields.Split(",")
+                    Dim existingFields = (From item In _quotesAndYields.Keys
+                            Where _quotesAndYields(item).Price > 0 AndAlso Not forbiddenFields.Contains(item)).ToList()
+                    Dim allowedFields = SettingsManager.Instance.FieldsPriority.Split(",")
+                    If Not allowedFields.Any OrElse Not existingFields.Any Then Return ""
+
+                    Dim i As Integer
+                    For i = 0 To allowedFields.Count() - 1
+                        If existingFields.Contains(allowedFields(i)) Then Return allowedFields(i)
+                    Next
+                    Return ""
+                End Get
+            End Property
+
+            Public Function Has(ByVal key As String) As Boolean
+                Return _quotesAndYields.ContainsKey(key)
+            End Function
+
+            Public Function IEnumerable_GetEnumerator() As IEnumerator(Of String) Implements IEnumerable(Of String).GetEnumerator
+                Return _quotesAndYields.Keys.GetEnumerator()
+            End Function
+
+            Public Function GetEnumerator() As IEnumerator Implements IEnumerable.GetEnumerator
+                Return _quotesAndYields.Keys.GetEnumerator()
+            End Function
+
+            Public ReadOnly Property Main() As BondPointDescription
+                Get
+                    Dim priorityField = MaxPriorityField
+                    Return If(priorityField <> "", _quotesAndYields(priorityField), Nothing)
+                End Get
+            End Property
+        End Class
+
+        Private ReadOnly _quotesAndYields As New QyContainer(Me)
+        Public ReadOnly Property QuotesAndYields As QyContainer
+            Get
+                Return _quotesAndYields
+            End Get
+        End Property
+
+        Public ReadOnly Property Label() As String
+            Get
+                Dim lab As String
+                Select Case LabelMode
+                    Case LabelMode.IssuerAndSeries : lab = MetaData.Label1
+                    Case LabelMode.IssuerCpnMat : lab = MetaData.Label2
+                    Case LabelMode.Description : lab = MetaData.Label3
+                    Case LabelMode.SeriesOnly : lab = MetaData.Label4
+                End Select
+                Label = lab
+            End Get
+        End Property
+
+        Public ReadOnly Property Fields() As FieldsDescription
+            Get
+                Return Parent.BondFields.Fields
+            End Get
+        End Property
+
+        Public Sub Disable()
+            Enabled = False
+            Parent.NotifyRemoved(Me)
+        End Sub
+
+        Public Sub Enable()
+            Enabled = True
+            Parent.NotifyQuote(Me)
+        End Sub
+
+        Public Sub Annihilate()
+            Parent.Elements.Remove(Me)
+            Parent.NotifyRemoved(Me)
+        End Sub
+
+        Sub SetCustomPrice(ByVal price As Double)
+            If price > 0 Then
+                UserSelectedQuote = Fields.Custom
+                QuotesAndYields(Fields.Custom).Price = price ' todo <<<
+                Parent.NotifyQuote(Me)
+            End If
+        End Sub
+
+    End Class
+End NameSpace

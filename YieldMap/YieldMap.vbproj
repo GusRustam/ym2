@@ -198,7 +198,9 @@
     <Compile Include="Forms\PortfolioForm\PortfolioForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Tools\ChartElements.vb" />
+    <Compile Include="Tools\Elements\BaseGroup.vb" />
+    <Compile Include="Tools\Elements\BondCurve.vb" />
+    <Compile Include="Tools\Elements\ChartElements.vb" />
     <Compile Include="Forms\ChartForm\GraphForm.Designer.vb">
       <DependentUpon>GraphForm.vb</DependentUpon>
     </Compile>
@@ -253,7 +255,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Tools\Element.vb" />
+    <Compile Include="Tools\Elements\Element.vb" />
+    <Compile Include="Tools\Elements\Group.vb" />
     <Compile Include="Tools\Estimation.vb" />
     <Compile Include="Tools\YieldCalc.vb" />
   </ItemGroup>

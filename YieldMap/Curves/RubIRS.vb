@@ -2,6 +2,7 @@
 Imports AdfinXRtLib
 Imports System.Text.RegularExpressions
 Imports System.Drawing
+Imports YieldMap.Tools.Elements
 Imports ReutersData
 Imports Uitls
 Imports YieldMap.Tools.Estimation

@@ -1,6 +1,7 @@
 ﻿Imports System.Windows.Forms.DataVisualization.Charting
 Imports DbManager
 Imports DbManager.Bonds
+Imports YieldMap.Tools.Elements
 Imports ReutersData
 Imports Uitls
 Imports YieldMap.Tools.History

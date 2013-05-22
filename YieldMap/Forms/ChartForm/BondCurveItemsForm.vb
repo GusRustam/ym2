@@ -1,4 +1,5 @@
-﻿Imports YieldMap.Tools
+﻿Imports YieldMap.Tools.Elements
+Imports YieldMap.Tools
 
 Namespace Forms.ChartForm
     Public Class BondCurveItemsForm

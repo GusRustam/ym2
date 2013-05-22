@@ -4,6 +4,7 @@ Imports AdfinXAnalyticsFunctions
 Imports System.ComponentModel
 Imports DbManager.Bonds
 Imports DbManager
+Imports YieldMap.Tools.Elements
 Imports ReutersData
 Imports Uitls
 Imports YieldMap.Commons
