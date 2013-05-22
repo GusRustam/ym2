@@ -633,6 +633,13 @@ Namespace Tools
                 NotifyQuote(item)
             Next
         End Sub
+
+        Public Sub Enable(ByVal rics As List(Of String))
+            For Each item In (From elem In _elements Where rics.Contains(elem.MetaData.RIC))
+                item.Enabled = True
+                NotifyQuote(item)
+            Next
+        End Sub
     End Class
 
     Public Class Group
@@ -878,7 +885,7 @@ Namespace Tools
         End Sub
 
         Public Function GetSnapshot() As BondCurveSnapshot
-            Return New BondCurveSnapshot(Elements, _lastCurve)
+            Return New BondCurveSnapshot(AllElements, _lastCurve)
         End Function
 
         Public Class BondCurveSnapshot
@@ -948,21 +955,32 @@ Namespace Tools
                 End Get
             End Property
 
-            Private ReadOnly _elements As List(Of BondCurveElement)
-            Public ReadOnly Property Elements() As List(Of BondCurveElement)
+            Private ReadOnly _disabledElements As New List(Of BondCurveElement)
+            Public ReadOnly Property DisabledElements() As List(Of BondCurveElement)
                 Get
-                    Return _elements
+                    Return _disabledElements
+                End Get
+            End Property
+
+            Private ReadOnly _enabledElements As New List(Of BondCurveElement)
+            Public ReadOnly Property EnabledElements() As List(Of BondCurveElement)
+                Get
+                    Return _enabledElements
                 End Get
             End Property
 
             Public Sub New(ByVal bonds As List(Of Bond), ByVal items As List(Of CurveItem))
-                _elements = New List(Of BondCurveElement)
                 For Each bond In bonds
                     Dim mainQuote = bond.QuotesAndYields.Main
                     If mainQuote Is Nothing Then Continue For
-                    _elements.Add(New BondCurveElement(bond.MetaData.RIC, bond.Label, mainQuote.GetYield(), mainQuote.Duration, mainQuote.Price, bond.QuotesAndYields.MaxPriorityField))
+                    If bond.Enabled Then
+                        _enabledElements.Add(New BondCurveElement(bond.MetaData.RIC, bond.Label, mainQuote.GetYield(), mainQuote.Duration, mainQuote.Price, bond.QuotesAndYields.MaxPriorityField))
+                    Else
+                        _disabledElements.Add(New BondCurveElement(bond.MetaData.RIC, bond.Label, mainQuote.GetYield(), mainQuote.Duration, mainQuote.Price, bond.QuotesAndYields.MaxPriorityField))
+                    End If
                 Next
-                _elements.Sort()
+                _enabledElements.Sort()
+                _disabledElements.Sort()
                 _current = New List(Of CurveItem)(items)
             End Sub
         End Class

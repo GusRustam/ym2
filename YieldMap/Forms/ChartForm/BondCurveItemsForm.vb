@@ -30,7 +30,7 @@ Namespace Forms.ChartForm
         Private Sub CurveUpdate()
             If Curve IsNot Nothing Then
                 Dim curveSnapshot = Curve.GetSnapshot()
-                BondsDGV.DataSource = curveSnapshot.Elements
+                BondsDGV.DataSource = curveSnapshot.EnabledElements
                 CurrentDGV.DataSource = curveSnapshot.Current
                 FormulaTB.Text = Curve.Formula
             Else
@@ -63,6 +63,9 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub AddItemsTSB_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AddItemsTSB.Click
+            Dim frm As New AddBondCurveItemsForm
+            frm.Curve = Curve
+            frm.ShowDialog()
             ' todo
             ' todo 1) отдельная опция - показ отдельно точек по облигациям
             ' todo 2) конвертация группы в кривую
