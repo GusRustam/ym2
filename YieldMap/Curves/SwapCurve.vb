@@ -64,10 +64,10 @@ Namespace Curves
 
         Protected MustOverride Function GetRICs(ByVal broker As String) As List(Of String)
 
-        Public MustOverride Sub RecalculateByType(ByVal type As SpreadType)
+        Public MustOverride Sub RecalculateByType(ByVal type As YSource)
         Protected MustOverride Sub Recalculate(ByRef list As List(Of SwapPointDescription))
 
-        Public Sub CleanupByType(ByVal type As SpreadType)
+        Public Sub CleanupByType(ByVal type As YSource)
             Dim rics = Descrs.Keys.ToList()
             rics.ForEach(Sub(ric) SpreadBmk.CleanupSpread(Descrs(ric), type))
         End Sub
@@ -132,7 +132,7 @@ Namespace Curves
                 Dim points = GetCurveData(True)
                 Dim estimator = New Estimator(mode)
 
-                Dim xyPoints = estimator.Approximate(XY.ConvertToXY(points, SpreadType.Yield))
+                Dim xyPoints = estimator.Approximate(XY.ConvertToXY(points, YSource.Yield))
                 Dim len = xyPoints.Count() - 1
                 Dim res(0 To len, 1) As Object
                 For i = 0 To xyPoints.Count() - 1

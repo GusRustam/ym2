@@ -264,8 +264,12 @@ Namespace Tools.Elements
             AddRics(src.GetDefaultRics())
         End Sub
 
+        Private Sub OnHistoricalData(ByVal ric As String, ByVal status As LoaderStatus, ByVal hstatus As HistoryStatus, ByVal data As Dictionary(Of Date, HistoricalItem)) Handles _histLoader.HistoricalData
+
+        End Sub
+
         Public Overrides Sub NotifyQuote(ByVal bond As Bond)
-            If Ansamble.ChartSpreadType = SpreadType.Yield Then
+            If Ansamble.YSource = YSource.Yield Then
                 Dim result As New List(Of CurveItem)
                 If _bootstrapped Then
                     Try
@@ -331,10 +335,10 @@ Namespace Tools.Elements
 
                 _lastCurve = New List(Of CurveItem)(result)
                 RaiseEvent Updated(result)
-            ElseIf Ansamble.ChartSpreadType.Belongs(SpreadType.ASWSpread, SpreadType.OASpread, SpreadType.ZSpread, SpreadType.PointSpread) Then
+            ElseIf Ansamble.YSource.Belongs(YSource.ASWSpread, YSource.OASpread, YSource.ZSpread, YSource.PointSpread) Then
                 ' todo plotting spreads
             Else
-                Logger.Warn("Unknown spread type {0}", Ansamble.ChartSpreadType)
+                Logger.Warn("Unknown spread type {0}", Ansamble.YSource)
             End If
         End Sub
 
@@ -350,15 +354,10 @@ Namespace Tools.Elements
             Return New BondCurveSnapshot(AllElements, _lastCurve)
         End Function
 
-
-
         Public Sub SetFitMode(ByVal mode As String)
             Dim model = EstimationModel.FromName(mode)
             EstModel = If(model Is Nothing OrElse (EstModel IsNot Nothing AndAlso EstModel = model), Nothing, model)
         End Sub
 
-        Private Sub OnHistoricalData(ByVal ric As String, ByVal status As LoaderStatus, ByVal hstatus As HistoryStatus, ByVal data As Dictionary(Of Date, HistoricalItem)) Handles _histLoader.HistoricalData
-
-        End Sub
     End Class
 End NameSpace

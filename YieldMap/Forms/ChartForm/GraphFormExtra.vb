@@ -4,7 +4,6 @@ Imports DbManager.Bonds
 Imports YieldMap.Tools.Elements
 Imports ReutersData
 Imports Uitls
-Imports YieldMap.Tools.History
 Imports YieldMap.Tools.Estimation
 Imports YieldMap.Curves
 Imports YieldMap.Tools
@@ -123,7 +122,7 @@ Namespace Forms.ChartForm
         Private Sub ShowYAxisCMS(ByVal loc As Point)
             If Not _spreadBenchmarks.Benchmarks.Any Then Return
             YAxisCMS.Items.Clear()
-            YAxisCMS.Items.Add(SpreadType.Yield.ToString(), Nothing, AddressOf OnYAxisSelected)
+            YAxisCMS.Items.Add(YSource.Yield.ToString(), Nothing, AddressOf OnYAxisSelected)
             _spreadBenchmarks.Benchmarks.Keys.ToList.ForEach(Sub(key) YAxisCMS.Items.Add(key.Name, Nothing, AddressOf OnYAxisSelected))
             YAxisCMS.Show(TheChart, loc)
         End Sub
@@ -191,10 +190,10 @@ Namespace Forms.ChartForm
         Private Sub SetYAxisMode(ByVal str As String)
             Try
                 Select Case str
-                    Case SpreadType.Yield.ToString() : MakeAxisY("Yield, %", "P2")
-                    Case SpreadType.ASWSpread.ToString() : MakeAxisY("ASW Spread, b.p.", "N0")
-                    Case SpreadType.PointSpread.ToString() : MakeAxisY("Spread, b.p.", "N0")
-                    Case SpreadType.ZSpread.ToString() : MakeAxisY("Z-Spread, b.p.", "N0")
+                    Case YSource.Yield.ToString() : MakeAxisY("Yield, %", "P2")
+                    Case YSource.ASWSpread.ToString() : MakeAxisY("ASW Spread, b.p.", "N0")
+                    Case YSource.PointSpread.ToString() : MakeAxisY("Spread, b.p.", "N0")
+                    Case YSource.ZSpread.ToString() : MakeAxisY("Z-Spread, b.p.", "N0")
                 End Select
                 TheChart.ChartAreas(0).AxisX.ScaleView.ZoomReset()
                 TheChart.ChartAreas(0).AxisY.ScaleView.ZoomReset()
@@ -232,7 +231,7 @@ Namespace Forms.ChartForm
                                  Where srs.Enabled And srs.Points.Any
                                  Select (
                                      From pnt In srs.Points
-                                     Where pnt.YValues.Any And (_spreadBenchmarks.CurrentType <> SpreadType.Yield OrElse pnt.YValues.First > 0)
+                                     Where pnt.YValues.Any And (_spreadBenchmarks.CurrentType <> YSource.Yield OrElse pnt.YValues.First > 0)
                                      Select pnt.YValues.First).Min
 
 
@@ -244,7 +243,7 @@ Namespace Forms.ChartForm
                     Dim newMin = lstMin.Min
 
                     Dim minMin As Double?, maxMax As Double?
-                    If _spreadBenchmarks.CurrentType = SpreadType.Yield Then
+                    If _spreadBenchmarks.CurrentType = YSource.Yield Then
                         minMin = _theSettings.MinYield / 100
                         maxMax = _theSettings.MaxYield / 100
                     Else
@@ -257,7 +256,7 @@ Namespace Forms.ChartForm
                         theMin = If(minMin.HasValue, Math.Max(minMin.Value, newMin), newMin)
                         theMax = If(maxMax.HasValue, Math.Min(maxMax.Value, newMax), newMax)
 
-                        Dim pow = If(_spreadBenchmarks.CurrentType = SpreadType.Yield, 3, 0)
+                        Dim pow = If(_spreadBenchmarks.CurrentType = YSource.Yield, 3, 0)
                         theMax = Math.Ceiling(theMax * (10 ^ pow)) / (10 ^ pow)
                         theMin = Math.Floor(theMin * (10 ^ pow)) / (10 ^ pow)
                         If theMax > theMin Then
@@ -415,10 +414,10 @@ Namespace Forms.ChartForm
 
                 Dim elem = _ansamble.Groups.FindBond(ric)
                 Dim bondDataPoint = elem.MetaData ' todo that's awful
-                Dim points As New List(Of Tuple(Of HistPointDescription, BondDescription))
+                Dim points As New List(Of Tuple(Of BondPointDescription, BondDescription))
                 For Each dt In data.Keys
                     Try
-                        Dim calc As New HistPointDescription
+                        Dim calc As New BondPointDescription
                         If data(dt).Close > 0 Then
                             calc.Price = data(dt).Close
 
@@ -450,7 +449,7 @@ Namespace Forms.ChartForm
                             points.ForEach(
                                 Sub(tpl)
                                     Dim point = New DataPoint(tpl.Item1.Duration, tpl.Item1.GetYield.Value) With {
-                                                 .Tag = New HistoryPoint With {
+                                                 .Tag = New HistoryPointTag With {
                                                      .Ric = bondDataPoint.RIC,
                                                      .Descr = tpl.Item1,
                                                      .Meta = tpl.Item2,

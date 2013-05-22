@@ -198,9 +198,11 @@
     <Compile Include="Forms\PortfolioForm\PortfolioForm.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Tools\Elements\Ansamble.vb" />
     <Compile Include="Tools\Elements\BaseGroup.vb" />
+    <Compile Include="Tools\Elements\Bond.vb" />
     <Compile Include="Tools\Elements\BondCurve.vb" />
-    <Compile Include="Tools\Elements\ChartElements.vb" />
+    <Compile Include="Tools\Elements\GroupContainer.vb" />
     <Compile Include="Forms\ChartForm\GraphForm.Designer.vb">
       <DependentUpon>GraphForm.vb</DependentUpon>
     </Compile>
@@ -219,7 +221,7 @@
     <Compile Include="Forms\MainForm\SettingsForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\TableForm\BondDescr.vb" />
+    <Compile Include="Tools\Elements\BondDescr.vb" />
     <Compile Include="Forms\TableForm\TableForm.Designer.vb">
       <DependentUpon>TableForm.vb</DependentUpon>
     </Compile>
@@ -257,6 +259,9 @@
     </Compile>
     <Compile Include="Tools\Elements\Element.vb" />
     <Compile Include="Tools\Elements\Group.vb" />
+    <Compile Include="Tools\Elements\Identifyable.vb" />
+    <Compile Include="Tools\Elements\SpreadContainer.vb" />
+    <Compile Include="Tools\Elements\YSource.vb" />
     <Compile Include="Tools\Estimation.vb" />
     <Compile Include="Tools\YieldCalc.vb" />
   </ItemGroup>

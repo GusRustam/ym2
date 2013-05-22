@@ -100,7 +100,7 @@ Namespace Curves
             Return AllowedTenors.Select(Function(item) String.Format("{0}{1}Y={2}", InstrumentName, item, broker)).ToList()
         End Function
 
-        Public Overrides Sub RecalculateByType(ByVal type As SpreadType)
+        Public Overrides Sub RecalculateByType(ByVal type As YSource)
             Logger.Trace("RecalculateByType({0})", type)
             Dim rics = Descrs.Keys.ToList()
             If SpreadBmk.Benchmarks.ContainsKey(type) AndAlso SpreadBmk.Benchmarks(type).GetName() = GetName() Then

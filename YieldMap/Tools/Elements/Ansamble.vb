@@ -27,13 +27,13 @@ Namespace Tools.Elements
             End Set
         End Property
 
-        Private _chartSpreadType As SpreadType = SpreadType.Yield
-        Public Property ChartSpreadType() As SpreadType
+        Private _ySource As YSource = YSource.Yield
+        Public Property YSource() As YSource
             Get
-                Return _chartSpreadType
+                Return _ySource
             End Get
-            Set(ByVal value As SpreadType)
-                _chartSpreadType = value
+            Set(ByVal value As YSource)
+                _ySource = value
                 Recalculate()
             End Set
         End Property
