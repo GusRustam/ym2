@@ -3,6 +3,7 @@ Imports System.Globalization
 Imports System.Threading
 Imports NLog
 Imports Settings
+Imports System.Threading.Tasks
 
 Public Class RawHistoricalItem
     Private ReadOnly _items As New Dictionary(Of String, String)
@@ -19,6 +20,12 @@ Public Class RawHistoricalItem
     Public ReadOnly Property Has(ByVal key As String) As Boolean
         Get
             Return _items.ContainsKey(key)
+        End Get
+    End Property
+
+    Public ReadOnly Property Keys() As List(Of String)
+        Get
+            Return _items.Keys.ToList()
         End Get
     End Property
 End Class
@@ -118,34 +125,153 @@ Public Class HistoricalItem
     End Function
 End Class
 
+Public Class HistoryBlock
+    Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(HistoryBlock))
+    Public Class DataCube
+        Private ReadOnly _rfd As New Dictionary(Of Date, Dictionary(Of String, Dictionary(Of String, String)))
+        'Private ReadOnly _data As String()
 
-Public Enum HistoryStatus
-    Full
-    Null
-    Failed
-    TimeOut
-    Part
-    None ' a special case
-End Enum
+        'Private _fields As List(Of String)
+        'Private _since As Date
+        'Private _till As Date
+        'Private _rics As List(Of String)
 
-Public Enum LoaderErrReason
-    None
-    Timeout
-    DataStatus
-    Exception
-End Enum
+        Public Sub New(ByVal rics As List(Of String), ByVal fields As List(Of String), ByVal since As Date, ByVal till As Date)
+            '_since = since
+            '_till = till
+            '_rics = rics
+            '_fields = fields
+            'ReDim _data((till - since).Days, rics.Count, fields.Count)
 
-Public Structure LoaderStatus
-    Public Finished As Boolean
-    Public Err As Boolean
-    Public Reason As LoaderErrReason
+            For Each dt As DateTime In Enumerable.Range(0, (till - since).Days).Select(Function(i) since.AddDays(i))
+                _rfd(dt) = New Dictionary(Of String, Dictionary(Of String, String))
+                For Each ric In rics
+                    _rfd(dt)(ric) = New Dictionary(Of String, String)
+                    For Each field In fields
+                        _rfd(dt)(ric)(field) = ""
+                    Next
+                Next
+            Next dt
+        End Sub
 
-    Public Sub New(ByVal finished As Boolean, ByVal err As Boolean, ByVal reason As LoaderErrReason)
-        Me.Finished = finished
-        Me.Err = err
-        Me.Reason = reason
+        Public Sub Add(ByVal ric As String, ByVal field As String, ByVal dt As Date, ByVal val As String)
+            _rfd(dt)(ric)(field) = val
+            '_data()
+        End Sub
+
+        Public ReadOnly Property RicDate(ByVal ric As String, ByVal dt As Date) As Dictionary(Of String, String)
+            Get
+                Return New Dictionary(Of String, String)(_rfd(dt)(ric))
+            End Get
+        End Property
+
+        Public ReadOnly Property RicField(ByVal ric As String, ByVal field As String) As Dictionary(Of Date, String)
+            Get
+                Dim res As New Dictionary(Of Date, String)
+                For Each item In _rfd
+                    Dim dt = item.Key
+                    Dim rfv = item.Value
+                    For Each fieldVal In From elem In rfv Let rc = elem.Key Where rc = ric Select elem.Value
+                        res.Add(dt, fieldVal(field))
+                    Next
+                Next
+                Return res
+            End Get
+        End Property
+
+        Public ReadOnly Property FieldDate(ByVal field As String, ByVal dt As Date) As Dictionary(Of String, String)
+            Get
+                Dim res As New Dictionary(Of String, String)
+                For Each item In (From elem As KeyValuePair(Of String, Dictionary(Of String, String)) In _rfd(dt))
+                    Dim ric = item.Key
+                    Dim fv = item.Value
+                    res.Add(ric, fv(field))
+                Next
+                Return res
+            End Get
+        End Property
+    End Class
+
+    Private _result As DataCube
+
+    Public Event History As Action(Of DataCube)
+
+    Private _count As Integer
+    Private _failed As Boolean = False
+    Private _fields As List(Of String)
+    Private _since As Date
+    Private _till As Date
+
+    Private Sub WaiterThread()
+        Logger.Info("WaiterThread()")
+        Try
+            While Interlocked.Read(_count) > 0
+                Logger.Debug("Threads to wait: {0}", Interlocked.Read(_count))
+                Thread.Sleep(TimeSpan.FromSeconds(1))
+            End While
+        Catch ex As ThreadAbortException
+            Logger.Warn("Waiter aborted")
+            If Interlocked.Read(_count) > 0 Then
+                SyncLock Me
+                    _failed = True
+                End SyncLock
+            End If
+        End Try
     End Sub
-End Structure
+
+    Private Sub OnHistory(ByVal itemRic As String, ByVal data As Dictionary(Of Date, HistoricalItem), ByVal rawData As Dictionary(Of DateTime, RawHistoricalItem))
+        Logger.Debug("OnHistory({0})", itemRic)
+        Try
+            SyncLock _result
+                If _failed Then Return
+                If data Is Nothing Then Return
+                For Each dt In data.Keys
+                    For Each field In rawData(dt).Keys
+                        _result.Add(itemRic, field, dt, rawData(dt)(field))
+                    Next
+                Next
+            End SyncLock
+        Catch ex As Exception
+            Logger.WarnException("Failed to parse data in ric loader thread", ex)
+            Logger.Warn("Exception = {0}", ex.ToString())
+        Finally
+            Interlocked.Decrement(_count)
+        End Try
+    End Sub
+
+    Private Sub RicLoaderThread(ByVal ric As String, ByVal state As ParallelLoopState)
+        Logger.Info("RicLoaderThread({0})", ric)
+        Dim hst As New History
+        AddHandler hst.HistoricalData, AddressOf OnHistory
+
+        SyncLock Me
+            If _failed Then Return
+        End SyncLock
+        hst.StartTask(ric, String.Join(",", _fields), _since, _till)
+    End Sub
+
+    Public Sub StartHistory(ByVal rics As List(Of String), ByVal fields As List(Of String), ByVal since As Date, ByVal till As Date)
+        ' Some general-purpose fields (could use clojures instead)
+        _count = rics.Count()
+        _fields = fields
+        _since = since
+        _till = till
+
+        _result = New DataCube(rics, fields, since, till)
+
+        Dim waiter = New Thread(AddressOf WaiterThread)
+        waiter.Start()
+
+        Parallel.ForEach(rics, AddressOf RicLoaderThread)
+
+        If Not waiter.Join(TimeSpan.FromSeconds(60)) Then
+            waiter.Abort()
+            RaiseEvent History(Nothing)
+        Else
+            RaiseEvent History(_result)
+        End If
+    End Sub
+End Class
 
 Public Class History
     Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(History))
@@ -180,17 +306,6 @@ Public Class History
 
     Public Delegate Sub NewDataDelegate(ByVal ric As String, ByVal data As Dictionary(Of Date, HistoricalItem), ByVal rawData As Dictionary(Of DateTime, RawHistoricalItem))
     Public Event HistoricalData As NewDataDelegate
-
-    Public Shared Function ParseDataStatus(ByVal status As RT_DataStatus) As HistoryStatus
-        Select Case status
-            Case RT_DataStatus.RT_DS_FULL : Return HistoryStatus.Full
-            Case RT_DataStatus.RT_DS_NULL_EMPTY : Return HistoryStatus.Null
-            Case RT_DataStatus.RT_DS_NULL_ERROR : Return HistoryStatus.Failed
-            Case RT_DataStatus.RT_DS_NULL_TIMEOUT : Return HistoryStatus.Failed
-            Case RT_DataStatus.RT_DS_PARTIAL : Return HistoryStatus.Part
-            Case Else : Return Nothing
-        End Select
-    End Function
 
     Public Sub StartTask(ByVal item As String, ByVal fields As String, ByVal since As Date, ByVal till As Date, Optional ByVal frequency As String = "D", Optional ByVal timeOut As Integer = 30)
         Dim ric = item

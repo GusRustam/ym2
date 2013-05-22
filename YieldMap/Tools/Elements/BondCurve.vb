@@ -209,12 +209,23 @@ Namespace Tools.Elements
                 QuoteLoader.AddItems(rics, BondFields.AllNames)
             Else
                 QuoteLoader.CancelAll()
-                AllElements.ForEach(Sub(elem) elem.QuotesAndYields.Clear())
-                For Each ric In rics
-                    Dim histLoader As New History
-                    AddHandler histLoader.HistoricalData, AddressOf OnHistoricalData
-                    histLoader.StartTask(ric, String.Join(",", _histFields.AllNames), _date, _date)
-                Next
+                Dim q As New HistoryBlock
+                AddHandler q.History, AddressOf OnHistory
+                q.StartHistory(rics, _histFields.AllNames, _date.AddDays(-10), _date)
+                'AllElements.ForEach(Sub(elem) elem.QuotesAndYields.Clear())
+                'For Each ric In rics
+                '    Dim histLoader As New History
+                '    AddHandler histLoader.HistoricalData, AddressOf OnHistoricalData
+                '    histLoader.StartTask(ric, String.Join(",", _histFields.AllNames), _date.AddDays(-10), _date)
+                'Next
+            End If
+        End Sub
+
+        Private Sub OnHistory(ByVal obj As HistoryBlock.DataCube)
+            If obj Is Nothing Then
+                [Date] = Today
+            Else
+                Logger.Info("HAHAHAHAHA")
             End If
         End Sub
 
@@ -267,50 +278,51 @@ Namespace Tools.Elements
             AddRics(src.GetDefaultRics())
         End Sub
 
-        Private Sub OnHistoricalData(ByVal ric As String, ByVal data As Dictionary(Of Date, HistoricalItem), ByVal rawData As Dictionary(Of DateTime, RawHistoricalItem))
-            If rawData Is Nothing Then
-                Logger.Error("No data on bond {0}", ric)
-                Return
-            End If
-            Dim bonds = (From elem In AllElements Where elem.MetaData.RIC = ric)
-            If Not bonds.Any Then
-                Logger.Warn("Instrument {0} does not belong to serie {1}", ric, SeriesName)
-                Return
-            End If
-            Dim bond = bonds.First()
-
-            If Not rawData.ContainsKey(_date) Then
-                Logger.Warn("Instrument {0} has no necessary date {1:dd/MM/yyyy}", ric, _date)
-                Return
-            End If
-            Dim quote = rawData(_date)
-            Dim fieldsDescription As FieldsDescription = _histFields.Fields
-            If quote.Has(fieldsDescription.Last) Then
-                HandleQuote(bond, _histFields.XmlName(fieldsDescription.Last), quote(fieldsDescription.Last), _date)
-            End If
-            If quote.Has(fieldsDescription.Bid) Or quote.Has(fieldsDescription.Ask) Then
-                If quote.Has(fieldsDescription.Bid) And quote.Has(fieldsDescription.Ask) Then
-                    Dim bid = CDbl(quote(fieldsDescription.Bid))
-                    HandleQuote(bond, _histFields.XmlName(fieldsDescription.Bid), bid, _date)
-                    Dim ask = CDbl(quote(fieldsDescription.Ask))
-                    HandleQuote(bond, _histFields.XmlName(fieldsDescription.Mid), ask, _date)
-                    Dim mid = (bid + ask) / 2
-                    HandleQuote(bond, _histFields.XmlName(fieldsDescription.Mid), mid, _date)
-                ElseIf quote.Has(fieldsDescription.Bid) Then
-                    Dim bid = CDbl(quote(fieldsDescription.Bid))
-                    HandleQuote(bond, _histFields.XmlName(fieldsDescription.Bid), bid, _date)
-                    If Not SettingsManager.Instance.MidIfBoth Then
-                        HandleQuote(bond, _histFields.XmlName(fieldsDescription.Mid), bid, _date)
-                    End If
-                ElseIf quote.Has(fieldsDescription.Ask) Then
-                    Dim ask = CDbl(quote(fieldsDescription.Ask))
-                    HandleQuote(bond, _histFields.XmlName(fieldsDescription.Mid), ask, _date)
-                    If Not SettingsManager.Instance.MidIfBoth Then
-                        HandleQuote(bond, _histFields.XmlName(fieldsDescription.Mid), ask, _date)
-                    End If
-                End If
-            End If
-        End Sub
+        'Private Sub OnHistoricalData(ByVal ric As String, ByVal data As Dictionary(Of Date, HistoricalItem), ByVal rawData As Dictionary(Of DateTime, RawHistoricalItem))
+        '    If rawData Is Nothing Then
+        '        Logger.Error("No data on bond {0}", ric)
+        '        Return
+        '    End If
+        '    Dim bonds = (From elem In AllElements Where elem.MetaData.RIC = ric)
+        '    If Not bonds.Any Then
+        '        Logger.Warn("Instrument {0} does not belong to serie {1}", ric, SeriesName)
+        '        Return
+        '    End If
+        '    Dim bond = bonds.First()
+        '    Dim dates = (From elem In rawData.Keys Where elem <= _date).ToList()
+        '    If Not dates.Any Then
+        '        Logger.Warn("Instrument {0} has no necessary date {1:dd/MM/yyyy}", ric, _date)
+        '        Return
+        '    End If
+        '    Dim maxDate = dates.Max
+        '    Dim quote = rawData(maxDate)
+        '    Dim fieldsDescription As FieldsDescription = _histFields.Fields
+        '    If quote.Has(fieldsDescription.Last) Then
+        '        HandleQuote(bond, _histFields.XmlName(fieldsDescription.Last), quote(fieldsDescription.Last), maxDate)
+        '    End If
+        '    If quote.Has(fieldsDescription.Bid) Or quote.Has(fieldsDescription.Ask) Then
+        '        If quote.Has(fieldsDescription.Bid) And quote.Has(fieldsDescription.Ask) Then
+        '            Dim bid = CDbl(quote(fieldsDescription.Bid))
+        '            HandleQuote(bond, _histFields.XmlName(fieldsDescription.Bid), bid, maxDate)
+        '            Dim ask = CDbl(quote(fieldsDescription.Ask))
+        '            HandleQuote(bond, _histFields.XmlName(fieldsDescription.Mid), ask, maxDate)
+        '            Dim mid = (bid + ask) / 2
+        '            HandleQuote(bond, _histFields.XmlName(fieldsDescription.Mid), mid, maxDate)
+        '        ElseIf quote.Has(fieldsDescription.Bid) Then
+        '            Dim bid = CDbl(quote(fieldsDescription.Bid))
+        '            HandleQuote(bond, _histFields.XmlName(fieldsDescription.Bid), bid, maxDate)
+        '            If Not SettingsManager.Instance.MidIfBoth Then
+        '                HandleQuote(bond, _histFields.XmlName(fieldsDescription.Mid), bid, maxDate)
+        '            End If
+        '        ElseIf quote.Has(fieldsDescription.Ask) Then
+        '            Dim ask = CDbl(quote(fieldsDescription.Ask))
+        '            HandleQuote(bond, _histFields.XmlName(fieldsDescription.Mid), ask, maxDate)
+        '            If Not SettingsManager.Instance.MidIfBoth Then
+        '                HandleQuote(bond, _histFields.XmlName(fieldsDescription.Mid), ask, maxDate)
+        '            End If
+        '        End If
+        '    End If
+        'End Sub
 
         Public Overrides Sub NotifyQuote(ByVal bond As Bond)
             If Ansamble.YSource = YSource.Yield Then

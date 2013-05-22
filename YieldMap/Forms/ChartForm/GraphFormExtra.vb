@@ -291,7 +291,6 @@ Namespace Forms.ChartForm
             SpreadCMS.Items.Clear()
             SpreadCMS.Tag = nm
             'If Not _moneyMarketCurves.Any() Then Return
-            ' todo add menu point to add a curve...
             _moneyMarketCurves.ForEach(
                 Sub(item)
                     Dim elem = CType(SpreadCMS.Items.Add(item.GetFullName(), Nothing, AddressOf OnYieldCurveSelected), ToolStripMenuItem)
@@ -486,8 +485,8 @@ Namespace Forms.ChartForm
                              .Name = crv.Identity,
                              .legendText = crv.SeriesName,
                              .ChartType = SeriesChartType.Line,
+                             .borderWidth = 2,
                              .color = Color.FromName(crv.Color),
-                             .borderWidth = 1,
                              .Tag = crv.Identity
                          }
                          TheChart.Series.Add(srs)
