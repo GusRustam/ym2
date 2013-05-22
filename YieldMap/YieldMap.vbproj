@@ -254,7 +254,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Tools\Element.vb" />
-    <Compile Include="Tools\Estimation\LinearRegression.vb" />
+    <Compile Include="Tools\Estimation.vb" />
     <Compile Include="Tools\YieldCalc.vb" />
   </ItemGroup>
   <ItemGroup>
@@ -474,9 +474,7 @@
       <Name>Uitls</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Tools\History\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <ProjectExtensions>
     <VisualStudio>

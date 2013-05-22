@@ -600,7 +600,8 @@ Namespace Tools
         End Sub
 
         Friend Function GetBond(ByVal ric As String) As Bond
-            Return _elements(ric)
+            Dim bonds = (From item In _elements Where item.MetaData.RIC = ric).ToList()
+            Return If(bonds.Any, bonds.First, Nothing)
         End Function
 
         Public Overridable Sub NotifyQuote(ByVal bond As Bond)
