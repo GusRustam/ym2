@@ -1,6 +1,7 @@
 ﻿Imports System.Windows.Forms.DataVisualization.Charting
 Imports DbManager
 Imports DbManager.Bonds
+Imports ReutersData
 Imports Uitls
 Imports YieldMap.Tools.History
 Imports YieldMap.Tools.Estimation
@@ -455,7 +456,7 @@ Namespace Forms.ChartForm
                                                      .SeriesId = id
                                                  }
                                         }
-                                    theSeries.Points.Add(Point)
+                                    theSeries.Points.Add(point)
                                 End Sub)
                         End If
 

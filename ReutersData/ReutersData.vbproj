@@ -80,6 +80,7 @@
     <Compile Include="Chain.vb" />
     <Compile Include="Dex2.vb" />
     <Compile Include="EikonSdk.vb" />
+    <Compile Include="History.vb" />
     <Compile Include="LiveQuotes.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

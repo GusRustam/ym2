@@ -268,20 +268,20 @@ Namespace Forms.ChartForm
                     If TypeOf point.Tag Is Bond And Not point.IsEmpty Then
                         Dim bondData = CType(point.Tag, Bond)
                         DscrLabel.Text = bondData.MetaData.ShortName
-                        Dim calculatedYield = bondData.QuotesAndYields.Main
+                        Dim mainYield = bondData.QuotesAndYields.Main
 
-                        SpreadLabel.Text = If(calculatedYield.PointSpread IsNot Nothing, String.Format("{0:F0} b.p.", calculatedYield.PointSpread), N_A)
-                        ZSpreadLabel.Text = If(calculatedYield.ZSpread IsNot Nothing, String.Format("{0:F0} b.p.", calculatedYield.ZSpread), N_A)
-                        ASWLabel.Text = If(calculatedYield.ASWSpread IsNot Nothing, String.Format("{0:F0} b.p.", calculatedYield.ASWSpread), N_A)
-                        YldLabel.Text = String.Format("{0:P2}", calculatedYield.Yld)
+                        SpreadLabel.Text = If(mainYield.PointSpread IsNot Nothing, String.Format("{0:F0} b.p.", mainYield.PointSpread), N_A)
+                        ZSpreadLabel.Text = If(mainYield.ZSpread IsNot Nothing, String.Format("{0:F0} b.p.", mainYield.ZSpread), N_A)
+                        ASWLabel.Text = If(mainYield.ASWSpread IsNot Nothing, String.Format("{0:F0} b.p.", mainYield.ASWSpread), N_A)
+                        YldLabel.Text = String.Format("{0:P2}", mainYield.Yld)
                         DurLabel.Text = String.Format("{0:F2}", point.XValue)
 
-                        ConvLabel.Text = String.Format("{0:F2}", calculatedYield.Convexity)
-                        YldLabel.Text = String.Format("{0:P2} {1}", calculatedYield.Yld.Yield, calculatedYield.Yld.ToWhat.Abbr)
-                        DatLabel.Text = String.Format("{0:dd/MM/yyyy}", calculatedYield.YieldAtDate)
+                        ConvLabel.Text = String.Format("{0:F2}", mainYield.Convexity)
+                        YldLabel.Text = String.Format("{0:P2} {1}", mainYield.Yld.Yield, mainYield.Yld.ToWhat.Abbr)
+                        DatLabel.Text = String.Format("{0:dd/MM/yyyy}", mainYield.YieldAtDate)
                         MatLabel.Text = String.Format("{0:dd/MM/yyyy}", bondData.MetaData.Maturity)
                         CpnLabel.Text = String.Format("{0:F2}%", bondData.MetaData.Coupon)
-                        PVBPLabel.Text = String.Format("{0:F4}", calculatedYield.PVBP)
+                        PVBPLabel.Text = String.Format("{0:F4}", mainYield.PVBP)
                         CType(htr.Series.Tag, BondSetSeries).SelectedPointIndex = htr.PointIndex
 
                         PlotBidAsk(bondData)
@@ -990,7 +990,7 @@ Namespace Forms.ChartForm
         Private Sub ShowHistoryTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles ShowHistoryTSMI.Click
             Logger.Trace("ShowHistQuotesTSMIClick")
             Try
-                Dim historyLoader As New HistoryLoadManager_v2
+                Dim historyLoader As New ReutersData.History
                 AddHandler historyLoader.HistoricalData, AddressOf OnHistoricalData
                 Dim item = CType(BondCMS.Tag, Bond)
                 historyLoader.StartTask(item.MetaData.RIC, "DATE, CLOSE", DateTime.Today.AddDays(-90), DateTime.Today, timeOut:=15)
@@ -1273,6 +1273,16 @@ Namespace Forms.ChartForm
             For Each item As ToolStripMenuItem In (From elem In InterpolationTSMI.DropDownItems Where TypeOf elem Is ToolStripMenuItem)
                 item.Checked = curve.EstModel IsNot Nothing AndAlso item.Tag = curve.EstModel.ItemName
             Next
+        End Sub
+
+        Private Sub SelectDateToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As EventArgs) Handles SelectDateToolStripMenuItem.Click
+            If BondCurveCMS.Tag Is Nothing Then Return
+            Dim curve = CType(BondCurveCMS.Tag, BondCurve)
+            Logger.Debug("SelDateTSMI_Click()")
+            Dim datePicker = New DatePickerForm
+            If datePicker.ShowDialog() = DialogResult.OK Then
+                curve.Date = datePicker.TheCalendar.SelectionEnd
+            End If
         End Sub
     End Class
 End Namespace

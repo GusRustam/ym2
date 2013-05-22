@@ -468,6 +468,11 @@ Namespace Tools
         Public PortfolioID As Long
 
         Private WithEvents _quoteLoader As New LiveQuotes
+        Protected ReadOnly Property QuoteLoader() As LiveQuotes
+            Get
+                Return _quoteLoader
+            End Get
+        End Property
 
         Private _color As String
         Public Property Color() As String
@@ -491,7 +496,7 @@ Namespace Tools
             RaiseEvent Clear(Me)
         End Sub
 
-        Public Sub StartAll()
+        Public Overridable Sub StartAll()
             Dim rics As List(Of String) = (From elem In _elements Select elem.MetaData.RIC).ToList()
             If rics.Count = 0 Then Return
             _quoteLoader.AddItems(rics, BondFields.AllNames)
@@ -751,12 +756,42 @@ Namespace Tools
             End Sub
         End Class
 
-        Private _historicalDate As Date?
-        Private _history As Boolean = False
+        Private _date As Date?
+        Public Property [Date]() As Date?
+            Get
+                Return _date
+            End Get
+            Set(ByVal value As Date?)
+                If _date <> value Then
+                    _date = value
+                    Cleanup()
+                    StartAll()
+                End If
+            End Set
+        End Property
+
+        Public Overrides Sub StartAll()
+            Dim rics As List(Of String) = (From elem In AllElements Select elem.MetaData.RIC).ToList()
+            If rics.Count = 0 Then Return
+            If _date = Today Then
+                QuoteLoader.AddItems(rics, BondFields.AllNames)
+            Else
+            End If
+        End Sub
 
         Public Event Updated As Action(Of List(Of CurveItem))
 
         Private _histFields As FieldContainer
+
+        ' Last curve snapshot
+        Private _lastCurve As List(Of CurveItem)
+
+        Private _formula As String
+        Public ReadOnly Property Formula() As String
+            Get
+                Return _formula
+            End Get
+        End Property
 
         Private _bootstrapped As Boolean
         Public Property Bootstrapped() As Boolean
@@ -793,14 +828,6 @@ Namespace Tools
             AddRics(src.GetDefaultRics())
         End Sub
 
-        Private _lastCurve As List(Of CurveItem)
-        Private _formula As String
-
-        Public ReadOnly Property Formula() As String
-            Get
-                Return _formula
-            End Get
-        End Property
 
         Public Overrides Sub NotifyQuote(ByVal bond As Bond)
             If Ansamble.ChartSpreadType = SpreadType.Yield Then
@@ -989,7 +1016,6 @@ Namespace Tools
             Dim model = EstimationModel.FromName(mode)
             EstModel = If(model Is Nothing OrElse (EstModel IsNot Nothing AndAlso EstModel = model), Nothing, model)
         End Sub
-
     End Class
 #End Region
 

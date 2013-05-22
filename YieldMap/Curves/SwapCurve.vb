@@ -1,8 +1,8 @@
 Imports System.Drawing
 Imports AdfinXRtLib
+Imports ReutersData
 Imports YieldMap.Tools
 Imports YieldMap.Tools.Estimation
-Imports YieldMap.Tools.History
 Imports NLog
 
 Namespace Curves
@@ -36,7 +36,7 @@ Namespace Curves
         Public MustOverride Function GetDate() As Date
 
         '' ============ ELEMENTS DESCRIPTIONS ============
-        Public MustOverride Function GetDuration(ric As String) As Double
+        Public MustOverride Function GetDuration(ByVal ric As String) As Double
 
         '' ============ COLORS ============
         Public MustOverride Function GetOuterColor() As Color
@@ -52,7 +52,7 @@ Namespace Curves
         '' ============ DATA LOADING ============
         Protected MustOverride Sub StartRealTime()
         Protected MustOverride Sub LoadHistory()
-        Protected MustOverride Sub OnHistoricalData(ByVal hst As HistoryLoadManager, ByVal ric As String, ByVal datastatus As RT_DataStatus, ByVal data As Dictionary(Of Date, HistoricalItem))
+        Protected MustOverride Sub OnHistoricalData(ByVal ric As String, ByVal status As LoaderStatus, ByVal hstatus As HistoryStatus, ByVal data As Dictionary(Of Date, HistoricalItem))
 
         '' ============ ITEMS ============
         Public MustOverride Function GetOriginalRICs() As List(Of String)
@@ -68,7 +68,7 @@ Namespace Curves
 
         Public Sub CleanupByType(ByVal type As SpreadType)
             Dim rics = Descrs.Keys.ToList()
-            rics.ForEach(Sub(ric) SpreadBmk.CleanupSpread(Descrs(ric), Type))
+            rics.ForEach(Sub(ric) SpreadBmk.CleanupSpread(Descrs(ric), type))
         End Sub
 
 #End Region
@@ -84,7 +84,7 @@ Namespace Curves
         Protected ReadOnly Descrs As New Dictionary(Of String, SwapPointDescription)
         Private ReadOnly _spreadBmk As SpreadContainer
 
-        Public Sub New(bmk As SpreadContainer)
+        Public Sub New(ByVal bmk As SpreadContainer)
             _spreadBmk = bmk
         End Sub
 
@@ -125,7 +125,7 @@ Namespace Curves
         Public Function ToFittedArray() As Array
             Dim data As Array = ToArray()
             Dim mode = GetFitMode()
-            If mode = estimationModel.LinInterp Then
+            If mode = EstimationModel.LinInterp Then
                 Return data
             Else
                 Dim points = GetCurveData(True)
@@ -144,20 +144,12 @@ Namespace Curves
 
 #Region "Loading data"
         '' LOAD SEPARATE RIC (HISTORICAL)
-        Protected Sub DoLoadRIC(ByVal ric As String, ByVal fields As List(Of String), ByVal aDate As Date)
+        Protected Sub DoLoadRIC(ByVal ric As String, ByVal fields As String, ByVal aDate As Date)
             Logger.Debug("DoLoadRIC({0})", ric)
 
-            Dim descr = New HistoryTaskDescr() With {
-                .Item = ric,
-                .StartDate = aDate.AddDays(-3),
-                .EndDate = aDate,
-                .Fields = fields,
-                .Frequency = "D",
-                .InterestingFields = fields
-            }
-
-            Dim hst As HistoryLoadManager = New HistoryLoadManager(New AdxRtHistory)
-            hst.StartTask(descr, AddressOf OnHistoricalData)
+            Dim hst As History = New History()
+            AddHandler hst.HistoricalData, AddressOf OnHistoricalData
+            hst.StartTask(ric, fields, aDate.AddDays(-3), aDate)
             If hst.Finished Then Return
         End Sub
 

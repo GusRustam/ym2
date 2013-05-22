@@ -62,7 +62,6 @@
 
         Public BackColor As String
         Public MarkerStyle As String
-        'Public YieldSource As YieldSource
 
         Public Overrides Function GetYield() As Double?
             Return Yld.Yield

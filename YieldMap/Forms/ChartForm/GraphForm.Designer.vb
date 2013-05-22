@@ -24,8 +24,8 @@
         <System.Diagnostics.DebuggerStepThrough()> _
         Private Sub InitializeComponent()
             Me.components = New System.ComponentModel.Container()
-            Dim ChartArea3 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-            Dim Legend3 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+            Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+            Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
             Me.TheStatusStrip = New System.Windows.Forms.StatusStrip()
             Me.StatusMessage = New System.Windows.Forms.ToolStripStatusLabel()
             Me.TheToolStrip = New System.Windows.Forms.ToolStrip()
@@ -810,12 +810,12 @@
             '
             'TheChart
             '
-            ChartArea3.Name = "ChartArea1"
-            Me.TheChart.ChartAreas.Add(ChartArea3)
+            ChartArea1.Name = "ChartArea1"
+            Me.TheChart.ChartAreas.Add(ChartArea1)
             Me.TheChart.Dock = System.Windows.Forms.DockStyle.Fill
-            Legend3.Enabled = False
-            Legend3.Name = "Legend1"
-            Me.TheChart.Legends.Add(Legend3)
+            Legend1.Enabled = False
+            Legend1.Name = "Legend1"
+            Me.TheChart.Legends.Add(Legend1)
             Me.TheChart.Location = New System.Drawing.Point(0, 0)
             Me.TheChart.Name = "TheChart"
             Me.TheChart.Size = New System.Drawing.Size(778, 417)

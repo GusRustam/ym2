@@ -114,36 +114,20 @@ Namespace Curves
         Protected Overrides Sub LoadHistory()
             Logger.Debug("LoadHistory")
             Dim rics = GetRICs(_broker)
-            rics.ForEach(Sub(ric) DoLoadRIC(ric, {"DATE", "BID", "ASK"}.ToList, _theDate))
-            DoLoadRIC(BaseInstrument, {"DATE", "CLOSE"}.ToList, _theDate)
+            rics.ForEach(Sub(ric) DoLoadRIC(ric, "DATE, BID, ASK", _theDate))
+            DoLoadRIC(BaseInstrument, "DATE, CLOSE", _theDate)
         End Sub
 
         '' START LOADING REALTIME DATA
         Protected Overrides Sub StartRealTime()
             _quoteLoader.AddItems(GetRICs(_broker), {"275", "393"}.ToList())
-            'If Not _quoteLoader.StartNewTask(New ListTaskDescr() With {
-            '                                    .Name = _name,
-            '                                    .Items = GetRICs(_broker),
-            '                                    .Fields = {"275", "393"}.ToList()
-            '                                }) Then
-            '    Logger.Error("Failed to start loading {0} data", Me.GetType().Name)
-            '    Throw New InvalidOperationException("Failed to start loading RUBIRS data")
-            'End If
             If BaseInstrument <> "" Then
                 _quoteLoader.AddItems({BaseInstrument}.ToList(), {"BID", "ASK"}.ToList())
-                'If Not _quoteLoader.StartNewTask(New ListTaskDescr() With {
-                '                                    .Name = _name + "_BASE",
-                '                                    .Items = {BaseInstrument}.ToList(),
-                '                                    .Fields = {"BID", "ASK"}.ToList()
-                '                                }) Then
-                '    Logger.Error("Failed to start loading {0}_BASE data", Me.GetType().Name)
-                '    Throw New InvalidOperationException(String.Format("Failed to start loading {0}_BASE data", Me.GetType().Name))
-                'End If
             End If
         End Sub
 
         '' HISTORICAL DATA ARRIVED
-        Protected Overrides Sub OnHistoricalData(ByVal hst As HistoryLoadManager, ByVal ric As String, ByVal datastatus As RT_DataStatus, ByVal data As Dictionary(Of Date, HistoricalItem))
+        Protected Overrides Sub OnHistoricalData(ByVal ric As String, ByVal status As LoaderStatus, ByVal hstatus As HistoryStatus, ByVal data As Dictionary(Of Date, HistoricalItem))
             Logger.Debug("OnHistoricalData({0})", ric)
             If data IsNot Nothing Then
                 Dim lastDate = data.Keys.Max
