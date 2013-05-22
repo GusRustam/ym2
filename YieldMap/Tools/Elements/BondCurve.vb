@@ -189,21 +189,18 @@ Namespace Tools.Elements
             End Sub
         End Class
 
-        Private _date As Date?
-        Public Property [Date]() As Date?
+        Private _date As Date = Today
+        Public Property [Date]() As Date
             Get
                 Return _date
             End Get
-            Set(ByVal value As Date?)
+            Set(ByVal value As Date)
                 If _date <> value Then
                     _date = value
-                    Cleanup()
                     StartAll()
                 End If
             End Set
         End Property
-
-        Private WithEvents _histLoader As New History
 
         Public Overrides Sub StartAll()
             Dim rics As List(Of String) = (From elem In AllElements Select elem.MetaData.RIC).ToList()
@@ -211,7 +208,12 @@ Namespace Tools.Elements
             If _date = Today Then
                 QuoteLoader.AddItems(rics, BondFields.AllNames)
             Else
-                _histLoader.StartTask(String.Join(",", rics), _histFields, _date, _date)
+                QuoteLoader.CancelAll()
+                For Each ric In rics
+                    Dim histLoader As New History
+                    AddHandler histLoader.HistoricalData, AddressOf OnHistoricalData
+                    histLoader.StartTask(ric, String.Join(",", _histFields.AllNames), _date, _date)
+                Next
             End If
         End Sub
 
@@ -264,8 +266,48 @@ Namespace Tools.Elements
             AddRics(src.GetDefaultRics())
         End Sub
 
-        Private Sub OnHistoricalData(ByVal ric As String, ByVal status As LoaderStatus, ByVal hstatus As HistoryStatus, ByVal data As Dictionary(Of Date, HistoricalItem)) Handles _histLoader.HistoricalData
+        Private Sub OnHistoricalData(ByVal ric As String, ByVal data As Dictionary(Of Date, HistoricalItem), ByVal rawData As Dictionary(Of DateTime, RawHistoricalItem))
+            If rawData Is Nothing Then
+                Logger.Error("No data on bond {0}", ric)
+                Return
+            End If
+            Dim bonds = (From elem In AllElements Where elem.MetaData.RIC = ric)
+            If Not bonds.Any Then
+                Logger.Warn("Instrument {0} does not belong to serie {1}", ric, SeriesName)
+                Return
+            End If
+            Dim bond = bonds.First()
 
+            If Not rawData.ContainsKey(_date) Then
+                Logger.Warn("Instrument {0} has no necessary date {1:dd/MM/yyyy}", ric, _date)
+                Return
+            End If
+            Dim quote = rawData(_date)
+            If quote.Has(_histFields.Fields.Last) Then
+                HandleQuote(bond, _histFields.Fields.Last, quote(_histFields.Fields.Last), _date)
+            End If
+            If quote.Has(_histFields.Fields.Bid) Or quote.Has(_histFields.Fields.Ask) Then
+                If quote.Has(_histFields.Fields.Bid) And quote.Has(_histFields.Fields.Ask) Then
+                    Dim bid = CDbl(quote(_histFields.Fields.Bid))
+                    HandleQuote(bond, _histFields.Fields.Bid, bid, _date)
+                    Dim ask = CDbl(quote(_histFields.Fields.Ask))
+                    HandleQuote(bond, _histFields.Fields.Mid, ask, _date)
+                    Dim mid = (bid + ask) / 2
+                    HandleQuote(bond, _histFields.Fields.Mid, mid, _date)
+                ElseIf quote.Has(_histFields.Fields.Bid) Then
+                    Dim bid = CDbl(quote(_histFields.Fields.Bid))
+                    HandleQuote(bond, _histFields.Fields.Bid, bid, _date)
+                    If Not SettingsManager.Instance.MidIfBoth Then
+                        HandleQuote(bond, _histFields.Fields.Mid, bid, _date)
+                    End If
+                ElseIf quote.Has(_histFields.Fields.Ask) Then
+                    Dim ask = CDbl(quote(_histFields.Fields.Ask))
+                    HandleQuote(bond, _histFields.Fields.Mid, ask, _date)
+                    If Not SettingsManager.Instance.MidIfBoth Then
+                        HandleQuote(bond, _histFields.Fields.Mid, ask, _date)
+                    End If
+                End If
+            End If
         End Sub
 
         Public Overrides Sub NotifyQuote(ByVal bond As Bond)

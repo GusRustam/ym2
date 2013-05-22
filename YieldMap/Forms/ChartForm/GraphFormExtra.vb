@@ -400,68 +400,64 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
-        Public Sub OnHistoricalData(ByVal ric As String, ByVal status As LoaderStatus, ByVal hstatus As HistoryStatus, ByVal data As Dictionary(Of Date, HistoricalItem))
+        Public Sub OnHistoricalData(ByVal ric As String, ByVal data As Dictionary(Of Date, HistoricalItem), ByVal rawData As Dictionary(Of DateTime, RawHistoricalItem))
             Logger.Trace("OnHistoricalQuotes({0})", ric)
-            If status.Err Then
-                MessageBox.Show("Failed to load history for ric " & ric, "Error")
+            If _ansamble.YSource <> YSource.Yield Then Return
+
+            If data Is Nothing OrElse data.Count <= 0 Then
+                Logger.Info("No data on {0} arrived", ric)
                 Return
             End If
-            If hstatus = HistoryStatus.Full Then
-                If data Is Nothing OrElse data.Count <= 0 Then
-                    Logger.Info("No data on {0} arrived", ric)
-                    Return
-                End If
 
-                Dim elem = _ansamble.Groups.FindBond(ric)
-                Dim bondDataPoint = elem.MetaData ' todo that's awful
-                Dim points As New List(Of Tuple(Of BondPointDescription, BondDescription))
-                For Each dt In data.Keys
-                    Try
-                        Dim calc As New BondPointDescription
-                        If data(dt).Close > 0 Then
-                            calc.Price = data(dt).Close
+            Dim elem = _ansamble.Groups.FindBond(ric)
+            Dim bondDataPoint = elem.MetaData ' todo that's awful
+            Dim points As New List(Of Tuple(Of BondPointDescription, BondDescription))
+            For Each dt In data.Keys
+                Try
+                    Dim calc As New BondPointDescription
+                    If data(dt).Close > 0 Then
+                        calc.Price = data(dt).Close
 
-                            CalculateYields(dt, bondDataPoint, calc)
-                            points.Add(Tuple.Create(calc, bondDataPoint))
-                        End If
-                    Catch ex As Exception
-                        Logger.ErrorException("Failed to calculate yield at historical date", ex)
-                        Logger.Error("Exception = {0}", ex.ToString())
-                    End Try
-                Next
-                GuiAsync(
-                    Sub()
-                        If points.Any() Then
-                            Dim id = Guid.NewGuid()
-                            Dim theSeries = New Series() With {
-                                .Name = bondDataPoint.Label,
-                                .legendText = bondDataPoint.Label & " history",
-                                .ChartType = SeriesChartType.Line,
-                                .color = Color.FromName(elem.Parent.Color),
-                                .markerColor = Color.Wheat,
-                                .markerBorderColor = Color.FromName(elem.Parent.Color),
-                                .borderWidth = 1,
-                                .markerStyle = MarkerStyle.Circle,
-                                .markerSize = 4,
-                                .Tag = id
-                            }
-                            TheChart.Series.Add(theSeries)
-                            points.ForEach(
-                                Sub(tpl)
-                                    Dim point = New DataPoint(tpl.Item1.Duration, tpl.Item1.GetYield.Value) With {
-                                                 .Tag = New HistoryPointTag With {
-                                                     .Ric = bondDataPoint.RIC,
-                                                     .Descr = tpl.Item1,
-                                                     .Meta = tpl.Item2,
-                                                     .SeriesId = id
-                                                 }
-                                        }
-                                    theSeries.Points.Add(point)
-                                End Sub)
-                        End If
+                        CalculateYields(dt, bondDataPoint, calc)
+                        points.Add(Tuple.Create(calc, bondDataPoint))
+                    End If
+                Catch ex As Exception
+                    Logger.ErrorException("Failed to calculate yield at historical date", ex)
+                    Logger.Error("Exception = {0}", ex.ToString())
+                End Try
+            Next
+            GuiAsync(
+                Sub()
+                    If points.Any() Then
+                        Dim id = Guid.NewGuid()
+                        Dim theSeries = New Series() With {
+                            .Name = bondDataPoint.Label,
+                            .legendText = bondDataPoint.Label & " history",
+                            .ChartType = SeriesChartType.Line,
+                            .color = Color.FromName(elem.Parent.Color),
+                            .markerColor = Color.Wheat,
+                            .markerBorderColor = Color.FromName(elem.Parent.Color),
+                            .borderWidth = 1,
+                            .markerStyle = MarkerStyle.Circle,
+                            .markerSize = 4,
+                            .Tag = id
+                        }
+                        TheChart.Series.Add(theSeries)
+                        points.ForEach(
+                            Sub(tpl)
+                                Dim point = New DataPoint(tpl.Item1.Duration, tpl.Item1.GetYield.Value) With {
+                                                .Tag = New HistoryPointTag With {
+                                                    .Ric = bondDataPoint.RIC,
+                                                    .Descr = tpl.Item1,
+                                                    .Meta = tpl.Item2,
+                                                    .SeriesId = id
+                                                }
+                                    }
+                                theSeries.Points.Add(point)
+                            End Sub)
+                    End If
 
-                    End Sub)
-            End If
+                End Sub)
         End Sub
 
         Private Sub NewCurveDeleted(ByVal obj As BaseGroup)
@@ -470,41 +466,43 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub OnNewCurvePaint(ByVal data As List(Of BondCurve.CurveItem))
-            If Not Data.Any Then Return
-            Dim crv As BondCurve
-            Dim itsBond As Boolean
-            If TypeOf Data.First Is BondCurve.BondCurveItem Then
-                crv = CType(CType(Data.First, BondCurve.BondCurveItem).Bond.Parent, BondCurve)
-                itsBond = True
-            ElseIf TypeOf Data.First Is BondCurve.PointCurveItem Then
-                crv = CType(Data.First, BondCurve.PointCurveItem).Curve
-                itsBond = False
-            Else
-                Logger.Warn("Unexpected items type for a bond-based curve")
-                Return
-            End If
-            Dim srs = TheChart.Series.FindByName(crv.Identity)
-            If srs IsNot Nothing Then TheChart.Series.Remove(srs)
-            srs = New Series() With {
-                .Name = crv.Identity,
-                .legendText = crv.SeriesName,
-                .ChartType = SeriesChartType.Line,
-                .color = Color.FromName(crv.Color),
-                .borderWidth = 1,
-                .Tag = crv.Identity
-            }
-            TheChart.Series.Add(srs)
-            If itsBond Then
-                For Each point In Data.Cast(Of BondCurve.BondCurveItem)()
-                    Dim pnt = New DataPoint(point.theX, point.theY) With {.Tag = point.Bond, .ToolTip = point.Bond.Label}
-                    srs.Points.Add(pnt)
-                Next
-            Else
-                For Each point In Data.Cast(Of BondCurve.PointCurveItem)()
-                    Dim pnt = New DataPoint(point.theX, point.theY) With {.Tag = point.Curve}
-                    srs.Points.Add(pnt)
-                Next
-            End If
+            GuiAsync(Sub()
+                         If Not data.Any Then Return
+                         Dim crv As BondCurve
+                         Dim itsBond As Boolean
+                         If TypeOf data.First Is BondCurve.BondCurveItem Then
+                             crv = CType(CType(data.First, BondCurve.BondCurveItem).Bond.Parent, BondCurve)
+                             itsBond = True
+                         ElseIf TypeOf data.First Is BondCurve.PointCurveItem Then
+                             crv = CType(data.First, BondCurve.PointCurveItem).Curve
+                             itsBond = False
+                         Else
+                             Logger.Warn("Unexpected items type for a bond-based curve")
+                             Return
+                         End If
+                         Dim srs = TheChart.Series.FindByName(crv.Identity)
+                         If srs IsNot Nothing Then TheChart.Series.Remove(srs)
+                         srs = New Series() With {
+                             .Name = crv.Identity,
+                             .legendText = crv.SeriesName,
+                             .ChartType = SeriesChartType.Line,
+                             .color = Color.FromName(crv.Color),
+                             .borderWidth = 1,
+                             .Tag = crv.Identity
+                         }
+                         TheChart.Series.Add(srs)
+                         If itsBond Then
+                             For Each point In data.Cast(Of BondCurve.BondCurveItem)()
+                                 Dim pnt = New DataPoint(point.TheX, point.TheY) With {.Tag = point.Bond, .ToolTip = point.Bond.Label}
+                                 srs.Points.Add(pnt)
+                             Next
+                         Else
+                             For Each point In data.Cast(Of BondCurve.PointCurveItem)()
+                                 Dim pnt = New DataPoint(point.TheX, point.TheY) With {.Tag = point.Curve}
+                                 srs.Points.Add(pnt)
+                             Next
+                         End If
+                     End Sub)
         End Sub
     End Class
 End Namespace

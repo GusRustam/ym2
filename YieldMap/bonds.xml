@@ -4,11 +4,8 @@
   <field-sets>
     <field-set id="MICEX" name="Micex bonds description">
       <historical>
-        <field type="TIME">???</field>
-        <field type="DATE">TIMESTAMP</field>
-        <field type="CLOSE">CLOSE</field>
-        <field type="VOLUME">CF_VOLUME</field>
-        <!-- historical VWAP??? -->
+        <field type="DATE">DATE</field>
+        <field type="LAST">CLOSE</field>
       </historical>
       <realtime>
         <field type="BID">BID</field>
@@ -24,11 +21,10 @@
       <realtime>
         <field type="BID">275</field>
         <field type="ASK">393</field>
-        <field type="SOURCE">???</field>
       </realtime>
       <historical>
-        <field type="DATE">TIMESTAMP</field>
-        <field type="CLOSE">CLOSE</field>
+        <field type="DATE">DATE</field>
+        <field type="LAST">CLOSE</field>
       </historical>
     </field-set>
   </field-sets>

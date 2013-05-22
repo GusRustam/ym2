@@ -59,9 +59,11 @@ Public Class FieldsDescription
     <MarkerStyle("Square")>
     <Price("White")>
     <ConfingName("CUSTOM")>
+    <Synthetic>
     Private _custom As String = "CUSTOM"
 
     <Price("White")>
+    <Synthetic()>
     <ConfingName("MID")>
     Private _mid As String = "MID"
 
@@ -108,8 +110,9 @@ Public Class FieldsDescription
             Let attx = fld.GetCustomAttributes(GetType(ConfingNameAttribute), False)
             Where attx.Any
             Let q = CType(attx.First, ConfingNameAttribute), val = CStr(fld.GetValue(Me))
+            Let synt = fld.GetCustomAttributes(GetType(SyntheticAttribute), False).Any
             Let isPrice = fld.GetCustomAttributes(GetType(PriceAttribute), False).Any
-            Select tuple.Create(val, q.XmlName, isPrice))
+            Select Tuple.Create(val, q.XmlName, isPrice, synt))
     End Function
 
     Public ReadOnly Property ID() As String
@@ -343,12 +346,16 @@ Public Class FieldsDescription
     End Function
 End Class
 
+Friend Class SyntheticAttribute
+    Inherits Attribute
+End Class
+
 Public Class FieldContainer
     Private ReadOnly _fields As FieldsDescription
     Private ReadOnly _nameToXml As New Dictionary(Of String, String)
     Private ReadOnly _nameToPrice As New Dictionary(Of String, Boolean)
+    Private ReadOnly _nameToSynt As New Dictionary(Of String, Boolean)
     Private ReadOnly _xmlToName As New Dictionary(Of String, String)
-    Private ReadOnly _xmlToPrice As New Dictionary(Of String, Boolean)
     Private ReadOnly _xmlNameToPriority As New Dictionary(Of String, Integer)
 
     ''' <summary>
@@ -358,9 +365,10 @@ Public Class FieldContainer
     ''' item1 is real name
     ''' item2 is xml name
     ''' item3 is price flag
+    ''' item4 is synthetic flag
     ''' </param>
     ''' <remarks></remarks>
-    Public Sub New(ByVal fields As FieldsDescription, ByVal data As IEnumerable(Of Tuple(Of String, String, Boolean)))
+    Public Sub New(ByVal fields As FieldsDescription, ByVal data As IEnumerable(Of Tuple(Of String, String, Boolean, Boolean)))
         Dim fieldPriority = SettingsManager.Instance.FieldsPriority.Split(",")
         Dim i As Integer
         For i = 0 To fieldPriority.Count - 1
@@ -370,21 +378,14 @@ Public Class FieldContainer
         _fields = fields
         For Each elem In From item In data Where item.Item1 <> ""
             _nameToXml.Add(elem.Item1, elem.Item2)
-            _xmlToName.Add(elem.Item2, elem.Item1)
             _nameToPrice.Add(elem.Item1, elem.Item3)
-            _xmlToPrice.Add(elem.Item2, elem.Item3)
+            _nameToSynt.Add(elem.Item1, elem.Item4)
         Next
     End Sub
 
     Public ReadOnly Property AllNames() As List(Of String)
         Get
-            Return _nameToXml.Keys.ToList()
-        End Get
-    End Property
-
-    Public ReadOnly Property AllXmlNames() As List(Of String)
-        Get
-            Return _xmlToName.Keys.ToList()
+            Return (From item In _nameToXml.Keys Where Not _nameToSynt(item)).ToList()
         End Get
     End Property
 
@@ -411,16 +412,6 @@ Public Class FieldContainer
             Return _nameToPrice.Keys.Contains(nm) AndAlso _nameToPrice(nm)
         End Get
     End Property
-
-    Public ReadOnly Property IsPriceByXmlName(ByVal xName As String) As Boolean
-        Get
-            Return _xmlToPrice.Keys.Contains(xName) AndAlso _xmlToPrice(xName)
-        End Get
-    End Property
-
-    'Public Function IsMaximumPriority(ByVal whatXmlName As String, ByVal xmlNames As IEnumerable(Of String))
-    '    Return _xmlNameToPriority(whatXmlName) >= (From key In xmlNames Select _xmlNameToPriority(key)).Max
-    'End Function
 End Class
 
 Friend Class PriceAttribute

@@ -1,13 +1,10 @@
 ﻿Imports AdfinXAnalyticsFunctions
-Imports AdfinXRtLib
 Imports System.Text.RegularExpressions
 Imports System.Drawing
 Imports YieldMap.Tools.Elements
 Imports ReutersData
 Imports Uitls
 Imports YieldMap.Tools.Estimation
-Imports YieldMap.Tools
-Imports YieldMap.Tools.History
 Imports NLog
 
 Namespace Curves
@@ -128,7 +125,7 @@ Namespace Curves
         End Sub
 
         '' HISTORICAL DATA ARRIVED
-        Protected Overrides Sub OnHistoricalData(ByVal ric As String, ByVal status As LoaderStatus, ByVal hstatus As HistoryStatus, ByVal data As Dictionary(Of Date, HistoricalItem))
+        Protected Overrides Sub OnHistoricalData(ByVal ric As String, ByVal data As Dictionary(Of Date, HistoricalItem), ByVal rawData As Dictionary(Of DateTime, RawHistoricalItem))
             Logger.Debug("OnHistoricalData({0})", ric)
             If data IsNot Nothing Then
                 Dim lastDate = data.Keys.Max

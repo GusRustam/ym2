@@ -4,6 +4,25 @@ Imports System.Threading
 Imports NLog
 Imports Settings
 
+Public Class RawHistoricalItem
+    Private ReadOnly _items As New Dictionary(Of String, String)
+
+    Default Public Property Data(ByVal key As String) As String
+        Get
+            Return _items(key)
+        End Get
+        Set(ByVal value As String)
+            _items(key) = value
+        End Set
+    End Property
+
+    Public ReadOnly Property Has(ByVal key As String) As Boolean
+        Get
+            Return _items.ContainsKey(key)
+        End Get
+    End Property
+End Class
+
 Public Class HistoricalItem
     Public AltOpen As Double
     Public Open As Double
@@ -159,7 +178,7 @@ Public Class History
         End Set
     End Property
 
-    Public Delegate Sub NewDataDelegate(ByVal ric As String, ByVal status As LoaderStatus, ByVal hstatus As HistoryStatus, ByVal data As Dictionary(Of Date, HistoricalItem))
+    Public Delegate Sub NewDataDelegate(ByVal ric As String, ByVal data As Dictionary(Of Date, HistoricalItem), ByVal rawData As Dictionary(Of DateTime, RawHistoricalItem))
     Public Event HistoricalData As NewDataDelegate
 
     Public Shared Function ParseDataStatus(ByVal status As RT_DataStatus) As HistoryStatus
@@ -201,7 +220,7 @@ Public Class History
                                 Logger.Warn("{0} waiter finihed with error", item)
                                 Err = True
                                 Finished = True
-                                RaiseEvent HistoricalData(item, New LoaderStatus(Finished, Err, LoaderErrReason.Timeout), HistoryStatus.None, Nothing)
+                                RaiseEvent HistoricalData(item, Nothing, Nothing)
                             Else
                                 Logger.Info("{0} waiter has finished successfully", item)
                             End If
@@ -238,6 +257,7 @@ Public Class History
     Private Sub ParseData()
         Try
             Dim res As New Dictionary(Of DateTime, HistoricalItem)
+            Dim rawRes As New Dictionary(Of DateTime, RawHistoricalItem)
 
             Dim data As Array = _historyManager.Data
 
@@ -258,54 +278,46 @@ Public Class History
                 Dim theValue = data.GetValue(0, col)
                 If Not IsDate(theValue) Then Continue For
 
-                Dim [date] = CDate(theValue)
+                Dim dt = CDate(theValue)
                 Dim bhd As New HistoricalItem
+                Dim thd As New RawHistoricalItem
                 For row = firstRow + 1 To lastRow
                     Dim itemName = data.GetValue(row, 0).ToString()
                     Dim propValue = data.GetValue(row, col)
                     Try
                         bhd.SetPropByValue(itemName, propValue)
+                        If IsNumeric(propValue) Or IsDate(propValue) Then thd(itemName) = propValue
                         Logger.Trace("Adding {0} -> {1}", itemName, propValue)
                     Catch ex As Exception
                         Logger.Trace("Failed adding {0} -> {1}", itemName, propValue)
                     End Try
                 Next
-                res.Add([date], bhd)
-
+                res.Add(dt, bhd)
+                rawRes.Add(dt, thd)
             Next
             If res.Count > 0 Then
                 Logger.Debug("Will return {0} for {1}",
-                             res.Aggregate("",
-                                           Function(str, item)
-                                               Return str +
-                                                      Environment.NewLine +
-                                                      String.Format("{0:dd/MM/yy} -> [{1}]", item.Key, item.Value)
-                                           End Function),
+                             res.Aggregate("", Function(str, item) String.Format("{0} {2:dd/MM/yy} -> [{3}]{1}", str, Environment.NewLine, item.Key, item.Value)),
                              _ric)
             Else
                 Logger.Warn("Will return nothing for {0}", _ric)
             End If
             Err = False
             Finished = True
-            RaiseEvent HistoricalData(_ric, New LoaderStatus(Finished, Err, LoaderErrReason.None), ParseDataStatus(_historyManager.DataStatus), res)
+            RaiseEvent HistoricalData(_ric, res, rawRes)
         Catch ex As Exception
             Logger.ErrorException("Failed to parse historical data", ex)
             Logger.Error("Exception = {0}", ex.ToString())
             Err = True
             Finished = True
             Try
-                If _historyManager IsNot Nothing Then
-                    RaiseEvent HistoricalData(_ric, New LoaderStatus(Finished, Err, LoaderErrReason.Exception), ParseDataStatus(_historyManager.DataStatus), Nothing) ' todo when  i kill program this bullshit fails
-                Else
-                    RaiseEvent HistoricalData(_ric, New LoaderStatus(Finished, Err, LoaderErrReason.Exception), HistoryStatus.None, Nothing) ' todo when  i kill program this bullshit fails
-                End If
+                RaiseEvent HistoricalData(_ric, Nothing, Nothing)
             Catch ex1 As Exception
                 Logger.ErrorException("Failed to stop task", ex)
                 Logger.Error("Exception = {0}", ex.ToString())
             End Try
         Finally
             Try
-                RemoveHandler _historyManager.OnUpdate, AddressOf OnNewData
                 _historyManager.FlushData()
                 _historyManager = Nothing
             Catch ex As Exception

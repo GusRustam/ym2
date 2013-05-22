@@ -1,8 +1,6 @@
 Imports System.Drawing
-Imports AdfinXRtLib
 Imports YieldMap.Tools.Elements
 Imports ReutersData
-Imports YieldMap.Tools
 Imports YieldMap.Tools.Estimation
 Imports NLog
 
@@ -53,7 +51,7 @@ Namespace Curves
         '' ============ DATA LOADING ============
         Protected MustOverride Sub StartRealTime()
         Protected MustOverride Sub LoadHistory()
-        Protected MustOverride Sub OnHistoricalData(ByVal ric As String, ByVal status As LoaderStatus, ByVal hstatus As HistoryStatus, ByVal data As Dictionary(Of Date, HistoricalItem))
+        Protected MustOverride Sub OnHistoricalData(ByVal ric As String, ByVal data As Dictionary(Of Date, HistoricalItem), ByVal rawData As Dictionary(Of DateTime, RawHistoricalItem))
 
         '' ============ ITEMS ============
         Public MustOverride Function GetOriginalRICs() As List(Of String)
@@ -147,6 +145,7 @@ Namespace Curves
         '' LOAD SEPARATE RIC (HISTORICAL)
         Protected Sub DoLoadRIC(ByVal ric As String, ByVal fields As String, ByVal aDate As Date)
             Logger.Debug("DoLoadRIC({0})", ric)
+            If ric = "" Then Return
 
             Dim hst As History = New History()
             AddHandler hst.HistoricalData, AddressOf OnHistoricalData

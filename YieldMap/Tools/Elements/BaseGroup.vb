@@ -96,30 +96,30 @@ Namespace Tools.Elements
                     End If
 
                     ' now update data point
-                    Dim bondDataPoint = bonds.First()
+                    Dim bond = bonds.First()
 
                     If fieldsAndValues.ContainsKey(BondFields.Fields.Volume) Then
-                        bondDataPoint.TodayVolume = fieldsAndValues(BondFields.Fields.Volume)
-                        RaiseEvent Volume(bondDataPoint)
+                        bond.TodayVolume = fieldsAndValues(BondFields.Fields.Volume)
+                        RaiseEvent Volume(bond)
                     End If
 
                     For Each fieldName In fieldsAndValues.Keys
                         If BondFields.IsPriceByName(fieldName) AndAlso fieldsAndValues(fieldName) > 0 Then
                             Dim fieldValue = fieldsAndValues(fieldName)
                             Try
-                                HandleQuote(bondDataPoint, fieldName, fieldValue, Date.Today)
+                                HandleQuote(bond, fieldName, fieldValue, Date.Today)
                                 Dim bid = BondFields.Fields.Bid
                                 Dim ask = BondFields.Fields.Ask
                                 If fieldName.Belongs(bid, ask) Then
                                     Dim bidPrice As Double
                                     Dim xmlBid = BondFields.XmlName(bid)
-                                    If bondDataPoint.QuotesAndYields.Has(xmlBid) Then
-                                        bidPrice = bondDataPoint.QuotesAndYields(xmlBid).Price
+                                    If bond.QuotesAndYields.Has(xmlBid) Then
+                                        bidPrice = bond.QuotesAndYields(xmlBid).Price
                                     End If
                                     Dim askPrice As Double
                                     Dim xmlAsk = BondFields.XmlName(ask)
-                                    If bondDataPoint.QuotesAndYields.Has(xmlAsk) Then
-                                        askPrice = bondDataPoint.QuotesAndYields(xmlAsk).Price
+                                    If bond.QuotesAndYields.Has(xmlAsk) Then
+                                        askPrice = bond.QuotesAndYields(xmlAsk).Price
                                     End If
                                     Dim midPrice As Double
                                     If bidPrice > 0 And askPrice > 0 Then
@@ -132,7 +132,7 @@ Namespace Tools.Elements
                                         End If
                                     End If
 
-                                    If midPrice > 0 Then HandleQuote(bondDataPoint, BondFields.Fields.Mid, midPrice, Date.Today)
+                                    If midPrice > 0 Then HandleQuote(bond, BondFields.Fields.Mid, midPrice, Date.Today)
                                 End If
                             Catch ex As Exception
                                 Logger.WarnException("Failed to plot the point", ex)
@@ -147,7 +147,7 @@ Namespace Tools.Elements
             Next
         End Sub
 
-        Private Sub HandleQuote(ByRef bondDataPoint As Bond, ByVal fieldName As String, ByVal fieldVal As Double?, ByVal calcDate As Date)
+        Protected Sub HandleQuote(ByRef bondDataPoint As Bond, ByVal fieldName As String, ByVal fieldVal As Double?, ByVal calcDate As Date)
             Dim calculation As New BondPointDescription
             Dim xmlName = BondFields.XmlName(fieldName)
             calculation.BackColor = BondFields.Fields.BackColor(xmlName)
