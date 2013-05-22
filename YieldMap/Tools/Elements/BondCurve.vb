@@ -209,6 +209,7 @@ Namespace Tools.Elements
                 QuoteLoader.AddItems(rics, BondFields.AllNames)
             Else
                 QuoteLoader.CancelAll()
+                AllElements.ForEach(Sub(elem) elem.QuotesAndYields.Clear())
                 For Each ric In rics
                     Dim histLoader As New History
                     AddHandler histLoader.HistoricalData, AddressOf OnHistoricalData
@@ -283,28 +284,29 @@ Namespace Tools.Elements
                 Return
             End If
             Dim quote = rawData(_date)
-            If quote.Has(_histFields.Fields.Last) Then
-                HandleQuote(bond, _histFields.Fields.Last, quote(_histFields.Fields.Last), _date)
+            Dim fieldsDescription As FieldsDescription = _histFields.Fields
+            If quote.Has(fieldsDescription.Last) Then
+                HandleQuote(bond, _histFields.XmlName(fieldsDescription.Last), quote(fieldsDescription.Last), _date)
             End If
-            If quote.Has(_histFields.Fields.Bid) Or quote.Has(_histFields.Fields.Ask) Then
-                If quote.Has(_histFields.Fields.Bid) And quote.Has(_histFields.Fields.Ask) Then
-                    Dim bid = CDbl(quote(_histFields.Fields.Bid))
-                    HandleQuote(bond, _histFields.Fields.Bid, bid, _date)
-                    Dim ask = CDbl(quote(_histFields.Fields.Ask))
-                    HandleQuote(bond, _histFields.Fields.Mid, ask, _date)
+            If quote.Has(fieldsDescription.Bid) Or quote.Has(fieldsDescription.Ask) Then
+                If quote.Has(fieldsDescription.Bid) And quote.Has(fieldsDescription.Ask) Then
+                    Dim bid = CDbl(quote(fieldsDescription.Bid))
+                    HandleQuote(bond, _histFields.XmlName(fieldsDescription.Bid), bid, _date)
+                    Dim ask = CDbl(quote(fieldsDescription.Ask))
+                    HandleQuote(bond, _histFields.XmlName(fieldsDescription.Mid), ask, _date)
                     Dim mid = (bid + ask) / 2
-                    HandleQuote(bond, _histFields.Fields.Mid, mid, _date)
-                ElseIf quote.Has(_histFields.Fields.Bid) Then
-                    Dim bid = CDbl(quote(_histFields.Fields.Bid))
-                    HandleQuote(bond, _histFields.Fields.Bid, bid, _date)
+                    HandleQuote(bond, _histFields.XmlName(fieldsDescription.Mid), mid, _date)
+                ElseIf quote.Has(fieldsDescription.Bid) Then
+                    Dim bid = CDbl(quote(fieldsDescription.Bid))
+                    HandleQuote(bond, _histFields.XmlName(fieldsDescription.Bid), bid, _date)
                     If Not SettingsManager.Instance.MidIfBoth Then
-                        HandleQuote(bond, _histFields.Fields.Mid, bid, _date)
+                        HandleQuote(bond, _histFields.XmlName(fieldsDescription.Mid), bid, _date)
                     End If
-                ElseIf quote.Has(_histFields.Fields.Ask) Then
-                    Dim ask = CDbl(quote(_histFields.Fields.Ask))
-                    HandleQuote(bond, _histFields.Fields.Mid, ask, _date)
+                ElseIf quote.Has(fieldsDescription.Ask) Then
+                    Dim ask = CDbl(quote(fieldsDescription.Ask))
+                    HandleQuote(bond, _histFields.XmlName(fieldsDescription.Mid), ask, _date)
                     If Not SettingsManager.Instance.MidIfBoth Then
-                        HandleQuote(bond, _histFields.Fields.Mid, ask, _date)
+                        HandleQuote(bond, _histFields.XmlName(fieldsDescription.Mid), ask, _date)
                     End If
                 End If
             End If

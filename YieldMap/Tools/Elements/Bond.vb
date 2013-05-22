@@ -125,6 +125,10 @@ Namespace Tools.Elements
                     Return If(priorityField <> "", _quotesAndYields(priorityField), Nothing)
                 End Get
             End Property
+
+            Public Sub Clear()
+                _quotesAndYields.Clear()
+            End Sub
         End Class
 
         Private ReadOnly _quotesAndYields As New QyContainer(Me)

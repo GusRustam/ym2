@@ -107,7 +107,7 @@ Namespace Tools.Elements
                         If BondFields.IsPriceByName(fieldName) AndAlso fieldsAndValues(fieldName) > 0 Then
                             Dim fieldValue = fieldsAndValues(fieldName)
                             Try
-                                HandleQuote(bond, fieldName, fieldValue, Date.Today)
+                                HandleQuote(bond, BondFields.XmlName(fieldName), fieldValue, Date.Today)
                                 Dim bid = BondFields.Fields.Bid
                                 Dim ask = BondFields.Fields.Ask
                                 If fieldName.Belongs(bid, ask) Then
@@ -132,7 +132,7 @@ Namespace Tools.Elements
                                         End If
                                     End If
 
-                                    If midPrice > 0 Then HandleQuote(bond, BondFields.Fields.Mid, midPrice, Date.Today)
+                                    If midPrice > 0 Then HandleQuote(bond, BondFields.XmlName(BondFields.Fields.Mid), midPrice, Date.Today)
                                 End If
                             Catch ex As Exception
                                 Logger.WarnException("Failed to plot the point", ex)
@@ -147,9 +147,9 @@ Namespace Tools.Elements
             Next
         End Sub
 
-        Protected Sub HandleQuote(ByRef bondDataPoint As Bond, ByVal fieldName As String, ByVal fieldVal As Double?, ByVal calcDate As Date)
+        Protected Sub HandleQuote(ByRef bondDataPoint As Bond, ByVal xmlName As String, ByVal fieldVal As Double?, ByVal calcDate As Date)
             Dim calculation As New BondPointDescription
-            Dim xmlName = BondFields.XmlName(fieldName)
+            'Dim xmlName = BondFields.XmlName(fieldName)
             calculation.BackColor = BondFields.Fields.BackColor(xmlName)
             calculation.MarkerStyle = BondFields.Fields.MarkerStyle(xmlName)
             calculation.Price = fieldVal
