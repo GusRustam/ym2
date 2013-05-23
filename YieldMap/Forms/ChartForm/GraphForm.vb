@@ -1007,6 +1007,7 @@ Namespace Forms.ChartForm
         Private Sub BondCurveCMS_Opening(ByVal sender As Object, ByVal e As CancelEventArgs) Handles BondCurveCMS.Opening
             If BondCurveCMS.Tag Is Nothing Then Return
             Dim curve = CType(BondCurveCMS.Tag, BondCurve)
+            BootstrappingToolStripMenuItem.Checked = curve.Bootstrapped
             For Each item As ToolStripMenuItem In (From elem In InterpolationTSMI.DropDownItems Where TypeOf elem Is ToolStripMenuItem)
                 item.Checked = curve.EstModel IsNot Nothing AndAlso item.Tag = curve.EstModel.ItemName
             Next
