@@ -6,71 +6,10 @@ Namespace Tools.Elements
     Public Class Bond
         Inherits Identifyable
 
-        Private _enabled As Boolean = True
+        Public Event Changed As Action
+        Public Event Price As Action
 
-        Public Property Enabled() As Boolean
-            Get
-                Return _enabled
-            End Get
-            Set(ByVal value As Boolean)
-                _enabled = value
-            End Set
-        End Property
-
-        Private ReadOnly _parent As BaseGroup
-        Private ReadOnly _metaData As BondDescription
         Public TodayVolume As Double
-
-        Private _userSelectedQuote As String
-        Public Property UserSelectedQuote As String
-            Get
-                Return _userSelectedQuote
-            End Get
-            Set(ByVal value As String)
-                _userSelectedQuote = value
-                Parent.NotifyChanged()
-            End Set
-        End Property
-
-        Private _usedDefinedSpread As Double
-
-        Public Property UsedDefinedSpread() As Double
-            Get
-                Return _usedDefinedSpread
-            End Get
-            Set(ByVal value As Double)
-                _usedDefinedSpread = value
-                Parent.NotifyChanged()
-            End Set
-        End Property
-
-        Private _labelMode As LabelMode = LabelMode.IssuerAndSeries
-
-        Public Property LabelMode As LabelMode
-            Get
-                Return _labelMode
-            End Get
-            Set(ByVal value As LabelMode)
-                _labelMode = value
-            End Set
-        End Property
-
-        Sub New(ByVal parent As BaseGroup, ByVal metaData As BondDescription)
-            _parent = parent
-            _metaData = metaData
-        End Sub
-
-        Public ReadOnly Property Parent As BaseGroup
-            Get
-                Return _parent
-            End Get
-        End Property
-
-        Public ReadOnly Property MetaData As BondDescription
-            Get
-                Return _metaData
-            End Get
-        End Property
 
         Public Class QyContainer
             Implements IEnumerable(Of String)
@@ -138,8 +77,83 @@ Namespace Tools.Elements
             End Get
         End Property
 
+        Private ReadOnly _metaData As BondDescription
+        Public ReadOnly Property MetaData As BondDescription
+            Get
+                Return _metaData
+            End Get
+        End Property
+
+        Private ReadOnly _parent As BaseGroup
+        Public ReadOnly Property Parent As BaseGroup
+            Get
+                Return _parent
+            End Get
+        End Property
+
+        Private _enabled As Boolean = True
+        Public Property Enabled() As Boolean
+            Get
+                Return _enabled
+            End Get
+            Set(ByVal value As Boolean)
+                _enabled = value
+                RaiseEvent Changed()
+            End Set
+        End Property
+
+        Private _userSelectedQuote As String
+        Public Property UserSelectedQuote As String
+            Get
+                Return _userSelectedQuote
+            End Get
+            Set(ByVal value As String)
+                _userSelectedQuote = value
+                RaiseEvent Changed()
+            End Set
+        End Property
+
+        Private _usedDefinedSpread As Double
+        Public Property UsedDefinedSpread() As Double
+            Get
+                Return _usedDefinedSpread
+            End Get
+            Set(ByVal value As Double)
+                _usedDefinedSpread = value
+                RaiseEvent Changed()
+            End Set
+        End Property
+
+        Private _labelEnabled As Boolean = False
+        Public Property LabelEnabled() As Boolean
+            Get
+                Return _labelEnabled
+            End Get
+            Set(ByVal value As Boolean)
+                _labelEnabled = value
+                RaiseEvent Changed()
+            End Set
+        End Property
+
+        Private _labelMode As LabelMode = LabelMode.IssuerAndSeries
+        Public Property LabelMode As LabelMode
+            Get
+                Return _labelMode
+            End Get
+            Set(ByVal value As LabelMode)
+                _labelMode = value
+                RaiseEvent Changed()
+            End Set
+        End Property
+
+        Sub New(ByVal parent As BaseGroup, ByVal metaData As BondDescription)
+            _parent = parent
+            _metaData = metaData
+        End Sub
+
         Public ReadOnly Property Label() As String
             Get
+                If Not _labelEnabled Then Return ""
                 Dim lab As String
                 Select Case LabelMode
                     Case LabelMode.IssuerAndSeries : lab = MetaData.Label1
@@ -159,28 +173,29 @@ Namespace Tools.Elements
 
         Public Sub Disable()
             Enabled = False
-            'Parent.NotifyRemoved(Me)
-            Parent.NotifyChanged()
+            RaiseEvent Changed()
         End Sub
 
         Public Sub Enable()
             Enabled = True
-            Parent.NotifyChanged()
+            RaiseEvent Changed()
         End Sub
 
         Public Sub Annihilate()
             Parent.Elements.Remove(Me)
-            Parent.NotifyChanged()
-            'Parent.NotifyRemoved(Me)
+            RaiseEvent Changed()
         End Sub
 
         Sub SetCustomPrice(ByVal price As Double)
             If price > 0 Then
                 UserSelectedQuote = Fields.Custom
                 QuotesAndYields(Fields.Custom).Price = price ' todo <<< RECALCULATION????
-                Parent.NotifyChanged()
+                RaiseEvent Price()
             End If
         End Sub
 
+        Public Sub ToggleLabel()
+            LabelEnabled = Not LabelEnabled
+        End Sub
     End Class
 End NameSpace

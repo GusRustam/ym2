@@ -3,7 +3,6 @@ Imports System.Windows.Forms.DataVisualization.Charting
 Imports System.Drawing
 Imports AdfinXAnalyticsFunctions
 Imports System.ComponentModel
-Imports DbManager.Bonds
 Imports YieldMap.Tools.Elements
 Imports YieldMap.Forms.PortfolioForm
 Imports Settings
@@ -20,15 +19,15 @@ Namespace Forms.ChartForm
 
         Private WithEvents _theSettings As SettingsManager = SettingsManager.Instance
         Private WithEvents _tableForm As TableForm.TableForm = New TableForm.TableForm()
-        Private WithEvents _bondsLoader As IBondsLoader = BondsLoader.Instance()
+        'Private WithEvents _bondsLoader As IBondsLoader = BondsLoader.Instance()
 
         Private ReadOnly _moneyMarketCurves As New List(Of SwapCurve)
         Private WithEvents _spreadBenchmarks As New SpreadContainer
         Private WithEvents _ansamble As New Ansamble
 
-        Private Sub Loader_Progress(ByVal obj As ProgressEvent) Handles _bondsLoader.Progress
-            ' todo it might be useful if one would like to load bond on the fly
-        End Sub
+        'Private Sub Loader_Progress(ByVal obj As ProgressEvent) Handles _bondsLoader.Progress
+        '    ' todo it might be useful if one would like to load bond on the fly
+        'End Sub
 
         Private Sub TheSettings_DurRangeChanged() Handles _theSettings.DurRangeChanged, _theSettings.SpreadRangeChanged, _theSettings.YieldRangeChanged
             SetChartMinMax()
@@ -41,16 +40,6 @@ Namespace Forms.ChartForm
         Private Sub TheSettings_FieldsPriorityChanged(ByVal list As String) Handles _theSettings.FieldsPriorityChanged
             _ansamble.Recalculate()
         End Sub
-
-#Region "I) Dependent forms"
-        'Private Sub TableFormShown(sender As Object, e As EventArgs) Handles _tableForm.Shown
-        '    AddHandler PointUpdated, AddressOf _tableForm.OnPointUpdated
-        'End Sub
-
-        'Private Sub TableFormFormClosing(sender As Object, e As FormClosingEventArgs) Handles _tableForm.FormClosing
-        '    RemoveHandler PointUpdated, AddressOf _tableForm.OnPointUpdated
-        'End Sub
-#End Region
 
 #Region "II) Form state manipulation"
         Private Enum FormDataStatus
@@ -74,8 +63,6 @@ Namespace Forms.ChartForm
                         StatusMessage.Text = ""
                     Case FormDataStatus.Stopped
                         _ansamble.Groups.Cleanup()
-
-                        '_historicalCurves.Clear()  ' todo where R these curves?
 
                         StatusMessage.Text = "Stopped"
                 End Select
@@ -567,18 +554,8 @@ Namespace Forms.ChartForm
 
         Private Sub ShowLabelsTSBClick(ByVal sender As Object, ByVal e As EventArgs) Handles ShowLabelsTSB.Click
             Logger.Trace("ShowLabelsTSBClick")
-            For Each series In From srs In TheChart.Series Where TypeOf srs.Tag Is BondSetSeries
-                Dim points = series.Points
-                For Each dataPoint In From pnt In points Where TypeOf pnt.Tag Is Bond Select {pnt, CType(pnt.Tag, Bond)}
-                    Dim lab As String
-                    Select Case dataPoint(1).LabelMode
-                        Case LabelMode.IssuerAndSeries : lab = dataPoint(1).Metadata.Label1
-                        Case LabelMode.IssuerCpnMat : lab = dataPoint(1).Metadata.Label2
-                        Case LabelMode.Description : lab = dataPoint(1).Metadata.Label3
-                        Case LabelMode.SeriesOnly : lab = dataPoint(1).Metadata.Label4
-                    End Select
-                    dataPoint(0).Label = If(ShowLabelsTSB.Checked, lab, "")
-                Next
+            For Each grp As KeyValuePair(Of Long, Group) In _ansamble.Groups
+                grp.Value.ToggleLabels()
             Next
         End Sub
 
@@ -687,10 +664,6 @@ Namespace Forms.ChartForm
 
             Dim aToolBar = New ToolStrip
             aToolBar.Dock = DockStyle.Fill
-            'Dim addButton = aToolBar.Items.Add("Add items...")
-            'addButton.Enabled = TypeOf theCurve Is YieldCurve
-            'Dim removeButton = aToolBar.Items.Add("Remove selected")
-            'removeButton.Enabled = TypeOf theCurve Is YieldCurve
 
             tl.Controls.Add(aToolBar, 0, 0)
 
@@ -717,132 +690,10 @@ Namespace Forms.ChartForm
             aTable.Dock = DockStyle.Fill
 
             tl.Controls.Add(aTable, 0, 1)
-
-            'Dim rmHandler = GetRemoveHandler(aForm, aTable, theCurve)
-            ''AddHandler removeButton.Click, rmHandler
-            ''AddHandler addButton.Click, GetAddHandler(theCurve)
-
-            'AddHandler aTable.RowHeaderMouseClick,
-            '    Sub(sender1 As Object, args As MouseEventArgs)
-            '        'If Not TypeOf theCurve Is YieldCurve Then Return
-
-            '        If args.Button = MouseButtons.Right Then
-            '            Dim cms As New ContextMenuStrip
-            '            Dim removeItemTSMI = cms.Items.Add("Remove item from curve")
-            '            AddHandler removeItemTSMI.Click, rmHandler
-            '            cms.Show(MousePosition)
-            '        End If
-            '    End Sub
             aForm.ShowDialog()
         End Sub
 
-        Private Function GetAddHandler(ByVal swapCurve As SwapCurve) As EventHandler
-            Return Sub()
-                       Dim aForm = New Form With {
-                            .Text = "Select one or more items to add",
-                            .Width = 400,
-                            .Height = 400,
-                            .FormBorderStyle = FormBorderStyle.Sizable
-                       }
-
-                       Dim tl As New TableLayoutPanel
-                       tl.RowCount = 2
-                       tl.RowStyles.Add(New RowStyle(SizeType.Percent, 100))
-                       tl.RowStyles.Add(New RowStyle(SizeType.Absolute, 30))
-                       tl.Dock = DockStyle.Fill
-                       tl.ColumnCount = 2
-                       tl.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 50))
-                       tl.ColumnStyles.Add(New ColumnStyle(SizeType.Percent, 50))
-                       aForm.Controls.Add(tl)
-
-                       Dim lst As New ListBox
-                       lst.SelectionMode = SelectionMode.MultiExtended
-
-                       Dim allItems = swapCurve.GetOriginalRICs()
-                       Dim existingItems = swapCurve.GetCurrentRICs()
-                       For Each item In existingItems
-                           allItems.Remove(item)
-                       Next
-                       For Each item In allItems
-                           lst.Items.Add(item)
-                       Next
-
-                       lst.Dock = DockStyle.Fill
-                       tl.Controls.Add(lst, 0, 0)
-                       tl.SetColumnSpan(lst, 2)
-
-                       Dim selectedItems As New List(Of String)
-
-                       Dim okButt As New Button
-                       okButt.Text = "OK"
-                       AddHandler okButt.Click,
-                           Sub()
-                               If lst.SelectedItems.Count = 0 Then
-                                   If MessageBox.Show("No items selected! Would you like to continue selecting items?", "Adding items into curve", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = MsgBoxResult.No Then
-                                       aForm.DialogResult = DialogResult.Cancel
-                                       aForm.Close()
-                                   End If
-                               Else
-                                   selectedItems.AddRange(lst.SelectedItems.Cast(Of String))
-                                   aForm.DialogResult = DialogResult.OK
-                                   aForm.Close()
-                               End If
-                           End Sub
-                       tl.Controls.Add(okButt, 0, 1)
-
-                       Dim cncButt As New Button
-                       cncButt.Text = "Cancel"
-                       cncButt.DialogResult = DialogResult.Cancel
-                       cncButt.Dock = DockStyle.Right
-                       tl.Controls.Add(cncButt, 1, 1)
-
-                       If aForm.ShowDialog() = DialogResult.OK Then
-                           swapCurve.AddItems(selectedItems)
-                       End If
-                   End Sub
-        End Function
-
-        Private Function GetRemoveHandler(ByVal aForm As Form, ByVal aTable As DataGridView, ByVal theCurve As SwapCurve) As EventHandler
-            Return Sub(sender As Object, args As EventArgs)
-                       Try
-                           If aTable.SelectedRows.Count > 0 Then
-                               If aTable.SelectedRows.Count >= aTable.Rows.Count - 1 Then
-                                   If MessageBox.Show("This will delete the curve. Would you like to continue?", "Remove the curve",
-                                                      MessageBoxButtons.YesNo, MessageBoxIcon.Question) = MsgBoxResult.Yes Then
-                                       ' todo curve MUST HAVE DELETE METHOD WHICH WILL CLEAN IT UP AND RAISE EVENT TO CLEAR CHART
-
-                                       ' deleting whole curve
-                                       Dim irsSeries = TheChart.Series.FindByName(theCurve.GetName())
-                                       If irsSeries IsNot Nothing Then TheChart.Series.Remove(irsSeries)
-                                       _moneyMarketCurves.Remove(theCurve)
-
-                                       theCurve.Cleanup()
-                                       SetChartMinMax()
-                                       aForm.Close()
-                                   End If
-                               Else
-                                   ' deleting selected items
-                                   Dim toDelete As List(Of String) = (From rw As DataGridViewRow In aTable.SelectedRows Select rw.Cells("RIC").Value).Cast(Of String).ToList()
-                                   If Not theCurve.RemoveItems(toDelete) Then
-                                       MessageBox.Show("Failed to delete selected items", "Remove items", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                                   End If
-                                   Dim crv = theCurve.GetSnapshot()
-                                   aTable.Rows.Clear()
-                                   crv.ForEach(Sub(item) aTable.Rows.Add(New Object() {item.Item1, item.Item2, item.Item3, item.Item4}))
-                               End If
-                           Else
-                               MessageBox.Show("No items selected", "Remove curve items", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                           End If
-                       Catch ex As Exception
-                           Logger.ErrorException("Failed to delete items from curve", ex)
-                           Logger.Error("Exception = {0}", ex)
-                       End Try
-                   End Sub
-        End Function
-
         Private Sub AsTableTSBClick(ByVal sender As Object, ByVal e As EventArgs) Handles AsTableTSB.Click
-            Dim bondsToShow As New List(Of BondDescr)
-
             _tableForm.Bonds = _ansamble.Groups.AsTable
             _tableForm.ShowDialog()
         End Sub
@@ -1020,10 +871,9 @@ Namespace Forms.ChartForm
 #Region "e) Assembly and curves events"
         Private Sub OnGroupClear(ByVal group As BaseGroup) Handles _ansamble.Cleared
             Logger.Trace("OnGroupClear()")
-            ' todo distinguish between group and curve
             GuiAsync(
                 Sub()
-                    Dim series As Series = TheChart.Series.FindByName(group.SeriesName)
+                    Dim series As Series = TheChart.Series.FindByName(group.Identity)
 
                     If series IsNot Nothing Then
                         series.Points.Clear()
@@ -1031,29 +881,12 @@ Namespace Forms.ChartForm
                     End If
 
                     With TheChart.Legends(0).CustomItems
-                        While .Any(Function(elem) elem.Name = group.SeriesName)
-                            .Remove(.First(Function(elem) elem.Name = group.SeriesName))
+                        While .Any(Function(elem) elem.Tag = group.Identity)
+                            .Remove(.First(Function(elem) elem.Tag = group.Identity))
                         End While
                     End With
                 End Sub)
         End Sub
-
-        
-
-        'Private Sub OnRemovedItem(ByVal group As Group, ByVal ric As String) Handles _ansamble.BondRemoved
-        '    Logger.Trace("OnRemovedItem({0})", ric)
-        '    GuiAsync(
-        '        Sub()
-        '            Dim series As Series = TheChart.Series.FindByName(group.SeriesName)
-        '            If series IsNot Nothing Then
-        '                While series.Points.Any(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric)
-        '                    series.Points.Remove(series.Points.First(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric))
-        '                End While
-        '            End If
-        '            If series.Points.Count = 0 Then _ansamble.Groups.Remove(group.Identity)
-        '            SetChartMinMax()
-        '        End Sub)
-        'End Sub
 
         Private Sub OnBenchmarkRemoved(ByVal type As YSource) Handles _spreadBenchmarks.BenchmarkRemoved
             Logger.Trace("OnBenchmarkRemoved({0})", type)
@@ -1113,22 +946,9 @@ Namespace Forms.ChartForm
 
         Private Sub SetSeriesLabel(ByVal id As String, ByVal mode As LabelMode)
             Try
-                Dim group = _ansamble.Groups(id)
-                group.Elements.ForEach(Sub(bond) bond.LabelMode = mode)
-                If ShowLabelsTSB.Checked Then
-                    TheChart.Series.FindByName(group.SeriesName).Points.ToList.ForEach(
-                        Sub(pnt)
-                            Try
-                                Dim bond = CType(pnt.Tag, Bond)
-                                bond.LabelMode = mode
-                                pnt.Label = bond.Label
-                            Catch ex As Exception
-                                Logger.WarnException("Failed to set label mode for point " & pnt.Tag, ex)
-                                Logger.Warn("Exception = {0}", ex)
-                            End Try
-                        End Sub)
-                End If
+                _ansamble.Groups(id).SetLabelMode(mode)
             Catch ex As Exception
+                Logger.Warn("Failed to set label mode, exception = {0}", ex.ToString())
             End Try
         End Sub
 

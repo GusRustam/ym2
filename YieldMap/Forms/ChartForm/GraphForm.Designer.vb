@@ -24,8 +24,8 @@
         <System.Diagnostics.DebuggerStepThrough()> _
         Private Sub InitializeComponent()
             Me.components = New System.ComponentModel.Container()
-            Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-            Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+            Dim ChartArea2 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+            Dim Legend2 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
             Me.TheStatusStrip = New System.Windows.Forms.StatusStrip()
             Me.StatusMessage = New System.Windows.Forms.ToolStripStatusLabel()
             Me.TheToolStrip = New System.Windows.Forms.ToolStrip()
@@ -138,9 +138,6 @@
             Me.IssuerCouponMaturityTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.SeriesDescriptionTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.SeriesSeriesOnlyTSMI = New System.Windows.Forms.ToolStripMenuItem()
-            Me.CloneToCurveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-            Me.CloneBondCurveTSMI = New System.Windows.Forms.ToolStripMenuItem()
-            Me.ConvertBondCurveTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.RemoveFromChartTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.BondCurveCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.ShowBondCurveItemsTSMI = New System.Windows.Forms.ToolStripMenuItem()
@@ -810,12 +807,12 @@
             '
             'TheChart
             '
-            ChartArea1.Name = "ChartArea1"
-            Me.TheChart.ChartAreas.Add(ChartArea1)
+            ChartArea2.Name = "ChartArea1"
+            Me.TheChart.ChartAreas.Add(ChartArea2)
             Me.TheChart.Dock = System.Windows.Forms.DockStyle.Fill
-            Legend1.Enabled = False
-            Legend1.Name = "Legend1"
-            Me.TheChart.Legends.Add(Legend1)
+            Legend2.Enabled = False
+            Legend2.Name = "Legend1"
+            Me.TheChart.Legends.Add(Legend2)
             Me.TheChart.Location = New System.Drawing.Point(0, 0)
             Me.TheChart.Name = "TheChart"
             Me.TheChart.Size = New System.Drawing.Size(778, 417)
@@ -1063,15 +1060,15 @@
             '
             'BondSetCMS
             '
-            Me.BondSetCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LabelToolStripMenuItem, Me.CloneToCurveToolStripMenuItem, Me.RemoveFromChartTSMI})
+            Me.BondSetCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LabelToolStripMenuItem, Me.RemoveFromChartTSMI})
             Me.BondSetCMS.Name = "BondSetCMS"
-            Me.BondSetCMS.Size = New System.Drawing.Size(143, 70)
+            Me.BondSetCMS.Size = New System.Drawing.Size(143, 48)
             '
             'LabelToolStripMenuItem
             '
             Me.LabelToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SeriesIssuerNameAndSeriesTSMI, Me.IssuerCouponMaturityTSMI, Me.SeriesDescriptionTSMI, Me.SeriesSeriesOnlyTSMI})
             Me.LabelToolStripMenuItem.Name = "LabelToolStripMenuItem"
-            Me.LabelToolStripMenuItem.Size = New System.Drawing.Size(142, 22)
+            Me.LabelToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
             Me.LabelToolStripMenuItem.Text = "Labeling mode"
             '
             'SeriesIssuerNameAndSeriesTSMI
@@ -1098,29 +1095,10 @@
             Me.SeriesSeriesOnlyTSMI.Size = New System.Drawing.Size(188, 22)
             Me.SeriesSeriesOnlyTSMI.Text = "Series Only"
             '
-            'CloneToCurveToolStripMenuItem
-            '
-            Me.CloneToCurveToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CloneBondCurveTSMI, Me.ConvertBondCurveTSMI})
-            Me.CloneToCurveToolStripMenuItem.Name = "CloneToCurveToolStripMenuItem"
-            Me.CloneToCurveToolStripMenuItem.Size = New System.Drawing.Size(142, 22)
-            Me.CloneToCurveToolStripMenuItem.Text = "Bond curve"
-            '
-            'CloneBondCurveTSMI
-            '
-            Me.CloneBondCurveTSMI.Name = "CloneBondCurveTSMI"
-            Me.CloneBondCurveTSMI.Size = New System.Drawing.Size(113, 22)
-            Me.CloneBondCurveTSMI.Text = "Clone"
-            '
-            'ConvertBondCurveTSMI
-            '
-            Me.ConvertBondCurveTSMI.Name = "ConvertBondCurveTSMI"
-            Me.ConvertBondCurveTSMI.Size = New System.Drawing.Size(113, 22)
-            Me.ConvertBondCurveTSMI.Text = "Convert"
-            '
             'RemoveFromChartTSMI
             '
             Me.RemoveFromChartTSMI.Name = "RemoveFromChartTSMI"
-            Me.RemoveFromChartTSMI.Size = New System.Drawing.Size(142, 22)
+            Me.RemoveFromChartTSMI.Size = New System.Drawing.Size(152, 22)
             Me.RemoveFromChartTSMI.Text = "Remove"
             '
             'BondCurveCMS
@@ -1384,9 +1362,6 @@
         Friend WithEvents VasicekCurveTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents CIRCurveTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents UsdIRSTSMI As System.Windows.Forms.ToolStripMenuItem
-        Friend WithEvents CloneToCurveToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-        Friend WithEvents CloneBondCurveTSMI As System.Windows.Forms.ToolStripMenuItem
-        Friend WithEvents ConvertBondCurveTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents BondCurvesNewTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents BondCurveTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents BondCurveCMS As System.Windows.Forms.ContextMenuStrip

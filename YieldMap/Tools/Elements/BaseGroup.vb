@@ -14,6 +14,23 @@ Namespace Tools.Elements
     Public MustInherit Class BaseGroup
         Inherits Identifyable
 
+        Public Event Clear As Action(Of BaseGroup)
+        Public Event Volume As Action(Of Bond)
+        Public Event Updated As Action(Of List(Of CurveItem))
+
+        Protected Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(BaseGroup))
+
+        Public YieldMode As String ' todo currently unused
+        Public SeriesName As String
+        Friend BondFields As FieldContainer
+        Public PortfolioID As Long
+
+        Protected MustOverride Sub NotifyChanged()
+
+        Public Sub Recalculate()
+            NotifyChanged()
+        End Sub
+
         Public MustInherit Class CurveItem
             Implements IComparable(Of CurveItem)
             Private ReadOnly _x As Double
@@ -59,27 +76,30 @@ Namespace Tools.Elements
             Inherits CurveItem
             Private ReadOnly _bond As Bond
             Private ReadOnly _backColor As String
+            Private ReadOnly _label As String
+            Private ReadOnly _toWhat As YieldToWhat
+            Private ReadOnly _markerStyle As String
 
+            <Browsable(False)>
             Public ReadOnly Property BackColor() As String
                 Get
                     Return _backColor
                 End Get
             End Property
 
+            <Browsable(False)>
             Public ReadOnly Property ToWhat() As YieldToWhat
                 Get
                     Return _toWhat
                 End Get
             End Property
 
+            <Browsable(False)>
             Public ReadOnly Property MarkerStyle() As String
                 Get
                     Return _markerStyle
                 End Get
             End Property
-
-            Private ReadOnly _toWhat As YieldToWhat
-            Private ReadOnly _markerStyle As String
 
             <Browsable(False)>
             Public ReadOnly Property Bond() As Bond
@@ -94,14 +114,20 @@ Namespace Tools.Elements
                 End Get
             End Property
 
-            Public Sub New(ByVal x As Double, ByVal y As Double, ByVal bond As Bond, ByVal backColor As String, ByVal toWhat As YieldToWhat, ByVal markerStyle As String)
+            Public ReadOnly Property Label As String
+                Get
+                    Return _label
+                End Get
+            End Property
+
+            Public Sub New(ByVal x As Double, ByVal y As Double, ByVal bond As Bond, ByVal backColor As String, ByVal toWhat As YieldToWhat, ByVal markerStyle As String, ByVal label As String)
                 MyBase.new(x, y)
                 _bond = bond
                 _backColor = backColor
                 _toWhat = toWhat
                 _markerStyle = markerStyle
+                _label = Label
             End Sub
-
         End Class
 
         Public Class PointCurveItem
@@ -121,22 +147,27 @@ Namespace Tools.Elements
             End Sub
         End Class
 
-        Protected Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(BaseGroup))
-
         Private ReadOnly _ansamble As Ansamble
+        Public ReadOnly Property Ansamble() As Ansamble
+            Get
+                Return _ansamble
+            End Get
+        End Property
 
-        Public Event Updated As Action(Of List(Of CurveItem))
+        Private _eventsFrozen As Boolean = False
+        Public Property EventsFrozen() As Boolean
+            Get
+                Return _eventsFrozen
+            End Get
+            Set(ByVal value As Boolean)
+                _eventsFrozen = value
+                If Not _eventsFrozen Then NotifyChanged()
+            End Set
+        End Property
 
         Protected Sub NotifyUpdated(ByVal curveItems As List(Of CurveItem))
-            RaiseEvent Updated(curveItems)
+            If Not _eventsFrozen Then RaiseEvent Updated(curveItems)
         End Sub
-
-        Public Event Clear As Action(Of BaseGroup)
-        Public Event Volume As Action(Of Bond)
-
-        Public YieldMode As String ' todo currently unused
-        Friend BondFields As FieldContainer
-        Public SeriesName As String
 
         Private ReadOnly _elements As New List(Of Bond) 'ric -> datapoint
         Public ReadOnly Property Elements() As List(Of Bond)
@@ -157,8 +188,6 @@ Namespace Tools.Elements
             End Get
         End Property
 
-        Public PortfolioID As Long
-
         Private WithEvents _quoteLoader As New LiveQuotes
         Protected ReadOnly Property QuoteLoader() As LiveQuotes
             Get
@@ -176,19 +205,11 @@ Namespace Tools.Elements
             End Set
         End Property
 
-        Public ReadOnly Property Ansamble() As Ansamble
-            Get
-                Return _ansamble
-            End Get
-        End Property
-
         Public Sub Cleanup()
             _quoteLoader.CancelAll()
             _elements.Clear()
             RaiseEvent Clear(Me)
         End Sub
-
-        Public MustOverride Sub NotifyChanged()
 
         Public Overridable Sub StartAll()
             Dim rics As List(Of String) = (From elem In _elements Select elem.MetaData.RIC).ToList()
@@ -281,7 +302,10 @@ Namespace Tools.Elements
             For Each ric In rics
                 Dim descr = BondsData.Instance.GetBondInfo(ric)
                 If descr IsNot Nothing Then
-                    _elements.Add(New Bond(Me, descr))
+                    Dim bond = New Bond(Me, descr)
+                    AddHandler bond.Changed, Sub() If Not _eventsFrozen Then NotifyChanged()
+                    AddHandler bond.Price, Sub() If Not _eventsFrozen Then NotifyChanged()
+                    _elements.Add(bond)
                 Else
                     Logger.Error("No description for bond {0} found", ric)
                 End If
@@ -305,31 +329,51 @@ Namespace Tools.Elements
         End Sub
 
         Public Sub Disable(ByVal ric As String)
+            EventsFrozen = True
             For Each item In (From elem In _elements Where elem.MetaData.RIC = ric)
                 item.Enabled = False
-                NotifyChanged()
             Next
+            EventsFrozen = False
         End Sub
 
         Public Sub Disable(ByVal rics As List(Of String))
+            EventsFrozen = True
             For Each item In (From elem In _elements Where rics.Contains(elem.MetaData.RIC))
                 item.Enabled = False
-                NotifyChanged()
             Next
+            EventsFrozen = False
         End Sub
 
         Public Sub Enable(ByVal ric As String)
+            EventsFrozen = True
             For Each item In (From elem In _elements Where elem.MetaData.RIC = ric)
                 item.Enabled = True
-                NotifyChanged()
             Next
+            EventsFrozen = False
         End Sub
 
         Public Sub Enable(ByVal rics As List(Of String))
+            EventsFrozen = True
             For Each item In (From elem In _elements Where rics.Contains(elem.MetaData.RIC))
                 item.Enabled = True
-                NotifyChanged()
             Next
+            EventsFrozen = False
+        End Sub
+
+        Public Sub ToggleLabels()
+            EventsFrozen = True
+            For Each elem In _elements
+                elem.ToggleLabel()
+            Next
+            EventsFrozen = False
+        End Sub
+
+        Public Sub SetLabelMode(ByVal mode As LabelMode)
+            EventsFrozen = True
+            For Each elem In _elements
+                elem.LabelMode = mode
+            Next
+            EventsFrozen = False
         End Sub
     End Class
 End NameSpace

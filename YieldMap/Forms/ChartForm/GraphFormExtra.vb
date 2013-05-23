@@ -464,91 +464,6 @@ Namespace Forms.ChartForm
             If srs IsNot Nothing Then TheChart.Series.Remove(srs)
         End Sub
 
-        'Private Sub OnBondQuote(ByVal grp As BaseGroup) Handles _ansamble.Quote
-        '    Logger.Trace("OnBondQuote({0}, {1})", bnd.MetaData.ShortName, bnd.Parent.SeriesName)
-        '    GuiAsync(
-        '        Sub()
-        '            Dim group = bnd.Parent
-        '            Dim maxPriorityField = bnd.QuotesAndYields.MaxPriorityField
-        '            If maxPriorityField = "" Then Return
-        '            Dim calc = bnd.QuotesAndYields(maxPriorityField)
-        '            Dim ric = bnd.MetaData.RIC
-
-        '            Dim series As Series = TheChart.Series.FindByName(group.SeriesName)
-        '            Dim clr = Color.FromName(group.Color)
-        '            If series Is Nothing Then
-        '                Dim seriesDescr = New BondSetSeries With {.Name = group.SeriesName, .Color = clr}
-        '                AddHandler seriesDescr.SelectedPointChanged, AddressOf OnSelectedPointChanged
-        '                series = New Series(group.SeriesName) With {
-        '                    .YValuesPerPoint = 1,
-        '                    .ChartType = SeriesChartType.Point,
-        '                    .IsVisibleInLegend = False,
-        '                    .color = Color.FromName(calc.BackColor),
-        '                    .markerSize = 8,
-        '                    .markerBorderWidth = 2,
-        '                    .markerBorderColor = clr,
-        '                    .markerStyle = MarkerStyle.Circle,
-        '                    .Tag = seriesDescr
-        '                }
-        '                With series.EmptyPointStyle
-        '                    .BorderWidth = 0
-        '                    .MarkerSize = 0
-        '                    .MarkerStyle = MarkerStyle.None
-        '                End With
-        '                series.SmartLabelStyle.Enabled = True
-        '                series.SmartLabelStyle.AllowOutsidePlotArea = LabelOutsidePlotAreaStyle.No
-        '                TheChart.Series.Add(series)
-        '                Dim legendItem As New LegendItem(group.SeriesName, clr, "") With {
-        '                    .Tag = group.Identity
-        '                }
-        '                TheChart.Legends(0).CustomItems.Add(legendItem)
-        '            End If
-
-        '            ' creating data point
-        '            Dim point As DataPoint
-        '            Dim yValue = _spreadBenchmarks.GetActualQuote(calc)
-        '            Dim haveSuchPoint = series.Points.Any(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric)
-
-        '            If haveSuchPoint Then
-        '                point = series.Points.First(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric)
-        '                If yValue IsNot Nothing Then
-        '                    point.XValue = calc.Duration
-        '                    If Math.Abs(yValue.Value - point.YValues.First) > 0.01 Then
-        '                        Logger.Trace("{0}: delta is {1}", ric, yValue.Value - point.YValues.First)
-        '                    End If
-        '                    point.YValues = {yValue.Value}
-        '                    point.Color = Color.FromName(calc.BackColor)
-        '                    Dim style As MarkerStyle
-        '                    If MarkerStyle.TryParse(calc.MarkerStyle, style) Then
-        '                        point.MarkerStyle = style
-        '                    Else
-        '                        point.MarkerStyle = IIf(calc.Yld.ToWhat.Equals(YieldToWhat.Maturity), MarkerStyle.Circle, MarkerStyle.Triangle)
-        '                    End If
-        '                    If ShowLabelsTSB.Checked Then point.Label = bnd.Label
-        '                Else
-        '                    series.Points.Remove(point)
-        '                End If
-        '            ElseIf yValue IsNot Nothing Then
-        '                point = New DataPoint(calc.Duration, yValue.Value) With {
-        '                    .Name = bnd.MetaData.RIC,
-        '                    .Tag = bnd,
-        '                    .ToolTip = bnd.MetaData.ShortName,
-        '                    .Color = Color.FromName(calc.BackColor)
-        '                }
-        '                Dim style As MarkerStyle
-        '                If MarkerStyle.TryParse(calc.MarkerStyle, style) Then
-        '                    point.MarkerStyle = style
-        '                Else
-        '                    point.MarkerStyle = IIf(calc.Yld.ToWhat.Equals(YieldToWhat.Maturity), MarkerStyle.Circle, MarkerStyle.Triangle)
-        '                End If
-        '                If ShowLabelsTSB.Checked Then point.Label = bnd.MetaData.ShortName
-        '                series.Points.Add(point)
-        '            End If
-        '            If Not raw Then SetChartMinMax()
-        '        End Sub)
-        'End Sub
-
-
         Private Sub OnGroupUpdated(ByVal data As List(Of BondCurve.CurveItem))
             Logger.Trace("OnGroupUpdated()")
             GuiAsync(
@@ -582,17 +497,21 @@ Namespace Forms.ChartForm
                     series.SmartLabelStyle.Enabled = True
                     series.SmartLabelStyle.AllowOutsidePlotArea = LabelOutsidePlotAreaStyle.No
                     TheChart.Series.Add(series)
-                    Dim legendItem As New LegendItem(group.SeriesName, clr, "") With {
-                        .Tag = group.Identity
-                    }
-                    TheChart.Legends(0).CustomItems.Add(legendItem)
+
+                    Dim legendItems = TheChart.Legends(0).CustomItems
+                    While legendItems.Any(Function(item) item.Tag = group.Identity)
+                        legendItems.Remove(legendItems.First(Function(item) item.Tag = group.Identity))
+                    End While
+                    Dim legendItem = New LegendItem(group.SeriesName, clr, "") With {.Tag = group.Identity}
+                    legendItems.Add(legendItem)
 
                     For Each pnt In dt
                         Dim point = New DataPoint(pnt.TheX, pnt.TheY) With {
                                 .Name = pnt.Bond.MetaData.RIC,
                                 .Tag = pnt.Bond,
                                 .ToolTip = pnt.Bond.MetaData.ShortName,
-                                .Color = Color.FromName(pnt.BackColor)
+                                .Color = Color.FromName(pnt.BackColor),
+                                .Label = pnt.Label
                             }
                         Dim style As MarkerStyle
                         If MarkerStyle.TryParse(pnt.MarkerStyle, style) Then
@@ -600,11 +519,8 @@ Namespace Forms.ChartForm
                         Else
                             point.MarkerStyle = IIf(pnt.ToWhat.Equals(YieldToWhat.Maturity), MarkerStyle.Circle, MarkerStyle.Triangle)
                         End If
-                        If ShowLabelsTSB.Checked Then point.Label = pnt.Bond.MetaData.ShortName
                         series.Points.Add(point)
                     Next
-
-                    ' creating data point
 
                     SetChartMinMax()
                 End Sub)

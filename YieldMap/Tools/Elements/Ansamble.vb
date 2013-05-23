@@ -55,10 +55,10 @@ Namespace Tools.Elements
 
         Public Sub Recalculate()
             For Each item As KeyValuePair(Of Long, BondCurve) In _curves
-                item.Value.NotifyChanged()
+                item.Value.Recalculate()
             Next
             For Each item As KeyValuePair(Of Long, Group) In _groups
-                item.Value.NotifyChanged()
+                item.Value.Recalculate()
             Next
         End Sub
 

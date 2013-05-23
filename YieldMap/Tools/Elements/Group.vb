@@ -25,7 +25,7 @@ Namespace Tools.Elements
             AddRics(portfolioStructure.Rics(port))
         End Sub
 
-        Public Overrides Sub NotifyChanged()
+        Protected Overrides Sub NotifyChanged()
             If Ansamble.YSource = YSource.Yield Then
                 Dim result As New List(Of CurveItem)
 
@@ -42,7 +42,7 @@ Namespace Tools.Elements
                     End Select
 
                     y = description.GetYield()
-                    If x > 0 And y > 0 Then result.Add(New BondCurveItem(x, y, bnd, description.BackColor, description.Yld.ToWhat, description.MarkerStyle))
+                    If x > 0 And y > 0 Then result.Add(New BondCurveItem(x, y, bnd, description.BackColor, description.Yld.ToWhat, description.MarkerStyle, bnd.Label))
                 Next
                 result.Sort()
 

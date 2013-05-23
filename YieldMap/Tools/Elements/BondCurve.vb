@@ -241,7 +241,7 @@ Namespace Tools.Elements
             Return Nothing
         End Function
 
-        Public Overrides Sub NotifyChanged()
+        Protected Overrides Sub NotifyChanged()
             If Ansamble.YSource = YSource.Yield Then
                 Dim result As New List(Of CurveItem)
                 If _bootstrapped Then
@@ -291,7 +291,7 @@ Namespace Tools.Elements
                         End Select
 
                         y = description.GetYield()
-                        If x > 0 And y > 0 Then result.Add(New BondCurveItem(x, y, bnd, description.BackColor, description.Yld.ToWhat, description.MarkerStyle))
+                        If x > 0 And y > 0 Then result.Add(New BondCurveItem(x, y, bnd, description.BackColor, description.Yld.ToWhat, description.MarkerStyle, bnd.Label))
                     Next
                 End If
                 result.Sort()
