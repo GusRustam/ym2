@@ -304,12 +304,16 @@ Namespace Tools.Elements
                 If descr IsNot Nothing Then
                     Dim bond = New Bond(Me, descr)
                     AddHandler bond.Changed, Sub() If Not _eventsFrozen Then NotifyChanged()
-                    AddHandler bond.Price, Sub() If Not _eventsFrozen Then NotifyChanged()
+                    AddHandler bond.CustomPrice, AddressOf OnCustomCustomPrice
                     _elements.Add(bond)
                 Else
                     Logger.Error("No description for bond {0} found", ric)
                 End If
             Next
+        End Sub
+
+        Private Sub OnCustomCustomPrice(ByVal bond As Bond, ByVal price As Double)
+            HandleQuote(bond, BondFields.XmlName(bond.Fields.Custom), price, Today)
         End Sub
 
         Protected Sub New(ByVal ansamble As Ansamble)

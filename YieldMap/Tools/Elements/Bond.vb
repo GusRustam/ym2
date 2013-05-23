@@ -7,7 +7,7 @@ Namespace Tools.Elements
         Inherits Identifyable
 
         Public Event Changed As Action
-        Public Event Price As Action
+        Public Event CustomPrice As Action(Of Bond, Double)
 
         Public TodayVolume As Double
 
@@ -188,9 +188,8 @@ Namespace Tools.Elements
 
         Sub SetCustomPrice(ByVal price As Double)
             If price > 0 Then
-                UserSelectedQuote = Fields.Custom
-                QuotesAndYields(Fields.Custom).Price = price ' todo <<< RECALCULATION????
-                RaiseEvent Price()
+                _userSelectedQuote = Fields.Custom
+                RaiseEvent CustomPrice(Me, price)
             End If
         End Sub
 
