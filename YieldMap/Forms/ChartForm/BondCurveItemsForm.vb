@@ -1,5 +1,4 @@
 ﻿Imports YieldMap.Tools.Elements
-Imports YieldMap.Tools
 
 Namespace Forms.ChartForm
     Public Class BondCurveItemsForm
@@ -13,20 +12,14 @@ Namespace Forms.ChartForm
                 If _curve IsNot Nothing Then
                     RemoveHandler _curve.Clear, AddressOf OnCurveCleared
                     RemoveHandler _curve.Updated, AddressOf OnCurveUpdated
-                    RemoveHandler _curve.RemovedItem, AddressOf OnCurveRemovedItem
                 End If
                 _curve = value
                 If _curve IsNot Nothing Then
                     AddHandler _curve.Clear, AddressOf OnCurveCleared
                     AddHandler _curve.Updated, AddressOf OnCurveUpdated
-                    AddHandler _curve.RemovedItem, AddressOf OnCurveRemovedItem
                 End If
             End Set
         End Property
-
-        Private Sub OnCurveRemovedItem(ByVal grp As BaseGroup, ByVal ric As String)
-            CurveUpdate()
-        End Sub
 
         Private Sub CurveUpdate()
             If Curve IsNot Nothing Then
@@ -39,7 +32,7 @@ Namespace Forms.ChartForm
                 CurrentDGV.DataSource = Nothing
                 FormulaTB.Text = ""
             End If
-            ResetEnabled
+            ResetEnabled()
         End Sub
 
         Private Sub ResetEnabled()
@@ -67,8 +60,6 @@ Namespace Forms.ChartForm
             Dim frm As New AddBondCurveItemsForm
             frm.Curve = Curve
             frm.ShowDialog()
-            ' todo 1) история по кривой
-            ' todo 2) убрать показ отдельных точек в группе - показывать все разом
             ' todo 3) спреды
             ' todo 4) упроситить и редуцировать swap curves
             ' todo 5) сделать контекстное меню группы и бондовой кривой в легенде
@@ -76,6 +67,10 @@ Namespace Forms.ChartForm
 
         Private Sub RemoveItemsTSB_Click(ByVal sender As Object, ByVal e As EventArgs) Handles RemoveItemsTSB.Click
             If BondsDGV.SelectedRows.Count <= 0 Then Return
+            If BondsDGV.Rows.Count <= 2 Then
+                MessageBox.Show("There must be at least two points in curve", "Cannot remove point", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Return
+            End If
             Dim elements = (From elem As DataGridViewRow In BondsDGV.SelectedRows Select CType(elem.DataBoundItem, BondCurve.BondCurveSnapshot.BondCurveElement).RIC).ToList()
             Curve.Disable(elements)
         End Sub

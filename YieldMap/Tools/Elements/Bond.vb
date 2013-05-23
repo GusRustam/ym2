@@ -28,7 +28,7 @@ Namespace Tools.Elements
             End Get
             Set(ByVal value As String)
                 _userSelectedQuote = value
-                Parent.NotifyQuote(Me)
+                Parent.NotifyChanged()
             End Set
         End Property
 
@@ -40,7 +40,7 @@ Namespace Tools.Elements
             End Get
             Set(ByVal value As Double)
                 _usedDefinedSpread = value
-                Parent.NotifyQuote(Me)
+                Parent.NotifyChanged()
             End Set
         End Property
 
@@ -159,24 +159,26 @@ Namespace Tools.Elements
 
         Public Sub Disable()
             Enabled = False
-            Parent.NotifyRemoved(Me)
+            'Parent.NotifyRemoved(Me)
+            Parent.NotifyChanged()
         End Sub
 
         Public Sub Enable()
             Enabled = True
-            Parent.NotifyQuote(Me)
+            Parent.NotifyChanged()
         End Sub
 
         Public Sub Annihilate()
             Parent.Elements.Remove(Me)
-            Parent.NotifyRemoved(Me)
+            Parent.NotifyChanged()
+            'Parent.NotifyRemoved(Me)
         End Sub
 
         Sub SetCustomPrice(ByVal price As Double)
             If price > 0 Then
                 UserSelectedQuote = Fields.Custom
-                QuotesAndYields(Fields.Custom).Price = price ' todo <<<
-                Parent.NotifyQuote(Me)
+                QuotesAndYields(Fields.Custom).Price = price ' todo <<< RECALCULATION????
+                Parent.NotifyChanged()
             End If
         End Sub
 

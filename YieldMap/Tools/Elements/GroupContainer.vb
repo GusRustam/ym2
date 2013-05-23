@@ -1,9 +1,8 @@
 ﻿Namespace Tools.Elements
     Public Class GroupContainer(Of T As BaseGroup)
+        Implements IEnumerable(Of KeyValuePair(Of Long, T))
         Private ReadOnly _groups As New Dictionary(Of Long, T)
 
-        Public Event RemovedItem As Action(Of T, String)
-        Public Event Quote As Action(Of Bond)
         Public Event Volume As Action(Of Bond)
         Public Event Cleared As Action(Of T)
 
@@ -66,8 +65,6 @@
         Public Sub Add(ByVal group As T)
             _groups.Add(group.Identity, group)
             AddHandler group.Clear, Sub(base As BaseGroup) RaiseEvent Cleared(base)
-            AddHandler group.Quote, Sub(bond As Bond) RaiseEvent Quote(bond)
-            AddHandler group.RemovedItem, Sub(grp As BaseGroup, ric As String) RaiseEvent RemovedItem(grp, ric)
             AddHandler group.Volume, Sub(bond As Bond) RaiseEvent Volume(bond)
         End Sub
 
@@ -80,6 +77,14 @@
                 Return kvp.Value.GetBond(ric)
             Next
             Return Nothing
+        End Function
+
+        Public Function IEnumerable_GetEnumerator() As IEnumerator(Of KeyValuePair(Of Long, T)) Implements IEnumerable(Of KeyValuePair(Of Long, T)).GetEnumerator
+            Return _groups.GetEnumerator()
+        End Function
+
+        Public Function GetEnumerator() As IEnumerator Implements IEnumerable.GetEnumerator
+            Return _groups.GetEnumerator()
         End Function
     End Class
 End Namespace

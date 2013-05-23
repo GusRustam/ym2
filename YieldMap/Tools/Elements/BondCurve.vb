@@ -1,4 +1,3 @@
-Imports System.ComponentModel
 Imports AdfinXAnalyticsFunctions
 Imports DbManager
 Imports Settings
@@ -10,89 +9,11 @@ Namespace Tools.Elements
     Public Class BondCurve
         Inherits BaseGroup
 
-        Public MustInherit Class CurveItem
-            Implements IComparable(Of CurveItem)
-            Private ReadOnly _x As Double
-            Private ReadOnly _y As Double
-
-            Public ReadOnly Property X() As String
-                Get
-                    Return String.Format("{0:F2}", _x)
-                End Get
-            End Property
-
-            Public ReadOnly Property Y() As String
-                Get
-                    Return String.Format("{0:P2}", _y)
-                End Get
-            End Property
-
-            <Browsable(False)>
-            Public ReadOnly Property TheX() As Double
-                Get
-                    Return _x
-                End Get
-            End Property
-
-            <Browsable(False)>
-            Public ReadOnly Property TheY() As Double
-                Get
-                    Return _y
-                End Get
-            End Property
-
-            Public Function CompareTo(ByVal other As CurveItem) As Integer Implements IComparable(Of CurveItem).CompareTo
-                Return _x.CompareTo(other._x)
-            End Function
-
-            Public Sub New(ByVal x As Double, ByVal y As Double)
-                _x = x
-                _y = y
-            End Sub
-        End Class
-
-        Public Class BondCurveItem
-            Inherits CurveItem
-            Private ReadOnly _bond As Bond
-
-            <Browsable(False)>
-            Public ReadOnly Property Bond() As Bond
-                Get
-                    Return _bond
-                End Get
-            End Property
-
-            Public ReadOnly Property Ric() As String
-                Get
-                    Return _bond.MetaData.RIC
-                End Get
-            End Property
-
-            Public Sub New(ByVal x As Double, ByVal y As Double, ByVal bond As Bond)
-                MyBase.new(x, y)
-                _bond = bond
-            End Sub
-
-        End Class
-
-        Public Class PointCurveItem
-            Inherits CurveItem
-            Private ReadOnly _curve As BondCurve
-
-            <Browsable(False)>
-            Public ReadOnly Property Curve() As BondCurve
-                Get
-                    Return _curve
-                End Get
-            End Property
-
-            Public Sub New(ByVal x As Double, ByVal y As Double, ByVal curve As BondCurve)
-                MyBase.New(x, y)
-                _curve = curve
-            End Sub
-        End Class
-
         Public Class BondCurveSnapshot
+            ''' <summary>
+            ''' Technical class to represent bond curve structure
+            ''' </summary>
+            ''' <remarks></remarks>
             Public Class BondCurveElement
                 Implements IComparable(Of BondCurveElement)
                 Private ReadOnly _ric As String
@@ -202,35 +123,6 @@ Namespace Tools.Elements
             End Set
         End Property
 
-        Public Overrides Sub StartAll()
-            Dim rics As List(Of String) = (From elem In AllElements Select elem.MetaData.RIC).ToList()
-            If rics.Count = 0 Then Return
-            If _date = Today Then
-                QuoteLoader.AddItems(rics, BondFields.AllNames)
-            Else
-                QuoteLoader.CancelAll()
-                Dim q As New HistoryBlock
-                AddHandler q.History, AddressOf OnHistory
-                q.StartHistory(rics, _histFields.AllNames, _date.AddDays(-10), _date)
-                'AllElements.ForEach(Sub(elem) elem.QuotesAndYields.Clear())
-                'For Each ric In rics
-                '    Dim histLoader As New History
-                '    AddHandler histLoader.HistoricalData, AddressOf OnHistoricalData
-                '    histLoader.StartTask(ric, String.Join(",", _histFields.AllNames), _date.AddDays(-10), _date)
-                'Next
-            End If
-        End Sub
-
-        Private Sub OnHistory(ByVal obj As HistoryBlock.DataCube)
-            If obj Is Nothing Then
-                [Date] = Today
-            Else
-                Logger.Info("HAHAHAHAHA")
-            End If
-        End Sub
-
-        Public Event Updated As Action(Of List(Of CurveItem))
-
         Private ReadOnly _histFields As FieldContainer
 
         ' Last curve snapshot
@@ -250,7 +142,7 @@ Namespace Tools.Elements
             End Get
             Set(ByVal value As Boolean)
                 _bootstrapped = value
-                NotifyQuote(Nothing)
+                NotifyChanged()
             End Set
         End Property
 
@@ -261,7 +153,7 @@ Namespace Tools.Elements
             End Get
             Set(ByVal value As EstimationModel)
                 _estModel = value
-                NotifyQuote(Nothing)
+                NotifyChanged()
             End Set
         End Property
 
@@ -278,71 +170,95 @@ Namespace Tools.Elements
             AddRics(src.GetDefaultRics())
         End Sub
 
-        'Private Sub OnHistoricalData(ByVal ric As String, ByVal data As Dictionary(Of Date, HistoricalItem), ByVal rawData As Dictionary(Of DateTime, RawHistoricalItem))
-        '    If rawData Is Nothing Then
-        '        Logger.Error("No data on bond {0}", ric)
-        '        Return
-        '    End If
-        '    Dim bonds = (From elem In AllElements Where elem.MetaData.RIC = ric)
-        '    If Not bonds.Any Then
-        '        Logger.Warn("Instrument {0} does not belong to serie {1}", ric, SeriesName)
-        '        Return
-        '    End If
-        '    Dim bond = bonds.First()
-        '    Dim dates = (From elem In rawData.Keys Where elem <= _date).ToList()
-        '    If Not dates.Any Then
-        '        Logger.Warn("Instrument {0} has no necessary date {1:dd/MM/yyyy}", ric, _date)
-        '        Return
-        '    End If
-        '    Dim maxDate = dates.Max
-        '    Dim quote = rawData(maxDate)
-        '    Dim fieldsDescription As FieldsDescription = _histFields.Fields
-        '    If quote.Has(fieldsDescription.Last) Then
-        '        HandleQuote(bond, _histFields.XmlName(fieldsDescription.Last), quote(fieldsDescription.Last), maxDate)
-        '    End If
-        '    If quote.Has(fieldsDescription.Bid) Or quote.Has(fieldsDescription.Ask) Then
-        '        If quote.Has(fieldsDescription.Bid) And quote.Has(fieldsDescription.Ask) Then
-        '            Dim bid = CDbl(quote(fieldsDescription.Bid))
-        '            HandleQuote(bond, _histFields.XmlName(fieldsDescription.Bid), bid, maxDate)
-        '            Dim ask = CDbl(quote(fieldsDescription.Ask))
-        '            HandleQuote(bond, _histFields.XmlName(fieldsDescription.Mid), ask, maxDate)
-        '            Dim mid = (bid + ask) / 2
-        '            HandleQuote(bond, _histFields.XmlName(fieldsDescription.Mid), mid, maxDate)
-        '        ElseIf quote.Has(fieldsDescription.Bid) Then
-        '            Dim bid = CDbl(quote(fieldsDescription.Bid))
-        '            HandleQuote(bond, _histFields.XmlName(fieldsDescription.Bid), bid, maxDate)
-        '            If Not SettingsManager.Instance.MidIfBoth Then
-        '                HandleQuote(bond, _histFields.XmlName(fieldsDescription.Mid), bid, maxDate)
-        '            End If
-        '        ElseIf quote.Has(fieldsDescription.Ask) Then
-        '            Dim ask = CDbl(quote(fieldsDescription.Ask))
-        '            HandleQuote(bond, _histFields.XmlName(fieldsDescription.Mid), ask, maxDate)
-        '            If Not SettingsManager.Instance.MidIfBoth Then
-        '                HandleQuote(bond, _histFields.XmlName(fieldsDescription.Mid), ask, maxDate)
-        '            End If
-        '        End If
-        '    End If
-        'End Sub
+        Public Overrides Sub StartAll()
+            Dim rics As List(Of String) = (From elem In AllElements Select elem.MetaData.RIC).ToList()
+            If rics.Count = 0 Then Return
+            If _date = Today Then
+                QuoteLoader.AddItems(rics, BondFields.AllNames)
+            Else
+                QuoteLoader.CancelAll()
+                Dim historyBlock As New HistoryBlock
+                AddHandler historyBlock.History, AddressOf OnHistory
+                historyBlock.Load(rics, _histFields.AllNames, _date.AddDays(-10), _date)
+            End If
+        End Sub
 
-        Public Overrides Sub NotifyQuote(ByVal bond As Bond)
+        Private Sub OnHistory(ByVal obj As HistoryBlock.DataCube)
+            If obj Is Nothing Then
+                [Date] = Today
+            Else
+                ' doing some cleanup
+                For Each elem In AllElements
+                    elem.QuotesAndYields.Clear()
+                Next
+                ' parsing historical data
+                For Each ric In obj.Rics
+                    ParseHistory(ric, obj.RicData2(ric))
+                Next
+            End If
+        End Sub
+
+        Private Sub ParseHistory(ByVal ric As String, ByVal rawData As Dictionary(Of String, Dictionary(Of Date, String)))
+            If rawData Is Nothing Then
+                Logger.Error("No data on bond {0}", ric)
+                Return
+            End If
+            Dim bonds = (From elem In AllElements Where elem.MetaData.RIC = ric)
+            If Not bonds.Any Then
+                Logger.Warn("Instrument {0} does not belong to serie {1}", ric, SeriesName)
+                Return
+            End If
+            Dim bond = bonds.First()
+
+            Dim fieldsDescription As FieldsDescription = _histFields.Fields
+            If rawData.ContainsKey(fieldsDescription.Last) Then
+                ParseHistoricalItem(rawData, fieldsDescription.Last, bond)
+            End If
+            If rawData.ContainsKey(fieldsDescription.Bid) Or rawData.ContainsKey(fieldsDescription.Ask) Then
+                Dim bidData = ParseHistoricalItem(rawData, fieldsDescription.Bid, bond)
+                Dim askData = ParseHistoricalItem(rawData, fieldsDescription.Ask, bond)
+                If bidData IsNot Nothing AndAlso askData IsNot Nothing AndAlso bidData.Item1 = askData.Item1 Then
+                    Dim mid = (bidData.Item2 + askData.Item2) / 2
+                    HandleQuote(bond, _histFields.XmlName(_histFields.Fields.Mid), mid, bidData.Item1)
+                ElseIf (bidData IsNot Nothing Or askData IsNot Nothing) And Not SettingsManager.Instance.MidIfBoth Then
+                    If bidData IsNot Nothing Then
+                        HandleQuote(bond, _histFields.XmlName(_histFields.Fields.Mid), bidData.Item2, bidData.Item1)
+                    Else
+                        HandleQuote(bond, _histFields.XmlName(_histFields.Fields.Mid), askData.Item2, askData.Item1)
+                    End If
+                End If
+            End If
+        End Sub
+
+        Private Function ParseHistoricalItem(ByVal rawData As Dictionary(Of String, Dictionary(Of Date, String)), ByVal field As String, ByVal bond As Bond) As Tuple(Of Date, Double)
+            Dim datVal = rawData(field)
+            Dim dates = (From key In datVal.Keys Where IsNumeric(datVal(key))).ToList()
+            If dates.Any Then
+                Dim maxdate = dates.Max
+                HandleQuote(bond, _histFields.XmlName(field), datVal(maxdate), maxdate)
+                Return Tuple.Create(maxdate, CDbl(rawData(field)(maxdate)))
+            End If
+            Return Nothing
+        End Function
+
+        Public Overrides Sub NotifyChanged()
             If Ansamble.YSource = YSource.Yield Then
                 Dim result As New List(Of CurveItem)
                 If _bootstrapped Then
                     Try
-                        ' todo use date of curve instead of today
                         Dim data = (From elem In Elements
-                                Where elem.MetaData.IssueDate <= Today And
-                                      elem.MetaData.Maturity > Today And
+                                Where elem.MetaData.IssueDate <= _date And
+                                      elem.MetaData.Maturity > _date And
                                       elem.QuotesAndYields.Any()).ToList()
 
                         Dim params(0 To data.Count() - 1, 5) As Object
                         For i = 0 To data.Count - 1
                             Dim meta = data(i).MetaData
                             params(i, 0) = "B"
-                            params(i, 1) = Today ' todo date
+                            params(i, 1) = _date
                             params(i, 2) = meta.Maturity
-                            params(i, 3) = meta.GetCouponByDate(Today) ' todo date
-                            params(i, 4) = data(i).QuotesAndYields.Main.Price / 100.0 ' todo local fields priorities???
+                            params(i, 3) = meta.GetCouponByDate(_date)
+                            params(i, 4) = data(i).QuotesAndYields.Main.Price / 100.0
                             params(i, 5) = meta.PaymentStructure
                         Next
                         Dim curveModule = New AdxYieldCurveModule
@@ -350,7 +266,7 @@ Namespace Tools.Elements
                         Dim termStructure As Array = curveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
                         For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
                             Dim matDate = Utils.FromExcelSerialDate(termStructure.GetValue(i, 1))
-                            Dim dur = (matDate - Today).TotalDays / 365.0 ' todo date
+                            Dim dur = (matDate - _date).TotalDays / 365.0
                             Dim yld = termStructure.GetValue(i, 2)
                             If dur > 0 And yld > 0 Then
                                 result.Add(New PointCurveItem(dur, yld, Me))
@@ -375,7 +291,7 @@ Namespace Tools.Elements
                         End Select
 
                         y = description.GetYield()
-                        If x > 0 And y > 0 Then result.Add(New BondCurveItem(x, y, bnd))
+                        If x > 0 And y > 0 Then result.Add(New BondCurveItem(x, y, bnd, description.BackColor, description.Yld.ToWhat, description.MarkerStyle))
                     Next
                 End If
                 result.Sort()
@@ -390,16 +306,12 @@ Namespace Tools.Elements
                 End If
 
                 _lastCurve = New List(Of CurveItem)(result)
-                RaiseEvent Updated(result)
+                NotifyUpdated(result)
             ElseIf Ansamble.YSource.Belongs(YSource.ASWSpread, YSource.OASpread, YSource.ZSpread, YSource.PointSpread) Then
                 ' todo plotting spreads
             Else
                 Logger.Warn("Unknown spread type {0}", Ansamble.YSource)
             End If
-        End Sub
-
-        Public Overrides Sub NotifyRemoved(ByVal bond As Bond)
-            NotifyQuote(Nothing)
         End Sub
 
         Public Sub Bootstrap()

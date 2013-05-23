@@ -16,6 +16,7 @@ Public Class LiveQuotes
     Public Sub CancelAll()
         Try
             _listManager.UnregisterAllItems()
+            _listManager.StopUpdates()
         Catch ex As Exception
             Logger.ErrorException("Failed to unregister items", ex)
             Logger.Error("Exception = {0}", ex.ToString())
@@ -44,16 +45,15 @@ Public Class LiveQuotes
         Dim itms = items.Aggregate(Function(str, elem) str & "," & elem)
         Dim flds = If(fields IsNot Nothing, fields.Aggregate(Function(str, elem) str & "," & elem), "")
         Logger.Debug("AddItems({0}, {1})", itms, flds)
-        Try
-            For Each item In From elem In items Where Not _listManager.IsRegisteredItem(elem)
+        For Each item In From elem In items Where Not _listManager.IsRegisteredItem(elem)
+            Try
                 _listManager.RegisterItems(item, flds)
-            Next
-        Catch ex As Exception
-            Logger.WarnException("Failed to start loading items", ex)
-            Logger.Warn("Exception = {0}", ex.ToString())
-            ' todo по идее, можно регистрировать элементы по одному и возвращать список 
-            ' todo тех, кого зарегистрировать не получилось
-        End Try
+            Catch ex As Exception
+                Logger.WarnException("Failed to start loading items", ex)
+                Logger.Warn("Exception = {0}", ex.ToString())
+            End Try
+        Next
+        _listManager.StartUpdates(RT_RunMode.RT_MODE_ONTIME_IF_UPDATED)
     End Sub
 
     Public Sub New()

@@ -464,44 +464,192 @@ Namespace Forms.ChartForm
             If srs IsNot Nothing Then TheChart.Series.Remove(srs)
         End Sub
 
+        'Private Sub OnBondQuote(ByVal grp As BaseGroup) Handles _ansamble.Quote
+        '    Logger.Trace("OnBondQuote({0}, {1})", bnd.MetaData.ShortName, bnd.Parent.SeriesName)
+        '    GuiAsync(
+        '        Sub()
+        '            Dim group = bnd.Parent
+        '            Dim maxPriorityField = bnd.QuotesAndYields.MaxPriorityField
+        '            If maxPriorityField = "" Then Return
+        '            Dim calc = bnd.QuotesAndYields(maxPriorityField)
+        '            Dim ric = bnd.MetaData.RIC
+
+        '            Dim series As Series = TheChart.Series.FindByName(group.SeriesName)
+        '            Dim clr = Color.FromName(group.Color)
+        '            If series Is Nothing Then
+        '                Dim seriesDescr = New BondSetSeries With {.Name = group.SeriesName, .Color = clr}
+        '                AddHandler seriesDescr.SelectedPointChanged, AddressOf OnSelectedPointChanged
+        '                series = New Series(group.SeriesName) With {
+        '                    .YValuesPerPoint = 1,
+        '                    .ChartType = SeriesChartType.Point,
+        '                    .IsVisibleInLegend = False,
+        '                    .color = Color.FromName(calc.BackColor),
+        '                    .markerSize = 8,
+        '                    .markerBorderWidth = 2,
+        '                    .markerBorderColor = clr,
+        '                    .markerStyle = MarkerStyle.Circle,
+        '                    .Tag = seriesDescr
+        '                }
+        '                With series.EmptyPointStyle
+        '                    .BorderWidth = 0
+        '                    .MarkerSize = 0
+        '                    .MarkerStyle = MarkerStyle.None
+        '                End With
+        '                series.SmartLabelStyle.Enabled = True
+        '                series.SmartLabelStyle.AllowOutsidePlotArea = LabelOutsidePlotAreaStyle.No
+        '                TheChart.Series.Add(series)
+        '                Dim legendItem As New LegendItem(group.SeriesName, clr, "") With {
+        '                    .Tag = group.Identity
+        '                }
+        '                TheChart.Legends(0).CustomItems.Add(legendItem)
+        '            End If
+
+        '            ' creating data point
+        '            Dim point As DataPoint
+        '            Dim yValue = _spreadBenchmarks.GetActualQuote(calc)
+        '            Dim haveSuchPoint = series.Points.Any(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric)
+
+        '            If haveSuchPoint Then
+        '                point = series.Points.First(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric)
+        '                If yValue IsNot Nothing Then
+        '                    point.XValue = calc.Duration
+        '                    If Math.Abs(yValue.Value - point.YValues.First) > 0.01 Then
+        '                        Logger.Trace("{0}: delta is {1}", ric, yValue.Value - point.YValues.First)
+        '                    End If
+        '                    point.YValues = {yValue.Value}
+        '                    point.Color = Color.FromName(calc.BackColor)
+        '                    Dim style As MarkerStyle
+        '                    If MarkerStyle.TryParse(calc.MarkerStyle, style) Then
+        '                        point.MarkerStyle = style
+        '                    Else
+        '                        point.MarkerStyle = IIf(calc.Yld.ToWhat.Equals(YieldToWhat.Maturity), MarkerStyle.Circle, MarkerStyle.Triangle)
+        '                    End If
+        '                    If ShowLabelsTSB.Checked Then point.Label = bnd.Label
+        '                Else
+        '                    series.Points.Remove(point)
+        '                End If
+        '            ElseIf yValue IsNot Nothing Then
+        '                point = New DataPoint(calc.Duration, yValue.Value) With {
+        '                    .Name = bnd.MetaData.RIC,
+        '                    .Tag = bnd,
+        '                    .ToolTip = bnd.MetaData.ShortName,
+        '                    .Color = Color.FromName(calc.BackColor)
+        '                }
+        '                Dim style As MarkerStyle
+        '                If MarkerStyle.TryParse(calc.MarkerStyle, style) Then
+        '                    point.MarkerStyle = style
+        '                Else
+        '                    point.MarkerStyle = IIf(calc.Yld.ToWhat.Equals(YieldToWhat.Maturity), MarkerStyle.Circle, MarkerStyle.Triangle)
+        '                End If
+        '                If ShowLabelsTSB.Checked Then point.Label = bnd.MetaData.ShortName
+        '                series.Points.Add(point)
+        '            End If
+        '            If Not raw Then SetChartMinMax()
+        '        End Sub)
+        'End Sub
+
+
+        Private Sub OnGroupUpdated(ByVal data As List(Of BondCurve.CurveItem))
+            Logger.Trace("OnGroupUpdated()")
+            GuiAsync(
+                Sub()
+                    If Not data.Any Then Return
+                    If Not TypeOf data.First Is BondCurve.BondCurveItem Then Return
+                    Dim dt = data.Cast(Of BondCurve.BondCurveItem).ToList()
+                    Dim group = dt.First.Bond.Parent
+                    Dim series As Series = TheChart.Series.FindByName(group.Identity)
+                    Dim clr = Color.FromName(group.Color)
+
+                    If series IsNot Nothing Then TheChart.Series.Remove(series)
+                    Dim seriesDescr = New BondSetSeries With {.Name = group.SeriesName, .Color = clr}
+                    AddHandler seriesDescr.SelectedPointChanged, AddressOf OnSelectedPointChanged
+                    series = New Series(group.Identity) With {
+                        .YValuesPerPoint = 1,
+                        .ChartType = SeriesChartType.Point,
+                        .IsVisibleInLegend = False,
+                        .color = clr,
+                        .markerSize = 8,
+                        .markerBorderWidth = 2,
+                        .markerBorderColor = clr,
+                        .markerStyle = MarkerStyle.Circle,
+                        .Tag = seriesDescr
+                    }
+                    With series.EmptyPointStyle
+                        .BorderWidth = 0
+                        .MarkerSize = 0
+                        .MarkerStyle = MarkerStyle.None
+                    End With
+                    series.SmartLabelStyle.Enabled = True
+                    series.SmartLabelStyle.AllowOutsidePlotArea = LabelOutsidePlotAreaStyle.No
+                    TheChart.Series.Add(series)
+                    Dim legendItem As New LegendItem(group.SeriesName, clr, "") With {
+                        .Tag = group.Identity
+                    }
+                    TheChart.Legends(0).CustomItems.Add(legendItem)
+
+                    For Each pnt In dt
+                        Dim point = New DataPoint(pnt.TheX, pnt.TheY) With {
+                                .Name = pnt.Bond.MetaData.RIC,
+                                .Tag = pnt.Bond,
+                                .ToolTip = pnt.Bond.MetaData.ShortName,
+                                .Color = Color.FromName(pnt.BackColor)
+                            }
+                        Dim style As MarkerStyle
+                        If MarkerStyle.TryParse(pnt.MarkerStyle, style) Then
+                            point.MarkerStyle = style
+                        Else
+                            point.MarkerStyle = IIf(pnt.ToWhat.Equals(YieldToWhat.Maturity), MarkerStyle.Circle, MarkerStyle.Triangle)
+                        End If
+                        If ShowLabelsTSB.Checked Then point.Label = pnt.Bond.MetaData.ShortName
+                        series.Points.Add(point)
+                    Next
+
+                    ' creating data point
+
+                    SetChartMinMax()
+                End Sub)
+        End Sub
+
         Private Sub OnNewCurvePaint(ByVal data As List(Of BondCurve.CurveItem))
-            GuiAsync(Sub()
-                         If Not data.Any Then Return
-                         Dim crv As BondCurve
-                         Dim itsBond As Boolean
-                         If TypeOf data.First Is BondCurve.BondCurveItem Then
-                             crv = CType(CType(data.First, BondCurve.BondCurveItem).Bond.Parent, BondCurve)
-                             itsBond = True
-                         ElseIf TypeOf data.First Is BondCurve.PointCurveItem Then
-                             crv = CType(data.First, BondCurve.PointCurveItem).Curve
-                             itsBond = False
-                         Else
-                             Logger.Warn("Unexpected items type for a bond-based curve")
-                             Return
-                         End If
-                         Dim srs = TheChart.Series.FindByName(crv.Identity)
-                         If srs IsNot Nothing Then TheChart.Series.Remove(srs)
-                         srs = New Series() With {
-                             .Name = crv.Identity,
-                             .legendText = crv.SeriesName,
-                             .ChartType = SeriesChartType.Line,
-                             .borderWidth = 2,
-                             .color = Color.FromName(crv.Color),
-                             .Tag = crv.Identity
-                         }
-                         TheChart.Series.Add(srs)
-                         If itsBond Then
-                             For Each point In data.Cast(Of BondCurve.BondCurveItem)()
-                                 Dim pnt = New DataPoint(point.TheX, point.TheY) With {.Tag = point.Bond, .ToolTip = point.Bond.Label}
-                                 srs.Points.Add(pnt)
-                             Next
-                         Else
-                             For Each point In data.Cast(Of BondCurve.PointCurveItem)()
-                                 Dim pnt = New DataPoint(point.TheX, point.TheY) With {.Tag = point.Curve}
-                                 srs.Points.Add(pnt)
-                             Next
-                         End If
-                     End Sub)
+            GuiAsync(
+                Sub()
+                    If Not data.Any Then Return
+                    Dim crv As BondCurve
+                    Dim itsBond As Boolean
+                    If TypeOf data.First Is BondCurve.BondCurveItem Then
+                        crv = CType(CType(data.First, BondCurve.BondCurveItem).Bond.Parent, BondCurve)
+                        itsBond = True
+                    ElseIf TypeOf data.First Is BondCurve.PointCurveItem Then
+                        crv = CType(data.First, BondCurve.PointCurveItem).Curve
+                        itsBond = False
+                    Else
+                        Logger.Warn("Unexpected items type for a bond-based curve")
+                        Return
+                    End If
+                    Dim srs = TheChart.Series.FindByName(crv.Identity)
+                    If srs IsNot Nothing Then TheChart.Series.Remove(srs)
+                    srs = New Series() With {
+                        .Name = crv.Identity,
+                        .legendText = crv.SeriesName,
+                        .ChartType = SeriesChartType.Line,
+                        .borderWidth = 2,
+                        .color = Color.FromName(crv.Color),
+                        .Tag = crv.Identity
+                    }
+                    TheChart.Series.Add(srs)
+                    If itsBond Then
+                        For Each point In data.Cast(Of BondCurve.BondCurveItem)()
+                            Dim pnt = New DataPoint(point.TheX, point.TheY) With {.Tag = point.Bond, .ToolTip = point.Bond.Label}
+                            srs.Points.Add(pnt)
+                        Next
+                    Else
+                        For Each point In data.Cast(Of BondCurve.PointCurveItem)()
+                            Dim pnt = New DataPoint(point.TheX, point.TheY) With {.Tag = point.Curve}
+                            srs.Points.Add(pnt)
+                        Next
+                    End If
+                    SetChartMinMax()
+                End Sub)
         End Sub
     End Class
 End Namespace

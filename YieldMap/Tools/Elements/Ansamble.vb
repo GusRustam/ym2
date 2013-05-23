@@ -1,6 +1,7 @@
 Namespace Tools.Elements
     Public Class Ansamble
         Private Shared ReadOnly Identities As New HashSet(Of Long)
+        Public Event Cleared As Action(Of BaseGroup)
 
         Public Shared Sub ReleaseID(ByVal id As Long)
             Identities.Remove(id)
@@ -53,38 +54,16 @@ Namespace Tools.Elements
         End Property
 
         Public Sub Recalculate()
-            ' todo something might have changed, I dunno what
+            For Each item As KeyValuePair(Of Long, BondCurve) In _curves
+                item.Value.NotifyChanged()
+            Next
+            For Each item As KeyValuePair(Of Long, Group) In _groups
+                item.Value.NotifyChanged()
+            Next
         End Sub
 
-        Private Sub _curves_Cleared(ByVal obj As BondCurve) Handles _curves.Cleared
-            RaiseEvent CurveCleared(obj)
-        End Sub
-
-        Public Event CurveCleared As Action(Of BondCurve)
-        Public Event CurveQuote As Action(Of BaseGroup)
-        Public Event GroupCleared As Action(Of Group)
-        Public Event BondQuote As Action(Of Bond)
-        Public Event BondRemoved As Action(Of Group, String)
-        Public Event BondVolume As Action(Of Bond)
-
-        Private Sub _curves_Quote(ByVal obj As Bond) Handles _curves.Quote
-            RaiseEvent CurveQuote(obj.Parent)
-        End Sub
-
-        Private Sub _groups_Cleared(ByVal obj As Group) Handles _groups.Cleared
-            RaiseEvent GroupCleared(obj)
-        End Sub
-
-        Private Sub _groups_Quote(ByVal obj As Bond) Handles _groups.Quote
-            RaiseEvent BondQuote(obj)
-        End Sub
-
-        Private Sub _groups_RemovedItem(ByVal arg1 As Group, ByVal arg2 As String) Handles _groups.RemovedItem
-            RaiseEvent BondRemoved(arg1, arg2)
-        End Sub
-
-        Private Sub _groups_Volume(ByVal obj As Bond) Handles _groups.Volume
-            RaiseEvent BondVolume(obj)
+        Private Sub GroupsCleared(ByVal obj As BaseGroup) Handles _curves.Cleared, _groups.Cleared
+            RaiseEvent Cleared(obj)
         End Sub
     End Class
 End NameSpace

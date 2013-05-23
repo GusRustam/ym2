@@ -129,21 +129,16 @@ Public Class HistoryBlock
     Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(HistoryBlock))
     Public Class DataCube
         Private ReadOnly _rfd As New Dictionary(Of Date, Dictionary(Of String, Dictionary(Of String, String)))
-        'Private ReadOnly _data As String()
-
-        'Private _fields As List(Of String)
-        'Private _since As Date
-        'Private _till As Date
-        'Private _rics As List(Of String)
+        Private ReadOnly _rics As List(Of String)
+        Private ReadOnly _fields As List(Of String)
+        Private ReadOnly _dates As List(Of Date)
 
         Public Sub New(ByVal rics As List(Of String), ByVal fields As List(Of String), ByVal since As Date, ByVal till As Date)
-            '_since = since
-            '_till = till
-            '_rics = rics
-            '_fields = fields
-            'ReDim _data((till - since).Days, rics.Count, fields.Count)
-
+            _rics = New List(Of String)(rics)
+            _fields = New List(Of String)(fields)
+            _dates = New List(Of Date)
             For Each dt As DateTime In Enumerable.Range(0, (till - since).Days).Select(Function(i) since.AddDays(i))
+                _dates.Add(dt)
                 _rfd(dt) = New Dictionary(Of String, Dictionary(Of String, String))
                 For Each ric In rics
                     _rfd(dt)(ric) = New Dictionary(Of String, String)
@@ -156,7 +151,6 @@ Public Class HistoryBlock
 
         Public Sub Add(ByVal ric As String, ByVal field As String, ByVal dt As Date, ByVal val As String)
             _rfd(dt)(ric)(field) = val
-            '_data()
         End Sub
 
         Public ReadOnly Property RicDate(ByVal ric As String, ByVal dt As Date) As Dictionary(Of String, String)
@@ -171,7 +165,7 @@ Public Class HistoryBlock
                 For Each item In _rfd
                     Dim dt = item.Key
                     Dim rfv = item.Value
-                    For Each fieldVal In From elem In rfv Let rc = elem.Key Where rc = ric Select elem.Value
+                    For Each fieldVal In From elem In rfv Where elem.Key = ric Select elem.Value
                         res.Add(dt, fieldVal(field))
                     Next
                 Next
@@ -190,86 +184,165 @@ Public Class HistoryBlock
                 Return res
             End Get
         End Property
+
+        Public ReadOnly Property Rics() As List(Of String)
+            Get
+                Return _rics
+            End Get
+        End Property
+
+        Public ReadOnly Property Fields() As List(Of String)
+            Get
+                Return _fields
+            End Get
+        End Property
+
+        Public ReadOnly Property Dates() As List(Of Date)
+            Get
+                Return _dates
+            End Get
+        End Property
+
+        Public ReadOnly Property RicData(ByVal ric As String) As Dictionary(Of Date, Dictionary(Of String, String))
+            Get
+                Dim res As New Dictionary(Of Date, Dictionary(Of String, String))
+                For Each dt In _dates
+                    res(dt) = _rfd(dt)(ric)
+                Next
+                Return res
+            End Get
+        End Property
+
+        Public ReadOnly Property RicData2(ByVal ric As String) As Dictionary(Of String, Dictionary(Of Date, String))
+            Get
+                Dim res As New Dictionary(Of String, Dictionary(Of Date, String))
+                For Each field In _fields
+                    res(field) = New Dictionary(Of Date, String)
+                    For Each dt In _dates
+                        res(field)(dt) = _rfd(dt)(ric)(field)
+                    Next
+                Next
+                Return res
+            End Get
+        End Property
     End Class
 
     Private _result As DataCube
 
     Public Event History As Action(Of DataCube)
 
-    Private _count As Integer
-    Private _failed As Boolean = False
     Private _fields As List(Of String)
     Private _since As Date
     Private _till As Date
 
+    Private _countdown As CountdownEvent
+
     Private Sub WaiterThread()
         Logger.Info("WaiterThread()")
-        Try
-            While Interlocked.Read(_count) > 0
-                Logger.Debug("Threads to wait: {0}", Interlocked.Read(_count))
-                Thread.Sleep(TimeSpan.FromSeconds(1))
-            End While
-        Catch ex As ThreadAbortException
-            Logger.Warn("Waiter aborted")
-            If Interlocked.Read(_count) > 0 Then
-                SyncLock Me
-                    _failed = True
-                End SyncLock
-            End If
-        End Try
+        If Not _countdown.Wait(TimeSpan.FromSeconds(30)) Then
+            Logger.Warn("{0} threads are still working", _countdown.CurrentCount)
+            RaiseEvent History(Nothing)
+        Else
+            Logger.Info("Ok!")
+            RaiseEvent History(_result)
+        End If
     End Sub
 
-    Private Sub OnHistory(ByVal itemRic As String, ByVal data As Dictionary(Of Date, HistoricalItem), ByVal rawData As Dictionary(Of DateTime, RawHistoricalItem))
-        Logger.Debug("OnHistory({0})", itemRic)
+    Private Sub RicLoaderThread(ByVal item As String)
+        Dim historyManager As AdxRtHistory = Eikon.Sdk.CreateAdxRtHistory()
+        AddHandler historyManager.OnUpdate, Sub() ParseData(historyManager, item)
+        Dim ric = item
+        If item(0) = "/" Then ric = item.Substring(1)
+        Logger.Warn("StartTask({0})", ric)
         Try
-            SyncLock _result
-                If _failed Then Return
-                If data Is Nothing Then Return
-                For Each dt In data.Keys
-                    For Each field In rawData(dt).Keys
-                        _result.Add(itemRic, field, dt, rawData(dt)(field))
-                    Next
-                Next
-            End SyncLock
+            With historyManager
+                .ErrorMode = AdxErrorMode.EXCEPTION
+                .Source = SettingsManager.Instance.ReutersDataSource
+                .Mode = String.Format(
+                    CultureInfo.CreateSpecificCulture("en-US"),
+                    "FRQ:{0} HEADER:YES START:{1:ddMMMyy} END:{2:ddMMMyy}", "D", _since, _till).ToUpper()
+                .ItemName = ric
+                .RequestHistory(String.Join(",", _fields))
+                If .Data IsNot Nothing Then ParseData(historyManager, ric)
+            End With
         Catch ex As Exception
-            Logger.WarnException("Failed to parse data in ric loader thread", ex)
-            Logger.Warn("Exception = {0}", ex.ToString())
-        Finally
-            Interlocked.Decrement(_count)
+            Logger.ErrorException("Error in history downloader", ex)
+            Logger.Error("Exception = {0}", ex.ToString())
         End Try
     End Sub
 
-    Private Sub RicLoaderThread(ByVal ric As String, ByVal state As ParallelLoopState)
-        Logger.Info("RicLoaderThread({0})", ric)
-        Dim hst As New History
-        AddHandler hst.HistoricalData, AddressOf OnHistory
+    Private Sub ParseData(ByVal historyManager As AdxRtHistory, ByVal ric As String)
+        Try
+            Dim data As Array = historyManager.Data
 
-        SyncLock Me
-            If _failed Then Return
-        End SyncLock
-        hst.StartTask(ric, String.Join(",", _fields), _since, _till)
+            Dim firstRow = data.GetLowerBound(0)
+            Dim lastRow = data.GetUpperBound(0)
+            Dim firstColumn = data.GetLowerBound(1)
+            Dim lastColumn = data.GetUpperBound(1)
+
+#If DEBUG Then
+            For row = firstRow To lastRow
+                For col = firstColumn To lastColumn
+                    Logger.Trace("({0},{1}) -> {2}", row, col, data.GetValue(row, col))
+                Next
+            Next
+#End If
+
+            For col = firstColumn + 1 To lastColumn
+                Dim theValue = data.GetValue(0, col)
+                If Not IsDate(theValue) Then Continue For
+
+                Dim dt = CDate(theValue)
+                SyncLock _result
+                    For row = firstRow To lastRow
+                        Dim itemName = data.GetValue(row, 0).ToString()
+                        Dim propValue = data.GetValue(row, col)
+                        Try
+                            If IsNumeric(propValue) Or IsDate(propValue) Then
+                                Logger.Trace("Added {0} -> {1}", itemName, propValue)
+                                _result.Add(ric, itemName, dt, propValue)
+                            Else
+                                Logger.Trace("Skipped {0} -> {1}", itemName, propValue)
+                            End If
+                        Catch ex As Exception
+                            Logger.Trace("Failed adding {0} -> {1} at {2:dd/MM/yy} for ric {3}", itemName, propValue, dt, ric)
+                            Logger.Trace("exception = {0}", ex.ToString())
+                        End Try
+                    Next
+                End SyncLock
+            Next
+        Catch ex As Exception
+            Logger.ErrorException("Failed to parse historical data", ex)
+            Logger.Error("Exception = {0}", ex.ToString())
+        Finally
+            Try
+                _countdown.Signal()
+                historyManager.FlushData()
+            Catch ex As Exception
+                Logger.WarnException("Failed to stop task", ex)
+                Logger.Warn("Exception = {0}", ex.ToString())
+            End Try
+        End Try
     End Sub
 
-    Public Sub StartHistory(ByVal rics As List(Of String), ByVal fields As List(Of String), ByVal since As Date, ByVal till As Date)
+    Public Sub Load(ByVal rics As List(Of String), ByVal fields As List(Of String), ByVal since As Date, ByVal till As Date)
         ' Some general-purpose fields (could use clojures instead)
-        _count = rics.Count()
         _fields = fields
         _since = since
         _till = till
 
+        ' main tool to wait all my threads
+        _countdown = New CountdownEvent(rics.Count())
+
+        ' wut to return
         _result = New DataCube(rics, fields, since, till)
 
+        ' data collector
         Dim waiter = New Thread(AddressOf WaiterThread)
         waiter.Start()
 
+        ' individual rics
         Parallel.ForEach(rics, AddressOf RicLoaderThread)
-
-        If Not waiter.Join(TimeSpan.FromSeconds(60)) Then
-            waiter.Abort()
-            RaiseEvent History(Nothing)
-        Else
-            RaiseEvent History(_result)
-        End If
     End Sub
 End Class
 

@@ -11,7 +11,6 @@ Imports Uitls
 Imports YieldMap.Curves
 Imports YieldMap.My.Resources
 Imports YieldMap.Commons
-Imports YieldMap.Tools
 Imports NLog
 Imports DbManager
 
@@ -36,7 +35,7 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub TheSettings_ShowPointSizeChanged(ByVal show As Boolean) Handles _theSettings.ShowPointSizeChanged
-            ' todo some refresh
+            _ansamble.Recalculate()
         End Sub
 
         Private Sub TheSettings_FieldsPriorityChanged(ByVal list As String) Handles _theSettings.FieldsPriorityChanged
@@ -100,6 +99,7 @@ Namespace Forms.ChartForm
                                            Where TypeOf port.Source Is Chain Or TypeOf port.Source Is UserList
                                            Select New Group(_ansamble, port, portfolioStructure)
                     ' todo add custom bonds
+                    AddHandler grp.Updated, AddressOf OnGroupUpdated
                     _ansamble.Groups.Add(grp)
                 Next
                 _ansamble.Groups.Start()
@@ -1018,8 +1018,9 @@ Namespace Forms.ChartForm
 #End Region
 
 #Region "e) Assembly and curves events"
-        Private Sub OnGroupClear(ByVal group As Group) Handles _ansamble.GroupCleared
+        Private Sub OnGroupClear(ByVal group As BaseGroup) Handles _ansamble.Cleared
             Logger.Trace("OnGroupClear()")
+            ' todo distinguish between group and curve
             GuiAsync(
                 Sub()
                     Dim series As Series = TheChart.Series.FindByName(group.SeriesName)
@@ -1037,104 +1038,22 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
-        Private Sub OnBondQuote(ByVal bnd As Bond, Optional ByVal raw As Boolean = False) Handles _ansamble.BondQuote
-            Logger.Trace("OnBondQuote({0}, {1})", bnd.MetaData.ShortName, bnd.Parent.SeriesName)
-            GuiAsync(
-                Sub()
-                    Dim group = bnd.Parent
-                    Dim maxPriorityField = bnd.QuotesAndYields.MaxPriorityField
-                    If maxPriorityField = "" Then Return
-                    Dim calc = bnd.QuotesAndYields(maxPriorityField)
-                    Dim ric = bnd.MetaData.RIC
+        
 
-                    Dim series As Series = TheChart.Series.FindByName(group.SeriesName)
-                    Dim clr = Color.FromName(group.Color)
-                    If series Is Nothing Then
-                        Dim seriesDescr = New BondSetSeries With {.Name = group.SeriesName, .Color = clr}
-                        AddHandler seriesDescr.SelectedPointChanged, AddressOf OnSelectedPointChanged
-                        series = New Series(group.SeriesName) With {
-                            .YValuesPerPoint = 1,
-                            .ChartType = SeriesChartType.Point,
-                            .IsVisibleInLegend = False,
-                            .color = Color.FromName(calc.BackColor),
-                            .markerSize = 8,
-                            .markerBorderWidth = 2,
-                            .markerBorderColor = clr,
-                            .markerStyle = MarkerStyle.Circle,
-                            .Tag = seriesDescr
-                        }
-                        With series.EmptyPointStyle
-                            .BorderWidth = 0
-                            .MarkerSize = 0
-                            .MarkerStyle = MarkerStyle.None
-                        End With
-                        series.SmartLabelStyle.Enabled = True
-                        series.SmartLabelStyle.AllowOutsidePlotArea = LabelOutsidePlotAreaStyle.No
-                        TheChart.Series.Add(series)
-                        Dim legendItem As New LegendItem(group.SeriesName, clr, "") With {
-                            .Tag = group.Identity
-                        }
-                        TheChart.Legends(0).CustomItems.Add(legendItem)
-                    End If
-
-                    ' creating data point
-                    Dim point As DataPoint
-                    Dim yValue = _spreadBenchmarks.GetActualQuote(calc)
-                    Dim haveSuchPoint = series.Points.Any(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric)
-
-                    If haveSuchPoint Then
-                        point = series.Points.First(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric)
-                        If yValue IsNot Nothing Then
-                            point.XValue = calc.Duration
-                            If Math.Abs(yValue.Value - point.YValues.First) > 0.01 Then
-                                Logger.Trace("{0}: delta is {1}", ric, yValue.Value - point.YValues.First)
-                            End If
-                            point.YValues = {yValue.Value}
-                            point.Color = Color.FromName(calc.BackColor)
-                            Dim style As MarkerStyle
-                            If MarkerStyle.TryParse(calc.MarkerStyle, style) Then
-                                point.MarkerStyle = style
-                            Else
-                                point.MarkerStyle = IIf(calc.Yld.ToWhat.Equals(YieldToWhat.Maturity), MarkerStyle.Circle, MarkerStyle.Triangle)
-                            End If
-                            If ShowLabelsTSB.Checked Then point.Label = bnd.Label
-                        Else
-                            series.Points.Remove(point)
-                        End If
-                    ElseIf yValue IsNot Nothing Then
-                        point = New DataPoint(calc.Duration, yValue.Value) With {
-                            .Name = bnd.MetaData.RIC,
-                            .Tag = bnd,
-                            .ToolTip = bnd.MetaData.ShortName,
-                            .Color = Color.FromName(calc.BackColor)
-                        }
-                        Dim style As MarkerStyle
-                        If MarkerStyle.TryParse(calc.MarkerStyle, style) Then
-                            point.MarkerStyle = style
-                        Else
-                            point.MarkerStyle = IIf(calc.Yld.ToWhat.Equals(YieldToWhat.Maturity), MarkerStyle.Circle, MarkerStyle.Triangle)
-                        End If
-                        If ShowLabelsTSB.Checked Then point.Label = bnd.MetaData.ShortName
-                        series.Points.Add(point)
-                    End If
-                    If Not raw Then SetChartMinMax()
-                End Sub)
-        End Sub
-
-        Private Sub OnRemovedItem(ByVal group As Group, ByVal ric As String) Handles _ansamble.BondRemoved
-            Logger.Trace("OnRemovedItem({0})", ric)
-            GuiAsync(
-                Sub()
-                    Dim series As Series = TheChart.Series.FindByName(group.SeriesName)
-                    If series IsNot Nothing Then
-                        While series.Points.Any(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric)
-                            series.Points.Remove(series.Points.First(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric))
-                        End While
-                    End If
-                    If series.Points.Count = 0 Then _ansamble.Groups.Remove(group.Identity)
-                    SetChartMinMax()
-                End Sub)
-        End Sub
+        'Private Sub OnRemovedItem(ByVal group As Group, ByVal ric As String) Handles _ansamble.BondRemoved
+        '    Logger.Trace("OnRemovedItem({0})", ric)
+        '    GuiAsync(
+        '        Sub()
+        '            Dim series As Series = TheChart.Series.FindByName(group.SeriesName)
+        '            If series IsNot Nothing Then
+        '                While series.Points.Any(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric)
+        '                    series.Points.Remove(series.Points.First(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = ric))
+        '                End While
+        '            End If
+        '            If series.Points.Count = 0 Then _ansamble.Groups.Remove(group.Identity)
+        '            SetChartMinMax()
+        '        End Sub)
+        'End Sub
 
         Private Sub OnBenchmarkRemoved(ByVal type As YSource) Handles _spreadBenchmarks.BenchmarkRemoved
             Logger.Trace("OnBenchmarkRemoved({0})", type)

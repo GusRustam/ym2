@@ -1,3 +1,4 @@
+Imports System.ComponentModel
 Imports DbManager.Bonds
 Imports DbManager
 Imports NLog
@@ -12,12 +13,124 @@ Namespace Tools.Elements
     ''' <remarks></remarks>
     Public MustInherit Class BaseGroup
         Inherits Identifyable
+
+        Public MustInherit Class CurveItem
+            Implements IComparable(Of CurveItem)
+            Private ReadOnly _x As Double
+            Private ReadOnly _y As Double
+
+            Public ReadOnly Property X() As String
+                Get
+                    Return String.Format("{0:F2}", _x)
+                End Get
+            End Property
+
+            Public ReadOnly Property Y() As String
+                Get
+                    Return String.Format("{0:P2}", _y)
+                End Get
+            End Property
+
+            <Browsable(False)>
+            Public ReadOnly Property TheX() As Double
+                Get
+                    Return _x
+                End Get
+            End Property
+
+            <Browsable(False)>
+            Public ReadOnly Property TheY() As Double
+                Get
+                    Return _y
+                End Get
+            End Property
+
+            Public Function CompareTo(ByVal other As CurveItem) As Integer Implements IComparable(Of CurveItem).CompareTo
+                Return _x.CompareTo(other._x)
+            End Function
+
+            Public Sub New(ByVal x As Double, ByVal y As Double)
+                _x = x
+                _y = y
+            End Sub
+        End Class
+
+        Public Class BondCurveItem
+            Inherits CurveItem
+            Private ReadOnly _bond As Bond
+            Private ReadOnly _backColor As String
+
+            Public ReadOnly Property BackColor() As String
+                Get
+                    Return _backColor
+                End Get
+            End Property
+
+            Public ReadOnly Property ToWhat() As YieldToWhat
+                Get
+                    Return _toWhat
+                End Get
+            End Property
+
+            Public ReadOnly Property MarkerStyle() As String
+                Get
+                    Return _markerStyle
+                End Get
+            End Property
+
+            Private ReadOnly _toWhat As YieldToWhat
+            Private ReadOnly _markerStyle As String
+
+            <Browsable(False)>
+            Public ReadOnly Property Bond() As Bond
+                Get
+                    Return _bond
+                End Get
+            End Property
+
+            Public ReadOnly Property Ric() As String
+                Get
+                    Return _bond.MetaData.RIC
+                End Get
+            End Property
+
+            Public Sub New(ByVal x As Double, ByVal y As Double, ByVal bond As Bond, ByVal backColor As String, ByVal toWhat As YieldToWhat, ByVal markerStyle As String)
+                MyBase.new(x, y)
+                _bond = bond
+                _backColor = backColor
+                _toWhat = toWhat
+                _markerStyle = markerStyle
+            End Sub
+
+        End Class
+
+        Public Class PointCurveItem
+            Inherits CurveItem
+            Private ReadOnly _curve As BondCurve
+
+            <Browsable(False)>
+            Public ReadOnly Property Curve() As BondCurve
+                Get
+                    Return _curve
+                End Get
+            End Property
+
+            Public Sub New(ByVal x As Double, ByVal y As Double, ByVal curve As BondCurve)
+                MyBase.New(x, y)
+                _curve = curve
+            End Sub
+        End Class
+
         Protected Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(BaseGroup))
 
         Private ReadOnly _ansamble As Ansamble
 
-        Public Event Quote As Action(Of Bond)
-        Public Event RemovedItem As Action(Of BaseGroup, String)
+        Public Event Updated As Action(Of List(Of CurveItem))
+
+        Protected Sub NotifyUpdated(ByVal curveItems As List(Of CurveItem))
+            RaiseEvent Updated(curveItems)
+        End Sub
+
         Public Event Clear As Action(Of BaseGroup)
         Public Event Volume As Action(Of Bond)
 
@@ -74,6 +187,8 @@ Namespace Tools.Elements
             _elements.Clear()
             RaiseEvent Clear(Me)
         End Sub
+
+        Public MustOverride Sub NotifyChanged()
 
         Public Overridable Sub StartAll()
             Dim rics As List(Of String) = (From elem In _elements Select elem.MetaData.RIC).ToList()
@@ -149,14 +264,13 @@ Namespace Tools.Elements
 
         Protected Sub HandleQuote(ByRef bondDataPoint As Bond, ByVal xmlName As String, ByVal fieldVal As Double?, ByVal calcDate As Date)
             Dim calculation As New BondPointDescription
-            'Dim xmlName = BondFields.XmlName(fieldName)
             calculation.BackColor = BondFields.Fields.BackColor(xmlName)
             calculation.MarkerStyle = BondFields.Fields.MarkerStyle(xmlName)
             calculation.Price = fieldVal
             CalculateYields(calcDate, bondDataPoint.MetaData, calculation) ' todo add userDefinedSpread
 
             bondDataPoint.QuotesAndYields(xmlName) = calculation
-            NotifyQuote(bondDataPoint)
+            NotifyChanged()
         End Sub
 
         Public Function HasRic(ByVal instrument As String) As Boolean
@@ -183,14 +297,6 @@ Namespace Tools.Elements
             Return If(bonds.Any, bonds.First, Nothing)
         End Function
 
-        Public Overridable Sub NotifyQuote(ByVal bond As Bond)
-            RaiseEvent Quote(bond)
-        End Sub
-
-        Public Overridable Sub NotifyRemoved(ByVal bond As Bond)
-            RaiseEvent RemovedItem(Me, bond.MetaData.RIC)
-        End Sub
-
         Public Sub Annihilate()
             _elements.Clear()
             _ansamble.BondCurves.Remove(Identity)
@@ -201,28 +307,28 @@ Namespace Tools.Elements
         Public Sub Disable(ByVal ric As String)
             For Each item In (From elem In _elements Where elem.MetaData.RIC = ric)
                 item.Enabled = False
-                NotifyRemoved(item)
+                NotifyChanged()
             Next
         End Sub
 
         Public Sub Disable(ByVal rics As List(Of String))
             For Each item In (From elem In _elements Where rics.Contains(elem.MetaData.RIC))
                 item.Enabled = False
-                NotifyRemoved(item)
+                NotifyChanged()
             Next
         End Sub
 
         Public Sub Enable(ByVal ric As String)
             For Each item In (From elem In _elements Where elem.MetaData.RIC = ric)
                 item.Enabled = True
-                NotifyQuote(item)
+                NotifyChanged()
             Next
         End Sub
 
         Public Sub Enable(ByVal rics As List(Of String))
             For Each item In (From elem In _elements Where rics.Contains(elem.MetaData.RIC))
                 item.Enabled = True
-                NotifyQuote(item)
+                NotifyChanged()
             Next
         End Sub
     End Class
