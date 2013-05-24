@@ -352,6 +352,17 @@ Namespace Tools.Elements
             EventsFrozen = False
         End Sub
 
+        Public WriteOnly Property LabelsOn As Boolean
+            Set(ByVal value As Boolean)
+                EventsFrozen = True
+                For Each elem In _elements
+                    elem.LabelEnabled = value
+                Next
+                EventsFrozen = False
+            End Set
+        End Property
+
+
         Public Sub ToggleLabels()
             EventsFrozen = True
             For Each elem In _elements

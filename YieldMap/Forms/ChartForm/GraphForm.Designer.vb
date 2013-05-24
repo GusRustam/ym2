@@ -331,7 +331,7 @@
             '
             Me.BondCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainInfoLine1TSMI, Me.ExtInfoTSMI, Me.BondLabelsTSMI, Me.BondCurveTSMI, Me.ToolStripSeparator5, Me.BondDescriptionTSMI, Me.RelatedQuoteTSMI, Me.RelatedChartTSMI, Me.ToolStripSeparator4, Me.ShowHistoryTSMI, Me.ToolStripSeparator1, Me.RemovePointTSMI})
             Me.BondCMS.Name = "BondContextMenuStrip"
-            Me.BondCMS.Size = New System.Drawing.Size(167, 220)
+            Me.BondCMS.Size = New System.Drawing.Size(167, 242)
             '
             'MainInfoLine1TSMI
             '
@@ -1068,7 +1068,7 @@
             '
             Me.LabelToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SeriesIssuerNameAndSeriesTSMI, Me.IssuerCouponMaturityTSMI, Me.SeriesDescriptionTSMI, Me.SeriesSeriesOnlyTSMI})
             Me.LabelToolStripMenuItem.Name = "LabelToolStripMenuItem"
-            Me.LabelToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.LabelToolStripMenuItem.Size = New System.Drawing.Size(142, 22)
             Me.LabelToolStripMenuItem.Text = "Labeling mode"
             '
             'SeriesIssuerNameAndSeriesTSMI
@@ -1098,14 +1098,14 @@
             'RemoveFromChartTSMI
             '
             Me.RemoveFromChartTSMI.Name = "RemoveFromChartTSMI"
-            Me.RemoveFromChartTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.RemoveFromChartTSMI.Size = New System.Drawing.Size(142, 22)
             Me.RemoveFromChartTSMI.Text = "Remove"
             '
             'BondCurveCMS
             '
             Me.BondCurveCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ShowBondCurveItemsTSMI, Me.DeleteBondCurveTSMI, Me.ToolStripMenuItem2, Me.InterpolationTSMI, Me.BootstrappingToolStripMenuItem, Me.ToolStripMenuItem3, Me.SelectDateToolStripMenuItem})
             Me.BondCurveCMS.Name = "BondCurveCMS"
-            Me.BondCurveCMS.Size = New System.Drawing.Size(153, 148)
+            Me.BondCurveCMS.Size = New System.Drawing.Size(142, 126)
             '
             'ShowBondCurveItemsTSMI
             '

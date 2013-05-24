@@ -201,7 +201,7 @@
     <Compile Include="Tools\Elements\Ansamble.vb" />
     <Compile Include="Tools\Elements\Bond.vb" />
     <Compile Include="Tools\Elements\BondCurve.vb" />
-    <Compile Include="Tools\Elements\BaseGroup.vb" />
+    <Compile Include="Tools\Elements\Group.vb" />
     <Compile Include="Tools\Elements\GroupContainer.vb" />
     <Compile Include="Forms\ChartForm\GraphForm.Designer.vb">
       <DependentUpon>GraphForm.vb</DependentUpon>

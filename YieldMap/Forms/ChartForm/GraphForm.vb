@@ -140,6 +140,58 @@ Namespace Forms.ChartForm
 #End Region
 
 #Region "b) Chart events"
+        Private Sub BondCMS_Opening(ByVal sender As Object, ByVal e As CancelEventArgs) Handles BondCMS.Opening
+            If BondCMS.Tag Is Nothing Then
+                e.Cancel = True
+                Return
+            End If
+
+            Dim bondDataPoint = CType(BondCMS.Tag, Bond)
+            If TypeOf bondDataPoint.Parent Is BondCurve Then
+                BondCurveTSMI.Visible = True
+            Else
+                BondCurveTSMI.Visible = False
+            End If
+            MainInfoLine1TSMI.Text = bondDataPoint.MetaData.ShortName
+
+            ExtInfoTSMI.DropDownItems.Clear()
+            For Each key In bondDataPoint.QuotesAndYields
+                Dim currentKey = key
+                Dim x = bondDataPoint.QuotesAndYields(key)
+                Dim newItem = ExtInfoTSMI.DropDownItems.Add(String.Format("{0}: {1:F4}, {2:P2} {3}, {4:F2}", key, x.Price, x.Yld.Yield, x.Yld.ToWhat.Abbr, x.Duration))
+                If bondDataPoint.QuotesAndYields.MaxPriorityField = key Then CType(newItem, ToolStripMenuItem).Checked = True
+                AddHandler newItem.Click,
+                    Sub(sender1 As Object, e1 As EventArgs)
+                        If currentKey <> bondDataPoint.UserSelectedQuote Then
+                            bondDataPoint.UserSelectedQuote = currentKey
+                        Else
+                            bondDataPoint.UserSelectedQuote = ""
+                        End If
+                    End Sub
+            Next
+
+            Dim newItem1 As ToolStripMenuItem
+
+            ExtInfoTSMI.DropDownItems.Add("-")
+            ExtInfoTSMI.DropDownItems.Add(String.Format("Today volume: {0:N0}", bondDataPoint.TodayVolume))
+            ExtInfoTSMI.DropDownItems.Add("-")
+            newItem1 = ExtInfoTSMI.DropDownItems.Add("Set custom price...")
+            AddHandler newItem1.Click,
+                       Sub(sender1 As Object, e1 As EventArgs)
+                           Dim res = InputBox("Enter price", "Custom bond price")
+                           If IsNumeric(res) Then
+                               bondDataPoint.SetCustomPrice(CDbl(res))
+                           ElseIf res <> "" Then
+                               MessageBox.Show("Invalid number")
+                           End If
+
+                       End Sub
+            IssuerNameSeriesTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.IssuerAndSeries)
+            ShortNameTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.IssuerCpnMat)
+            DescriptionTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.Description)
+            SeriesOnlyTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.SeriesOnly)
+        End Sub
+
         ' The chart
         Private Sub TheChartClick(ByVal sender As Object, ByVal e As EventArgs) Handles TheChart.Click
             Logger.Trace("TheChartClick")
@@ -150,54 +202,9 @@ Namespace Forms.ChartForm
                     If htr.ChartElementType = ChartElementType.DataPoint Then
                         Dim point As DataPoint = CType(htr.Object, DataPoint)
                         If TypeOf point.Tag Is Bond Then
-                            Dim bondDataPoint = CType(point.Tag, Bond)
-                            If TypeOf bondDataPoint.Parent Is BondCurve Then
-                                BondCurveTSMI.Visible = True
-                            Else
-                                BondCurveTSMI.Visible = False
-                            End If
-                            With BondCMS
-                                .Tag = bondDataPoint
-                                .Show(TheChart, mouseEvent.Location)
-                            End With
-                            MainInfoLine1TSMI.Text = point.ToolTip
+                            BondCMS.Tag = point.Tag
+                            BondCMS.Show(TheChart, mouseEvent.Location)
 
-                            ExtInfoTSMI.DropDownItems.Clear()
-                            For Each key In bondDataPoint.QuotesAndYields
-                                Dim currentKey = key
-                                Dim x = bondDataPoint.QuotesAndYields(key)
-                                Dim newItem = ExtInfoTSMI.DropDownItems.Add(String.Format("{0}: {1:F4}, {2:P2} {3}, {4:F2}", key, x.Price, x.Yld.Yield, x.Yld.ToWhat.Abbr, x.Duration))
-                                If bondDataPoint.QuotesAndYields.MaxPriorityField = key Then CType(newItem, ToolStripMenuItem).Checked = True
-                                AddHandler newItem.Click,
-                                    Sub(sender1 As Object, e1 As EventArgs)
-                                        If currentKey <> bondDataPoint.UserSelectedQuote Then
-                                            bondDataPoint.UserSelectedQuote = currentKey
-                                        Else
-                                            bondDataPoint.UserSelectedQuote = ""
-                                        End If
-                                    End Sub
-                            Next
-
-                            Dim newItem1 As ToolStripMenuItem
-
-                            ExtInfoTSMI.DropDownItems.Add("-")
-                            ExtInfoTSMI.DropDownItems.Add(String.Format("Today volume: {0:N0}", bondDataPoint.TodayVolume))
-                            ExtInfoTSMI.DropDownItems.Add("-")
-                            newItem1 = ExtInfoTSMI.DropDownItems.Add("Set custom price...")
-                            AddHandler newItem1.Click,
-                                       Sub(sender1 As Object, e1 As EventArgs)
-                                           Dim res = InputBox("Enter price", "Custom bond price")
-                                           If IsNumeric(res) Then
-                                               bondDataPoint.SetCustomPrice(CDbl(res))
-                                           ElseIf res <> "" Then
-                                               MessageBox.Show("Invalid number")
-                                           End If
-
-                                       End Sub
-                            IssuerNameSeriesTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.IssuerAndSeries)
-                            ShortNameTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.IssuerCpnMat)
-                            DescriptionTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.Description)
-                            SeriesOnlyTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.SeriesOnly)
                         ElseIf TypeOf point.Tag Is SwapCurve Then
                             Dim curve = CType(point.Tag, SwapCurve)
                             MMNameTSMI.Text = curve.GetFullName()
@@ -211,16 +218,23 @@ Namespace Forms.ChartForm
                             HistoryCMS.Show(TheChart, mouseEvent.Location)
 
                         ElseIf TypeOf point.Tag Is BondCurve Then
-                            BondCurveCMS.Tag = point.Tag
+                            BondCurveCMS.Tag = CType(point.Tag, BondCurve).Identity
                             BondCurveCMS.Show(TheChart, mouseEvent.Location)
+
                         End If
                     ElseIf htr.ChartElementType = ChartElementType.PlottingArea Or htr.ChartElementType = ChartElementType.Gridlines Then
                         ChartCMS.Show(TheChart, mouseEvent.Location)
+
                     ElseIf htr.ChartElementType = ChartElementType.LegendItem Then
                         Dim item = CType(htr.Object, LegendItem)
-                        If _ansamble.Items.Exists(item.Tag) Then
-                            BondSetCMS.Tag = item.Tag
-                            BondSetCMS.Show(TheChart, mouseEvent.Location)
+                        If _ansamble(item.Tag) IsNot Nothing Then
+                            If TypeOf _ansamble(item.Tag) Is BondGroup Then
+                                BondSetCMS.Tag = item.Tag
+                                BondSetCMS.Show(TheChart, mouseEvent.Location)
+                            ElseIf TypeOf _ansamble(item.Tag) Is BondCurve Then
+                                BondCurveCMS.Tag = item.Tag
+                                BondCurveCMS.Show(TheChart, mouseEvent.Location)
+                            End If
                         End If
                     End If
                 Catch ex As Exception
@@ -554,8 +568,8 @@ Namespace Forms.ChartForm
 
         Private Sub ShowLabelsTSBClick(ByVal sender As Object, ByVal e As EventArgs) Handles ShowLabelsTSB.Click
             Logger.Trace("ShowLabelsTSBClick")
-            For Each grp As KeyValuePair(Of Long, BondGroup) In _ansamble.Items
-                grp.Value.ToggleLabels()
+            For Each grp As KeyValuePair(Of Long, Group) In _ansamble.Items
+                grp.Value.LabelsOn = ShowLabelsTSB.Checked
             Next
         End Sub
 
@@ -970,26 +984,26 @@ Namespace Forms.ChartForm
 
         Private Sub BondCurveTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BondCurveTSMI.Click
             If BondCMS.Tag Is Nothing Then Return
-            BondCurveCMS.Tag = CType(BondCMS.Tag, Bond).Parent
+            BondCurveCMS.Tag = CType(BondCMS.Tag, Bond).Parent.Identity
             BondCurveCMS.Show(MousePosition)
         End Sub
 
         Private Sub DeleteBondCurveTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles DeleteBondCurveTSMI.Click
             If BondCurveCMS.Tag Is Nothing Then Return
-            Dim crv = CType(BondCurveCMS.Tag, BondCurve)
+            Dim crv = CType(_ansamble(BondCurveCMS.Tag), BondCurve)
             _ansamble(crv.Identity).Cleanup()
         End Sub
 
         Private Sub BootstrappingToolStripMenuItem_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BootstrappingToolStripMenuItem.Click
             If BondCurveCMS.Tag Is Nothing Then Return
-            Dim crv = CType(BondCurveCMS.Tag, BondCurve)
+            Dim crv = CType(_ansamble(BondCurveCMS.Tag), BondCurve)
             crv.Bootstrap()
         End Sub
 
         Private Sub ShowBondCurveItemsTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles ShowBondCurveItemsTSMI.Click
             If BondCurveCMS.Tag Is Nothing Then Return
             Dim frm As New BondCurveItemsForm
-            frm.Curve = CType(BondCurveCMS.Tag, BondCurve)
+            frm.Curve = CType(_ansamble(BondCurveCMS.Tag), BondCurve)
             frm.Show()
         End Sub
 
@@ -999,14 +1013,14 @@ Namespace Forms.ChartForm
             VasicekTSMI.Click, CIRRTSMI.Click
 
             If BondCurveCMS.Tag Is Nothing Then Return
-            Dim curve = CType(BondCurveCMS.Tag, BondCurve)
+            Dim curve = CType(_ansamble(BondCurveCMS.Tag), BondCurve)
             Dim snd = CType(sender, ToolStripMenuItem)
             curve.SetFitMode(snd.Tag.ToString())
         End Sub
 
         Private Sub BondCurveCMS_Opening(ByVal sender As Object, ByVal e As CancelEventArgs) Handles BondCurveCMS.Opening
             If BondCurveCMS.Tag Is Nothing Then Return
-            Dim curve = CType(BondCurveCMS.Tag, BondCurve)
+            Dim curve = CType(_ansamble(BondCurveCMS.Tag), BondCurve)
             BootstrappingToolStripMenuItem.Checked = curve.Bootstrapped
             For Each item As ToolStripMenuItem In (From elem In InterpolationTSMI.DropDownItems Where TypeOf elem Is ToolStripMenuItem)
                 item.Checked = curve.EstModel IsNot Nothing AndAlso item.Tag = curve.EstModel.ItemName
@@ -1015,10 +1029,17 @@ Namespace Forms.ChartForm
 
         Private Sub SelectDateToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As EventArgs) Handles SelectDateToolStripMenuItem.Click
             If BondCurveCMS.Tag Is Nothing Then Return
-            Dim curve = CType(BondCurveCMS.Tag, BondCurve)
-            Logger.Debug("SelDateTSMI_Click()")
+            Dim curve = CType(_ansamble(BondCurveCMS.Tag), BondCurve)
             Dim datePicker = New DatePickerForm
             If datePicker.ShowDialog() = DialogResult.OK Then curve.Date = datePicker.TheCalendar.SelectionEnd
+        End Sub
+
+        Private Sub BondCurveCMS_Closing(ByVal sender As Object, ByVal e As ToolStripDropDownClosingEventArgs) Handles BondCurveCMS.Closing
+            BondCurveCMS.Tag = Nothing
+        End Sub
+
+        Private Sub BondCMS_Closing(ByVal sender As System.Object, ByVal e As ToolStripDropDownClosingEventArgs) Handles BondCMS.Closing
+            BondCMS.Tag = Nothing
         End Sub
     End Class
 End Namespace

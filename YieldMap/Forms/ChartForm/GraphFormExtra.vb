@@ -509,7 +509,6 @@ Namespace Forms.ChartForm
                         Dim point = New DataPoint(pnt.TheX, pnt.TheY) With {
                                 .Name = pnt.Bond.MetaData.RIC,
                                 .Tag = pnt.Bond,
-                                .ToolTip = pnt.Bond.MetaData.ShortName,
                                 .Color = Color.FromName(pnt.BackColor),
                                 .Label = pnt.Label
                             }
@@ -544,18 +543,30 @@ Namespace Forms.ChartForm
                     End If
                     Dim srs = TheChart.Series.FindByName(crv.Identity)
                     If srs IsNot Nothing Then TheChart.Series.Remove(srs)
+                    Dim clr = Color.FromName(crv.Color)
                     srs = New Series() With {
                         .Name = crv.Identity,
-                        .legendText = crv.SeriesName,
                         .ChartType = SeriesChartType.Line,
+                        .IsVisibleInLegend = False,
                         .borderWidth = 2,
-                        .color = Color.FromName(crv.Color),
+                        .color = clr,
                         .Tag = crv.Identity
                     }
                     TheChart.Series.Add(srs)
+                    Dim legendItems = TheChart.Legends(0).CustomItems
+                    While legendItems.Any(Function(item) item.Tag = crv.Identity)
+                        legendItems.Remove(legendItems.First(Function(item) item.Tag = crv.Identity))
+                    End While
+                    Dim legendItem = New LegendItem(crv.SeriesName, clr, "") With {.Tag = crv.Identity}
+                    legendItems.Add(legendItem)
+
+
                     If itsBond Then
                         For Each point In data.Cast(Of BondCurve.BondCurveItem)()
-                            Dim pnt = New DataPoint(point.TheX, point.TheY) With {.Tag = point.Bond, .ToolTip = point.Bond.Label}
+                            Dim pnt = New DataPoint(point.TheX, point.TheY) With {
+                                .Tag = point.Bond,
+                                .Label = point.Label
+                            }
                             srs.Points.Add(pnt)
                         Next
                     Else

@@ -50,10 +50,9 @@ Namespace Tools.Elements
         End Function
 
         Public Sub Cleanup()
-            For Each kvp In _items
-                kvp.Value.Cleanup()
-            Next
-            _items.Clear()
+            While _items.Any
+                _items.First.Value.Cleanup()
+            End While
         End Sub
 
         Public Sub Start()
