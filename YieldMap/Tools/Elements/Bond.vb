@@ -84,8 +84,8 @@ Namespace Tools.Elements
             End Get
         End Property
 
-        Private ReadOnly _parent As BaseGroup
-        Public ReadOnly Property Parent As BaseGroup
+        Private ReadOnly _parent As Group
+        Public ReadOnly Property Parent As Group
             Get
                 Return _parent
             End Get
@@ -146,7 +146,7 @@ Namespace Tools.Elements
             End Set
         End Property
 
-        Sub New(ByVal parent As BaseGroup, ByVal metaData As BondDescription)
+        Sub New(ByVal parent As Group, ByVal metaData As BondDescription)
             _parent = parent
             _metaData = metaData
         End Sub

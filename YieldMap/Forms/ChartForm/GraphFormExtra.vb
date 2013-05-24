@@ -408,7 +408,7 @@ Namespace Forms.ChartForm
                 Return
             End If
 
-            Dim elem = _ansamble.Groups.FindBond(ric)
+            Dim elem = _ansamble.Items.Bonds(Function(m) m.RIC = ric).First()
             Dim bondDataPoint = elem.MetaData ' todo that's awful
             Dim points As New List(Of Tuple(Of BondPointDescription, BondDescription))
             For Each dt In data.Keys
@@ -459,7 +459,7 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
-        Private Sub NewCurveDeleted(ByVal obj As BaseGroup)
+        Private Sub NewCurveDeleted(ByVal obj As Group)
             Dim srs = TheChart.Series.FindByName(obj.Identity)
             If srs IsNot Nothing Then TheChart.Series.Remove(srs)
         End Sub

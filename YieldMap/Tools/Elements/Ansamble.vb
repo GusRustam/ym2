@@ -1,7 +1,7 @@
 Namespace Tools.Elements
     Public Class Ansamble
         Private Shared ReadOnly Identities As New HashSet(Of Long)
-        Public Event Cleared As Action(Of BaseGroup)
+        Public Event Cleared As Action(Of Group)
 
         Public Shared Sub ReleaseID(ByVal id As Long)
             Identities.Remove(id)
@@ -39,31 +39,28 @@ Namespace Tools.Elements
             End Set
         End Property
 
-        Private WithEvents _groups As New GroupContainer(Of Group)
-        Public ReadOnly Property Groups As GroupContainer(Of Group)
+        Private WithEvents _items As New GroupContainer
+        Public ReadOnly Property Items As GroupContainer
             Get
-                Return _groups
+                Return _items
             End Get
         End Property
 
-        Private WithEvents _curves As New GroupContainer(Of BondCurve)
-        Public ReadOnly Property BondCurves As GroupContainer(Of BondCurve)
+        Default Public ReadOnly Property Data(ByVal id As Long) As Group
             Get
-                Return _curves
+                Return _items(id)
             End Get
         End Property
 
         Public Sub Recalculate()
-            For Each item As KeyValuePair(Of Long, BondCurve) In _curves
-                item.Value.Recalculate()
-            Next
-            For Each item As KeyValuePair(Of Long, Group) In _groups
+            For Each item As KeyValuePair(Of Long, BondCurve) In _items
                 item.Value.Recalculate()
             Next
         End Sub
 
-        Private Sub GroupsCleared(ByVal obj As BaseGroup) Handles _curves.Cleared, _groups.Cleared
+        Private Sub GroupsCleared(ByVal obj As Group) Handles _items.Cleared
             RaiseEvent Cleared(obj)
         End Sub
+
     End Class
-End NameSpace
+End Namespace

@@ -7,7 +7,7 @@ Imports ReutersData
 
 Namespace Tools.Elements
     Public Class BondCurve
-        Inherits BaseGroup
+        Inherits Group
 
         Public Class BondCurveSnapshot
             ''' <summary>
@@ -73,8 +73,8 @@ Namespace Tools.Elements
                 End Function
             End Class
 
-            Private ReadOnly _current As List(Of CurveItem)
-            Public ReadOnly Property Current() As List(Of CurveItem)
+            Private ReadOnly _current As List(Of Group.CurveItem)
+            Public ReadOnly Property Current() As List(Of Group.CurveItem)
                 Get
                     Return _current
                 End Get

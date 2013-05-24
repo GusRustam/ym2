@@ -199,9 +199,9 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Tools\Elements\Ansamble.vb" />
-    <Compile Include="Tools\Elements\BaseGroup.vb" />
     <Compile Include="Tools\Elements\Bond.vb" />
     <Compile Include="Tools\Elements\BondCurve.vb" />
+    <Compile Include="Tools\Elements\BaseGroup.vb" />
     <Compile Include="Tools\Elements\GroupContainer.vb" />
     <Compile Include="Forms\ChartForm\GraphForm.Designer.vb">
       <DependentUpon>GraphForm.vb</DependentUpon>
@@ -258,7 +258,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Tools\Elements\Element.vb" />
-    <Compile Include="Tools\Elements\Group.vb" />
+    <Compile Include="Tools\Elements\BondGroup.vb" />
     <Compile Include="Tools\Elements\Identifyable.vb" />
     <Compile Include="Tools\Elements\SpreadContainer.vb" />
     <Compile Include="Tools\Elements\YSource.vb" />
@@ -486,7 +486,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_BuildVersioningStyle="None.MonthStamp.Increment.TimeStamp" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" />
+      <UserProperties BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_BuildVersioningStyle="None.MonthStamp.Increment.TimeStamp" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

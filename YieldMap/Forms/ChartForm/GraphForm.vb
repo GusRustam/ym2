@@ -26,7 +26,7 @@ Namespace Forms.ChartForm
         Private WithEvents _ansamble As New Ansamble
 
         'Private Sub Loader_Progress(ByVal obj As ProgressEvent) Handles _bondsLoader.Progress
-        '    ' todo it might be useful if one would like to load bond on the fly
+        '    ' it might be useful if one would like to load bond on the fly
         'End Sub
 
         Private Sub TheSettings_DurRangeChanged() Handles _theSettings.DurRangeChanged, _theSettings.SpreadRangeChanged, _theSettings.YieldRangeChanged
@@ -62,7 +62,7 @@ Namespace Forms.ChartForm
                     Case FormDataStatus.Running
                         StatusMessage.Text = ""
                     Case FormDataStatus.Stopped
-                        _ansamble.Groups.Cleanup()
+                        _ansamble.Items.Cleanup()
 
                         StatusMessage.Text = "Stopped"
                 End Select
@@ -82,14 +82,14 @@ Namespace Forms.ChartForm
                 End If
 
                 Dim portfolioStructure = PortfolioManager.Instance.GetPortfolioStructure(currentPortID)
-                For Each grp As Group In From port In portfolioStructure.Sources
+                For Each grp As BondGroup In From port In portfolioStructure.Sources
                                            Where TypeOf port.Source Is Chain Or TypeOf port.Source Is UserList
-                                           Select New Group(_ansamble, port, portfolioStructure)
+                                           Select New BondGroup(_ansamble, port, portfolioStructure)
                     ' todo add custom bonds
                     AddHandler grp.Updated, AddressOf OnGroupUpdated
-                    _ansamble.Groups.Add(grp)
+                    _ansamble.Items.Add(grp)
                 Next
-                _ansamble.Groups.Start()
+                _ansamble.Items.Start()
             End Set
         End Property
 #End Region
@@ -117,7 +117,7 @@ Namespace Forms.ChartForm
 
         Private Sub GraphFormFormClosing(ByVal sender As Object, ByVal e As FormClosingEventArgs) Handles MyBase.FormClosing
             Logger.Trace("GraphForm_FormClosing")
-            _ansamble.Groups.Cleanup()
+            _ansamble.Items.Cleanup()
             _moneyMarketCurves.ForEach(Sub(curve) curve.Cleanup())
             _moneyMarketCurves.Clear()
             ThisFormStatus = FormDataStatus.Stopped
@@ -218,7 +218,7 @@ Namespace Forms.ChartForm
                         ChartCMS.Show(TheChart, mouseEvent.Location)
                     ElseIf htr.ChartElementType = ChartElementType.LegendItem Then
                         Dim item = CType(htr.Object, LegendItem)
-                        If _ansamble.Groups.Exists(item.Tag) Then
+                        If _ansamble.Items.Exists(item.Tag) Then
                             BondSetCMS.Tag = item.Tag
                             BondSetCMS.Show(TheChart, mouseEvent.Location)
                         End If
@@ -554,7 +554,7 @@ Namespace Forms.ChartForm
 
         Private Sub ShowLabelsTSBClick(ByVal sender As Object, ByVal e As EventArgs) Handles ShowLabelsTSB.Click
             Logger.Trace("ShowLabelsTSBClick")
-            For Each grp As KeyValuePair(Of Long, Group) In _ansamble.Groups
+            For Each grp As KeyValuePair(Of Long, BondGroup) In _ansamble.Items
                 grp.Value.ToggleLabels()
             Next
         End Sub
@@ -694,7 +694,7 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub AsTableTSBClick(ByVal sender As Object, ByVal e As EventArgs) Handles AsTableTSB.Click
-            _tableForm.Bonds = _ansamble.Groups.AsTable
+            _tableForm.Bonds = _ansamble.Items.AsTable
             _tableForm.ShowDialog()
         End Sub
 
@@ -742,7 +742,7 @@ Namespace Forms.ChartForm
             Dim curve = New BondCurve(_ansamble, src)
             AddHandler curve.Updated, AddressOf OnNewCurvePaint
             AddHandler curve.Clear, AddressOf NewCurveDeleted
-            _ansamble.BondCurves.Add(curve)
+            _ansamble.Items.Add(curve)
             curve.StartAll()
         End Sub
 
@@ -828,7 +828,7 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub RemoveFromChartTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RemoveFromChartTSMI.Click
-            If BondSetCMS.Tag IsNot Nothing AndAlso IsNumeric(BondSetCMS.Tag) Then _ansamble.Groups.Remove(BondSetCMS.Tag)
+            If BondSetCMS.Tag IsNot Nothing AndAlso IsNumeric(BondSetCMS.Tag) Then _ansamble.Items.Remove(BondSetCMS.Tag)
         End Sub
 
         Private Sub RemovePointTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RemovePointTSMI.Click
@@ -869,7 +869,7 @@ Namespace Forms.ChartForm
 #End Region
 
 #Region "e) Assembly and curves events"
-        Private Sub OnGroupClear(ByVal group As BaseGroup) Handles _ansamble.Cleared
+        Private Sub OnGroupClear(ByVal group As Group) Handles _ansamble.Cleared
             Logger.Trace("OnGroupClear()")
             GuiAsync(
                 Sub()
@@ -946,7 +946,7 @@ Namespace Forms.ChartForm
 
         Private Sub SetSeriesLabel(ByVal id As String, ByVal mode As LabelMode)
             Try
-                _ansamble.Groups(id).SetLabelMode(mode)
+                _ansamble.Items(id).SetLabelMode(mode)
             Catch ex As Exception
                 Logger.Warn("Failed to set label mode, exception = {0}", ex.ToString())
             End Try
@@ -977,7 +977,7 @@ Namespace Forms.ChartForm
         Private Sub DeleteBondCurveTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles DeleteBondCurveTSMI.Click
             If BondCurveCMS.Tag Is Nothing Then Return
             Dim crv = CType(BondCurveCMS.Tag, BondCurve)
-            crv.Annihilate()
+            _ansamble(crv.Identity).Cleanup()
         End Sub
 
         Private Sub BootstrappingToolStripMenuItem_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BootstrappingToolStripMenuItem.Click
@@ -1018,9 +1018,7 @@ Namespace Forms.ChartForm
             Dim curve = CType(BondCurveCMS.Tag, BondCurve)
             Logger.Debug("SelDateTSMI_Click()")
             Dim datePicker = New DatePickerForm
-            If datePicker.ShowDialog() = DialogResult.OK Then
-                curve.Date = datePicker.TheCalendar.SelectionEnd
-            End If
+            If datePicker.ShowDialog() = DialogResult.OK Then curve.Date = datePicker.TheCalendar.SelectionEnd
         End Sub
     End Class
 End Namespace

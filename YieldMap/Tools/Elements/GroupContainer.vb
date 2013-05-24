@@ -1,14 +1,16 @@
-﻿Namespace Tools.Elements
-    Public Class GroupContainer(Of T As BaseGroup)
-        Implements IEnumerable(Of KeyValuePair(Of Long, T))
-        Private ReadOnly _groups As New Dictionary(Of Long, T)
+﻿Imports DbManager.Bonds
+
+Namespace Tools.Elements
+    Public Class GroupContainer
+        Implements IEnumerable(Of KeyValuePair(Of Long, Group))
+        Private ReadOnly _items As New Dictionary(Of Long, Group)
 
         Public Event Volume As Action(Of Bond)
-        Public Event Cleared As Action(Of T)
+        Public Event Cleared As Action(Of Group)
 
-        Default Public ReadOnly Property Data(ByVal id As Long) As T
+        Default Public ReadOnly Property Data(ByVal id As Long) As Group
             Get
-                Return _groups(id)
+                Return _items(id)
             End Get
         End Property
 
@@ -16,7 +18,7 @@
         Public ReadOnly Property AsTable() As List(Of BondDescr)
             Get
                 Dim result As New List(Of BondDescr)
-                For Each grp In From kvp In _groups Select kvp.Value
+                For Each grp In From kvp In _items Select kvp.Value
                     grp.Elements.ForEach(
                         Sub(elem)
                             Dim res As New BondDescr
@@ -30,10 +32,8 @@
                                 res.Price = quote.Price
                                 res.Quote = fieldName
                                 res.QuoteDate = quote.YieldAtDate
-                                res.State = BondDescr.StateType.Ok
                                 res.ToWhat = quote.Yld.ToWhat
                                 res.BondYield = quote.Yld.Yield
-                                res.CalcMode = BondDescr.CalculationMode.SystemPrice
                                 res.Convexity = quote.Convexity
                                 res.Duration = quote.Duration
                                 res.Live = quote.YieldAtDate = Date.Today
@@ -46,45 +46,57 @@
         End Property
 
         Public Function Exists(ByVal id As Long) As Boolean
-            Return _groups.Keys.Contains(id)
+            Return _items.Keys.Contains(id)
         End Function
 
         Public Sub Cleanup()
-            For Each kvp In _groups
+            For Each kvp In _items
                 kvp.Value.Cleanup()
             Next
-            _groups.Clear()
+            _items.Clear()
         End Sub
 
         Public Sub Start()
-            For Each kvp In _groups
+            For Each kvp In _items
                 kvp.Value.StartAll()
             Next
         End Sub
 
-        Public Sub Add(ByVal group As T)
-            _groups.Add(group.Identity, group)
-            AddHandler group.Clear, Sub(base As BaseGroup) RaiseEvent Cleared(base)
+        Public Sub Add(ByVal group As Group)
+            _items.Add(group.Identity, group)
+            AddHandler group.Clear, Sub(base As Group)
+                                        _items.Remove(base.Identity)
+                                        RaiseEvent Cleared(base)
+                                    End Sub
             AddHandler group.Volume, Sub(bond As Bond) RaiseEvent Volume(bond)
         End Sub
 
         Public Sub Remove(ByVal id As Long)
-            _groups.Remove(id)
+            _items.Remove(id)
         End Sub
 
-        Public Function FindBond(ByVal ric As String) As Bond
-            For Each kvp In From elem In _groups Where elem.Value.HasRic(ric)
-                Return kvp.Value.GetBond(ric)
-            Next
-            Return Nothing
-        End Function
-
-        Public Function IEnumerable_GetEnumerator() As IEnumerator(Of KeyValuePair(Of Long, T)) Implements IEnumerable(Of KeyValuePair(Of Long, T)).GetEnumerator
-            Return _groups.GetEnumerator()
+        Public Function IEnumerable_GetEnumerator() As IEnumerator(Of KeyValuePair(Of Long, Group)) Implements IEnumerable(Of KeyValuePair(Of Long, Group)).GetEnumerator
+            Return _items.GetEnumerator()
         End Function
 
         Public Function GetEnumerator() As IEnumerator Implements IEnumerable.GetEnumerator
-            Return _groups.GetEnumerator()
+            Return _items.GetEnumerator()
+        End Function
+
+        Public Function Bonds(ByVal clause As Func(Of Bond, Boolean)) As List(Of Bond)
+            Dim res As New List(Of Bond)
+            For Each item In _items
+                res.AddRange(item.Value.Bonds(clause))
+            Next
+            Return res
+        End Function
+
+        Public Function Bonds(ByVal clause As Func(Of BondDescription, Boolean)) As List(Of Bond)
+            Dim res As New List(Of Bond)
+            For Each item In _items
+                res.AddRange(item.Value.Bonds(clause))
+            Next
+            Return res
         End Function
     End Class
 End Namespace
