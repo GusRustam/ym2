@@ -44,7 +44,7 @@ Namespace Forms.ChartForm
             CurveUpdate()
         End Sub
 
-        Private Sub OnCurveCleared(ByVal obj As Group)
+        Private Sub OnCurveCleared()
             Close()
         End Sub
 

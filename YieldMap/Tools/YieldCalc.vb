@@ -10,7 +10,6 @@ Imports Uitls
 Imports YieldMap.Commons
 Imports NLog
 Imports System.Text.RegularExpressions
-Imports YieldMap.Tools.Estimation
 
 Namespace Tools
     Public Class YieldToWhatConverter

@@ -133,8 +133,8 @@
   <ItemGroup>
     <Compile Include="Commons\Common.vb" />
     <Compile Include="Commons\MAPI.vb" />
-    <Compile Include="Curves\RubIRS.vb" />
-    <Compile Include="Curves\SwapCurve.vb" />
+    <Compile Include="Tools\Elements\RubIRS.vb" />
+    <Compile Include="Tools\Elements\SwapCurve.vb" />
     <Compile Include="Forms\ChartForm\AddBondCurveItemsForm.Designer.vb">
       <DependentUpon>AddBondCurveItemsForm.vb</DependentUpon>
     </Compile>
@@ -486,7 +486,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_BuildVersioningStyle="None.MonthStamp.Increment.TimeStamp" />
+      <UserProperties BuildVersion_BuildVersioningStyle="None.MonthStamp.Increment.TimeStamp" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -7,7 +7,6 @@ Imports YieldMap.Tools.Elements
 Imports YieldMap.Forms.PortfolioForm
 Imports Settings
 Imports Uitls
-Imports YieldMap.Curves
 Imports YieldMap.My.Resources
 Imports YieldMap.Commons
 Imports NLog
@@ -517,12 +516,22 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
+
+        Public Sub OnCurveRemoved()
+            ' todo
+        End Sub
+
+
+        Private Sub OnCurvePaint()
+            ' todo
+        End Sub
+
         Private Sub RubCCSTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RubCCSTSMI.Click
             Logger.Debug("RubCCSTSMIClick()")
             Dim rubCCS = New RubCCS(_spreadBenchmarks)
 
-            AddHandler rubCCS.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
-            AddHandler rubCCS.Recalculated, AddressOf OnCurveRecalculated
+            AddHandler rubCCS.Cleared, AddressOf OnCurveRemoved
+            'AddHandler rubCCS.Recalculated, AddressOf OnCurveRecalculated
             AddHandler rubCCS.Updated, AddressOf OnCurvePaint
 
             rubCCS.Subscribe()
@@ -532,8 +541,8 @@ Namespace Forms.ChartForm
         Private Sub RubIRS_TSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RubIRSTSMI.Click
             Logger.Debug("RubIRSTSMIClick()")
             Dim rubIRS = New RubIRS(_spreadBenchmarks)
-            AddHandler rubIRS.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
-            AddHandler rubIRS.Recalculated, AddressOf OnCurveRecalculated
+            AddHandler rubIRS.Cleared, AddressOf OnCurveRemoved
+            'AddHandler rubIRS.Recalculated, AddressOf OnCurveRecalculated
             AddHandler rubIRS.Updated, AddressOf OnCurvePaint
 
             rubIRS.Subscribe()
@@ -543,8 +552,8 @@ Namespace Forms.ChartForm
         Private Sub UsdIRS_TSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles UsdIRSTSMI.Click
             Logger.Debug("UsdIRS_TSMIClick()")
             Dim usdIRS = New UsdIRS(_spreadBenchmarks)
-            AddHandler usdIRS.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
-            AddHandler usdIRS.Recalculated, AddressOf OnCurveRecalculated
+            AddHandler usdIRS.Cleared, AddressOf OnCurveRemoved
+            'AddHandler usdIRS.Recalculated, AddressOf OnCurveRecalculated
             AddHandler usdIRS.Updated, AddressOf OnCurvePaint
 
             usdIRS.Subscribe()
@@ -554,8 +563,8 @@ Namespace Forms.ChartForm
         Private Sub NDFTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles NDFTSMI.Click
             Logger.Debug("NDFTSMI_Click()")
             Dim rubNDF = New RubNDF(_spreadBenchmarks)
-            AddHandler rubNDF.Cleared, AddressOf _spreadBenchmarks.OnCurveRemoved
-            AddHandler rubNDF.Recalculated, AddressOf OnCurveRecalculated
+            AddHandler rubNDF.Cleared, AddressOf OnCurveRemoved
+            'AddHandler rubNDF.Recalculated, AddressOf OnCurveRecalculated
             AddHandler rubNDF.Updated, AddressOf OnCurvePaint
 
             rubNDF.Subscribe()
@@ -605,23 +614,6 @@ Namespace Forms.ChartForm
             Clipboard.SetImage(bmp)
         End Sub
 
-        Private Sub OnYieldCurveSelected(ByVal sender As Object, ByVal eventArgs As EventArgs)
-            Logger.Info("OnYieldCurveSelected()")
-            Dim senderTSMI = TryCast(sender, ToolStripMenuItem)
-            If senderTSMI Is Nothing Then Return
-
-            If senderTSMI.Checked Then
-                _spreadBenchmarks.AddType(YSource.FromString(SpreadCMS.Tag), senderTSMI.Tag)
-            Else
-                _spreadBenchmarks.RemoveType(YSource.FromString(SpreadCMS.Tag))
-            End If
-
-            UpdateAxisYTitle(False)
-
-            ASWLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(YSource.ASWSpread), " -> " + _spreadBenchmarks.Benchmarks(YSource.ASWSpread).GetFullName(), "")
-            SpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(YSource.PointSpread), " -> " + _spreadBenchmarks.Benchmarks(YSource.PointSpread).GetFullName(), "")
-            ZSpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(YSource.ZSpread), " -> " + _spreadBenchmarks.Benchmarks(YSource.ZSpread).GetFullName(), "")
-        End Sub
 
         Private Sub RelatedQuoteTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RelatedQuoteTSMI.Click
             If BondCMS.Tag Is Nothing Then Return
@@ -733,7 +725,7 @@ Namespace Forms.ChartForm
                 End Function
             ).Cast(Of SwapCurve).ToList().ForEach(
                 Sub(item)
-                    Dim elem = CType(SpreadCMS.Items.Add(item.GetFullName(), Nothing, AddressOf OnYieldCurveSelected), ToolStripMenuItem)
+                    Dim elem = CType(SpreadCMS.Items.Add(item.GetFullName(), Nothing, AddressOf OnSwapCurveSelected), ToolStripMenuItem)
                     elem.CheckOnClick = True
                     elem.Checked = refCurve IsNot Nothing AndAlso item.GetFullName() = refCurve.GetFullName()
                     elem.Tag = item
@@ -795,7 +787,7 @@ Namespace Forms.ChartForm
             Dim snd = CType(sender, ToolStripMenuItem)
             Dim curve = _moneyMarketCurves.First(Function(item) item.GetName() = MoneyCurveCMS.Tag.ToString())
             If curve Is Nothing Then Return
-            If curve.BootstrappingEnabled() Then curve.SetBootstrapped(snd.Checked)
+            If curve.CanBootstrap() Then curve.Bootstrapped = snd.Checked
         End Sub
 
         Private Sub OnBrokerSelected(ByVal sender As Object, ByVal e As EventArgs)
@@ -828,16 +820,16 @@ Namespace Forms.ChartForm
             curve.SetFitMode(snd.Tag)
         End Sub
 
-        Private Sub OnCurvePaint(ByVal curve As SwapCurve)
-            Logger.Debug("OnCurvePaint({0})", curve.GetName())
-            PaintSwapCurve(curve, False)
-            _spreadBenchmarks.UpdateCurve(curve.GetName())
-            SetChartMinMax()
-        End Sub
+        'Private Sub OnCurvePaint(ByVal curve As SwapCurve)
+        '    Logger.Debug("OnCurvePaint({0})", curve.GetName())
+        '    'PaintSwapCurve(curve, False)
+        '    _spreadBenchmarks.UpdateCurve(curve.GetName())
+        '    SetChartMinMax()
+        'End Sub
 
         Private Sub OnCurveRecalculated(ByVal curve As SwapCurve)
             Logger.Debug("OnCurveRecalculated({0})", curve.GetName())
-            PaintSwapCurve(curve, True)
+            'PaintSwapCurve(curve, True)
             SetChartMinMax()
         End Sub
 
@@ -902,84 +894,63 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
-        Private Sub OnBenchmarkRemoved(ByVal type As YSource) Handles _spreadBenchmarks.BenchmarkRemoved
-            Logger.Trace("OnBenchmarkRemoved({0})", type)
-            _moneyMarketCurves.ForEach(Sub(curve) curve.CleanupByType(type))
-            '_ansamble.Groups.CleanupByType(type)
-        End Sub
+        'Private Sub OnBenchmarkRemoved(ByVal type As YSource) Handles _spreadBenchmarks.BenchmarkRemoved
+        '    Logger.Trace("OnBenchmarkRemoved({0})", type)
+        '    '_moneyMarketCurves.ForEach(Sub(curve) curve.CleanupByType(type))
+        '    '_ansamble.Groups.CleanupByType(type)
+        'End Sub
 
-        Private Sub OnBenchmarkUpdated(ByVal type As YSource) Handles _spreadBenchmarks.BenchmarkUpdated
-            Logger.Trace("OnBenchmarkUpdated({0})", type)
-            _moneyMarketCurves.ForEach(Sub(curve) curve.RecalculateByType(type))
-            '_ansamble.Groups.RecalculateByType(type)
-        End Sub
+        'Private Sub OnBenchmarkUpdated(ByVal type As YSource) Handles _spreadBenchmarks.BenchmarkUpdated
+        '    Logger.Trace("OnBenchmarkUpdated({0})", type)
+        '    '_moneyMarketCurves.ForEach(Sub(curve) curve.RecalculateByType(type))
+        '    '_ansamble.Groups.RecalculateByType(type)
+        'End Sub
 
-        Private Sub OnTypeSelected(ByVal newType As YSource, ByVal oldType As YSource) Handles _spreadBenchmarks.TypeSelected
-            Logger.Trace("OnTypeSelected({0}, {1})", newType, oldType)
-            If newType <> oldType Then
-                SetYAxisMode(newType.ToString())
-                _moneyMarketCurves.ForEach(Sub(curve) curve.RecalculateByType(newType))
-                '_ansamble.Groups.RecalculateByType(newType)
-            End If
-        End Sub
+        'Private Sub OnTypeSelected(ByVal newType As YSource, ByVal oldType As YSource) Handles _spreadBenchmarks.TypeSelected
+        '    Logger.Trace("OnTypeSelected({0}, {1})", newType, oldType)
+        '    If newType <> oldType Then
+        '        SetYAxisMode(newType.ToString())
+        '        '_moneyMarketCurves.ForEach(Sub(curve) curve.RecalculateByType(newType))
+        '        '_ansamble.Groups.RecalculateByType(newType)
+        '    End If
+        'End Sub
 #End Region
 #End Region
-
-        Private Sub SetLabel(ByVal bond As Bond, ByVal mode As LabelMode)
-            Try
-                Dim group = bond.Parent
-                bond.LabelMode = mode
-                If ShowLabelsTSB.Checked Then
-                    TheChart.Series.FindByName(group.Identity).Points.First(Function(pnt) CType(pnt.Tag, Bond).MetaData.RIC = bond.MetaData.RIC).Label = bond.Label
-                End If
-            Catch ex As Exception
-                Logger.WarnException("Failed to set label mode", ex)
-                Logger.Warn("Exception = {0}", ex)
-            End Try
-        End Sub
 
         Private Sub IssuerNameSeriesTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles IssuerNameSeriesTSMI.Click
-            If BondCMS.Tag Is Nothing Then Return
-            SetLabel(BondCMS.Tag, LabelMode.IssuerAndSeries)
+            If BondCMS.Tag Is Nothing OrElse Not TypeOf BondCMS.Tag Is Bond Then Return
+            BondCMS.Tag.LabelMode = LabelMode.IssuerAndSeries
         End Sub
 
         Private Sub ShortNameTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles ShortNameTSMI.Click
-            If BondCMS.Tag Is Nothing Then Return
-            SetLabel(BondCMS.Tag, LabelMode.IssuerCpnMat)
+            If BondCMS.Tag Is Nothing OrElse Not TypeOf BondCMS.Tag Is Bond Then Return
+            BondCMS.Tag.LabelMode = LabelMode.IssuerCpnMat
         End Sub
 
         Private Sub DescriptionTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles DescriptionTSMI.Click
-            If BondCMS.Tag Is Nothing Then Return
-            SetLabel(BondCMS.Tag, LabelMode.Description)
+            If BondCMS.Tag Is Nothing OrElse Not TypeOf BondCMS.Tag Is Bond Then Return
+            BondCMS.Tag.LabelMode = LabelMode.Description
         End Sub
 
         Private Sub SeriesOnlyTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SeriesOnlyTSMI.Click
-            If BondCMS.Tag Is Nothing Then Return
-            SetLabel(BondCMS.Tag, LabelMode.SeriesOnly)
-        End Sub
-
-        Private Sub SetSeriesLabel(ByVal id As String, ByVal mode As LabelMode)
-            Try
-                _ansamble.Items(id).SetLabelMode(mode)
-            Catch ex As Exception
-                Logger.Warn("Failed to set label mode, exception = {0}", ex.ToString())
-            End Try
+            If BondCMS.Tag Is Nothing OrElse Not TypeOf BondCMS.Tag Is Bond Then Return
+            BondCMS.Tag.LabelMode = LabelMode.SeriesOnly
         End Sub
 
         Private Sub SeriesIssuerNameAndSeriesTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SeriesIssuerNameAndSeriesTSMI.Click
-            SetSeriesLabel(BondSetCMS.Tag, LabelMode.IssuerAndSeries)
+            _ansamble.Items(BondSetCMS.Tag).SetLabelMode(LabelMode.IssuerAndSeries)
         End Sub
 
         Private Sub SeriesSeriesOnlyTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SeriesSeriesOnlyTSMI.Click
-            SetSeriesLabel(BondSetCMS.Tag, LabelMode.SeriesOnly)
+            _ansamble.Items(BondSetCMS.Tag).SetLabelMode(LabelMode.SeriesOnly)
         End Sub
 
         Private Sub SeriesDescriptionTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SeriesDescriptionTSMI.Click
-            SetSeriesLabel(BondSetCMS.Tag, LabelMode.Description)
+            _ansamble.Items(BondSetCMS.Tag).SetLabelMode(LabelMode.Description)
         End Sub
 
         Private Sub IssuerCouponMaturityTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles IssuerCouponMaturityTSMI.Click
-            SetSeriesLabel(BondSetCMS.Tag, LabelMode.IssuerCpnMat)
+            _ansamble.Items(BondSetCMS.Tag).SetLabelMode(LabelMode.IssuerCpnMat)
         End Sub
 
         Private Sub BondCurveTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BondCurveTSMI.Click
@@ -1034,12 +1005,5 @@ Namespace Forms.ChartForm
             If datePicker.ShowDialog() = DialogResult.OK Then curve.Date = datePicker.TheCalendar.SelectionEnd
         End Sub
 
-        Private Sub BondCurveCMS_Closing(ByVal sender As Object, ByVal e As ToolStripDropDownClosingEventArgs) Handles BondCurveCMS.Closing
-            BondCurveCMS.Tag = Nothing
-        End Sub
-
-        Private Sub BondCMS_Closing(ByVal sender As System.Object, ByVal e As ToolStripDropDownClosingEventArgs) Handles BondCMS.Closing
-            BondCMS.Tag = Nothing
-        End Sub
     End Class
 End Namespace

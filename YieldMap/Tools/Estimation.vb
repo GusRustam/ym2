@@ -1,11 +1,11 @@
 ﻿Imports DotNumerics.Optimization
+Imports Uitls
 Imports YieldMap.Tools.Elements
 Imports MathNet.Numerics.Interpolation.Algorithms
 Imports MathNet.Numerics.LinearAlgebra.Double
 Imports System.Reflection
-Imports Uitls.Utils
 
-Namespace Tools.Estimation
+Namespace Tools
     Public Enum EstimationType
         Interpolation
         Estimation
@@ -158,7 +158,7 @@ Namespace Tools.Estimation
         End Function
 
         Public Overridable Function GetFormula() As String Implements IFormulable.GetFormula
-            Return String.Format("Y = {0:F4} + {1:F4}*X ", A, B)
+            Return String.Format("Y = {0:F8} + {1:F8}*X ", A, B)
         End Function
     End Class
 
@@ -182,7 +182,7 @@ Namespace Tools.Estimation
         End Function
 
         Public Overrides Function GetFormula() As String
-            Return String.Format("Y = {0:F4} + {1:F4}*Log(1 + X) ", A, B)
+            Return String.Format("Y = {0:F8} + {1:F8}*Log(1 + X) ", A, B)
         End Function
     End Class
 
@@ -207,7 +207,7 @@ Namespace Tools.Estimation
         End Function
 
         Public Overrides Function GetFormula() As String
-            Return String.Format("Y = {0:F4}*{1:F4}^X", Math.Exp(A), Math.Exp(B))
+            Return String.Format("Y = {0:F8}*{1:F8}^X", Math.Exp(A), Math.Exp(B))
         End Function
     End Class
 
@@ -231,7 +231,7 @@ Namespace Tools.Estimation
         End Function
 
         Public Overrides Function GetFormula() As String
-            Return String.Format("Y = 1/({0:F4} + {1:F4}*X)", A, B)
+            Return String.Format("Y = 1/({0:F8} + {1:F8}*X)", A, B)
         End Function
     End Class
 
@@ -276,10 +276,10 @@ Namespace Tools.Estimation
         End Function
 
         Public Overrides Function GetFormula() As String
-            Dim res = String.Format("Y = {0:P2} + {1:P2}*x", _theta(0), _theta(1))
+            Dim res = String.Format("Y = {0:F8} + {1:F8}*x", _theta(0), _theta(1))
             For i = 2 To P
                 If Math.Abs(_theta(i)) > 0.000001 Then
-                    res += String.Format(" + {0:P2}*x^{1}", _theta(i), i)
+                    res += String.Format(" + {0:F8}*x^{1}", _theta(i), i)
                 End If
             Next
             Return res
@@ -291,7 +291,7 @@ Namespace Tools.Estimation
     Public Class CubicSpline
         Public Function Interpolate(ByVal xv As List(Of Double), ByVal yv As List(Of Double)) As List(Of XY)
             Dim spline As New CubicSplineInterpolation(xv, yv)
-            Return GetRange(xv.Min, xv.Max, 300).Select(Function(anX) New XY With {.X = anX, .Y = spline.Interpolate(anX)}).ToList()
+            Return Utils.GetRange(xv.Min, xv.Max, 300).Select(Function(anX) New XY With {.X = anX, .Y = spline.Interpolate(anX)}).ToList()
         End Function
     End Class
 
@@ -388,7 +388,7 @@ Namespace Tools.Estimation
             Dim lbfgsb As New L_BFGS_B
             Dim minimum = lbfgsb.ComputeMin(AddressOf NSSCost, AddressOf NSSCg, vars)
 
-            Return GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = avgY * NSS(anX, minimum) / 10}).ToList()
+            Return Utils.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = avgY * NSS(anX, minimum) / 10}).ToList()
         End Function
 
         Public Function GetFormula() As String Implements IFormulable.GetFormula
@@ -449,9 +449,9 @@ Namespace Tools.Estimation
             Dim valByAvg = VasicekCostRel(minByAvg, Function(val) yavg * val / 10)
 
             If valByAvg < valByRange Then
-                Return GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = yavg * Vasicek(anX, minByAvg) / 10}).ToList()
+                Return Utils.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = yavg * Vasicek(anX, minByAvg) / 10}).ToList()
             Else
-                Return GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = ymin + (ymax - ymin) * Vasicek(anX, minByRange)}).ToList()
+                Return Utils.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = ymin + (ymax - ymin) * Vasicek(anX, minByRange)}).ToList()
             End If
         End Function
 
@@ -517,9 +517,9 @@ Namespace Tools.Estimation
             Dim valByAvg = CIRCostRel(minByAvg, Function(val) 10 * val / yavg)
 
             If valByAvg < valByRange Then
-                Return GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = 10 * CIR(anX, minByAvg) / yavg}).ToList()
+                Return Utils.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = 10 * CIR(anX, minByAvg) / yavg}).ToList()
             Else
-                Return GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = ymin + (ymax - ymin) * CIR(anX, minByRange)}).ToList()
+                Return Utils.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = ymin + (ymax - ymin) * CIR(anX, minByRange)}).ToList()
             End If
         End Function
 
@@ -593,7 +593,7 @@ Namespace Tools.Estimation
                     _regression.Fit(x, y)
                 End If
 
-                Return GetRange(x.Min, x.Max, 100).Select(Function(anX) New XY With {.X = anX, .Y = _regression.Estimate(anX)}).ToList()
+                Return Utils.GetRange(x.Min, x.Max, 100).Select(Function(anX) New XY With {.X = anX, .Y = _regression.Estimate(anX)}).ToList()
             Else
                 If _estimationModel = EstimationModel.CubicSpline Then
                     Return (New CubicSpline).Interpolate(x, y)

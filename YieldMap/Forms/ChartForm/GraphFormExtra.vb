@@ -5,7 +5,6 @@ Imports YieldMap.Tools.Elements
 Imports ReutersData
 Imports Uitls
 Imports YieldMap.Tools.Estimation
-Imports YieldMap.Curves
 Imports YieldMap.Tools
 
 Namespace Forms.ChartForm
@@ -76,42 +75,42 @@ Namespace Forms.ChartForm
                 quotes.ToList.ForEach(Sub(quote) AddItem(quote, (quote = currQuote), QuoteTSMI, AddressOf OnQuoteSelected))
             End If
 
-            Dim fitModes = curve.GetFitModes()
-            If fitModes.Count() <= 1 Then
-                FitTSMI.Enabled = False
-            Else
-                FitTSMI.Enabled = True
-                Dim currFit = curve.GetFitMode()
+            'Dim fitModes = curve.GetFitModes()
+            'If fitModes.Count() <= 1 Then
+            '    FitTSMI.Enabled = False
+            'Else
+            '    FitTSMI.Enabled = True
+            '    Dim currFit = curve.GetFitMode()
 
-                CheckFit(EstimationModel.Lin, fitModes, currFit, LinearRegressionTSMI)
-                CheckFit(EstimationModel.Log, fitModes, currFit, LogarithmicRegressionTSMI)
-                CheckFit(EstimationModel.Inv, fitModes, currFit, InverseRegressionTSMI)
-                CheckFit(EstimationModel.Pow, fitModes, currFit, PowerRegressionTSMI)
-                CheckFit(EstimationModel.Poly6, fitModes, currFit, Poly6RegressionTSMI)
-                CheckFit(EstimationModel.NSS, fitModes, currFit, NelsonSiegelSvenssonTSMI)
-                CheckFit(EstimationModel.LinInterp, fitModes, currFit, LinearInterpolationTSMI)
-                CheckFit(EstimationModel.CubicSpline, fitModes, currFit, CubicSplineTSMI)
-                CheckFit(EstimationModel.Vasicek, fitModes, currFit, VasicekCurveTSMI)
-                CheckFit(EstimationModel.CoxIngersollRoss, fitModes, currFit, CIRCurveTSMI)
-            End If
+            '    CheckFit(EstimationModel.Lin, fitModes, currFit, LinearRegressionTSMI)
+            '    CheckFit(EstimationModel.Log, fitModes, currFit, LogarithmicRegressionTSMI)
+            '    CheckFit(EstimationModel.Inv, fitModes, currFit, InverseRegressionTSMI)
+            '    CheckFit(EstimationModel.Pow, fitModes, currFit, PowerRegressionTSMI)
+            '    CheckFit(EstimationModel.Poly6, fitModes, currFit, Poly6RegressionTSMI)
+            '    CheckFit(EstimationModel.NSS, fitModes, currFit, NelsonSiegelSvenssonTSMI)
+            '    CheckFit(EstimationModel.LinInterp, fitModes, currFit, LinearInterpolationTSMI)
+            '    CheckFit(EstimationModel.CubicSpline, fitModes, currFit, CubicSplineTSMI)
+            '    CheckFit(EstimationModel.Vasicek, fitModes, currFit, VasicekCurveTSMI)
+            '    CheckFit(EstimationModel.CoxIngersollRoss, fitModes, currFit, CIRCurveTSMI)
+            'End If
 
-            If curve.BootstrappingEnabled Then
+            If curve.CanBootstrap Then
                 BootstrapTSMI.Visible = True
                 BootstrapTSMI.Enabled = True
-                BootstrapTSMI.Checked = curve.IsBootstrapped
+                BootstrapTSMI.Checked = curve.Bootstrapped
             Else
                 BootstrapTSMI.Enabled = False
                 BootstrapTSMI.Visible = False
             End If
         End Sub
 
-        Private Shared Sub CheckFit(ByVal fit As EstimationModel, ByVal modes As EstimationModel(), ByVal curModel As EstimationModel, ByVal item As ToolStripMenuItem)
-            If modes.Contains(fit) Then
-                item.Visible = True
-                item.Checked = (curModel = fit)
-                item.Tag = fit
-            End If
-        End Sub
+        'Private Shared Sub CheckFit(ByVal fit As EstimationModel, ByVal modes As EstimationModel(), ByVal curModel As EstimationModel, ByVal item As ToolStripMenuItem)
+        '    If modes.Contains(fit) Then
+        '        item.Visible = True
+        '        item.Checked = (curModel = fit)
+        '        item.Tag = fit
+        '    End If
+        'End Sub
 
         Private Shared Sub AddItem(ByVal name As String, ByVal checked As Boolean, ByVal toolStripMenuItem As ToolStripMenuItem, ByVal eventHandler As EventHandler, Optional ByVal tag As Object = Nothing)
             Dim num = toolStripMenuItem.DropDownItems.Add(New ToolStripMenuItem(name, Nothing, eventHandler) With {.Checked = checked})
@@ -293,13 +292,51 @@ Namespace Forms.ChartForm
             'If Not _moneyMarketCurves.Any() Then Return
             _moneyMarketCurves.ForEach(
                 Sub(item)
-                    Dim elem = CType(SpreadCMS.Items.Add(item.GetFullName(), Nothing, AddressOf OnYieldCurveSelected), ToolStripMenuItem)
+                    Dim elem = CType(SpreadCMS.Items.Add(item.GetFullName(), Nothing, AddressOf OnSwapCurveSelected), ToolStripMenuItem)
                     elem.CheckOnClick = True
                     elem.Checked = refCurve IsNot Nothing AndAlso item.GetFullName() = refCurve.GetFullName()
                     elem.Tag = item
                 End Sub)
 
+            Dim items = (From elem In _ansamble.Items Where TypeOf elem.Value Is BondCurve Select elem.Value).ToList()
+            If items.Any Then SpreadCMS.Items.Add(New ToolStripSeparator)
+            For Each item In items
+                Dim elem = CType(SpreadCMS.Items.Add(item.SeriesName, Nothing, AddressOf OnBondCurveSelected), ToolStripMenuItem)
+                elem.CheckOnClick = True
+                elem.Tag = item
+            Next item
+
+            ' todo add item to add a curve and use it as a benchmark
+            If SpreadCMS.Items.Count > 0 Then SpreadCMS.Items.Add(New ToolStripSeparator)
+            SpreadCMS.Items.Add(New ToolStripSeparator)
+            SpreadCMS.Items.Add("New curve...", Nothing, AddressOf OnNewCurvePressed)
             SpreadCMS.Show(MousePosition)
+        End Sub
+
+        Private Sub OnNewCurvePressed(ByVal sender As Object, ByVal e As EventArgs)
+            ' todo
+        End Sub
+
+        Private Sub OnSwapCurveSelected(ByVal sender As Object, ByVal eventArgs As EventArgs)
+            Logger.Info("OnYieldCurveSelected()")
+            Dim senderTSMI = TryCast(sender, ToolStripMenuItem)
+            If senderTSMI Is Nothing Then Return
+
+            If senderTSMI.Checked Then
+                _spreadBenchmarks.AddType(YSource.FromString(SpreadCMS.Tag), senderTSMI.Tag)
+            Else
+                _spreadBenchmarks.RemoveType(YSource.FromString(SpreadCMS.Tag))
+            End If
+
+            UpdateAxisYTitle(False)
+
+            ASWLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(YSource.ASWSpread), " -> " + _spreadBenchmarks.Benchmarks(YSource.ASWSpread).GetFullName(), "")
+            SpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(YSource.PointSpread), " -> " + _spreadBenchmarks.Benchmarks(YSource.PointSpread).GetFullName(), "")
+            ZSpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(YSource.ZSpread), " -> " + _spreadBenchmarks.Benchmarks(YSource.ZSpread).GetFullName(), "")
+        End Sub
+
+        Private Sub OnBondCurveSelected(ByVal sender As Object, ByVal e As EventArgs)
+            ' todo 
         End Sub
 
         Private Sub ResetPointSelection()
@@ -346,58 +383,58 @@ Namespace Forms.ChartForm
             Next
         End Sub
 
-        Private Sub PaintSwapCurve(ByVal curve As SwapCurve, ByVal raw As Boolean)
-            Logger.Debug("PaintSwapCurve({0}, {1})", curve.GetName(), raw)
-            Dim points As List(Of SwapPointDescription)
-            points = curve.GetCurveData(raw)
-            If points Is Nothing Then Return
+        'Private Sub PaintSwapCurve(ByVal curve As SwapCurve, ByVal raw As Boolean)
+        '    Logger.Debug("PaintSwapCurve({0}, {1})", curve.GetName(), raw)
+        '    Dim points As List(Of SwapPointDescription)
+        '    points = curve.GetCurveData(raw)
+        '    If points Is Nothing Then Return
 
-            Dim estimator = New Estimator(curve.GetFitMode())
-            Dim xyPoints = estimator.Approximate(XY.ConvertToXY(points, _spreadBenchmarks.CurrentType))
+        '    Dim estimator = New Estimator(curve.GetFitMode())
+        '    Dim xyPoints = estimator.Approximate(XY.ConvertToXY(points, _spreadBenchmarks.CurrentType))
 
-            If xyPoints Is Nothing Then Return
-            Logger.Trace("Got points to plot")
+        '    If xyPoints Is Nothing Then Return
+        '    Logger.Trace("Got points to plot")
 
-            GuiAsync(
-                Sub()
-                    Dim theSeries = TheChart.Series.FindByName(curve.GetName())
-                    If theSeries Is Nothing Then
-                        theSeries = New Series() With {
-                            .Name = curve.GetName(),
-                            .legendText = curve.GetFullName(),
-                            .ChartType = SeriesChartType.Line,
-                            .color = curve.GetOuterColor(),
-                            .markerColor = curve.GetInnerColor(),
-                            .markerBorderColor = curve.GetOuterColor(),
-                            .borderWidth = 2,
-                            .Tag = curve,
-                            .markerStyle = MarkerStyle.None,
-                            .markerSize = 0
-                        }
-                        TheChart.Series.Add(theSeries)
-                    Else
-                        theSeries.Points.Clear()
-                        theSeries.LegendText = curve.GetFullName()
-                    End If
+        '    GuiAsync(
+        '        Sub()
+        '            Dim theSeries = TheChart.Series.FindByName(curve.GetName())
+        '            If theSeries Is Nothing Then
+        '                theSeries = New Series() With {
+        '                    .Name = curve.GetName(),
+        '                    .legendText = curve.GetFullName(),
+        '                    .ChartType = SeriesChartType.Line,
+        '                    .color = curve.GetOuterColor(),
+        '                    .markerColor = curve.GetInnerColor(),
+        '                    .markerBorderColor = curve.GetOuterColor(),
+        '                    .borderWidth = 2,
+        '                    .Tag = curve,
+        '                    .markerStyle = MarkerStyle.None,
+        '                    .markerSize = 0
+        '                }
+        '                TheChart.Series.Add(theSeries)
+        '            Else
+        '                theSeries.Points.Clear()
+        '                theSeries.LegendText = curve.GetFullName()
+        '            End If
 
-                    If points Is Nothing OrElse points.Count < 2 Then
-                        theSeries.Enabled = False
-                        Logger.Info("Too little points to plot")
-                        Return
-                    End If
-                    theSeries.Enabled = True
+        '            If points Is Nothing OrElse points.Count < 2 Then
+        '                theSeries.Enabled = False
+        '                Logger.Info("Too little points to plot")
+        '                Return
+        '            End If
+        '            theSeries.Enabled = True
 
-                    xyPoints.ForEach(
-                        Sub(item)
-                            theSeries.Points.Add(New DataPoint With {
-                                .Name = String.Format("{0}Y", item.X),
-                                .XValue = item.X,
-                                .YValues = {item.Y},
-                                .Tag = curve
-                            })
-                        End Sub)
-                End Sub)
-        End Sub
+        '            xyPoints.ForEach(
+        '                Sub(item)
+        '                    theSeries.Points.Add(New DataPoint With {
+        '                        .Name = String.Format("{0}Y", item.X),
+        '                        .XValue = item.X,
+        '                        .YValues = {item.Y},
+        '                        .Tag = curve
+        '                    })
+        '                End Sub)
+        '        End Sub)
+        'End Sub
 
         Public Sub OnHistoricalData(ByVal ric As String, ByVal data As Dictionary(Of Date, HistoricalItem), ByVal rawData As Dictionary(Of DateTime, RawHistoricalItem))
             Logger.Trace("OnHistoricalQuotes({0})", ric)
@@ -457,11 +494,6 @@ Namespace Forms.ChartForm
                     End If
 
                 End Sub)
-        End Sub
-
-        Private Sub NewCurveDeleted(ByVal obj As Group)
-            Dim srs = TheChart.Series.FindByName(obj.Identity)
-            If srs IsNot Nothing Then TheChart.Series.Remove(srs)
         End Sub
 
         Private Sub OnGroupUpdated(ByVal data As List(Of BondCurve.CurveItem))
@@ -578,5 +610,6 @@ Namespace Forms.ChartForm
                     SetChartMinMax()
                 End Sub)
         End Sub
+
     End Class
 End Namespace

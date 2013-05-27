@@ -1,13 +1,14 @@
 Imports AdfinXAnalyticsFunctions
+Imports System.ComponentModel
 Imports DbManager
 Imports Settings
 Imports Uitls
-Imports YieldMap.Tools.Estimation
 Imports ReutersData
 
 Namespace Tools.Elements
     Public Class BondCurve
         Inherits Group
+        Implements ICurve
 
         Public Class BondCurveSnapshot
             ''' <summary>
@@ -22,14 +23,16 @@ Namespace Tools.Elements
                 Private ReadOnly _duration As Double
                 Private ReadOnly _price As Double
                 Private ReadOnly _quote As String
+                Private ReadOnly _yieldDate As Date
 
-                Public Sub New(ByVal ric As String, ByVal descr As String, ByVal [yield] As Double, ByVal duration As Double, ByVal price As Double, ByVal quote As String)
+                Public Sub New(ByVal ric As String, ByVal descr As String, ByVal [yield] As Double, ByVal duration As Double, ByVal price As Double, ByVal quote As String, ByVal yieldDate As Date)
                     _ric = ric
                     _descr = descr
                     _yield = yield
                     _duration = duration
                     _price = price
                     _quote = quote
+                    _yieldDate = yieldDate
                 End Sub
 
                 Public ReadOnly Property RIC() As String
@@ -68,13 +71,20 @@ Namespace Tools.Elements
                     End Get
                 End Property
 
+                <DisplayName("Yield date")>
+                Public ReadOnly Property YieldDate() As String
+                    Get
+                        Return String.Format("{0:dd/MM/yyyy}", _yieldDate)
+                    End Get
+                End Property
+
                 Public Function CompareTo(ByVal other As BondCurveElement) As Integer Implements IComparable(Of BondCurveElement).CompareTo
                     Return _duration.CompareTo(other._duration)
                 End Function
             End Class
 
-            Private ReadOnly _current As List(Of Group.CurveItem)
-            Public ReadOnly Property Current() As List(Of Group.CurveItem)
+            Private ReadOnly _current As List(Of CurveItem)
+            Public ReadOnly Property Current() As List(Of CurveItem)
                 Get
                     Return _current
                 End Get
@@ -99,9 +109,9 @@ Namespace Tools.Elements
                     Dim mainQuote = bond.QuotesAndYields.Main
                     If mainQuote Is Nothing Then Continue For
                     If bond.Enabled Then
-                        _enabledElements.Add(New BondCurveElement(bond.MetaData.RIC, bond.Label, mainQuote.GetYield(), mainQuote.Duration, mainQuote.Price, bond.QuotesAndYields.MaxPriorityField))
+                        _enabledElements.Add(New BondCurveElement(bond.MetaData.RIC, bond.Label, mainQuote.GetYield(), mainQuote.Duration, mainQuote.Price, bond.QuotesAndYields.MaxPriorityField, mainQuote.YieldAtDate))
                     Else
-                        _disabledElements.Add(New BondCurveElement(bond.MetaData.RIC, bond.Label, mainQuote.GetYield(), mainQuote.Duration, mainQuote.Price, bond.QuotesAndYields.MaxPriorityField))
+                        _disabledElements.Add(New BondCurveElement(bond.MetaData.RIC, bond.Label, mainQuote.GetYield(), mainQuote.Duration, mainQuote.Price, bond.QuotesAndYields.MaxPriorityField, mainQuote.YieldAtDate))
                     End If
                 Next
                 _enabledElements.Sort()
@@ -136,7 +146,14 @@ Namespace Tools.Elements
         End Property
 
         Private _bootstrapped As Boolean
-        Public Property Bootstrapped() As Boolean
+
+        Public ReadOnly Property CanBootstrap() As Boolean Implements ICurve.CanBootstrap
+            Get
+                Return True
+            End Get
+        End Property
+
+        Public Property Bootstrapped() As Boolean Implements ICurve.Bootstrapped
             Get
                 Return _bootstrapped
             End Get
@@ -241,7 +258,7 @@ Namespace Tools.Elements
             Return Nothing
         End Function
 
-        Protected Overrides Sub NotifyChanged()
+        Public Overrides Sub NotifyChanged()
             If Ansamble.YSource = YSource.Yield Then
                 Dim result As New List(Of CurveItem)
                 If _bootstrapped Then
@@ -298,11 +315,11 @@ Namespace Tools.Elements
 
                 If _estModel IsNot Nothing Then
                     Dim est As New Estimator(_estModel)
-                    _formula = est.GetFormula()
                     Dim tmp = New List(Of CurveItem)(result)
                     Dim list As List(Of XY) = (From item In tmp Select New XY(item.TheX, item.TheY)).ToList()
                     Dim apprXY = est.Approximate(list)
                     result = (From item In apprXY Select New PointCurveItem(item.X, item.Y, Me)).Cast(Of CurveItem).ToList()
+                    _formula = est.GetFormula()
                 End If
 
                 _lastCurve = New List(Of CurveItem)(result)
@@ -314,7 +331,7 @@ Namespace Tools.Elements
             End If
         End Sub
 
-        Public Sub Bootstrap()
+        Public Sub Bootstrap() Implements ICurve.Bootstrap
             Bootstrapped = Not Bootstrapped
         End Sub
 
@@ -326,6 +343,5 @@ Namespace Tools.Elements
             Dim model = EstimationModel.FromName(mode)
             EstModel = If(model Is Nothing OrElse (EstModel IsNot Nothing AndAlso EstModel = model), Nothing, model)
         End Sub
-
     End Class
 End NameSpace

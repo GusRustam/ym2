@@ -1,5 +1,4 @@
 Imports DbManager.Bonds
-Imports YieldMap.Curves
 
 Namespace Tools.Elements
     Public Class SpreadContainer
@@ -21,37 +20,37 @@ Namespace Tools.Elements
             End Set
         End Property
 
-        Public Sub CalcAllSpreads(ByRef descr As BasePointDescription, Optional ByVal data As BondDescription = Nothing, Optional ByVal type As YSource = Nothing)
-            If type IsNot Nothing Then
-                If data IsNot Nothing Then
-                    If type = YSource.ZSpread AndAlso Benchmarks.ContainsKey(YSource.ZSpread) Then
-                        CalcZSprd(Benchmarks(YSource.ZSpread).ToArray(), descr, data)
-                    End If
-                    If type = YSource.ASWSpread AndAlso Benchmarks.ContainsKey(YSource.ASWSpread) Then
-                        Dim aswSpreadMainCurve = Benchmarks(YSource.ASWSpread)
-                        Dim bmk = CType(aswSpreadMainCurve, IAssetSwapBenchmark)
-                        CalcASWSprd(aswSpreadMainCurve.ToArray(), bmk.FloatLegStructure, bmk.FloatingPointValue, descr, data)
-                    End If
-                End If
-                If type = YSource.PointSpread AndAlso Benchmarks.ContainsKey(YSource.PointSpread) Then
-                    CalcPntSprd(Benchmarks(YSource.PointSpread).ToFittedArray(), descr)
-                End If
-            Else
-                If data IsNot Nothing Then
-                    If Benchmarks.ContainsKey(YSource.ZSpread) Then
-                        CalcZSprd(Benchmarks(YSource.ZSpread).ToArray(), descr, data)
-                    End If
-                    If Benchmarks.ContainsKey(YSource.ASWSpread) Then
-                        Dim aswSpreadMainCurve = Benchmarks(YSource.ASWSpread)
-                        Dim bmk = CType(aswSpreadMainCurve, IAssetSwapBenchmark)
-                        CalcASWSprd(aswSpreadMainCurve.ToArray(), bmk.FloatLegStructure, bmk.FloatingPointValue, descr, data)
-                    End If
-                End If
-                If Benchmarks.ContainsKey(YSource.PointSpread) Then
-                    CalcPntSprd(Benchmarks(YSource.PointSpread).ToFittedArray(), descr)
-                End If
-            End If
-        End Sub
+        'Public Sub CalcAllSpreads(ByRef descr As BasePointDescription, Optional ByVal data As BondDescription = Nothing, Optional ByVal type As YSource = Nothing)
+        '    If type IsNot Nothing Then
+        '        If data IsNot Nothing Then
+        '            If type = YSource.ZSpread AndAlso Benchmarks.ContainsKey(YSource.ZSpread) Then
+        '                CalcZSprd(Benchmarks(YSource.ZSpread).ToArray(), descr, data)
+        '            End If
+        '            If type = YSource.ASWSpread AndAlso Benchmarks.ContainsKey(YSource.ASWSpread) Then
+        '                Dim aswSpreadMainCurve = Benchmarks(YSource.ASWSpread)
+        '                Dim bmk = CType(aswSpreadMainCurve, IAssetSwapBenchmark)
+        '                CalcASWSprd(aswSpreadMainCurve.ToArray(), bmk.FloatLegStructure, bmk.FloatingPointValue, descr, data)
+        '            End If
+        '        End If
+        '        If type = YSource.PointSpread AndAlso Benchmarks.ContainsKey(YSource.PointSpread) Then
+        '            CalcPntSprd(Benchmarks(YSource.PointSpread).ToFittedArray(), descr)
+        '        End If
+        '    Else
+        '        If data IsNot Nothing Then
+        '            If Benchmarks.ContainsKey(YSource.ZSpread) Then
+        '                CalcZSprd(Benchmarks(YSource.ZSpread).ToArray(), descr, data)
+        '            End If
+        '            If Benchmarks.ContainsKey(YSource.ASWSpread) Then
+        '                Dim aswSpreadMainCurve = Benchmarks(YSource.ASWSpread)
+        '                Dim bmk = CType(aswSpreadMainCurve, IAssetSwapBenchmark)
+        '                CalcASWSprd(aswSpreadMainCurve.ToArray(), bmk.FloatLegStructure, bmk.FloatingPointValue, descr, data)
+        '            End If
+        '        End If
+        '        If Benchmarks.ContainsKey(YSource.PointSpread) Then
+        '            CalcPntSprd(Benchmarks(YSource.PointSpread).ToFittedArray(), descr)
+        '        End If
+        '    End If
+        'End Sub
 
         Public Function GetActualQuote(ByVal calc As BasePointDescription) As Double?
             Dim fieldName = _currentType.ToString()
@@ -72,14 +71,14 @@ Namespace Tools.Elements
         End Function
 
 
-        Public Sub OnCurveRemoved(ByVal curve As SwapCurve)
-            Dim types = (From keyValue In Benchmarks Where keyValue.Value.GetName() = curve.GetName() Select keyValue.Key).ToList()
-            types.ForEach(Sub(type)
-                Benchmarks.Remove(type)
-                RaiseEvent BenchmarkRemoved(type)
-                             End Sub)
-            If types.Contains(CurrentType) Then CurrentType = YSource.Yield
-        End Sub
+        'Public Sub OnCurveRemoved(ByVal curve As SwapCurve)
+        '    Dim types = (From keyValue In Benchmarks Where keyValue.Value.GetName() = curve.GetName() Select keyValue.Key).ToList()
+        '    types.ForEach(Sub(type)
+        '        Benchmarks.Remove(type)
+        '        RaiseEvent BenchmarkRemoved(type)
+        '                     End Sub)
+        '    If types.Contains(CurrentType) Then CurrentType = YSource.Yield
+        'End Sub
 
         Public Sub UpdateCurve(ByVal curveName As String)
             Dim types = (From keyValue In Benchmarks Where keyValue.Value.GetName() = curveName Select keyValue.Key).ToList()
@@ -111,5 +110,6 @@ Namespace Tools.Elements
                 descr.PointSpread = Nothing
             End If
         End Sub
+
     End Class
 End NameSpace

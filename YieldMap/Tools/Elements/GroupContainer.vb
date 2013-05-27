@@ -63,9 +63,9 @@ Namespace Tools.Elements
 
         Public Sub Add(ByVal group As Group)
             _items.Add(group.Identity, group)
-            AddHandler group.Clear, Sub(base As Group)
-                                        _items.Remove(base.Identity)
-                                        RaiseEvent Cleared(base)
+            AddHandler group.Clear, Sub()
+                                        _items.Remove(group.Identity)
+                                        RaiseEvent Cleared(group)
                                     End Sub
             AddHandler group.Volume, Sub(bond As Bond) RaiseEvent Volume(bond)
         End Sub

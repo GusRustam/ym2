@@ -13,8 +13,9 @@ Namespace Tools.Elements
     ''' <remarks></remarks>
     Public MustInherit Class Group
         Inherits Identifyable
+        Implements IChangeable
 
-        Public Event Clear As Action(Of Group)
+        Public Event Clear As Action
         Public Event Volume As Action(Of Bond)
         Public Event Updated As Action(Of List(Of CurveItem))
 
@@ -25,11 +26,7 @@ Namespace Tools.Elements
         Friend BondFields As FieldContainer
         Public PortfolioID As Long
 
-        Protected MustOverride Sub NotifyChanged()
-
-        Public Sub Recalculate()
-            NotifyChanged()
-        End Sub
+        Public MustOverride Sub NotifyChanged() Implements IChangeable.NotifyChanged
 
         Public MustInherit Class CurveItem
             Implements IComparable(Of CurveItem)
@@ -208,7 +205,7 @@ Namespace Tools.Elements
         Public Sub Cleanup()
             _quoteLoader.CancelAll()
             _elements.Clear()
-            RaiseEvent Clear(Me)
+            RaiseEvent Clear()
         End Sub
 
         Public Overridable Sub StartAll()
