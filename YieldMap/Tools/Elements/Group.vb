@@ -26,7 +26,7 @@ Namespace Tools.Elements
         Friend BondFields As FieldContainer
         Public PortfolioID As Long
 
-        Public MustOverride Sub NotifyChanged() Implements IChangeable.NotifyChanged
+        Public MustOverride Sub Recalculate() Implements IChangeable.Recalculate
 
         Public MustInherit Class CurveItem
             Implements IComparable(Of CurveItem)
@@ -158,7 +158,7 @@ Namespace Tools.Elements
             End Get
             Set(ByVal value As Boolean)
                 _eventsFrozen = value
-                If Not _eventsFrozen Then NotifyChanged()
+                If Not _eventsFrozen Then Recalculate()
             End Set
         End Property
 
@@ -202,7 +202,7 @@ Namespace Tools.Elements
             End Set
         End Property
 
-        Public Sub Cleanup()
+        Public Sub Cleanup() Implements IChangeable.Cleanup
             _quoteLoader.CancelAll()
             _elements.Clear()
             RaiseEvent Clear()
@@ -288,7 +288,7 @@ Namespace Tools.Elements
             CalculateYields(calcDate, bondDataPoint.MetaData, calculation) ' todo add userDefinedSpread
 
             bondDataPoint.QuotesAndYields(xmlName) = calculation
-            NotifyChanged()
+            Recalculate()
         End Sub
 
         Public Function HasRic(ByVal instrument As String) As Boolean
@@ -300,7 +300,7 @@ Namespace Tools.Elements
                 Dim descr = BondsData.Instance.GetBondInfo(ric)
                 If descr IsNot Nothing Then
                     Dim bond = New Bond(Me, descr)
-                    AddHandler bond.Changed, Sub() If Not _eventsFrozen Then NotifyChanged()
+                    AddHandler bond.Changed, Sub() If Not _eventsFrozen Then Recalculate()
                     AddHandler bond.CustomPrice, AddressOf OnCustomCustomPrice
                     _elements.Add(bond)
                 Else
@@ -358,7 +358,6 @@ Namespace Tools.Elements
                 EventsFrozen = False
             End Set
         End Property
-
 
         Public Sub ToggleLabels()
             EventsFrozen = True

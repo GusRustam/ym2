@@ -289,7 +289,7 @@ Namespace Forms.ChartForm
                         Dim curve = CType(point.Tag, SwapCurve)
 
                         DscrLabel.Text = curve.GetFullName()
-                        DatLabel.Text = String.Format("{0:dd/MM/yyyy}", curve.GetDate())
+                        DatLabel.Text = String.Format("{0:dd/MM/yyyy}", curve.[Date])
                         Dim period = String.Format("{0:F0}D", 365 * point.XValue)
                         Dim aDate = (New AdxDateModule).DfAddPeriod("RUS", Date.Today, period, "")
                         MatLabel.Text = String.Format("{0:dd/MM/yyyy}", Utils.FromExcelSerialDate(aDate.GetValue(1, 1)))
@@ -516,11 +516,9 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-
         Public Sub OnCurveRemoved()
             ' todo
         End Sub
-
 
         Private Sub OnCurvePaint()
             ' todo
@@ -528,10 +526,9 @@ Namespace Forms.ChartForm
 
         Private Sub RubCCSTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RubCCSTSMI.Click
             Logger.Debug("RubCCSTSMIClick()")
-            Dim rubCCS = New RubCCS(_spreadBenchmarks)
+            Dim rubCCS = New RubCCS
 
             AddHandler rubCCS.Cleared, AddressOf OnCurveRemoved
-            'AddHandler rubCCS.Recalculated, AddressOf OnCurveRecalculated
             AddHandler rubCCS.Updated, AddressOf OnCurvePaint
 
             rubCCS.Subscribe()
@@ -540,9 +537,8 @@ Namespace Forms.ChartForm
 
         Private Sub RubIRS_TSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RubIRSTSMI.Click
             Logger.Debug("RubIRSTSMIClick()")
-            Dim rubIRS = New RubIRS(_spreadBenchmarks)
+            Dim rubIRS = New RubIRS
             AddHandler rubIRS.Cleared, AddressOf OnCurveRemoved
-            'AddHandler rubIRS.Recalculated, AddressOf OnCurveRecalculated
             AddHandler rubIRS.Updated, AddressOf OnCurvePaint
 
             rubIRS.Subscribe()
@@ -551,9 +547,8 @@ Namespace Forms.ChartForm
 
         Private Sub UsdIRS_TSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles UsdIRSTSMI.Click
             Logger.Debug("UsdIRS_TSMIClick()")
-            Dim usdIRS = New UsdIRS(_spreadBenchmarks)
+            Dim usdIRS = New UsdIRS
             AddHandler usdIRS.Cleared, AddressOf OnCurveRemoved
-            'AddHandler usdIRS.Recalculated, AddressOf OnCurveRecalculated
             AddHandler usdIRS.Updated, AddressOf OnCurvePaint
 
             usdIRS.Subscribe()
@@ -562,9 +557,8 @@ Namespace Forms.ChartForm
 
         Private Sub NDFTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles NDFTSMI.Click
             Logger.Debug("NDFTSMI_Click()")
-            Dim rubNDF = New RubNDF(_spreadBenchmarks)
+            Dim rubNDF = New RubNDF
             AddHandler rubNDF.Cleared, AddressOf OnCurveRemoved
-            'AddHandler rubNDF.Recalculated, AddressOf OnCurveRecalculated
             AddHandler rubNDF.Updated, AddressOf OnCurvePaint
 
             rubNDF.Subscribe()
@@ -747,7 +741,10 @@ Namespace Forms.ChartForm
 
             Dim curve = New BondCurve(_ansamble, src)
             AddHandler curve.Updated, AddressOf OnNewCurvePaint
-            AddHandler curve.Clear, AddressOf NewCurveDeleted
+            AddHandler curve.Clear, Sub()
+                                        Dim srs = TheChart.Series.FindByName(curve.Identity)
+                                        If srs IsNot Nothing Then TheChart.Series.Remove(srs)
+                                    End Sub
             _ansamble.Items.Add(curve)
             curve.StartAll()
         End Sub
@@ -761,7 +758,7 @@ Namespace Forms.ChartForm
                     Logger.Warn("No such curve {0}", MoneyCurveCMS.Tag.ToString())
                 Else
                     Dim curve = curves.First
-                    curve.SetDate(datePicker.TheCalendar.SelectionEnd)
+                    curve.[Date] = datePicker.TheCalendar.SelectionEnd
                 End If
             End If
         End Sub
@@ -808,18 +805,6 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub OnFitSelected(ByVal sender As Object, ByVal e As EventArgs) Handles _
-            LinearRegressionTSMI.Click, LogarithmicRegressionTSMI.Click, InverseRegressionTSMI.Click, PowerRegressionTSMI.Click, _
-            Poly6RegressionTSMI.Click, NelsonSiegelSvenssonTSMI.Click, LinearInterpolationTSMI.Click, CubicSplineTSMI.Click, _
-            VasicekCurveTSMI.Click, CIRCurveTSMI.Click
-
-            Logger.Debug("OnFitSelected()")
-            Dim snd = CType(sender, ToolStripMenuItem)
-            Dim curve = _moneyMarketCurves.First(Function(item) item.GetName() = MoneyCurveCMS.Tag.ToString())
-            If curve Is Nothing Then Return
-            curve.SetFitMode(snd.Tag)
-        End Sub
-
         'Private Sub OnCurvePaint(ByVal curve As SwapCurve)
         '    Logger.Debug("OnCurvePaint({0})", curve.GetName())
         '    'PaintSwapCurve(curve, False)
@@ -827,11 +812,11 @@ Namespace Forms.ChartForm
         '    SetChartMinMax()
         'End Sub
 
-        Private Sub OnCurveRecalculated(ByVal curve As SwapCurve)
-            Logger.Debug("OnCurveRecalculated({0})", curve.GetName())
-            'PaintSwapCurve(curve, True)
-            SetChartMinMax()
-        End Sub
+        'Private Sub OnCurveRecalculated(ByVal curve As SwapCurve)
+        '    Logger.Debug("OnCurveRecalculated({0})", curve.GetName())
+        '    'PaintSwapCurve(curve, True)
+        '    SetChartMinMax()
+        'End Sub
 
         Private Sub RemoveFromChartTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RemoveFromChartTSMI.Click
             If BondSetCMS.Tag IsNot Nothing AndAlso IsNumeric(BondSetCMS.Tag) Then _ansamble.Items.Remove(BondSetCMS.Tag)

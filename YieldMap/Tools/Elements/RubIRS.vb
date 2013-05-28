@@ -17,14 +17,9 @@ Namespace Tools.Elements
         Inherits SwapCurve
         Implements IAssetSwapBenchmark
 
-        Public Sub New(ByVal bmk As SpreadContainer)
-            MyBase.New(bmk)
-        End Sub
-
         '' LOGGER
         Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(RubIRS))
 
-        '' SWAP STRUCTURES
         '' SWAP STRUCTURES
         Private Shared ReadOnly SwapStructure =
             "LBOTH CLDR:RUS ARND:NO CFADJ:YES CRND:NO DMC:MODIFIED EMC:SAMEDAY IC:S1 " +
@@ -46,7 +41,7 @@ Namespace Tools.Elements
         Protected Overridable Property AllowedTenors() As String() = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"}
         Protected Overridable Property Brokers() As String() = {"GFI", "TRDL", "ICAP", ""}
 
-        Private Shared ReadOnly InstrumentType = "S"
+        'Private Shared ReadOnly InstrumentType = "S"
         Private Shared ReadOnly PossibleQuotes() As String = {"BID", "ASK", "MID"}
 
         Private _bootstrapped As Boolean
@@ -73,18 +68,6 @@ Namespace Tools.Elements
             Return CInt(capture)
         End Function
 
-        Public Overrides Function RemoveItem(ByVal ric As String) As Boolean
-            Return False
-        End Function
-
-        Public Overrides Function RemoveItems(ByVal ric As List(Of String)) As Boolean
-            Return False
-        End Function
-
-        Public Overrides Sub AddItems(ByVal rics As List(Of String))
-            Return
-        End Sub
-
         ''' <summary>
         ''' Return full list of rics to be loaded
         ''' </summary>
@@ -95,16 +78,6 @@ Namespace Tools.Elements
             Return AllowedTenors.Select(Function(item) String.Format("{0}{1}Y={2}", InstrumentName, item, broker)).ToList()
         End Function
 
-        'Public Overrides Sub RecalculateByType(ByVal type As YSource)
-        '    Logger.Trace("RecalculateByType({0})", type)
-        '    Dim rics = Descrs.Keys.ToList()
-        '    If SpreadBmk.Benchmarks.ContainsKey(type) AndAlso SpreadBmk.Benchmarks(type).GetName() = GetName() Then
-        '        rics.ForEach(Sub(ric) SpreadBmk.CleanupSpread(Descrs(ric), type:=type))
-        '    Else
-        '        rics.ForEach(Sub(ric) SpreadBmk.CalcAllSpreads(Descrs(ric), type:=type))
-        '    End If
-        '    If SpreadBmk.CurrentType = type Then NotifyRecalculated(Me)
-        'End Sub
 
         '' START LOADING HISTORICAL DATA
         Protected Overrides Sub LoadHistory()
@@ -144,7 +117,7 @@ Namespace Tools.Elements
                     Else
                         BaseInstrumentPrice = elem.Value
                     End If
-                    NotifyChanged()
+                    Recalculate()
                 Catch ex As Exception
                     Logger.WarnException("Failed to parse instrument " + ric, ex)
                     Logger.Warn("Exception = {0}", ex.ToString())
@@ -154,18 +127,10 @@ Namespace Tools.Elements
             End If
         End Sub
 
-        Public Overrides Function GetOriginalRICs() As List(Of String)
-            Return GetRICs("")
-        End Function
-
-        Public Overrides Function GetCurrentRICs() As List(Of String)
-            Return GetRICs(GetBroker())
-        End Function
-
         Public Overrides Sub Cleanup()
             _quoteLoader.CancelItems(GetRICs(_broker))
             If BaseInstrument <> "" Then _quoteLoader.CancelItem(BaseInstrument)
-            MyBase.Cleanup()
+            NotifyCleanup()
         End Sub
 
         '' REALTIME DATA ARRIVED
@@ -181,14 +146,14 @@ Namespace Tools.Elements
                     Dim duration = GetDuration(ric)
                     If fv.Keys.Contains("393") Or fv.Keys.Contains("275") Then
                         Try
-                            Descrs(ric).YieldAtDate = GetDate()
+                            Descrs(ric).YieldAtDate = [Date]
                             If _quote = "BID" Or _quote = "ASK" Then
                                 Dim yld As Double
                                 yld = CDbl(fv(IIf(_quote = "BID", "393", "275")))
                                 If yld > 0 Then
                                     Descrs(ric).Yield = yld / 100
                                     Descrs(ric).Duration = duration
-                                    NotifyChanged()
+                                    Recalculate()
                                 End If
                             Else
                                 Dim bidYield = CDbl(fv("393")) / 100
@@ -205,7 +170,7 @@ Namespace Tools.Elements
                                 End If
                                 If found Then
                                     Descrs(ric).Duration = duration
-                                    NotifyChanged()
+                                    Recalculate()
                                 End If
                             End If
                         Catch ex As Exception
@@ -244,7 +209,7 @@ Namespace Tools.Elements
                                     found = False
                                 End If
                             End If
-                            If found Then NotifyChanged()
+                            If found Then Recalculate()
                         Catch ex As Exception
                             Logger.WarnException("Failed to parse realtime base data", ex)
                             Logger.Warn("Exception = {0}", ex.ToString())
@@ -271,12 +236,12 @@ Namespace Tools.Elements
             End Get
             Set(ByVal value As Boolean)
                 _bootstrapped = value
-                NotifyChanged()
+                Recalculate()
             End Set
         End Property
 
         Public Overrides Sub Bootstrap()
-            ' todo bootstrapping
+            Bootstrapped = Not Bootstrapped
         End Sub
 
         'Public Overrides Function Bootstrap(ByVal data As List(Of SwapPointDescription)) As List(Of SwapPointDescription)
@@ -304,21 +269,12 @@ Namespace Tools.Elements
         'End Function
 
         Public Overrides Function GetSnapshot() As List(Of Tuple(Of String, String, Double?, Double))
-            Return Descrs.Values.Select(Function(elem) New Tuple(Of String, String, Double?, Double)(elem.RIC, String.Format("{0:N}Y", GetDuration(elem.RIC)), elem.Yield, elem.Duration)).ToList()
+            'Return Descrs.Values.Select(Function(elem) New Tuple(Of String, String, Double?, Double)(elem.RIC, String.Format("{0:N}Y", GetDuration(elem.RIC)), elem.Yield, elem.Duration)).ToList()
+            ' todo
+            Return Nothing
         End Function
 
         '' OVERRIDEN METHODS
-        Public Overrides Function GetFitModes() As EstimationModel()
-            Return {EstimationModel.DefaultModel}
-        End Function
-
-        Public Overrides Sub SetFitMode(ByVal mode As EstimationModel)
-        End Sub
-
-        Public Overrides Function GetFitMode() As EstimationModel
-            Return EstimationModel.DefaultModel
-        End Function
-
         Public Overrides Function GetBrokers() As String()
             Return Brokers
         End Function
@@ -345,26 +301,22 @@ Namespace Tools.Elements
             Return _quote
         End Function
 
-        Public Overrides Sub SetDate(ByVal theDate As Date)
-            _theDate = theDate
-            Subscribe()
-        End Sub
-
-        Public Overrides Function GetDate() As Date
-            Return _theDate
-        End Function
-
-        'Protected Overrides Sub Recalculate(ByRef list As List(Of SwapPointDescription))
-        '    Logger.Trace("Recalculate()")
-        '    list.ForEach(Sub(elem) SpreadBmk.CalcAllSpreads(elem))
-        'End Sub
+        Public Overrides Property [Date]() As Date
+            Get
+                Return _theDate
+            End Get
+            Set(ByVal value As Date)
+                _theDate = value
+                Subscribe()
+            End Set
+        End Property
 
         Public Overrides Function GetName() As String
             Return _name
         End Function
 
         Public Overrides Function GetFullName() As String
-            Dim dt = GetDate()
+            Dim dt = [Date]()
             Dim dateStr = IIf(dt <> DateTime.Today, String.Format("{0:dd/MM/yy}", dt), "Today")
 
             Dim broker = GetBroker()
@@ -402,9 +354,6 @@ Namespace Tools.Elements
 
     Public NotInheritable Class RubCCS
         Inherits RubIRS
-        Public Sub New(ByVal bmk As SpreadContainer)
-            MyBase.New(bmk)
-        End Sub
 
         Protected Overrides Property InstrumentName() As String = "RUUSAM3L"
         Protected Overrides Property AllowedTenors() As String() = {"1", "2", "3", "4", "5", "6", "7", "10", "15", "20"}
@@ -429,9 +378,6 @@ Namespace Tools.Elements
 
     Public NotInheritable Class RubNDF
         Inherits RubIRS
-        Public Sub New(ByVal bmk As SpreadContainer)
-            MyBase.New(bmk)
-        End Sub
 
         Protected Overrides Property InstrumentName() As String = "RUB"
         Protected Overrides Property AllowedTenors() As String() = {"1W", "2W", "1M", "2M", "3M", "6M", "9M", "1Y", "18M", "2Y", "3Y", "4Y", "5Y"}
@@ -456,8 +402,8 @@ Namespace Tools.Elements
             Dim match = Regex.Match(ric, String.Format("{0}(?<term>[0-9]+?[DWMY])ID=.*", InstrumentName))
             Dim term = match.Groups("term").Value
             Dim dateModule As New AdxDateModule
-            Dim aDate As Array = dateModule.DfAddPeriod("RUS", GetDate(), term, "")
-            Return dateModule.DfCountYears(GetDate(), Utils.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
+            Dim aDate As Array = dateModule.DfAddPeriod("RUS", [Date](), term, "")
+            Return dateModule.DfCountYears([Date](), Utils.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
         End Function
 
         Public Overrides Function BenchmarkEnabled() As Boolean
@@ -471,9 +417,6 @@ Namespace Tools.Elements
 
     Public NotInheritable Class UsdIRS
         Inherits RubIRS
-        Public Sub New(ByVal bmk As SpreadContainer)
-            MyBase.New(bmk)
-        End Sub
 
         Protected Overrides Property InstrumentName() As String = "USDAM3L"
         Protected Overrides Property AllowedTenors() As String() = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "20", "25", "30"}
@@ -498,8 +441,8 @@ Namespace Tools.Elements
             Dim match = Regex.Match(ric, String.Format("{0}(?<term>[0-9]+?Y)=.*", InstrumentName))
             Dim term = match.Groups("term").Value
             Dim dateModule As New AdxDateModule
-            Dim aDate As Array = dateModule.DfAddPeriod("RUS", GetDate(), term, "")
-            Return dateModule.DfCountYears(GetDate(), Utils.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
+            Dim aDate As Array = dateModule.DfAddPeriod("RUS", [Date], term, "")
+            Return dateModule.DfCountYears([Date], Utils.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
         End Function
 
         Public Overrides Function BenchmarkEnabled() As Boolean

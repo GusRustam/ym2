@@ -121,7 +121,7 @@ Namespace Tools.Elements
         End Class
 
         Private _date As Date = Today
-        Public Property [Date]() As Date
+        Public Property [Date]() As Date Implements ICurve.[Date]
             Get
                 Return _date
             End Get
@@ -159,7 +159,7 @@ Namespace Tools.Elements
             End Get
             Set(ByVal value As Boolean)
                 _bootstrapped = value
-                NotifyChanged()
+                Recalculate()
             End Set
         End Property
 
@@ -170,7 +170,7 @@ Namespace Tools.Elements
             End Get
             Set(ByVal value As EstimationModel)
                 _estModel = value
-                NotifyChanged()
+                Recalculate()
             End Set
         End Property
 
@@ -258,7 +258,7 @@ Namespace Tools.Elements
             Return Nothing
         End Function
 
-        Public Overrides Sub NotifyChanged()
+        Public Overrides Sub Recalculate()
             If Ansamble.YSource = YSource.Yield Then
                 Dim result As New List(Of CurveItem)
                 If _bootstrapped Then

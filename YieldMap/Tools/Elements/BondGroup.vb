@@ -25,7 +25,7 @@ Namespace Tools.Elements
             AddRics(portfolioStructure.Rics(port))
         End Sub
 
-        Public Overrides Sub NotifyChanged()
+        Public Overrides Sub Recalculate()
             If Ansamble.YSource = YSource.Yield Then
                 Dim result As New List(Of CurveItem)
 

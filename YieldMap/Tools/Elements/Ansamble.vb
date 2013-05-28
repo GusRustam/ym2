@@ -54,7 +54,7 @@ Namespace Tools.Elements
 
         Public Sub Recalculate()
             For Each item As KeyValuePair(Of Long, BondCurve) In _items
-                item.Value.NotifyChanged()
+                item.Value.Recalculate()
             Next
         End Sub
 
