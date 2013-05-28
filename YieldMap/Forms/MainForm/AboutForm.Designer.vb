@@ -109,6 +109,7 @@
             Me.SendReportButton.TabIndex = 4
             Me.SendReportButton.Text = "Send report to developer"
             Me.SendReportButton.UseVisualStyleBackColor = True
+            Me.SendReportButton.Visible = False
             '
             'CloseButton
             '

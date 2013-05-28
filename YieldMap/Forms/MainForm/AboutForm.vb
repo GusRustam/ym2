@@ -1,5 +1,4 @@
 ﻿Imports System.Reflection
-Imports YieldMap.Commons
 
 Namespace Forms.MainForm
     Public Class AboutForm
@@ -8,9 +7,9 @@ Namespace Forms.MainForm
             OsVerLabel.Text = Environment.OSVersion.VersionString
         End Sub
 
-        Private Shared Sub SendReportButtonClick(sender As Object, e As EventArgs) Handles SendReportButton.Click
-            SendErrorReport("Yield Map Info", GetEnvironment())
-        End Sub
+        'Private Shared Sub SendReportButtonClick(sender As Object, e As EventArgs) Handles SendReportButton.Click
+        '    SendErrorReport("Yield Map Info", GetEnvironment())
+        'End Sub
 
         Private Sub CloseButtonClick(sender As Object, e As EventArgs) Handles CloseButton.Click
             Close()

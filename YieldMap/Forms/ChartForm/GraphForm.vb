@@ -8,7 +8,6 @@ Imports YieldMap.Forms.PortfolioForm
 Imports Settings
 Imports Uitls
 Imports YieldMap.My.Resources
-Imports YieldMap.Commons
 Imports NLog
 Imports DbManager
 
@@ -595,7 +594,7 @@ Namespace Forms.ChartForm
             If BondCMS.Tag Is Nothing Then Return
             Dim ric = CType(BondCMS.Tag, Bond).MetaData.RIC
             Try
-                RunCommand("reuters://REALTIME/verb=FullQuote/ric=" + ric)
+                Utils.RunCommand("reuters://REALTIME/verb=FullQuote/ric=" + ric)
             Catch ex As Exception
                 MessageBox.Show("No permission to run external applications", "Cannot perform operation", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
             End Try
@@ -605,7 +604,7 @@ Namespace Forms.ChartForm
             If BondCMS.Tag Is Nothing Then Return
             Dim ric = CType(BondCMS.Tag, Bond).MetaData.RIC
             Try
-                RunCommand("reuters://REALTIME/verb=BondData/ric=" + ric)
+                Utils.RunCommand("reuters://REALTIME/verb=BondData/ric=" + ric)
             Catch ex As Exception
                 MessageBox.Show("No permission to run external applications", "Cannot perform operation", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
             End Try
@@ -615,7 +614,7 @@ Namespace Forms.ChartForm
             If BondCMS.Tag Is Nothing Then Return
             Dim ric = CType(BondCMS.Tag, Bond).MetaData.RIC
             Try
-                RunCommand("reuters://REALTIME/verb=RelatedGraph/ric=" + ric)
+                Utils.RunCommand("reuters://REALTIME/verb=RelatedGraph/ric=" + ric)
             Catch ex As Exception
                 MessageBox.Show("No permission to run external applications", "Cannot perform operation", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
             End Try

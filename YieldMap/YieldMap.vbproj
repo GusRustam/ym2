@@ -86,9 +86,6 @@
     <Reference Include="DotNumerics">
       <HintPath>..\..\..\..\Repository (.Net)\DotNumerics V1.1 Dec-15-2009\Binaries\Release\DotNumerics.dll</HintPath>
     </Reference>
-    <Reference Include="Ionic.Zip">
-      <HintPath>..\packages\DotNetZip.1.9.1.8\lib\net20\Ionic.Zip.dll</HintPath>
-    </Reference>
     <Reference Include="MathNet.Numerics">
       <HintPath>..\packages\MathNet.Numerics.2.2.1\lib\Net40\MathNet.Numerics.dll</HintPath>
     </Reference>
@@ -131,8 +128,6 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commons\Common.vb" />
-    <Compile Include="Commons\MAPI.vb" />
     <Compile Include="Tools\Elements\CurveItem.vb" />
     <Compile Include="Tools\Elements\RubIRS.vb" />
     <Compile Include="Tools\Elements\SwapCurve.vb" />
@@ -236,12 +231,6 @@
       <DependentUpon>MainForm.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\UnhandledExcForm.Designer.vb">
-      <DependentUpon>UnhandledExcForm.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\UnhandledExcForm.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="MainModule.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -311,9 +300,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\MainForm\MainForm.resx">
       <DependentUpon>MainForm.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\UnhandledExcForm.resx">
-      <DependentUpon>UnhandledExcForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>

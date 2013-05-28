@@ -207,25 +207,26 @@ Namespace Forms.MainForm
             '
             Me.CMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LogSettingsTSMI, Me.ShowLogTSMI, Me.RaiseExcTSMI})
             Me.CMS.Name = "CMS"
-            Me.CMS.Size = New System.Drawing.Size(207, 70)
+            Me.CMS.Size = New System.Drawing.Size(196, 92)
             '
             'LogSettingsTSMI
             '
             Me.LogSettingsTSMI.Name = "LogSettingsTSMI"
-            Me.LogSettingsTSMI.Size = New System.Drawing.Size(206, 22)
+            Me.LogSettingsTSMI.Size = New System.Drawing.Size(195, 22)
             Me.LogSettingsTSMI.Text = "Logging settings"
             '
             'ShowLogTSMI
             '
             Me.ShowLogTSMI.Name = "ShowLogTSMI"
-            Me.ShowLogTSMI.Size = New System.Drawing.Size(206, 22)
+            Me.ShowLogTSMI.Size = New System.Drawing.Size(195, 22)
             Me.ShowLogTSMI.Text = "Show log"
             '
             'RaiseExcTSMI
             '
             Me.RaiseExcTSMI.Name = "RaiseExcTSMI"
-            Me.RaiseExcTSMI.Size = New System.Drawing.Size(206, 22)
+            Me.RaiseExcTSMI.Size = New System.Drawing.Size(195, 22)
             Me.RaiseExcTSMI.Text = "Send report to developer"
+            Me.RaiseExcTSMI.Visible = False
             '
             'MenuStrip1
             '
@@ -246,25 +247,25 @@ Namespace Forms.MainForm
             'ConnectTSMI
             '
             Me.ConnectTSMI.Name = "ConnectTSMI"
-            Me.ConnectTSMI.Size = New System.Drawing.Size(166, 22)
+            Me.ConnectTSMI.Size = New System.Drawing.Size(155, 22)
             Me.ConnectTSMI.Text = "Connect to Eikon"
             '
             'NewChartTSMI
             '
             Me.NewChartTSMI.Enabled = False
             Me.NewChartTSMI.Name = "NewChartTSMI"
-            Me.NewChartTSMI.Size = New System.Drawing.Size(166, 22)
+            Me.NewChartTSMI.Size = New System.Drawing.Size(155, 22)
             Me.NewChartTSMI.Text = "New chart..."
             '
             'ToolStripMenuItem1
             '
             Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(163, 6)
+            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(152, 6)
             '
             'ExitTSMI
             '
             Me.ExitTSMI.Name = "ExitTSMI"
-            Me.ExitTSMI.Size = New System.Drawing.Size(166, 22)
+            Me.ExitTSMI.Size = New System.Drawing.Size(155, 22)
             Me.ExitTSMI.Text = "Exit"
             '
             'ToolsToolStripMenuItem
@@ -277,13 +278,13 @@ Namespace Forms.MainForm
             'DatabaseManagerTSMI
             '
             Me.DatabaseManagerTSMI.Name = "DatabaseManagerTSMI"
-            Me.DatabaseManagerTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.DatabaseManagerTSMI.Size = New System.Drawing.Size(177, 22)
             Me.DatabaseManagerTSMI.Text = "Database manager..."
             '
             'SettingsToolStripMenuItem
             '
             Me.SettingsToolStripMenuItem.Name = "SettingsToolStripMenuItem"
-            Me.SettingsToolStripMenuItem.Size = New System.Drawing.Size(188, 22)
+            Me.SettingsToolStripMenuItem.Size = New System.Drawing.Size(177, 22)
             Me.SettingsToolStripMenuItem.Text = "Settings..."
             '
             'ViewToolStripMenuItem
@@ -299,30 +300,30 @@ Namespace Forms.MainForm
             Me.ToolbarTSMI.CheckOnClick = True
             Me.ToolbarTSMI.CheckState = System.Windows.Forms.CheckState.Checked
             Me.ToolbarTSMI.Name = "ToolbarTSMI"
-            Me.ToolbarTSMI.Size = New System.Drawing.Size(159, 22)
+            Me.ToolbarTSMI.Size = New System.Drawing.Size(148, 22)
             Me.ToolbarTSMI.Text = "Toolbar"
             '
             'ToolStripSeparator4
             '
             Me.ToolStripSeparator4.Name = "ToolStripSeparator4"
-            Me.ToolStripSeparator4.Size = New System.Drawing.Size(156, 6)
+            Me.ToolStripSeparator4.Size = New System.Drawing.Size(145, 6)
             '
             'TileWindowsHorizontallyTSMI
             '
             Me.TileWindowsHorizontallyTSMI.Name = "TileWindowsHorizontallyTSMI"
-            Me.TileWindowsHorizontallyTSMI.Size = New System.Drawing.Size(159, 22)
+            Me.TileWindowsHorizontallyTSMI.Size = New System.Drawing.Size(148, 22)
             Me.TileWindowsHorizontallyTSMI.Text = "Tile horizontally"
             '
             'TileVerticallyTSMI
             '
             Me.TileVerticallyTSMI.Name = "TileVerticallyTSMI"
-            Me.TileVerticallyTSMI.Size = New System.Drawing.Size(159, 22)
+            Me.TileVerticallyTSMI.Size = New System.Drawing.Size(148, 22)
             Me.TileVerticallyTSMI.Text = "Tile vertically"
             '
             'CascadeTSMI
             '
             Me.CascadeTSMI.Name = "CascadeTSMI"
-            Me.CascadeTSMI.Size = New System.Drawing.Size(159, 22)
+            Me.CascadeTSMI.Size = New System.Drawing.Size(148, 22)
             Me.CascadeTSMI.Text = "Cascade"
             '
             'HelpToolStripMenuItem
@@ -335,7 +336,7 @@ Namespace Forms.MainForm
             'AboutMenuTSMI
             '
             Me.AboutMenuTSMI.Name = "AboutMenuTSMI"
-            Me.AboutMenuTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.AboutMenuTSMI.Size = New System.Drawing.Size(115, 22)
             Me.AboutMenuTSMI.Text = "About..."
             '
             'MainForm

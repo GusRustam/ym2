@@ -6,7 +6,6 @@ Imports Uitls
 Imports YieldMap.My.Resources
 Imports NLog
 Imports Logging
-Imports YieldMap.Commons
 
 Namespace Forms.MainForm
     Public Class MainForm
@@ -100,12 +99,8 @@ Namespace Forms.MainForm
             Controller.Shutdown()
         End Sub
 
-        Private Shared Sub RaiseExcTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RaiseExcTSMI.Click
-            SendErrorReport("Yield Map Info", GetEnvironment())
-        End Sub
-
         Private Shared Sub ShowLogTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles ShowLogTSMI.Click
-            RunCommand(Path.Combine(LogFilePath, LogFileName))
+            Utils.RunCommand(Path.Combine(LogFilePath, LogFileName))
         End Sub
 
         Private Shared Sub AboutTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles AboutTSMI.Click

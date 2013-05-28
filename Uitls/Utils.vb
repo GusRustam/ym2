@@ -4,6 +4,7 @@ Imports System.Runtime.CompilerServices
 Imports System.Windows.Forms
 Imports System.Drawing
 Imports System.Xml
+Imports NLog
 
 Public Interface IProgressObject
     ReadOnly Property Name() As String
@@ -105,7 +106,7 @@ Public Class IdValue(Of TIdType, TValueType)
 
     Public Sub New(ByVal id As TIdType, ByVal name As TValueType)
         Me.Id = id
-        Me.Value = name
+        Value = name
     End Sub
 
     Public Overrides Function ToString() As String
@@ -125,6 +126,16 @@ Public Class IdName(Of TIdType)
 End Class
 
 Public Class Utils
+    Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(Utils))
+    Public Shared Sub RunCommand(ByVal command As String)
+        Try
+            Process.Start(command)
+        Catch ex As Exception
+            Logger.WarnException("Failed to run command [" + command + "]", ex)
+            Logger.Warn("Exception = {0}", ex)
+        End Try
+    End Sub
+
     Public Shared Function GetColorList(Optional ByVal threshold As Double = 0.7) As List(Of String)
         Dim colorsArr = [Enum].GetValues(GetType(KnownColor))
         Dim colors = New List(Of String)()
