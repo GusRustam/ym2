@@ -74,25 +74,6 @@ Namespace Forms.ChartForm
                 quotes.ToList.ForEach(Sub(quote) AddItem(quote, (quote = currQuote), QuoteTSMI, AddressOf OnQuoteSelected))
             End If
 
-            'Dim fitModes = curve.GetFitModes()
-            'If fitModes.Count() <= 1 Then
-            '    FitTSMI.Enabled = False
-            'Else
-            '    FitTSMI.Enabled = True
-            '    Dim currFit = curve.GetFitMode()
-
-            '    CheckFit(EstimationModel.Lin, fitModes, currFit, LinearRegressionTSMI)
-            '    CheckFit(EstimationModel.Log, fitModes, currFit, LogarithmicRegressionTSMI)
-            '    CheckFit(EstimationModel.Inv, fitModes, currFit, InverseRegressionTSMI)
-            '    CheckFit(EstimationModel.Pow, fitModes, currFit, PowerRegressionTSMI)
-            '    CheckFit(EstimationModel.Poly6, fitModes, currFit, Poly6RegressionTSMI)
-            '    CheckFit(EstimationModel.NSS, fitModes, currFit, NelsonSiegelSvenssonTSMI)
-            '    CheckFit(EstimationModel.LinInterp, fitModes, currFit, LinearInterpolationTSMI)
-            '    CheckFit(EstimationModel.CubicSpline, fitModes, currFit, CubicSplineTSMI)
-            '    CheckFit(EstimationModel.Vasicek, fitModes, currFit, VasicekCurveTSMI)
-            '    CheckFit(EstimationModel.CoxIngersollRoss, fitModes, currFit, CIRCurveTSMI)
-            'End If
-
             If curve.CanBootstrap Then
                 BootstrapTSMI.Visible = True
                 BootstrapTSMI.Enabled = True
@@ -102,14 +83,6 @@ Namespace Forms.ChartForm
                 BootstrapTSMI.Visible = False
             End If
         End Sub
-
-        'Private Shared Sub CheckFit(ByVal fit As EstimationModel, ByVal modes As EstimationModel(), ByVal curModel As EstimationModel, ByVal item As ToolStripMenuItem)
-        '    If modes.Contains(fit) Then
-        '        item.Visible = True
-        '        item.Checked = (curModel = fit)
-        '        item.Tag = fit
-        '    End If
-        'End Sub
 
         Private Shared Sub AddItem(ByVal name As String, ByVal checked As Boolean, ByVal toolStripMenuItem As ToolStripMenuItem, ByVal eventHandler As EventHandler, Optional ByVal tag As Object = Nothing)
             Dim num = toolStripMenuItem.DropDownItems.Add(New ToolStripMenuItem(name, Nothing, eventHandler) With {.Checked = checked})
@@ -560,8 +533,10 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
-        Public Sub OnSwapCurveRemoved(ByVal curve As SwapCurve)
-            ' todo
+        Public Sub OnSwapCurveRemoved(ByVal crv As SwapCurve)
+            Dim srs = TheChart.Series.FindByName(crv.Identity)
+            If srs IsNot Nothing Then TheChart.Series.Remove(srs)
+            SetChartMinMax()
         End Sub
 
         Private Sub OnSwapCurvePaint(ByVal data As List(Of CurveItem))

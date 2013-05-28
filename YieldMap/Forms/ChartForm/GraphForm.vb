@@ -506,7 +506,6 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-
         Private Sub RubCCSTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RubCCSTSMI.Click
             Logger.Debug("RubCCSTSMIClick()")
             Dim rubCCS = New RubCCS(_ansamble)
@@ -745,7 +744,9 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub DeleteMmCurveTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles DeleteMMCurveTSMI.Click
-            _ansamble.SwapCurves.Remove(MoneyCurveCMS.Tag)
+            If MoneyCurveCMS.Tag Is Nothing Then Return
+            Dim crv = CType(_ansamble(MoneyCurveCMS.Tag), SwapCurve)
+            _ansamble(crv.Identity).Cleanup()
         End Sub
 
         Private Sub BootstrapTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles BootstrapTSMI.Click

@@ -56,7 +56,7 @@ Namespace Tools.Elements
 
         Default Public ReadOnly Property Data(ByVal id As Long) As IChangeable
             Get
-                Return If(_items(id), _swapCurves(id))
+                Return If(_items.Exists(id), Items(id), _swapCurves(id))
             End Get
         End Property
 
