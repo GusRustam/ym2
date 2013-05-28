@@ -1,9 +1,13 @@
 Namespace Tools.Elements
+    'Public Interface IIdentifyable
+    '    ReadOnly Property Identity() As Long
+    'End Interface
+
     Public MustInherit Class Identifyable
-        Implements IEquatable(Of Identifyable)
+        Implements IEquatable(Of Identifyable) ', IIdentifyable
         Private ReadOnly _identity As Long = Ansamble.GenerateID()
 
-        Public ReadOnly Property Identity() As Long
+        Public ReadOnly Property Identity() As Long 'Implements IIdentifyable.Identity
             Get
                 Return _identity
             End Get
@@ -38,4 +42,4 @@ Namespace Tools.Elements
             Ansamble.ReleaseID(_identity)
         End Sub
     End Class
-End NameSpace
+End Namespace

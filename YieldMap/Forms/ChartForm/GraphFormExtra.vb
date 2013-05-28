@@ -4,7 +4,6 @@ Imports DbManager.Bonds
 Imports YieldMap.Tools.Elements
 Imports ReutersData
 Imports Uitls
-Imports YieldMap.Tools.Estimation
 Imports YieldMap.Tools
 
 Namespace Forms.ChartForm
@@ -119,10 +118,12 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub ShowYAxisCMS(ByVal loc As Point)
-            If Not _spreadBenchmarks.Benchmarks.Any Then Return
+            If Not _ansamble.Benchmarks.Any Then Return
             YAxisCMS.Items.Clear()
             YAxisCMS.Items.Add(YSource.Yield.ToString(), Nothing, AddressOf OnYAxisSelected)
-            _spreadBenchmarks.Benchmarks.Keys.ToList.ForEach(Sub(key) YAxisCMS.Items.Add(key.Name, Nothing, AddressOf OnYAxisSelected))
+            For Each key In _ansamble.Benchmarks.Values
+                YAxisCMS.Items.Add(key.Name, Nothing, AddressOf OnYAxisSelected)
+            Next
             YAxisCMS.Show(TheChart, loc)
         End Sub
 
@@ -152,16 +153,19 @@ Namespace Forms.ChartForm
                 TheChart.Series.Add(bidAskSeries)
             End If
             bidAskSeries.Points.Clear()
-            If bond.QuotesAndYields.Has(bond.Fields.Bid) Then
-                Dim calc = bond.QuotesAndYields(bond.Fields.Bid)
-                Dim yValue = _spreadBenchmarks.GetActualQuote(calc)
-                bidAskSeries.Points.Add(New DataPoint(calc.Duration, yValue.Value))
-            End If
-            If bond.QuotesAndYields.Has(bond.Fields.Ask) Then
-                Dim calc = bond.QuotesAndYields(bond.Fields.Ask)
-                Dim yValue = _spreadBenchmarks.GetActualQuote(calc)
-                bidAskSeries.Points.Add(New DataPoint(calc.Duration, yValue.Value))
-            End If
+            ' todo request bid and ask from the bond. It will have to do the calculation using appropriate field and return XY
+
+            'If bond.QuotesAndYields.Has(bond.Fields.Bid) Then
+            '    Dim calc = bond.QuotesAndYields(bond.Fields.Bid)
+            '    Dim yValue = _spreadBenchmarks.GetActualQuote(calc)
+            '    bidAskSeries.Points.Add(New DataPoint(calc.Duration, yValue.Value))
+            'End If
+            'If bond.QuotesAndYields.Has(bond.Fields.Ask) Then
+            '    Dim calc = bond.QuotesAndYields(bond.Fields.Ask)
+            '    Dim yValue = _spreadBenchmarks.GetActualQuote(calc)
+            '    bidAskSeries.Points.Add(New DataPoint(calc.Duration, yValue.Value))
+            'End If
+
             TheChart.ChartAreas(0).AxisX.Minimum = minX
             TheChart.ChartAreas(0).AxisX.Maximum = maxX
             TheChart.ChartAreas(0).AxisY.Minimum = minY
@@ -171,7 +175,7 @@ Namespace Forms.ChartForm
         Private Sub UpdateAxisYTitle(ByVal mouseOver As Boolean)
             Dim axisFont As Font, clr As Color
 
-            If _spreadBenchmarks.Benchmarks.Any() Then
+            If _ansamble.Benchmarks.Any() Then
                 clr = Color.DarkBlue
                 Dim fs As FontStyle = IIf(Not mouseOver, FontStyle.Bold, FontStyle.Bold Or FontStyle.Underline)
                 axisFont = New Font(FontFamily.GenericSansSerif, 11, fs)
@@ -230,7 +234,7 @@ Namespace Forms.ChartForm
                                  Where srs.Enabled And srs.Points.Any
                                  Select (
                                      From pnt In srs.Points
-                                     Where pnt.YValues.Any And (_spreadBenchmarks.CurrentType <> YSource.Yield OrElse pnt.YValues.First > 0)
+                                     Where pnt.YValues.Any And (_ansamble.YSource <> YSource.Yield OrElse pnt.YValues.First > 0)
                                      Select pnt.YValues.First).Min
 
 
@@ -242,7 +246,7 @@ Namespace Forms.ChartForm
                     Dim newMin = lstMin.Min
 
                     Dim minMin As Double?, maxMax As Double?
-                    If _spreadBenchmarks.CurrentType = YSource.Yield Then
+                    If _ansamble.YSource = YSource.Yield Then
                         minMin = _theSettings.MinYield / 100
                         maxMax = _theSettings.MaxYield / 100
                     Else
@@ -255,7 +259,7 @@ Namespace Forms.ChartForm
                         theMin = If(minMin.HasValue, Math.Max(minMin.Value, newMin), newMin)
                         theMax = If(maxMax.HasValue, Math.Min(maxMax.Value, newMax), newMax)
 
-                        Dim pow = If(_spreadBenchmarks.CurrentType = YSource.Yield, 3, 0)
+                        Dim pow = If(_ansamble.YSource = YSource.Yield, 3, 0)
                         theMax = Math.Ceiling(theMax * (10 ^ pow)) / (10 ^ pow)
                         theMin = Math.Floor(theMin * (10 ^ pow)) / (10 ^ pow)
                         If theMax > theMin Then
@@ -290,18 +294,17 @@ Namespace Forms.ChartForm
             SpreadCMS.Items.Clear()
             SpreadCMS.Tag = nm
             'If Not _moneyMarketCurves.Any() Then Return
-            _moneyMarketCurves.ForEach(
-                Sub(item)
-                    Dim elem = CType(SpreadCMS.Items.Add(item.GetFullName(), Nothing, AddressOf OnSwapCurveSelected), ToolStripMenuItem)
-                    elem.CheckOnClick = True
-                    elem.Checked = refCurve IsNot Nothing AndAlso item.GetFullName() = refCurve.GetFullName()
-                    elem.Tag = item
-                End Sub)
+            For Each item In _ansamble.SwapCurves
+                Dim elem = CType(SpreadCMS.Items.Add(item.Name, Nothing, AddressOf OnSwapCurveSelected), ToolStripMenuItem)
+                elem.CheckOnClick = True
+                elem.Checked = refCurve IsNot Nothing AndAlso item.Name = refCurve.Name
+                elem.Tag = item
+            Next
 
             Dim items = (From elem In _ansamble.Items Where TypeOf elem.Value Is BondCurve Select elem.Value).ToList()
             If items.Any Then SpreadCMS.Items.Add(New ToolStripSeparator)
             For Each item In items
-                Dim elem = CType(SpreadCMS.Items.Add(item.SeriesName, Nothing, AddressOf OnBondCurveSelected), ToolStripMenuItem)
+                Dim elem = CType(SpreadCMS.Items.Add(item.Name, Nothing, AddressOf OnBondCurveSelected), ToolStripMenuItem)
                 elem.CheckOnClick = True
                 elem.Tag = item
             Next item
@@ -322,17 +325,18 @@ Namespace Forms.ChartForm
             Dim senderTSMI = TryCast(sender, ToolStripMenuItem)
             If senderTSMI Is Nothing Then Return
 
-            If senderTSMI.Checked Then
-                _spreadBenchmarks.AddType(YSource.FromString(SpreadCMS.Tag), senderTSMI.Tag)
-            Else
-                _spreadBenchmarks.RemoveType(YSource.FromString(SpreadCMS.Tag))
-            End If
+            ' todo adding deleting benchmark
+            'If senderTSMI.Checked Then
+            '    _spreadBenchmarks.AddType(YSource.FromString(SpreadCMS.Tag), senderTSMI.Tag)
+            'Else
+            '    _spreadBenchmarks.RemoveType(YSource.FromString(SpreadCMS.Tag))
+            'End If
 
             UpdateAxisYTitle(False)
 
-            ASWLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(YSource.ASWSpread), " -> " + _spreadBenchmarks.Benchmarks(YSource.ASWSpread).GetFullName(), "")
-            SpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(YSource.PointSpread), " -> " + _spreadBenchmarks.Benchmarks(YSource.PointSpread).GetFullName(), "")
-            ZSpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(YSource.ZSpread), " -> " + _spreadBenchmarks.Benchmarks(YSource.ZSpread).GetFullName(), "")
+            ASWLabel.Text = If(_ansamble.Benchmarks.ContainsKey(YSource.ASWSpread), " -> " + _ansamble.Benchmarks(YSource.ASWSpread).Name, "")
+            SpreadLabel.Text = If(_ansamble.Benchmarks.ContainsKey(YSource.PointSpread), " -> " + _ansamble.Benchmarks(YSource.PointSpread).Name, "")
+            ZSpreadLabel.Text = If(_ansamble.Benchmarks.ContainsKey(YSource.ZSpread), " -> " + _ansamble.Benchmarks(YSource.ZSpread).Name, "")
         End Sub
 
         Private Sub OnBondCurveSelected(ByVal sender As Object, ByVal e As EventArgs)
@@ -496,19 +500,19 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
-        Private Sub OnGroupUpdated(ByVal data As List(Of BondCurve.CurveItem))
+        Private Sub OnGroupUpdated(ByVal data As List(Of CurveItem))
             Logger.Trace("OnGroupUpdated()")
             GuiAsync(
                 Sub()
                     If Not data.Any Then Return
-                    If Not TypeOf data.First Is BondCurve.BondCurveItem Then Return
-                    Dim dt = data.Cast(Of BondCurve.BondCurveItem).ToList()
+                    If Not TypeOf data.First Is BondCurveItem Then Return
+                    Dim dt = data.Cast(Of BondCurveItem).ToList()
                     Dim group = dt.First.Bond.Parent
                     Dim series As Series = TheChart.Series.FindByName(group.Identity)
                     Dim clr = Color.FromName(group.Color)
 
                     If series IsNot Nothing Then TheChart.Series.Remove(series)
-                    Dim seriesDescr = New BondSetSeries With {.Name = group.SeriesName, .Color = clr}
+                    Dim seriesDescr = New BondSetSeries With {.Name = group.Name, .Color = clr}
                     AddHandler seriesDescr.SelectedPointChanged, AddressOf OnSelectedPointChanged
                     series = New Series(group.Identity) With {
                         .YValuesPerPoint = 1,
@@ -534,7 +538,7 @@ Namespace Forms.ChartForm
                     While legendItems.Any(Function(item) item.Tag = group.Identity)
                         legendItems.Remove(legendItems.First(Function(item) item.Tag = group.Identity))
                     End While
-                    Dim legendItem = New LegendItem(group.SeriesName, clr, "") With {.Tag = group.Identity}
+                    Dim legendItem = New LegendItem(group.Name, clr, "") With {.Tag = group.Identity}
                     legendItems.Add(legendItem)
 
                     For Each pnt In dt
@@ -557,17 +561,17 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
-        Private Sub OnNewCurvePaint(ByVal data As List(Of BondCurve.CurveItem))
+        Private Sub OnNewCurvePaint(ByVal data As List(Of CurveItem))
             GuiAsync(
                 Sub()
                     If Not data.Any Then Return
                     Dim crv As BondCurve
                     Dim itsBond As Boolean
-                    If TypeOf data.First Is BondCurve.BondCurveItem Then
-                        crv = CType(CType(data.First, BondCurve.BondCurveItem).Bond.Parent, BondCurve)
+                    If TypeOf data.First Is BondCurveItem Then
+                        crv = CType(CType(data.First, BondCurveItem).Bond.Parent, BondCurve)
                         itsBond = True
-                    ElseIf TypeOf data.First Is BondCurve.PointCurveItem Then
-                        crv = CType(data.First, BondCurve.PointCurveItem).Curve
+                    ElseIf TypeOf data.First Is PointCurveItem Then
+                        crv = CType(data.First, PointCurveItem).Curve
                         itsBond = False
                     Else
                         Logger.Warn("Unexpected items type for a bond-based curve")
@@ -589,12 +593,11 @@ Namespace Forms.ChartForm
                     While legendItems.Any(Function(item) item.Tag = crv.Identity)
                         legendItems.Remove(legendItems.First(Function(item) item.Tag = crv.Identity))
                     End While
-                    Dim legendItem = New LegendItem(crv.SeriesName, clr, "") With {.Tag = crv.Identity}
+                    Dim legendItem = New LegendItem(crv.Name, clr, "") With {.Tag = crv.Identity}
                     legendItems.Add(legendItem)
 
-
                     If itsBond Then
-                        For Each point In data.Cast(Of BondCurve.BondCurveItem)()
+                        For Each point In data.Cast(Of BondCurveItem)()
                             Dim pnt = New DataPoint(point.TheX, point.TheY) With {
                                 .Tag = point.Bond,
                                 .Label = point.Label
@@ -602,7 +605,7 @@ Namespace Forms.ChartForm
                             srs.Points.Add(pnt)
                         Next
                     Else
-                        For Each point In data.Cast(Of BondCurve.PointCurveItem)()
+                        For Each point In data.Cast(Of PointCurveItem)()
                             Dim pnt = New DataPoint(point.TheX, point.TheY) With {.Tag = point.Curve}
                             srs.Points.Add(pnt)
                         Next

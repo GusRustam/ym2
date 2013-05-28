@@ -57,16 +57,16 @@ Namespace Tools.Elements
 
         Public Sub Start()
             For Each kvp In _items
-                kvp.Value.StartAll()
+                kvp.Value.Subscribe()
             Next
         End Sub
 
         Public Sub Add(ByVal group As Group)
             _items.Add(group.Identity, group)
-            AddHandler group.Clear, Sub()
-                                        _items.Remove(group.Identity)
-                                        RaiseEvent Cleared(group)
-                                    End Sub
+            AddHandler group.Cleared, Sub()
+                                          _items.Remove(group.Identity)
+                                          RaiseEvent Cleared(group)
+                                      End Sub
             AddHandler group.Volume, Sub(bond As Bond) RaiseEvent Volume(bond)
         End Sub
 

@@ -10,12 +10,12 @@ Namespace Forms.ChartForm
             End Get
             Set(ByVal value As BondCurve)
                 If _curve IsNot Nothing Then
-                    RemoveHandler _curve.Clear, AddressOf OnCurveCleared
+                    RemoveHandler _curve.Cleared, AddressOf OnCurveCleared
                     RemoveHandler _curve.Updated, AddressOf OnCurveUpdated
                 End If
                 _curve = value
                 If _curve IsNot Nothing Then
-                    AddHandler _curve.Clear, AddressOf OnCurveCleared
+                    AddHandler _curve.Cleared, AddressOf OnCurveCleared
                     AddHandler _curve.Updated, AddressOf OnCurveUpdated
                 End If
             End Set
@@ -40,7 +40,7 @@ Namespace Forms.ChartForm
             RemoveItemsTSB.Enabled = MainTC.SelectedTab.Name = BondsTP.Name
         End Sub
 
-        Private Sub OnCurveUpdated(ByVal obj As List(Of BondCurve.CurveItem))
+        Private Sub OnCurveUpdated(ByVal obj As List(Of CurveItem))
             CurveUpdate()
         End Sub
 

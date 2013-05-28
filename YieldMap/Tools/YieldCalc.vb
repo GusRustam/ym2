@@ -3,11 +3,9 @@ Imports System.Globalization
 Imports AdfinXAnalyticsFunctions
 Imports System.ComponentModel
 Imports DbManager.Bonds
-Imports DbManager
 Imports YieldMap.Tools.Elements
 Imports ReutersData
 Imports Uitls
-Imports YieldMap.Commons
 Imports NLog
 Imports System.Text.RegularExpressions
 
@@ -236,6 +234,9 @@ Namespace Tools
             Dim bondYield As Array = BondModule.AdBondYield(settleDate, calc.Price / 100, descr.Maturity, coupon, descr.PaymentStructure, descr.RateStructure, "")
             Dim bestYield = ParseBondYield(bondYield).Max
             Logger.Trace("best Yield: {0}", bestYield)
+
+            ' todo no best yield! (or else, best yield and other yields too)
+            ' todo modified duration
 
             Dim bondDeriv As Array = BondModule.AdBondDeriv(settleDate, bestYield.Yield, descr.Maturity, coupon, 0, descr.PaymentStructure, Regex.Replace(descr.RateStructure, "YT[A-Z]", bestYield.ToWhat.Abbr), "", "")
 #If DEBUG Then

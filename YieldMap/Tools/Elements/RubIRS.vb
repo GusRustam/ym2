@@ -17,6 +17,9 @@ Namespace Tools.Elements
         Inherits SwapCurve
         Implements IAssetSwapBenchmark
 
+        Protected ReadOnly Descrs As New Dictionary(Of String, SwapPointDescription)
+        Protected Overridable Property BaseInstrumentPrice As Double
+
         '' LOGGER
         Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(RubIRS))
 
@@ -41,20 +44,31 @@ Namespace Tools.Elements
         Protected Overridable Property AllowedTenors() As String() = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"}
         Protected Overridable Property Brokers() As String() = {"GFI", "TRDL", "ICAP", ""}
 
-        'Private Shared ReadOnly InstrumentType = "S"
         Private Shared ReadOnly PossibleQuotes() As String = {"BID", "ASK", "MID"}
 
         Private _bootstrapped As Boolean
 
         '' LOADERS
-        Private WithEvents _quoteLoader As New LiveQuotes 'ListLoadManager
+        Private WithEvents _quoteLoader As New LiveQuotes
 
         '' DATA LOADING PARAMETERS
-        Private _theDate As Date = Date.Today
+        Private _theCurveDate As Date = Date.Today
         Private _broker As String = ""
         Private _quote As String = "MID"
-        Private ReadOnly _name As String = Guid.NewGuid().ToString()
+        'Private ReadOnly _name As String = Guid.NewGuid().ToString()
 
+        Public Overrides Sub Subscribe()
+            Logger.Debug("Subscirbe({0})", Identity)
+
+            Cleanup()
+            GetRICs(GetBroker()).ForEach(Sub(ric As String) Descrs.Add(ric, New SwapPointDescription(ric)))
+
+            If CurveDate() = Date.Today Then
+                StartRealTime()
+            Else
+                LoadHistory()
+            End If
+        End Sub
 
         ''' <summary>
         ''' Parsing swap name to retrieve term
@@ -74,17 +88,26 @@ Namespace Tools.Elements
         ''' <param name="broker">broker name</param>
         ''' <returns>a list of string</returns>
         ''' <remarks></remarks>
-        Protected Overrides Function GetRICs(ByVal broker As String) As List(Of String)
+        Protected Overridable Function GetRICs(ByVal broker As String) As List(Of String)
             Return AllowedTenors.Select(Function(item) String.Format("{0}{1}Y={2}", InstrumentName, item, broker)).ToList()
         End Function
-
 
         '' START LOADING HISTORICAL DATA
         Protected Overrides Sub LoadHistory()
             Logger.Debug("LoadHistory")
             Dim rics = GetRICs(_broker)
-            rics.ForEach(Sub(ric) DoLoadRIC(ric, "DATE, BID, ASK", _theDate))
-            DoLoadRIC(BaseInstrument, "DATE, CLOSE", _theDate)
+            rics.ForEach(Sub(ric) DoLoadRIC(ric, "DATE, BID, ASK", _theCurveDate))
+            DoLoadRIC(BaseInstrument, "DATE, CLOSE", _theCurveDate)
+        End Sub
+
+        Protected Sub DoLoadRIC(ByVal ric As String, ByVal fields As String, ByVal aDate As Date)
+            Logger.Debug("DoLoadRIC({0})", ric)
+            If ric = "" Then Return
+
+            Dim hst As History = New History()
+            AddHandler hst.HistoricalData, AddressOf OnHistoricalData
+            hst.StartTask(ric, fields, aDate.AddDays(-3), aDate)
+            If hst.Finished Then Return
         End Sub
 
         '' START LOADING REALTIME DATA
@@ -133,6 +156,10 @@ Namespace Tools.Elements
             NotifyCleanup()
         End Sub
 
+        Public Overrides Sub Recalculate()
+            ' todo full recalculation and raising Updated event
+        End Sub
+
         '' REALTIME DATA ARRIVED
         Private Sub OnRealTimeData(ByVal data As Dictionary(Of String, Dictionary(Of String, Double))) Handles _quoteLoader.NewData
             Logger.Debug("OnRealTimeData")
@@ -146,7 +173,7 @@ Namespace Tools.Elements
                     Dim duration = GetDuration(ric)
                     If fv.Keys.Contains("393") Or fv.Keys.Contains("275") Then
                         Try
-                            Descrs(ric).YieldAtDate = [Date]
+                            Descrs(ric).YieldAtDate = CurveDate
                             If _quote = "BID" Or _quote = "ASK" Then
                                 Dim yld As Double
                                 yld = CDbl(fv(IIf(_quote = "BID", "393", "275")))
@@ -270,7 +297,7 @@ Namespace Tools.Elements
 
         Public Overrides Function GetSnapshot() As List(Of Tuple(Of String, String, Double?, Double))
             'Return Descrs.Values.Select(Function(elem) New Tuple(Of String, String, Double?, Double)(elem.RIC, String.Format("{0:N}Y", GetDuration(elem.RIC)), elem.Yield, elem.Duration)).ToList()
-            ' todo
+            ' todo snapshotting :/
             Return Nothing
         End Function
 
@@ -301,39 +328,41 @@ Namespace Tools.Elements
             Return _quote
         End Function
 
-        Public Overrides Property [Date]() As Date
+        Public Overrides Property CurveDate() As Date
             Get
-                Return _theDate
+                Return _theCurveDate
             End Get
             Set(ByVal value As Date)
-                _theDate = value
+                _theCurveDate = value
                 Subscribe()
             End Set
         End Property
 
-        Public Overrides Function GetName() As String
-            Return _name
-        End Function
+        Public Overrides ReadOnly Property Name As String
+            Get
+                Dim dt = CurveDate()
+                Dim dateStr = IIf(dt <> DateTime.Today, String.Format("{0:dd/MM/yy}", dt), "Today")
 
-        Public Overrides Function GetFullName() As String
-            Dim dt = [Date]()
-            Dim dateStr = IIf(dt <> DateTime.Today, String.Format("{0:dd/MM/yy}", dt), "Today")
+                Dim broker = GetBroker()
+                If broker.Trim().Length = 0 Then
+                    Return String.Format("{0} ({1}, {2})", Me.GetType().Name, GetQuote, dateStr)
+                Else
+                    Return String.Format("{0} ({1}, {2} by {3})", Me.GetType().Name, GetQuote, dateStr, broker)
+                End If
+            End Get
+        End Property
 
-            Dim broker = GetBroker()
-            If broker.Trim().Length = 0 Then
-                Return String.Format("{0} ({1}, {2})", Me.GetType().Name, GetQuote, dateStr)
-            Else
-                Return String.Format("{0} ({1}, {2} by {3})", Me.GetType().Name, GetQuote, dateStr, broker)
-            End If
-        End Function
+        Public Overrides ReadOnly Property OuterColor() As Color
+            Get
+                Return Color.Firebrick
+            End Get
+        End Property
 
-        Public Overrides Function GetOuterColor() As Color
-            Return Color.Firebrick
-        End Function
-
-        Public Overrides Function GetInnerColor() As Color
-            Return Color.NavajoWhite
-        End Function
+        Public Overrides ReadOnly Property InnerColor() As Color
+            Get
+                Return Color.NavajoWhite
+            End Get
+        End Property
 
         Public Overridable Function BenchmarkEnabled() As Boolean Implements IAssetSwapBenchmark.CanBeBenchmark
             Return True
@@ -367,13 +396,17 @@ Namespace Tools.Elements
             End Get
         End Property
 
-        Public Overrides Function GetOuterColor() As Color
-            Return Color.MidnightBlue
-        End Function
+        Public Overrides ReadOnly Property OuterColor() As Color
+            Get
+                Return Color.MidnightBlue
+            End Get
+        End Property
 
-        Public Overrides Function GetInnerColor() As Color
-            Return Color.LightSteelBlue
-        End Function
+        Public Overrides ReadOnly Property InnerColor() As Color
+            Get
+                Return Color.LightSteelBlue
+            End Get
+        End Property
     End Class
 
     Public NotInheritable Class RubNDF
@@ -384,13 +417,17 @@ Namespace Tools.Elements
         Protected Overrides Property Brokers() As String() = {"GFI", "TRDL", "ICAP", "R", ""}
         Protected Overrides Property BaseInstrument As String = ""
 
-        Public Overrides Function GetOuterColor() As Color
-            Return Color.OrangeRed
-        End Function
+        Public Overrides ReadOnly Property OuterColor() As Color
+            Get
+                Return Color.OrangeRed
+            End Get
+        End Property
 
-        Public Overrides Function GetInnerColor() As Color
-            Return Color.Orange
-        End Function
+        Public Overrides ReadOnly Property InnerColor() As Color
+            Get
+                Return Color.Orange
+            End Get
+        End Property
 
         Public Overrides ReadOnly Property CanBootstrap As Boolean
             Get
@@ -402,8 +439,8 @@ Namespace Tools.Elements
             Dim match = Regex.Match(ric, String.Format("{0}(?<term>[0-9]+?[DWMY])ID=.*", InstrumentName))
             Dim term = match.Groups("term").Value
             Dim dateModule As New AdxDateModule
-            Dim aDate As Array = dateModule.DfAddPeriod("RUS", [Date](), term, "")
-            Return dateModule.DfCountYears([Date](), Utils.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
+            Dim aDate As Array = dateModule.DfAddPeriod("RUS", CurveDate(), term, "")
+            Return dateModule.DfCountYears(CurveDate(), Utils.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
         End Function
 
         Public Overrides Function BenchmarkEnabled() As Boolean
@@ -423,13 +460,17 @@ Namespace Tools.Elements
         Protected Overrides Property Brokers() As String() = {"TRDL", "ICAP", ""}
         Protected Overrides Property BaseInstrument As String = "USD3MFSR="
 
-        Public Overrides Function GetOuterColor() As Color
-            Return Color.DarkKhaki
-        End Function
+        Public Overrides ReadOnly Property OuterColor() As Color
+            Get
+                Return Color.DarkKhaki
+            End Get
+        End Property
 
-        Public Overrides Function GetInnerColor() As Color
-            Return Color.Khaki
-        End Function
+        Public Overrides ReadOnly Property InnerColor() As Color
+            Get
+                Return Color.Khaki
+            End Get
+        End Property
 
         Protected Overrides ReadOnly Property Struct() As String
             Get
@@ -441,8 +482,8 @@ Namespace Tools.Elements
             Dim match = Regex.Match(ric, String.Format("{0}(?<term>[0-9]+?Y)=.*", InstrumentName))
             Dim term = match.Groups("term").Value
             Dim dateModule As New AdxDateModule
-            Dim aDate As Array = dateModule.DfAddPeriod("RUS", [Date], term, "")
-            Return dateModule.DfCountYears([Date], Utils.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
+            Dim aDate As Array = dateModule.DfAddPeriod("RUS", CurveDate, term, "")
+            Return dateModule.DfCountYears(CurveDate, Utils.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
         End Function
 
         Public Overrides Function BenchmarkEnabled() As Boolean
@@ -458,6 +499,5 @@ Namespace Tools.Elements
                 Return "CLDR:USA  ARND:NO CCM:MMA0 CFADJ:YES CRND:NO DMC:MODIFIED EMC:SAMEDAY IC:S1 PDELAY:0  REFDATE:MATURITY RP:1 XD:NO FRQ:Q"
             End Get
         End Property
-
     End Class
 End Namespace

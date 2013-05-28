@@ -120,15 +120,15 @@ Namespace Tools.Elements
             End Sub
         End Class
 
-        Private _date As Date = Today
-        Public Property [Date]() As Date Implements ICurve.[Date]
+        Private _curveDate As Date = Today
+        Public Property CurveDate() As Date Implements ICurve.CurveDate
             Get
-                Return _date
+                Return _curveDate
             End Get
             Set(ByVal value As Date)
-                If _date <> value Then
-                    _date = value
-                    StartAll()
+                If _curveDate <> value Then
+                    _curveDate = value
+                    Subscribe()
                 End If
             End Set
         End Property
@@ -177,7 +177,7 @@ Namespace Tools.Elements
         Public Sub New(ByVal ansamble As Ansamble, ByVal src As Source)
             MyBase.new(ansamble)
 
-            SeriesName = src.Name
+            _name = src.Name
             PortfolioID = src.ID
             BondFields = src.Fields.Realtime.AsContainer()
             Color = src.Color
@@ -187,22 +187,22 @@ Namespace Tools.Elements
             AddRics(src.GetDefaultRics())
         End Sub
 
-        Public Overrides Sub StartAll()
+        Public Overrides Sub Subscribe()
             Dim rics As List(Of String) = (From elem In AllElements Select elem.MetaData.RIC).ToList()
             If rics.Count = 0 Then Return
-            If _date = Today Then
+            If _curveDate = Today Then
                 QuoteLoader.AddItems(rics, BondFields.AllNames)
             Else
                 QuoteLoader.CancelAll()
                 Dim historyBlock As New HistoryBlock
                 AddHandler historyBlock.History, AddressOf OnHistory
-                historyBlock.Load(rics, _histFields.AllNames, _date.AddDays(-10), _date)
+                historyBlock.Load(rics, _histFields.AllNames, _curveDate.AddDays(-10), _curveDate)
             End If
         End Sub
 
         Private Sub OnHistory(ByVal obj As HistoryBlock.DataCube)
             If obj Is Nothing Then
-                [Date] = Today
+                CurveDate = Today
             Else
                 ' doing some cleanup
                 For Each elem In AllElements
@@ -222,7 +222,7 @@ Namespace Tools.Elements
             End If
             Dim bonds = (From elem In AllElements Where elem.MetaData.RIC = ric)
             If Not bonds.Any Then
-                Logger.Warn("Instrument {0} does not belong to serie {1}", ric, SeriesName)
+                Logger.Warn("Instrument {0} does not belong to serie {1}", ric, Name)
                 Return
             End If
             Dim bond = bonds.First()
@@ -264,17 +264,17 @@ Namespace Tools.Elements
                 If _bootstrapped Then
                     Try
                         Dim data = (From elem In Elements
-                                Where elem.MetaData.IssueDate <= _date And
-                                      elem.MetaData.Maturity > _date And
+                                Where elem.MetaData.IssueDate <= _curveDate And
+                                      elem.MetaData.Maturity > _curveDate And
                                       elem.QuotesAndYields.Any()).ToList()
 
                         Dim params(0 To data.Count() - 1, 5) As Object
                         For i = 0 To data.Count - 1
                             Dim meta = data(i).MetaData
                             params(i, 0) = "B"
-                            params(i, 1) = _date
+                            params(i, 1) = _curveDate
                             params(i, 2) = meta.Maturity
-                            params(i, 3) = meta.GetCouponByDate(_date)
+                            params(i, 3) = meta.GetCouponByDate(_curveDate)
                             params(i, 4) = data(i).QuotesAndYields.Main.Price / 100.0
                             params(i, 5) = meta.PaymentStructure
                         Next
@@ -283,7 +283,7 @@ Namespace Tools.Elements
                         Dim termStructure As Array = curveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
                         For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
                             Dim matDate = Utils.FromExcelSerialDate(termStructure.GetValue(i, 1))
-                            Dim dur = (matDate - _date).TotalDays / 365.0
+                            Dim dur = (matDate - _curveDate).TotalDays / 365.0
                             Dim yld = termStructure.GetValue(i, 2)
                             If dur > 0 And yld > 0 Then
                                 result.Add(New PointCurveItem(dur, yld, Me))

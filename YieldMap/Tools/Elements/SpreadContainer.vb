@@ -80,10 +80,10 @@ Namespace Tools.Elements
         '    If types.Contains(CurrentType) Then CurrentType = YSource.Yield
         'End Sub
 
-        Public Sub UpdateCurve(ByVal curveName As String)
-            Dim types = (From keyValue In Benchmarks Where keyValue.Value.GetName() = curveName Select keyValue.Key).ToList()
-            types.ForEach(Sub(type) RaiseEvent BenchmarkUpdated(type))
-        End Sub
+        'Public Sub UpdateCurve(ByVal curveName As String)
+        '    Dim types = (From keyValue In Benchmarks Where keyValue.Value.Identity = curveName Select keyValue.Key).ToList()
+        '    types.ForEach(Sub(type) RaiseEvent BenchmarkUpdated(type))
+        'End Sub
 
         Public Sub AddType(ByVal type As YSource, ByVal curve As SwapCurve)
             If Benchmarks.ContainsKey(type) Then

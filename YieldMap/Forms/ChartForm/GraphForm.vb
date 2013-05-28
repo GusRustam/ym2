@@ -18,15 +18,9 @@ Namespace Forms.ChartForm
 
         Private WithEvents _theSettings As SettingsManager = SettingsManager.Instance
         Private WithEvents _tableForm As TableForm.TableForm = New TableForm.TableForm()
-        'Private WithEvents _bondsLoader As IBondsLoader = BondsLoader.Instance()
 
-        Private ReadOnly _moneyMarketCurves As New List(Of SwapCurve)
-        Private WithEvents _spreadBenchmarks As New SpreadContainer
+        'Private ReadOnly _moneyMarketCurves As New List(Of SwapCurve)
         Private WithEvents _ansamble As New Ansamble
-
-        'Private Sub Loader_Progress(ByVal obj As ProgressEvent) Handles _bondsLoader.Progress
-        '    ' it might be useful if one would like to load bond on the fly
-        'End Sub
 
         Private Sub TheSettings_DurRangeChanged() Handles _theSettings.DurRangeChanged, _theSettings.SpreadRangeChanged, _theSettings.YieldRangeChanged
             SetChartMinMax()
@@ -116,9 +110,7 @@ Namespace Forms.ChartForm
 
         Private Sub GraphFormFormClosing(ByVal sender As Object, ByVal e As FormClosingEventArgs) Handles MyBase.FormClosing
             Logger.Trace("GraphForm_FormClosing")
-            _ansamble.Items.Cleanup()
-            _moneyMarketCurves.ForEach(Sub(curve) curve.Cleanup())
-            _moneyMarketCurves.Clear()
+            _ansamble.Cleanup()
             ThisFormStatus = FormDataStatus.Stopped
         End Sub
 
@@ -206,9 +198,9 @@ Namespace Forms.ChartForm
 
                         ElseIf TypeOf point.Tag Is SwapCurve Then
                             Dim curve = CType(point.Tag, SwapCurve)
-                            MMNameTSMI.Text = curve.GetFullName()
+                            MMNameTSMI.Text = curve.Name
                             MoneyCurveCMS.Show(TheChart, mouseEvent.Location)
-                            MoneyCurveCMS.Tag = curve.GetName()
+                            MoneyCurveCMS.Tag = curve.Identity
                             ShowCurveParameters(curve)
 
                         ElseIf TypeOf point.Tag Is HistoryPointTag Then
@@ -288,13 +280,13 @@ Namespace Forms.ChartForm
                     ElseIf TypeOf point.Tag Is SwapCurve Then
                         Dim curve = CType(point.Tag, SwapCurve)
 
-                        DscrLabel.Text = curve.GetFullName()
-                        DatLabel.Text = String.Format("{0:dd/MM/yyyy}", curve.[Date])
+                        DscrLabel.Text = curve.Name
+                        DatLabel.Text = String.Format("{0:dd/MM/yyyy}", curve.CurveDate)
                         Dim period = String.Format("{0:F0}D", 365 * point.XValue)
                         Dim aDate = (New AdxDateModule).DfAddPeriod("RUS", Date.Today, period, "")
                         MatLabel.Text = String.Format("{0:dd/MM/yyyy}", Utils.FromExcelSerialDate(aDate.GetValue(1, 1)))
 
-                        Select Case _spreadBenchmarks.CurrentType
+                        Select Case _ansamble.YSource
                             Case YSource.Yield : YldLabel.Text = String.Format("{0:P2}", point.YValues(0))
                             Case YSource.ZSpread : ZSpreadLabel.Text = String.Format("{0:F0} b.p.", point.YValues(0))
                             Case YSource.PointSpread : SpreadLabel.Text = String.Format("{0:F0} b.p.", point.YValues(0))
@@ -338,9 +330,9 @@ Namespace Forms.ChartForm
                     YldLabel.Text = ""
                     DurLabel.Text = ""
                     MatLabel.Text = ""
-                    ASWLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(YSource.ASWSpread), " -> " + _spreadBenchmarks.Benchmarks(YSource.ASWSpread).GetFullName(), "")
-                    SpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(YSource.PointSpread), " -> " + _spreadBenchmarks.Benchmarks(YSource.PointSpread).GetFullName(), "")
-                    ZSpreadLabel.Text = If(_spreadBenchmarks.Benchmarks.ContainsKey(YSource.ZSpread), " -> " + _spreadBenchmarks.Benchmarks(YSource.ZSpread).GetFullName(), "")
+                    ASWLabel.Text = If(_ansamble.Benchmarks.ContainsKey(YSource.ASWSpread), " -> " + _ansamble.Benchmarks(YSource.ASWSpread).Name, "")
+                    SpreadLabel.Text = If(_ansamble.Benchmarks.ContainsKey(YSource.PointSpread), " -> " + _ansamble.Benchmarks(YSource.PointSpread).Name, "")
+                    ZSpreadLabel.Text = If(_ansamble.Benchmarks.ContainsKey(YSource.ZSpread), " -> " + _ansamble.Benchmarks(YSource.ZSpread).Name, "")
                 End If
             End Try
         End Sub
@@ -516,11 +508,11 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Public Sub OnCurveRemoved()
+        Public Sub OnCurveRemoved(ByVal curve As SwapCurve)
             ' todo
         End Sub
 
-        Private Sub OnCurvePaint()
+        Private Sub OnCurvePaint(ByVal data As List(Of CurveItem))
             ' todo
         End Sub
 
@@ -528,41 +520,41 @@ Namespace Forms.ChartForm
             Logger.Debug("RubCCSTSMIClick()")
             Dim rubCCS = New RubCCS
 
-            AddHandler rubCCS.Cleared, AddressOf OnCurveRemoved
+            AddHandler rubCCS.Cleared, Sub() OnCurveRemoved(rubCCS)
             AddHandler rubCCS.Updated, AddressOf OnCurvePaint
 
             rubCCS.Subscribe()
-            _moneyMarketCurves.Add(rubCCS)
+            _ansamble.SwapCurves.Add(rubCCS)
         End Sub
 
         Private Sub RubIRS_TSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RubIRSTSMI.Click
             Logger.Debug("RubIRSTSMIClick()")
             Dim rubIRS = New RubIRS
-            AddHandler rubIRS.Cleared, AddressOf OnCurveRemoved
+            AddHandler rubIRS.Cleared, Sub() OnCurveRemoved(rubIRS)
             AddHandler rubIRS.Updated, AddressOf OnCurvePaint
 
             rubIRS.Subscribe()
-            _moneyMarketCurves.Add(rubIRS)
+            _ansamble.SwapCurves.Add(rubIRS)
         End Sub
 
         Private Sub UsdIRS_TSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles UsdIRSTSMI.Click
             Logger.Debug("UsdIRS_TSMIClick()")
             Dim usdIRS = New UsdIRS
-            AddHandler usdIRS.Cleared, AddressOf OnCurveRemoved
+            AddHandler usdIRS.Cleared, Sub() OnCurveRemoved(usdIRS)
             AddHandler usdIRS.Updated, AddressOf OnCurvePaint
 
             usdIRS.Subscribe()
-            _moneyMarketCurves.Add(usdIRS)
+            _ansamble.SwapCurves.Add(usdIRS)
         End Sub
 
         Private Sub NDFTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles NDFTSMI.Click
             Logger.Debug("NDFTSMI_Click()")
             Dim rubNDF = New RubNDF
-            AddHandler rubNDF.Cleared, AddressOf OnCurveRemoved
+            AddHandler rubNDF.Cleared, Sub() OnCurveRemoved(rubNDF)
             AddHandler rubNDF.Updated, AddressOf OnCurvePaint
 
             rubNDF.Subscribe()
-            _moneyMarketCurves.Add(rubNDF)
+            _ansamble.SwapCurves.Add(rubNDF)
         End Sub
 
         Private Sub ShowLegendTSBClicked(ByVal sender As Object, ByVal e As EventArgs) Handles ShowLegendTSB.Click
@@ -599,7 +591,7 @@ Namespace Forms.ChartForm
         Private Sub OnYAxisSelected(ByVal sender As Object, ByVal e As EventArgs)
             Logger.Info("OnYAxisSelected()")
             Dim item As ToolStripMenuItem = TryCast(sender, ToolStripMenuItem)
-            If item IsNot Nothing Then _spreadBenchmarks.CurrentType = YSource.FromString(item.Text)
+            If item IsNot Nothing Then _ansamble.YSource = YSource.FromString(item.Text)
         End Sub
 
         Private Sub CopyToClipboardTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles CopyToClipboardTSMI.Click
@@ -640,57 +632,58 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub ShowCurveItemsTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles ShowCurveItemsTSMI.Click
-            Dim aTable As DataGridView
-            Dim theCurve As SwapCurve
-            Dim aForm As Form
+            ' todo better snapshotting
+            'Dim aTable As DataGridView
+            'Dim theCurve As SwapCurve
+            'Dim aForm As Form
 
-            theCurve = _moneyMarketCurves.First(Function(curve) curve.GetName() = CStr(MoneyCurveCMS.Tag))
+            'theCurve = _moneyMarketCurves.First(Function(curve) curve.Identity = MoneyCurveCMS.Tag)
 
-            Dim aCurve = theCurve.GetSnapshot()
+            'Dim aCurve = theCurve.GetSnapshot()
 
-            aForm = New Form With {
-                .Text = "Curve items",
-                .Width = 400,
-                .Height = 400,
-                .FormBorderStyle = FormBorderStyle.Sizable
-            }
+            'aForm = New Form With {
+            '    .Text = "Curve items",
+            '    .Width = 400,
+            '    .Height = 400,
+            '    .FormBorderStyle = FormBorderStyle.Sizable
+            '}
 
-            Dim tl As New TableLayoutPanel
-            tl.RowCount = 2
-            tl.RowStyles.Add(New RowStyle(SizeType.Absolute, 30))
-            tl.RowStyles.Add(New RowStyle(SizeType.AutoSize))
-            tl.Dock = DockStyle.Fill
-            aForm.Controls.Add(tl)
+            'Dim tl As New TableLayoutPanel
+            'tl.RowCount = 2
+            'tl.RowStyles.Add(New RowStyle(SizeType.Absolute, 30))
+            'tl.RowStyles.Add(New RowStyle(SizeType.AutoSize))
+            'tl.Dock = DockStyle.Fill
+            'aForm.Controls.Add(tl)
 
-            Dim aToolBar = New ToolStrip
-            aToolBar.Dock = DockStyle.Fill
+            'Dim aToolBar = New ToolStrip
+            'aToolBar.Dock = DockStyle.Fill
 
-            tl.Controls.Add(aToolBar, 0, 0)
+            'tl.Controls.Add(aToolBar, 0, 0)
 
-            aTable = New DataGridView
-            aTable.AutoGenerateColumns = False
-            aTable.AllowUserToAddRows = False
-            aTable.AllowUserToDeleteRows = False
-            aTable.AllowUserToResizeRows = False
-            aTable.AllowDrop = False
+            'aTable = New DataGridView
+            'aTable.AutoGenerateColumns = False
+            'aTable.AllowUserToAddRows = False
+            'aTable.AllowUserToDeleteRows = False
+            'aTable.AllowUserToResizeRows = False
+            'aTable.AllowDrop = False
 
-            aTable.Columns.Add("RIC", "RIC")
-            aTable.Columns.Add("Descr", "Descr")
-            aTable.Columns.Add("Rate", "Rate")
-            aTable.Columns.Add("Duration", "Duration")
+            'aTable.Columns.Add("RIC", "RIC")
+            'aTable.Columns.Add("Descr", "Descr")
+            'aTable.Columns.Add("Rate", "Rate")
+            'aTable.Columns.Add("Duration", "Duration")
 
-            aTable.Columns("RIC").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            aTable.Columns("Descr").AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-            aTable.Columns("Rate").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            aTable.Columns("Rate").DefaultCellStyle = New DataGridViewCellStyle() With {.Format = "P2"}
-            aTable.Columns("Duration").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            aTable.Columns("Duration").DefaultCellStyle = New DataGridViewCellStyle() With {.Format = "N2"}
+            'aTable.Columns("RIC").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            'aTable.Columns("Descr").AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            'aTable.Columns("Rate").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            'aTable.Columns("Rate").DefaultCellStyle = New DataGridViewCellStyle() With {.Format = "P2"}
+            'aTable.Columns("Duration").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            'aTable.Columns("Duration").DefaultCellStyle = New DataGridViewCellStyle() With {.Format = "N2"}
 
-            aCurve.ForEach(Sub(item) aTable.Rows.Add(New Object() {item.Item1, item.Item2, item.Item3, item.Item4}))
-            aTable.Dock = DockStyle.Fill
+            'aCurve.ForEach(Sub(item) aTable.Rows.Add(New Object() {item.Item1, item.Item2, item.Item3, item.Item4}))
+            'aTable.Dock = DockStyle.Fill
 
-            tl.Controls.Add(aTable, 0, 1)
-            aForm.ShowDialog()
+            'tl.Controls.Add(aTable, 0, 1)
+            'aForm.ShowDialog()
         End Sub
 
         Private Sub AsTableTSBClick(ByVal sender As Object, ByVal e As EventArgs) Handles AsTableTSB.Click
@@ -700,32 +693,32 @@ Namespace Forms.ChartForm
 
         Private Sub LinkSpreadLabelLinkClicked(ByVal sender As Object, ByVal e As LinkLabelLinkClickedEventArgs) Handles SpreadLinkLabel.LinkClicked
             ShowCurveCMS("PointSpread",
-                If(_spreadBenchmarks.Benchmarks.ContainsKey(YSource.PointSpread), _spreadBenchmarks.Benchmarks(YSource.PointSpread), Nothing))
+                If(_ansamble.Benchmarks.ContainsKey(YSource.PointSpread), _ansamble.Benchmarks(YSource.PointSpread), Nothing))
         End Sub
 
         Private Sub ZSpreadLinkLabelLinkClicked(ByVal sender As Object, ByVal e As LinkLabelLinkClickedEventArgs) Handles ZSpreadLinkLabel.LinkClicked
             ShowCurveCMS("ZSpread",
-                If(_spreadBenchmarks.Benchmarks.ContainsKey(YSource.ZSpread), _spreadBenchmarks.Benchmarks(YSource.ZSpread), Nothing))
+                If(_ansamble.Benchmarks.ContainsKey(YSource.ZSpread), _ansamble.Benchmarks(YSource.ZSpread), Nothing))
         End Sub
 
-        Private Sub ASWLinkLabelLinkClicked(ByVal sender As Object, ByVal e As LinkLabelLinkClickedEventArgs) Handles ASWLinkLabel.LinkClicked
-            Dim refCurve = If(_spreadBenchmarks.Benchmarks.ContainsKey(YSource.ASWSpread), _spreadBenchmarks.Benchmarks(YSource.ASWSpread), Nothing)
-            SpreadCMS.Items.Clear()
-            SpreadCMS.Tag = "ASWSpread"
-            If Not _moneyMarketCurves.Any() Then Return
-            _moneyMarketCurves.Where(
-                Function(crv)
-                    Return TypeOf crv Is IAssetSwapBenchmark AndAlso CType(crv, IAssetSwapBenchmark).CanBeBenchmark()
-                End Function
-            ).Cast(Of SwapCurve).ToList().ForEach(
-                Sub(item)
-                    Dim elem = CType(SpreadCMS.Items.Add(item.GetFullName(), Nothing, AddressOf OnSwapCurveSelected), ToolStripMenuItem)
-                    elem.CheckOnClick = True
-                    elem.Checked = refCurve IsNot Nothing AndAlso item.GetFullName() = refCurve.GetFullName()
-                    elem.Tag = item
-                End Sub)
-            SpreadCMS.Show(MousePosition)
-        End Sub
+        'Private Sub ASWLinkLabelLinkClicked(ByVal sender As Object, ByVal e As LinkLabelLinkClickedEventArgs) Handles ASWLinkLabel.LinkClicked
+        '    Dim refCurve = If(_spreadBenchmarks.Benchmarks.ContainsKey(YSource.ASWSpread), _spreadBenchmarks.Benchmarks(YSource.ASWSpread), Nothing)
+        '    SpreadCMS.Items.Clear()
+        '    SpreadCMS.Tag = "ASWSpread"
+        '    If Not _moneyMarketCurves.Any() Then Return
+        '    _moneyMarketCurves.Where(
+        '        Function(crv)
+        '            Return TypeOf crv Is IAssetSwapBenchmark AndAlso CType(crv, IAssetSwapBenchmark).CanBeBenchmark()
+        '        End Function
+        '    ).Cast(Of SwapCurve).ToList().ForEach(
+        '        Sub(item)
+        '            Dim elem = CType(SpreadCMS.Items.Add(item.Name, Nothing, AddressOf OnSwapCurveSelected), ToolStripMenuItem)
+        '            elem.CheckOnClick = True
+        '            elem.Checked = refCurve IsNot Nothing AndAlso item.Name = refCurve.Name
+        '            elem.Tag = item
+        '        End Sub)
+        '    SpreadCMS.Show(MousePosition)
+        'End Sub
 
         Private Sub CurvesTSMIDropDownOpening(ByVal sender As Object, ByVal e As EventArgs) Handles CurvesTSMI.DropDownOpening
             Dim portfolioManager = DbManager.PortfolioManager.Instance
@@ -741,48 +734,49 @@ Namespace Forms.ChartForm
 
             Dim curve = New BondCurve(_ansamble, src)
             AddHandler curve.Updated, AddressOf OnNewCurvePaint
-            AddHandler curve.Clear, Sub()
-                                        Dim srs = TheChart.Series.FindByName(curve.Identity)
-                                        If srs IsNot Nothing Then TheChart.Series.Remove(srs)
-                                    End Sub
+            AddHandler curve.Cleared, Sub()
+                                          Dim srs = TheChart.Series.FindByName(curve.Identity)
+                                          If srs IsNot Nothing Then TheChart.Series.Remove(srs)
+                                      End Sub
             _ansamble.Items.Add(curve)
-            curve.StartAll()
+            curve.Subscribe()
         End Sub
 
         Private Sub SelDateTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles SelDateTSMI.Click
             Logger.Debug("SelDateTSMI_Click()")
             Dim datePicker = New DatePickerForm
             If datePicker.ShowDialog() = DialogResult.OK Then
-                Dim curves = _moneyMarketCurves.Where(Function(item) item.GetName() = MoneyCurveCMS.Tag.ToString())
-                If curves.Count = 0 Then
+
+                Dim curve = _ansamble.SwapCurves(MoneyCurveCMS.Tag)
+                If curve Is Nothing Then
                     Logger.Warn("No such curve {0}", MoneyCurveCMS.Tag.ToString())
                 Else
-                    Dim curve = curves.First
-                    curve.[Date] = datePicker.TheCalendar.SelectionEnd
+                    curve.CurveDate = datePicker.TheCalendar.SelectionEnd
                 End If
             End If
         End Sub
 
         Private Sub DeleteMmCurveTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles DeleteMMCurveTSMI.Click
-            Logger.Debug("DeleteMmCurveTSMIClick()")
-            Dim curves = _moneyMarketCurves.Where(Function(item) item.GetName() = MoneyCurveCMS.Tag.ToString())
-            If curves.Count = 0 Then
-                Logger.Warn("No such curve {0}", MoneyCurveCMS.Tag.ToString())
-            Else
-                Dim curve = curves.First
-                Dim irsSeries = TheChart.Series.FindByName(curve.GetName())
-                If irsSeries IsNot Nothing Then TheChart.Series.Remove(irsSeries)
-                _moneyMarketCurves.Remove(curve)
+            ' todo better cleanup
+            'Logger.Debug("DeleteMmCurveTSMIClick()")
+            'Dim curves = _moneyMarketCurves.Where(Function(item) item.Identity = MoneyCurveCMS.Tag.ToString())
+            'If curves.Count = 0 Then
+            '    Logger.Warn("No such curve {0}", MoneyCurveCMS.Tag.ToString())
+            'Else
+            '    Dim curve = curves.First
+            '    Dim irsSeries = TheChart.Series.FindByName(curve.GetName())
+            '    If irsSeries IsNot Nothing Then TheChart.Series.Remove(irsSeries)
+            '    _moneyMarketCurves.Remove(curve)
 
-                curve.Cleanup()
-                SetChartMinMax()
-            End If
+            '    curve.Cleanup()
+            '    SetChartMinMax()
+            'End If
         End Sub
 
         Private Sub BootstrapTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles BootstrapTSMI.Click
             Logger.Debug("BootstrapTSMIClick()")
             Dim snd = CType(sender, ToolStripMenuItem)
-            Dim curve = _moneyMarketCurves.First(Function(item) item.GetName() = MoneyCurveCMS.Tag.ToString())
+            Dim curve = _ansamble.SwapCurves(MoneyCurveCMS.Tag)
             If curve Is Nothing Then Return
             If curve.CanBootstrap() Then curve.Bootstrapped = snd.Checked
         End Sub
@@ -790,7 +784,7 @@ Namespace Forms.ChartForm
         Private Sub OnBrokerSelected(ByVal sender As Object, ByVal e As EventArgs)
             Logger.Debug("OnBrokerSelected()")
             Dim snd = CType(sender, ToolStripMenuItem)
-            Dim curve = _moneyMarketCurves.First(Function(item) item.GetName() = MoneyCurveCMS.Tag.ToString())
+            Dim curve = _ansamble.SwapCurves(MoneyCurveCMS.Tag)
             If curve IsNot Nothing Then
                 curve.SetBroker(snd.Text)
             End If
@@ -799,7 +793,7 @@ Namespace Forms.ChartForm
         Private Sub OnQuoteSelected(ByVal sender As Object, ByVal e As EventArgs)
             Logger.Debug("OnQuoteSelected()")
             Dim snd = CType(sender, ToolStripMenuItem)
-            Dim curve = _moneyMarketCurves.First(Function(item) item.GetName() = MoneyCurveCMS.Tag.ToString())
+            Dim curve = _ansamble.SwapCurves(MoneyCurveCMS.Tag)
             If curve IsNot Nothing Then
                 curve.SetQuote(snd.Text)
             End If
@@ -860,7 +854,7 @@ Namespace Forms.ChartForm
 #End Region
 
 #Region "e) Assembly and curves events"
-        Private Sub OnGroupClear(ByVal group As Group) Handles _ansamble.Cleared
+        Private Sub OnGroupClear(ByVal group As Group) Handles _ansamble.GroupCleared
             Logger.Trace("OnGroupClear()")
             GuiAsync(
                 Sub()
@@ -987,7 +981,7 @@ Namespace Forms.ChartForm
             If BondCurveCMS.Tag Is Nothing Then Return
             Dim curve = CType(_ansamble(BondCurveCMS.Tag), BondCurve)
             Dim datePicker = New DatePickerForm
-            If datePicker.ShowDialog() = DialogResult.OK Then curve.Date = datePicker.TheCalendar.SelectionEnd
+            If datePicker.ShowDialog() = DialogResult.OK Then curve.CurveDate = datePicker.TheCalendar.SelectionEnd
         End Sub
 
     End Class

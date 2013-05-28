@@ -1,4 +1,3 @@
-Imports System.ComponentModel
 Imports DbManager.Bonds
 Imports DbManager
 Imports NLog
@@ -15,134 +14,25 @@ Namespace Tools.Elements
         Inherits Identifyable
         Implements IChangeable
 
-        Public Event Clear As Action
+        Public Event Cleared As Action Implements IChangeable.Cleared
         Public Event Volume As Action(Of Bond)
         Public Event Updated As Action(Of List(Of CurveItem))
 
         Protected Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(Group))
 
         Public YieldMode As String ' todo currently unused
-        Public SeriesName As String
+
+        Protected _name As String
+        Public ReadOnly Property Name As String Implements IChangeable.Name
+            Get
+                Return _name
+            End Get
+        End Property
+
         Friend BondFields As FieldContainer
         Public PortfolioID As Long
 
         Public MustOverride Sub Recalculate() Implements IChangeable.Recalculate
-
-        Public MustInherit Class CurveItem
-            Implements IComparable(Of CurveItem)
-            Private ReadOnly _x As Double
-            Private ReadOnly _y As Double
-
-            Public ReadOnly Property X() As String
-                Get
-                    Return String.Format("{0:F2}", _x)
-                End Get
-            End Property
-
-            Public ReadOnly Property Y() As String
-                Get
-                    Return String.Format("{0:P2}", _y)
-                End Get
-            End Property
-
-            <Browsable(False)>
-            Public ReadOnly Property TheX() As Double
-                Get
-                    Return _x
-                End Get
-            End Property
-
-            <Browsable(False)>
-            Public ReadOnly Property TheY() As Double
-                Get
-                    Return _y
-                End Get
-            End Property
-
-            Public Function CompareTo(ByVal other As CurveItem) As Integer Implements IComparable(Of CurveItem).CompareTo
-                Return _x.CompareTo(other._x)
-            End Function
-
-            Public Sub New(ByVal x As Double, ByVal y As Double)
-                _x = x
-                _y = y
-            End Sub
-        End Class
-
-        Public Class BondCurveItem
-            Inherits CurveItem
-            Private ReadOnly _bond As Bond
-            Private ReadOnly _backColor As String
-            Private ReadOnly _label As String
-            Private ReadOnly _toWhat As YieldToWhat
-            Private ReadOnly _markerStyle As String
-
-            <Browsable(False)>
-            Public ReadOnly Property BackColor() As String
-                Get
-                    Return _backColor
-                End Get
-            End Property
-
-            <Browsable(False)>
-            Public ReadOnly Property ToWhat() As YieldToWhat
-                Get
-                    Return _toWhat
-                End Get
-            End Property
-
-            <Browsable(False)>
-            Public ReadOnly Property MarkerStyle() As String
-                Get
-                    Return _markerStyle
-                End Get
-            End Property
-
-            <Browsable(False)>
-            Public ReadOnly Property Bond() As Bond
-                Get
-                    Return _bond
-                End Get
-            End Property
-
-            Public ReadOnly Property Ric() As String
-                Get
-                    Return _bond.MetaData.RIC
-                End Get
-            End Property
-
-            Public ReadOnly Property Label As String
-                Get
-                    Return _label
-                End Get
-            End Property
-
-            Public Sub New(ByVal x As Double, ByVal y As Double, ByVal bond As Bond, ByVal backColor As String, ByVal toWhat As YieldToWhat, ByVal markerStyle As String, ByVal label As String)
-                MyBase.new(x, y)
-                _bond = bond
-                _backColor = backColor
-                _toWhat = toWhat
-                _markerStyle = markerStyle
-                _label = label
-            End Sub
-        End Class
-
-        Public Class PointCurveItem
-            Inherits CurveItem
-            Private ReadOnly _curve As BondCurve
-
-            <Browsable(False)>
-            Public ReadOnly Property Curve() As BondCurve
-                Get
-                    Return _curve
-                End Get
-            End Property
-
-            Public Sub New(ByVal x As Double, ByVal y As Double, ByVal curve As BondCurve)
-                MyBase.New(x, y)
-                _curve = curve
-            End Sub
-        End Class
 
         Private ReadOnly _ansamble As Ansamble
         Public ReadOnly Property Ansamble() As Ansamble
@@ -193,6 +83,7 @@ Namespace Tools.Elements
         End Property
 
         Private _color As String
+
         Public Property Color() As String
             Get
                 Return _color
@@ -205,10 +96,10 @@ Namespace Tools.Elements
         Public Sub Cleanup() Implements IChangeable.Cleanup
             _quoteLoader.CancelAll()
             _elements.Clear()
-            RaiseEvent Clear()
+            RaiseEvent Cleared()
         End Sub
 
-        Public Overridable Sub StartAll()
+        Public Overridable Sub Subscribe() Implements IChangeable.Subscribe
             Dim rics As List(Of String) = (From elem In _elements Select elem.MetaData.RIC).ToList()
             If rics.Count = 0 Then Return
             _quoteLoader.AddItems(rics, BondFields.AllNames)
@@ -224,7 +115,7 @@ Namespace Tools.Elements
                     ' checking if this bond is allowed to show up
                     Dim bonds = (From elem In _elements Where elem.MetaData.RIC = instrument)
                     If Not bonds.Any Then
-                        Logger.Warn("Instrument {0} does not belong to serie {1}", instrument, SeriesName)
+                        Logger.Warn("Instrument {0} does not belong to serie {1}", instrument, Name)
                         Continue For
                     End If
 
@@ -383,4 +274,4 @@ Namespace Tools.Elements
             Return From elem In _elements Where clause(elem.MetaData)
         End Function
     End Class
-End NameSpace
+End Namespace

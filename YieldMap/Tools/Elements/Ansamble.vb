@@ -1,7 +1,8 @@
 Namespace Tools.Elements
     Public Class Ansamble
         Private Shared ReadOnly Identities As New HashSet(Of Long)
-        Public Event Cleared As Action(Of Group)
+        Public Event GroupCleared As Action(Of Group)
+        Public Event SwapCleared As Action(Of SwapCurve)
 
         Public Shared Sub ReleaseID(ByVal id As Long)
             Identities.Remove(id)
@@ -46,9 +47,24 @@ Namespace Tools.Elements
             End Get
         End Property
 
+        Private WithEvents _swapCurves As New SwapCurveContainer
+        Public ReadOnly Property SwapCurves() As SwapCurveContainer
+            Get
+                Return _swapCurves
+            End Get
+        End Property
+
         Default Public ReadOnly Property Data(ByVal id As Long) As Group
             Get
                 Return _items(id)
+            End Get
+        End Property
+
+        ' todo develop a ChangeableContainer
+        Public ReadOnly Property Benchmarks() As Dictionary(Of YSource, IChangeable)
+            Get
+                ' todo
+                Return New Dictionary(Of YSource, IChangeable)()
             End Get
         End Property
 
@@ -56,11 +72,22 @@ Namespace Tools.Elements
             For Each item As KeyValuePair(Of Long, BondCurve) In _items
                 item.Value.Recalculate()
             Next
+            For Each item As SwapCurve In _swapCurves
+                item.Recalculate()
+            Next
         End Sub
 
         Private Sub GroupsCleared(ByVal obj As Group) Handles _items.Cleared
-            RaiseEvent Cleared(obj)
+            RaiseEvent GroupCleared(obj)
         End Sub
 
+        Private Sub SwapCurveCleared(ByVal obj As SwapCurve) Handles _swapCurves.Cleared
+            RaiseEvent SwapCleared(obj)
+        End Sub
+
+        Public Sub Cleanup()
+            Items.Cleanup()
+            SwapCurves.Cleanup()
+        End Sub
     End Class
 End Namespace
