@@ -133,7 +133,6 @@
   <ItemGroup>
     <Compile Include="Commons\Common.vb" />
     <Compile Include="Commons\MAPI.vb" />
-    <Compile Include="Tools\Elements\ChangeableContainer.vb" />
     <Compile Include="Tools\Elements\CurveItem.vb" />
     <Compile Include="Tools\Elements\RubIRS.vb" />
     <Compile Include="Tools\Elements\SwapCurve.vb" />

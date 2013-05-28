@@ -1,21 +1,19 @@
 Imports System.Drawing
-Imports ReutersData
 
 Namespace Tools.Elements
     Public Interface IChangeable
-        'Inherits IIdentifyable
         Event Cleared As Action
+        ReadOnly Property Name As String
         Sub Cleanup()
         Sub Recalculate()
         Sub Subscribe()
-        ReadOnly Property Name As String
     End Interface
 
     Public Interface ICurve
         ReadOnly Property CanBootstrap() As Boolean
         Property Bootstrapped() As Boolean
-        Sub Bootstrap()
         Property CurveDate() As Date
+        Sub Bootstrap()
     End Interface
 
     Public MustInherit Class SwapCurve
@@ -26,9 +24,14 @@ Namespace Tools.Elements
         Public Event Cleared As Action Implements IChangeable.Cleared
         Public Event Updated As Action(Of List(Of CurveItem))
 
+        '' ============ ICHANGEABLE INTERFACE ============
         Public MustOverride Sub Recalculate() Implements IChangeable.Recalculate
+        Public MustOverride ReadOnly Property Name() As String Implements IChangeable.Name
+        Public MustOverride Sub Cleanup() Implements IChangeable.Cleanup
+        Public MustOverride Sub Subscribe() Implements IChangeable.Subscribe
 
-        '' ============ BOOTSTRAPPING ============
+        '' ============ ICURVE INTERFACE ============
+        Public MustOverride Property CurveDate() As Date Implements ICurve.CurveDate
         Public MustOverride ReadOnly Property CanBootstrap() As Boolean Implements ICurve.CanBootstrap
         Public MustOverride Property Bootstrapped() As Boolean Implements ICurve.Bootstrapped
         Public MustOverride Sub Bootstrap() Implements ICurve.Bootstrap
@@ -43,35 +46,19 @@ Namespace Tools.Elements
         Public MustOverride Sub SetQuote(ByVal b As String)
         Public MustOverride Function GetQuote() As String
 
-        '' ============ TODAY AND HISTORICAL DATA ============
-        Public MustOverride Property CurveDate() As Date Implements ICurve.CurveDate
-
-        '' ============ ELEMENTS DESCRIPTIONS ============
-        Public MustOverride Function GetDuration(ByVal ric As String) As Double
-
         '' ============ COLORS ============
         Public MustOverride ReadOnly Property OuterColor() As Color
         Public MustOverride ReadOnly Property InnerColor() As Color
 
-        '' ============ NAMES ============
-        Public MustOverride ReadOnly Property Name() As String Implements IChangeable.Name
-
         '' ============ DESCRIPTIONS ============
         Public MustOverride Function GetSnapshot() As List(Of Tuple(Of String, String, Double?, Double))
 
-        '' ============ CLEANUP ============
-        Public MustOverride Sub Cleanup() Implements IChangeable.Cleanup
-
-        '' ============ DATA LOADING ============
-        Protected MustOverride Sub StartRealTime()
-        Protected MustOverride Sub LoadHistory()
-        Protected MustOverride Sub OnHistoricalData(ByVal ric As String, ByVal data As Dictionary(Of Date, HistoricalItem), ByVal rawData As Dictionary(Of DateTime, RawHistoricalItem))
-
-        '' LOADING DATA
-        Public MustOverride Sub Subscribe() Implements IChangeable.Subscribe
-
         Protected Sub NotifyCleanup()
             RaiseEvent Cleared()
+        End Sub
+
+        Protected Sub NotifyUpdated(ByVal data As List(Of CurveItem))
+            RaiseEvent Updated(data)
         End Sub
     End Class
 End Namespace

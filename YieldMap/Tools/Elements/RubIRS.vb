@@ -76,7 +76,7 @@ Namespace Tools.Elements
         ''' <param name="ric">swap ric</param>
         ''' <returns>numeric value - swap tenor</returns>
         ''' <remarks></remarks>
-        Public Overrides Function GetDuration(ByVal ric As String) As Double
+        Protected Overridable Function GetDuration(ByVal ric As String) As Double
             Dim match = Regex.Match(ric, String.Format("{0}(?<year>[0-9]+?)Y.*", InstrumentName))
             Dim capture = match.Groups("year").Value
             Return CInt(capture)
@@ -93,7 +93,7 @@ Namespace Tools.Elements
         End Function
 
         '' START LOADING HISTORICAL DATA
-        Protected Overrides Sub LoadHistory()
+        Protected Sub LoadHistory()
             Logger.Debug("LoadHistory")
             Dim rics = GetRICs(_broker)
             rics.ForEach(Sub(ric) DoLoadRIC(ric, "DATE, BID, ASK", _theCurveDate))
@@ -111,7 +111,7 @@ Namespace Tools.Elements
         End Sub
 
         '' START LOADING REALTIME DATA
-        Protected Overrides Sub StartRealTime()
+        Protected Sub StartRealTime()
             _quoteLoader.AddItems(GetRICs(_broker), {"275", "393"}.ToList())
             If BaseInstrument <> "" Then
                 _quoteLoader.AddItems({BaseInstrument}.ToList(), {"BID", "ASK"}.ToList())
@@ -119,7 +119,7 @@ Namespace Tools.Elements
         End Sub
 
         '' HISTORICAL DATA ARRIVED
-        Protected Overrides Sub OnHistoricalData(ByVal ric As String, ByVal data As Dictionary(Of Date, HistoricalItem), ByVal rawData As Dictionary(Of DateTime, RawHistoricalItem))
+        Protected Sub OnHistoricalData(ByVal ric As String, ByVal data As Dictionary(Of Date, HistoricalItem), ByVal rawData As Dictionary(Of DateTime, RawHistoricalItem))
             Logger.Debug("OnHistoricalData({0})", ric)
             If data IsNot Nothing Then
                 Dim lastDate = data.Keys.Max
@@ -435,7 +435,7 @@ Namespace Tools.Elements
             End Get
         End Property
 
-        Public Overrides Function GetDuration(ByVal ric As String) As Double
+        Protected Overrides Function GetDuration(ByVal ric As String) As Double
             Dim match = Regex.Match(ric, String.Format("{0}(?<term>[0-9]+?[DWMY])ID=.*", InstrumentName))
             Dim term = match.Groups("term").Value
             Dim dateModule As New AdxDateModule
@@ -478,7 +478,7 @@ Namespace Tools.Elements
             End Get
         End Property
 
-        Public Overrides Function GetDuration(ByVal ric As String) As Double
+        Protected Overrides Function GetDuration(ByVal ric As String) As Double
             Dim match = Regex.Match(ric, String.Format("{0}(?<term>[0-9]+?Y)=.*", InstrumentName))
             Dim term = match.Groups("term").Value
             Dim dateModule As New AdxDateModule

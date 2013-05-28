@@ -100,6 +100,14 @@ Namespace Tools.Elements
         End Sub
     End Class
 
+    Public Class SwapCurveItem
+        Inherits CurveItem
+
+        Public Sub New(ByVal x As Double, ByVal y As Double)
+            MyBase.New(x, y)
+        End Sub
+    End Class
+
     Public Class PointCurveItem
         Inherits CurveItem
         Private ReadOnly _curve As BondCurve

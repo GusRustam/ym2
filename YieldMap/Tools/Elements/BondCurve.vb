@@ -320,6 +320,8 @@ Namespace Tools.Elements
                     Dim apprXY = est.Approximate(list)
                     result = (From item In apprXY Select New PointCurveItem(item.X, item.Y, Me)).Cast(Of CurveItem).ToList()
                     _formula = est.GetFormula()
+                Else
+                    _formula = "N/A"
                 End If
 
                 _lastCurve = New List(Of CurveItem)(result)

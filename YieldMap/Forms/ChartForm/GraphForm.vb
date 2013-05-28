@@ -18,8 +18,6 @@ Namespace Forms.ChartForm
 
         Private WithEvents _theSettings As SettingsManager = SettingsManager.Instance
         Private WithEvents _tableForm As TableForm.TableForm = New TableForm.TableForm()
-
-        'Private ReadOnly _moneyMarketCurves As New List(Of SwapCurve)
         Private WithEvents _ansamble As New Ansamble
 
         Private Sub TheSettings_DurRangeChanged() Handles _theSettings.DurRangeChanged, _theSettings.SpreadRangeChanged, _theSettings.YieldRangeChanged
@@ -701,24 +699,21 @@ Namespace Forms.ChartForm
                 If(_ansamble.Benchmarks.ContainsKey(YSource.ZSpread), _ansamble.Benchmarks(YSource.ZSpread), Nothing))
         End Sub
 
-        'Private Sub ASWLinkLabelLinkClicked(ByVal sender As Object, ByVal e As LinkLabelLinkClickedEventArgs) Handles ASWLinkLabel.LinkClicked
-        '    Dim refCurve = If(_spreadBenchmarks.Benchmarks.ContainsKey(YSource.ASWSpread), _spreadBenchmarks.Benchmarks(YSource.ASWSpread), Nothing)
-        '    SpreadCMS.Items.Clear()
-        '    SpreadCMS.Tag = "ASWSpread"
-        '    If Not _moneyMarketCurves.Any() Then Return
-        '    _moneyMarketCurves.Where(
-        '        Function(crv)
-        '            Return TypeOf crv Is IAssetSwapBenchmark AndAlso CType(crv, IAssetSwapBenchmark).CanBeBenchmark()
-        '        End Function
-        '    ).Cast(Of SwapCurve).ToList().ForEach(
-        '        Sub(item)
-        '            Dim elem = CType(SpreadCMS.Items.Add(item.Name, Nothing, AddressOf OnSwapCurveSelected), ToolStripMenuItem)
-        '            elem.CheckOnClick = True
-        '            elem.Checked = refCurve IsNot Nothing AndAlso item.Name = refCurve.Name
-        '            elem.Tag = item
-        '        End Sub)
-        '    SpreadCMS.Show(MousePosition)
-        'End Sub
+        Private Sub ASWLinkLabelLinkClicked(ByVal sender As Object, ByVal e As LinkLabelLinkClickedEventArgs) Handles ASWLinkLabel.LinkClicked
+            Dim refCurve = If(_ansamble.Benchmarks.ContainsKey(YSource.ASWSpread), _ansamble.Benchmarks(YSource.ASWSpread), Nothing)
+            SpreadCMS.Items.Clear()
+            SpreadCMS.Tag = "ASWSpread"
+            If Not _ansamble.SwapCurves.Any() Then Return
+            For Each item In (From crv In _ansamble.SwapCurves
+                              Where TypeOf crv Is IAssetSwapBenchmark AndAlso CType(crv, IAssetSwapBenchmark).CanBeBenchmark())
+                Dim elem = CType(SpreadCMS.Items.Add(item.Name, Nothing, AddressOf OnSwapCurveSelected), ToolStripMenuItem)
+                elem.CheckOnClick = True
+                elem.Checked = refCurve IsNot Nothing AndAlso item.Name = refCurve.Name
+                elem.Tag = item
+            Next
+            
+            SpreadCMS.Show(MousePosition)
+        End Sub
 
         Private Sub CurvesTSMIDropDownOpening(ByVal sender As Object, ByVal e As EventArgs) Handles CurvesTSMI.DropDownOpening
             Dim portfolioManager = DbManager.PortfolioManager.Instance
@@ -757,20 +752,7 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub DeleteMmCurveTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles DeleteMMCurveTSMI.Click
-            ' todo better cleanup
-            'Logger.Debug("DeleteMmCurveTSMIClick()")
-            'Dim curves = _moneyMarketCurves.Where(Function(item) item.Identity = MoneyCurveCMS.Tag.ToString())
-            'If curves.Count = 0 Then
-            '    Logger.Warn("No such curve {0}", MoneyCurveCMS.Tag.ToString())
-            'Else
-            '    Dim curve = curves.First
-            '    Dim irsSeries = TheChart.Series.FindByName(curve.GetName())
-            '    If irsSeries IsNot Nothing Then TheChart.Series.Remove(irsSeries)
-            '    _moneyMarketCurves.Remove(curve)
-
-            '    curve.Cleanup()
-            '    SetChartMinMax()
-            'End If
+            _ansamble.SwapCurves.Remove(MoneyCurveCMS.Tag)
         End Sub
 
         Private Sub BootstrapTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles BootstrapTSMI.Click
@@ -798,19 +780,6 @@ Namespace Forms.ChartForm
                 curve.SetQuote(snd.Text)
             End If
         End Sub
-
-        'Private Sub OnCurvePaint(ByVal curve As SwapCurve)
-        '    Logger.Debug("OnCurvePaint({0})", curve.GetName())
-        '    'PaintSwapCurve(curve, False)
-        '    _spreadBenchmarks.UpdateCurve(curve.GetName())
-        '    SetChartMinMax()
-        'End Sub
-
-        'Private Sub OnCurveRecalculated(ByVal curve As SwapCurve)
-        '    Logger.Debug("OnCurveRecalculated({0})", curve.GetName())
-        '    'PaintSwapCurve(curve, True)
-        '    SetChartMinMax()
-        'End Sub
 
         Private Sub RemoveFromChartTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RemoveFromChartTSMI.Click
             If BondSetCMS.Tag IsNot Nothing AndAlso IsNumeric(BondSetCMS.Tag) Then _ansamble.Items.Remove(BondSetCMS.Tag)
@@ -872,27 +841,6 @@ Namespace Forms.ChartForm
                     End With
                 End Sub)
         End Sub
-
-        'Private Sub OnBenchmarkRemoved(ByVal type As YSource) Handles _spreadBenchmarks.BenchmarkRemoved
-        '    Logger.Trace("OnBenchmarkRemoved({0})", type)
-        '    '_moneyMarketCurves.ForEach(Sub(curve) curve.CleanupByType(type))
-        '    '_ansamble.Groups.CleanupByType(type)
-        'End Sub
-
-        'Private Sub OnBenchmarkUpdated(ByVal type As YSource) Handles _spreadBenchmarks.BenchmarkUpdated
-        '    Logger.Trace("OnBenchmarkUpdated({0})", type)
-        '    '_moneyMarketCurves.ForEach(Sub(curve) curve.RecalculateByType(type))
-        '    '_ansamble.Groups.RecalculateByType(type)
-        'End Sub
-
-        'Private Sub OnTypeSelected(ByVal newType As YSource, ByVal oldType As YSource) Handles _spreadBenchmarks.TypeSelected
-        '    Logger.Trace("OnTypeSelected({0}, {1})", newType, oldType)
-        '    If newType <> oldType Then
-        '        SetYAxisMode(newType.ToString())
-        '        '_moneyMarketCurves.ForEach(Sub(curve) curve.RecalculateByType(newType))
-        '        '_ansamble.Groups.RecalculateByType(newType)
-        '    End If
-        'End Sub
 #End Region
 #End Region
 

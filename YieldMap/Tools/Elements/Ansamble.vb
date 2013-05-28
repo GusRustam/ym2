@@ -54,9 +54,9 @@ Namespace Tools.Elements
             End Get
         End Property
 
-        Default Public ReadOnly Property Data(ByVal id As Long) As Group
+        Default Public ReadOnly Property Data(ByVal id As Long) As IChangeable
             Get
-                Return _items(id)
+                Return If(_items(id), _swapCurves(id))
             End Get
         End Property
 
