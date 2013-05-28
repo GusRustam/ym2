@@ -17,7 +17,7 @@ Namespace Tools.Elements
         Inherits SwapCurve
         Implements IAssetSwapBenchmark
 
-        Protected ReadOnly Descrs As New Dictionary(Of String, SwapPointDescription)
+        Protected ReadOnly Descrs As New List(Of SwapPointDescription)
         Protected Overridable Property BaseInstrumentPrice As Double
 
         '' LOGGER
@@ -46,6 +46,7 @@ Namespace Tools.Elements
 
         Private Shared ReadOnly PossibleQuotes() As String = {"BID", "ASK", "MID"}
 
+        Private ReadOnly _ansamble As Ansamble
         Private _bootstrapped As Boolean
 
         '' LOADERS
@@ -55,13 +56,19 @@ Namespace Tools.Elements
         Private _theCurveDate As Date = Date.Today
         Private _broker As String = ""
         Private _quote As String = "MID"
+        Private _lastCurve As List(Of CurveItem)
+        Private Const InstrumentType As String = "S"
+
+        Sub New(ByVal ansamble As Ansamble)
+            _ansamble = ansamble
+        End Sub
         'Private ReadOnly _name As String = Guid.NewGuid().ToString()
 
         Public Overrides Sub Subscribe()
             Logger.Debug("Subscirbe({0})", Identity)
 
             Cleanup()
-            GetRICs(GetBroker()).ForEach(Sub(ric As String) Descrs.Add(ric, New SwapPointDescription(ric)))
+            GetRICs(GetBroker()).ForEach(Sub(ric As String) Descrs.Add(New SwapPointDescription(ric)))
 
             If CurveDate() = Date.Today Then
                 StartRealTime()
@@ -132,7 +139,8 @@ Namespace Tools.Elements
                 End Select
                 Try
                     If ric <> BaseInstrument Then
-                        With Descrs(ric)
+                        Dim item = (From descr In Descrs Where descr.RIC = ric).First
+                        With item
                             .Yield = aYield / 100
                             .Duration = GetDuration(ric)
                             .YieldAtDate = lastDate
@@ -157,7 +165,49 @@ Namespace Tools.Elements
         End Sub
 
         Public Overrides Sub Recalculate()
-            ' todo full recalculation and raising Updated event
+            If _ansamble.YSource = YSource.Yield Then
+                Dim result As New List(Of CurveItem)
+                If _bootstrapped Then
+                    Try
+                        Dim data = (From elem In Descrs Where elem.Yield > 0).ToList()
+
+                        Dim params(0 To data.Count() - 1, 5) As Object
+                        For i = 0 To data.Count - 1
+                            params(i, 0) = InstrumentType
+                            params(i, 1) = CurveDate
+                            params(i, 2) = CurveDate.AddDays(data(i).Duration * 365.0)
+                            params(i, 3) = BaseInstrumentPrice / 100
+                            params(i, 4) = data(i).Yield
+                            params(i, 5) = Struct
+                        Next
+                        Dim curveModule = New AdxYieldCurveModule
+                        Dim termStructure As Array = curveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
+                        For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
+                            Dim dur = (Utils.FromExcelSerialDate(termStructure.GetValue(i, 1)) - CurveDate).TotalDays / 365.0
+                            Dim yld = termStructure.GetValue(i, 2)
+                            If dur > 0 And yld > 0 Then result.Add(New SwapCurveItem(dur, yld, Me, data(i).RIC))
+                        Next
+                    Catch ex As Exception
+                        Logger.ErrorException("Failed to bootstrap", ex)
+                        Logger.Error("Exception = {0}", ex.ToString())
+                        Return
+                    End Try
+                Else
+                    result.AddRange((From item In Descrs
+                                     Let x = item.Duration, y = item.GetYield()
+                                     Where x > 0 And y > 0
+                                     Select New SwapCurveItem(x, y, Me, item.RIC)).
+                                 Cast(Of CurveItem))
+                End If
+                result.Sort()
+
+                _lastCurve = New List(Of CurveItem)(result)
+                NotifyUpdated(result)
+            ElseIf _ansamble.YSource.Belongs(YSource.ASWSpread, YSource.OASpread, YSource.ZSpread, YSource.PointSpread) Then
+                ' todo plotting spreads
+            Else
+                Logger.Warn("Unknown spread type {0}", _ansamble.YSource)
+            End If
         End Sub
 
         '' REALTIME DATA ARRIVED
@@ -173,13 +223,14 @@ Namespace Tools.Elements
                     Dim duration = GetDuration(ric)
                     If fv.Keys.Contains("393") Or fv.Keys.Contains("275") Then
                         Try
-                            Descrs(ric).YieldAtDate = CurveDate
+                            Dim elem = (From descr In Descrs Where descr.RIC = ric).First
+                            elem.YieldAtDate = CurveDate
                             If _quote = "BID" Or _quote = "ASK" Then
                                 Dim yld As Double
                                 yld = CDbl(fv(IIf(_quote = "BID", "393", "275")))
                                 If yld > 0 Then
-                                    Descrs(ric).Yield = yld / 100
-                                    Descrs(ric).Duration = duration
+                                    elem.Yield = yld / 100
+                                    elem.Duration = duration
                                     Recalculate()
                                 End If
                             Else
@@ -187,16 +238,16 @@ Namespace Tools.Elements
                                 Dim askYield = CDbl(fv("275")) / 100
                                 Dim found = True
                                 If bidYield > 0 And askYield > 0 Then
-                                    Descrs(ric).Yield = (bidYield + askYield) / 2
+                                    elem.Yield = (bidYield + askYield) / 2
                                 ElseIf bidYield > 0 Then
-                                    Descrs(ric).Yield = bidYield
+                                    elem.Yield = bidYield
                                 ElseIf askYield > 0 Then
-                                    Descrs(ric).Yield = askYield
+                                    elem.Yield = askYield
                                 Else
                                     found = False
                                 End If
                                 If found Then
-                                    Descrs(ric).Duration = duration
+                                    elem.Duration = duration
                                     Recalculate()
                                 End If
                             End If
@@ -384,6 +435,10 @@ Namespace Tools.Elements
     Public NotInheritable Class RubCCS
         Inherits RubIRS
 
+        Public Sub New(ByVal ansamble As Ansamble)
+            MyBase.New(ansamble)
+        End Sub
+
         Protected Overrides Property InstrumentName() As String = "RUUSAM3L"
         Protected Overrides Property AllowedTenors() As String() = {"1", "2", "3", "4", "5", "6", "7", "10", "15", "20"}
         Protected Overrides Property BaseInstrument As String = ""
@@ -412,6 +467,10 @@ Namespace Tools.Elements
     Public NotInheritable Class RubNDF
         Inherits RubIRS
 
+
+        Public Sub New(ByVal ansamble As Ansamble)
+            MyBase.New(ansamble)
+        End Sub
         Protected Overrides Property InstrumentName() As String = "RUB"
         Protected Overrides Property AllowedTenors() As String() = {"1W", "2W", "1M", "2M", "3M", "6M", "9M", "1Y", "18M", "2Y", "3Y", "4Y", "5Y"}
         Protected Overrides Property Brokers() As String() = {"GFI", "TRDL", "ICAP", "R", ""}
@@ -455,6 +514,9 @@ Namespace Tools.Elements
     Public NotInheritable Class UsdIRS
         Inherits RubIRS
 
+        Public Sub New(ByVal ansamble As Ansamble)
+            MyBase.New(ansamble)
+        End Sub
         Protected Overrides Property InstrumentName() As String = "USDAM3L"
         Protected Overrides Property AllowedTenors() As String() = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "20", "25", "30"}
         Protected Overrides Property Brokers() As String() = {"TRDL", "ICAP", ""}

@@ -309,7 +309,6 @@ Namespace Forms.ChartForm
                 elem.Tag = item
             Next item
 
-            ' todo add item to add a curve and use it as a benchmark
             If SpreadCMS.Items.Count > 0 Then SpreadCMS.Items.Add(New ToolStripSeparator)
             SpreadCMS.Items.Add(New ToolStripSeparator)
             SpreadCMS.Items.Add("New curve...", Nothing, AddressOf OnNewCurvePressed)
@@ -317,7 +316,7 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub OnNewCurvePressed(ByVal sender As Object, ByVal e As EventArgs)
-            ' todo
+            ' todo show new curve creation dialog epta
         End Sub
 
         Private Sub OnSwapCurveSelected(ByVal sender As Object, ByVal eventArgs As EventArgs)
@@ -557,6 +556,49 @@ Namespace Forms.ChartForm
                         series.Points.Add(point)
                     Next
 
+                    SetChartMinMax()
+                End Sub)
+        End Sub
+
+        Public Sub OnSwapCurveRemoved(ByVal curve As SwapCurve)
+            ' todo
+        End Sub
+
+        Private Sub OnSwapCurvePaint(ByVal data As List(Of CurveItem))
+            GuiAsync(
+                Sub()
+                    If Not data.Any Then Return
+                    If Not TypeOf data.First Is SwapCurveItem Then
+                        Logger.Warn("Unexpected items type for a swap-based curve")
+                        Return
+                    End If
+                    Dim dt = data.Cast(Of SwapCurveItem).ToList()
+                    Dim crv = dt.First.Curve
+                    Dim srs = TheChart.Series.FindByName(crv.Identity)
+                    If srs IsNot Nothing Then TheChart.Series.Remove(srs)
+                    srs = New Series() With {
+                        .Name = crv.Identity,
+                        .ChartType = SeriesChartType.Line,
+                        .IsVisibleInLegend = False,
+                        .borderWidth = 2,
+                        .color = crv.OuterColor,
+                        .Tag = crv.Identity,
+                        .markerColor = crv.InnerColor,
+                        .markerStyle = MarkerStyle.Circle,
+                        .markerSize = 4
+                    }
+                    TheChart.Series.Add(srs)
+                    Dim legendItems = TheChart.Legends(0).CustomItems
+                    While legendItems.Any(Function(item) item.Tag = crv.Identity)
+                        legendItems.Remove(legendItems.First(Function(item) item.Tag = crv.Identity))
+                    End While
+                    Dim legendItem = New LegendItem(crv.Name, crv.OuterColor, "") With {.Tag = crv.Identity}
+                    legendItems.Add(legendItem)
+
+                    For Each point In dt
+                        Dim pnt = New DataPoint(point.TheX, point.TheY) With {.Tag = point.Curve, .ToolTip = point.RIC}
+                        srs.Points.Add(pnt)
+                    Next
                     SetChartMinMax()
                 End Sub)
         End Sub

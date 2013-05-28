@@ -103,9 +103,27 @@ Namespace Tools.Elements
     Public Class SwapCurveItem
         Inherits CurveItem
 
-        Public Sub New(ByVal x As Double, ByVal y As Double)
+        Private ReadOnly _curve As SwapCurve
+        Private ReadOnly _ric As String
+
+        Public Sub New(ByVal x As Double, ByVal y As Double, ByVal curve As SwapCurve, ByVal ric As String)
             MyBase.New(x, y)
+            _curve = curve
+            _ric = ric
         End Sub
+
+        <Browsable(False)>
+        Public ReadOnly Property Curve As SwapCurve
+            Get
+                Return _curve
+            End Get
+        End Property
+
+        Public ReadOnly Property RIC As String
+            Get
+                Return _ric
+            End Get
+        End Property
     End Class
 
     Public Class PointCurveItem

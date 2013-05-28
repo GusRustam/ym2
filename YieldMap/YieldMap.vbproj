@@ -261,7 +261,6 @@
     <Compile Include="Tools\Elements\Element.vb" />
     <Compile Include="Tools\Elements\BondGroup.vb" />
     <Compile Include="Tools\Elements\Identifyable.vb" />
-    <Compile Include="Tools\Elements\SpreadContainer.vb" />
     <Compile Include="Tools\Elements\SwapCurveContainer.vb" />
     <Compile Include="Tools\Elements\YSource.vb" />
     <Compile Include="Tools\Estimation.vb" />

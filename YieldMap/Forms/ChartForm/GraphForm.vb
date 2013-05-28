@@ -506,20 +506,13 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Public Sub OnCurveRemoved(ByVal curve As SwapCurve)
-            ' todo
-        End Sub
-
-        Private Sub OnCurvePaint(ByVal data As List(Of CurveItem))
-            ' todo
-        End Sub
 
         Private Sub RubCCSTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RubCCSTSMI.Click
             Logger.Debug("RubCCSTSMIClick()")
-            Dim rubCCS = New RubCCS
+            Dim rubCCS = New RubCCS(_ansamble)
 
-            AddHandler rubCCS.Cleared, Sub() OnCurveRemoved(rubCCS)
-            AddHandler rubCCS.Updated, AddressOf OnCurvePaint
+            AddHandler rubCCS.Cleared, Sub() OnSwapCurveRemoved(rubCCS)
+            AddHandler rubCCS.Updated, AddressOf OnSwapCurvePaint
 
             rubCCS.Subscribe()
             _ansamble.SwapCurves.Add(rubCCS)
@@ -527,9 +520,9 @@ Namespace Forms.ChartForm
 
         Private Sub RubIRS_TSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RubIRSTSMI.Click
             Logger.Debug("RubIRSTSMIClick()")
-            Dim rubIRS = New RubIRS
-            AddHandler rubIRS.Cleared, Sub() OnCurveRemoved(rubIRS)
-            AddHandler rubIRS.Updated, AddressOf OnCurvePaint
+            Dim rubIRS = New RubIRS(_ansamble)
+            AddHandler rubIRS.Cleared, Sub() OnSwapCurveRemoved(rubIRS)
+            AddHandler rubIRS.Updated, AddressOf OnSwapCurvePaint
 
             rubIRS.Subscribe()
             _ansamble.SwapCurves.Add(rubIRS)
@@ -537,9 +530,9 @@ Namespace Forms.ChartForm
 
         Private Sub UsdIRS_TSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles UsdIRSTSMI.Click
             Logger.Debug("UsdIRS_TSMIClick()")
-            Dim usdIRS = New UsdIRS
-            AddHandler usdIRS.Cleared, Sub() OnCurveRemoved(usdIRS)
-            AddHandler usdIRS.Updated, AddressOf OnCurvePaint
+            Dim usdIRS = New UsdIRS(_ansamble)
+            AddHandler usdIRS.Cleared, Sub() OnSwapCurveRemoved(usdIRS)
+            AddHandler usdIRS.Updated, AddressOf OnSwapCurvePaint
 
             usdIRS.Subscribe()
             _ansamble.SwapCurves.Add(usdIRS)
@@ -547,9 +540,9 @@ Namespace Forms.ChartForm
 
         Private Sub NDFTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles NDFTSMI.Click
             Logger.Debug("NDFTSMI_Click()")
-            Dim rubNDF = New RubNDF
-            AddHandler rubNDF.Cleared, Sub() OnCurveRemoved(rubNDF)
-            AddHandler rubNDF.Updated, AddressOf OnCurvePaint
+            Dim rubNDF = New RubNDF(_ansamble)
+            AddHandler rubNDF.Cleared, Sub() OnSwapCurveRemoved(rubNDF)
+            AddHandler rubNDF.Updated, AddressOf OnSwapCurvePaint
 
             rubNDF.Subscribe()
             _ansamble.SwapCurves.Add(rubNDF)

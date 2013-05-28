@@ -225,6 +225,7 @@ Namespace Tools
             End If
         End Sub
 
+        ' todo I don't like this function now soo much!
         Public Sub CalculateYields(ByVal dt As DateTime, ByVal descr As BondDescription, ByRef calc As BasePointDescription)
             Logger.Trace("CalculateYields({0}, {1})", calc.Price, descr.RIC)
 
