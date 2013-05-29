@@ -260,7 +260,7 @@ Namespace Tools.Elements
         End Function
 
         Public Overrides Sub Recalculate()
-            If Ansamble.YSource = YSource.Yield Then
+            If Ansamble.YSource = Yield Then
                 Dim result As New List(Of CurveItem)
                 If _bootstrapped Then
                     Try
@@ -327,7 +327,7 @@ Namespace Tools.Elements
 
                 _lastCurve = New List(Of CurveItem)(result)
                 NotifyUpdated(result)
-            ElseIf Ansamble.YSource.Belongs(YSource.ASWSpread, YSource.OASpread, YSource.ZSpread, YSource.PointSpread) Then
+            ElseIf Ansamble.YSource.Belongs(AswSpread, OaSpread, ZSpread, PointSpread) Then
                 ' todo plotting spreads
             Else
                 Logger.Warn("Unknown spread type {0}", Ansamble.YSource)
@@ -338,7 +338,6 @@ Namespace Tools.Elements
             Bootstrapped = Not Bootstrapped
         End Sub
 
-
         Public Function GetSnapshot() As BondCurveSnapshot
             Return New BondCurveSnapshot(AllElements, _lastCurve)
         End Function
@@ -348,11 +347,11 @@ Namespace Tools.Elements
             EstModel = If(model Is Nothing OrElse (EstModel IsNot Nothing AndAlso EstModel = model), Nothing, model)
         End Sub
 
-        Public Sub ClearSpread(ByVal ySource As YSource) Implements ICurve.ClearSpread
+        Public Sub ClearSpread(ByVal ySource As OrdinateBase) Implements ICurve.ClearSpread
             Throw New NotImplementedException()
         End Sub
 
-        Public Sub SetSpread(ByVal ySource As YSource) Implements ICurve.SetSpread
+        Public Sub SetSpread(ByVal ySource As OrdinateBase) Implements ICurve.SetSpread
             Throw New NotImplementedException()
         End Sub
     End Class

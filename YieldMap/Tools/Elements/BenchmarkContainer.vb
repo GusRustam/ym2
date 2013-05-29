@@ -1,27 +1,27 @@
 Namespace Tools.Elements
     Public Class BenchmarkContainer
         Implements IEnumerable(Of ICurve)
-        Public Event NewBmk As Action(Of YSource)
-        Public Event ClearBmk As Action(Of YSource)
+        Public Event NewBmk As Action(Of IOrdinate)
+        Public Event ClearBmk As Action(Of IOrdinate)
 
-        Private ReadOnly _items As New Dictionary(Of YSource, ICurve)
+        Private ReadOnly _items As New Dictionary(Of IOrdinate, ICurve)
 
-        Default Public ReadOnly Property Items(ByVal wut As YSource) As ICurve
+        Default Public ReadOnly Property Items(ByVal wut As IOrdinate) As ICurve
             Get
                 Return _items(wut)
             End Get
         End Property
 
-        Public Sub Put(ByVal src As YSource, ByVal crv As ICurve)
+        Public Sub Put(ByVal src As IOrdinate, ByVal crv As ICurve)
             _items(src) = crv
             RaiseEvent NewBmk(src)
         End Sub
 
-        Public Function Has(ByVal src As YSource) As Boolean
+        Public Function Has(ByVal src As IOrdinate) As Boolean
             Return _items.ContainsKey(src)
         End Function
 
-        Public Sub Clear(ByVal src As YSource)
+        Public Sub Clear(ByVal src As IOrdinate)
             _items.Remove(src)
             RaiseEvent ClearBmk(src)
         End Sub

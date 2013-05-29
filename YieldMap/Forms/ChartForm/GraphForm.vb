@@ -284,10 +284,10 @@ Namespace Forms.ChartForm
                         MatLabel.Text = String.Format("{0:dd/MM/yyyy}", Utils.FromExcelSerialDate(aDate.GetValue(1, 1)))
 
                         Select Case _ansamble.YSource
-                            Case YSource.Yield : YldLabel.Text = String.Format("{0:P2}", point.YValues(0))
-                            Case YSource.ZSpread : ZSpreadLabel.Text = String.Format("{0:F0} b.p.", point.YValues(0))
-                            Case YSource.PointSpread : SpreadLabel.Text = String.Format("{0:F0} b.p.", point.YValues(0))
-                            Case YSource.ASWSpread : ASWLabel.Text = String.Format("{0:F0} b.p.", point.YValues(0))
+                            Case Yield : YldLabel.Text = String.Format("{0:P2}", point.YValues(0))
+                            Case ZSpread : ZSpreadLabel.Text = String.Format("{0:F0} b.p.", point.YValues(0))
+                            Case PointSpread : SpreadLabel.Text = String.Format("{0:F0} b.p.", point.YValues(0))
+                            Case AswSpread : ASWLabel.Text = String.Format("{0:F0} b.p.", point.YValues(0))
                         End Select
                         DurLabel.Text = String.Format("{0:F2}", point.XValue)
 
@@ -327,9 +327,9 @@ Namespace Forms.ChartForm
                     YldLabel.Text = ""
                     DurLabel.Text = ""
                     MatLabel.Text = ""
-                    ASWLabel.Text = If(_ansamble.Benchmarks.Has(YSource.ASWSpread), " -> " + _ansamble.Benchmarks(YSource.ASWSpread).Name, "")
-                    SpreadLabel.Text = If(_ansamble.Benchmarks.Has(YSource.PointSpread), " -> " + _ansamble.Benchmarks(YSource.PointSpread).Name, "")
-                    ZSpreadLabel.Text = If(_ansamble.Benchmarks.Has(YSource.ZSpread), " -> " + _ansamble.Benchmarks(YSource.ZSpread).Name, "")
+                    ASWLabel.Text = If(_ansamble.Benchmarks.Has(AswSpread), " -> " + _ansamble.Benchmarks(AswSpread).Name, "")
+                    SpreadLabel.Text = If(_ansamble.Benchmarks.Has(PointSpread), " -> " + _ansamble.Benchmarks(PointSpread).Name, "")
+                    ZSpreadLabel.Text = If(_ansamble.Benchmarks.Has(ZSpread), " -> " + _ansamble.Benchmarks(ZSpread).Name, "")
                 End If
             End Try
         End Sub
@@ -580,7 +580,7 @@ Namespace Forms.ChartForm
         Private Sub OnYAxisSelected(ByVal sender As Object, ByVal e As EventArgs)
             Logger.Info("OnYAxisSelected()")
             Dim item As ToolStripMenuItem = TryCast(sender, ToolStripMenuItem)
-            If item IsNot Nothing Then _ansamble.YSource = YSource.FromString(item.Text)
+            If item IsNot Nothing Then _ansamble.YSource = Ordinate.FromString(item.Text)
         End Sub
 
         Private Sub CopyToClipboardTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles CopyToClipboardTSMI.Click
@@ -682,16 +682,16 @@ Namespace Forms.ChartForm
 
         Private Sub LinkSpreadLabelLinkClicked(ByVal sender As Object, ByVal e As LinkLabelLinkClickedEventArgs) Handles SpreadLinkLabel.LinkClicked
             ShowCurveCMS("PointSpread",
-                If(_ansamble.Benchmarks.Has(YSource.PointSpread), _ansamble.Benchmarks(YSource.PointSpread), Nothing))
+                If(_ansamble.Benchmarks.Has(PointSpread), _ansamble.Benchmarks(PointSpread), Nothing))
         End Sub
 
         Private Sub ZSpreadLinkLabelLinkClicked(ByVal sender As Object, ByVal e As LinkLabelLinkClickedEventArgs) Handles ZSpreadLinkLabel.LinkClicked
             ShowCurveCMS("ZSpread",
-                If(_ansamble.Benchmarks.Has(YSource.ZSpread), _ansamble.Benchmarks(YSource.ZSpread), Nothing))
+                If(_ansamble.Benchmarks.Has(ZSpread), _ansamble.Benchmarks(ZSpread), Nothing))
         End Sub
 
         Private Sub ASWLinkLabelLinkClicked(ByVal sender As Object, ByVal e As LinkLabelLinkClickedEventArgs) Handles ASWLinkLabel.LinkClicked
-            Dim refCurve = If(_ansamble.Benchmarks.Has(YSource.ASWSpread), _ansamble.Benchmarks(YSource.ASWSpread), Nothing)
+            Dim refCurve = If(_ansamble.Benchmarks.Has(AswSpread), _ansamble.Benchmarks(AswSpread), Nothing)
             SpreadCMS.Items.Clear()
             SpreadCMS.Tag = "ASWSpread"
             If Not _ansamble.SwapCurves.Any() Then Return
