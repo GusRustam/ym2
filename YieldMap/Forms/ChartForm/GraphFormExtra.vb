@@ -369,7 +369,7 @@ Namespace Forms.ChartForm
 
             Dim elem = _ansamble.Items.Bonds(Function(m) m.RIC = ric).First()
             Dim bondDataPoint = elem.MetaData ' todo that's awful
-            Dim points As New List(Of Tuple(Of BondPointDescription, BondDescription))
+            Dim points As New List(Of Tuple(Of BondPointDescription, BondMetadata))
             For Each dt In data.Keys
                 Try
                     Dim calc As New BondPointDescription

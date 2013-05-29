@@ -22,10 +22,10 @@ Namespace Tools.Elements
 
         Public YieldMode As String ' todo currently unused
 
-        Protected _name As String
+        Protected Nm As String
         Public ReadOnly Property Name() As String Implements INamed.Name
             Get
-                Return _name
+                Return Nm
             End Get
         End Property
 
@@ -42,15 +42,15 @@ Namespace Tools.Elements
         End Property
 
         Private _eventsFrozen As Boolean = False
-        Public Property EventsFrozen() As Boolean
-            Get
-                Return _eventsFrozen
-            End Get
-            Set(ByVal value As Boolean)
-                _eventsFrozen = value
-                If Not _eventsFrozen Then Recalculate()
-            End Set
-        End Property
+
+        Public Sub FreezeEvents() Implements IChangeable.FreezeEvents
+            _eventsFrozen = True
+        End Sub
+
+        Public Sub UnfreezeEvents() Implements IChangeable.UnfreezeEvents
+            _eventsFrozen = False
+            Recalculate()
+        End Sub
 
         Protected Sub NotifyUpdated(ByVal curveItems As List(Of CurveItem))
             If Not _eventsFrozen Then RaiseEvent Updated(curveItems)
@@ -104,6 +104,7 @@ Namespace Tools.Elements
             If rics.Count = 0 Then Return
             _quoteLoader.AddItems(rics, BondFields.AllNames)
         End Sub
+
 
         Private Sub OnQuotes(ByVal data As Dictionary(Of String, Dictionary(Of String, Double))) Handles _quoteLoader.NewData
             Logger.Trace("QuoteLoaderOnNewData()")
@@ -209,68 +210,68 @@ Namespace Tools.Elements
         End Sub
 
         Public Sub Disable(ByVal ric As String)
-            EventsFrozen = True
+            FreezeEvents()
             For Each item In (From elem In _elements Where elem.MetaData.RIC = ric)
                 item.Enabled = False
             Next
-            EventsFrozen = False
+            UnfreezeEvents()
         End Sub
 
         Public Sub Disable(ByVal rics As List(Of String))
-            EventsFrozen = True
+            FreezeEvents()
             For Each item In (From elem In _elements Where rics.Contains(elem.MetaData.RIC))
                 item.Enabled = False
             Next
-            EventsFrozen = False
+            UnfreezeEvents()
         End Sub
 
         Public Sub Enable(ByVal ric As String)
-            EventsFrozen = True
+            FreezeEvents()
             For Each item In (From elem In _elements Where elem.MetaData.RIC = ric)
                 item.Enabled = True
             Next
-            EventsFrozen = False
+            UnfreezeEvents()
         End Sub
 
         Public Sub Enable(ByVal rics As List(Of String))
-            EventsFrozen = True
+            FreezeEvents()
             For Each item In (From elem In _elements Where rics.Contains(elem.MetaData.RIC))
                 item.Enabled = True
             Next
-            EventsFrozen = False
+            UnfreezeEvents()
         End Sub
 
         Public WriteOnly Property LabelsOn As Boolean
             Set(ByVal value As Boolean)
-                EventsFrozen = True
+                FreezeEvents()
                 For Each elem In _elements
                     elem.LabelEnabled = value
                 Next
-                EventsFrozen = False
+                UnfreezeEvents()
             End Set
         End Property
 
         Public Sub ToggleLabels()
-            EventsFrozen = True
+            FreezeEvents()
             For Each elem In _elements
                 elem.ToggleLabel()
             Next
-            EventsFrozen = False
+            UnfreezeEvents()
         End Sub
 
         Public Sub SetLabelMode(ByVal mode As LabelMode)
-            EventsFrozen = True
+            FreezeEvents()
             For Each elem In _elements
                 elem.LabelMode = mode
             Next
-            EventsFrozen = False
+            UnfreezeEvents()
         End Sub
 
         Public Function Bonds(ByVal clause As Func(Of Bond, Boolean)) As IEnumerable(Of Bond)
             Return From elem In _elements Where clause(elem)
         End Function
 
-        Public Function Bonds(ByVal clause As Func(Of BondDescription, Boolean)) As IEnumerable(Of Bond)
+        Public Function Bonds(ByVal clause As Func(Of BondMetadata, Boolean)) As IEnumerable(Of Bond)
             Return From elem In _elements Where clause(elem.MetaData)
         End Function
     End Class

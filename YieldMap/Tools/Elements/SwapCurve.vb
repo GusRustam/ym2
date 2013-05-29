@@ -11,6 +11,8 @@ Namespace Tools.Elements
         Sub Cleanup()
         Sub Recalculate()
         Sub Subscribe()
+        Sub FreezeEvents()
+        Sub UnfreezeEvents()
     End Interface
 
     Public Interface ICurve
@@ -36,6 +38,16 @@ Namespace Tools.Elements
         Public MustOverride ReadOnly Property Name() As String Implements INamed.Name
         Public MustOverride Sub Cleanup() Implements IChangeable.Cleanup
         Public MustOverride Sub Subscribe() Implements IChangeable.Subscribe
+
+        Private _eventsFrozen As Boolean
+        Public Sub FreezeEvents() Implements IChangeable.FreezeEvents
+            _eventsFrozen = True
+        End Sub
+
+        Public Sub UnfreezeEvents() Implements IChangeable.UnfreezeEvents
+            _eventsFrozen = False
+            Recalculate()
+        End Sub
 
         '' ============ ICURVE INTERFACE ============
         Public MustOverride Property CurveDate() As Date Implements ICurve.CurveDate
@@ -67,7 +79,7 @@ Namespace Tools.Elements
         End Sub
 
         Protected Sub NotifyUpdated(ByVal data As List(Of CurveItem))
-            RaiseEvent Updated(data)
+            If Not _eventsFrozen Then RaiseEvent Updated(data)
         End Sub
     End Class
 End Namespace

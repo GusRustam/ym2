@@ -219,7 +219,7 @@ Public Class PortfolioStructure
     Public ReadOnly Property Rics(ByVal src As PortfolioSource) As ReadOnlyCollection(Of String)
         Get
             Dim res As New List(Of String)
-            Dim interpreter = New FilterInterpreter(Of BondDescription)
+            Dim interpreter = New FilterInterpreter(Of BondMetadata)
             Dim filter As Boolean = False
             Dim cond = src.Condition
             If cond <> "" Then
@@ -258,7 +258,7 @@ Public Class PortfolioStructure
     Public ReadOnly Property Rics(Optional ByVal netted As Boolean = False) As ReadOnlyCollection(Of RicDescription)
         Get
             Dim res As New List(Of RicDescription)
-            Dim interpreter = New FilterInterpreter(Of BondDescription)
+            Dim interpreter = New FilterInterpreter(Of BondMetadata)
             Dim filter As Boolean = False
             For Each src In _sources
                 Dim description As RicDescription

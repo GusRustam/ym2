@@ -77,8 +77,8 @@ Namespace Tools.Elements
             End Get
         End Property
 
-        Private ReadOnly _metaData As BondDescription
-        Public ReadOnly Property MetaData As BondDescription
+        Private ReadOnly _metaData As BondMetadata
+        Public ReadOnly Property MetaData As BondMetadata
             Get
                 Return _metaData
             End Get
@@ -146,7 +146,7 @@ Namespace Tools.Elements
             End Set
         End Property
 
-        Sub New(ByVal parent As Group, ByVal metaData As BondDescription)
+        Sub New(ByVal parent As Group, ByVal metaData As BondMetadata)
             _parent = parent
             _metaData = metaData
         End Sub

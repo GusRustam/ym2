@@ -176,7 +176,6 @@ Namespace Tools.Elements
                 Return _live
             End Get
             Set(ByVal value As Boolean)
-                Logger.Trace("Live <- {0}", value)
                 _live = value
             End Set
         End Property

@@ -4,7 +4,7 @@ Namespace Forms.PortfolioForm
     Public Class ParserErrorForm
 
         Private Sub ParserErrorForm_Load(ByVal sender As System.Object, ByVal e As EventArgs) Handles MyBase.Load
-            Dim fields As List(Of String) = FilterHelper.GetFilterableFields(Of BondDescription)()
+            Dim fields As List(Of String) = FilterHelper.GetFilterableFields(Of BondMetadata)()
             VariablesLB.DataSource = fields
             ConditionTB.Select()
 
@@ -48,10 +48,10 @@ Namespace Forms.PortfolioForm
                 Dim grammar = fp.SetFilter(ConditionTB.Text)
                 MessagesTB.ForeColor = Color.DarkGreen
                 MessagesTB.Text = "Parsed successfully"
-                Dim x As New FilterInterpreter(Of BondDescription)
+                Dim x As New FilterInterpreter(Of BondMetadata)
                 x.SetGrammar(grammar)
                 Try
-                    x.Allows(New BondDescription("X", "X", "X", Date.Today, 10, "X", "X", Date.Today, "X", "X", "X", "X", "X",
+                    x.Allows(New BondMetadata("X", "X", "X", Date.Today, 10, "X", "X", Date.Today, "X", "X", "X", "X", "X",
                              "X", "X", True, True, True, New RatingDescr(Rating.Other, Nothing, Nothing),
                              New RatingDescr(Rating.Other, Nothing, Nothing),
                              New RatingDescr(Rating.Other, Nothing, Nothing), "x"))

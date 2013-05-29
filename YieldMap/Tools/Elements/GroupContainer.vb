@@ -90,7 +90,7 @@ Namespace Tools.Elements
             Return res
         End Function
 
-        Public Function Bonds(ByVal clause As Func(Of BondDescription, Boolean)) As List(Of Bond)
+        Public Function Bonds(ByVal clause As Func(Of BondMetadata, Boolean)) As List(Of Bond)
             Dim res As New List(Of Bond)
             For Each item In _items
                 res.AddRange(item.Value.Bonds(clause))

@@ -252,7 +252,7 @@
     <Compile Include="Tools\Elements\BondGroup.vb" />
     <Compile Include="Tools\Elements\Identifyable.vb" />
     <Compile Include="Tools\Elements\SwapCurveContainer.vb" />
-    <Compile Include="Tools\Elements\YSource.vb" />
+    <Compile Include="Tools\Elements\IOrdinate.vb" />
     <Compile Include="Tools\Estimation.vb" />
     <Compile Include="Tools\YieldCalc.vb" />
   </ItemGroup>

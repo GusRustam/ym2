@@ -62,6 +62,8 @@ Namespace Tools.Elements
 
         ' todo develop a ChangeableContainer??? Or a special container for bnchmrks?
         Private WithEvents _benchmarks As New BenchmarkContainer
+        Private _eventsFrozen As Boolean
+
         Public ReadOnly Property Benchmarks() As BenchmarkContainer
             Get
                 ' todo
@@ -92,8 +94,9 @@ Namespace Tools.Elements
         End Sub
 
         Private Sub Benchmarks_ClearBmk(obj As IOrdinate) Handles _benchmarks.ClearBmk
-            For Each item As KeyValuePair(Of Long, BondCurve) In _items
-                item.Value.ClearSpread(obj)
+            For Each item As KeyValuePair(Of Long, Group) In _items
+                Dim bondCurve = TryCast(item.Value, BondCurve)
+                If bondCurve IsNot Nothing Then bondCurve.ClearSpread(obj)
             Next
             For Each item As SwapCurve In _swapCurves
                 item.ClearSpread(obj)
@@ -101,11 +104,34 @@ Namespace Tools.Elements
         End Sub
 
         Private Sub Benchmarks_NewBmk(obj As IOrdinate) Handles _benchmarks.NewBmk
-            For Each item As KeyValuePair(Of Long, BondCurve) In _items
-                item.Value.SetSpread(obj)
+            FreezeEvents()
+            For Each item As KeyValuePair(Of Long, Group) In _items
+                Dim bondCurve = TryCast(item.Value, BondCurve)
+                If bondCurve IsNot Nothing Then bondCurve.SetSpread(obj)
             Next
             For Each item As SwapCurve In _swapCurves
                 item.SetSpread(obj)
+            Next
+            UnfreezeEvents()
+        End Sub
+
+        Private Sub UnfreezeEvents()
+            _eventsFrozen = false
+            For Each item As KeyValuePair(Of Long, Group) In _items
+                item.UnfreezeEvents()
+            Next
+            For Each item As SwapCurve In _swapCurves
+                item.UnfreezeEvents()
+            Next
+        End Sub
+
+        Private Sub FreezeEvents()
+            _eventsFrozen = True
+            For Each item As KeyValuePair(Of Long, Group) In _items
+                item.FreezeEvents()
+            Next
+            For Each item As SwapCurve In _swapCurves
+                item.FreezeEvents()
             Next
         End Sub
     End Class

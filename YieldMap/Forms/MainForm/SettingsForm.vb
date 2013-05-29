@@ -85,7 +85,7 @@ Namespace Forms.MainForm
 
             Dim selectedFields = Settings.BondSelectorVisibleColumns.Split(",")
             ColumnsCLB.Items.Clear()
-            For Each field In BondDescription.GetHideableFields()
+            For Each field In BondMetadata.GetHideableFields()
                 Dim idx = ColumnsCLB.Items.Add(field)
                 ColumnsCLB.SetItemCheckState(idx, If(selectedFields.Contains(field), CheckState.Checked, CheckState.Unchecked))
             Next

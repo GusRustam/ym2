@@ -162,7 +162,7 @@ Namespace Tools
                                  price, yield, yieldToWhat.Abbr, duration)
         End Function
 
-        Public Sub CalcZSprd(ByVal rateArray As Array, ByRef descr As BasePointDescription, ByVal data As BondDescription)
+        Public Sub CalcZSprd(ByVal rateArray As Array, ByRef descr As BasePointDescription, ByVal data As BondMetadata)
             If descr.Price > 0 Then
                 Try
                     Dim settleDate = BondModule.BdSettle(DateTime.Today, data.PaymentStructure)
@@ -209,7 +209,7 @@ Namespace Tools
             descr.PointSpread = Nothing
         End Sub
 
-        Public Sub CalcASWSprd(ByVal rateArray As Array, ByVal floatLegStructure As String, ByVal floatingRate As Double, ByRef descr As BasePointDescription, ByVal data As BondDescription)
+        Public Sub CalcASWSprd(ByVal rateArray As Array, ByVal floatLegStructure As String, ByVal floatingRate As Double, ByRef descr As BasePointDescription, ByVal data As BondMetadata)
             If descr.Price > 0 Then
                 Try
                     Dim settleDate = BondModule.BdSettle(DateTime.Today, data.PaymentStructure)
@@ -226,7 +226,7 @@ Namespace Tools
         End Sub
 
         ' todo I don't like this function now soo much!
-        Public Sub CalculateYields(ByVal dt As DateTime, ByVal descr As BondDescription, ByRef calc As BasePointDescription)
+        Public Sub CalculateYields(ByVal dt As DateTime, ByVal descr As BondMetadata, ByRef calc As BasePointDescription)
             Logger.Trace("CalculateYields({0}, {1})", calc.Price, descr.RIC)
 
             Dim coupon = BondsData.Instance.GetBondPayments(descr.RIC).GetCoupon(dt)

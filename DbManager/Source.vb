@@ -147,7 +147,7 @@ Public MustInherit Class Source
     End Property
 
 
-    Public Function GetDefaultRicsView() As List(Of BondDescription)
+    Public Function GetDefaultRicsView() As List(Of BondMetadata)
         Dim bondsData As IBondsData = Bonds.BondsData.Instance
         Return (From ric In GetDefaultRics()
             Where bondsData.BondExists(ric)

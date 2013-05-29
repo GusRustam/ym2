@@ -121,7 +121,7 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bonds\BondDescription.vb" />
+    <Compile Include="Bonds\BondMetadata.vb" />
     <Compile Include="BondsDataSet.Designer.vb">
       <DependentUpon>BondsDataSet.xsd</DependentUpon>
       <AutoGen>True</AutoGen>

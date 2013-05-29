@@ -57,7 +57,7 @@ Namespace Tools.Elements
     Friend Structure HistoryPointTag
         Public Ric As String
         Public Descr As BondPointDescription
-        Public Meta As BondDescription
+        Public Meta As BondMetadata
         Public SeriesId As Guid
     End Structure
 

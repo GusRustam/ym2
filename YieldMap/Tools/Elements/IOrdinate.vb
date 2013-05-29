@@ -1,6 +1,7 @@
 ﻿Namespace Tools.Elements
     Public Interface IOrdinate
-        Sub SetValue(ByVal bpd As BasePointDescription, ByVal val As Double)
+        Sub SetValue(ByVal bpd As BasePointDescription, ByVal val As Double?)
+        Function CalculateSpread(ByVal item As BasePointDescription, ByVal curve As ICurve) As Double?
         ReadOnly Property NameProperty() As String
         ReadOnly Property DescrProperty() As String
     End Interface
@@ -8,7 +9,7 @@
     Public MustInherit Class OrdinateBase
         Implements IOrdinate
         Implements IEquatable(Of OrdinateBase)
-        Public MustOverride Sub SetValue(ByVal bpd As BasePointDescription, ByVal val As Double) Implements IOrdinate.SetValue
+        Public MustOverride Sub SetValue(ByVal bpd As BasePointDescription, ByVal val As Double?) Implements IOrdinate.SetValue
         Protected ReadOnly Name As String
         Protected ReadOnly Descr As String
 
@@ -58,6 +59,8 @@
             Me.Name = name
             Me.Descr = descr
         End Sub
+
+        Public MustOverride Function CalculateSpread(ByVal item As BasePointDescription, ByVal curve As ICurve) As Double? Implements IOrdinate.CalculateSpread
     End Class
 
     Public Class OrdinateYield
@@ -69,10 +72,14 @@
             MyBase.New(name, descr)
         End Sub
 
-        Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal val As Double)
+        Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal val As Double?)
             ' todo OR NOT?????? Maybe these classes should do ze calculation of ze spreads?
             Throw New InvalidOperationException()
         End Sub
+
+        Public Overrides Function CalculateSpread(ByVal item As BasePointDescription, ByVal curve As ICurve) As Double?
+            Throw New InvalidOperationException()
+        End Function
 
         Public Shared ReadOnly Property Instance() As OrdinateYield
             Get
@@ -90,9 +97,13 @@
             MyBase.New(name, descr)
         End Sub
 
-        Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal val As Double)
+        Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal val As Double?)
             Throw New InvalidOperationException()
         End Sub
+
+        Public Overrides Function CalculateSpread(ByVal item As BasePointDescription, ByVal curve As ICurve) As Double?
+            Throw New NotImplementedException()
+        End Function
 
         Public Shared ReadOnly Property Instance() As OrdinateBase
             Get
@@ -110,9 +121,13 @@
             MyBase.New(name, descr)
         End Sub
 
-        Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal val As Double)
+        Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal val As Double?)
             Throw New InvalidOperationException()
         End Sub
+
+        Public Overrides Function CalculateSpread(ByVal item As BasePointDescription, ByVal curve As ICurve) As Double?
+            Throw New NotImplementedException()
+        End Function
 
         Public Shared ReadOnly Property Instance() As OrdinateAswSpread
             Get
@@ -130,9 +145,13 @@
             MyBase.New(name, descr)
         End Sub
 
-        Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal val As Double)
+        Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal val As Double?)
             bpd.OASpread = val
         End Sub
+
+        Public Overrides Function CalculateSpread(ByVal item As BasePointDescription, ByVal curve As ICurve) As Double?
+            Throw New NotImplementedException()
+        End Function
 
         Public Shared ReadOnly Property Instance() As OrdinateOaSpread
             Get
@@ -150,9 +169,13 @@
             MyBase.New(name, descr)
         End Sub
 
-        Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal val As Double)
+        Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal val As Double?)
             bpd.ZSpread = val
         End Sub
+
+        Public Overrides Function CalculateSpread(ByVal item As BasePointDescription, ByVal curve As ICurve) As Double?
+            Throw New NotImplementedException()
+        End Function
 
         Public Shared ReadOnly Property Instance() As OrdinateZSpread
             Get

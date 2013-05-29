@@ -91,7 +91,7 @@ Namespace Forms.PortfolioForm
                         order = SortDirection.Asc
                 End Select
                 Dim propertyName = BondListDGV.Columns(e.ColumnIndex).DataPropertyName
-                Dim sortableFields = (From prop In GetType(BondDescription).GetProperties(BindingFlags.Public Or BindingFlags.Instance)
+                Dim sortableFields = (From prop In GetType(BondMetadata).GetProperties(BindingFlags.Public Or BindingFlags.Instance)
                                  Where prop.GetCustomAttributes(GetType(SortableAttribute), False).Any
                                  Select prop.Name).ToList()
                 If sortableFields.Contains(propertyName) Then

@@ -16,7 +16,7 @@ Namespace Tools.Elements
                 Throw New InvalidOperationException(String.Format("Unsupported source {0}", source))
             End If
 
-            _name = If(port.Name <> "", port.Name, source.Name)
+            Nm = If(port.Name <> "", port.Name, source.Name)
             PortfolioID = source.ID
             BondFields = source.Fields.Realtime.AsContainer()
             Color = If(port.Color <> "", port.Color, source.Color)

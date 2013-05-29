@@ -79,7 +79,7 @@ Namespace Bonds
             Return _subRicToRic.ContainsKey(ric)
         End Function
 
-        Public Function GetBondInfo(ByVal aRic As String) As BondDescription Implements IBondsData.GetBondInfo
+        Public Function GetBondInfo(ByVal aRic As String) As BondMetadata Implements IBondsData.GetBondInfo
             'aRic = SkipSlash(aRic) todo RICSSS
             Dim items = (From row In _ldr.GetBondsTable()
                          Where _subRicToRic.Keys.Contains(aRic) AndAlso row.ric = _subRicToRic(aRic)
@@ -135,7 +135,7 @@ Namespace Bonds
 
             Dim lastRating = If(lastIssueRating > lastIssuerRating, lastIssueRating, lastIssuerRating)
 
-            Return New BondDescription(ric, sN, sN, maturityDate, coupon,
+            Return New BondMetadata(ric, sN, sN, maturityDate, coupon,
                                        paymentStructure, rateStructure, issueDate, sN,
                                        shortName & " " & If(coupon > 0, String.Format("{0}", coupon), "ZC"),
                                        description, series, issuerName, borrowerName, currency,
@@ -164,7 +164,7 @@ Namespace Bonds
             Return res
         End Function
 
-        Public Function GetBondInfo(ByVal rics As List(Of String)) As List(Of BondDescription) Implements IBondsData.GetBondInfo
+        Public Function GetBondInfo(ByVal rics As List(Of String)) As List(Of BondMetadata) Implements IBondsData.GetBondInfo
             Return (From item In rics Select GetBondInfo(item)).ToList()
         End Function
     End Class

@@ -49,7 +49,7 @@ Namespace Bonds
         Inherits Attribute
     End Class
 
-    Public Class BondDescription
+    Public Class BondMetadata
         Private ReadOnly _ric As String
         Private ReadOnly _shortName As String
         Private ReadOnly _label As String
@@ -302,7 +302,7 @@ Namespace Bonds
 
 
         Public Shared Function GetHideableFields() As List(Of String)
-            Return (From field In GetType(BondDescription).GetProperties(BindingFlags.Instance Or BindingFlags.Public)
+            Return (From field In GetType(BondMetadata).GetProperties(BindingFlags.Instance Or BindingFlags.Public)
                       Where field.GetCustomAttributes(GetType(Hideable), False).Any
                       Select field.Name).ToList()
         End Function

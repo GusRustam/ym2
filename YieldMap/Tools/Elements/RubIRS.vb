@@ -77,6 +77,7 @@ Namespace Tools.Elements
             End If
         End Sub
 
+
         ''' <summary>
         ''' Parsing swap name to retrieve term
         ''' </summary>
@@ -323,11 +324,15 @@ Namespace Tools.Elements
         End Sub
 
         Public Overrides Sub ClearSpread(ByVal ySource As OrdinateBase)
-            Throw New NotImplementedException()
+            For Each item In Descrs
+                ySource.SetValue(item, Nothing)
+            Next
         End Sub
 
         Public Overrides Sub SetSpread(ByVal ySource As OrdinateBase)
-            Throw New NotImplementedException()
+            For Each item In Descrs
+                ySource.SetValue(item, ySource.CalculateSpread(item, _ansamble.Benchmarks(ySource)))
+            Next
         End Sub
 
         Public Overrides Function GetSnapshot() As List(Of Tuple(Of String, String, Double?, Double))

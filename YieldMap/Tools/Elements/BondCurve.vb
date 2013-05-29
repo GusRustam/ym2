@@ -178,7 +178,7 @@ Namespace Tools.Elements
         Public Sub New(ByVal ansamble As Ansamble, ByVal src As Source)
             MyBase.new(ansamble)
 
-            _name = src.Name
+            Nm = src.Name
             PortfolioID = src.ID
             BondFields = src.Fields.Realtime.AsContainer()
             Color = src.Color
@@ -348,11 +348,17 @@ Namespace Tools.Elements
         End Sub
 
         Public Sub ClearSpread(ByVal ySource As OrdinateBase) Implements ICurve.ClearSpread
-            Throw New NotImplementedException()
+            For Each item In AllElements
+                ' todo foreach by quotes&yields 'cos now it's bond an' I nid BPD
+                ySource.SetValue(item, Nothing)
+            Next
         End Sub
 
         Public Sub SetSpread(ByVal ySource As OrdinateBase) Implements ICurve.SetSpread
-            Throw New NotImplementedException()
+            For Each item In AllElements
+                ' todo foreach by quotes&yields 'cos now it's bond an' I nid BPD
+                ySource.SetValue(item, ySource.CalculateSpread(item, Ansamble.Benchmarks(ySource)))
+            Next
         End Sub
     End Class
 End NameSpace

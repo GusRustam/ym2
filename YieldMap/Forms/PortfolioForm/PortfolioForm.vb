@@ -666,7 +666,7 @@ Namespace Forms.PortfolioForm
             If src Is Nothing Then Return
 
             Dim rics = (From row As DataGridViewRow In ChainListItemsGrid.SelectedRows
-                        Let descr = TryCast(row.DataBoundItem, BondDescription)
+                        Let descr = TryCast(row.DataBoundItem, BondMetadata)
                         Where descr IsNot Nothing
                         Select descr.RIC).ToList()
             If rics.Any Then

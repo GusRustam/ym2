@@ -20,9 +20,9 @@ Namespace Bonds
     Public Interface IBondsData
         Sub Refresh()
         Function BondExists(ByVal ric As String) As Boolean
-        Function GetBondInfo(ByVal ric As String) As BondDescription
+        Function GetBondInfo(ByVal ric As String) As BondMetadata
         Function GetBondPayments(ByVal ric As String) As BondPayments
-        Function GetBondInfo(ByVal rics As List(Of String)) As List(Of BondDescription)
+        Function GetBondInfo(ByVal rics As List(Of String)) As List(Of BondMetadata)
     End Interface
 
     Public Interface IBondsLoader

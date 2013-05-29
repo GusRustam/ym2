@@ -1,8 +1,8 @@
 ﻿Namespace Bonds
     Public Class BondView
-        Private ReadOnly _items As New List(Of BondDescription)
-        Private ReadOnly _interpreter As New FilterInterpreter(Of BondDescription)
-        Private ReadOnly _sorter As New Sorter(Of BondDescription)
+        Private ReadOnly _items As New List(Of BondMetadata)
+        Private ReadOnly _interpreter As New FilterInterpreter(Of BondMetadata)
+        Private ReadOnly _sorter As New Sorter(Of BondMetadata)
 
         Public Sub SetFilter(ByVal flt As String)
             ' todo exception messages and exception handling
@@ -20,9 +20,9 @@
             _items.AddRange(BondsData.Instance.GetBondInfo(rics))
         End Sub
 
-        Public ReadOnly Property Items() As List(Of BondDescription)
+        Public ReadOnly Property Items() As List(Of BondMetadata)
             Get
-                Dim list = New List(Of BondDescription)(From elem In _items Where _interpreter.Allows(elem))
+                Dim list = New List(Of BondMetadata)(From elem In _items Where _interpreter.Allows(elem))
                 list.Sort(_sorter)
                 Return list
             End Get
