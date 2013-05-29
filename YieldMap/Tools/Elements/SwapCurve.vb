@@ -1,32 +1,39 @@
 Imports System.Drawing
 
 Namespace Tools.Elements
-    Public Interface IChangeable
-        Event Cleared As Action
+    Public Interface INamed
         ReadOnly Property Name As String
+    End Interface
+
+    Public Interface IChangeable
+        Inherits INamed
+        Event Cleared As Action
         Sub Cleanup()
         Sub Recalculate()
         Sub Subscribe()
     End Interface
 
     Public Interface ICurve
+        Inherits INamed
         ReadOnly Property CanBootstrap() As Boolean
         Property Bootstrapped() As Boolean
         Property CurveDate() As Date
         Sub Bootstrap()
+
+        Sub ClearSpread(ByVal ySource As OrdinateBase)
+        Sub SetSpread(ByVal ySource As OrdinateBase)
     End Interface
 
     Public MustInherit Class SwapCurve
         Inherits Identifyable
-        Implements ICurve
-        Implements IChangeable
+        Implements ICurve, IChangeable
 
         Public Event Cleared As Action Implements IChangeable.Cleared
         Public Event Updated As Action(Of List(Of CurveItem))
 
         '' ============ ICHANGEABLE INTERFACE ============
         Public MustOverride Sub Recalculate() Implements IChangeable.Recalculate
-        Public MustOverride ReadOnly Property Name() As String Implements IChangeable.Name
+        Public MustOverride ReadOnly Property Name() As String Implements INamed.Name
         Public MustOverride Sub Cleanup() Implements IChangeable.Cleanup
         Public MustOverride Sub Subscribe() Implements IChangeable.Subscribe
 
@@ -35,6 +42,8 @@ Namespace Tools.Elements
         Public MustOverride ReadOnly Property CanBootstrap() As Boolean Implements ICurve.CanBootstrap
         Public MustOverride Property Bootstrapped() As Boolean Implements ICurve.Bootstrapped
         Public MustOverride Sub Bootstrap() Implements ICurve.Bootstrap
+        Public MustOverride Sub ClearSpread(ByVal ySource As OrdinateBase) Implements ICurve.ClearSpread
+        Public MustOverride Sub SetSpread(ByVal ySource As OrdinateBase) Implements ICurve.SetSpread
 
         '' ============ BROKERS ============
         Public MustOverride Function GetBrokers() As String()

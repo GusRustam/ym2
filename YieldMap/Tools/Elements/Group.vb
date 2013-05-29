@@ -23,7 +23,7 @@ Namespace Tools.Elements
         Public YieldMode As String ' todo currently unused
 
         Protected _name As String
-        Public ReadOnly Property Name As String Implements IChangeable.Name
+        Public ReadOnly Property Name() As String Implements INamed.Name
             Get
                 Return _name
             End Get
@@ -115,7 +115,7 @@ Namespace Tools.Elements
                     ' checking if this bond is allowed to show up
                     Dim bonds = (From elem In _elements Where elem.MetaData.RIC = instrument)
                     If Not bonds.Any Then
-                        Logger.Warn("Instrument {0} does not belong to serie {1}", instrument, Name)
+                        Logger.Warn("Instrument {0} does not belong to current serie", instrument)
                         Continue For
                     End If
 

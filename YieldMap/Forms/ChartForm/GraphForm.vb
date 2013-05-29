@@ -327,9 +327,9 @@ Namespace Forms.ChartForm
                     YldLabel.Text = ""
                     DurLabel.Text = ""
                     MatLabel.Text = ""
-                    ASWLabel.Text = If(_ansamble.Benchmarks.ContainsKey(YSource.ASWSpread), " -> " + _ansamble.Benchmarks(YSource.ASWSpread).Name, "")
-                    SpreadLabel.Text = If(_ansamble.Benchmarks.ContainsKey(YSource.PointSpread), " -> " + _ansamble.Benchmarks(YSource.PointSpread).Name, "")
-                    ZSpreadLabel.Text = If(_ansamble.Benchmarks.ContainsKey(YSource.ZSpread), " -> " + _ansamble.Benchmarks(YSource.ZSpread).Name, "")
+                    ASWLabel.Text = If(_ansamble.Benchmarks.Has(YSource.ASWSpread), " -> " + _ansamble.Benchmarks(YSource.ASWSpread).Name, "")
+                    SpreadLabel.Text = If(_ansamble.Benchmarks.Has(YSource.PointSpread), " -> " + _ansamble.Benchmarks(YSource.PointSpread).Name, "")
+                    ZSpreadLabel.Text = If(_ansamble.Benchmarks.Has(YSource.ZSpread), " -> " + _ansamble.Benchmarks(YSource.ZSpread).Name, "")
                 End If
             End Try
         End Sub
@@ -682,16 +682,16 @@ Namespace Forms.ChartForm
 
         Private Sub LinkSpreadLabelLinkClicked(ByVal sender As Object, ByVal e As LinkLabelLinkClickedEventArgs) Handles SpreadLinkLabel.LinkClicked
             ShowCurveCMS("PointSpread",
-                If(_ansamble.Benchmarks.ContainsKey(YSource.PointSpread), _ansamble.Benchmarks(YSource.PointSpread), Nothing))
+                If(_ansamble.Benchmarks.Has(YSource.PointSpread), _ansamble.Benchmarks(YSource.PointSpread), Nothing))
         End Sub
 
         Private Sub ZSpreadLinkLabelLinkClicked(ByVal sender As Object, ByVal e As LinkLabelLinkClickedEventArgs) Handles ZSpreadLinkLabel.LinkClicked
             ShowCurveCMS("ZSpread",
-                If(_ansamble.Benchmarks.ContainsKey(YSource.ZSpread), _ansamble.Benchmarks(YSource.ZSpread), Nothing))
+                If(_ansamble.Benchmarks.Has(YSource.ZSpread), _ansamble.Benchmarks(YSource.ZSpread), Nothing))
         End Sub
 
         Private Sub ASWLinkLabelLinkClicked(ByVal sender As Object, ByVal e As LinkLabelLinkClickedEventArgs) Handles ASWLinkLabel.LinkClicked
-            Dim refCurve = If(_ansamble.Benchmarks.ContainsKey(YSource.ASWSpread), _ansamble.Benchmarks(YSource.ASWSpread), Nothing)
+            Dim refCurve = If(_ansamble.Benchmarks.Has(YSource.ASWSpread), _ansamble.Benchmarks(YSource.ASWSpread), Nothing)
             SpreadCMS.Items.Clear()
             SpreadCMS.Tag = "ASWSpread"
             If Not _ansamble.SwapCurves.Any() Then Return

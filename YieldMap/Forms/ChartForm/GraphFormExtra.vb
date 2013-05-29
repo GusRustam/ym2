@@ -93,8 +93,8 @@ Namespace Forms.ChartForm
         Private Sub ShowYAxisCMS(ByVal loc As Point)
             If Not _ansamble.Benchmarks.Any Then Return
             YAxisCMS.Items.Clear()
-            YAxisCMS.Items.Add(YSource.Yield.ToString(), Nothing, AddressOf OnYAxisSelected)
-            For Each key In _ansamble.Benchmarks.Values
+            YAxisCMS.Items.Add(Yield.ToString(), Nothing, AddressOf OnYAxisSelected) ' todo pass name somehow
+            For Each key In _ansamble.Benchmarks
                 YAxisCMS.Items.Add(key.Name, Nothing, AddressOf OnYAxisSelected)
             Next
             YAxisCMS.Show(TheChart, loc)
@@ -166,10 +166,10 @@ Namespace Forms.ChartForm
         Private Sub SetYAxisMode(ByVal str As String)
             Try
                 Select Case str
-                    Case YSource.Yield.ToString() : MakeAxisY("Yield, %", "P2")
-                    Case YSource.ASWSpread.ToString() : MakeAxisY("ASW Spread, b.p.", "N0")
-                    Case YSource.PointSpread.ToString() : MakeAxisY("Spread, b.p.", "N0")
-                    Case YSource.ZSpread.ToString() : MakeAxisY("Z-Spread, b.p.", "N0")
+                    Case Yield.ToString() : MakeAxisY("Yield, %", "P2")
+                    Case AswSpread.ToString() : MakeAxisY("ASW Spread, b.p.", "N0")
+                    Case PointSpread.ToString() : MakeAxisY("Spread, b.p.", "N0")
+                    Case ZSpread.ToString() : MakeAxisY("Z-Spread, b.p.", "N0")
                 End Select
                 TheChart.ChartAreas(0).AxisX.ScaleView.ZoomReset()
                 TheChart.ChartAreas(0).AxisY.ScaleView.ZoomReset()
@@ -207,7 +207,7 @@ Namespace Forms.ChartForm
                                  Where srs.Enabled And srs.Points.Any
                                  Select (
                                      From pnt In srs.Points
-                                     Where pnt.YValues.Any And (_ansamble.YSource <> YSource.Yield OrElse pnt.YValues.First > 0)
+                                     Where pnt.YValues.Any And (_ansamble.YSource <> Yield OrElse pnt.YValues.First > 0)
                                      Select pnt.YValues.First).Min
 
 
@@ -219,7 +219,7 @@ Namespace Forms.ChartForm
                     Dim newMin = lstMin.Min
 
                     Dim minMin As Double?, maxMax As Double?
-                    If _ansamble.YSource = YSource.Yield Then
+                    If _ansamble.YSource = Yield Then
                         minMin = _theSettings.MinYield / 100
                         maxMax = _theSettings.MaxYield / 100
                     Else
@@ -232,7 +232,7 @@ Namespace Forms.ChartForm
                         theMin = If(minMin.HasValue, Math.Max(minMin.Value, newMin), newMin)
                         theMax = If(maxMax.HasValue, Math.Min(maxMax.Value, newMax), newMax)
 
-                        Dim pow = If(_ansamble.YSource = YSource.Yield, 3, 0)
+                        Dim pow = If(_ansamble.YSource = Yield, 3, 0)
                         theMax = Math.Ceiling(theMax * (10 ^ pow)) / (10 ^ pow)
                         theMin = Math.Floor(theMin * (10 ^ pow)) / (10 ^ pow)
                         If theMax > theMin Then
@@ -275,7 +275,7 @@ Namespace Forms.ChartForm
             Next
 
             Dim items = (From elem In _ansamble.Items Where TypeOf elem.Value Is BondCurve Select elem.Value).ToList()
-            If items.Any Then SpreadCMS.Items.Add(New ToolStripSeparator)
+            If SpreadCMS.Items.Count > 0 And items.Any Then SpreadCMS.Items.Add(New ToolStripSeparator)
             For Each item In items
                 Dim elem = CType(SpreadCMS.Items.Add(item.Name, Nothing, AddressOf OnBondCurveSelected), ToolStripMenuItem)
                 elem.CheckOnClick = True
@@ -283,7 +283,6 @@ Namespace Forms.ChartForm
             Next item
 
             If SpreadCMS.Items.Count > 0 Then SpreadCMS.Items.Add(New ToolStripSeparator)
-            SpreadCMS.Items.Add(New ToolStripSeparator)
             SpreadCMS.Items.Add("New curve...", Nothing, AddressOf OnNewCurvePressed)
             SpreadCMS.Show(MousePosition)
         End Sub
@@ -297,18 +296,18 @@ Namespace Forms.ChartForm
             Dim senderTSMI = TryCast(sender, ToolStripMenuItem)
             If senderTSMI Is Nothing Then Return
 
-            ' todo adding deleting benchmark
-            'If senderTSMI.Checked Then
-            '    _spreadBenchmarks.AddType(YSource.FromString(SpreadCMS.Tag), senderTSMI.Tag)
-            'Else
-            '    _spreadBenchmarks.RemoveType(YSource.FromString(SpreadCMS.Tag))
-            'End If
+            If senderTSMI.Checked Then
+                _ansamble.Benchmarks.Put(FromString(SpreadCMS.Tag), senderTSMI.Tag)
+                '_spreadBenchmarks.AddType(YSource.FromString(SpreadCMS.Tag), senderTSMI.Tag)
+            Else
+                _ansamble.Benchmarks.Clear(FromString(SpreadCMS.Tag))
+            End If
 
             UpdateAxisYTitle(False)
 
-            ASWLabel.Text = If(_ansamble.Benchmarks.ContainsKey(YSource.ASWSpread), " -> " + _ansamble.Benchmarks(YSource.ASWSpread).Name, "")
-            SpreadLabel.Text = If(_ansamble.Benchmarks.ContainsKey(YSource.PointSpread), " -> " + _ansamble.Benchmarks(YSource.PointSpread).Name, "")
-            ZSpreadLabel.Text = If(_ansamble.Benchmarks.ContainsKey(YSource.ZSpread), " -> " + _ansamble.Benchmarks(YSource.ZSpread).Name, "")
+            ASWLabel.Text = If(_ansamble.Benchmarks.Has(AswSpread), " -> " + _ansamble.Benchmarks(AswSpread).Name, "")
+            SpreadLabel.Text = If(_ansamble.Benchmarks.Has(PointSpread), " -> " + _ansamble.Benchmarks(PointSpread).Name, "")
+            ZSpreadLabel.Text = If(_ansamble.Benchmarks.Has(ZSpread), " -> " + _ansamble.Benchmarks(ZSpread).Name, "")
         End Sub
 
         Private Sub OnBondCurveSelected(ByVal sender As Object, ByVal e As EventArgs)
@@ -359,62 +358,9 @@ Namespace Forms.ChartForm
             Next
         End Sub
 
-        'Private Sub PaintSwapCurve(ByVal curve As SwapCurve, ByVal raw As Boolean)
-        '    Logger.Debug("PaintSwapCurve({0}, {1})", curve.GetName(), raw)
-        '    Dim points As List(Of SwapPointDescription)
-        '    points = curve.GetCurveData(raw)
-        '    If points Is Nothing Then Return
-
-        '    Dim estimator = New Estimator(curve.GetFitMode())
-        '    Dim xyPoints = estimator.Approximate(XY.ConvertToXY(points, _spreadBenchmarks.CurrentType))
-
-        '    If xyPoints Is Nothing Then Return
-        '    Logger.Trace("Got points to plot")
-
-        '    GuiAsync(
-        '        Sub()
-        '            Dim theSeries = TheChart.Series.FindByName(curve.GetName())
-        '            If theSeries Is Nothing Then
-        '                theSeries = New Series() With {
-        '                    .Name = curve.GetName(),
-        '                    .legendText = curve.GetFullName(),
-        '                    .ChartType = SeriesChartType.Line,
-        '                    .color = curve.GetOuterColor(),
-        '                    .markerColor = curve.GetInnerColor(),
-        '                    .markerBorderColor = curve.GetOuterColor(),
-        '                    .borderWidth = 2,
-        '                    .Tag = curve,
-        '                    .markerStyle = MarkerStyle.None,
-        '                    .markerSize = 0
-        '                }
-        '                TheChart.Series.Add(theSeries)
-        '            Else
-        '                theSeries.Points.Clear()
-        '                theSeries.LegendText = curve.GetFullName()
-        '            End If
-
-        '            If points Is Nothing OrElse points.Count < 2 Then
-        '                theSeries.Enabled = False
-        '                Logger.Info("Too little points to plot")
-        '                Return
-        '            End If
-        '            theSeries.Enabled = True
-
-        '            xyPoints.ForEach(
-        '                Sub(item)
-        '                    theSeries.Points.Add(New DataPoint With {
-        '                        .Name = String.Format("{0}Y", item.X),
-        '                        .XValue = item.X,
-        '                        .YValues = {item.Y},
-        '                        .Tag = curve
-        '                    })
-        '                End Sub)
-        '        End Sub)
-        'End Sub
-
         Public Sub OnHistoricalData(ByVal ric As String, ByVal data As Dictionary(Of Date, HistoricalItem), ByVal rawData As Dictionary(Of DateTime, RawHistoricalItem))
             Logger.Trace("OnHistoricalQuotes({0})", ric)
-            If _ansamble.YSource <> YSource.Yield Then Return
+            If _ansamble.YSource <> Yield Then Return
 
             If data Is Nothing OrElse data.Count <= 0 Then
                 Logger.Info("No data on {0} arrived", ric)

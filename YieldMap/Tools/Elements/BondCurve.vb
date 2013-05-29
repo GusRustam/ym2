@@ -164,6 +164,7 @@ Namespace Tools.Elements
         End Property
 
         Private _estModel As EstimationModel
+
         Public Property EstModel() As EstimationModel
             Get
                 Return _estModel
@@ -337,6 +338,7 @@ Namespace Tools.Elements
             Bootstrapped = Not Bootstrapped
         End Sub
 
+
         Public Function GetSnapshot() As BondCurveSnapshot
             Return New BondCurveSnapshot(AllElements, _lastCurve)
         End Function
@@ -344,6 +346,14 @@ Namespace Tools.Elements
         Public Sub SetFitMode(ByVal mode As String)
             Dim model = EstimationModel.FromName(mode)
             EstModel = If(model Is Nothing OrElse (EstModel IsNot Nothing AndAlso EstModel = model), Nothing, model)
+        End Sub
+
+        Public Sub ClearSpread(ByVal ySource As YSource) Implements ICurve.ClearSpread
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Sub SetSpread(ByVal ySource As YSource) Implements ICurve.SetSpread
+            Throw New NotImplementedException()
         End Sub
     End Class
 End NameSpace

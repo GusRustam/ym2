@@ -29,12 +29,12 @@ Namespace Tools.Elements
             End Set
         End Property
 
-        Private _ySource As YSource = YSource.Yield
-        Public Property YSource() As YSource
+        Private _ySource As OrdinateBase = Yield
+        Public Property YSource() As OrdinateBase
             Get
                 Return _ySource
             End Get
-            Set(ByVal value As YSource)
+            Set(ByVal value As OrdinateBase)
                 _ySource = value
                 Recalculate()
             End Set
@@ -60,11 +60,12 @@ Namespace Tools.Elements
             End Get
         End Property
 
-        ' todo develop a ChangeableContainer
-        Public ReadOnly Property Benchmarks() As Dictionary(Of YSource, IChangeable)
+        ' todo develop a ChangeableContainer??? Or a special container for bnchmrks?
+        Private WithEvents _benchmarks As New BenchmarkContainer
+        Public ReadOnly Property Benchmarks() As BenchmarkContainer
             Get
                 ' todo
-                Return New Dictionary(Of YSource, IChangeable)()
+                Return _benchmarks
             End Get
         End Property
 
@@ -88,6 +89,24 @@ Namespace Tools.Elements
         Public Sub Cleanup()
             Items.Cleanup()
             SwapCurves.Cleanup()
+        End Sub
+
+        Private Sub Benchmarks_ClearBmk(obj As IOrdinate) Handles _benchmarks.ClearBmk
+            For Each item As KeyValuePair(Of Long, BondCurve) In _items
+                item.Value.ClearSpread(obj)
+            Next
+            For Each item As SwapCurve In _swapCurves
+                item.ClearSpread(obj)
+            Next
+        End Sub
+
+        Private Sub Benchmarks_NewBmk(obj As IOrdinate) Handles _benchmarks.NewBmk
+            For Each item As KeyValuePair(Of Long, BondCurve) In _items
+                item.Value.SetSpread(obj)
+            Next
+            For Each item As SwapCurve In _swapCurves
+                item.SetSpread(obj)
+            Next
         End Sub
     End Class
 End Namespace

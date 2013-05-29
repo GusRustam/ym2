@@ -6,6 +6,7 @@ Namespace Tools.Elements
     Public Class BondGroup
         Inherits Group
 
+
         Public Sub New(ByVal ans As Ansamble, ByVal port As PortfolioSource, ByVal portfolioStructure As PortfolioStructure)
             MyBase.new(ans)
             Dim source = TryCast(port.Source, Source)
@@ -26,7 +27,7 @@ Namespace Tools.Elements
         End Sub
 
         Public Overrides Sub Recalculate()
-            If Ansamble.YSource = YSource.Yield Then
+            If Ansamble.YSource = Yield Then
                 Dim result As New List(Of CurveItem)
 
                 For Each bnd In Elements
@@ -47,7 +48,7 @@ Namespace Tools.Elements
                 result.Sort()
 
                 NotifyUpdated(result)
-            ElseIf Ansamble.YSource.Belongs(YSource.ASWSpread, YSource.OASpread, YSource.ZSpread, YSource.PointSpread) Then
+            ElseIf Ansamble.YSource.Belongs(AswSpread, OaSpread, ZSpread, PointSpread) Then
                 ' todo plotting spreads
             Else
                 Logger.Warn("Unknown spread type {0}", Ansamble.YSource)

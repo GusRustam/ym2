@@ -165,7 +165,7 @@ Namespace Tools.Elements
         End Sub
 
         Public Overrides Sub Recalculate()
-            If _ansamble.YSource = YSource.Yield Then
+            If _ansamble.YSource = Yield Then
                 Dim result As New List(Of CurveItem)
                 If _bootstrapped Then
                     Try
@@ -203,7 +203,7 @@ Namespace Tools.Elements
 
                 _lastCurve = New List(Of CurveItem)(result)
                 NotifyUpdated(result)
-            ElseIf _ansamble.YSource.Belongs(YSource.ASWSpread, YSource.OASpread, YSource.ZSpread, YSource.PointSpread) Then
+            ElseIf _ansamble.YSource.Belongs(AswSpread, OaSpread, ZSpread, PointSpread) Then
                 ' todo plotting spreads
             Else
                 Logger.Warn("Unknown spread type {0}", _ansamble.YSource)
@@ -322,29 +322,13 @@ Namespace Tools.Elements
             Bootstrapped = Not Bootstrapped
         End Sub
 
-        'Public Overrides Function Bootstrap(ByVal data As List(Of SwapPointDescription)) As List(Of SwapPointDescription)
-        '    Dim params(0 To data.Count() - 1, 5) As Object
-        '    For i = 0 To data.Count - 1
-        '        params(i, 0) = InstrumentType
-        '        params(i, 1) = _theDate
-        '        params(i, 2) = _theDate.AddDays(data(i).Duration * 365.0)
-        '        params(i, 3) = BaseInstrumentPrice / 100
-        '        params(i, 4) = data(i).Yield
-        '        params(i, 5) = Struct
-        '    Next
-        '    Dim curveModule = New AdxYieldCurveModule
-        '    Dim termStructure As Array = curveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
-        '    Dim result As New List(Of SwapPointDescription)
-        '    For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
-        '        Dim dur = (Utils.FromExcelSerialDate(termStructure.GetValue(i, 1)) - _theDate).TotalDays / 365.0
-        '        Dim yld = termStructure.GetValue(i, 2)
-        '        If dur > 0 And yld > 0 Then
-        '            Dim ric = Descrs.Where(Function(pair) Math.Abs(pair.Value.Duration - dur) < 0.00001).Select(Function(pair) pair.Value).ToList()
-        '            If ric.Any() Then result.Add(New SwapPointDescription(ric.First.RIC) With {.Yield = yld, .Duration = dur, .YieldAtDate = ric.First.YieldAtDate})
-        '        End If
-        '    Next
-        '    Return result
-        'End Function
+        Public Overrides Sub ClearSpread(ByVal ySource As OrdinateBase)
+            Throw New NotImplementedException()
+        End Sub
+
+        Public Overrides Sub SetSpread(ByVal ySource As OrdinateBase)
+            Throw New NotImplementedException()
+        End Sub
 
         Public Overrides Function GetSnapshot() As List(Of Tuple(Of String, String, Double?, Double))
             'Return Descrs.Values.Select(Function(elem) New Tuple(Of String, String, Double?, Double)(elem.RIC, String.Format("{0:N}Y", GetDuration(elem.RIC)), elem.Yield, elem.Duration)).ToList()
