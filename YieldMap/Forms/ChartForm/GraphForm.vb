@@ -816,11 +816,15 @@ Namespace Forms.ChartForm
 #End Region
 
 #Region "e) Assembly and curves events"
-        Private Sub OnGroupClear(ByVal group As Group) Handles _ansamble.GroupCleared
-            Logger.Trace("OnGroupClear()")
+        Private Sub OnGroupClear(ByVal group As Identifyable) Handles _ansamble.GroupCleared, _ansamble.SwapCleared
+            ClearSeries(group.Identity)
+        End Sub
+
+        Private Sub ClearSeries(ByVal id As Long)
+            Logger.Trace("ClearSeries({0})", id)
             GuiAsync(
                 Sub()
-                    Dim series As Series = TheChart.Series.FindByName(group.Identity)
+                    Dim series As Series = TheChart.Series.FindByName(id)
 
                     If series IsNot Nothing Then
                         series.Points.Clear()
@@ -828,11 +832,15 @@ Namespace Forms.ChartForm
                     End If
 
                     With TheChart.Legends(0).CustomItems
-                        While .Any(Function(elem) elem.Tag = group.Identity)
-                            .Remove(.First(Function(elem) elem.Tag = group.Identity))
+                        While .Any(Function(elem) elem.Tag = id)
+                            .Remove(.First(Function(elem) elem.Tag = id))
                         End While
                     End With
                 End Sub)
+        End Sub
+
+        Private Sub OnOrdinate(obj As IOrdinate) Handles _ansamble.Ordinate
+            SetYAxisMode(obj)
         End Sub
 #End Region
 #End Region

@@ -34,16 +34,21 @@ Namespace Tools.Elements
             'For Each qy In From item In AllElements From quoteName In item.QuotesAndYields Select item.QuotesAndYields(quoteName)
             '    res.Add(New PointCurveItem(qy.Duration, ord.GetValue(qy), Me))
             'Next
-            Dim res = New List(Of CurveItem)(From item In AllElements
-                                                               From quoteName In item.QuotesAndYields
-                                                               Let q = item.QuotesAndYields(quoteName)
-                                                               Select New BondCurveItem(q.Duration, ordinate.GetValue(q), q.ParentBond, q.BackColor, q.Yld.ToWhat, q.MarkerStyle, q.ParentBond.Label))
-            res.Sort()
+            Dim res = New List(Of CurveItem)(
+                        From item In AllElements
+                        From quoteName In item.QuotesAndYields
+                        Let q = item.QuotesAndYields(quoteName)
+                        Let theY = ordinate.GetValue(q)
+                        Where theY.HasValue
+                        Select New BondCurveItem(q.Duration, theY, q.ParentBond,
+                                                q.BackColor, q.Yld.ToWhat, q.MarkerStyle,
+                                                q.ParentBond.Label))
+            'res.Sort()
             Return res
         End Function
 
         Public Sub SetSpread(ByVal ySource As OrdinateBase)
-            If Ansamble.Benchmarks(ySource) = Me Then
+            If Ansamble.Benchmarks(ySource) <> Me Then
                 For Each qy In From item In AllElements From quoteName In item.QuotesAndYields Select item.QuotesAndYields(quoteName)
                     ySource.SetValue(qy, Ansamble.Benchmarks(ySource))
                 Next
@@ -52,7 +57,6 @@ Namespace Tools.Elements
                     ySource.ClearValue(qy)
                 Next
             End If
-
         End Sub
 
         Public Overrides Sub Recalculate()

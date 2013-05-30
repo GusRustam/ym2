@@ -3,6 +3,7 @@
         Private Shared ReadOnly Identities As New HashSet(Of Long)
         Public Event GroupCleared As Action(Of Group)
         Public Event SwapCleared As Action(Of SwapCurve)
+        Public Event Ordinate As Action(Of IOrdinate)
 
         Public Shared Sub ReleaseID(ByVal id As Long)
             Identities.Remove(id)
@@ -36,6 +37,7 @@
             End Get
             Set(ByVal value As OrdinateBase)
                 _ySource = value
+                RaiseEvent Ordinate(value)
                 Recalculate()
             End Set
         End Property

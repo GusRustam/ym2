@@ -158,7 +158,8 @@ Namespace Tools.Elements
         End Sub
 
         Public Overrides Sub Recalculate(ByVal ord As IOrdinate)
-            Throw New NotImplementedException()
+            If ord = Yield Then Throw New InvalidOperationException()
+            _lastCurve(ord) = RecalculateSpread(ord)
         End Sub
 
         Public Overrides Sub Recalculate()
@@ -175,7 +176,10 @@ Namespace Tools.Elements
 
         Private Function RecalculateSpread(ByVal ordinate As IOrdinate) As List(Of CurveItem)
             SetSpread(ordinate)
-            Dim res = New List(Of CurveItem)(From item In Descrs Select New PointCurveItem(item.Duration, ordinate.GetValue(item), Me))
+            Dim res = New List(Of CurveItem)(From item In Descrs
+                                             Let theY = ordinate.GetValue(item)
+                                             Where theY.HasValue
+                                             Select New PointCurveItem(item.Duration, theY, Me))
             res.Sort()
             Return res
         End Function
@@ -340,13 +344,13 @@ Namespace Tools.Elements
 
         Public Overrides Function RateArray() As Array
             If _lastCurve.ContainsKey(Yield) Then
-                Dim list = (From elem In _lastCurve(Yield) Select elem.TheX, elem.TheY).ToList()
+                Dim list = (From elem In _lastCurve(Yield) Select New XY(elem.TheX, elem.TheY)).ToList()
                 list.Sort()
                 Dim len = list.Count - 1
                 Dim res(0 To len, 1) As Object
                 For i = 0 To len
-                    res(i, 0) = DateTime.Today.AddDays(TimeSpan.FromDays(list(i).TheX * 365).TotalDays) ' todo and wut if mode is maturity?
-                    res(i, 1) = list(i).TheY
+                    res(i, 0) = DateTime.Today.AddDays(TimeSpan.FromDays(list(i).X * 365).TotalDays) ' todo and wut if mode is maturity?
+                    res(i, 1) = list(i).Y
                 Next
                 Return res
             Else

@@ -94,8 +94,8 @@ Namespace Forms.ChartForm
             If Not _ansamble.Benchmarks.Any Then Return
             YAxisCMS.Items.Clear()
             YAxisCMS.Items.Add(Yield.ToString(), Nothing, AddressOf OnYAxisSelected) ' todo pass name somehow
-            For Each key In _ansamble.Benchmarks
-                YAxisCMS.Items.Add(key.Name, Nothing, AddressOf OnYAxisSelected)
+            For Each key As ICurve In _ansamble.Benchmarks
+                YAxisCMS.Items.Add(_ansamble.Benchmarks.GetOrdinate(key).NameProperty, Nothing, AddressOf OnYAxisSelected)
             Next
             YAxisCMS.Show(TheChart, loc)
         End Sub
@@ -163,18 +163,18 @@ Namespace Forms.ChartForm
             End With
         End Sub
 
-        Private Sub SetYAxisMode(ByVal str As String)
+        Private Sub SetYAxisMode(ByVal ord As IOrdinate)
             Try
-                Select Case str
-                    Case Yield.ToString() : MakeAxisY("Yield, %", "P2")
-                    Case AswSpread.ToString() : MakeAxisY("ASW Spread, b.p.", "N0")
-                    Case PointSpread.ToString() : MakeAxisY("Spread, b.p.", "N0")
-                    Case ZSpread.ToString() : MakeAxisY("Z-Spread, b.p.", "N0")
+                Select Case ord
+                    Case Yield : MakeAxisY("Yield, %", "P2")
+                    Case AswSpread : MakeAxisY("ASW Spread, b.p.", "N0")
+                    Case PointSpread : MakeAxisY("Spread, b.p.", "N0")
+                    Case ZSpread : MakeAxisY("Z-Spread, b.p.", "N0")
                 End Select
                 TheChart.ChartAreas(0).AxisX.ScaleView.ZoomReset()
                 TheChart.ChartAreas(0).AxisY.ScaleView.ZoomReset()
             Catch ex As Exception
-                Logger.WarnException("Failed to select y-axis variable " + str, ex)
+                Logger.WarnException(String.Format("Failed to select y-axis variable {0}", ord), ex)
                 Logger.Warn("Exception = {0}", ex.ToString())
             End Try
         End Sub
@@ -483,12 +483,15 @@ Namespace Forms.ChartForm
             GuiAsync(
                 Sub()
                     If Not data.Any Then Return
-                    If Not TypeOf data.First Is SwapCurveItem Then
+                    Dim crv As SwapCurve
+                    If TypeOf data.First Is SwapCurveItem Then
+                        crv = CType(data.First, SwapCurveItem).Curve
+                    ElseIf TypeOf data.First Is PointCurveItem Then
+                        crv = CType(CType(data.First, PointCurveItem).Curve, SwapCurve)
+                    Else
                         Logger.Warn("Unexpected items type for a swap-based curve")
                         Return
                     End If
-                    Dim dt = data.Cast(Of SwapCurveItem).ToList()
-                    Dim crv = dt.First.Curve
                     Dim srs = TheChart.Series.FindByName(crv.Identity)
                     If srs IsNot Nothing Then TheChart.Series.Remove(srs)
                     srs = New Series() With {
@@ -510,8 +513,8 @@ Namespace Forms.ChartForm
                     Dim legendItem = New LegendItem(crv.Name, crv.OuterColor, "") With {.Tag = crv.Identity}
                     legendItems.Add(legendItem)
 
-                    For Each point In dt
-                        Dim pnt = New DataPoint(point.TheX, point.TheY) With {.Tag = point.Curve, .ToolTip = point.RIC}
+                    For Each point In data
+                        Dim pnt = New DataPoint(point.TheX, point.TheY) With {.Tag = crv}
                         srs.Points.Add(pnt)
                     Next
                     SetChartMinMax()

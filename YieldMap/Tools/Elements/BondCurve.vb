@@ -269,10 +269,13 @@ Namespace Tools.Elements
             'For Each qy In From item In AllElements From quoteName In item.QuotesAndYields Select item.QuotesAndYields(quoteName)
             '    res.Add(New PointCurveItem(qy.Duration, ord.GetValue(qy), Me))
             'Next
-            Dim res = New List(Of CurveItem)(From item In AllElements
-                                                               From quoteName In item.QuotesAndYields
-                                                               Let q = item.QuotesAndYields(quoteName)
-                                                               Select New PointCurveItem(q.Duration, ord.GetValue(q), Me))
+            Dim res = New List(Of CurveItem)(
+                        From item In AllElements
+                        From quoteName In item.QuotesAndYields
+                        Let q = item.QuotesAndYields(quoteName)
+                        Let theY = ord.GetValue(q)
+                        Where theY.HasValue
+                        Select New PointCurveItem(q.Duration, theY, Me))
             res.Sort()
             Return res
         End Function
@@ -285,7 +288,6 @@ Namespace Tools.Elements
             ElseIf Ansamble.YSource.Belongs(AswSpread, OaSpread, ZSpread, PointSpread) Then
                 _lastCurve(Ansamble.YSource) = RecalculateSpread(Ansamble.YSource)
                 NotifyUpdated(_lastCurve(Ansamble.YSource))
-
             Else
                 Logger.Warn("Unknown spread type {0}", Ansamble.YSource)
             End If

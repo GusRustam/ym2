@@ -8,7 +8,7 @@ Namespace Tools.Elements
         Sub ClearValue(ByVal bpd As BasePointDescription)
         ReadOnly Property NameProperty() As String
         ReadOnly Property DescrProperty() As String
-        Function GetValue(ByVal bpd As BasePointDescription) As Double
+        Function GetValue(ByVal bpd As BasePointDescription) As Double?
     End Interface
 
     Public MustInherit Class OrdinateBase
@@ -62,7 +62,7 @@ Namespace Tools.Elements
             End Get
         End Property
 
-        Public MustOverride Function GetValue(ByVal bpd As BasePointDescription) As Double Implements IOrdinate.GetValue
+        Public MustOverride Function GetValue(ByVal bpd As BasePointDescription) As Double? Implements IOrdinate.GetValue
 
         Protected Sub New(ByVal name As String, ByVal descr As String)
             Me.Name = name
@@ -91,7 +91,7 @@ Namespace Tools.Elements
             bpd.ClearYield()
         End Sub
 
-        Public Overrides Function GetValue(ByVal bpd As BasePointDescription) As Double
+        Public Overrides Function GetValue(ByVal bpd As BasePointDescription) As Double?
             Return bpd.Yield
         End Function
 
@@ -151,7 +151,7 @@ Namespace Tools.Elements
             bpd.PointSpread = Nothing
         End Sub
 
-        Public Overrides Function GetValue(ByVal bpd As BasePointDescription) As Double
+        Public Overrides Function GetValue(ByVal bpd As BasePointDescription) As Double?
             Return bpd.PointSpread
         End Function
 
@@ -209,7 +209,7 @@ Namespace Tools.Elements
             bpd.ASWSpread = Nothing
         End Sub
 
-        Public Overrides Function GetValue(ByVal bpd As BasePointDescription) As Double
+        Public Overrides Function GetValue(ByVal bpd As BasePointDescription) As Double?
             Return bpd.ASWSpread
         End Function
 
@@ -241,7 +241,7 @@ Namespace Tools.Elements
             bpd.OASpread = Nothing
         End Sub
 
-        Public Overrides Function GetValue(ByVal bpd As BasePointDescription) As Double
+        Public Overrides Function GetValue(ByVal bpd As BasePointDescription) As Double?
             Return bpd.OASpread
         End Function
 
@@ -293,7 +293,7 @@ Namespace Tools.Elements
             bpd.ZSpread = Nothing
         End Sub
 
-        Public Overrides Function GetValue(ByVal bpd As BasePointDescription) As Double
+        Public Overrides Function GetValue(ByVal bpd As BasePointDescription) As Double?
             Return bpd.ZSpread
         End Function
 

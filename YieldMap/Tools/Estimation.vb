@@ -614,6 +614,7 @@ Namespace Tools
     End Class
 
     Public Class XY
+        Implements IComparable(Of XY)
         Public X As Double
         Public Y As Double
 
@@ -625,29 +626,6 @@ Namespace Tools
         Public Sub New()
         End Sub
 
-        Public Shared Function ConvertToXY(ByVal data As List(Of SwapPointDescription), ByVal type As OrdinateBase) As List(Of XY)
-            Dim x As List(Of Double)
-            Dim y As List(Of Double)
-            Select Case type
-                Case Yield
-                    x = data.Where(Function(elem) elem.Yield.HasValue).Select(Function(elem) elem.Duration).ToList()
-                    y = data.Where(Function(elem) elem.Yield.HasValue).Select(Function(elem) elem.Yield.Value).ToList()
-                Case PointSpread
-                    x = data.Where(Function(elem) elem.PointSpread.HasValue).Select(Function(elem) elem.Duration).ToList()
-                    y = data.Where(Function(elem) elem.PointSpread.HasValue).Select(Function(elem) elem.PointSpread.Value).ToList()
-                Case ZSpread
-                    x = data.Where(Function(elem) elem.ZSpread.HasValue).Select(Function(elem) elem.Duration).ToList()
-                    y = data.Where(Function(elem) elem.ZSpread.HasValue).Select(Function(elem) elem.ZSpread.Value).ToList()
-                Case AswSpread
-                    x = data.Where(Function(elem) elem.ASWSpread.HasValue).Select(Function(elem) elem.Duration).ToList()
-                    y = data.Where(Function(elem) elem.ASWSpread.HasValue).Select(Function(elem) elem.ASWSpread.Value).ToList()
-                Case Else
-                    x = New List(Of Double)()
-                    y = New List(Of Double)()
-            End Select
-            Return PackXY(x, y)
-        End Function
-
         Public Shared Function GetX(ByVal xy As List(Of XY)) As List(Of Double)
             Return xy.Select(Function(elem) elem.X).ToList()
         End Function
@@ -656,12 +634,8 @@ Namespace Tools
             Return xy.Select(Function(elem) elem.Y).ToList()
         End Function
 
-        Public Shared Function PackXY(ByVal x As List(Of Double), ByVal y As List(Of Double)) As List(Of XY)
-            Dim res As New List(Of XY)
-            For i = 0 To x.Count() - 1
-                res.Add(New XY With {.X = x(i), .Y = y(i)})
-            Next
-            Return res
+        Public Function CompareTo(ByVal other As XY) As Integer Implements IComparable(Of XY).CompareTo
+            Return X.CompareTo(other.X)
         End Function
     End Class
 #End Region
