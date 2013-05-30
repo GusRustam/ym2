@@ -9,10 +9,17 @@ Namespace Tools.Elements
         Inherits INamed
         Event Cleared As Action
         Sub Cleanup()
-        Sub Recalculate()
+        Sub Recalculate() ' todo add parameter with spread type
         Sub Subscribe()
         Sub FreezeEvents()
         Sub UnfreezeEvents()
+    End Interface
+
+    Public Interface IAswBenchmark
+        Function CanBeBenchmark() As Boolean
+
+        ReadOnly Property FloatLegStructure() As String
+        ReadOnly Property FloatingPointValue() As Double
     End Interface
 
     Public Interface ICurve
@@ -24,6 +31,7 @@ Namespace Tools.Elements
 
         Sub ClearSpread(ByVal ySource As OrdinateBase)
         Sub SetSpread(ByVal ySource As OrdinateBase)
+        Function RateArray() As Array
     End Interface
 
     Public MustInherit Class SwapCurve
@@ -56,6 +64,7 @@ Namespace Tools.Elements
         Public MustOverride Sub Bootstrap() Implements ICurve.Bootstrap
         Public MustOverride Sub ClearSpread(ByVal ySource As OrdinateBase) Implements ICurve.ClearSpread
         Public MustOverride Sub SetSpread(ByVal ySource As OrdinateBase) Implements ICurve.SetSpread
+        Public MustOverride Function RateArray() As Array Implements ICurve.RateArray
 
         '' ============ BROKERS ============
         Public MustOverride Function GetBrokers() As String()

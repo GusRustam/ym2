@@ -109,9 +109,9 @@ Namespace Tools.Elements
                     Dim mainQuote = bond.QuotesAndYields.Main
                     If mainQuote Is Nothing Then Continue For
                     If bond.Enabled Then
-                        _enabledElements.Add(New BondCurveElement(bond.MetaData.RIC, bond.Label, mainQuote.GetYield(), mainQuote.Duration, mainQuote.Price, bond.QuotesAndYields.MaxPriorityField, mainQuote.YieldAtDate))
+                        _enabledElements.Add(New BondCurveElement(bond.MetaData.RIC, bond.Label, mainQuote.Yield, mainQuote.Duration, mainQuote.Price, bond.QuotesAndYields.MaxPriorityField, mainQuote.YieldAtDate))
                     Else
-                        _disabledElements.Add(New BondCurveElement(bond.MetaData.RIC, bond.Label, mainQuote.GetYield(), mainQuote.Duration, mainQuote.Price, bond.QuotesAndYields.MaxPriorityField, mainQuote.YieldAtDate))
+                        _disabledElements.Add(New BondCurveElement(bond.MetaData.RIC, bond.Label, mainQuote.Yield, mainQuote.Duration, mainQuote.Price, bond.QuotesAndYields.MaxPriorityField, mainQuote.YieldAtDate))
                     End If
                 Next
                 _enabledElements.Sort()
@@ -136,7 +136,7 @@ Namespace Tools.Elements
         Private ReadOnly _histFields As FieldContainer
 
         ' Last curve snapshot
-        Private _lastCurve As List(Of CurveItem)
+        Private _lastCurve As New Dictionary(Of IOrdinate, List(Of CurveItem))
 
         Private _formula As String
         Public ReadOnly Property Formula() As String
@@ -308,7 +308,7 @@ Namespace Tools.Elements
                                 x = (bnd.MetaData.Maturity.Value - Date.Today).Days / 365
                         End Select
 
-                        y = description.GetYield()
+                        y = description.Yield
                         If x > 0 And y > 0 Then result.Add(New BondCurveItem(x, y, bnd, description.BackColor, description.Yld.ToWhat, description.MarkerStyle, bnd.Label))
                     Next
                 End If
@@ -325,7 +325,7 @@ Namespace Tools.Elements
                     _formula = "N/A"
                 End If
 
-                _lastCurve = New List(Of CurveItem)(result)
+                _lastCurve(Yield) = New List(Of CurveItem)(result)
                 NotifyUpdated(result)
             ElseIf Ansamble.YSource.Belongs(AswSpread, OaSpread, ZSpread, PointSpread) Then
                 ' todo plotting spreads
@@ -339,7 +339,9 @@ Namespace Tools.Elements
         End Sub
 
         Public Function GetSnapshot() As BondCurveSnapshot
-            Return New BondCurveSnapshot(AllElements, _lastCurve)
+            If Not _lastCurve.ContainsKey(Yield) Then Return Nothing
+            ' todo add spreads to snapshot /?
+            Return New BondCurveSnapshot(AllElements, _lastCurve(Yield))
         End Function
 
         Public Sub SetFitMode(ByVal mode As String)
@@ -358,5 +360,18 @@ Namespace Tools.Elements
                 ySource.SetValue(qy, Ansamble.Benchmarks(ySource))
             Next
         End Sub
+
+        Public Function RateArray() As Array Implements ICurve.RateArray
+            If Not _lastCurve.ContainsKey(Yield) Then Return Nothing
+            Dim list = (From elem In _lastCurve(Yield) Select elem.TheX, elem.TheY).ToList()
+            list.Sort()
+            Dim len = list.Count - 1
+            Dim res(0 To len, 1) As Object
+            For i = 0 To len
+                res(i, 0) = DateTime.Today.AddDays(TimeSpan.FromDays(list(i).TheX * 365).TotalDays) ' todo and wut if mode is maturity?
+                res(i, 1) = list(i).TheY
+            Next
+            Return res
+        End Function
     End Class
 End NameSpace

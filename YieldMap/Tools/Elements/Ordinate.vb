@@ -1,4 +1,6 @@
 ﻿Imports AdfinXAnalyticsFunctions
+Imports DbManager.Bonds
+Imports NLog
 Imports ReutersData
 
 Namespace Tools.Elements
@@ -78,7 +80,9 @@ Namespace Tools.Elements
 
         ' тогда вопрос, что такое val. Давайте щетать, что для облигации это иё цена, ась?
         Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal curve As ICurve, Optional ByVal val As Double? = Nothing)
-            bpd.CalculateYield(val)
+            ' этот метод не должен вызываться ни для бондов, ни для кривой, поскольку они получают свои доходности из загруженных данных
+            Throw New InvalidOperationException()
+            'bpd.Yield = val
         End Sub
 
         Public Overrides Sub ClearValue(ByVal bpd As BasePointDescription)
@@ -101,11 +105,39 @@ Namespace Tools.Elements
             MyBase.New(name, descr)
         End Sub
 
+        Private Shared Function CalcPntSprd(ByVal rateArray As Array, ByVal dscr As BasePointDescription) As Double
+            Dim data As New List(Of XY)
+            For i = rateArray.GetLowerBound(0) To rateArray.GetUpperBound(0)
+                data.Add(New XY() With {.Y = rateArray.GetValue(i, 1), .X = (CDate(rateArray.GetValue(i, 0)) - dscr.YieldAtDate).Days / 365})
+            Next
+
+            Dim yld = dscr.Yield(Nothing)
+            Dim duration = dscr.Duration
+
+            If data.Count() >= 2 Then
+                Dim minDur = data.Select(Function(theXY) theXY.X).Min
+                Dim maxDur = data.Select(Function(theXY) theXY.X).Max
+                If duration < minDur Or duration > maxDur Then Return Nothing
+
+                For i = 0 To data.Count() - 2
+                    Dim xi = data(i).X
+                    Dim xi1 = data(i + 1).X
+                    If xi <= duration And xi1 >= duration Then
+                        Dim yi = data(i).Y
+                        Dim yi1 = data(i + 1).Y
+                        Dim a = (xi1 - duration) / (xi1 - xi)
+                        Return (yld - (a * yi + (1 - a) * yi1)) * 10000
+                    End If
+                Next
+            End If
+            Return Nothing
+        End Function
+
         Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal curve As ICurve, Optional ByVal val As Double? = Nothing)
             If val IsNot Nothing Then
                 bpd.PointSpread = val
             Else
-                ' todo calculating point spread
+                bpd.PointSpread = CalcPntSprd(curve.RateArray, bpd)
             End If
         End Sub
 
@@ -124,16 +156,42 @@ Namespace Tools.Elements
         Inherits OrdinateBase
 
         Private Shared ReadOnly Inst As New OrdinateAswSpread("ASWSpread", "Asset swap spread")
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(OrdinateZSpread))
+        Private Shared ReadOnly SwapModule As AdxSwapModule = Eikon.Sdk.CreateAdxSwapModule()
 
         Public Sub New(ByVal name As String, ByVal descr As String)
             MyBase.New(name, descr)
         End Sub
 
+        Private Function CalcASWSprd(ByVal rateArray As Array, ByVal floatLegStructure As String, ByVal floatingRate As Double, ByRef dscr As BondPointDescription) As Double?
+            Dim data = dscr.ParentBond.MetaData
+            If dscr.Price > 0 Then
+                Try
+                    Dim settleDate = BondModule.BdSettle(DateTime.Today, data.PaymentStructure)
+                    Dim res As Array = SwapModule.AdAssetSwapBdSpread(settleDate, data.Maturity, rateArray, dscr.Price / 100.0,
+                                                                      data.Coupon / 100.0, floatingRate, data.PaymentStructure,
+                                                                      floatLegStructure, "ZCTYPE:RATE IM:LIX RM:YC", "")
+                    Return res.GetValue(1, 1)
+                Catch ex As Exception
+                    Logger.ErrorException("Failed to calculate ASW Spread", ex)
+                    Logger.Error("Exception = {0}", ex.ToString())
+                    Return Nothing
+                End Try
+            Else
+                Return Nothing
+            End If
+        End Function
+
         Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal curve As ICurve, Optional ByVal val As Double? = Nothing)
             If val IsNot Nothing Then
                 bpd.ASWSpread = val
             Else
-                ' todo
+                If TypeOf curve Is IAswBenchmark Then
+                    Dim asw = CType(curve, IAswBenchmark)
+                    bpd.ASWSpread = CalcASWSprd(curve.RateArray, asw.FloatLegStructure, asw.FloatingPointValue, bpd)
+                Else
+                    ClearValue(bpd)
+                End If
             End If
         End Sub
 
@@ -161,7 +219,7 @@ Namespace Tools.Elements
             If val IsNot Nothing Then
                 bpd.OASpread = val
             Else
-                ' todo
+                ClearValue(bpd)
             End If
         End Sub
 
@@ -179,17 +237,37 @@ Namespace Tools.Elements
     Public Class OrdinateZSpread
         Inherits OrdinateBase
 
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(OrdinateZSpread))
         Private Shared ReadOnly Inst As New OrdinateZSpread("ZSpread", "Z Spread")
 
         Public Sub New(ByVal name As String, ByVal descr As String)
             MyBase.New(name, descr)
         End Sub
 
+        Private Function CalcZSprd(ByVal rateArray As Array, ByRef dscr As BondPointDescription) As Double?
+            Dim data = dscr.ParentBond.MetaData
+            If dscr.Price > 0 Then
+                Try
+                    Dim settleDate = BondModule.BdSettle(DateTime.Today, data.PaymentStructure)
+                    Return BondModule.AdBondSpread(settleDate, rateArray, dscr.Price / 100.0, data.Maturity, data.Coupon / 100.0, data.PaymentStructure, "ZCTYPE:RATE IM:LIX RM:YC", "", "")
+                Catch ex As Exception
+                    Logger.ErrorException("Failed to calculate Z-Spread", ex)
+                    Logger.Error("Exception = {0}", ex.ToString())
+                    Return Nothing
+                End Try
+            End If
+            Return Nothing
+        End Function
+
         Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal curve As ICurve, Optional ByVal val As Double? = Nothing)
             If val IsNot Nothing Then
                 bpd.ZSpread = val
             Else
-                ' todo
+                If TypeOf bpd Is BondPointDescription Then
+                    bpd.ZSpread = CalcZSprd(curve.RateArray, bpd)
+                Else
+                    ClearValue(bpd)
+                End If
             End If
         End Sub
 

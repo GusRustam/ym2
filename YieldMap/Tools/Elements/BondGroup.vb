@@ -42,7 +42,7 @@ Namespace Tools.Elements
                             x = (bnd.MetaData.Maturity.Value - Date.Today).Days / 365
                     End Select
 
-                    y = description.GetYield()
+                    y = description.Yield
                     If x > 0 And y > 0 Then result.Add(New BondCurveItem(x, y, bnd, description.BackColor, description.Yld.ToWhat, description.MarkerStyle, bnd.Label))
                 Next
                 result.Sort()

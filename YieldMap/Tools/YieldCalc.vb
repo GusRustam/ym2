@@ -1,13 +1,6 @@
 ﻿Imports System.Windows.Forms.DataVisualization.Charting
 Imports System.Globalization
-Imports AdfinXAnalyticsFunctions
 Imports System.ComponentModel
-Imports DbManager.Bonds
-Imports YieldMap.Tools.Elements
-Imports ReutersData
-Imports Uitls
-Imports NLog
-Imports System.Text.RegularExpressions
 
 Namespace Tools
     Public Class YieldToWhatConverter
@@ -154,133 +147,10 @@ Namespace Tools
     ''' </summary>
     ''' <remarks></remarks>
     Friend Module YieldCalc
-        Private ReadOnly Logger As Logger = Logging.GetLogger(GetType(YieldCalc))
-        Private ReadOnly BondModule As AdxBondModule = Eikon.Sdk.CreateAdxBondModule()
-        Private ReadOnly SwapModule As AdxSwapModule = Eikon.Sdk.CreateAdxSwapModule()
         Public Function QuoteDescription(price As Double, yield As Double, duration As Double, yieldToWhat As YieldToWhat) As String
             Return String.Format("P [{0:F4}], Y [{1:P2}] {2}, D [{3:F2}]",
                                  price, yield, yieldToWhat.Abbr, duration)
         End Function
 
-        Public Sub CalcZSprd(ByVal rateArray As Array, ByRef descr As BasePointDescription, ByVal data As BondMetadata)
-            If descr.Price > 0 Then
-                Try
-                    Dim settleDate = BondModule.BdSettle(DateTime.Today, data.PaymentStructure)
-                    descr.ZSpread = BondModule.AdBondSpread(settleDate, rateArray, descr.Price / 100.0, data.Maturity, data.Coupon / 100.0, data.PaymentStructure, "ZCTYPE:RATE IM:LIX RM:YC", "", "")
-                Catch ex As Exception
-                    Logger.ErrorException("Failed to calculate Z-Spread", ex)
-                    Logger.Error("Exception = {0}", ex.ToString())
-                    descr.ZSpread = Nothing
-                End Try
-            Else
-                descr.ZSpread = Nothing
-            End If
-        End Sub
-
-        Public Sub CalcPntSprd(ByVal rateArray As Array, ByRef descr As BasePointDescription)
-            Dim data As New List(Of XY)
-            For i = rateArray.GetLowerBound(0) To rateArray.GetUpperBound(0)
-                data.Add(New XY() With {.Y = rateArray.GetValue(i, 1), .X = (CDate(rateArray.GetValue(i, 0)) - descr.YieldAtDate).Days / 365})
-            Next
-
-            Dim yld = descr.GetYield()
-            Dim duration = descr.Duration
-
-            If data.Count() >= 2 Then
-                Dim minDur = data.Select(Function(theXY) theXY.X).Min
-                Dim maxDur = data.Select(Function(theXY) theXY.X).Max
-                If duration < minDur Or duration > maxDur Then
-                    descr.PointSpread = Nothing
-                    Return
-                End If
-
-                For i = 0 To data.Count() - 2
-                    Dim xi = data(i).X
-                    Dim xi1 = data(i + 1).X
-                    If xi <= duration And xi1 >= duration Then
-                        Dim yi = data(i).Y
-                        Dim yi1 = data(i + 1).Y
-                        Dim a = (xi1 - duration) / (xi1 - xi)
-                        descr.PointSpread = (yld - (a * yi + (1 - a) * yi1)) * 10000
-                        Return
-                    End If
-                Next
-            End If
-            descr.PointSpread = Nothing
-        End Sub
-
-        Public Sub CalcASWSprd(ByVal rateArray As Array, ByVal floatLegStructure As String, ByVal floatingRate As Double, ByRef descr As BasePointDescription, ByVal data As BondMetadata)
-            If descr.Price > 0 Then
-                Try
-                    Dim settleDate = BondModule.BdSettle(DateTime.Today, data.PaymentStructure)
-                    Dim res As Array = SwapModule.AdAssetSwapBdSpread(settleDate, data.Maturity, rateArray, descr.Price / 100.0, data.Coupon / 100.0, floatingRate, data.PaymentStructure, floatLegStructure, "ZCTYPE:RATE IM:LIX RM:YC", "")
-                    descr.ASWSpread = res.GetValue(1, 1)
-                Catch ex As Exception
-                    Logger.ErrorException("Failed to calculate ASW Spread", ex)
-                    Logger.Error("Exception = {0}", ex.ToString())
-                    descr.ASWSpread = Nothing
-                End Try
-            Else
-                descr.ASWSpread = Nothing
-            End If
-        End Sub
-
-        ' todo I don't like this function now soo much!
-        Public Sub CalculateYields(ByVal dt As DateTime, ByVal descr As BondMetadata, ByRef calc As BasePointDescription)
-            Logger.Trace("CalculateYields({0}, {1})", calc.Price, descr.RIC)
-
-            Dim coupon = BondsData.Instance.GetBondPayments(descr.RIC).GetCoupon(dt)
-            Dim settleDate = BondModule.BdSettle(dt, descr.PaymentStructure)
-            Logger.Trace("Coupon: {0}, settleDate: {1}, maturity: {2}", coupon, settleDate, descr.Maturity)
-            Dim bondYield As Array = BondModule.AdBondYield(settleDate, calc.Price / 100, descr.Maturity, coupon, descr.PaymentStructure, descr.RateStructure, "")
-            Dim bestYield = ParseBondYield(bondYield).Max
-            Logger.Trace("best Yield: {0}", bestYield)
-
-            ' todo no best yield! (or else, best yield and other yields too)
-            ' todo modified duration
-
-            Dim bondDeriv As Array = BondModule.AdBondDeriv(settleDate, bestYield.Yield, descr.Maturity, coupon, 0, descr.PaymentStructure, Regex.Replace(descr.RateStructure, "YT[A-Z]", bestYield.ToWhat.Abbr), "", "")
-#If DEBUG Then
-            Logger.Trace(" --- derivatives ---")
-            For i = bondDeriv.GetLowerBound(0) To bondDeriv.GetUpperBound(0)
-                For j = bondDeriv.GetLowerBound(0) To bondDeriv.GetUpperBound(1)
-                    Logger.Trace("({0},{1}) -> {2}", i, j, bondDeriv.GetValue(i, j))
-                Next
-            Next
-#End If
-            Dim duration = bondDeriv.GetValue(1, 5)
-            Dim convexity = bondDeriv.GetValue(1, 7)
-            Dim pvbp = bondDeriv.GetValue(1, 4)
-
-            calc.Duration = duration
-            calc.YieldAtDate = dt
-
-            If TypeOf calc Is BondPointDescription Then
-                Dim clc = CType(calc, BondPointDescription)
-                clc.Convexity = convexity
-                clc.PVBP = pvbp
-                clc.Yld = bestYield
-            ElseIf TypeOf calc Is SwapPointDescription Then
-                Dim clc = CType(calc, SwapPointDescription)
-                clc.Yield = bestYield.Yield
-            End If
-        End Sub
-
-        Private Function ParseBondYield(ByVal bondYield As Array) As List(Of YieldStructure)
-            Dim res As New List(Of YieldStructure)
-
-            For j = bondYield.GetLowerBound(0) To bondYield.GetUpperBound(0)
-                Dim yield = CSng(bondYield.GetValue(j, 1))
-                Dim itsDate = Utils.FromExcelSerialDate(bondYield.GetValue(j, 2))
-                Logger.Trace("Parsing line: {0:P2} {1:dd-MMM-yy} {2} {3}", yield, itsDate, bondYield.GetValue(j, 3).ToString(), bondYield.GetValue(j, 4).ToString())
-                Dim toWhat As YieldToWhat
-                If Not YieldToWhat.TryParse(bondYield.GetValue(j, 4).ToString(), toWhat) Then
-                    toWhat = YieldToWhat.Maturity
-                End If
-                Dim yieldDescr = New YieldStructure With {.Yield = yield, .YieldToDate = itsDate, .ToWhat = toWhat}
-                res.Add(yieldDescr)
-            Next
-            Return res
-        End Function
     End Module
 End Namespace

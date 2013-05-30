@@ -40,6 +40,7 @@ Namespace Tools.Elements
             End Set
         End Property
 
+        ' todo catch updates by type and do recalculations
         Private WithEvents _items As New GroupContainer
         Public ReadOnly Property Items As GroupContainer
             Get
@@ -47,6 +48,7 @@ Namespace Tools.Elements
             End Get
         End Property
 
+        ' todo catch updates by type and do recalculations
         Private WithEvents _swapCurves As New SwapCurveContainer
         Public ReadOnly Property SwapCurves() As SwapCurveContainer
             Get
@@ -60,7 +62,6 @@ Namespace Tools.Elements
             End Get
         End Property
 
-        ' todo develop a ChangeableContainer??? Or a special container for bnchmrks?
         Private WithEvents _benchmarks As New BenchmarkContainer
         Private _eventsFrozen As Boolean
 

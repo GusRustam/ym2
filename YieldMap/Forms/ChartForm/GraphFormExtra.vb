@@ -268,7 +268,7 @@ Namespace Forms.ChartForm
             SpreadCMS.Tag = nm
             'If Not _moneyMarketCurves.Any() Then Return
             For Each item In _ansamble.SwapCurves
-                Dim elem = CType(SpreadCMS.Items.Add(item.Name, Nothing, AddressOf OnSwapCurveSelected), ToolStripMenuItem)
+                Dim elem = CType(SpreadCMS.Items.Add(item.Name, Nothing, AddressOf OnBenchmarkSelected), ToolStripMenuItem)
                 elem.CheckOnClick = True
                 elem.Checked = refCurve IsNot Nothing AndAlso item.Name = refCurve.Name
                 elem.Tag = item
@@ -277,7 +277,7 @@ Namespace Forms.ChartForm
             Dim items = (From elem In _ansamble.Items Where TypeOf elem.Value Is BondCurve Select elem.Value).ToList()
             If SpreadCMS.Items.Count > 0 And items.Any Then SpreadCMS.Items.Add(New ToolStripSeparator)
             For Each item In items
-                Dim elem = CType(SpreadCMS.Items.Add(item.Name, Nothing, AddressOf OnBondCurveSelected), ToolStripMenuItem)
+                Dim elem = CType(SpreadCMS.Items.Add(item.Name, Nothing, AddressOf OnBenchmarkSelected), ToolStripMenuItem)
                 elem.CheckOnClick = True
                 elem.Tag = item
             Next item
@@ -291,14 +291,13 @@ Namespace Forms.ChartForm
             ' todo show new curve creation dialog epta
         End Sub
 
-        Private Sub OnSwapCurveSelected(ByVal sender As Object, ByVal eventArgs As EventArgs)
-            Logger.Info("OnYieldCurveSelected()")
+        Private Sub OnBenchmarkSelected(ByVal sender As Object, ByVal eventArgs As EventArgs)
+            Logger.Info("OnBenchmarkSelected()")
             Dim senderTSMI = TryCast(sender, ToolStripMenuItem)
             If senderTSMI Is Nothing Then Return
 
             If senderTSMI.Checked Then
                 _ansamble.Benchmarks.Put(FromString(SpreadCMS.Tag), senderTSMI.Tag)
-                '_spreadBenchmarks.AddType(YSource.FromString(SpreadCMS.Tag), senderTSMI.Tag)
             Else
                 _ansamble.Benchmarks.Clear(FromString(SpreadCMS.Tag))
             End If
@@ -308,10 +307,6 @@ Namespace Forms.ChartForm
             ASWLabel.Text = If(_ansamble.Benchmarks.Has(AswSpread), " -> " + _ansamble.Benchmarks(AswSpread).Name, "")
             SpreadLabel.Text = If(_ansamble.Benchmarks.Has(PointSpread), " -> " + _ansamble.Benchmarks(PointSpread).Name, "")
             ZSpreadLabel.Text = If(_ansamble.Benchmarks.Has(ZSpread), " -> " + _ansamble.Benchmarks(ZSpread).Name, "")
-        End Sub
-
-        Private Sub OnBondCurveSelected(ByVal sender As Object, ByVal e As EventArgs)
-            ' todo 
         End Sub
 
         Private Sub ResetPointSelection()
@@ -358,6 +353,7 @@ Namespace Forms.ChartForm
             Next
         End Sub
 
+        ' todo that's awful
         Public Sub OnHistoricalData(ByVal ric As String, ByVal data As Dictionary(Of Date, HistoricalItem), ByVal rawData As Dictionary(Of DateTime, RawHistoricalItem))
             Logger.Trace("OnHistoricalQuotes({0})", ric)
             If _ansamble.YSource <> Yield Then Return
@@ -368,15 +364,13 @@ Namespace Forms.ChartForm
             End If
 
             Dim elem = _ansamble.Items.Bonds(Function(m) m.RIC = ric).First()
-            Dim bondDataPoint = elem.MetaData ' todo that's awful
+            Dim bondDataPoint = elem.MetaData
             Dim points As New List(Of Tuple(Of BondPointDescription, BondMetadata))
             For Each dt In data.Keys
                 Try
                     Dim calc As New BondPointDescription
                     If data(dt).Close > 0 Then
-                        calc.Price = data(dt).Close
-
-                        CalculateYields(dt, bondDataPoint, calc)
+                        calc.Yield(dt) = data(dt).Close
                         points.Add(Tuple.Create(calc, bondDataPoint))
                     End If
                 Catch ex As Exception
@@ -403,7 +397,7 @@ Namespace Forms.ChartForm
                         TheChart.Series.Add(theSeries)
                         points.ForEach(
                             Sub(tpl)
-                                Dim point = New DataPoint(tpl.Item1.Duration, tpl.Item1.GetYield.Value) With {
+                                Dim point = New DataPoint(tpl.Item1.Duration, tpl.Item1.Yield.Value) With {
                                                 .Tag = New HistoryPointTag With {
                                                     .Ric = bondDataPoint.RIC,
                                                     .Descr = tpl.Item1,

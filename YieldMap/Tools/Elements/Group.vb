@@ -172,14 +172,14 @@ Namespace Tools.Elements
             Next
         End Sub
 
-        Protected Sub HandleQuote(ByRef bondDataPoint As Bond, ByVal xmlName As String, ByVal fieldVal As Double?, ByVal calcDate As Date)
-            Dim calculation As New BondPointDescription
-            calculation.BackColor = BondFields.Fields.BackColor(xmlName)
-            calculation.MarkerStyle = BondFields.Fields.MarkerStyle(xmlName)
-            calculation.Price = fieldVal
-            CalculateYields(calcDate, bondDataPoint.MetaData, calculation) ' todo add userDefinedSpread
+        Protected Sub HandleQuote(ByRef bond As Bond, ByVal xmlName As String, ByVal fieldVal As Double?, ByVal calcDate As Date)
+            Dim descr As New BondPointDescription
+            descr.BackColor = BondFields.Fields.BackColor(xmlName)
+            descr.MarkerStyle = BondFields.Fields.MarkerStyle(xmlName)
+            descr.ParentBond = Bond
+            descr.Yield(calcDate) = fieldVal
 
-            bondDataPoint.QuotesAndYields(xmlName) = calculation
+            Bond.QuotesAndYields(xmlName) = descr
             Recalculate()
         End Sub
 

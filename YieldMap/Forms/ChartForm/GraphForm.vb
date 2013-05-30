@@ -696,8 +696,8 @@ Namespace Forms.ChartForm
             SpreadCMS.Tag = "ASWSpread"
             If Not _ansamble.SwapCurves.Any() Then Return
             For Each item In (From crv In _ansamble.SwapCurves
-                              Where TypeOf crv Is IAssetSwapBenchmark AndAlso CType(crv, IAssetSwapBenchmark).CanBeBenchmark())
-                Dim elem = CType(SpreadCMS.Items.Add(item.Name, Nothing, AddressOf OnSwapCurveSelected), ToolStripMenuItem)
+                              Where TypeOf crv Is IAswBenchmark AndAlso CType(crv, IAswBenchmark).CanBeBenchmark())
+                Dim elem = CType(SpreadCMS.Items.Add(item.Name, Nothing, AddressOf OnBenchmarkSelected), ToolStripMenuItem)
                 elem.CheckOnClick = True
                 elem.Checked = refCurve IsNot Nothing AndAlso item.Name = refCurve.Name
                 elem.Tag = item

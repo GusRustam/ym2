@@ -81,9 +81,8 @@ Namespace Tools.Elements
         Public ASWSpread As Double?
         Public OASpread As Double?
 
-        Public MustOverride Function GetYield() As Double?
-        Public MustOverride Sub CalculateYield(ByVal val As Double)
         Public MustOverride Sub ClearYield()
+        Public MustOverride Property Yield(Optional ByVal dt As Date? = Nothing) As Double?
 
         Public Function CompareTo(ByVal other As BasePointDescription) As Integer Implements IComparable(Of BasePointDescription).CompareTo
             If other IsNot Nothing Then
@@ -104,18 +103,21 @@ Namespace Tools.Elements
     Public Class SwapPointDescription
         Inherits BasePointDescription
 
-        Public Yield As Double?
-        Public Overrides Function GetYield() As Double?
-            Return Yield
-        End Function
-
-        Public Overrides Sub CalculateYield(ByVal val As Double)
-            [Yield] = val
-        End Sub
+        Private _yield As Double?
 
         Public Overrides Sub ClearYield()
-            [Yield] = Nothing
+            _yield = Nothing
         End Sub
+
+        Public Overrides Property Yield(Optional ByVal dt As Date? = Nothing) As Double?
+            Get
+                Return _yield
+            End Get
+            Set(value As Double?)
+                If dt.HasValue Then YieldAtDate = dt.Value
+                _yield = value
+            End Set
+        End Property
 
         Private ReadOnly _ric As String
         Public ReadOnly Property RIC As String
@@ -129,7 +131,7 @@ Namespace Tools.Elements
         End Sub
 
         Public Overrides Function ToString() As String
-            Return String.Format("{0} {1:P2}:{2:F2}", RIC, Yield / 100, Duration)
+            Return String.Format("{0} {1:P2}:{2:F2}", RIC, _yield / 100, Duration)
         End Function
     End Class
 
@@ -146,11 +148,6 @@ Namespace Tools.Elements
 
         Public BackColor As String
         Public MarkerStyle As String
-
-        Public Overrides Function GetYield() As Double?
-            Return Yld.Yield
-        End Function
-
 
         Private Shared Function ParseBondYield(ByVal bondYield As Array) As List(Of YieldStructure)
             Dim res As New List(Of YieldStructure)
@@ -169,13 +166,15 @@ Namespace Tools.Elements
             Return res
         End Function
 
-        Private Sub CalculateYields(ByVal dscr As BondMetadata)
+        Private Sub CalculateYields(ByVal prc As Double)
+            Price = prc
+            Dim dscr = ParentBond.MetaData
             Logger.Trace("CalculateYields({0}, {1})", Price, dscr.RIC)
 
             Dim coupon = BondsData.Instance.GetBondPayments(dscr.RIC).GetCoupon(YieldAtDate)
             Dim settleDate = _bondModule.BdSettle(YieldAtDate, dscr.PaymentStructure)
             Logger.Trace("Coupon: {0}, settleDate: {1}, maturity: {2}", coupon, settleDate, dscr.Maturity)
-            Dim bondYield As Array = _bondModule.AdBondYield(settleDate, Price / 100, dscr.Maturity, coupon, dscr.PaymentStructure, dscr.RateStructure, "")
+            Dim bondYield As Array = _bondModule.AdBondYield(settleDate, price / 100, dscr.Maturity, coupon, dscr.PaymentStructure, dscr.RateStructure, "")
             Dim bestYield = ParseBondYield(bondYield).Max
             Logger.Trace("best Yield: {0}", bestYield)
 
@@ -191,13 +190,18 @@ Namespace Tools.Elements
             Yld = bestYield
         End Sub
 
-        Public Overrides Sub CalculateYield(ByVal val As Double)
-            Price = val
-            CalculateYields(ParentBond.MetaData)
-        End Sub
-
         Public Overrides Sub ClearYield()
             Yld = New YieldStructure()
         End Sub
+
+        Public Overrides Property Yield(Optional ByVal dt As Date? = Nothing) As Double?
+            Get
+                Return Yld.Yield
+            End Get
+            Set(value As Double?)
+                If dt.HasValue Then YieldAtDate = dt.Value
+                CalculateYields(value)
+            End Set
+        End Property
     End Class
 End Namespace

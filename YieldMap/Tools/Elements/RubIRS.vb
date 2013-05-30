@@ -6,16 +6,9 @@ Imports Uitls
 Imports NLog
 
 Namespace Tools.Elements
-    Public Interface IAssetSwapBenchmark
-        Function CanBeBenchmark() As Boolean
-
-        ReadOnly Property FloatLegStructure() As String
-        ReadOnly Property FloatingPointValue() As Double
-    End Interface
-
     Public Class RubIRS
         Inherits SwapCurve
-        Implements IAssetSwapBenchmark
+        Implements IAswBenchmark
 
         Protected ReadOnly Descrs As New List(Of SwapPointDescription)
         Protected Overridable Property BaseInstrumentPrice As Double
@@ -56,7 +49,7 @@ Namespace Tools.Elements
         Private _theCurveDate As Date = Date.Today
         Private _broker As String = ""
         Private _quote As String = "MID"
-        Private _lastCurve As List(Of CurveItem) ' todo use it in Snapshotting :/
+        Private ReadOnly _lastCurve As New Dictionary(Of IOrdinate, List(Of CurveItem))
         Private Const InstrumentType As String = "S"
 
         Sub New(ByVal ansamble As Ansamble)
@@ -142,7 +135,7 @@ Namespace Tools.Elements
                     If ric <> BaseInstrument Then
                         Dim item = (From descr In Descrs Where descr.RIC = ric).First
                         With item
-                            .Yield = aYield / 100
+                            .Yield(lastDate) = aYield / 100
                             .Duration = GetDuration(ric)
                             .YieldAtDate = lastDate
                         End With
@@ -170,7 +163,7 @@ Namespace Tools.Elements
                 Dim result As New List(Of CurveItem)
                 If _bootstrapped Then
                     Try
-                        Dim data = (From elem In Descrs Where elem.Yield > 0).ToList()
+                        Dim data = (From elem In Descrs Where elem.Yield.HasValue AndAlso elem.Yield > 0).ToList()
 
                         Dim params(0 To data.Count() - 1, 5) As Object
                         For i = 0 To data.Count - 1
@@ -195,14 +188,14 @@ Namespace Tools.Elements
                     End Try
                 Else
                     result.AddRange((From item In Descrs
-                                     Let x = item.Duration, y = item.GetYield()
+                                     Let x = item.Duration, y = item.Yield
                                      Where x > 0 And y > 0
                                      Select New SwapCurveItem(x, y, Me, item.RIC)).
                                  Cast(Of CurveItem))
                 End If
                 result.Sort()
+                _lastCurve(Yield) = New List(Of CurveItem)(result)
 
-                _lastCurve = New List(Of CurveItem)(result)
                 NotifyUpdated(result)
             ElseIf _ansamble.YSource.Belongs(AswSpread, OaSpread, ZSpread, PointSpread) Then
                 ' todo plotting spreads
@@ -230,7 +223,7 @@ Namespace Tools.Elements
                                 Dim yld As Double
                                 yld = CDbl(fv(IIf(_quote = "BID", "393", "275")))
                                 If yld > 0 Then
-                                    elem.Yield = yld / 100
+                                    elem.Yield(Today) = yld / 100
                                     elem.Duration = duration
                                     Recalculate()
                                 End If
@@ -239,11 +232,11 @@ Namespace Tools.Elements
                                 Dim askYield = CDbl(fv("275")) / 100
                                 Dim found = True
                                 If bidYield > 0 And askYield > 0 Then
-                                    elem.Yield = (bidYield + askYield) / 2
+                                    elem.Yield(Today) = (bidYield + askYield) / 2
                                 ElseIf bidYield > 0 Then
-                                    elem.Yield = bidYield
+                                    elem.Yield(Today) = bidYield
                                 ElseIf askYield > 0 Then
-                                    elem.Yield = askYield
+                                    elem.Yield(Today) = askYield
                                 Else
                                     found = False
                                 End If
@@ -257,11 +250,6 @@ Namespace Tools.Elements
                             Logger.Warn("Exception = {0}", ex.ToString())
                         End Try
                     End If
-#If DEBUG Then
-                    For Each x As KeyValuePair(Of String, Double) In fv
-                        Logger.Trace("  {0} -> {1}", x.Key, x.Value)
-                    Next
-#End If
                 ElseIf BaseInstrument = ric Then
                     Logger.Trace("Got base instrument {0}", BaseInstrument)
                     If fv.Keys.Contains("BID") Or fv.Keys.Contains("ASK") Then
@@ -294,11 +282,6 @@ Namespace Tools.Elements
                             Logger.Warn("Exception = {0}", ex.ToString())
                         End Try
                     End If
-#If DEBUG Then
-                    For Each x As KeyValuePair(Of String, Double) In fv
-                        Logger.Trace("  {0} -> {1}", x.Key, x.Value)
-                    Next
-#End If
                 End If
             Next
         End Sub
@@ -331,9 +314,25 @@ Namespace Tools.Elements
 
         Public Overrides Sub SetSpread(ByVal ySource As OrdinateBase)
             For Each item In Descrs
-                ySource.SetValue(item, ySource.Calculate(item, _ansamble.Benchmarks(ySource)))
+                ySource.SetValue(item, _ansamble.Benchmarks(ySource))
             Next
         End Sub
+
+        Public Overrides Function RateArray() As Array
+            If _lastCurve.ContainsKey(Yield) Then
+                Dim list = (From elem In _lastCurve(Yield) Select elem.TheX, elem.TheY).ToList()
+                list.Sort()
+                Dim len = list.Count - 1
+                Dim res(0 To len, 1) As Object
+                For i = 0 To len
+                    res(i, 0) = DateTime.Today.AddDays(TimeSpan.FromDays(list(i).TheX * 365).TotalDays) ' todo and wut if mode is maturity?
+                    res(i, 1) = list(i).TheY
+                Next
+                Return res
+            Else
+                Return Nothing
+            End If
+        End Function
 
         Public Overrides Function GetSnapshot() As List(Of Tuple(Of String, String, Double?, Double))
             'Return Descrs.Values.Select(Function(elem) New Tuple(Of String, String, Double?, Double)(elem.RIC, String.Format("{0:N}Y", GetDuration(elem.RIC)), elem.Yield, elem.Duration)).ToList()
@@ -404,17 +403,17 @@ Namespace Tools.Elements
             End Get
         End Property
 
-        Public Overridable Function BenchmarkEnabled() As Boolean Implements IAssetSwapBenchmark.CanBeBenchmark
+        Public Overridable Function BenchmarkEnabled() As Boolean Implements IAswBenchmark.CanBeBenchmark
             Return True
         End Function
 
-        Public Overridable ReadOnly Property FloatLegStructure() As String Implements IAssetSwapBenchmark.FloatLegStructure
+        Public Overridable ReadOnly Property FloatLegStructure() As String Implements IAswBenchmark.FloatLegStructure
             Get
                 Return SwapFloatLeg
             End Get
         End Property
 
-        Public Overridable ReadOnly Property FloatingPointValue() As Double Implements IAssetSwapBenchmark.FloatingPointValue
+        Public Overridable ReadOnly Property FloatingPointValue() As Double Implements IAswBenchmark.FloatingPointValue
             Get
                 Return 0
             End Get

@@ -13,6 +13,8 @@ Namespace Tools.Elements
         End Property
 
         Public Sub Put(ByVal src As IOrdinate, ByVal crv As ICurve)
+            If src = Yield Then Throw New InvalidOperationException()
+            ' todo ???????? ?? ??????????? ???????????
             _items(src) = crv
             RaiseEvent NewBmk(src)
         End Sub
