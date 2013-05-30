@@ -55,7 +55,6 @@ Namespace Tools.Elements
         Sub New(ByVal ansamble As Ansamble)
             _ansamble = ansamble
         End Sub
-        'Private ReadOnly _name As String = Guid.NewGuid().ToString()
 
         Public Overrides Sub Subscribe()
             Logger.Debug("Subscirbe({0})", Identity)
@@ -156,6 +155,10 @@ Namespace Tools.Elements
             _quoteLoader.CancelItems(GetRICs(_broker))
             If BaseInstrument <> "" Then _quoteLoader.CancelItem(BaseInstrument)
             NotifyCleanup()
+        End Sub
+
+        Public Overrides Sub Recalculate(ByVal ord As IOrdinate)
+            Throw New NotImplementedException()
         End Sub
 
         Public Overrides Sub Recalculate()

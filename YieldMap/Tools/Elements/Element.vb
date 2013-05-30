@@ -156,7 +156,7 @@ Namespace Tools.Elements
                 Dim yield = CSng(bondYield.GetValue(j, 1))
                 Dim itsDate = Utils.FromExcelSerialDate(bondYield.GetValue(j, 2))
                 Logger.Trace("Parsing line: {0:P2} {1:dd-MMM-yy} {2} {3}", yield, itsDate, bondYield.GetValue(j, 3).ToString(), bondYield.GetValue(j, 4).ToString())
-                Dim toWhat As YieldToWhat
+                Dim toWhat As YieldToWhat = YieldToWhat.Call
                 If Not YieldToWhat.TryParse(bondYield.GetValue(j, 4).ToString(), toWhat) Then
                     toWhat = YieldToWhat.Maturity
                 End If

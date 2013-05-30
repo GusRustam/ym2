@@ -154,7 +154,7 @@ Namespace Tools.Elements
         Public ReadOnly Property Label() As String
             Get
                 If Not _labelEnabled Then Return ""
-                Dim lab As String
+                Dim lab As String = ""
                 Select Case LabelMode
                     Case LabelMode.IssuerAndSeries : lab = MetaData.Label1
                     Case LabelMode.IssuerCpnMat : lab = MetaData.Label2

@@ -194,6 +194,7 @@ Public Class PortfolioManager
                             srcId = item.Attributes("id").Value
                             source = CustomBond.Load(srcId)
                         Case Else
+                            srcId = -1
                             Logger.Warn("Unsupported item {0}", what)
                     End Select
 

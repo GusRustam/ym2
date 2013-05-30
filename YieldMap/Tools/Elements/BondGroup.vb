@@ -26,6 +26,10 @@ Namespace Tools.Elements
             AddRics(portfolioStructure.Rics(port))
         End Sub
 
+        Public Overrides Sub Recalculate(ByVal ord As IOrdinate)
+            Throw New NotImplementedException()
+        End Sub
+
         Public Overrides Sub Recalculate()
             If Ansamble.YSource = Yield Then
                 Dim result As New List(Of CurveItem)
@@ -54,5 +58,6 @@ Namespace Tools.Elements
                 Logger.Warn("Unknown spread type {0}", Ansamble.YSource)
             End If
         End Sub
+
     End Class
 End Namespace

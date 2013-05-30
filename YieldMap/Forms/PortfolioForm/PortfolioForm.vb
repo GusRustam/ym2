@@ -223,6 +223,8 @@ Namespace Forms.PortfolioForm
                 If PortfolioTree.SelectedNode IsNot Nothing Then
                     Dim descr = CType(PortfolioTree.SelectedNode.Tag, Portfolio)
                     selectedNodeId = descr.Id
+                Else
+                    Return
                 End If
             Else
                 selectedNodeId = selId
@@ -333,21 +335,17 @@ Namespace Forms.PortfolioForm
 
         Private Sub AddToolStripMenuItem_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AddToolStripMenuItem.Click
             Dim node = TryCast(PortTreeCM.Tag, TreeNode)
+            If node Is Nothing Then Return
+
+            PortfolioTree.SelectedNode = node
+            Dim descr = TryCast(node.Tag, Portfolio)
+            If descr Is Nothing Then Return
+            Dim theId = descr.Id
 
             Dim adder As New AddPortfolioForm With {
-                .EditMode = False,
-                .ItIsPortfolio = True
+             .EditMode = False,
+             .ItIsPortfolio = True
             }
-
-            Dim theId As String
-
-            If node IsNot Nothing Then
-                PortfolioTree.SelectedNode = node
-                Dim descr = TryCast(node.Tag, Portfolio)
-                If descr Is Nothing Then Return
-                theId = descr.Id
-            End If
-
             If adder.ShowDialog() = DialogResult.OK Then
                 Dim newId As Long
                 Try

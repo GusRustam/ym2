@@ -136,7 +136,7 @@ Namespace Tools.Elements
         Private ReadOnly _histFields As FieldContainer
 
         ' Last curve snapshot
-        Private _lastCurve As New Dictionary(Of IOrdinate, List(Of CurveItem))
+        Private ReadOnly _lastCurve As New Dictionary(Of IOrdinate, List(Of CurveItem))
 
         Private _formula As String
         Public ReadOnly Property Formula() As String
@@ -164,7 +164,6 @@ Namespace Tools.Elements
         End Property
 
         Private _estModel As EstimationModel
-
         Public Property EstModel() As EstimationModel
             Get
                 Return _estModel
@@ -258,6 +257,10 @@ Namespace Tools.Elements
             End If
             Return Nothing
         End Function
+
+        Public Overrides Sub Recalculate(ByVal ord As IOrdinate)
+            Throw New NotImplementedException()
+        End Sub
 
         Public Overrides Sub Recalculate()
             If Ansamble.YSource = Yield Then

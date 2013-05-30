@@ -268,7 +268,7 @@ Namespace Bonds
                         If fltStr(i) = "(" Then
                             ' BR_EXPR
                             Dim ind As Integer
-                            Dim elems As LinkedList(Of IGrammarElement)
+                            Dim elems As LinkedList(Of IGrammarElement) = Nothing
                             Try
                                 elems = ParseFilterString(fltStr.Substring(i + 1), ind, bracketsLevel + 1)
                             Catch ex As ParserException

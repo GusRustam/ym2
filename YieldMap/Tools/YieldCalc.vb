@@ -90,7 +90,7 @@ Namespace Tools
         End Function
 
         Public Shared Narrowing Operator CType(x As String) As YieldToWhat
-            Dim res As YieldToWhat
+            Dim res As YieldToWhat = YieldToWhat.Call
             If TryParse(x, res) Then
                 Return res
             Else
@@ -141,16 +141,4 @@ Namespace Tools
             End If
         End Function
     End Class
-
-    ''' <summary>
-    ''' Shared yield calc functions
-    ''' </summary>
-    ''' <remarks></remarks>
-    Friend Module YieldCalc
-        Public Function QuoteDescription(price As Double, yield As Double, duration As Double, yieldToWhat As YieldToWhat) As String
-            Return String.Format("P [{0:F4}], Y [{1:P2}] {2}, D [{3:F2}]",
-                                 price, yield, yieldToWhat.Abbr, duration)
-        End Function
-
-    End Module
 End Namespace

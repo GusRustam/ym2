@@ -9,7 +9,8 @@ Namespace Tools.Elements
         Inherits INamed
         Event Cleared As Action
         Sub Cleanup()
-        Sub Recalculate() ' todo add parameter with spread type
+        Sub Recalculate()
+        Sub Recalculate(ByVal ord As IOrdinate) ' todo add parameter with spread type
         Sub Subscribe()
         Sub FreezeEvents()
         Sub UnfreezeEvents()
@@ -43,6 +44,7 @@ Namespace Tools.Elements
 
         '' ============ ICHANGEABLE INTERFACE ============
         Public MustOverride Sub Recalculate() Implements IChangeable.Recalculate
+        Public MustOverride Sub Recalculate(ByVal ord As IOrdinate) Implements IChangeable.Recalculate
         Public MustOverride ReadOnly Property Name() As String Implements INamed.Name
         Public MustOverride Sub Cleanup() Implements IChangeable.Cleanup
         Public MustOverride Sub Subscribe() Implements IChangeable.Subscribe

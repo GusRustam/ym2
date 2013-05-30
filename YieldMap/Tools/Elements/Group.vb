@@ -33,6 +33,7 @@ Namespace Tools.Elements
         Public PortfolioID As Long
 
         Public MustOverride Sub Recalculate() Implements IChangeable.Recalculate
+        Public MustOverride Sub Recalculate(ByVal ord As IOrdinate) Implements IChangeable.Recalculate
 
         Private ReadOnly _ansamble As Ansamble
         Public ReadOnly Property Ansamble() As Ansamble
@@ -104,7 +105,6 @@ Namespace Tools.Elements
             If rics.Count = 0 Then Return
             _quoteLoader.AddItems(rics, BondFields.AllNames)
         End Sub
-
 
         Private Sub OnQuotes(ByVal data As Dictionary(Of String, Dictionary(Of String, Double))) Handles _quoteLoader.NewData
             Logger.Trace("QuoteLoaderOnNewData()")

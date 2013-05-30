@@ -3,10 +3,7 @@ Imports YieldMap.Forms.PortfolioForm
 Imports YieldMap.Forms.ChartForm
 Imports NLog
 Imports Settings
-Imports YieldMap.Commons
 Imports YieldMap.Forms.MainForm
-Imports YieldMap.My.Resources
-Imports YieldMap.Forms
 
 Module MainModule
     Private _mainForm As MainForm

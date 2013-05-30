@@ -233,11 +233,11 @@ Public Class Chain
         Return hashCode
     End Function
 
-    Public Shared Operator =(ByVal left As Chain, ByVal right As Chain) As Boolean
+    Public Shared Shadows Operator =(ByVal left As Chain, ByVal right As Chain) As Boolean
         Return Equals(left, right)
     End Operator
 
-    Public Shared Operator <>(ByVal left As Chain, ByVal right As Chain) As Boolean
+    Public Shared Shadows Operator <>(ByVal left As Chain, ByVal right As Chain) As Boolean
         Return Not Equals(left, right)
     End Operator
 End Class

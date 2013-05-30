@@ -641,6 +641,9 @@ Namespace Tools
                 Case AswSpread
                     x = data.Where(Function(elem) elem.ASWSpread.HasValue).Select(Function(elem) elem.Duration).ToList()
                     y = data.Where(Function(elem) elem.ASWSpread.HasValue).Select(Function(elem) elem.ASWSpread.Value).ToList()
+                Case Else
+                    x = New List(Of Double)()
+                    y = New List(Of Double)()
             End Select
             Return PackXY(x, y)
         End Function
