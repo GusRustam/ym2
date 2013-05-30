@@ -18,8 +18,12 @@ Namespace Tools.Elements
             RaiseEvent NewBmk(src)
         End Sub
 
-        Public Function Has(ByVal src As IOrdinate) As Boolean
+        Public Function HasOrd(ByVal src As IOrdinate) As Boolean
             Return _items.ContainsKey(src)
+        End Function
+
+        Public Function HasCurve(ByVal crv As ICurve) As Boolean
+            Return _items.ContainsValue(crv)
         End Function
 
         Public Sub Clear(ByVal src As IOrdinate)
@@ -37,6 +41,13 @@ Namespace Tools.Elements
 
         Public Function GetEnumerator() As IEnumerator Implements IEnumerable.GetEnumerator
             Return _items.Values.GetEnumerator()
+        End Function
+
+        Public Function GetOrdinate(ByVal crv As ICurve) As IOrdinate
+            For Each kvp In From pair In _items Where pair.Value.Equals(crv)
+                Return kvp.Key
+            Next
+            Return Nothing
         End Function
     End Class
 End NameSpace

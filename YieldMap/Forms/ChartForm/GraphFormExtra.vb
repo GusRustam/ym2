@@ -304,9 +304,9 @@ Namespace Forms.ChartForm
 
             UpdateAxisYTitle(False)
 
-            ASWLabel.Text = If(_ansamble.Benchmarks.Has(AswSpread), " -> " + _ansamble.Benchmarks(AswSpread).Name, "")
-            SpreadLabel.Text = If(_ansamble.Benchmarks.Has(PointSpread), " -> " + _ansamble.Benchmarks(PointSpread).Name, "")
-            ZSpreadLabel.Text = If(_ansamble.Benchmarks.Has(ZSpread), " -> " + _ansamble.Benchmarks(ZSpread).Name, "")
+            ASWLabel.Text = If(_ansamble.Benchmarks.HasOrd(AswSpread), " -> " + _ansamble.Benchmarks(AswSpread).Name, "")
+            SpreadLabel.Text = If(_ansamble.Benchmarks.HasOrd(PointSpread), " -> " + _ansamble.Benchmarks(PointSpread).Name, "")
+            ZSpreadLabel.Text = If(_ansamble.Benchmarks.HasOrd(ZSpread), " -> " + _ansamble.Benchmarks(ZSpread).Name, "")
         End Sub
 
         Private Sub ResetPointSelection()

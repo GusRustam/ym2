@@ -327,9 +327,9 @@ Namespace Forms.ChartForm
                     YldLabel.Text = ""
                     DurLabel.Text = ""
                     MatLabel.Text = ""
-                    ASWLabel.Text = If(_ansamble.Benchmarks.Has(AswSpread), " -> " + _ansamble.Benchmarks(AswSpread).Name, "")
-                    SpreadLabel.Text = If(_ansamble.Benchmarks.Has(PointSpread), " -> " + _ansamble.Benchmarks(PointSpread).Name, "")
-                    ZSpreadLabel.Text = If(_ansamble.Benchmarks.Has(ZSpread), " -> " + _ansamble.Benchmarks(ZSpread).Name, "")
+                    ASWLabel.Text = If(_ansamble.Benchmarks.HasOrd(AswSpread), " -> " + _ansamble.Benchmarks(AswSpread).Name, "")
+                    SpreadLabel.Text = If(_ansamble.Benchmarks.HasOrd(PointSpread), " -> " + _ansamble.Benchmarks(PointSpread).Name, "")
+                    ZSpreadLabel.Text = If(_ansamble.Benchmarks.HasOrd(ZSpread), " -> " + _ansamble.Benchmarks(ZSpread).Name, "")
                 End If
             End Try
         End Sub
@@ -682,16 +682,16 @@ Namespace Forms.ChartForm
 
         Private Sub LinkSpreadLabelLinkClicked(ByVal sender As Object, ByVal e As LinkLabelLinkClickedEventArgs) Handles SpreadLinkLabel.LinkClicked
             ShowCurveCMS("PointSpread",
-                If(_ansamble.Benchmarks.Has(PointSpread), _ansamble.Benchmarks(PointSpread), Nothing))
+                If(_ansamble.Benchmarks.HasOrd(PointSpread), _ansamble.Benchmarks(PointSpread), Nothing))
         End Sub
 
         Private Sub ZSpreadLinkLabelLinkClicked(ByVal sender As Object, ByVal e As LinkLabelLinkClickedEventArgs) Handles ZSpreadLinkLabel.LinkClicked
             ShowCurveCMS("ZSpread",
-                If(_ansamble.Benchmarks.Has(ZSpread), _ansamble.Benchmarks(ZSpread), Nothing))
+                If(_ansamble.Benchmarks.HasOrd(ZSpread), _ansamble.Benchmarks(ZSpread), Nothing))
         End Sub
 
         Private Sub ASWLinkLabelLinkClicked(ByVal sender As Object, ByVal e As LinkLabelLinkClickedEventArgs) Handles ASWLinkLabel.LinkClicked
-            Dim refCurve = If(_ansamble.Benchmarks.Has(AswSpread), _ansamble.Benchmarks(AswSpread), Nothing)
+            Dim refCurve = If(_ansamble.Benchmarks.HasOrd(AswSpread), _ansamble.Benchmarks(AswSpread), Nothing)
             SpreadCMS.Items.Clear()
             SpreadCMS.Tag = "ASWSpread"
             If Not _ansamble.SwapCurves.Any() Then Return

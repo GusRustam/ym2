@@ -163,49 +163,60 @@ Namespace Tools.Elements
 
         Public Overrides Sub Recalculate()
             If _ansamble.YSource = Yield Then
-                Dim result As New List(Of CurveItem)
-                If _bootstrapped Then
-                    Try
-                        Dim data = (From elem In Descrs Where elem.Yield.HasValue AndAlso elem.Yield > 0).ToList()
-
-                        Dim params(0 To data.Count() - 1, 5) As Object
-                        For i = 0 To data.Count - 1
-                            params(i, 0) = InstrumentType
-                            params(i, 1) = CurveDate
-                            params(i, 2) = CurveDate.AddDays(data(i).Duration * 365.0)
-                            params(i, 3) = BaseInstrumentPrice / 100
-                            params(i, 4) = data(i).Yield
-                            params(i, 5) = Struct
-                        Next
-                        Dim curveModule = New AdxYieldCurveModule
-                        Dim termStructure As Array = curveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
-                        For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
-                            Dim dur = (Utils.FromExcelSerialDate(termStructure.GetValue(i, 1)) - CurveDate).TotalDays / 365.0
-                            Dim yld = termStructure.GetValue(i, 2)
-                            If dur > 0 And yld > 0 Then result.Add(New SwapCurveItem(dur, yld, Me, data(i).RIC))
-                        Next
-                    Catch ex As Exception
-                        Logger.ErrorException("Failed to bootstrap", ex)
-                        Logger.Error("Exception = {0}", ex.ToString())
-                        Return
-                    End Try
-                Else
-                    result.AddRange((From item In Descrs
-                                     Let x = item.Duration, y = item.Yield
-                                     Where x > 0 And y > 0
-                                     Select New SwapCurveItem(x, y, Me, item.RIC)).
-                                 Cast(Of CurveItem))
-                End If
-                result.Sort()
-                _lastCurve(Yield) = New List(Of CurveItem)(result)
-
-                NotifyUpdated(result)
+                _lastCurve(Yield) = RecalculateYield()
+                NotifyUpdated(_lastCurve(Yield))
             ElseIf _ansamble.YSource.Belongs(AswSpread, OaSpread, ZSpread, PointSpread) Then
-                ' todo plotting spreads
+                _lastCurve(_ansamble.YSource) = RecalculateSpread(_ansamble.YSource)
+                NotifyUpdated(_lastCurve(_ansamble.YSource))
             Else
                 Logger.Warn("Unknown spread type {0}", _ansamble.YSource)
             End If
         End Sub
+
+        Private Function RecalculateSpread(ByVal ordinate As IOrdinate) As List(Of CurveItem)
+            SetSpread(ordinate)
+            Dim res = New List(Of CurveItem)(From item In Descrs Select New PointCurveItem(item.Duration, ordinate.GetValue(item), Me))
+            res.Sort()
+            Return res
+        End Function
+
+        Private Function RecalculateYield() As List(Of CurveItem)
+            Dim result As New List(Of CurveItem)
+            If _bootstrapped Then
+                Try
+                    Dim data = (From elem In Descrs Where elem.Yield.HasValue AndAlso elem.Yield > 0).ToList()
+
+                    Dim params(0 To data.Count() - 1, 5) As Object
+                    For i = 0 To data.Count - 1
+                        params(i, 0) = InstrumentType
+                        params(i, 1) = CurveDate
+                        params(i, 2) = CurveDate.AddDays(data(i).Duration * 365.0)
+                        params(i, 3) = BaseInstrumentPrice / 100
+                        params(i, 4) = data(i).Yield
+                        params(i, 5) = Struct
+                    Next
+                    Dim curveModule = New AdxYieldCurveModule
+                    Dim termStructure As Array = curveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
+                    For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
+                        Dim dur = (Utils.FromExcelSerialDate(termStructure.GetValue(i, 1)) - CurveDate).TotalDays / 365.0
+                        Dim yld = termStructure.GetValue(i, 2)
+                        If dur > 0 And yld > 0 Then result.Add(New SwapCurveItem(dur, yld, Me, data(i).RIC))
+                    Next
+                Catch ex As Exception
+                    Logger.ErrorException("Failed to bootstrap", ex)
+                    Logger.Error("Exception = {0}", ex.ToString())
+                    Return result
+                End Try
+            Else
+                result.AddRange((From item In Descrs
+                                   Let x = item.Duration, y = item.Yield
+                                   Where x > 0 And y > 0
+                                   Select New SwapCurveItem(x, y, Me, item.RIC)).
+                                   Cast(Of CurveItem))
+            End If
+            result.Sort()
+            Return result
+        End Function
 
         '' REALTIME DATA ARRIVED
         Private Sub OnRealTimeData(ByVal data As Dictionary(Of String, Dictionary(Of String, Double))) Handles _quoteLoader.NewData
@@ -316,9 +327,15 @@ Namespace Tools.Elements
         End Sub
 
         Public Overrides Sub SetSpread(ByVal ySource As OrdinateBase)
-            For Each item In Descrs
-                ySource.SetValue(item, _ansamble.Benchmarks(ySource))
-            Next
+            If _ansamble.Benchmarks(ySource) = Me Then
+                For Each item In Descrs
+                    ySource.SetValue(item, _ansamble.Benchmarks(ySource))
+                Next
+            Else
+                For Each item In Descrs
+                    ySource.ClearValue(item)
+                Next
+            End If
         End Sub
 
         Public Overrides Function RateArray() As Array

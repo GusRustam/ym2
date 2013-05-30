@@ -128,16 +128,16 @@ Namespace Tools.Elements
 
     Public Class PointCurveItem
         Inherits CurveItem
-        Private ReadOnly _curve As BondCurve
+        Private ReadOnly _curve As ICurve
 
         <Browsable(False)>
-        Public ReadOnly Property Curve() As BondCurve
+        Public ReadOnly Property Curve() As ICurve
             Get
                 Return _curve
             End Get
         End Property
 
-        Public Sub New(ByVal x As Double, ByVal y As Double, ByVal curve As BondCurve)
+        Public Sub New(ByVal x As Double, ByVal y As Double, ByVal curve As ICurve)
             MyBase.New(x, y)
             _curve = curve
         End Sub

@@ -1,5 +1,4 @@
 ﻿Imports AdfinXAnalyticsFunctions
-Imports DbManager.Bonds
 Imports NLog
 Imports ReutersData
 
@@ -9,6 +8,7 @@ Namespace Tools.Elements
         Sub ClearValue(ByVal bpd As BasePointDescription)
         ReadOnly Property NameProperty() As String
         ReadOnly Property DescrProperty() As String
+        Function GetValue(ByVal bpd As BasePointDescription) As Double
     End Interface
 
     Public MustInherit Class OrdinateBase
@@ -62,6 +62,8 @@ Namespace Tools.Elements
             End Get
         End Property
 
+        Public MustOverride Function GetValue(ByVal bpd As BasePointDescription) As Double Implements IOrdinate.GetValue
+
         Protected Sub New(ByVal name As String, ByVal descr As String)
             Me.Name = name
             Me.Descr = descr
@@ -88,6 +90,10 @@ Namespace Tools.Elements
         Public Overrides Sub ClearValue(ByVal bpd As BasePointDescription)
             bpd.ClearYield()
         End Sub
+
+        Public Overrides Function GetValue(ByVal bpd As BasePointDescription) As Double
+            Return bpd.Yield
+        End Function
 
         Public Shared ReadOnly Property Instance() As OrdinateYield
             Get
@@ -145,6 +151,10 @@ Namespace Tools.Elements
             bpd.PointSpread = Nothing
         End Sub
 
+        Public Overrides Function GetValue(ByVal bpd As BasePointDescription) As Double
+            Return bpd.PointSpread
+        End Function
+
         Public Shared ReadOnly Property Instance() As OrdinateBase
             Get
                 Return Inst
@@ -199,6 +209,10 @@ Namespace Tools.Elements
             bpd.ASWSpread = Nothing
         End Sub
 
+        Public Overrides Function GetValue(ByVal bpd As BasePointDescription) As Double
+            Return bpd.ASWSpread
+        End Function
+
         Public Shared ReadOnly Property Instance() As OrdinateAswSpread
             Get
                 Return Inst
@@ -226,6 +240,10 @@ Namespace Tools.Elements
         Public Overrides Sub ClearValue(ByVal bpd As BasePointDescription)
             bpd.OASpread = Nothing
         End Sub
+
+        Public Overrides Function GetValue(ByVal bpd As BasePointDescription) As Double
+            Return bpd.OASpread
+        End Function
 
         Public Shared ReadOnly Property Instance() As OrdinateOaSpread
             Get
@@ -274,6 +292,10 @@ Namespace Tools.Elements
         Public Overrides Sub ClearValue(ByVal bpd As BasePointDescription)
             bpd.ZSpread = Nothing
         End Sub
+
+        Public Overrides Function GetValue(ByVal bpd As BasePointDescription) As Double
+            Return bpd.ZSpread
+        End Function
 
         Public Shared ReadOnly Property Instance() As OrdinateZSpread
             Get

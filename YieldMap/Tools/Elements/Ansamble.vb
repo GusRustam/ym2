@@ -1,4 +1,4 @@
-Namespace Tools.Elements
+﻿Namespace Tools.Elements
     Public Class Ansamble
         Private Shared ReadOnly Identities As New HashSet(Of Long)
         Public Event GroupCleared As Action(Of Group)
@@ -40,7 +40,6 @@ Namespace Tools.Elements
             End Set
         End Property
 
-        ' todo catch updates by type and do recalculations
         Private WithEvents _items As New GroupContainer
         Public ReadOnly Property Items As GroupContainer
             Get
@@ -48,7 +47,6 @@ Namespace Tools.Elements
             End Get
         End Property
 
-        ' todo catch updates by type and do recalculations
         Private WithEvents _swapCurves As New SwapCurveContainer
         Public ReadOnly Property SwapCurves() As SwapCurveContainer
             Get
@@ -72,10 +70,7 @@ Namespace Tools.Elements
         End Property
 
         Public Sub Recalculate()
-            For Each item As KeyValuePair(Of Long, BondCurve) In _items
-                item.Value.Recalculate()
-            Next
-            For Each item As SwapCurve In _swapCurves
+            For Each item In AllItems()
                 item.Recalculate()
             Next
         End Sub
@@ -95,11 +90,7 @@ Namespace Tools.Elements
 
         Private Sub Benchmarks_ClearBmk(obj As IOrdinate) Handles _benchmarks.ClearBmk
             FreezeEvents()
-            For Each item As KeyValuePair(Of Long, Group) In _items
-                Dim bondCurve = TryCast(item.Value, BondCurve)
-                If bondCurve IsNot Nothing Then bondCurve.ClearSpread(obj)
-            Next
-            For Each item As SwapCurve In _swapCurves
+            For Each item In AllCurves()
                 item.ClearSpread(obj)
             Next
             UnfreezeEvents()
@@ -107,11 +98,7 @@ Namespace Tools.Elements
 
         Private Sub Benchmarks_NewBmk(obj As IOrdinate) Handles _benchmarks.NewBmk
             FreezeEvents()
-            For Each item As KeyValuePair(Of Long, Group) In _items
-                Dim bondCurve = TryCast(item.Value, BondCurve)
-                If bondCurve IsNot Nothing Then bondCurve.SetSpread(obj)
-            Next
-            For Each item As SwapCurve In _swapCurves
+            For Each item In AllCurves()
                 item.SetSpread(obj)
             Next
             UnfreezeEvents()
@@ -119,22 +106,55 @@ Namespace Tools.Elements
 
         Private Sub UnfreezeEvents()
             _eventsFrozen = false
-            For Each item As KeyValuePair(Of Long, Group) In _items
-                item.Value.UnfreezeEvents()
-            Next
-            For Each item As SwapCurve In _swapCurves
+            For Each item In AllItems()
                 item.UnfreezeEvents()
             Next
         End Sub
 
         Private Sub FreezeEvents()
             _eventsFrozen = True
-            For Each item As KeyValuePair(Of Long, Group) In _items
-                item.Value.FreezeEvents()
-            Next
-            For Each item As SwapCurve In _swapCurves
+            For Each item In AllItems()
                 item.FreezeEvents()
             Next
         End Sub
+
+        Private Sub UnfreezeEventsQuiet()
+            _eventsFrozen = False
+            For Each item In AllItems()
+                item.UnfreezeEventsQuiet()
+            Next
+        End Sub
+
+        Private Function AllCurves() As List(Of ICurve)
+            Dim res = (From item In Items Where TypeOf item.Value Is ICurve Select item.Value).Cast(Of ICurve).ToList()
+            res.AddRange(_swapCurves.Cast(Of ICurve))
+            Return res
+        End Function
+
+        Private Function AllItems() As List(Of IChangeable)
+            Dim res = (From item In Items Select item.Value).Cast(Of IChangeable).ToList()
+            res.AddRange(_swapCurves.Cast(Of IChangeable))
+            Return res
+        End Function
+
+        ' сюда можно попасть двумя путями - либо когда пересчитали ВСЕ в ответ на одну из глобальных команд,
+        ' или когда пересчитали только одну сущность в ответ на новые данные.
+        ' но потом сюда посыплются сообщения о пересчете от тех, кого мы Recalculate в цикле. 
+        ' однако, мы заморозили события.
+        ' Тем не менее, когда разморозим, опять пойдет волна.
+        ' Может быть, тогда нужна неуведомляющаяя разморозка?
+        Private Sub SomethingRecalculated(obj As IChangeable) Handles _items.Recalculated, _swapCurves.Recalculated
+            If Not TypeOf obj Is ICurve Then Return ' group was recalculated; not interesting
+            Dim crv = CType(obj, ICurve)
+            If _benchmarks.HasCurve(crv) Then
+                Dim ord = _benchmarks.GetOrdinate(crv)
+                FreezeEvents()
+                For Each item In AllItems()
+                    item.Recalculate(ord)
+                Next
+                UnfreezeEventsQuiet()
+            End If
+        End Sub
+
     End Class
 End Namespace

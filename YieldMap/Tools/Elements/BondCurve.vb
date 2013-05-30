@@ -259,83 +259,105 @@ Namespace Tools.Elements
         End Function
 
         Public Overrides Sub Recalculate(ByVal ord As IOrdinate)
-            Throw New NotImplementedException()
+            ' yield can't be a source for benchmark
+            If ord = Yield Then Throw New InvalidOperationException()
+            _lastCurve(ord) = RecalculateSpread(ord)
         End Sub
+
+        Private Function RecalculateSpread(ByVal ord As IOrdinate) As List(Of CurveItem)
+            SetSpread(ord)
+            'For Each qy In From item In AllElements From quoteName In item.QuotesAndYields Select item.QuotesAndYields(quoteName)
+            '    res.Add(New PointCurveItem(qy.Duration, ord.GetValue(qy), Me))
+            'Next
+            Dim res = New List(Of CurveItem)(From item In AllElements
+                                                               From quoteName In item.QuotesAndYields
+                                                               Let q = item.QuotesAndYields(quoteName)
+                                                               Select New PointCurveItem(q.Duration, ord.GetValue(q), Me))
+            res.Sort()
+            Return res
+        End Function
 
         Public Overrides Sub Recalculate()
             If Ansamble.YSource = Yield Then
-                Dim result As New List(Of CurveItem)
-                If _bootstrapped Then
-                    Try
-                        Dim data = (From elem In Elements
-                                Where elem.MetaData.IssueDate <= _curveDate And
-                                      elem.MetaData.Maturity > _curveDate And
-                                      elem.QuotesAndYields.Any()).ToList()
+                _lastCurve(Yield) = RecalculateYields()
+                NotifyUpdated(_lastCurve(Yield))
 
-                        Dim params(0 To data.Count() - 1, 5) As Object
-                        For i = 0 To data.Count - 1
-                            Dim meta = data(i).MetaData
-                            params(i, 0) = "B"
-                            params(i, 1) = _curveDate
-                            params(i, 2) = meta.Maturity
-                            params(i, 3) = meta.GetCouponByDate(_curveDate)
-                            params(i, 4) = data(i).QuotesAndYields.Main.Price / 100.0
-                            params(i, 5) = meta.PaymentStructure
-                        Next
-                        Dim curveModule = New AdxYieldCurveModule
-
-                        Dim termStructure As Array = curveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
-                        For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
-                            Dim matDate = Utils.FromExcelSerialDate(termStructure.GetValue(i, 1))
-                            Dim dur = (matDate - _curveDate).TotalDays / 365.0
-                            Dim yld = termStructure.GetValue(i, 2)
-                            If dur > 0 And yld > 0 Then
-                                result.Add(New PointCurveItem(dur, yld, Me))
-                            End If
-                        Next
-                    Catch ex As Exception
-                        Logger.ErrorException("Failed to bootstrap", ex)
-                        Logger.Error("Exception = {0}", ex.ToString())
-                        Return
-                    End Try
-                Else
-                    For Each bnd In Elements
-                        Dim x As Double, y As Double
-                        Dim description = bnd.QuotesAndYields.Main
-                        If description Is Nothing Then Continue For
-
-                        Select Case Ansamble.XSource
-                            Case XSource.Duration
-                                x = description.Duration
-                            Case XSource.Maturity
-                                x = (bnd.MetaData.Maturity.Value - Date.Today).Days / 365
-                        End Select
-
-                        y = description.Yield
-                        If x > 0 And y > 0 Then result.Add(New BondCurveItem(x, y, bnd, description.BackColor, description.Yld.ToWhat, description.MarkerStyle, bnd.Label))
-                    Next
-                End If
-                result.Sort()
-
-                If _estModel IsNot Nothing Then
-                    Dim est As New Estimator(_estModel)
-                    Dim tmp = New List(Of CurveItem)(result)
-                    Dim list As List(Of XY) = (From item In tmp Select New XY(item.TheX, item.TheY)).ToList()
-                    Dim apprXY = est.Approximate(list)
-                    result = (From item In apprXY Select New PointCurveItem(item.X, item.Y, Me)).Cast(Of CurveItem).ToList()
-                    _formula = est.GetFormula()
-                Else
-                    _formula = "N/A"
-                End If
-
-                _lastCurve(Yield) = New List(Of CurveItem)(result)
-                NotifyUpdated(result)
             ElseIf Ansamble.YSource.Belongs(AswSpread, OaSpread, ZSpread, PointSpread) Then
-                ' todo plotting spreads
+                _lastCurve(Ansamble.YSource) = RecalculateSpread(Ansamble.YSource)
+                NotifyUpdated(_lastCurve(Ansamble.YSource))
+
             Else
                 Logger.Warn("Unknown spread type {0}", Ansamble.YSource)
             End If
         End Sub
+
+        Private Function RecalculateYields() As List(Of CurveItem)
+            Dim result As New List(Of CurveItem)
+            If _bootstrapped Then
+                Try
+                    Dim data = (From elem In Elements
+                            Where elem.MetaData.IssueDate <= _curveDate And
+                                  elem.MetaData.Maturity > _curveDate And
+                                  elem.QuotesAndYields.Any()).ToList()
+
+                    Dim params(0 To data.Count() - 1, 5) As Object
+                    For i = 0 To data.Count - 1
+                        Dim meta = data(i).MetaData
+                        params(i, 0) = "B"
+                        params(i, 1) = _curveDate
+                        params(i, 2) = meta.Maturity
+                        params(i, 3) = meta.GetCouponByDate(_curveDate)
+                        params(i, 4) = data(i).QuotesAndYields.Main.Price / 100.0
+                        params(i, 5) = meta.PaymentStructure
+                    Next
+                    Dim curveModule = New AdxYieldCurveModule
+
+                    Dim termStructure As Array = curveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
+                    For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
+                        Dim matDate = Utils.FromExcelSerialDate(termStructure.GetValue(i, 1))
+                        Dim dur = (matDate - _curveDate).TotalDays / 365.0
+                        Dim yld = termStructure.GetValue(i, 2)
+                        If dur > 0 And yld > 0 Then
+                            result.Add(New PointCurveItem(dur, yld, Me))
+                        End If
+                    Next
+                Catch ex As Exception
+                    Logger.ErrorException("Failed to bootstrap", ex)
+                    Logger.Error("Exception = {0}", ex.ToString())
+                    Return result
+                End Try
+            Else
+                For Each bnd In Elements
+                    Dim x As Double, y As Double
+                    Dim description = bnd.QuotesAndYields.Main
+                    If description Is Nothing Then Continue For
+
+                    Select Case Ansamble.XSource
+                        Case XSource.Duration
+                            x = description.Duration
+                        Case XSource.Maturity
+                            x = (bnd.MetaData.Maturity.Value - Date.Today).Days / 365
+                    End Select
+
+                    y = description.Yield
+                    If x > 0 And y > 0 Then result.Add(New BondCurveItem(x, y, bnd, description.BackColor, description.Yld.ToWhat, description.MarkerStyle, bnd.Label))
+                Next
+            End If
+            result.Sort()
+
+            If _estModel IsNot Nothing Then
+                Dim est As New Estimator(_estModel)
+                Dim tmp = New List(Of CurveItem)(result)
+                Dim list As List(Of XY) = (From item In tmp Select New XY(item.TheX, item.TheY)).ToList()
+                Dim apprXY = est.Approximate(list)
+                result = (From item In apprXY Select New PointCurveItem(item.X, item.Y, Me)).Cast(Of CurveItem).ToList()
+                _formula = est.GetFormula()
+            Else
+                _formula = "N/A"
+            End If
+
+            Return result
+        End Function
 
         Public Sub Bootstrap() Implements ICurve.Bootstrap
             Bootstrapped = Not Bootstrapped

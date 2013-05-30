@@ -14,6 +14,7 @@ Namespace Tools.Elements
         Sub Subscribe()
         Sub FreezeEvents()
         Sub UnfreezeEvents()
+        Sub UnfreezeEventsQuiet()
     End Interface
 
     Public Interface IAswBenchmark
@@ -57,6 +58,10 @@ Namespace Tools.Elements
         Public Sub UnfreezeEvents() Implements IChangeable.UnfreezeEvents
             _eventsFrozen = False
             Recalculate()
+        End Sub
+
+        Public Sub UnfreezeEventsQuiet() Implements IChangeable.UnfreezeEventsQuiet
+            _eventsFrozen = False
         End Sub
 
         '' ============ ICURVE INTERFACE ============

@@ -53,6 +53,10 @@ Namespace Tools.Elements
             Recalculate()
         End Sub
 
+        Public Sub UnfreezeEventsQuiet() Implements IChangeable.UnfreezeEventsQuiet
+            _eventsFrozen = False
+        End Sub
+
         Protected Sub NotifyUpdated(ByVal curveItems As List(Of CurveItem))
             If Not _eventsFrozen Then RaiseEvent Updated(curveItems)
         End Sub

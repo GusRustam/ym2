@@ -3,6 +3,7 @@
         Implements IEnumerable(Of SwapCurve)
 
         Public Event Cleared As Action(Of SwapCurve)
+        Public Event Recalculated As Action(Of SwapCurve)
 
         Private ReadOnly _items As New Dictionary(Of Long, SwapCurve)
         Default Public ReadOnly Property Data(ByVal id As Long) As SwapCurve
@@ -37,6 +38,7 @@
 
         Public Sub Add(ByVal group As SwapCurve)
             _items.Add(group.Identity, group)
+            AddHandler group.Updated, Sub() RaiseEvent Recalculated(group)
             AddHandler group.Cleared, Sub()
                                           _items.Remove(group.Identity)
                                           RaiseEvent Cleared(group)
@@ -46,6 +48,5 @@
         Public Sub Remove(ByVal id As Long)
             _items.Remove(id)
         End Sub
-
     End Class
 End Namespace
