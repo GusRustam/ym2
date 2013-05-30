@@ -66,7 +66,6 @@ Namespace Tools.Elements
 
         Public ReadOnly Property Benchmarks() As BenchmarkContainer
             Get
-                ' todo
                 Return _benchmarks
             End Get
         End Property
@@ -94,6 +93,7 @@ Namespace Tools.Elements
         End Sub
 
         Private Sub Benchmarks_ClearBmk(obj As IOrdinate) Handles _benchmarks.ClearBmk
+            FreezeEvents()
             For Each item As KeyValuePair(Of Long, Group) In _items
                 Dim bondCurve = TryCast(item.Value, BondCurve)
                 If bondCurve IsNot Nothing Then bondCurve.ClearSpread(obj)
@@ -101,6 +101,7 @@ Namespace Tools.Elements
             For Each item As SwapCurve In _swapCurves
                 item.ClearSpread(obj)
             Next
+            UnfreezeEvents()
         End Sub
 
         Private Sub Benchmarks_NewBmk(obj As IOrdinate) Handles _benchmarks.NewBmk
@@ -118,7 +119,7 @@ Namespace Tools.Elements
         Private Sub UnfreezeEvents()
             _eventsFrozen = false
             For Each item As KeyValuePair(Of Long, Group) In _items
-                item.UnfreezeEvents()
+                item.Value.UnfreezeEvents()
             Next
             For Each item As SwapCurve In _swapCurves
                 item.UnfreezeEvents()
@@ -128,7 +129,7 @@ Namespace Tools.Elements
         Private Sub FreezeEvents()
             _eventsFrozen = True
             For Each item As KeyValuePair(Of Long, Group) In _items
-                item.FreezeEvents()
+                item.Value.FreezeEvents()
             Next
             For Each item As SwapCurve In _swapCurves
                 item.FreezeEvents()

@@ -56,7 +56,7 @@ Namespace Tools.Elements
         Private _theCurveDate As Date = Date.Today
         Private _broker As String = ""
         Private _quote As String = "MID"
-        Private _lastCurve As List(Of CurveItem)
+        Private _lastCurve As List(Of CurveItem) ' todo use it in Snapshotting :/
         Private Const InstrumentType As String = "S"
 
         Sub New(ByVal ansamble As Ansamble)
@@ -325,13 +325,13 @@ Namespace Tools.Elements
 
         Public Overrides Sub ClearSpread(ByVal ySource As OrdinateBase)
             For Each item In Descrs
-                ySource.SetValue(item, Nothing)
+                ySource.ClearValue(item)
             Next
         End Sub
 
         Public Overrides Sub SetSpread(ByVal ySource As OrdinateBase)
             For Each item In Descrs
-                ySource.SetValue(item, ySource.CalculateSpread(item, _ansamble.Benchmarks(ySource)))
+                ySource.SetValue(item, ySource.Calculate(item, _ansamble.Benchmarks(ySource)))
             Next
         End Sub
 

@@ -1,7 +1,10 @@
-﻿Namespace Tools.Elements
+﻿Imports AdfinXAnalyticsFunctions
+Imports ReutersData
+
+Namespace Tools.Elements
     Public Interface IOrdinate
-        Sub SetValue(ByVal bpd As BasePointDescription, ByVal val As Double?)
-        Function CalculateSpread(ByVal item As BasePointDescription, ByVal curve As ICurve) As Double?
+        Sub SetValue(ByVal bpd As BasePointDescription, ByVal curve As ICurve, Optional ByVal val As Double? = Nothing)
+        Sub ClearValue(ByVal bpd As BasePointDescription)
         ReadOnly Property NameProperty() As String
         ReadOnly Property DescrProperty() As String
     End Interface
@@ -9,7 +12,9 @@
     Public MustInherit Class OrdinateBase
         Implements IOrdinate
         Implements IEquatable(Of OrdinateBase)
-        Public MustOverride Sub SetValue(ByVal bpd As BasePointDescription, ByVal val As Double?) Implements IOrdinate.SetValue
+        Protected ReadOnly BondModule As AdxBondModule = Eikon.Sdk.CreateAdxBondModule()
+        Public MustOverride Sub SetValue(ByVal bpd As BasePointDescription, ByVal curve As ICurve, Optional ByVal val As Double? = Nothing) Implements IOrdinate.SetValue
+        Public MustOverride Sub ClearValue(ByVal bpd As BasePointDescription) Implements IOrdinate.ClearValue
         Protected ReadOnly Name As String
         Protected ReadOnly Descr As String
 
@@ -60,7 +65,6 @@
             Me.Descr = descr
         End Sub
 
-        Public MustOverride Function CalculateSpread(ByVal item As BasePointDescription, ByVal curve As ICurve) As Double? Implements IOrdinate.CalculateSpread
     End Class
 
     Public Class OrdinateYield
@@ -72,14 +76,14 @@
             MyBase.New(name, descr)
         End Sub
 
-        Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal val As Double?)
-            ' todo OR NOT?????? Maybe these classes should do ze calculation of ze spreads?
-            Throw New InvalidOperationException()
+        ' тогда вопрос, что такое val. Давайте щетать, что для облигации это иё цена, ась?
+        Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal curve As ICurve, Optional ByVal val As Double? = Nothing)
+            bpd.CalculateYield(val)
         End Sub
 
-        Public Overrides Function CalculateSpread(ByVal item As BasePointDescription, ByVal curve As ICurve) As Double?
-            Throw New InvalidOperationException()
-        End Function
+        Public Overrides Sub ClearValue(ByVal bpd As BasePointDescription)
+            bpd.ClearYield()
+        End Sub
 
         Public Shared ReadOnly Property Instance() As OrdinateYield
             Get
@@ -97,13 +101,17 @@
             MyBase.New(name, descr)
         End Sub
 
-        Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal val As Double?)
-            Throw New InvalidOperationException()
+        Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal curve As ICurve, Optional ByVal val As Double? = Nothing)
+            If val IsNot Nothing Then
+                bpd.PointSpread = val
+            Else
+                ' todo calculating point spread
+            End If
         End Sub
 
-        Public Overrides Function CalculateSpread(ByVal item As BasePointDescription, ByVal curve As ICurve) As Double?
-            Throw New NotImplementedException()
-        End Function
+        Public Overrides Sub ClearValue(ByVal bpd As BasePointDescription)
+            bpd.PointSpread = Nothing
+        End Sub
 
         Public Shared ReadOnly Property Instance() As OrdinateBase
             Get
@@ -121,13 +129,17 @@
             MyBase.New(name, descr)
         End Sub
 
-        Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal val As Double?)
-            Throw New InvalidOperationException()
+        Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal curve As ICurve, Optional ByVal val As Double? = Nothing)
+            If val IsNot Nothing Then
+                bpd.ASWSpread = val
+            Else
+                ' todo
+            End If
         End Sub
 
-        Public Overrides Function CalculateSpread(ByVal item As BasePointDescription, ByVal curve As ICurve) As Double?
-            Throw New NotImplementedException()
-        End Function
+        Public Overrides Sub ClearValue(ByVal bpd As BasePointDescription)
+            bpd.ASWSpread = Nothing
+        End Sub
 
         Public Shared ReadOnly Property Instance() As OrdinateAswSpread
             Get
@@ -145,13 +157,17 @@
             MyBase.New(name, descr)
         End Sub
 
-        Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal val As Double?)
-            bpd.OASpread = val
+        Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal curve As ICurve, Optional ByVal val As Double? = Nothing)
+            If val IsNot Nothing Then
+                bpd.OASpread = val
+            Else
+                ' todo
+            End If
         End Sub
 
-        Public Overrides Function CalculateSpread(ByVal item As BasePointDescription, ByVal curve As ICurve) As Double?
-            Throw New NotImplementedException()
-        End Function
+        Public Overrides Sub ClearValue(ByVal bpd As BasePointDescription)
+            bpd.OASpread = Nothing
+        End Sub
 
         Public Shared ReadOnly Property Instance() As OrdinateOaSpread
             Get
@@ -169,13 +185,17 @@
             MyBase.New(name, descr)
         End Sub
 
-        Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal val As Double?)
-            bpd.ZSpread = val
+        Public Overrides Sub SetValue(ByVal bpd As BasePointDescription, ByVal curve As ICurve, Optional ByVal val As Double? = Nothing)
+            If val IsNot Nothing Then
+                bpd.ZSpread = val
+            Else
+                ' todo
+            End If
         End Sub
 
-        Public Overrides Function CalculateSpread(ByVal item As BasePointDescription, ByVal curve As ICurve) As Double?
-            Throw New NotImplementedException()
-        End Function
+        Public Overrides Sub ClearValue(ByVal bpd As BasePointDescription)
+            bpd.ZSpread = Nothing
+        End Sub
 
         Public Shared ReadOnly Property Instance() As OrdinateZSpread
             Get

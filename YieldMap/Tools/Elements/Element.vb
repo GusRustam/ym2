@@ -1,4 +1,9 @@
-﻿Imports DbManager.Bonds
+﻿Imports AdfinXAnalyticsFunctions
+Imports DbManager.Bonds
+Imports System.Text.RegularExpressions
+Imports NLog
+Imports ReutersData
+Imports Uitls
 
 Namespace Tools.Elements
     ''' <summary>
@@ -77,6 +82,8 @@ Namespace Tools.Elements
         Public OASpread As Double?
 
         Public MustOverride Function GetYield() As Double?
+        Public MustOverride Sub CalculateYield(ByVal val As Double)
+        Public MustOverride Sub ClearYield()
 
         Public Function CompareTo(ByVal other As BasePointDescription) As Integer Implements IComparable(Of BasePointDescription).CompareTo
             If other IsNot Nothing Then
@@ -91,6 +98,7 @@ Namespace Tools.Elements
                 Return 0
             End If
         End Function
+
     End Class
 
     Public Class SwapPointDescription
@@ -100,6 +108,14 @@ Namespace Tools.Elements
         Public Overrides Function GetYield() As Double?
             Return Yield
         End Function
+
+        Public Overrides Sub CalculateYield(ByVal val As Double)
+            [Yield] = val
+        End Sub
+
+        Public Overrides Sub ClearYield()
+            [Yield] = Nothing
+        End Sub
 
         Private ReadOnly _ric As String
         Public ReadOnly Property RIC As String
@@ -119,6 +135,8 @@ Namespace Tools.Elements
 
     Public Class BondPointDescription
         Inherits BasePointDescription
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(BondPointDescription))
+        Private ReadOnly _bondModule As AdxBondModule = Eikon.Sdk.CreateAdxBondModule()
 
         Public ParentBond As Bond
 
@@ -132,5 +150,54 @@ Namespace Tools.Elements
         Public Overrides Function GetYield() As Double?
             Return Yld.Yield
         End Function
+
+
+        Private Shared Function ParseBondYield(ByVal bondYield As Array) As List(Of YieldStructure)
+            Dim res As New List(Of YieldStructure)
+
+            For j = bondYield.GetLowerBound(0) To bondYield.GetUpperBound(0)
+                Dim yield = CSng(bondYield.GetValue(j, 1))
+                Dim itsDate = Utils.FromExcelSerialDate(bondYield.GetValue(j, 2))
+                Logger.Trace("Parsing line: {0:P2} {1:dd-MMM-yy} {2} {3}", yield, itsDate, bondYield.GetValue(j, 3).ToString(), bondYield.GetValue(j, 4).ToString())
+                Dim toWhat As YieldToWhat
+                If Not YieldToWhat.TryParse(bondYield.GetValue(j, 4).ToString(), toWhat) Then
+                    toWhat = YieldToWhat.Maturity
+                End If
+                Dim yieldDescr = New YieldStructure With {.Yield = yield, .YieldToDate = itsDate, .ToWhat = toWhat}
+                res.Add(yieldDescr)
+            Next
+            Return res
+        End Function
+
+        Private Sub CalculateYields(ByVal dscr As BondMetadata)
+            Logger.Trace("CalculateYields({0}, {1})", Price, dscr.RIC)
+
+            Dim coupon = BondsData.Instance.GetBondPayments(dscr.RIC).GetCoupon(YieldAtDate)
+            Dim settleDate = _bondModule.BdSettle(YieldAtDate, dscr.PaymentStructure)
+            Logger.Trace("Coupon: {0}, settleDate: {1}, maturity: {2}", coupon, settleDate, dscr.Maturity)
+            Dim bondYield As Array = _bondModule.AdBondYield(settleDate, Price / 100, dscr.Maturity, coupon, dscr.PaymentStructure, dscr.RateStructure, "")
+            Dim bestYield = ParseBondYield(bondYield).Max
+            Logger.Trace("best Yield: {0}", bestYield)
+
+            ' todo no best yield! (or else, best yield and other yields too), and todo modified duration
+
+            Dim bondDeriv As Array = _bondModule.AdBondDeriv(settleDate, bestYield.Yield, dscr.Maturity, coupon, 0, dscr.PaymentStructure, Regex.Replace(dscr.RateStructure, "YT[A-Z]", bestYield.ToWhat.Abbr), "", "")
+
+            Duration = bondDeriv.GetValue(1, 5)
+            Convexity = bondDeriv.GetValue(1, 7)
+            PVBP = bondDeriv.GetValue(1, 4)
+
+            bestYield.Yield += ParentBond.UsedDefinedSpread
+            Yld = bestYield
+        End Sub
+
+        Public Overrides Sub CalculateYield(ByVal val As Double)
+            Price = val
+            CalculateYields(ParentBond.MetaData)
+        End Sub
+
+        Public Overrides Sub ClearYield()
+            Yld = New YieldStructure()
+        End Sub
     End Class
 End Namespace

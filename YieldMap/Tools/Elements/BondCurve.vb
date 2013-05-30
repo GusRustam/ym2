@@ -348,16 +348,14 @@ Namespace Tools.Elements
         End Sub
 
         Public Sub ClearSpread(ByVal ySource As OrdinateBase) Implements ICurve.ClearSpread
-            For Each item In AllElements
-                ' todo foreach by quotes&yields 'cos now it's bond an' I nid BPD
-                ySource.SetValue(item, Nothing)
+            For Each qy In From item In AllElements From quoteName In item.QuotesAndYields Select item.QuotesAndYields(quoteName)
+                ySource.ClearValue(qy)
             Next
         End Sub
 
         Public Sub SetSpread(ByVal ySource As OrdinateBase) Implements ICurve.SetSpread
-            For Each item In AllElements
-                ' todo foreach by quotes&yields 'cos now it's bond an' I nid BPD
-                ySource.SetValue(item, ySource.CalculateSpread(item, Ansamble.Benchmarks(ySource)))
+            For Each qy In From item In AllElements From quoteName In item.QuotesAndYields Select item.QuotesAndYields(quoteName)
+                ySource.SetValue(qy, Ansamble.Benchmarks(ySource))
             Next
         End Sub
     End Class
