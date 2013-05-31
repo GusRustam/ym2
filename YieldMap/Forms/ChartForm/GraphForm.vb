@@ -13,6 +13,34 @@ Imports DbManager
 
 Namespace Forms.ChartForm
     Public Class GraphForm
+        Implements IEquatable(Of GraphForm)
+        Private _id As Guid = Guid.NewGuid()
+
+        Public Overloads Function Equals(ByVal other As GraphForm) As Boolean Implements IEquatable(Of GraphForm).Equals
+            If ReferenceEquals(Nothing, other) Then Return False
+            If ReferenceEquals(Me, other) Then Return True
+            Return _id.Equals(other._id)
+        End Function
+
+        Public Overloads Overrides Function Equals(ByVal obj As Object) As Boolean
+            If ReferenceEquals(Nothing, obj) Then Return False
+            If ReferenceEquals(Me, obj) Then Return True
+            If obj.GetType IsNot Me.GetType Then Return False
+            Return Equals(DirectCast(obj, GraphForm))
+        End Function
+
+        Public Overrides Function GetHashCode() As Integer
+            Return _id.GetHashCode
+        End Function
+
+        Public Shared Operator =(ByVal left As GraphForm, ByVal right As GraphForm) As Boolean
+            Return Equals(left, right)
+        End Operator
+
+        Public Shared Operator <>(ByVal left As GraphForm, ByVal right As GraphForm) As Boolean
+            Return Not Equals(left, right)
+        End Operator
+
         Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(GraphForm))
 
         Private WithEvents _theSettings As SettingsManager = SettingsManager.Instance
@@ -52,7 +80,7 @@ Namespace Forms.ChartForm
                     Case FormDataStatus.Running
                         StatusMessage.Text = ""
                     Case FormDataStatus.Stopped
-                        _ansamble.Items.Cleanup()
+                        _ansamble.Items.Cleanup() 'todo because of this bond curves get cleared when swithing portfolios!
 
                         StatusMessage.Text = "Stopped"
                 End Select
@@ -702,7 +730,7 @@ Namespace Forms.ChartForm
                 elem.Checked = refCurve IsNot Nothing AndAlso item.Name = refCurve.Name
                 elem.Tag = item
             Next
-            
+
             SpreadCMS.Show(MousePosition)
         End Sub
 

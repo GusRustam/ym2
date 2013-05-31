@@ -36,7 +36,7 @@ Namespace Tools.Elements
                         From quoteName In item.QuotesAndYields
                         Let q = item.QuotesAndYields(quoteName)
                         Let theY = ordinate.GetValue(q)
-                        Where theY.HasValue And quoteName = item.QuotesAndYields.Main.QuoteName
+                        Where theY.HasValue AndAlso item.QuotesAndYields.Main IsNot Nothing AndAlso quoteName = item.QuotesAndYields.Main.QuoteName
                         Select New BondCurveItem(q.Duration, theY, q.ParentBond,
                                                 q.BackColor, q.Yld.ToWhat, q.MarkerStyle,
                                                 q.ParentBond.Label))

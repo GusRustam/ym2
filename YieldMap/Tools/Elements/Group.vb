@@ -56,7 +56,7 @@ Namespace Tools.Elements
 
         Public Sub UnfreezeEventsQuiet() Implements IChangeable.UnfreezeEventsQuiet
             _eventsFrozen = False
-            If Ansamble.YSource <> Yield Then Recalculate(Ansamble.YSource) 'todo wut??
+            If Ansamble.YSource <> Yield Then Recalculate(Ansamble.YSource)
         End Sub
 
         Protected Sub NotifyUpdated(ByVal curveItems As List(Of CurveItem))

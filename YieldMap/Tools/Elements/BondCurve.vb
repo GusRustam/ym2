@@ -267,15 +267,14 @@ Namespace Tools.Elements
 
         Private Function RecalculateSpread(ByVal ord As IOrdinate) As List(Of CurveItem)
             SetSpread(ord)
-            'For Each qy In From item In AllElements From quoteName In item.QuotesAndYields Select item.QuotesAndYields(quoteName)
-            '    res.Add(New PointCurveItem(qy.Duration, ord.GetValue(qy), Me))
-            'Next
+            ' I can't calculate spreads of interpolated curves. It does make sense 'cos interpolated curve is of only XY points 
+            ' I could calculate point spread but would it (I mean troubles) make sence?
             Dim res = New List(Of CurveItem)(
                         From item In AllElements
                         From quoteName In item.QuotesAndYields
                         Let q = item.QuotesAndYields(quoteName)
                         Let theY = ord.GetValue(q)
-                        Where theY.HasValue And quoteName = item.QuotesAndYields.Main.QuoteName
+                        Where theY.HasValue AndAlso item.QuotesAndYields.Main IsNot Nothing AndAlso quoteName = item.QuotesAndYields.Main.QuoteName
                         Select New PointCurveItem(q.Duration, theY, Me))
             res.Sort()
             Return res

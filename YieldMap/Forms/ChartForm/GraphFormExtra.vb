@@ -264,7 +264,7 @@ Namespace Forms.ChartForm
             End With
         End Sub
 
-        Private Sub ShowCurveCMS(ByVal nm As String, ByVal refCurve As SwapCurve)
+        Private Sub ShowCurveCMS(ByVal nm As String, ByVal refCurve As ICurve)
             SpreadCMS.Items.Clear()
             SpreadCMS.Tag = nm
             For Each item In _ansamble.SwapCurves

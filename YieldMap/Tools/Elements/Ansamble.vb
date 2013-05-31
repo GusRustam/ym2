@@ -95,6 +95,7 @@
             For Each item In AllCurves()
                 item.ClearSpread(obj)
             Next
+            If YSource = obj Then YSource = Yield
             UnfreezeEvents()
         End Sub
 

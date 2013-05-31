@@ -14,7 +14,7 @@ Namespace Tools.Elements
         Sub Subscribe()
         Sub FreezeEvents()
         Sub UnfreezeEvents()
-        Sub UnfreezeEventsQuiet() ' todo that's baaad!
+        Sub UnfreezeEventsQuiet()
     End Interface
 
     Public Interface IAswBenchmark
@@ -76,7 +76,7 @@ Namespace Tools.Elements
 
         Public Sub UnfreezeEventsQuiet() Implements IChangeable.UnfreezeEventsQuiet
             _eventsFrozen = False
-            If Ansamble.YSource <> Yield Then Recalculate(_ansamble.YSource) 'todo wut??
+            If Ansamble.YSource <> Yield Then Recalculate(_ansamble.YSource)
         End Sub
 
         '' ============ ICURVE INTERFACE ============

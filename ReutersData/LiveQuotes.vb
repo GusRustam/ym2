@@ -10,8 +10,7 @@ Public Class LiveQuotes
     Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(LiveQuotes))
     Private WithEvents _listManager As AdxRtList = Eikon.Sdk.CreateAdxRtList()
 
-    ' TODO В главном менеджере сделать главное событие- завершение работы приложения!
-    ' TODO Его ловить вот в таких вот классах и корректно убивать все объекты
+    ' TODO событие- завершение работы приложения ловить вот в таких вот классах и корректно убивать все объекты
 
     Public Sub CancelAll()
         Try

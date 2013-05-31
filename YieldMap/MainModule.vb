@@ -34,7 +34,7 @@ Module MainModule
             Dim frm As New GraphForm
             If parent IsNot Nothing Then frm.MdiParent = parent
             frm.Show()
-            AddHandler frm.Closed, Sub() _charts.Remove(frm) ' todo equality members for forms
+            AddHandler frm.Closed, Sub() _charts.Remove(frm)
             _charts.Add(frm)
             Return _charts.Count
         End Function

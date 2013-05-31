@@ -66,7 +66,6 @@ Namespace Forms.ChartForm
             frm.Curve = Curve
             frm.ShowDialog()
             ' todo 3) спреды
-            ' todo 4) упроситить и редуцировать swap curves
             ' todo 5) сделать контекстное меню группы и бондовой кривой в легенде
         End Sub
 

@@ -280,14 +280,6 @@ Public Class HistoryBlock
             Dim firstColumn = data.GetLowerBound(1)
             Dim lastColumn = data.GetUpperBound(1)
 
-#If DEBUG Then
-            For row = firstRow To lastRow
-                For col = firstColumn To lastColumn
-                    Logger.Trace("({0},{1}) -> {2}", row, col, data.GetValue(row, col))
-                Next
-            Next
-#End If
-
             For col = firstColumn + 1 To lastColumn
                 Dim theValue = data.GetValue(0, col)
                 If Not IsDate(theValue) Then Continue For
@@ -435,11 +427,8 @@ Public Class History
                     ParseData()
                 Else
                     Logger.Warn(String.Format("{2}: Data Status is {0}; will omit the data. Error message is {1}", datastatus, _historyManager.ErrorString, _ric))
-                    ' why raise empty event? todo: only if U want to update status
-                    ' RaiseEvent HistoricalData(_ric, New LoaderStatus(Finished, Err, LoaderErrReason.DataStatus), datastatus, Nothing)
                 End If
-            End Sub
-            )
+            End Sub)
     End Sub
 
     Private Sub ParseData()
