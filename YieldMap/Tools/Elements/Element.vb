@@ -149,6 +149,12 @@ Namespace Tools.Elements
         Public BackColor As String
         Public MarkerStyle As String
 
+        Private ReadOnly _quoteName As String
+
+        Sub New(ByVal quoteName As String)
+            _quoteName = quoteName
+        End Sub
+
         Private Shared Function ParseBondYield(ByVal bondYield As Array) As List(Of YieldStructure)
             Dim res As New List(Of YieldStructure)
 
@@ -202,6 +208,12 @@ Namespace Tools.Elements
                 If dt.HasValue Then YieldAtDate = dt.Value
                 CalculateYields(value)
             End Set
+        End Property
+
+        Public ReadOnly Property QuoteName As String
+            Get
+                Return _quoteName
+            End Get
         End Property
     End Class
 End Namespace

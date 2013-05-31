@@ -12,6 +12,12 @@ Namespace Tools.Elements
             End Get
         End Property
 
+        Public ReadOnly Property Keys() As IEnumerable(Of IOrdinate)
+            Get
+                Return _items.Keys
+            End Get
+        End Property
+
         Public Sub Put(ByVal src As IOrdinate, ByVal crv As ICurve)
             If src = Yield Then Throw New InvalidOperationException()
             _items(src) = crv

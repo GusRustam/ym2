@@ -77,6 +77,7 @@ Namespace Forms.ChartForm
                                            Select New BondGroup(_ansamble, port, portfolioStructure)
                     ' todo add custom bonds
                     AddHandler grp.Updated, AddressOf OnGroupUpdated
+                    AddHandler grp.UpdatedSpread, Sub(data As List(Of CurveItem), ord As IOrdinate) If _ansamble.YSource = ord Then OnGroupUpdated(data)
                     _ansamble.Items.Add(grp)
                 Next
                 _ansamble.Items.Start()
@@ -510,7 +511,8 @@ Namespace Forms.ChartForm
             Dim rubCCS = New RubCCS(_ansamble)
 
             AddHandler rubCCS.Cleared, Sub() OnSwapCurveRemoved(rubCCS)
-            AddHandler rubCCS.Updated, AddressOf OnSwapCurvePaint
+            AddHandler rubCCS.Updated, Sub(data As List(Of CurveItem)) OnSwapCurvePaint(data, rubCCS)
+            AddHandler rubCCS.UpdatedSpread, Sub(data As List(Of CurveItem), ord As IOrdinate) If _ansamble.YSource = ord Then OnSwapCurvePaint(data, rubCCS)
 
             rubCCS.Subscribe()
             _ansamble.SwapCurves.Add(rubCCS)
@@ -520,7 +522,8 @@ Namespace Forms.ChartForm
             Logger.Debug("RubIRSTSMIClick()")
             Dim rubIRS = New RubIRS(_ansamble)
             AddHandler rubIRS.Cleared, Sub() OnSwapCurveRemoved(rubIRS)
-            AddHandler rubIRS.Updated, AddressOf OnSwapCurvePaint
+            AddHandler rubIRS.Updated, Sub(data As List(Of CurveItem)) OnSwapCurvePaint(data, rubIRS)
+            AddHandler rubIRS.UpdatedSpread, Sub(data As List(Of CurveItem), ord As IOrdinate) If _ansamble.YSource = ord Then OnSwapCurvePaint(data, rubIRS)
 
             rubIRS.Subscribe()
             _ansamble.SwapCurves.Add(rubIRS)
@@ -530,7 +533,8 @@ Namespace Forms.ChartForm
             Logger.Debug("UsdIRS_TSMIClick()")
             Dim usdIRS = New UsdIRS(_ansamble)
             AddHandler usdIRS.Cleared, Sub() OnSwapCurveRemoved(usdIRS)
-            AddHandler usdIRS.Updated, AddressOf OnSwapCurvePaint
+            AddHandler usdIRS.Updated, Sub(data As List(Of CurveItem)) OnSwapCurvePaint(data, usdIRS)
+            AddHandler usdIRS.UpdatedSpread, Sub(data As List(Of CurveItem), ord As IOrdinate) If _ansamble.YSource = ord Then OnSwapCurvePaint(data, usdIRS)
 
             usdIRS.Subscribe()
             _ansamble.SwapCurves.Add(usdIRS)
@@ -540,7 +544,8 @@ Namespace Forms.ChartForm
             Logger.Debug("NDFTSMI_Click()")
             Dim rubNDF = New RubNDF(_ansamble)
             AddHandler rubNDF.Cleared, Sub() OnSwapCurveRemoved(rubNDF)
-            AddHandler rubNDF.Updated, AddressOf OnSwapCurvePaint
+            AddHandler rubNDF.Updated, Sub(data As List(Of CurveItem)) OnSwapCurvePaint(data, rubNDF)
+            AddHandler rubNDF.UpdatedSpread, Sub(data As List(Of CurveItem), ord As IOrdinate) If _ansamble.YSource = ord Then OnSwapCurvePaint(data, rubNDF)
 
             rubNDF.Subscribe()
             _ansamble.SwapCurves.Add(rubNDF)
@@ -576,12 +581,7 @@ Namespace Forms.ChartForm
 #End Region
 
 #Region "d) Context menu events"
-        ' Selection of y-axis type (yield / spread)
-        Private Sub OnYAxisSelected(ByVal sender As Object, ByVal e As EventArgs)
-            Logger.Info("OnYAxisSelected()")
-            Dim item As ToolStripMenuItem = TryCast(sender, ToolStripMenuItem)
-            If item IsNot Nothing Then _ansamble.YSource = Ordinate.FromString(item.Text)
-        End Sub
+
 
         Private Sub CopyToClipboardTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles CopyToClipboardTSMI.Click
             Dim bmp As New Bitmap(TheChart.Width, TheChart.Height)
@@ -719,6 +719,7 @@ Namespace Forms.ChartForm
             Dim src = CType(CType(sender, ToolStripMenuItem).Tag, Source)
 
             Dim curve = New BondCurve(_ansamble, src)
+            AddHandler curve.UpdatedSpread, Sub(data As List(Of CurveItem), ord As IOrdinate) If _ansamble.YSource = ord Then OnNewCurvePaint(data)
             AddHandler curve.Updated, AddressOf OnNewCurvePaint
             AddHandler curve.Cleared, Sub()
                                           Dim srs = TheChart.Series.FindByName(curve.Identity)

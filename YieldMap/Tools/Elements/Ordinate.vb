@@ -111,7 +111,7 @@ Namespace Tools.Elements
             MyBase.New(name, descr)
         End Sub
 
-        Private Shared Function CalcPntSprd(ByVal rateArray As Array, ByVal dscr As BasePointDescription) As Double
+        Private Shared Function CalcPntSprd(ByVal rateArray As Array, ByVal dscr As BasePointDescription) As Double?
             Dim data As New List(Of XY)
             For i = rateArray.GetLowerBound(0) To rateArray.GetUpperBound(0)
                 data.Add(New XY() With {.Y = rateArray.GetValue(i, 1), .X = (CDate(rateArray.GetValue(i, 0)) - dscr.YieldAtDate).Days / 365})

@@ -10,11 +10,11 @@ Namespace Tools.Elements
         Event Cleared As Action
         Sub Cleanup()
         Sub Recalculate()
-        Sub Recalculate(ByVal ord As IOrdinate) ' todo add parameter with spread type
+        Sub Recalculate(ByVal ord As IOrdinate)
         Sub Subscribe()
         Sub FreezeEvents()
         Sub UnfreezeEvents()
-        Sub UnfreezeEventsQuiet()
+        Sub UnfreezeEventsQuiet() ' todo that's baaad!
     End Interface
 
     Public Interface IAswBenchmark
@@ -42,6 +42,15 @@ Namespace Tools.Elements
 
         Public Event Cleared As Action Implements IChangeable.Cleared
         Public Event Updated As Action(Of List(Of CurveItem))
+        Public Event UpdatedSpread As Action(Of List(Of CurveItem), IOrdinate)
+
+        Private ReadOnly _ansamble As Ansamble
+
+        Public ReadOnly Property Ansamble() As Ansamble
+            Get
+                Return _ansamble
+            End Get
+        End Property
 
         '' ============ ICHANGEABLE INTERFACE ============
         Public MustOverride Sub Recalculate() Implements IChangeable.Recalculate
@@ -51,6 +60,11 @@ Namespace Tools.Elements
         Public MustOverride Sub Subscribe() Implements IChangeable.Subscribe
 
         Private _eventsFrozen As Boolean
+
+        Sub New(ByVal ansamble As Ansamble)
+            _ansamble = ansamble
+        End Sub
+
         Public Sub FreezeEvents() Implements IChangeable.FreezeEvents
             _eventsFrozen = True
         End Sub
@@ -62,6 +76,7 @@ Namespace Tools.Elements
 
         Public Sub UnfreezeEventsQuiet() Implements IChangeable.UnfreezeEventsQuiet
             _eventsFrozen = False
+            If Ansamble.YSource <> Yield Then Recalculate(_ansamble.YSource) 'todo wut??
         End Sub
 
         '' ============ ICURVE INTERFACE ============
@@ -97,5 +112,10 @@ Namespace Tools.Elements
         Protected Sub NotifyUpdated(ByVal data As List(Of CurveItem))
             If Not _eventsFrozen Then RaiseEvent Updated(data)
         End Sub
+
+        Protected Sub NotifyUpdatedSpread(ByVal data As List(Of CurveItem), ByVal ord As IOrdinate)
+            If Not _eventsFrozen Then RaiseEvent UpdatedSpread(data, ord)
+        End Sub
+
     End Class
 End Namespace

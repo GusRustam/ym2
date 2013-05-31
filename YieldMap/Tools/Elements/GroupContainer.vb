@@ -8,6 +8,7 @@ Namespace Tools.Elements
         Public Event Volume As Action(Of Bond)
         Public Event Cleared As Action(Of Group)
         Public Event Recalculated As Action(Of Group)
+        'Public Event RecalculatedSpread As Action(Of Group, IOrdinate)
 
         Default Public ReadOnly Property Data(ByVal id As Long) As Group
             Get
@@ -65,6 +66,7 @@ Namespace Tools.Elements
         Public Sub Add(ByVal group As Group)
             _items.Add(group.Identity, group)
             AddHandler group.Updated, Sub() RaiseEvent Recalculated(group)
+            'AddHandler group.UpdatedSpread, Sub(dt As List(Of CurveItem), ord As IOrdinate) RaiseEvent RecalculatedSpread(group, ord)
             AddHandler group.Cleared, Sub()
                                           _items.Remove(group.Identity)
                                           RaiseEvent Cleared(group)

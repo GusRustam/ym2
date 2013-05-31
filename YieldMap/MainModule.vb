@@ -86,13 +86,7 @@ Module MainModule
         ' Error handling 
         AddHandler Application.ThreadException, New ThreadExceptionEventHandler(AddressOf ThreadEventHandler)
         Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException)
-
         AddHandler AppDomain.CurrentDomain.UnhandledException, New UnhandledExceptionEventHandler(AddressOf DomainEventHandler)
-
-        '' Setting up db path
-        'Dim installPath = Utils.GetMyPath()
-        'AppDomain.CurrentDomain.SetData("DataDirectory", installPath)
-        'My.Settings.Default("bondsConnectionString") = String.Format("data source=""{0}\bonds.sqlite""", installPath)
 
         _mainForm = New MainForm
         Application.Run(_mainForm)
@@ -103,10 +97,6 @@ Module MainModule
         If MessageBox.Show(String.Format("Unhandled exception of type {0} occured.{1}Would you like to close the application?", e.ExceptionObject.GetType(), Environment.NewLine), "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error) = MsgBoxResult.Yes Then
             Controller.Shutdown()
         End If
-        'Dim frm As New UnhandledExcForm
-        'frm.Text = Unhandled_domain_exception
-        'frm.ErrorTextBox.Text = GetEnvironment() + Environment.NewLine + Environment.NewLine + e.ExceptionObject.ToString()
-        'frm.ShowDialog()
     End Sub
 
     Private Sub ThreadEventHandler(ByVal sender As Object, ByVal e As ThreadExceptionEventArgs)
@@ -114,9 +104,5 @@ Module MainModule
         If MessageBox.Show(String.Format("Unhandled exception {0} occured.{1}Would you like to close the application?", e.Exception.GetType(), Environment.NewLine), "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error) = MsgBoxResult.Yes Then
             Controller.Shutdown()
         End If
-        'Dim frm As New UnhandledExcForm
-        'frm.Text = Unhandled_thread_exception
-        'frm.ErrorTextBox.Text = GetEnvironment() + Environment.NewLine + Environment.NewLine + e.Exception.ToString()
-        'frm.ShowDialog()
     End Sub
 End Module

@@ -17,9 +17,14 @@ Namespace Forms.ChartForm
                 If _curve IsNot Nothing Then
                     AddHandler _curve.Cleared, AddressOf OnCurveCleared
                     AddHandler _curve.Updated, AddressOf OnCurveUpdated
+                    AddHandler _curve.UpdatedSpread, AddressOf OnCurveUpdatedSpread
                 End If
             End Set
         End Property
+
+        Private Sub OnCurveUpdatedSpread(ByVal arg1 As List(Of CurveItem), ByVal arg2 As IOrdinate)
+            'todo
+        End Sub
 
         Private Sub CurveUpdate()
             If Curve IsNot Nothing Then

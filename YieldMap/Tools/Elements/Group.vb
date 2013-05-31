@@ -17,6 +17,7 @@ Namespace Tools.Elements
         Public Event Cleared As Action Implements IChangeable.Cleared
         Public Event Volume As Action(Of Bond)
         Public Event Updated As Action(Of List(Of CurveItem))
+        Public Event UpdatedSpread As Action(Of List(Of CurveItem), IOrdinate)
 
         Protected Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(Group))
 
@@ -55,10 +56,15 @@ Namespace Tools.Elements
 
         Public Sub UnfreezeEventsQuiet() Implements IChangeable.UnfreezeEventsQuiet
             _eventsFrozen = False
+            If Ansamble.YSource <> Yield Then Recalculate(Ansamble.YSource) 'todo wut??
         End Sub
 
         Protected Sub NotifyUpdated(ByVal curveItems As List(Of CurveItem))
             If Not _eventsFrozen Then RaiseEvent Updated(curveItems)
+        End Sub
+
+        Protected Sub NotifyUpdatedSpread(ByVal curveItems As List(Of CurveItem), ord As IOrdinate)
+            If Not _eventsFrozen Then RaiseEvent UpdatedSpread(curveItems, ord)
         End Sub
 
         Private ReadOnly _elements As New List(Of Bond) 'ric -> datapoint
@@ -177,7 +183,7 @@ Namespace Tools.Elements
         End Sub
 
         Protected Sub HandleQuote(ByRef bond As Bond, ByVal xmlName As String, ByVal fieldVal As Double?, ByVal calcDate As Date)
-            Dim descr As New BondPointDescription
+            Dim descr As New BondPointDescription(xmlName)
             descr.BackColor = BondFields.Fields.BackColor(xmlName)
             descr.MarkerStyle = BondFields.Fields.MarkerStyle(xmlName)
             descr.ParentBond = Bond

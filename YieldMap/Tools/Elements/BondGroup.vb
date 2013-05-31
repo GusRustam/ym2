@@ -26,24 +26,21 @@ Namespace Tools.Elements
         End Sub
 
         Public Overrides Sub Recalculate(ByVal ord As IOrdinate)
-            RecalculateSpread(ord)
+            NotifyUpdatedSpread(RecalculateSpread(ord), ord)
         End Sub
 
         Private Function RecalculateSpread(ByVal ordinate As IOrdinate) As List(Of CurveItem)
             SetSpread(ordinate)
-            'For Each qy In From item In AllElements From quoteName In item.QuotesAndYields Select item.QuotesAndYields(quoteName)
-            '    res.Add(New PointCurveItem(qy.Duration, ord.GetValue(qy), Me))
-            'Next
             Dim res = New List(Of CurveItem)(
                         From item In AllElements
                         From quoteName In item.QuotesAndYields
                         Let q = item.QuotesAndYields(quoteName)
                         Let theY = ordinate.GetValue(q)
-                        Where theY.HasValue
+                        Where theY.HasValue And quoteName = item.QuotesAndYields.Main.QuoteName
                         Select New BondCurveItem(q.Duration, theY, q.ParentBond,
                                                 q.BackColor, q.Yld.ToWhat, q.MarkerStyle,
                                                 q.ParentBond.Label))
-            'res.Sort()
+            res.Sort()
             Return res
         End Function
 

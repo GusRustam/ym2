@@ -39,7 +39,6 @@ Namespace Tools.Elements
 
         Private Shared ReadOnly PossibleQuotes() As String = {"BID", "ASK", "MID"}
 
-        Private ReadOnly _ansamble As Ansamble
         Private _bootstrapped As Boolean
 
         '' LOADERS
@@ -53,7 +52,7 @@ Namespace Tools.Elements
         Private Const InstrumentType As String = "S"
 
         Sub New(ByVal ansamble As Ansamble)
-            _ansamble = ansamble
+            MyBase.new(ansamble)
         End Sub
 
         Public Overrides Sub Subscribe()
@@ -160,17 +159,18 @@ Namespace Tools.Elements
         Public Overrides Sub Recalculate(ByVal ord As IOrdinate)
             If ord = Yield Then Throw New InvalidOperationException()
             _lastCurve(ord) = RecalculateSpread(ord)
+            NotifyUpdatedSpread(_lastCurve(ord), ord)
         End Sub
 
         Public Overrides Sub Recalculate()
-            If _ansamble.YSource = Yield Then
-                _lastCurve(Yield) = RecalculateYield()
+            _lastCurve(Yield) = RecalculateYield()
+            If Ansamble.YSource = Yield Then
                 NotifyUpdated(_lastCurve(Yield))
-            ElseIf _ansamble.YSource.Belongs(AswSpread, OaSpread, ZSpread, PointSpread) Then
-                _lastCurve(_ansamble.YSource) = RecalculateSpread(_ansamble.YSource)
-                NotifyUpdated(_lastCurve(_ansamble.YSource))
+            ElseIf Ansamble.YSource.Belongs(AswSpread, OaSpread, ZSpread, PointSpread) Then
+                _lastCurve(Ansamble.YSource) = RecalculateSpread(Ansamble.YSource)
+                NotifyUpdated(_lastCurve(Ansamble.YSource))
             Else
-                Logger.Warn("Unknown spread type {0}", _ansamble.YSource)
+                Logger.Warn("Unknown spread type {0}", Ansamble.YSource)
             End If
         End Sub
 
@@ -331,9 +331,9 @@ Namespace Tools.Elements
         End Sub
 
         Public Overrides Sub SetSpread(ByVal ySource As OrdinateBase)
-            If _ansamble.Benchmarks(ySource) = Me Then
+            If Ansamble.Benchmarks(ySource) <> Me Then
                 For Each item In Descrs
-                    ySource.SetValue(item, _ansamble.Benchmarks(ySource))
+                    ySource.SetValue(item, Ansamble.Benchmarks(ySource))
                 Next
             Else
                 For Each item In Descrs

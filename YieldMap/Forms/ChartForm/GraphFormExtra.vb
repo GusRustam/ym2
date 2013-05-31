@@ -93,9 +93,10 @@ Namespace Forms.ChartForm
         Private Sub ShowYAxisCMS(ByVal loc As Point)
             If Not _ansamble.Benchmarks.Any Then Return
             YAxisCMS.Items.Clear()
-            YAxisCMS.Items.Add(Yield.ToString(), Nothing, AddressOf OnYAxisSelected) ' todo pass name somehow
-            For Each key As ICurve In _ansamble.Benchmarks
-                YAxisCMS.Items.Add(_ansamble.Benchmarks.GetOrdinate(key).NameProperty, Nothing, AddressOf OnYAxisSelected)
+            YAxisCMS.Items.Add(Yield.DescrProperty, Nothing, Sub() _ansamble.YSource = Yield)
+            For Each key As IOrdinate In _ansamble.Benchmarks.Keys
+                Dim tmp = key
+                YAxisCMS.Items.Add(key.DescrProperty, Nothing, Sub() _ansamble.YSource = tmp)
             Next
             YAxisCMS.Show(TheChart, loc)
         End Sub
@@ -266,7 +267,6 @@ Namespace Forms.ChartForm
         Private Sub ShowCurveCMS(ByVal nm As String, ByVal refCurve As SwapCurve)
             SpreadCMS.Items.Clear()
             SpreadCMS.Tag = nm
-            'If Not _moneyMarketCurves.Any() Then Return
             For Each item In _ansamble.SwapCurves
                 Dim elem = CType(SpreadCMS.Items.Add(item.Name, Nothing, AddressOf OnBenchmarkSelected), ToolStripMenuItem)
                 elem.CheckOnClick = True
@@ -368,7 +368,7 @@ Namespace Forms.ChartForm
             Dim points As New List(Of Tuple(Of BondPointDescription, BondMetadata))
             For Each dt In data.Keys
                 Try
-                    Dim calc As New BondPointDescription
+                    Dim calc As New BondPointDescription("HST")
                     If data(dt).Close > 0 Then
                         calc.Yield(dt) = data(dt).Close
                         points.Add(Tuple.Create(calc, bondDataPoint))
@@ -479,21 +479,14 @@ Namespace Forms.ChartForm
             SetChartMinMax()
         End Sub
 
-        Private Sub OnSwapCurvePaint(ByVal data As List(Of CurveItem))
+        Private Sub OnSwapCurvePaint(ByVal data As List(Of CurveItem), ByVal crv As SwapCurve)
             GuiAsync(
                 Sub()
-                    If Not data.Any Then Return
-                    Dim crv As SwapCurve
-                    If TypeOf data.First Is SwapCurveItem Then
-                        crv = CType(data.First, SwapCurveItem).Curve
-                    ElseIf TypeOf data.First Is PointCurveItem Then
-                        crv = CType(CType(data.First, PointCurveItem).Curve, SwapCurve)
-                    Else
-                        Logger.Warn("Unexpected items type for a swap-based curve")
-                        Return
-                    End If
                     Dim srs = TheChart.Series.FindByName(crv.Identity)
-                    If srs IsNot Nothing Then TheChart.Series.Remove(srs)
+                    If srs IsNot Nothing Then
+                        srs.Points.Clear()
+                        TheChart.Series.Remove(srs)
+                    End If
                     srs = New Series() With {
                         .Name = crv.Identity,
                         .ChartType = SeriesChartType.Line,

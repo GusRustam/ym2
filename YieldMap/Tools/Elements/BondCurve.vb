@@ -262,6 +262,7 @@ Namespace Tools.Elements
             ' yield can't be a source for benchmark
             If ord = Yield Then Throw New InvalidOperationException()
             _lastCurve(ord) = RecalculateSpread(ord)
+            NotifyUpdatedSpread(_lastCurve(ord), ord)
         End Sub
 
         Private Function RecalculateSpread(ByVal ord As IOrdinate) As List(Of CurveItem)
@@ -274,15 +275,15 @@ Namespace Tools.Elements
                         From quoteName In item.QuotesAndYields
                         Let q = item.QuotesAndYields(quoteName)
                         Let theY = ord.GetValue(q)
-                        Where theY.HasValue
+                        Where theY.HasValue And quoteName = item.QuotesAndYields.Main.QuoteName
                         Select New PointCurveItem(q.Duration, theY, Me))
             res.Sort()
             Return res
         End Function
 
         Public Overrides Sub Recalculate()
+            _lastCurve(Yield) = RecalculateYields()
             If Ansamble.YSource = Yield Then
-                _lastCurve(Yield) = RecalculateYields()
                 NotifyUpdated(_lastCurve(Yield))
 
             ElseIf Ansamble.YSource.Belongs(AswSpread, OaSpread, ZSpread, PointSpread) Then
@@ -383,20 +384,26 @@ Namespace Tools.Elements
         End Sub
 
         Public Sub SetSpread(ByVal ySource As OrdinateBase) Implements ICurve.SetSpread
-            For Each qy In From item In AllElements From quoteName In item.QuotesAndYields Select item.QuotesAndYields(quoteName)
-                ySource.SetValue(qy, Ansamble.Benchmarks(ySource))
-            Next
+            If Ansamble.Benchmarks(ySource) <> Me Then
+                For Each qy In From item In AllElements From quoteName In item.QuotesAndYields Select item.QuotesAndYields(quoteName)
+                    ySource.SetValue(qy, Ansamble.Benchmarks(ySource))
+                Next
+            Else
+                For Each qy In From item In AllElements From quoteName In item.QuotesAndYields Select item.QuotesAndYields(quoteName)
+                    ySource.ClearValue(qy)
+                Next
+            End If
         End Sub
 
         Public Function RateArray() As Array Implements ICurve.RateArray
             If Not _lastCurve.ContainsKey(Yield) Then Return Nothing
-            Dim list = (From elem In _lastCurve(Yield) Select elem.TheX, elem.TheY).ToList()
+            Dim list = (From elem In _lastCurve(Yield) Select New XY(elem.TheX, elem.TheY)).ToList()
             list.Sort()
             Dim len = list.Count - 1
             Dim res(0 To len, 1) As Object
             For i = 0 To len
-                res(i, 0) = DateTime.Today.AddDays(TimeSpan.FromDays(list(i).TheX * 365).TotalDays) ' todo and wut if mode is maturity?
-                res(i, 1) = list(i).TheY
+                res(i, 0) = DateTime.Today.AddDays(TimeSpan.FromDays(list(i).X * 365).TotalDays) ' todo and wut if mode is maturity?
+                res(i, 1) = list(i).Y
             Next
             Return res
         End Function
