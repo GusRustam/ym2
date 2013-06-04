@@ -127,18 +127,17 @@ Namespace Forms.ChartForm
                 TheChart.Series.Add(bidAskSeries)
             End If
             bidAskSeries.Points.Clear()
-            ' todo request bid and ask from the bond. It will have to do the calculation using appropriate field and return XY
 
-            'If bond.QuotesAndYields.Has(bond.Fields.Bid) Then
-            '    Dim calc = bond.QuotesAndYields(bond.Fields.Bid)
-            '    Dim yValue = _spreadBenchmarks.GetActualQuote(calc)
-            '    bidAskSeries.Points.Add(New DataPoint(calc.Duration, yValue.Value))
-            'End If
-            'If bond.QuotesAndYields.Has(bond.Fields.Ask) Then
-            '    Dim calc = bond.QuotesAndYields(bond.Fields.Ask)
-            '    Dim yValue = _spreadBenchmarks.GetActualQuote(calc)
-            '    bidAskSeries.Points.Add(New DataPoint(calc.Duration, yValue.Value))
-            'End If
+            If bond.QuotesAndYields.Has(bond.Fields.Bid) Then
+                Dim calc = bond.QuotesAndYields(bond.Fields.Bid)
+                Dim yValue = _ansamble.YSource.GetValue(calc)
+                bidAskSeries.Points.Add(New DataPoint(calc.Duration, yValue.Value))
+            End If
+            If bond.QuotesAndYields.Has(bond.Fields.Ask) Then
+                Dim calc = bond.QuotesAndYields(bond.Fields.Ask)
+                Dim yValue = _ansamble.YSource.GetValue(calc)
+                bidAskSeries.Points.Add(New DataPoint(calc.Duration, yValue.Value))
+            End If
 
             TheChart.ChartAreas(0).AxisX.Minimum = minX
             TheChart.ChartAreas(0).AxisX.Maximum = maxX

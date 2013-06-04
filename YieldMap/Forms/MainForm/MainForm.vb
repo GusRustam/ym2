@@ -35,7 +35,6 @@ Namespace Forms.MainForm
             If message.Log.Success() Then
                 Initialized = True
                 InitEventLabel.Text = DatabaseUpdatedSuccessfully
-                _theSettings.LastDbUpdate = Today
                 RemoveHandler _ldr.Progress, AddressOf ProgressHandler
             ElseIf message.Log.Failed() Then
                 InitEventLabel.Text = FailedToUpdateDatabase
@@ -135,9 +134,9 @@ Namespace Forms.MainForm
 
             BondsData.Instance.Refresh()
 
-            If Not _theSettings.LastDbUpdate.HasValue OrElse _theSettings.LastDbUpdate < Today Then
-                _ldr.Initialize()
-            End If
+            'If Not _theSettings.LastDbUpdate.HasValue OrElse _theSettings.LastDbUpdate < Today Then
+            _ldr.Initialize()
+            'End If
         End Sub
 
         Private Sub ConnectorDisconnected() Handles _connector.Disconnected

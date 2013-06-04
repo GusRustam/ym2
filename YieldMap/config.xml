@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <settings>
   <property name="data-source" value="IDN" />
-  <property name="last-db-update" value="" />
   <property name="log-level" value="Trace" />
   <property name="mid-if-both" value="False" />
   <property name="show-bid-ask" value="True" />
@@ -13,6 +12,9 @@
   <property name="forbidden-fields" value="BID,ASK" />
   <property name="yield-calc-mode" value="YTA" />
   <property name="load-rics" value="False" />
+  <property name="clear-points" value="False" />
+  <property name="clear-bond-curves" value="False" />
+  <property name="clear-other-curves" value="False" />
   <viewport>
     <yield min="" max="" />
     <spread min="" max="" />

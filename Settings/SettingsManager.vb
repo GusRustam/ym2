@@ -188,18 +188,6 @@ Public Class SettingsManager
         End Set
     End Property
 
-
-    Private _lastDbUpdate As Date? = Nothing
-    Public Property LastDbUpdate As Date?
-        Get
-            Return _lastDbUpdate
-        End Get
-        Set(ByVal value As Date?)
-            SaveValue("/settings/property[@name='last-db-update']/@value", If(value.HasValue, value, ""))
-            _lastDbUpdate = Date.Parse(value)
-        End Set
-    End Property
-
     Private _yieldCalcMode As String = "YTM"
     Public Property YieldCalcMode() As String
         Get
@@ -253,6 +241,39 @@ Public Class SettingsManager
         End Set
     End Property
 
+    Private _clearPoints As Boolean = False
+    Public Property ClearPoints() As Boolean
+        Get
+            Return _clearPoints
+        End Get
+        Set(ByVal value As Boolean)
+            SaveValue("/settings/property[@name='clear-points']/@value", value.ToString())
+            _clearPoints = value
+        End Set
+    End Property
+
+    Private _clearBondCurves As Boolean = False
+    Public Property ClearBondCurves() As Boolean
+        Get
+            Return _clearBondCurves
+        End Get
+        Set(ByVal value As Boolean)
+            SaveValue("/settings/property[@name='clear-bond-curves']/@value", value.ToString())
+            _clearBondCurves = value
+        End Set
+    End Property
+
+    Private _clearOtherCurves As Boolean = False
+    Public Property ClearOtherCurves() As Boolean
+        Get
+            Return _clearOtherCurves
+        End Get
+        Set(ByVal value As Boolean)
+            SaveValue("/settings/property[@name='clear-other-curves']/@value", value.ToString())
+            _clearOtherCurves = value
+        End Set
+    End Property
+
     Sub New()
         Settings.Load(SettingsPath)
 
@@ -269,13 +290,15 @@ Public Class SettingsManager
         GetBoolValue("/settings/property[@name='show-main-toolbar']/@value", _showMainToolBar)
         GetBoolValue("/settings/property[@name='show-chart-toolbar']/@value", _showChartToolBar)
         GetBoolValue("/settings/property[@name='load-rics']/@value", _loadRics)
+        GetBoolValue("/settings/property[@name='clear-points']/@value", _clearPoints)
+        GetBoolValue("/settings/property[@name='clear-bond-curves']/@value", _clearBondCurves)
+        GetBoolValue("/settings/property[@name='clear-other-curves']/@value", _clearOtherCurves)
 
         GetStringValue("/settings/property[@name='fields-priority']/@value", _fieldsPriority)
         GetStringValue("/settings/property[@name='forbidden-fields']/@value", _forbiddenFields)
         GetStringValue("/settings/property[@name='yield-calc-mode']/@value", _yieldCalcMode)
         GetStringValue("/settings/property[@name='visible-columns']/@value", _bondSelectorVisibleColumns)
         GetStringValue("/settings/property[@name='data-source']/@value", _dataSource)
-        GetDateValue("/settings/property[@name='last-db-update']/@value", _lastDbUpdate)
 
         Dim tmp As String = "" : GetStringValue("/settings/property[@name='log-level']/@value", tmp)
         _logLevel = If(tmp <> "", LogLevel.FromString(tmp), LogLevel.Error)

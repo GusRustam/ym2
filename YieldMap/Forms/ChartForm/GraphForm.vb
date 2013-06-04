@@ -14,7 +14,7 @@ Imports DbManager
 Namespace Forms.ChartForm
     Public Class GraphForm
         Implements IEquatable(Of GraphForm)
-        Private _id As Guid = Guid.NewGuid()
+        Private ReadOnly _id As Guid = Guid.NewGuid()
 
         Public Overloads Function Equals(ByVal other As GraphForm) As Boolean Implements IEquatable(Of GraphForm).Equals
             If ReferenceEquals(Nothing, other) Then Return False
@@ -80,7 +80,9 @@ Namespace Forms.ChartForm
                     Case FormDataStatus.Running
                         StatusMessage.Text = ""
                     Case FormDataStatus.Stopped
-                        _ansamble.Items.Cleanup() 'todo because of this bond curves get cleared when swithing portfolios!
+                        If _theSettings.ClearPoints Then _ansamble.Items.CleanupOnlyBonds()
+                        If _theSettings.ClearBondCurves Then _ansamble.Items.CleanupOnlyCurves()
+                        If _theSettings.ClearOtherCurves Then _ansamble.SwapCurves.Cleanup()
 
                         StatusMessage.Text = "Stopped"
                 End Select
@@ -91,15 +93,15 @@ Namespace Forms.ChartForm
             Set(ByVal value As Integer)
                 Logger.Trace("ThisFormDataSource to id {0}", value)
 
-                Dim currentPortID As Long
+                Dim currentPortId As Long
                 If value < 0 Then
                     ThisFormStatus = FormDataStatus.Running
                     Return
                 Else
-                    currentPortID = value
+                    currentPortId = value
                 End If
 
-                Dim portfolioStructure = PortfolioManager.Instance.GetPortfolioStructure(currentPortID)
+                Dim portfolioStructure = PortfolioManager.Instance.GetPortfolioStructure(currentPortId)
                 For Each grp As BondGroup In From port In portfolioStructure.Sources
                                            Where TypeOf port.Source Is Chain Or TypeOf port.Source Is UserList
                                            Select New BondGroup(_ansamble, port, portfolioStructure)

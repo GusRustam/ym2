@@ -83,6 +83,10 @@ Namespace Forms.MainForm
             YieldCalcModeCB.SelectedText = Settings.YieldCalcMode
             MidIfBothCB.Checked = Settings.MidIfBoth
 
+            ClearBondCurvesCheckBox.Checked = Settings.ClearBondCurves
+            ClearOtherCurvesCheckBox.Checked = Settings.ClearOtherCurves
+            ClearPointsCheckBox.Checked = Settings.ClearPoints
+
             Dim selectedFields = Settings.BondSelectorVisibleColumns.Split(",")
             ColumnsCLB.Items.Clear()
             For Each field In BondMetadata.GetHideableFields()
@@ -134,6 +138,10 @@ Namespace Forms.MainForm
             Settings.ForbiddenFields = String.Join(",", HiddenFieldsListBox.Items.Cast(Of String))
             Settings.MidIfBoth = MidIfBothCB.Checked
             Settings.LoadRics = LoadRicsCB.Checked
+
+            Settings.ClearBondCurves = ClearBondCurvesCheckBox.Checked
+            Settings.ClearOtherCurves = ClearOtherCurvesCheckBox.Checked
+            Settings.ClearPoints = ClearPointsCheckBox.Checked
 
             Dim columnsString As String = ""
 

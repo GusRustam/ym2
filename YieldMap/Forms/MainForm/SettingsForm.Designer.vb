@@ -23,6 +23,7 @@
         'Не изменяйте ее в редакторе исходного кода.
         <System.Diagnostics.DebuggerStepThrough()> _
         Private Sub InitializeComponent()
+            Dim Label11 As System.Windows.Forms.Label
             Me.MainTableLayoutPanel = New System.Windows.Forms.TableLayoutPanel()
             Me.SaveSettingsButton = New System.Windows.Forms.Button()
             Me.MainTabControl = New System.Windows.Forms.TabControl()
@@ -52,6 +53,9 @@
             Me.Label9 = New System.Windows.Forms.Label()
             Me.Label3 = New System.Windows.Forms.Label()
             Me.MainGeneralTabPage = New System.Windows.Forms.TabPage()
+            Me.LoadRicsButton = New System.Windows.Forms.Button()
+            Me.LoadRicsCB = New System.Windows.Forms.CheckBox()
+            Me.Label10 = New System.Windows.Forms.Label()
             Me.Label2 = New System.Windows.Forms.Label()
             Me.ChartWindowCheckBox = New System.Windows.Forms.CheckBox()
             Me.MainWindowCheckBox = New System.Windows.Forms.CheckBox()
@@ -70,9 +74,10 @@
             Me.LogErrRadioButton = New System.Windows.Forms.RadioButton()
             Me.LogNoneRadioButton = New System.Windows.Forms.RadioButton()
             Me.TheCancelButton = New System.Windows.Forms.Button()
-            Me.LoadRicsCB = New System.Windows.Forms.CheckBox()
-            Me.Label10 = New System.Windows.Forms.Label()
-            Me.LoadRicsButton = New System.Windows.Forms.Button()
+            Me.ClearPointsCheckBox = New System.Windows.Forms.CheckBox()
+            Me.ClearBondCurvesCheckBox = New System.Windows.Forms.CheckBox()
+            Me.ClearOtherCurvesCheckBox = New System.Windows.Forms.CheckBox()
+            Label11 = New System.Windows.Forms.Label()
             Me.MainTableLayoutPanel.SuspendLayout()
             Me.MainTabControl.SuspendLayout()
             Me.MainChartPage.SuspendLayout()
@@ -97,12 +102,12 @@
             Me.MainTableLayoutPanel.RowCount = 2
             Me.MainTableLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
             Me.MainTableLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
-            Me.MainTableLayoutPanel.Size = New System.Drawing.Size(544, 275)
+            Me.MainTableLayoutPanel.Size = New System.Drawing.Size(544, 272)
             Me.MainTableLayoutPanel.TabIndex = 5
             '
             'SaveSettingsButton
             '
-            Me.SaveSettingsButton.Location = New System.Drawing.Point(3, 248)
+            Me.SaveSettingsButton.Location = New System.Drawing.Point(3, 245)
             Me.SaveSettingsButton.Name = "SaveSettingsButton"
             Me.SaveSettingsButton.Size = New System.Drawing.Size(155, 24)
             Me.SaveSettingsButton.TabIndex = 6
@@ -121,11 +126,15 @@
             Me.MainTabControl.Location = New System.Drawing.Point(3, 3)
             Me.MainTabControl.Name = "MainTabControl"
             Me.MainTabControl.SelectedIndex = 0
-            Me.MainTabControl.Size = New System.Drawing.Size(538, 239)
+            Me.MainTabControl.Size = New System.Drawing.Size(538, 236)
             Me.MainTabControl.TabIndex = 5
             '
             'MainChartPage
             '
+            Me.MainChartPage.Controls.Add(Label11)
+            Me.MainChartPage.Controls.Add(Me.ClearOtherCurvesCheckBox)
+            Me.MainChartPage.Controls.Add(Me.ClearBondCurvesCheckBox)
+            Me.MainChartPage.Controls.Add(Me.ClearPointsCheckBox)
             Me.MainChartPage.Controls.Add(Me.YieldCalcModeCB)
             Me.MainChartPage.Controls.Add(Me.Label8)
             Me.MainChartPage.Controls.Add(Me.MaxYieldTextBox)
@@ -144,7 +153,7 @@
             Me.MainChartPage.Location = New System.Drawing.Point(4, 22)
             Me.MainChartPage.Name = "MainChartPage"
             Me.MainChartPage.Padding = New System.Windows.Forms.Padding(3)
-            Me.MainChartPage.Size = New System.Drawing.Size(530, 213)
+            Me.MainChartPage.Size = New System.Drawing.Size(530, 210)
             Me.MainChartPage.TabIndex = 2
             Me.MainChartPage.Text = "Chart"
             Me.MainChartPage.UseVisualStyleBackColor = True
@@ -178,7 +187,7 @@
             'Label5
             '
             Me.Label5.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+                Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
             Me.Label5.AutoSize = True
             Me.Label5.Location = New System.Drawing.Point(10, 124)
             Me.Label5.Margin = New System.Windows.Forms.Padding(6, 6, 0, 0)
@@ -190,7 +199,7 @@
             'Label6
             '
             Me.Label6.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+                Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
             Me.Label6.AutoSize = True
             Me.Label6.Location = New System.Drawing.Point(10, 96)
             Me.Label6.Margin = New System.Windows.Forms.Padding(6, 6, 0, 0)
@@ -242,7 +251,7 @@
             'Label7
             '
             Me.Label7.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+                Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
             Me.Label7.AutoSize = True
             Me.Label7.Location = New System.Drawing.Point(10, 70)
             Me.Label7.Margin = New System.Windows.Forms.Padding(6, 6, 0, 0)
@@ -254,7 +263,7 @@
             'Label4
             '
             Me.Label4.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+                Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
             Me.Label4.AutoSize = True
             Me.Label4.Location = New System.Drawing.Point(4, 41)
             Me.Label4.Margin = New System.Windows.Forms.Padding(6, 6, 0, 0)
@@ -266,7 +275,7 @@
             'ShowPointSizeCheckBox
             '
             Me.ShowPointSizeCheckBox.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+                Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
             Me.ShowPointSizeCheckBox.AutoSize = True
             Me.ShowPointSizeCheckBox.Location = New System.Drawing.Point(214, 12)
             Me.ShowPointSizeCheckBox.Margin = New System.Windows.Forms.Padding(0)
@@ -280,7 +289,7 @@
             'MidIfBothCB
             '
             Me.MidIfBothCB.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+                Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
             Me.MidIfBothCB.AutoSize = True
             Me.MidIfBothCB.Location = New System.Drawing.Point(7, 177)
             Me.MidIfBothCB.Margin = New System.Windows.Forms.Padding(0)
@@ -293,7 +302,7 @@
             'ShowBidAskCheckBox
             '
             Me.ShowBidAskCheckBox.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+                Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
             Me.ShowBidAskCheckBox.AutoSize = True
             Me.ShowBidAskCheckBox.Location = New System.Drawing.Point(8, 12)
             Me.ShowBidAskCheckBox.Margin = New System.Windows.Forms.Padding(0)
@@ -376,7 +385,7 @@
             'Label9
             '
             Me.Label9.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+                Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
             Me.Label9.AutoSize = True
             Me.Label9.Location = New System.Drawing.Point(202, 12)
             Me.Label9.Margin = New System.Windows.Forms.Padding(0)
@@ -389,7 +398,7 @@
             'Label3
             '
             Me.Label3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                        Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+                Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
             Me.Label3.AutoSize = True
             Me.Label3.Location = New System.Drawing.Point(3, 12)
             Me.Label3.Margin = New System.Windows.Forms.Padding(0)
@@ -410,10 +419,42 @@
             Me.MainGeneralTabPage.Location = New System.Drawing.Point(4, 22)
             Me.MainGeneralTabPage.Name = "MainGeneralTabPage"
             Me.MainGeneralTabPage.Padding = New System.Windows.Forms.Padding(3)
-            Me.MainGeneralTabPage.Size = New System.Drawing.Size(530, 213)
+            Me.MainGeneralTabPage.Size = New System.Drawing.Size(530, 210)
             Me.MainGeneralTabPage.TabIndex = 1
             Me.MainGeneralTabPage.Text = "General"
             Me.MainGeneralTabPage.UseVisualStyleBackColor = True
+            '
+            'LoadRicsButton
+            '
+            Me.LoadRicsButton.Location = New System.Drawing.Point(148, 80)
+            Me.LoadRicsButton.Name = "LoadRicsButton"
+            Me.LoadRicsButton.Size = New System.Drawing.Size(210, 23)
+            Me.LoadRicsButton.TabIndex = 3
+            Me.LoadRicsButton.Text = "Save settings and load contributed rics"
+            Me.LoadRicsButton.UseVisualStyleBackColor = True
+            Me.LoadRicsButton.Visible = False
+            '
+            'LoadRicsCB
+            '
+            Me.LoadRicsCB.AutoSize = True
+            Me.LoadRicsCB.Location = New System.Drawing.Point(10, 84)
+            Me.LoadRicsCB.Name = "LoadRicsCB"
+            Me.LoadRicsCB.Size = New System.Drawing.Size(132, 17)
+            Me.LoadRicsCB.TabIndex = 2
+            Me.LoadRicsCB.Text = "Load contributed RICs"
+            Me.LoadRicsCB.UseVisualStyleBackColor = True
+            '
+            'Label10
+            '
+            Me.Label10.AutoSize = True
+            Me.Label10.Location = New System.Drawing.Point(7, 120)
+            Me.Label10.Name = "Label10"
+            Me.Label10.Size = New System.Drawing.Size(417, 39)
+            Me.Label10.TabIndex = 1
+            Me.Label10.Text = "If you want to start using contributed rics immediately, please set the above che" & _
+        "ckbox " & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "and press button ""Save settings and load contributed rics"". Otherwise it" & _
+        " will take effect " & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "after restart"
+            Me.Label10.Visible = False
             '
             'Label2
             '
@@ -522,7 +563,7 @@
             Me.Label1.Size = New System.Drawing.Size(419, 13)
             Me.Label1.TabIndex = 7
             Me.Label1.Text = "Choose granularity of logging (the finer the granularity, the slower the applicat" & _
-                "ion works):"
+        "ion works):"
             '
             'LogTraceRadioButton
             '
@@ -600,44 +641,51 @@
             '
             Me.TheCancelButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
             Me.TheCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel
-            Me.TheCancelButton.Location = New System.Drawing.Point(386, 248)
+            Me.TheCancelButton.Location = New System.Drawing.Point(386, 245)
             Me.TheCancelButton.Name = "TheCancelButton"
             Me.TheCancelButton.Size = New System.Drawing.Size(155, 24)
             Me.TheCancelButton.TabIndex = 7
             Me.TheCancelButton.Text = "Cancel"
             Me.TheCancelButton.UseVisualStyleBackColor = True
             '
-            'LoadRicsCB
+            'ClearPointsCheckBox
             '
-            Me.LoadRicsCB.AutoSize = True
-            Me.LoadRicsCB.Location = New System.Drawing.Point(10, 84)
-            Me.LoadRicsCB.Name = "LoadRicsCB"
-            Me.LoadRicsCB.Size = New System.Drawing.Size(132, 17)
-            Me.LoadRicsCB.TabIndex = 2
-            Me.LoadRicsCB.Text = "Load contributed RICs"
-            Me.LoadRicsCB.UseVisualStyleBackColor = True
+            Me.ClearPointsCheckBox.AutoSize = True
+            Me.ClearPointsCheckBox.Location = New System.Drawing.Point(338, 66)
+            Me.ClearPointsCheckBox.Name = "ClearPointsCheckBox"
+            Me.ClearPointsCheckBox.Size = New System.Drawing.Size(101, 17)
+            Me.ClearPointsCheckBox.TabIndex = 43
+            Me.ClearPointsCheckBox.Text = "Separate bonds"
+            Me.ClearPointsCheckBox.UseVisualStyleBackColor = True
             '
-            'Label10
+            'Label11
             '
-            Me.Label10.AutoSize = True
-            Me.Label10.Location = New System.Drawing.Point(7, 120)
-            Me.Label10.Name = "Label10"
-            Me.Label10.Size = New System.Drawing.Size(417, 39)
-            Me.Label10.TabIndex = 1
-            Me.Label10.Text = "If you want to start using contributed rics immediately, please set the above che" & _
-                "ckbox " & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "and press button ""Save settings and load contributed rics"". Otherwise it" & _
-                " will take effect " & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "after restart"
-            Me.Label10.Visible = False
+            Label11.AutoSize = True
+            Label11.Location = New System.Drawing.Point(326, 41)
+            Label11.Name = "Label11"
+            Label11.Size = New System.Drawing.Size(148, 13)
+            Label11.TabIndex = 44
+            Label11.Text = "When select a portfolio, clear:"
             '
-            'Button1
+            'ClearBondCurvesCheckBox
             '
-            Me.LoadRicsButton.Location = New System.Drawing.Point(148, 80)
-            Me.LoadRicsButton.Name = "LoadRicsButton"
-            Me.LoadRicsButton.Size = New System.Drawing.Size(210, 23)
-            Me.LoadRicsButton.TabIndex = 3
-            Me.LoadRicsButton.Text = "Save settings and load contributed rics"
-            Me.LoadRicsButton.UseVisualStyleBackColor = True
-            Me.LoadRicsButton.Visible = False
+            Me.ClearBondCurvesCheckBox.AutoSize = True
+            Me.ClearBondCurvesCheckBox.Location = New System.Drawing.Point(338, 95)
+            Me.ClearBondCurvesCheckBox.Name = "ClearBondCurvesCheckBox"
+            Me.ClearBondCurvesCheckBox.Size = New System.Drawing.Size(86, 17)
+            Me.ClearBondCurvesCheckBox.TabIndex = 43
+            Me.ClearBondCurvesCheckBox.Text = "Bond curves"
+            Me.ClearBondCurvesCheckBox.UseVisualStyleBackColor = True
+            '
+            'ClearOtherCurvesCheckBox
+            '
+            Me.ClearOtherCurvesCheckBox.AutoSize = True
+            Me.ClearOtherCurvesCheckBox.Location = New System.Drawing.Point(338, 126)
+            Me.ClearOtherCurvesCheckBox.Name = "ClearOtherCurvesCheckBox"
+            Me.ClearOtherCurvesCheckBox.Size = New System.Drawing.Size(87, 17)
+            Me.ClearOtherCurvesCheckBox.TabIndex = 43
+            Me.ClearOtherCurvesCheckBox.Text = "Other curves"
+            Me.ClearOtherCurvesCheckBox.UseVisualStyleBackColor = True
             '
             'SettingsForm
             '
@@ -645,7 +693,7 @@
             Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
             Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
             Me.CancelButton = Me.TheCancelButton
-            Me.ClientSize = New System.Drawing.Size(544, 275)
+            Me.ClientSize = New System.Drawing.Size(544, 272)
             Me.Controls.Add(Me.MainTableLayoutPanel)
             Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
             Me.MaximizeBox = False
@@ -720,5 +768,8 @@
         Friend WithEvents LoadRicsCB As System.Windows.Forms.CheckBox
         Friend WithEvents LoadRicsButton As System.Windows.Forms.Button
         Friend WithEvents Label10 As System.Windows.Forms.Label
+        Friend WithEvents ClearPointsCheckBox As System.Windows.Forms.CheckBox
+        Friend WithEvents ClearOtherCurvesCheckBox As System.Windows.Forms.CheckBox
+        Friend WithEvents ClearBondCurvesCheckBox As System.Windows.Forms.CheckBox
     End Class
 End Namespace

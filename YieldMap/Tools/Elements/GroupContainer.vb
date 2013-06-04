@@ -8,7 +8,6 @@ Namespace Tools.Elements
         Public Event Volume As Action(Of Bond)
         Public Event Cleared As Action(Of Group)
         Public Event Recalculated As Action(Of Group)
-        'Public Event RecalculatedSpread As Action(Of Group, IOrdinate)
 
         Default Public ReadOnly Property Data(ByVal id As Long) As Group
             Get
@@ -66,7 +65,6 @@ Namespace Tools.Elements
         Public Sub Add(ByVal group As Group)
             _items.Add(group.Identity, group)
             AddHandler group.Updated, Sub() RaiseEvent Recalculated(group)
-            'AddHandler group.UpdatedSpread, Sub(dt As List(Of CurveItem), ord As IOrdinate) RaiseEvent RecalculatedSpread(group, ord)
             AddHandler group.Cleared, Sub()
                                           _items.Remove(group.Identity)
                                           RaiseEvent Cleared(group)
@@ -101,5 +99,17 @@ Namespace Tools.Elements
             Next
             Return res
         End Function
+
+        Public Sub CleanupOnlyBonds()
+            While _items.Any(Function(item) TypeOf item.Value Is BondGroup)
+                _items.First(Function(item) TypeOf item.Value Is BondGroup).Value.Cleanup()
+            End While
+        End Sub
+
+        Public Sub CleanupOnlyCurves()
+            While _items.Any(Function(item) TypeOf item.Value Is BondCurve)
+                _items.First(Function(item) TypeOf item.Value Is BondCurve).Value.Cleanup()
+            End While
+        End Sub
     End Class
 End Namespace

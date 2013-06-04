@@ -173,7 +173,7 @@ Namespace Tools.Elements
             MyBase.New(name, descr)
         End Sub
 
-        Private Function CalcASWSprd(ByVal rateArray As Array, ByVal floatLegStructure As String, ByVal floatingRate As Double, ByRef dscr As BondPointDescription) As Double?
+        Private Function CalcAswSprd(ByVal rateArray As Array, ByVal floatLegStructure As String, ByVal floatingRate As Double, ByRef dscr As BondPointDescription) As Double?
             Dim data = dscr.ParentBond.MetaData
             If dscr.Price > 0 Then
                 Try
@@ -196,7 +196,7 @@ Namespace Tools.Elements
             If val IsNot Nothing Then
                 bpd.ASWSpread = val
             Else
-                If TypeOf curve Is IAswBenchmark Then
+                If TypeOf curve Is IAswBenchmark AndAlso TypeOf bpd Is BondPointDescription Then
                     Dim asw = CType(curve, IAswBenchmark)
                     bpd.ASWSpread = CalcASWSprd(curve.RateArray, asw.FloatLegStructure, asw.FloatingPointValue, bpd)
                 Else

@@ -16,7 +16,7 @@ Module MainModule
         Private _portManForm As PortfolioForm
         Private _settingsForm As SettingsForm
         Private Shared _instance As MainController
-        Private Shared _shutdownController As ShutdownController = ShutdownController.Instance
+        Private Shared ReadOnly ShutdownController As ShutdownController = ShutdownController.Instance
 
         Public Shared ReadOnly Property Instance() As MainController
             Get
@@ -59,8 +59,8 @@ Module MainModule
 
         Public Sub Shutdown()
             CloseAllCharts()
-            _shutdownController.Shutdown()
-            DllFunctions.CoUninitialize()
+            ShutdownController.Shutdown()
+            CoUninitialize()
         End Sub
     End Class
 
