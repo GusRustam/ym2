@@ -1,9 +1,12 @@
 ﻿Imports EikonDesktopDataAPILib
 Imports System.Threading
 Imports NLog
+Imports CommonController
+Imports System.Runtime.InteropServices
 
 Public Class Eikon
     Private Shared _myEikonDesktopSdk As New EikonDesktopDataAPI
+
 
     Private Sub New()
     End Sub
@@ -32,6 +35,13 @@ Public Class EikonConnector
     Public Event LocalMode As Action
     Public Event Offline As Action
     Public Event Timeout As Action
+
+    Private WithEvents _shutdownManager As ShutdownController = ShutdownController.Instance
+
+    Private Sub ShutdownNow() Handles _shutdownManager.ShutdownNow
+        Marshal.ReleaseComObject(_sdk)
+        _sdk = Nothing
+    End Sub
 
     Private Sub New(ByVal sdk As EikonDesktopDataAPI)
         _sdk = sdk

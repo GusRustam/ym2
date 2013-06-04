@@ -38,13 +38,12 @@ Public Module LoggerManager
 
         ' 2) Creating logger UDP config
         UdpTarget = New ChainsawTarget() With {
-            .Address = "udp://localhost:7071",
+            .Address = "udp://127.0.0.1:7071",
             .Name = "Chainsaw",
             .Layout = New Log4JXmlEventLayout
         }
 
         ' 4) Selecting congiguration and initializing
-
         Logger = LogManager.GetCurrentClassLogger()
         Dim loggerConfig As LoggingConfiguration = New LoggingConfiguration()
         loggerConfig.LoggingRules.Add(New LoggingRule("*", LoggingLevel, TxtTarget))

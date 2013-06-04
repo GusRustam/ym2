@@ -4,6 +4,7 @@ Imports YieldMap.Forms.ChartForm
 Imports NLog
 Imports Settings
 Imports YieldMap.Forms.MainForm
+Imports CommonController
 
 Module MainModule
     Private _mainForm As MainForm
@@ -14,6 +15,7 @@ Module MainModule
         Private _portManForm As PortfolioForm
         Private _settingsForm As SettingsForm
         Private Shared _instance As MainController
+        Private Shared _shutdownController As ShutdownController = ShutdownController.Instance
 
         Public Shared ReadOnly Property Instance() As MainController
             Get
@@ -21,8 +23,6 @@ Module MainModule
                 Return _instance
             End Get
         End Property
-
-        Public Event ShutdownNow As action
 
         Public Sub CloseAllCharts()
             While _charts.Any
@@ -58,7 +58,7 @@ Module MainModule
 
         Public Sub Shutdown()
             CloseAllCharts()
-            RaiseEvent ShutdownNow()
+            _shutdownController.Shutdown()
         End Sub
     End Class
 

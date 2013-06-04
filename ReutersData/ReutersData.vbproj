@@ -118,6 +118,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CommonController\CommonController.csproj">
+      <Project>{2A27FDE2-19B6-4D0F-B393-C71CF555ECC8}</Project>
+      <Name>CommonController</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Logging\Loggers.vbproj">
       <Project>{B010EAB3-4503-4E36-B15D-36E3BF552DD3}</Project>
       <Name>Loggers</Name>

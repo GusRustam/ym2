@@ -13,8 +13,8 @@ if exist "%USERPROFILE%\Local Settings\Application Data\%FLD%" (
 ) else if exist "%ProgramFiles%\%FLD%" (
 	set THPATH=%ProgramFiles%\%FLD%
 	
-) else if exist "%ProgramFiles(x86)% \%FLD%" (
-	set "THPATH=%ProgramFiles(x86)% \%FLD%"
+) else if exist "%ProgramFiles(x86)%\%FLD%" (
+	set "THPATH=%ProgramFiles(x86)%\%FLD%"
 	
 ) else if exist "%COMMONPROGRAMFILES(x86)%\%FLD%" (
 	set "THPATH=%COMMONPROGRAMFILES(x86)%\%FLD%"

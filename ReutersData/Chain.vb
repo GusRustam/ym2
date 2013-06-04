@@ -5,6 +5,7 @@ Imports System.Runtime.InteropServices
 Imports NLog
 Imports Settings
 Imports System.Threading
+Imports CommonController
 
 Public Class Chain
     Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(Chain))
@@ -12,6 +13,9 @@ Public Class Chain
     Private ReadOnly _rics As New ConcurrentBag(Of String)
     Private _mode As String
     Private _failedFlag As Integer = 0
+    Private Shared ReadOnly _chainManagers As New List(Of AdxRtChain)
+
+    Private WithEvents _shutdownManager As ShutdownController = ShutdownController.Instance
 
     Private ReadOnly _failedHandlers As New List(Of Action(Of String, Exception, Boolean))
     Public Custom Event Failed As Action(Of String, Exception, Boolean)
@@ -65,6 +69,7 @@ Public Class Chain
         End If
         Try
             chainMan = Eikon.Sdk.CreateAdxRtChain()
+            _chainManagers.Add(chainMan)
             chainMan.Source = SettingsManager.Instance.ReutersDataSource
             chainMan.ItemName = ricName
             chainMan.Mode = _mode

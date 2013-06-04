@@ -1,6 +1,8 @@
 ﻿Imports System.Diagnostics.Contracts
 Imports Dex2Lib
 Imports NLog
+Imports CommonController
+Imports System.Runtime.InteropServices
 
 Public Structure Dex2Field
     Public Field As String
@@ -84,6 +86,8 @@ Public Class Dex2
     Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(Dex2))
     Private _columns As List(Of String)
 
+    Private WithEvents _shutdownManager As ShutdownController = ShutdownController.Instance
+
     Public Event Metadata As Action(Of LinkedList(Of Dictionary(Of String, Object)))
     Public Event Failure As Action(Of Exception)
 
@@ -138,5 +142,10 @@ Public Class Dex2
             RaiseEvent Failure(ex)
         End Try
 
+    End Sub
+
+    Private Sub ShutdownNow() Handles _shutdownManager.ShutdownNow
+        Marshal.ReleaseComObject(_rData)
+        _rData = Nothing
     End Sub
 End Class

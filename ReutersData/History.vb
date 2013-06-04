@@ -4,6 +4,8 @@ Imports System.Threading
 Imports NLog
 Imports Settings
 Imports System.Threading.Tasks
+Imports CommonController
+Imports System.Runtime.InteropServices
 
 Public Class RawHistoricalItem
     Private ReadOnly _items As New Dictionary(Of String, String)
@@ -236,6 +238,16 @@ Public Class HistoryBlock
     Private _till As Date
 
     Private _countdown As CountdownEvent
+    Private WithEvents _shutdownManager As ShutdownController = ShutdownController.Instance
+    Private Shared ReadOnly _historyManagers As New List(Of AdxRtHistory)
+
+    Private Sub ShutdownNow() Handles _shutdownManager.ShutdownNow
+        For Each hM In _historyManagers
+            Marshal.ReleaseComObject(hM)
+            hM = Nothing
+        Next
+        _historyManagers.Clear()
+    End Sub
 
     Private Sub WaiterThread()
         Logger.Info("WaiterThread()")
@@ -250,6 +262,8 @@ Public Class HistoryBlock
 
     Private Sub RicLoaderThread(ByVal item As String)
         Dim historyManager As AdxRtHistory = Eikon.Sdk.CreateAdxRtHistory()
+        _historyManagers.Add(historyManager)
+
         AddHandler historyManager.OnUpdate, Sub() ParseData(historyManager, item)
         Dim ric = item
         If item(0) = "/" Then ric = item.Substring(1)
@@ -340,7 +354,8 @@ End Class
 
 Public Class History
     Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(History))
-    Private WithEvents _historyManager As AdxRtHistory = Eikon.SDK.CreateAdxRtHistory()
+    Private WithEvents _historyManager As AdxRtHistory = Eikon.Sdk.CreateAdxRtHistory()
+    Private WithEvents _shutdownManager As ShutdownController = ShutdownController.Instance
 
     Private _ric As String
     Private _error As Boolean
@@ -502,5 +517,10 @@ Public Class History
                 Logger.Warn("Exception = {0}", ex.ToString())
             End Try
         End Try
+    End Sub
+
+    Private Sub ShutdownNow() Handles _shutdownManager.ShutdownNow
+        Marshal.ReleaseComObject(_historyManager)
+        _historyManager = Nothing
     End Sub
 End Class

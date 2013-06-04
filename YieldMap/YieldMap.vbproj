@@ -429,15 +429,6 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
-    <COMReference Include="Dex2Lib">
-      <Guid>{89CB9AA2-9658-4D64-A86F-C6A4D89778BF}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>1</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
     <COMReference Include="EikonDesktopDataAPILib">
       <Guid>{CF3E8564-F9F5-4852-8297-BC0A2CFADFAD}</Guid>
       <VersionMajor>7</VersionMajor>
@@ -449,6 +440,10 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CommonController\CommonController.csproj">
+      <Project>{2A27FDE2-19B6-4D0F-B393-C71CF555ECC8}</Project>
+      <Name>CommonController</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DbManager\Managers.vbproj">
       <Project>{5178A2E3-0612-4749-B7E6-06C8BD131421}</Project>
       <Name>Managers</Name>
@@ -474,7 +469,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_BuildVersioningStyle="None.MonthStamp.Increment.TimeStamp" />
+      <UserProperties BuildVersion_BuildVersioningStyle="None.MonthStamp.Increment.TimeStamp" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,11 +1,15 @@
 ﻿Imports AdfinXRtLib
 Imports NLog
+Imports CommonController
+Imports System.Runtime.InteropServices
 
 Public Class LiveQuotes
     Implements IDisposable
 
     Public Delegate Sub OnNewData(ByVal ricFieldValue As Dictionary(Of String, Dictionary(Of String, Double)))
     Public Event NewData As OnNewData
+
+    Private WithEvents _shutdownManager As ShutdownController = ShutdownController.Instance
 
     Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(LiveQuotes))
     Private WithEvents _listManager As AdxRtList = Eikon.Sdk.CreateAdxRtList()
@@ -129,6 +133,11 @@ Public Class LiveQuotes
         Logger.Debug("Dispose()")
         _listManager.UnregisterAllItems()
         _listManager.CloseAllLinks()
+        _listManager = Nothing
+    End Sub
+
+    Private Sub ShutdownNow() Handles _shutdownManager.ShutdownNow
+        Marshal.ReleaseComObject(_listManager)
         _listManager = Nothing
     End Sub
 End Class

@@ -20,6 +20,7 @@ Namespace Tools.Elements
 
         Public Sub Put(ByVal src As IOrdinate, ByVal crv As ICurve)
             If src = Yield Then Throw New InvalidOperationException()
+            If _items.ContainsKey(src) Then Clear(src)
             _items(src) = crv
             RaiseEvent NewBmk(src)
         End Sub

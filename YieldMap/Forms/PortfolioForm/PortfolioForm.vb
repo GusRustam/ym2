@@ -223,8 +223,8 @@ Namespace Forms.PortfolioForm
                 If PortfolioTree.SelectedNode IsNot Nothing Then
                     Dim descr = CType(PortfolioTree.SelectedNode.Tag, Portfolio)
                     selectedNodeId = descr.Id
-                Else
-                    Return
+                    ''Else
+                    ''    Return
                 End If
             Else
                 selectedNodeId = selId
