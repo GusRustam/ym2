@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
+using Uitls;
 
 namespace CommonController {
     public class ShutdownController {
-        [DllImport("ole32.dll")]
-        private extern void CoUninitialize();
-
         public event Action ShutdownNow;
         private static ShutdownController _instance; 
 
@@ -25,7 +23,7 @@ namespace CommonController {
 
         public void Shutdown() {
             ShutdownNow();
-            CoUninitialize();
+            DllFunctions.CoUninitialize();
         }
     }
 }

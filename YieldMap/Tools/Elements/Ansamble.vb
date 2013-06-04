@@ -62,7 +62,7 @@
             End Get
         End Property
 
-        Private WithEvents _benchmarks As New BenchmarkContainer
+        Private WithEvents _benchmarks As New BenchmarkContainer(Me)
         Private _eventsFrozen As Boolean
 
         Public ReadOnly Property Benchmarks() As BenchmarkContainer

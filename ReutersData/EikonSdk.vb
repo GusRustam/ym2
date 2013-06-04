@@ -112,7 +112,6 @@ Public Class EikonConnector
         End Select
     End Sub
 
-
     Public Shared ReadOnly Property Instance(ByVal sdk As EikonDesktopDataAPI) As EikonConnector
         Get
             If _instance Is Nothing Then _instance = New EikonConnector(sdk)
@@ -125,5 +124,4 @@ Public Class EikonConnector
             Return _instance
         End Get
     End Property
-
 End Class

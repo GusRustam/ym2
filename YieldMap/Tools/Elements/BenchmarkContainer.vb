@@ -5,6 +5,7 @@ Namespace Tools.Elements
         Public Event ClearBmk As Action(Of IOrdinate)
 
         Private ReadOnly _items As New Dictionary(Of IOrdinate, ICurve)
+        Private ReadOnly _ansamble As Ansamble
 
         Default Public ReadOnly Property Items(ByVal wut As IOrdinate) As ICurve
             Get
@@ -19,10 +20,23 @@ Namespace Tools.Elements
         End Property
 
         Public Sub Put(ByVal src As IOrdinate, ByVal crv As ICurve)
+            ' there can't be benchmark for Yield
             If src = Yield Then Throw New InvalidOperationException()
+
+            ' saving current Y Source
+            Dim _tempYSrc = _ansamble.YSource
+
+            ' removing old benchmark (this will clear all calculated spreads)
             If _items.ContainsKey(src) Then Clear(src)
+
+            ' saving new benchmark
             _items(src) = crv
+
+            ' recalculating spreds
             RaiseEvent NewBmk(src)
+
+            ' restoring Y Source mode
+            If _tempYSrc <> _ansamble.YSource Then _ansamble.YSource = _tempYSrc
         End Sub
 
         Public Function HasOrd(ByVal src As IOrdinate) As Boolean
@@ -56,5 +70,9 @@ Namespace Tools.Elements
             Next
             Return Nothing
         End Function
+
+        Public Sub New(ByVal ansamble As Ansamble)
+            _ansamble = ansamble
+        End Sub
     End Class
 End NameSpace

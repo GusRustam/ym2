@@ -5,6 +5,7 @@ Imports NLog
 Imports Settings
 Imports YieldMap.Forms.MainForm
 Imports CommonController
+Imports Uitls
 
 Module MainModule
     Private _mainForm As MainForm
@@ -59,6 +60,7 @@ Module MainModule
         Public Sub Shutdown()
             CloseAllCharts()
             _shutdownController.Shutdown()
+            DllFunctions.CoUninitialize()
         End Sub
     End Class
 

@@ -113,4 +113,12 @@ Public Class Chain
             End Sub
         chainMan.RequestChain()
     End Sub
+
+    Private Sub ShutdownNow() Handles _shutdownManager.ShutdownNow
+        For Each hM In _chainManagers
+            Marshal.ReleaseComObject(hM)
+            hM = Nothing
+        Next
+        _chainManagers.Clear()
+    End Sub
 End Class

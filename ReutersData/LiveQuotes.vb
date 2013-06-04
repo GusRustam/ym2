@@ -137,6 +137,7 @@ Public Class LiveQuotes
     End Sub
 
     Private Sub ShutdownNow() Handles _shutdownManager.ShutdownNow
+        CancelAll()
         Marshal.ReleaseComObject(_listManager)
         _listManager = Nothing
     End Sub

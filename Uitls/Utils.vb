@@ -5,6 +5,7 @@ Imports System.Windows.Forms
 Imports System.Drawing
 Imports System.Xml
 Imports NLog
+Imports System.Runtime.InteropServices
 
 Public Interface IProgressObject
     ReadOnly Property Name() As String
@@ -188,6 +189,12 @@ Public Class Utils
         Return res
     End Function
 End Class
+
+Public Module DllFunctions
+    <DllImport("ole32.dll")>
+    Public Sub CoUninitialize()
+    End Sub
+End Module
 
 Public Module Extensions
     <Extension()>

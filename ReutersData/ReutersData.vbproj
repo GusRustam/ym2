@@ -130,9 +130,9 @@
       <Project>{05B05017-CA42-415D-AE0B-2E4F8D301871}</Project>
       <Name>Settings</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Uitls\Uitls.vbproj">
+    <ProjectReference Include="..\Uitls\Utils.vbproj">
       <Project>{E4CE19AC-D60C-49F4-8358-9DACC4B9B35D}</Project>
-      <Name>Uitls</Name>
+      <Name>Utils</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
