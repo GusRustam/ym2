@@ -25,6 +25,16 @@ Namespace Tools.Elements
             AddRics(portfolioStructure.Rics(port))
         End Sub
 
+        Public Sub New(ByVal ans As Ansamble, ByVal name As String, ByVal rics As List(Of String), ByVal clr As String, ByVal fields As FieldSet)
+            MyBase.new(ans)
+            Nm = name
+            PortfolioID = -1 ' ??
+            BondFields = fields.Realtime.AsContainer()
+            Color = clr
+            YieldMode = SettingsManager.Instance.YieldCalcMode
+            AddRics(rics)
+        End Sub
+
         Public Overrides Sub Recalculate(ByVal ord As IOrdinate)
             NotifyUpdatedSpread(RecalculateSpread(ord), ord)
         End Sub

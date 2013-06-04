@@ -1,32 +1,12 @@
-﻿Imports System.Reflection
-Imports YieldMap.BondsDataSetTableAdapters
+﻿Imports DbManager
+Imports Uitls
 
 Namespace Forms.ChartForm
     Public Class GroupSelectForm
-        Private Class IdValue(Of T)
-            Private ReadOnly _id As T
-            Private ReadOnly _name As String
-
-            Public Sub New(ByVal id As T, ByVal name As String)
-                _id = id
-                _name = name
-            End Sub
-
-            Public ReadOnly Property ID As T
-                Get
-                    Return _id
-                End Get
-            End Property
-
-            Public Overrides Function ToString() As String
-                Return _name
-            End Function
-        End Class
-
-        Public Sub InitGroupList(ByVal data As Dictionary(Of Guid, String))
+        Public Sub InitGroupList(ByVal data As Dictionary(Of Long, String))
             ExistingGroupsListBox.Items.Clear()
             For Each key In data.Keys
-                ExistingGroupsListBox.Items.Add(New IdValue(Of Guid)(key, data(key)))
+                ExistingGroupsListBox.Items.Add(New IdValue(Of Long, String)(key, data(key)))
             Next
 
             If Not data.Any Then SelectNew(True)
@@ -34,7 +14,7 @@ Namespace Forms.ChartForm
 
         Public ReadOnly Property LayoutId() As Integer
             Get
-                Return CType(FieldsLayoutComboBox.Items(FieldsLayoutComboBox.SelectedIndex), IdValue(Of Integer)).ID
+                Return CType(FieldsLayoutComboBox.Items(FieldsLayoutComboBox.SelectedIndex), IdValue(Of Integer, String)).Id
             End Get
         End Property
 
@@ -50,10 +30,10 @@ Namespace Forms.ChartForm
             End Get
         End Property
 
-        Public ReadOnly Property ExistingGroupId As Guid
+        Public ReadOnly Property ExistingGroupId As Long
             Get
                 If ExistingGroupsListBox.SelectedIndex >= 0 Then
-                    Return CType(ExistingGroupsListBox.Items(ExistingGroupsListBox.SelectedIndex), IdValue(Of Guid)).ID
+                    Return CType(ExistingGroupsListBox.Items(ExistingGroupsListBox.SelectedIndex), IdValue(Of Long, String)).Id
                 Else
                     Return Nothing
                 End If
@@ -70,7 +50,7 @@ Namespace Forms.ChartForm
             End Get
         End Property
 
-        Private Sub OkButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles OkButton.Click
+        Private Sub OkButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles OkButton.Click, RandomColorButton.Click
             Close()
         End Sub
 
@@ -110,18 +90,10 @@ Namespace Forms.ChartForm
 
         Private Sub GroupSelectForm_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
             FieldsLayoutComboBox.Items.Clear()
-            Dim layoutTA As New field_setTableAdapter
-            For Each row In layoutTA.GetData()
-                FieldsLayoutComboBox.Items.Add(New IdValue(Of Integer)(row.id, row.name))
-            Next
+            FieldsLayoutComboBox.DataSource = PortfolioManager.Instance.GetFieldLayouts
             FieldsLayoutComboBox.SelectedIndex = 0
 
-            Dim colorsArr = [Enum].GetValues(GetType(KnownColor))
-            Dim colors = New List(Of String)
-            Array.ForEach(Of KnownColor)(colorsArr, Sub(color) colors.Add(color.ToString()))
-            Dim props = GetType(SystemColors).GetProperties(BindingFlags.Static Or BindingFlags.Public)
-            Array.ForEach(props, Sub(prop) colors.Remove(prop.Name))
-            For Each clr In colors
+            For Each clr In Utils.GetColorList()
                 ColorsComboBox.Items.Add(clr)
             Next
         End Sub

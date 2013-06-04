@@ -266,10 +266,10 @@ Namespace Forms.ChartForm
         Private Sub ShowCurveCMS(ByVal nm As String, ByVal refCurve As ICurve)
             SpreadCMS.Items.Clear()
             SpreadCMS.Tag = nm
-            For Each item In _ansamble.SwapCurves
+            For Each item As SwapCurve In _ansamble.SwapCurves
                 Dim elem = CType(SpreadCMS.Items.Add(item.Name, Nothing, AddressOf OnBenchmarkSelected), ToolStripMenuItem)
                 elem.CheckOnClick = True
-                elem.Checked = refCurve IsNot Nothing AndAlso item.Name = refCurve.Name
+                elem.Checked = refCurve IsNot Nothing AndAlso item.Identity = CType(refCurve, Identifyable).Identity
                 elem.Tag = item
             Next
 
@@ -278,16 +278,9 @@ Namespace Forms.ChartForm
             For Each item In items
                 Dim elem = CType(SpreadCMS.Items.Add(item.Name, Nothing, AddressOf OnBenchmarkSelected), ToolStripMenuItem)
                 elem.CheckOnClick = True
+                elem.Checked = refCurve IsNot Nothing AndAlso item.Identity = CType(refCurve, Identifyable).Identity
                 elem.Tag = item
             Next item
-
-            If SpreadCMS.Items.Count > 0 Then SpreadCMS.Items.Add(New ToolStripSeparator)
-            SpreadCMS.Items.Add("New curve...", Nothing, AddressOf OnNewCurvePressed)
-            SpreadCMS.Show(MousePosition)
-        End Sub
-
-        Private Sub OnNewCurvePressed(ByVal sender As Object, ByVal e As EventArgs)
-            ' todo show new curve creation dialog epta
         End Sub
 
         Private Sub OnBenchmarkSelected(ByVal sender As Object, ByVal eventArgs As EventArgs)
@@ -394,18 +387,17 @@ Namespace Forms.ChartForm
                             .Tag = id
                         }
                         TheChart.Series.Add(theSeries)
-                        points.ForEach(
-                            Sub(tpl)
-                                Dim point = New DataPoint(tpl.Item1.Duration, tpl.Item1.Yield.Value) With {
-                                                .Tag = New HistoryPointTag With {
-                                                    .Ric = bondDataPoint.RIC,
-                                                    .Descr = tpl.Item1,
-                                                    .Meta = tpl.Item2,
-                                                    .SeriesId = id
-                                                }
-                                    }
-                                theSeries.Points.Add(point)
-                            End Sub)
+                        For Each tpl In points
+                            Dim point = New DataPoint(tpl.Item1.Duration, tpl.Item1.Yield.Value) With {
+                                            .Tag = New HistoryPointTag With {
+                                                .Ric = bondDataPoint.RIC,
+                                                .Descr = tpl.Item1,
+                                                .Meta = tpl.Item2,
+                                                .SeriesId = id
+                                            }
+                                }
+                            theSeries.Points.Add(point)
+                        Next
                     End If
 
                 End Sub)
@@ -505,8 +497,7 @@ Namespace Forms.ChartForm
                     Dim legendItem = New LegendItem(crv.Name, crv.OuterColor, "") With {.Tag = crv.Identity}
                     legendItems.Add(legendItem)
 
-                    For Each point In data
-                        Dim pnt = New DataPoint(point.TheX, point.TheY) With {.Tag = crv}
+                    For Each pnt In From point In data Select New DataPoint(point.TheX, point.TheY) With {.Tag = crv}
                         srs.Points.Add(pnt)
                     Next
                     SetChartMinMax()

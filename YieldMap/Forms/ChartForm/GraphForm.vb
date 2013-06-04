@@ -841,7 +841,23 @@ Namespace Forms.ChartForm
         Private Sub SelectFromAListTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SelectFromAListTSMI.Click
             Dim bondSelector As New BondSelectorForm
             If bondSelector.ShowDialog() = DialogResult.OK AndAlso bondSelector.SelectedRICs.Any Then
-                ' todo create group using selected bonds and show it
+                Dim groupSelect As New GroupSelectForm
+                groupSelect.InitGroupList((From q In _ansamble.Items Where TypeOf q.Value Is BondGroup Select New IdValue(Of Long, String)(q.Value.Identity, q.Value.Name)).ToDictionary(Function(x) x.Id, Function(x) x.name))
+                If groupSelect.ShowDialog() = DialogResult.OK Then
+                    If groupSelect.UseNew Then
+                        ' tood bullshit
+                        Dim grp = New BondGroup(_ansamble, groupSelect.Name, bondSelector.SelectedRICs, bondSelector.BackColor, bondSelector.FieldSet)
+                        AddHandler grp.Updated, AddressOf OnGroupUpdated
+                        AddHandler grp.UpdatedSpread, Sub(data As List(Of CurveItem), ord As IOrdinate) If _ansamble.YSource = ord Then OnGroupUpdated(data)
+                        _ansamble.Items.Add(grp)
+                    Else
+
+                    End If
+
+                End If
+
+
+                Next
             End If
         End Sub
 #End Region

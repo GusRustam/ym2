@@ -190,12 +190,12 @@
             '
             Me.SelectColumnsCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SelectColumnsToolStripMenuItem})
             Me.SelectColumnsCMS.Name = "SelectColumnsCMS"
-            Me.SelectColumnsCMS.Size = New System.Drawing.Size(164, 48)
+            Me.SelectColumnsCMS.Size = New System.Drawing.Size(173, 26)
             '
             'SelectColumnsToolStripMenuItem
             '
             Me.SelectColumnsToolStripMenuItem.Name = "SelectColumnsToolStripMenuItem"
-            Me.SelectColumnsToolStripMenuItem.Size = New System.Drawing.Size(163, 22)
+            Me.SelectColumnsToolStripMenuItem.Size = New System.Drawing.Size(172, 22)
             Me.SelectColumnsToolStripMenuItem.Text = "Choose columns..."
             '
             'BondSelectorForm

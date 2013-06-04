@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <settings>
   <property name="data-source" value="IDN" />
-  <property name="log-level" value="Trace" />
+  <property name="log-level" value="Warn" />
   <property name="mid-if-both" value="False" />
   <property name="show-bid-ask" value="True" />
   <property name="show-main-toolbar" value="True" />

@@ -34,6 +34,7 @@
             Me.FieldsLayoutComboBox = New System.Windows.Forms.ComboBox()
             Me.ColorsComboBox = New System.Windows.Forms.ComboBox()
             Me.Label2 = New System.Windows.Forms.Label()
+            Me.RandomColorButton = New System.Windows.Forms.Button()
             Me.SuspendLayout()
             '
             'ExistingGroupsListBox
@@ -141,6 +142,16 @@
             Me.Label2.TabIndex = 6
             Me.Label2.Text = "Color"
             '
+            'RandomColorButton
+            '
+            Me.RandomColorButton.DialogResult = System.Windows.Forms.DialogResult.OK
+            Me.RandomColorButton.Location = New System.Drawing.Point(179, 226)
+            Me.RandomColorButton.Name = "RandomColorButton"
+            Me.RandomColorButton.Size = New System.Drawing.Size(75, 23)
+            Me.RandomColorButton.TabIndex = 3
+            Me.RandomColorButton.Text = "Random"
+            Me.RandomColorButton.UseVisualStyleBackColor = True
+            '
             'GroupSelectForm
             '
             Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -153,6 +164,7 @@
             Me.Controls.Add(Me.NewGroupRadioButton)
             Me.Controls.Add(Me.ExistingGroupRadioButton)
             Me.Controls.Add(Me.CancelButton)
+            Me.Controls.Add(Me.RandomColorButton)
             Me.Controls.Add(Me.OkButton)
             Me.Controls.Add(Me.NewGroupTextBox)
             Me.Controls.Add(Me.ExistingGroupsListBox)
@@ -175,5 +187,6 @@
         Friend WithEvents FieldsLayoutComboBox As System.Windows.Forms.ComboBox
         Friend WithEvents ColorsComboBox As System.Windows.Forms.ComboBox
         Friend WithEvents Label2 As System.Windows.Forms.Label
+        Friend WithEvents RandomColorButton As System.Windows.Forms.Button
     End Class
 End Namespace
