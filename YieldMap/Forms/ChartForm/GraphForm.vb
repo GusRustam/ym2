@@ -842,22 +842,20 @@ Namespace Forms.ChartForm
             Dim bondSelector As New BondSelectorForm
             If bondSelector.ShowDialog() = DialogResult.OK AndAlso bondSelector.SelectedRICs.Any Then
                 Dim groupSelect As New GroupSelectForm
-                groupSelect.InitGroupList((From q In _ansamble.Items Where TypeOf q.Value Is BondGroup Select New IdValue(Of Long, String)(q.Value.Identity, q.Value.Name)).ToDictionary(Function(x) x.Id, Function(x) x.name))
+                groupSelect.InitGroupList((From q In _ansamble.Items Where TypeOf q.Value Is BondGroup Select New IdValue(Of Long, String)(q.Value.Identity, q.Value.Name)).ToDictionary(Of Long, String)(Function(x) x.Id, Function(x) x.Value))
                 If groupSelect.ShowDialog() = DialogResult.OK Then
+                    Dim grp As BondGroup
                     If groupSelect.UseNew Then
-                        ' tood bullshit
-                        Dim grp = New BondGroup(_ansamble, groupSelect.Name, bondSelector.SelectedRICs, bondSelector.BackColor, bondSelector.FieldSet)
+                        grp = New BondGroup(_ansamble, groupSelect.NewName, bondSelector.SelectedRICs, groupSelect.NewColor, New FieldSet(groupSelect.LayoutId))
                         AddHandler grp.Updated, AddressOf OnGroupUpdated
                         AddHandler grp.UpdatedSpread, Sub(data As List(Of CurveItem), ord As IOrdinate) If _ansamble.YSource = ord Then OnGroupUpdated(data)
                         _ansamble.Items.Add(grp)
                     Else
-
+                        grp = _ansamble.Items(groupSelect.ExistingGroupId)
+                        grp.AddRics(bondSelector.SelectedRICs)
                     End If
-
+                    grp.Subscribe()
                 End If
-
-
-                Next
             End If
         End Sub
 #End Region

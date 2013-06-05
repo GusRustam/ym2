@@ -12,9 +12,9 @@ Namespace Forms.ChartForm
             If Not data.Any Then SelectNew(True)
         End Sub
 
-        Public ReadOnly Property LayoutId() As Integer
+        Public ReadOnly Property LayoutId() As String
             Get
-                Return CType(FieldsLayoutComboBox.Items(FieldsLayoutComboBox.SelectedIndex), IdValue(Of Integer, String)).Id
+                Return CType(FieldsLayoutComboBox.Items(FieldsLayoutComboBox.SelectedIndex), IdName(Of String)).Id
             End Get
         End Property
 
@@ -50,7 +50,7 @@ Namespace Forms.ChartForm
             End Get
         End Property
 
-        Private Sub OkButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles OkButton.Click, RandomColorButton.Click
+        Private Sub OkButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles OkButton.Click
             Close()
         End Sub
 
@@ -66,6 +66,7 @@ Namespace Forms.ChartForm
             NewGroupTextBox.Enabled = really
             FieldsLayoutComboBox.Enabled = really
             ColorsComboBox.Enabled = really
+            RandomColorButton.Enabled = really
         End Sub
 
         Private Sub ExistingGroupsListBox_Click(ByVal sender As Object, ByVal e As EventArgs) Handles ExistingGroupsListBox.Click
@@ -109,6 +110,10 @@ Namespace Forms.ChartForm
                 g.FillRectangle(New SolidBrush(c), r.X + m.Width + 10, r.Y + 2, r.Width - m.Width - 15, r.Height - 6)
                 g.DrawRectangle(New Pen(New SolidBrush(Color.Black)), r.X + m.Width + 10, r.Y + 2, r.Width - m.Width - 15, r.Height - 6)
             End If
+        End Sub
+
+        Private Sub RandomColorButton_Click(sender As Object, e As EventArgs) Handles RandomColorButton.Click
+            ColorsComboBox.SelectedIndex = New Random().NextDouble() * ColorsComboBox.Items.Count
         End Sub
     End Class
 End Namespace

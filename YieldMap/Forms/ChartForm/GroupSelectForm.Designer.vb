@@ -144,7 +144,7 @@
             '
             'RandomColorButton
             '
-            Me.RandomColorButton.DialogResult = System.Windows.Forms.DialogResult.OK
+            Me.RandomColorButton.Enabled = False
             Me.RandomColorButton.Location = New System.Drawing.Point(179, 226)
             Me.RandomColorButton.Name = "RandomColorButton"
             Me.RandomColorButton.Size = New System.Drawing.Size(75, 23)
