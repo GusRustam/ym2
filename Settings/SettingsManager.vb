@@ -13,6 +13,7 @@ Public Class SettingsManager
     Public Event DataSourceChanged As Action(Of String)
     Public Event FieldsPriorityChanged As Action(Of String)
     Public Event ForbiddenFieldsChanged As Action(Of String)
+    Public Event ShowBidAskChanged As Action(Of Boolean)
 
     Private Shared ReadOnly SettingsPath As String = Path.Combine(Utils.GetMyPath(), "config.xml")
     Private Shared ReadOnly Settings As New XmlDocument
@@ -115,6 +116,7 @@ Public Class SettingsManager
         Set(ByVal value As Boolean)
             SaveValue("/settings/property[@name='show-bid-ask']/@value", value.ToString())
             _showBidAsk = value
+            RaiseEvent ShowBidAskChanged(value)
         End Set
     End Property
 

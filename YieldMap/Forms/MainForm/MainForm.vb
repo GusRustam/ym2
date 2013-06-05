@@ -99,7 +99,7 @@ Namespace Forms.MainForm
         End Sub
 
         Private Shared Sub ShowLogTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles ShowLogTSMI.Click
-            Utils.RunCommand(Path.Combine(LogFilePath, LogFileName))
+            Utils.RunCommand(Path.Combine(LogFilePath, LogFileName), "", True)
         End Sub
 
         Private Shared Sub AboutTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles AboutTSMI.Click

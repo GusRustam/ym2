@@ -465,6 +465,10 @@
       <Project>{703E1833-D8F6-4FB3-83BA-BF30B50AB7C3}</Project>
       <Name>ReutersData</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Runner\Runner.csproj">
+      <Project>{8662F1E9-3D4B-494E-9D6F-1CD86DEA0E2A}</Project>
+      <Name>Runner</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Settings\Settings.vbproj">
       <Project>{05B05017-CA42-415D-AE0B-2E4F8D301871}</Project>
       <Name>Settings</Name>
@@ -478,7 +482,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_BuildVersioningStyle="None.MonthStamp.Increment.TimeStamp" />
+      <UserProperties BuildVersion_BuildVersioningStyle="None.MonthStamp.Increment.TimeStamp" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

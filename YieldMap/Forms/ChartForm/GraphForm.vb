@@ -3,6 +3,7 @@ Imports System.Windows.Forms.DataVisualization.Charting
 Imports System.Drawing
 Imports AdfinXAnalyticsFunctions
 Imports System.ComponentModel
+Imports System.IO
 Imports YieldMap.Tools.Elements
 Imports YieldMap.Forms.PortfolioForm
 Imports Settings
@@ -53,6 +54,10 @@ Namespace Forms.ChartForm
 
         Private Sub TheSettings_ShowPointSizeChanged(ByVal show As Boolean) Handles _theSettings.ShowPointSizeChanged
             _ansamble.Recalculate()
+        End Sub
+
+        Private Sub TheSettings_ShowBidAskChanged(ByVal show As Boolean) Handles _theSettings.ShowBidAskChanged
+            If Not show Then HideBidAsk()
         End Sub
 
         Private Sub TheSettings_FieldsPriorityChanged(ByVal list As String) Handles _theSettings.FieldsPriorityChanged
@@ -611,20 +616,20 @@ Namespace Forms.ChartForm
 #End Region
 
 #Region "d) Context menu events"
-
-
         Private Sub CopyToClipboardTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles CopyToClipboardTSMI.Click
             Dim bmp As New Bitmap(TheChart.Width, TheChart.Height)
             TheChart.DrawToBitmap(bmp, TheChart.ClientRectangle)
             Clipboard.SetImage(bmp)
         End Sub
 
-
         Private Sub RelatedQuoteTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RelatedQuoteTSMI.Click
             If BondCMS.Tag Is Nothing Then Return
             Dim ric = CType(BondCMS.Tag, Bond).MetaData.RIC
+            Dim cmd As String, args As String
             Try
-                Utils.RunCommand("reuters://REALTIME/verb=FullQuote/ric=" + ric)
+                cmd = String.Format("""{0}""", Path.Combine(Utils.GetMyPath(), "Runner.exe"))
+                args = String.Format("reuters://REALTIME/verb=FullQuote/ric={0}", ric)
+                Utils.RunCommand(cmd, args)
             Catch ex As Exception
                 MessageBox.Show("No permission to run external applications", "Cannot perform operation", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
             End Try
@@ -633,9 +638,14 @@ Namespace Forms.ChartForm
         Private Sub BondDescriptionTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles BondDescriptionTSMI.Click
             If BondCMS.Tag Is Nothing Then Return
             Dim ric = CType(BondCMS.Tag, Bond).MetaData.RIC
+            Dim cmd As String, args As String
             Try
-                Utils.RunCommand("reuters://REALTIME/verb=BondData/ric=" + ric)
+                cmd = String.Format("""{0}""", Path.Combine(Utils.GetMyPath(), "Runner.exe"))
+                args = String.Format("reuters://REALTIME/verb=BondData/ric={0}", ric)
+                Utils.RunCommand(cmd, args)
             Catch ex As Exception
+                Logger.WarnException(String.Format("Failed to run command {0} with args {1}", cmd, args), ex)
+                Logger.Warn("Exception = {0}", ex.ToString())
                 MessageBox.Show("No permission to run external applications", "Cannot perform operation", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
             End Try
         End Sub
@@ -643,66 +653,18 @@ Namespace Forms.ChartForm
         Private Sub RelatedChartTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RelatedChartTSMI.Click
             If BondCMS.Tag Is Nothing Then Return
             Dim ric = CType(BondCMS.Tag, Bond).MetaData.RIC
+            Dim cmd As String, args As String
             Try
-                Utils.RunCommand("reuters://REALTIME/verb=RelatedGraph/ric=" + ric)
+                cmd = String.Format("""{0}""", Path.Combine(Utils.GetMyPath(), "Runner.exe"))
+                args = String.Format("reuters://REALTIME/verb=RelatedGraph/ric={0}", ric)
+                Utils.RunCommand(cmd, args)
             Catch ex As Exception
                 MessageBox.Show("No permission to run external applications", "Cannot perform operation", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
             End Try
         End Sub
 
         Private Sub ShowCurveItemsTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles ShowCurveItemsTSMI.Click
-            ' todo better snapshotting
-            'Dim aTable As DataGridView
-            'Dim theCurve As SwapCurve
-            'Dim aForm As Form
-
-            'theCurve = _moneyMarketCurves.First(Function(curve) curve.Identity = MoneyCurveCMS.Tag)
-
-            'Dim aCurve = theCurve.GetSnapshot()
-
-            'aForm = New Form With {
-            '    .Text = "Curve items",
-            '    .Width = 400,
-            '    .Height = 400,
-            '    .FormBorderStyle = FormBorderStyle.Sizable
-            '}
-
-            'Dim tl As New TableLayoutPanel
-            'tl.RowCount = 2
-            'tl.RowStyles.Add(New RowStyle(SizeType.Absolute, 30))
-            'tl.RowStyles.Add(New RowStyle(SizeType.AutoSize))
-            'tl.Dock = DockStyle.Fill
-            'aForm.Controls.Add(tl)
-
-            'Dim aToolBar = New ToolStrip
-            'aToolBar.Dock = DockStyle.Fill
-
-            'tl.Controls.Add(aToolBar, 0, 0)
-
-            'aTable = New DataGridView
-            'aTable.AutoGenerateColumns = False
-            'aTable.AllowUserToAddRows = False
-            'aTable.AllowUserToDeleteRows = False
-            'aTable.AllowUserToResizeRows = False
-            'aTable.AllowDrop = False
-
-            'aTable.Columns.Add("RIC", "RIC")
-            'aTable.Columns.Add("Descr", "Descr")
-            'aTable.Columns.Add("Rate", "Rate")
-            'aTable.Columns.Add("Duration", "Duration")
-
-            'aTable.Columns("RIC").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            'aTable.Columns("Descr").AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-            'aTable.Columns("Rate").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            'aTable.Columns("Rate").DefaultCellStyle = New DataGridViewCellStyle() With {.Format = "P2"}
-            'aTable.Columns("Duration").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            'aTable.Columns("Duration").DefaultCellStyle = New DataGridViewCellStyle() With {.Format = "N2"}
-
-            'aCurve.ForEach(Sub(item) aTable.Rows.Add(New Object() {item.Item1, item.Item2, item.Item3, item.Item4}))
-            'aTable.Dock = DockStyle.Fill
-
-            'tl.Controls.Add(aTable, 0, 1)
-            'aForm.ShowDialog()
+            ' todo snapshottin'
         End Sub
 
         Private Sub AsTableTSBClick(ByVal sender As Object, ByVal e As EventArgs) Handles AsTableTSB.Click

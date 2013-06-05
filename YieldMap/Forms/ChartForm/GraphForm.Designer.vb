@@ -24,8 +24,16 @@
         <System.Diagnostics.DebuggerStepThrough()> _
         Private Sub InitializeComponent()
             Me.components = New System.ComponentModel.Container()
-            Dim ChartArea2 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-            Dim Legend2 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+            Dim Label8 As System.Windows.Forms.Label
+            Dim Label3 As System.Windows.Forms.Label
+            Dim Label6 As System.Windows.Forms.Label
+            Dim Label1 As System.Windows.Forms.Label
+            Dim Label2 As System.Windows.Forms.Label
+            Dim Label4 As System.Windows.Forms.Label
+            Dim Label5 As System.Windows.Forms.Label
+            Dim Label7 As System.Windows.Forms.Label
+            Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+            Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
             Me.TheStatusStrip = New System.Windows.Forms.StatusStrip()
             Me.StatusMessage = New System.Windows.Forms.ToolStripStatusLabel()
             Me.TheToolStrip = New System.Windows.Forms.ToolStrip()
@@ -67,28 +75,20 @@
             Me.MainTableLayout = New System.Windows.Forms.TableLayoutPanel()
             Me.ItemDescriptionPanel = New System.Windows.Forms.TableLayoutPanel()
             Me.PVBPLabel = New System.Windows.Forms.Label()
-            Me.Label8 = New System.Windows.Forms.Label()
             Me.ASWLabel = New System.Windows.Forms.Label()
             Me.OASLabel = New System.Windows.Forms.Label()
             Me.CpnLabel = New System.Windows.Forms.Label()
-            Me.Label3 = New System.Windows.Forms.Label()
             Me.DurLabel = New System.Windows.Forms.Label()
             Me.SpreadLabel = New System.Windows.Forms.Label()
             Me.DscrLabel = New System.Windows.Forms.Label()
-            Me.Label6 = New System.Windows.Forms.Label()
             Me.DatLabel = New System.Windows.Forms.Label()
-            Me.Label1 = New System.Windows.Forms.Label()
             Me.YldLabel = New System.Windows.Forms.Label()
             Me.ZSpreadLabel = New System.Windows.Forms.Label()
-            Me.Label2 = New System.Windows.Forms.Label()
             Me.SpreadLinkLabel = New System.Windows.Forms.LinkLabel()
             Me.ZSpreadLinkLabel = New System.Windows.Forms.LinkLabel()
-            Me.Label4 = New System.Windows.Forms.Label()
             Me.ASWLinkLabel = New System.Windows.Forms.LinkLabel()
-            Me.Label5 = New System.Windows.Forms.Label()
             Me.MatLabel = New System.Windows.Forms.Label()
             Me.ConvLabel = New System.Windows.Forms.Label()
-            Me.Label7 = New System.Windows.Forms.Label()
             Me.OASpreadLinkLabel = New System.Windows.Forms.LinkLabel()
             Me.MainPanel = New System.Windows.Forms.Panel()
             Me.InfoLabel = New System.Windows.Forms.Label()
@@ -157,6 +157,14 @@
             Me.BootstrappingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Me.ToolStripMenuItem3 = New System.Windows.Forms.ToolStripSeparator()
             Me.SelectDateToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Label8 = New System.Windows.Forms.Label()
+            Label3 = New System.Windows.Forms.Label()
+            Label6 = New System.Windows.Forms.Label()
+            Label1 = New System.Windows.Forms.Label()
+            Label2 = New System.Windows.Forms.Label()
+            Label4 = New System.Windows.Forms.Label()
+            Label5 = New System.Windows.Forms.Label()
+            Label7 = New System.Windows.Forms.Label()
             Me.TheStatusStrip.SuspendLayout()
             Me.TheToolStrip.SuspendLayout()
             Me.BondCMS.SuspendLayout()
@@ -227,7 +235,7 @@
             Me.PortfolioTSSB.Image = Global.YieldMap.My.Resources.Resources.folder
             Me.PortfolioTSSB.ImageTransparentColor = System.Drawing.Color.Magenta
             Me.PortfolioTSSB.Name = "PortfolioTSSB"
-            Me.PortfolioTSSB.Size = New System.Drawing.Size(79, 22)
+            Me.PortfolioTSSB.Size = New System.Drawing.Size(85, 22)
             Me.PortfolioTSSB.Text = "Portfolio"
             '
             'CurvesTSMI
@@ -236,44 +244,44 @@
             Me.CurvesTSMI.Image = Global.YieldMap.My.Resources.Resources.graph_edge_curved
             Me.CurvesTSMI.ImageTransparentColor = System.Drawing.Color.Magenta
             Me.CurvesTSMI.Name = "CurvesTSMI"
-            Me.CurvesTSMI.Size = New System.Drawing.Size(73, 22)
+            Me.CurvesTSMI.Size = New System.Drawing.Size(75, 22)
             Me.CurvesTSMI.Text = "Curves"
             '
             'BondCurvesNewTSMI
             '
             Me.BondCurvesNewTSMI.Name = "BondCurvesNewTSMI"
-            Me.BondCurvesNewTSMI.Size = New System.Drawing.Size(133, 22)
+            Me.BondCurvesNewTSMI.Size = New System.Drawing.Size(139, 22)
             Me.BondCurvesNewTSMI.Text = "Bond curves"
             '
             'ToolStripMenuItem1
             '
             Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RubIRSTSMI, Me.RubCCSTSMI, Me.NDFTSMI, Me.UsdIRSTSMI})
             Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(133, 22)
+            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(139, 22)
             Me.ToolStripMenuItem1.Text = "IR curves"
             '
             'RubIRSTSMI
             '
             Me.RubIRSTSMI.Name = "RubIRSTSMI"
-            Me.RubIRSTSMI.Size = New System.Drawing.Size(116, 22)
+            Me.RubIRSTSMI.Size = New System.Drawing.Size(120, 22)
             Me.RubIRSTSMI.Text = "Rub IRS"
             '
             'RubCCSTSMI
             '
             Me.RubCCSTSMI.Name = "RubCCSTSMI"
-            Me.RubCCSTSMI.Size = New System.Drawing.Size(116, 22)
+            Me.RubCCSTSMI.Size = New System.Drawing.Size(120, 22)
             Me.RubCCSTSMI.Text = "Rub CCS"
             '
             'NDFTSMI
             '
             Me.NDFTSMI.Name = "NDFTSMI"
-            Me.NDFTSMI.Size = New System.Drawing.Size(116, 22)
+            Me.NDFTSMI.Size = New System.Drawing.Size(120, 22)
             Me.NDFTSMI.Text = "NDF"
             '
             'UsdIRSTSMI
             '
             Me.UsdIRSTSMI.Name = "UsdIRSTSMI"
-            Me.UsdIRSTSMI.Size = New System.Drawing.Size(116, 22)
+            Me.UsdIRSTSMI.Size = New System.Drawing.Size(120, 22)
             Me.UsdIRSTSMI.Text = "Usd IRS"
             '
             'ToolStripSeparator2
@@ -331,107 +339,107 @@
             '
             Me.BondCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainInfoLine1TSMI, Me.ExtInfoTSMI, Me.BondLabelsTSMI, Me.BondCurveTSMI, Me.ToolStripSeparator5, Me.BondDescriptionTSMI, Me.RelatedQuoteTSMI, Me.RelatedChartTSMI, Me.ToolStripSeparator4, Me.ShowHistoryTSMI, Me.ToolStripSeparator1, Me.RemovePointTSMI})
             Me.BondCMS.Name = "BondContextMenuStrip"
-            Me.BondCMS.Size = New System.Drawing.Size(167, 242)
+            Me.BondCMS.Size = New System.Drawing.Size(177, 220)
             '
             'MainInfoLine1TSMI
             '
             Me.MainInfoLine1TSMI.Name = "MainInfoLine1TSMI"
-            Me.MainInfoLine1TSMI.Size = New System.Drawing.Size(166, 22)
+            Me.MainInfoLine1TSMI.Size = New System.Drawing.Size(176, 22)
             Me.MainInfoLine1TSMI.Text = "Description"
             '
             'ExtInfoTSMI
             '
             Me.ExtInfoTSMI.Name = "ExtInfoTSMI"
-            Me.ExtInfoTSMI.Size = New System.Drawing.Size(166, 22)
+            Me.ExtInfoTSMI.Size = New System.Drawing.Size(176, 22)
             Me.ExtInfoTSMI.Text = "Quotes"
             '
             'BondLabelsTSMI
             '
             Me.BondLabelsTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.IssuerNameSeriesTSMI, Me.ShortNameTSMI, Me.DescriptionTSMI, Me.SeriesOnlyTSMI})
             Me.BondLabelsTSMI.Name = "BondLabelsTSMI"
-            Me.BondLabelsTSMI.Size = New System.Drawing.Size(166, 22)
+            Me.BondLabelsTSMI.Size = New System.Drawing.Size(176, 22)
             Me.BondLabelsTSMI.Text = "Labels"
             '
             'IssuerNameSeriesTSMI
             '
             Me.IssuerNameSeriesTSMI.Name = "IssuerNameSeriesTSMI"
-            Me.IssuerNameSeriesTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.IssuerNameSeriesTSMI.Size = New System.Drawing.Size(200, 22)
             Me.IssuerNameSeriesTSMI.Text = "Issuer Series"
             '
             'ShortNameTSMI
             '
             Me.ShortNameTSMI.Name = "ShortNameTSMI"
-            Me.ShortNameTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.ShortNameTSMI.Size = New System.Drawing.Size(200, 22)
             Me.ShortNameTSMI.Text = "Issuer Coupon-Maturity"
             '
             'DescriptionTSMI
             '
             Me.DescriptionTSMI.Name = "DescriptionTSMI"
-            Me.DescriptionTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.DescriptionTSMI.Size = New System.Drawing.Size(200, 22)
             Me.DescriptionTSMI.Text = "Description"
             '
             'SeriesOnlyTSMI
             '
             Me.SeriesOnlyTSMI.Name = "SeriesOnlyTSMI"
-            Me.SeriesOnlyTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.SeriesOnlyTSMI.Size = New System.Drawing.Size(200, 22)
             Me.SeriesOnlyTSMI.Text = "Series Only"
             '
             'BondCurveTSMI
             '
             Me.BondCurveTSMI.Name = "BondCurveTSMI"
-            Me.BondCurveTSMI.Size = New System.Drawing.Size(166, 22)
+            Me.BondCurveTSMI.Size = New System.Drawing.Size(176, 22)
             Me.BondCurveTSMI.Text = "Curve menu"
             '
             'ToolStripSeparator5
             '
             Me.ToolStripSeparator5.Name = "ToolStripSeparator5"
-            Me.ToolStripSeparator5.Size = New System.Drawing.Size(163, 6)
+            Me.ToolStripSeparator5.Size = New System.Drawing.Size(173, 6)
             '
             'BondDescriptionTSMI
             '
             Me.BondDescriptionTSMI.Name = "BondDescriptionTSMI"
-            Me.BondDescriptionTSMI.Size = New System.Drawing.Size(166, 22)
+            Me.BondDescriptionTSMI.Size = New System.Drawing.Size(176, 22)
             Me.BondDescriptionTSMI.Text = "Bond description"
             '
             'RelatedQuoteTSMI
             '
             Me.RelatedQuoteTSMI.Name = "RelatedQuoteTSMI"
-            Me.RelatedQuoteTSMI.Size = New System.Drawing.Size(166, 22)
+            Me.RelatedQuoteTSMI.Size = New System.Drawing.Size(176, 22)
             Me.RelatedQuoteTSMI.Text = "Related quote"
             '
             'RelatedChartTSMI
             '
             Me.RelatedChartTSMI.Name = "RelatedChartTSMI"
-            Me.RelatedChartTSMI.Size = New System.Drawing.Size(166, 22)
+            Me.RelatedChartTSMI.Size = New System.Drawing.Size(176, 22)
             Me.RelatedChartTSMI.Text = "Related chart"
             '
             'ToolStripSeparator4
             '
             Me.ToolStripSeparator4.Name = "ToolStripSeparator4"
-            Me.ToolStripSeparator4.Size = New System.Drawing.Size(163, 6)
+            Me.ToolStripSeparator4.Size = New System.Drawing.Size(173, 6)
             '
             'ShowHistoryTSMI
             '
             Me.ShowHistoryTSMI.Name = "ShowHistoryTSMI"
-            Me.ShowHistoryTSMI.Size = New System.Drawing.Size(166, 22)
+            Me.ShowHistoryTSMI.Size = New System.Drawing.Size(176, 22)
             Me.ShowHistoryTSMI.Text = "Show history"
             '
             'ToolStripSeparator1
             '
             Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-            Me.ToolStripSeparator1.Size = New System.Drawing.Size(163, 6)
+            Me.ToolStripSeparator1.Size = New System.Drawing.Size(173, 6)
             '
             'RemovePointTSMI
             '
             Me.RemovePointTSMI.Name = "RemovePointTSMI"
-            Me.RemovePointTSMI.Size = New System.Drawing.Size(166, 22)
+            Me.RemovePointTSMI.Size = New System.Drawing.Size(176, 22)
             Me.RemovePointTSMI.Text = "Remove from chart"
             '
             'MainTableLayout
             '
             Me.MainTableLayout.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                        Or System.Windows.Forms.AnchorStyles.Left) _
-                        Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
             Me.MainTableLayout.ColumnCount = 1
             Me.MainTableLayout.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
             Me.MainTableLayout.Controls.Add(Me.ItemDescriptionPanel, 0, 0)
@@ -447,8 +455,8 @@
             'ItemDescriptionPanel
             '
             Me.ItemDescriptionPanel.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                        Or System.Windows.Forms.AnchorStyles.Left) _
-                        Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
             Me.ItemDescriptionPanel.AutoSize = True
             Me.ItemDescriptionPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
             Me.ItemDescriptionPanel.BackColor = System.Drawing.SystemColors.Control
@@ -462,28 +470,28 @@
             Me.ItemDescriptionPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
             Me.ItemDescriptionPanel.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
             Me.ItemDescriptionPanel.Controls.Add(Me.PVBPLabel, 3, 3)
-            Me.ItemDescriptionPanel.Controls.Add(Me.Label8, 2, 3)
+            Me.ItemDescriptionPanel.Controls.Add(Label8, 2, 3)
             Me.ItemDescriptionPanel.Controls.Add(Me.ASWLabel, 5, 2)
             Me.ItemDescriptionPanel.Controls.Add(Me.OASLabel, 5, 3)
             Me.ItemDescriptionPanel.Controls.Add(Me.CpnLabel, 1, 3)
-            Me.ItemDescriptionPanel.Controls.Add(Me.Label3, 2, 1)
+            Me.ItemDescriptionPanel.Controls.Add(Label3, 2, 1)
             Me.ItemDescriptionPanel.Controls.Add(Me.DurLabel, 3, 1)
             Me.ItemDescriptionPanel.Controls.Add(Me.SpreadLabel, 5, 0)
             Me.ItemDescriptionPanel.Controls.Add(Me.DscrLabel, 1, 1)
-            Me.ItemDescriptionPanel.Controls.Add(Me.Label6, 0, 0)
+            Me.ItemDescriptionPanel.Controls.Add(Label6, 0, 0)
             Me.ItemDescriptionPanel.Controls.Add(Me.DatLabel, 1, 0)
-            Me.ItemDescriptionPanel.Controls.Add(Me.Label1, 2, 0)
+            Me.ItemDescriptionPanel.Controls.Add(Label1, 2, 0)
             Me.ItemDescriptionPanel.Controls.Add(Me.YldLabel, 3, 0)
             Me.ItemDescriptionPanel.Controls.Add(Me.ZSpreadLabel, 5, 1)
-            Me.ItemDescriptionPanel.Controls.Add(Me.Label2, 0, 1)
+            Me.ItemDescriptionPanel.Controls.Add(Label2, 0, 1)
             Me.ItemDescriptionPanel.Controls.Add(Me.SpreadLinkLabel, 4, 0)
             Me.ItemDescriptionPanel.Controls.Add(Me.ZSpreadLinkLabel, 4, 1)
-            Me.ItemDescriptionPanel.Controls.Add(Me.Label4, 2, 2)
+            Me.ItemDescriptionPanel.Controls.Add(Label4, 2, 2)
             Me.ItemDescriptionPanel.Controls.Add(Me.ASWLinkLabel, 4, 2)
-            Me.ItemDescriptionPanel.Controls.Add(Me.Label5, 0, 2)
+            Me.ItemDescriptionPanel.Controls.Add(Label5, 0, 2)
             Me.ItemDescriptionPanel.Controls.Add(Me.MatLabel, 1, 2)
             Me.ItemDescriptionPanel.Controls.Add(Me.ConvLabel, 3, 2)
-            Me.ItemDescriptionPanel.Controls.Add(Me.Label7, 0, 3)
+            Me.ItemDescriptionPanel.Controls.Add(Label7, 0, 3)
             Me.ItemDescriptionPanel.Controls.Add(Me.OASpreadLinkLabel, 4, 3)
             Me.ItemDescriptionPanel.Location = New System.Drawing.Point(3, 3)
             Me.ItemDescriptionPanel.Name = "ItemDescriptionPanel"
@@ -509,14 +517,14 @@
             '
             'Label8
             '
-            Me.Label8.Anchor = System.Windows.Forms.AnchorStyles.Left
-            Me.Label8.AutoSize = True
-            Me.Label8.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.Label8.Location = New System.Drawing.Point(250, 63)
-            Me.Label8.Name = "Label8"
-            Me.Label8.Size = New System.Drawing.Size(39, 13)
-            Me.Label8.TabIndex = 6
-            Me.Label8.Text = "PVBP"
+            Label8.Anchor = System.Windows.Forms.AnchorStyles.Left
+            Label8.AutoSize = True
+            Label8.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Label8.Location = New System.Drawing.Point(250, 63)
+            Label8.Name = "Label8"
+            Label8.Size = New System.Drawing.Size(39, 13)
+            Label8.TabIndex = 6
+            Label8.Text = "PVBP"
             '
             'ASWLabel
             '
@@ -553,14 +561,14 @@
             '
             'Label3
             '
-            Me.Label3.Anchor = System.Windows.Forms.AnchorStyles.Left
-            Me.Label3.AutoSize = True
-            Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.Label3.Location = New System.Drawing.Point(250, 23)
-            Me.Label3.Name = "Label3"
-            Me.Label3.Size = New System.Drawing.Size(55, 13)
-            Me.Label3.TabIndex = 0
-            Me.Label3.Text = "Duration"
+            Label3.Anchor = System.Windows.Forms.AnchorStyles.Left
+            Label3.AutoSize = True
+            Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Label3.Location = New System.Drawing.Point(250, 23)
+            Label3.Name = "Label3"
+            Label3.Size = New System.Drawing.Size(55, 13)
+            Label3.TabIndex = 0
+            Label3.Text = "Duration"
             '
             'DurLabel
             '
@@ -597,14 +605,14 @@
             '
             'Label6
             '
-            Me.Label6.Anchor = System.Windows.Forms.AnchorStyles.Left
-            Me.Label6.AutoSize = True
-            Me.Label6.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.Label6.Location = New System.Drawing.Point(3, 3)
-            Me.Label6.Name = "Label6"
-            Me.Label6.Size = New System.Drawing.Size(34, 13)
-            Me.Label6.TabIndex = 0
-            Me.Label6.Text = "Date"
+            Label6.Anchor = System.Windows.Forms.AnchorStyles.Left
+            Label6.AutoSize = True
+            Label6.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Label6.Location = New System.Drawing.Point(3, 3)
+            Label6.Name = "Label6"
+            Label6.Size = New System.Drawing.Size(34, 13)
+            Label6.TabIndex = 0
+            Label6.Text = "Date"
             '
             'DatLabel
             '
@@ -619,14 +627,14 @@
             '
             'Label1
             '
-            Me.Label1.Anchor = System.Windows.Forms.AnchorStyles.Left
-            Me.Label1.AutoSize = True
-            Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.Label1.Location = New System.Drawing.Point(250, 3)
-            Me.Label1.Name = "Label1"
-            Me.Label1.Size = New System.Drawing.Size(35, 13)
-            Me.Label1.TabIndex = 0
-            Me.Label1.Text = "Yield"
+            Label1.Anchor = System.Windows.Forms.AnchorStyles.Left
+            Label1.AutoSize = True
+            Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Label1.Location = New System.Drawing.Point(250, 3)
+            Label1.Name = "Label1"
+            Label1.Size = New System.Drawing.Size(35, 13)
+            Label1.TabIndex = 0
+            Label1.Text = "Yield"
             '
             'YldLabel
             '
@@ -652,14 +660,14 @@
             '
             'Label2
             '
-            Me.Label2.Anchor = System.Windows.Forms.AnchorStyles.Left
-            Me.Label2.AutoSize = True
-            Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.Label2.Location = New System.Drawing.Point(3, 23)
-            Me.Label2.Name = "Label2"
-            Me.Label2.Size = New System.Drawing.Size(40, 13)
-            Me.Label2.TabIndex = 0
-            Me.Label2.Text = "Descr"
+            Label2.Anchor = System.Windows.Forms.AnchorStyles.Left
+            Label2.AutoSize = True
+            Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Label2.Location = New System.Drawing.Point(3, 23)
+            Label2.Name = "Label2"
+            Label2.Size = New System.Drawing.Size(40, 13)
+            Label2.TabIndex = 0
+            Label2.Text = "Descr"
             '
             'SpreadLinkLabel
             '
@@ -695,14 +703,14 @@
             '
             'Label4
             '
-            Me.Label4.Anchor = System.Windows.Forms.AnchorStyles.Left
-            Me.Label4.AutoSize = True
-            Me.Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.Label4.Location = New System.Drawing.Point(250, 43)
-            Me.Label4.Name = "Label4"
-            Me.Label4.Size = New System.Drawing.Size(62, 13)
-            Me.Label4.TabIndex = 0
-            Me.Label4.Text = "Convexity"
+            Label4.Anchor = System.Windows.Forms.AnchorStyles.Left
+            Label4.AutoSize = True
+            Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Label4.Location = New System.Drawing.Point(250, 43)
+            Label4.Name = "Label4"
+            Label4.Size = New System.Drawing.Size(62, 13)
+            Label4.TabIndex = 0
+            Label4.Text = "Convexity"
             '
             'ASWLinkLabel
             '
@@ -722,14 +730,14 @@
             '
             'Label5
             '
-            Me.Label5.Anchor = System.Windows.Forms.AnchorStyles.Left
-            Me.Label5.AutoSize = True
-            Me.Label5.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.Label5.Location = New System.Drawing.Point(3, 43)
-            Me.Label5.Name = "Label5"
-            Me.Label5.Size = New System.Drawing.Size(52, 13)
-            Me.Label5.TabIndex = 0
-            Me.Label5.Text = "Maturity"
+            Label5.Anchor = System.Windows.Forms.AnchorStyles.Left
+            Label5.AutoSize = True
+            Label5.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Label5.Location = New System.Drawing.Point(3, 43)
+            Label5.Name = "Label5"
+            Label5.Size = New System.Drawing.Size(52, 13)
+            Label5.TabIndex = 0
+            Label5.Text = "Maturity"
             '
             'MatLabel
             '
@@ -755,14 +763,14 @@
             '
             'Label7
             '
-            Me.Label7.Anchor = System.Windows.Forms.AnchorStyles.Left
-            Me.Label7.AutoSize = True
-            Me.Label7.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Me.Label7.Location = New System.Drawing.Point(3, 63)
-            Me.Label7.Name = "Label7"
-            Me.Label7.Size = New System.Drawing.Size(50, 13)
-            Me.Label7.TabIndex = 0
-            Me.Label7.Text = "Coupon"
+            Label7.Anchor = System.Windows.Forms.AnchorStyles.Left
+            Label7.AutoSize = True
+            Label7.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Label7.Location = New System.Drawing.Point(3, 63)
+            Label7.Name = "Label7"
+            Label7.Size = New System.Drawing.Size(50, 13)
+            Label7.TabIndex = 0
+            Label7.Text = "Coupon"
             '
             'OASpreadLinkLabel
             '
@@ -807,12 +815,12 @@
             '
             'TheChart
             '
-            ChartArea2.Name = "ChartArea1"
-            Me.TheChart.ChartAreas.Add(ChartArea2)
+            ChartArea1.Name = "ChartArea1"
+            Me.TheChart.ChartAreas.Add(ChartArea1)
             Me.TheChart.Dock = System.Windows.Forms.DockStyle.Fill
-            Legend2.Enabled = False
-            Legend2.Name = "Legend1"
-            Me.TheChart.Legends.Add(Legend2)
+            Legend1.Enabled = False
+            Legend1.Name = "Legend1"
+            Me.TheChart.Legends.Add(Legend1)
             Me.TheChart.Location = New System.Drawing.Point(0, 0)
             Me.TheChart.Name = "TheChart"
             Me.TheChart.Size = New System.Drawing.Size(778, 417)
@@ -832,190 +840,190 @@
             '
             Me.ChartCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToClipboardTSMI, Me.ClipboardSeparator, Me.AddBondToChartTSMI, Me.SelectFromAListTSMI})
             Me.ChartCMS.Name = "ChartCMS"
-            Me.ChartCMS.Size = New System.Drawing.Size(174, 76)
+            Me.ChartCMS.Size = New System.Drawing.Size(186, 76)
             '
             'CopyToClipboardTSMI
             '
             Me.CopyToClipboardTSMI.Name = "CopyToClipboardTSMI"
-            Me.CopyToClipboardTSMI.Size = New System.Drawing.Size(173, 22)
+            Me.CopyToClipboardTSMI.Size = New System.Drawing.Size(185, 22)
             Me.CopyToClipboardTSMI.Text = "Copy to clipboard"
             '
             'ClipboardSeparator
             '
             Me.ClipboardSeparator.Name = "ClipboardSeparator"
-            Me.ClipboardSeparator.Size = New System.Drawing.Size(170, 6)
+            Me.ClipboardSeparator.Size = New System.Drawing.Size(182, 6)
             '
             'AddBondToChartTSMI
             '
             Me.AddBondToChartTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.EnterRICTSMI})
             Me.AddBondToChartTSMI.Name = "AddBondToChartTSMI"
-            Me.AddBondToChartTSMI.Size = New System.Drawing.Size(173, 22)
+            Me.AddBondToChartTSMI.Size = New System.Drawing.Size(185, 22)
             Me.AddBondToChartTSMI.Text = "Add bond onto chart"
             Me.AddBondToChartTSMI.Visible = False
             '
             'EnterRICTSMI
             '
             Me.EnterRICTSMI.Name = "EnterRICTSMI"
-            Me.EnterRICTSMI.Size = New System.Drawing.Size(133, 22)
+            Me.EnterRICTSMI.Size = New System.Drawing.Size(131, 22)
             Me.EnterRICTSMI.Text = "Enter RIC..."
             '
             'SelectFromAListTSMI
             '
             Me.SelectFromAListTSMI.Name = "SelectFromAListTSMI"
-            Me.SelectFromAListTSMI.Size = New System.Drawing.Size(173, 22)
+            Me.SelectFromAListTSMI.Size = New System.Drawing.Size(185, 22)
             Me.SelectFromAListTSMI.Text = "Add bond..."
             '
             'HistoryCMS
             '
             Me.HistoryCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RemoveHistoryTSMI})
             Me.HistoryCMS.Name = "HistoryCMS"
-            Me.HistoryCMS.Size = New System.Drawing.Size(150, 26)
+            Me.HistoryCMS.Size = New System.Drawing.Size(157, 26)
             '
             'RemoveHistoryTSMI
             '
             Me.RemoveHistoryTSMI.Name = "RemoveHistoryTSMI"
-            Me.RemoveHistoryTSMI.Size = New System.Drawing.Size(149, 22)
+            Me.RemoveHistoryTSMI.Size = New System.Drawing.Size(156, 22)
             Me.RemoveHistoryTSMI.Text = "Remove history"
             '
             'MoneyCurveCMS
             '
             Me.MoneyCurveCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MMNameTSMI, Me.ShowCurveItemsTSMI, Me.DeleteMMCurveTSMI, Me.ToolStripSeparator10, Me.BrokerTSMI, Me.QuoteTSMI, Me.FitTSMI, Me.BootstrapTSMI, Me.ToolStripSeparator11, Me.SelDateTSMI})
             Me.MoneyCurveCMS.Name = "MoneyCurveCMS"
-            Me.MoneyCurveCMS.Size = New System.Drawing.Size(141, 192)
+            Me.MoneyCurveCMS.Size = New System.Drawing.Size(153, 214)
             '
             'MMNameTSMI
             '
             Me.MMNameTSMI.Enabled = False
             Me.MMNameTSMI.Name = "MMNameTSMI"
-            Me.MMNameTSMI.Size = New System.Drawing.Size(140, 22)
+            Me.MMNameTSMI.Size = New System.Drawing.Size(152, 22)
             Me.MMNameTSMI.Text = "Name"
             '
             'ShowCurveItemsTSMI
             '
             Me.ShowCurveItemsTSMI.Name = "ShowCurveItemsTSMI"
-            Me.ShowCurveItemsTSMI.Size = New System.Drawing.Size(140, 22)
+            Me.ShowCurveItemsTSMI.Size = New System.Drawing.Size(152, 22)
             Me.ShowCurveItemsTSMI.Text = "Show items..."
             '
             'DeleteMMCurveTSMI
             '
             Me.DeleteMMCurveTSMI.Name = "DeleteMMCurveTSMI"
-            Me.DeleteMMCurveTSMI.Size = New System.Drawing.Size(140, 22)
+            Me.DeleteMMCurveTSMI.Size = New System.Drawing.Size(152, 22)
             Me.DeleteMMCurveTSMI.Text = "Delete curve"
             '
             'ToolStripSeparator10
             '
             Me.ToolStripSeparator10.Name = "ToolStripSeparator10"
-            Me.ToolStripSeparator10.Size = New System.Drawing.Size(137, 6)
+            Me.ToolStripSeparator10.Size = New System.Drawing.Size(149, 6)
             '
             'BrokerTSMI
             '
             Me.BrokerTSMI.Name = "BrokerTSMI"
-            Me.BrokerTSMI.Size = New System.Drawing.Size(140, 22)
+            Me.BrokerTSMI.Size = New System.Drawing.Size(152, 22)
             Me.BrokerTSMI.Text = "Broker"
             '
             'QuoteTSMI
             '
             Me.QuoteTSMI.Name = "QuoteTSMI"
-            Me.QuoteTSMI.Size = New System.Drawing.Size(140, 22)
+            Me.QuoteTSMI.Size = New System.Drawing.Size(152, 22)
             Me.QuoteTSMI.Text = "Quote"
             '
             'FitTSMI
             '
             Me.FitTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LinearRegressionTSMI, Me.LogarithmicRegressionTSMI, Me.InverseRegressionTSMI, Me.PowerRegressionTSMI, Me.Poly6RegressionTSMI, Me.NelsonSiegelSvenssonTSMI, Me.ToolStripSeparator8, Me.LinearInterpolationTSMI, Me.CubicSplineTSMI, Me.ToolStripSeparator9, Me.VasicekCurveTSMI, Me.CIRCurveTSMI})
             Me.FitTSMI.Name = "FitTSMI"
-            Me.FitTSMI.Size = New System.Drawing.Size(140, 22)
+            Me.FitTSMI.Size = New System.Drawing.Size(152, 22)
             Me.FitTSMI.Text = "Interpolation"
             '
             'LinearRegressionTSMI
             '
             Me.LinearRegressionTSMI.Name = "LinearRegressionTSMI"
-            Me.LinearRegressionTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.LinearRegressionTSMI.Size = New System.Drawing.Size(201, 22)
             Me.LinearRegressionTSMI.Tag = "Lin"
             Me.LinearRegressionTSMI.Text = "Linear Regression"
             '
             'LogarithmicRegressionTSMI
             '
             Me.LogarithmicRegressionTSMI.Name = "LogarithmicRegressionTSMI"
-            Me.LogarithmicRegressionTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.LogarithmicRegressionTSMI.Size = New System.Drawing.Size(201, 22)
             Me.LogarithmicRegressionTSMI.Tag = "Log"
             Me.LogarithmicRegressionTSMI.Text = "Logarithmic Regression"
             '
             'InverseRegressionTSMI
             '
             Me.InverseRegressionTSMI.Name = "InverseRegressionTSMI"
-            Me.InverseRegressionTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.InverseRegressionTSMI.Size = New System.Drawing.Size(201, 22)
             Me.InverseRegressionTSMI.Tag = "Inv"
             Me.InverseRegressionTSMI.Text = "Inverse Regression"
             '
             'PowerRegressionTSMI
             '
             Me.PowerRegressionTSMI.Name = "PowerRegressionTSMI"
-            Me.PowerRegressionTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.PowerRegressionTSMI.Size = New System.Drawing.Size(201, 22)
             Me.PowerRegressionTSMI.Tag = "Pow"
             Me.PowerRegressionTSMI.Text = "Power Regression"
             '
             'Poly6RegressionTSMI
             '
             Me.Poly6RegressionTSMI.Name = "Poly6RegressionTSMI"
-            Me.Poly6RegressionTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.Poly6RegressionTSMI.Size = New System.Drawing.Size(201, 22)
             Me.Poly6RegressionTSMI.Text = "Poly6 Regression"
             '
             'NelsonSiegelSvenssonTSMI
             '
             Me.NelsonSiegelSvenssonTSMI.Name = "NelsonSiegelSvenssonTSMI"
-            Me.NelsonSiegelSvenssonTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.NelsonSiegelSvenssonTSMI.Size = New System.Drawing.Size(201, 22)
             Me.NelsonSiegelSvenssonTSMI.Text = "Nelson-Siegel-Svensson"
             '
             'ToolStripSeparator8
             '
             Me.ToolStripSeparator8.Name = "ToolStripSeparator8"
-            Me.ToolStripSeparator8.Size = New System.Drawing.Size(185, 6)
+            Me.ToolStripSeparator8.Size = New System.Drawing.Size(198, 6)
             '
             'LinearInterpolationTSMI
             '
             Me.LinearInterpolationTSMI.Name = "LinearInterpolationTSMI"
-            Me.LinearInterpolationTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.LinearInterpolationTSMI.Size = New System.Drawing.Size(201, 22)
             Me.LinearInterpolationTSMI.Text = "Linear Interpolation"
             '
             'CubicSplineTSMI
             '
             Me.CubicSplineTSMI.Name = "CubicSplineTSMI"
-            Me.CubicSplineTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.CubicSplineTSMI.Size = New System.Drawing.Size(201, 22)
             Me.CubicSplineTSMI.Text = "Cubic Spline"
             '
             'ToolStripSeparator9
             '
             Me.ToolStripSeparator9.Name = "ToolStripSeparator9"
-            Me.ToolStripSeparator9.Size = New System.Drawing.Size(185, 6)
+            Me.ToolStripSeparator9.Size = New System.Drawing.Size(198, 6)
             '
             'VasicekCurveTSMI
             '
             Me.VasicekCurveTSMI.Name = "VasicekCurveTSMI"
-            Me.VasicekCurveTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.VasicekCurveTSMI.Size = New System.Drawing.Size(201, 22)
             Me.VasicekCurveTSMI.Text = "Vasicek Curve"
             '
             'CIRCurveTSMI
             '
             Me.CIRCurveTSMI.Name = "CIRCurveTSMI"
-            Me.CIRCurveTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.CIRCurveTSMI.Size = New System.Drawing.Size(201, 22)
             Me.CIRCurveTSMI.Text = "CIR Curve"
             '
             'BootstrapTSMI
             '
             Me.BootstrapTSMI.CheckOnClick = True
             Me.BootstrapTSMI.Name = "BootstrapTSMI"
-            Me.BootstrapTSMI.Size = New System.Drawing.Size(140, 22)
+            Me.BootstrapTSMI.Size = New System.Drawing.Size(152, 22)
             Me.BootstrapTSMI.Text = "Bootstrap"
             '
             'ToolStripSeparator11
             '
             Me.ToolStripSeparator11.Name = "ToolStripSeparator11"
-            Me.ToolStripSeparator11.Size = New System.Drawing.Size(137, 6)
+            Me.ToolStripSeparator11.Size = New System.Drawing.Size(149, 6)
             '
             'SelDateTSMI
             '
             Me.SelDateTSMI.Name = "SelDateTSMI"
-            Me.SelDateTSMI.Size = New System.Drawing.Size(140, 22)
+            Me.SelDateTSMI.Size = New System.Drawing.Size(152, 22)
             Me.SelDateTSMI.Text = "Select date..."
             '
             'SpreadCMS
@@ -1027,30 +1035,30 @@
             '
             Me.DurConvCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ModifiedTSMI, Me.MacaleyTSMI})
             Me.DurConvCMS.Name = "DurConvCMS"
-            Me.DurConvCMS.Size = New System.Drawing.Size(116, 48)
+            Me.DurConvCMS.Size = New System.Drawing.Size(121, 48)
             '
             'ModifiedTSMI
             '
             Me.ModifiedTSMI.Name = "ModifiedTSMI"
-            Me.ModifiedTSMI.Size = New System.Drawing.Size(115, 22)
+            Me.ModifiedTSMI.Size = New System.Drawing.Size(120, 22)
             Me.ModifiedTSMI.Text = "Duration"
             '
             'MacaleyTSMI
             '
             Me.MacaleyTSMI.Name = "MacaleyTSMI"
-            Me.MacaleyTSMI.Size = New System.Drawing.Size(115, 22)
+            Me.MacaleyTSMI.Size = New System.Drawing.Size(120, 22)
             Me.MacaleyTSMI.Text = "Maturity"
             '
             'BidAskCMS
             '
             Me.BidAskCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RemoveBidAskTSMI})
             Me.BidAskCMS.Name = "BidAskCMS"
-            Me.BidAskCMS.Size = New System.Drawing.Size(151, 26)
+            Me.BidAskCMS.Size = New System.Drawing.Size(160, 26)
             '
             'RemoveBidAskTSMI
             '
             Me.RemoveBidAskTSMI.Name = "RemoveBidAskTSMI"
-            Me.RemoveBidAskTSMI.Size = New System.Drawing.Size(150, 22)
+            Me.RemoveBidAskTSMI.Size = New System.Drawing.Size(159, 22)
             Me.RemoveBidAskTSMI.Text = "Remove bid-ask"
             '
             'YAxisCMS
@@ -1062,158 +1070,158 @@
             '
             Me.BondSetCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LabelToolStripMenuItem, Me.RemoveFromChartTSMI})
             Me.BondSetCMS.Name = "BondSetCMS"
-            Me.BondSetCMS.Size = New System.Drawing.Size(143, 48)
+            Me.BondSetCMS.Size = New System.Drawing.Size(154, 48)
             '
             'LabelToolStripMenuItem
             '
             Me.LabelToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SeriesIssuerNameAndSeriesTSMI, Me.IssuerCouponMaturityTSMI, Me.SeriesDescriptionTSMI, Me.SeriesSeriesOnlyTSMI})
             Me.LabelToolStripMenuItem.Name = "LabelToolStripMenuItem"
-            Me.LabelToolStripMenuItem.Size = New System.Drawing.Size(142, 22)
+            Me.LabelToolStripMenuItem.Size = New System.Drawing.Size(153, 22)
             Me.LabelToolStripMenuItem.Text = "Labeling mode"
             '
             'SeriesIssuerNameAndSeriesTSMI
             '
             Me.SeriesIssuerNameAndSeriesTSMI.Name = "SeriesIssuerNameAndSeriesTSMI"
-            Me.SeriesIssuerNameAndSeriesTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.SeriesIssuerNameAndSeriesTSMI.Size = New System.Drawing.Size(200, 22)
             Me.SeriesIssuerNameAndSeriesTSMI.Text = "Issuer Series"
             '
             'IssuerCouponMaturityTSMI
             '
             Me.IssuerCouponMaturityTSMI.Name = "IssuerCouponMaturityTSMI"
-            Me.IssuerCouponMaturityTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.IssuerCouponMaturityTSMI.Size = New System.Drawing.Size(200, 22)
             Me.IssuerCouponMaturityTSMI.Text = "Issuer Coupon-Maturity"
             '
             'SeriesDescriptionTSMI
             '
             Me.SeriesDescriptionTSMI.Name = "SeriesDescriptionTSMI"
-            Me.SeriesDescriptionTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.SeriesDescriptionTSMI.Size = New System.Drawing.Size(200, 22)
             Me.SeriesDescriptionTSMI.Text = "Description"
             '
             'SeriesSeriesOnlyTSMI
             '
             Me.SeriesSeriesOnlyTSMI.Name = "SeriesSeriesOnlyTSMI"
-            Me.SeriesSeriesOnlyTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.SeriesSeriesOnlyTSMI.Size = New System.Drawing.Size(200, 22)
             Me.SeriesSeriesOnlyTSMI.Text = "Series Only"
             '
             'RemoveFromChartTSMI
             '
             Me.RemoveFromChartTSMI.Name = "RemoveFromChartTSMI"
-            Me.RemoveFromChartTSMI.Size = New System.Drawing.Size(142, 22)
+            Me.RemoveFromChartTSMI.Size = New System.Drawing.Size(153, 22)
             Me.RemoveFromChartTSMI.Text = "Remove"
             '
             'BondCurveCMS
             '
             Me.BondCurveCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ShowBondCurveItemsTSMI, Me.DeleteBondCurveTSMI, Me.ToolStripMenuItem2, Me.InterpolationTSMI, Me.BootstrappingToolStripMenuItem, Me.ToolStripMenuItem3, Me.SelectDateToolStripMenuItem})
             Me.BondCurveCMS.Name = "BondCurveCMS"
-            Me.BondCurveCMS.Size = New System.Drawing.Size(142, 126)
+            Me.BondCurveCMS.Size = New System.Drawing.Size(150, 126)
             '
             'ShowBondCurveItemsTSMI
             '
             Me.ShowBondCurveItemsTSMI.Name = "ShowBondCurveItemsTSMI"
-            Me.ShowBondCurveItemsTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.ShowBondCurveItemsTSMI.Size = New System.Drawing.Size(149, 22)
             Me.ShowBondCurveItemsTSMI.Text = "Show items..."
             '
             'DeleteBondCurveTSMI
             '
             Me.DeleteBondCurveTSMI.Name = "DeleteBondCurveTSMI"
-            Me.DeleteBondCurveTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.DeleteBondCurveTSMI.Size = New System.Drawing.Size(149, 22)
             Me.DeleteBondCurveTSMI.Text = "Delete curve"
             '
             'ToolStripMenuItem2
             '
             Me.ToolStripMenuItem2.Name = "ToolStripMenuItem2"
-            Me.ToolStripMenuItem2.Size = New System.Drawing.Size(149, 6)
+            Me.ToolStripMenuItem2.Size = New System.Drawing.Size(146, 6)
             '
             'InterpolationTSMI
             '
             Me.InterpolationTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LinRegTSMI, Me.LogRegTSMI, Me.PowRegTSMI, Me.PolyRegTSMI, Me.InvRegTSMI, Me.NSSRegTSMI, Me.CubSplineTSMI, Me.ToolStripMenuItem5, Me.VasicekTSMI, Me.CIRRTSMI})
             Me.InterpolationTSMI.Name = "InterpolationTSMI"
-            Me.InterpolationTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.InterpolationTSMI.Size = New System.Drawing.Size(149, 22)
             Me.InterpolationTSMI.Text = "Interpolation"
             '
             'LinRegTSMI
             '
             Me.LinRegTSMI.Name = "LinRegTSMI"
-            Me.LinRegTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.LinRegTSMI.Size = New System.Drawing.Size(201, 22)
             Me.LinRegTSMI.Tag = "Lin"
             Me.LinRegTSMI.Text = "Linear regression"
             '
             'LogRegTSMI
             '
             Me.LogRegTSMI.Name = "LogRegTSMI"
-            Me.LogRegTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.LogRegTSMI.Size = New System.Drawing.Size(201, 22)
             Me.LogRegTSMI.Tag = "Log"
             Me.LogRegTSMI.Text = "Logarithmic regression"
             '
             'PowRegTSMI
             '
             Me.PowRegTSMI.Name = "PowRegTSMI"
-            Me.PowRegTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.PowRegTSMI.Size = New System.Drawing.Size(201, 22)
             Me.PowRegTSMI.Tag = "Pow"
             Me.PowRegTSMI.Text = "Power regression"
             '
             'PolyRegTSMI
             '
             Me.PolyRegTSMI.Name = "PolyRegTSMI"
-            Me.PolyRegTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.PolyRegTSMI.Size = New System.Drawing.Size(201, 22)
             Me.PolyRegTSMI.Tag = "Poly6"
             Me.PolyRegTSMI.Text = "Polynomial regression"
             '
             'InvRegTSMI
             '
             Me.InvRegTSMI.Name = "InvRegTSMI"
-            Me.InvRegTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.InvRegTSMI.Size = New System.Drawing.Size(201, 22)
             Me.InvRegTSMI.Tag = "Inv"
             Me.InvRegTSMI.Text = "Inverse regression"
             '
             'NSSRegTSMI
             '
             Me.NSSRegTSMI.Name = "NSSRegTSMI"
-            Me.NSSRegTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.NSSRegTSMI.Size = New System.Drawing.Size(201, 22)
             Me.NSSRegTSMI.Tag = "NSS"
             Me.NSSRegTSMI.Text = "Nelson-Siegel-Svensson"
             '
             'CubSplineTSMI
             '
             Me.CubSplineTSMI.Name = "CubSplineTSMI"
-            Me.CubSplineTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.CubSplineTSMI.Size = New System.Drawing.Size(201, 22)
             Me.CubSplineTSMI.Tag = "CubicSpline"
             Me.CubSplineTSMI.Text = "Cubic spline"
             '
             'ToolStripMenuItem5
             '
             Me.ToolStripMenuItem5.Name = "ToolStripMenuItem5"
-            Me.ToolStripMenuItem5.Size = New System.Drawing.Size(185, 6)
+            Me.ToolStripMenuItem5.Size = New System.Drawing.Size(198, 6)
             '
             'VasicekTSMI
             '
             Me.VasicekTSMI.Name = "VasicekTSMI"
-            Me.VasicekTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.VasicekTSMI.Size = New System.Drawing.Size(201, 22)
             Me.VasicekTSMI.Tag = "Vasicek"
             Me.VasicekTSMI.Text = "Vasicek curve"
             '
             'CIRRTSMI
             '
             Me.CIRRTSMI.Name = "CIRRTSMI"
-            Me.CIRRTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.CIRRTSMI.Size = New System.Drawing.Size(201, 22)
             Me.CIRRTSMI.Tag = "CIR"
             Me.CIRRTSMI.Text = "CIR curve"
             '
             'BootstrappingToolStripMenuItem
             '
             Me.BootstrappingToolStripMenuItem.Name = "BootstrappingToolStripMenuItem"
-            Me.BootstrappingToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.BootstrappingToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
             Me.BootstrappingToolStripMenuItem.Text = "Bootstrapping"
             '
             'ToolStripMenuItem3
             '
             Me.ToolStripMenuItem3.Name = "ToolStripMenuItem3"
-            Me.ToolStripMenuItem3.Size = New System.Drawing.Size(149, 6)
+            Me.ToolStripMenuItem3.Size = New System.Drawing.Size(146, 6)
             '
             'SelectDateToolStripMenuItem
             '
             Me.SelectDateToolStripMenuItem.Name = "SelectDateToolStripMenuItem"
-            Me.SelectDateToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.SelectDateToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
             Me.SelectDateToolStripMenuItem.Text = "Select date..."
             '
             'GraphForm
@@ -1269,7 +1277,6 @@
         Friend WithEvents MainTableLayout As System.Windows.Forms.TableLayoutPanel
         Friend WithEvents ResizePictureBox As System.Windows.Forms.PictureBox
         Friend WithEvents ItemDescriptionPanel As System.Windows.Forms.TableLayoutPanel
-        Friend WithEvents Label1 As System.Windows.Forms.Label
         Friend WithEvents DurLabel As System.Windows.Forms.Label
         Friend WithEvents SpreadLabel As System.Windows.Forms.Label
         Friend WithEvents ZSpreadLabel As System.Windows.Forms.Label
@@ -1277,9 +1284,7 @@
         Friend WithEvents CopyToClipboardTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents HistoryCMS As System.Windows.Forms.ContextMenuStrip
         Friend WithEvents RemoveHistoryTSMI As System.Windows.Forms.ToolStripMenuItem
-        Friend WithEvents Label2 As System.Windows.Forms.Label
         Friend WithEvents DscrLabel As System.Windows.Forms.Label
-        Friend WithEvents Label6 As System.Windows.Forms.Label
         Friend WithEvents DatLabel As System.Windows.Forms.Label
         Friend WithEvents MoneyCurveCMS As System.Windows.Forms.ContextMenuStrip
         Friend WithEvents MMNameTSMI As System.Windows.Forms.ToolStripMenuItem
@@ -1292,9 +1297,7 @@
         Friend WithEvents SpreadLinkLabel As System.Windows.Forms.LinkLabel
         Friend WithEvents SpreadCMS As System.Windows.Forms.ContextMenuStrip
         Friend WithEvents ZSpreadLinkLabel As System.Windows.Forms.LinkLabel
-        Friend WithEvents Label4 As System.Windows.Forms.Label
         Friend WithEvents ASWLinkLabel As System.Windows.Forms.LinkLabel
-        Friend WithEvents Label5 As System.Windows.Forms.Label
         Friend WithEvents MatLabel As System.Windows.Forms.Label
         Friend WithEvents ConvLabel As System.Windows.Forms.Label
         Friend WithEvents DurConvCMS As System.Windows.Forms.ContextMenuStrip
@@ -1314,13 +1317,10 @@
         Friend WithEvents RelatedChartTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents CpnLabel As System.Windows.Forms.Label
         Friend WithEvents YldLabel As System.Windows.Forms.Label
-        Friend WithEvents Label7 As System.Windows.Forms.Label
         Friend WithEvents OASpreadLinkLabel As System.Windows.Forms.LinkLabel
         Friend WithEvents ASWLabel As System.Windows.Forms.Label
         Friend WithEvents OASLabel As System.Windows.Forms.Label
         Friend WithEvents PVBPLabel As System.Windows.Forms.Label
-        Friend WithEvents Label8 As System.Windows.Forms.Label
-        Friend WithEvents Label3 As System.Windows.Forms.Label
         Friend WithEvents ToolStripMenuItem1 As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents RubIRSTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents RubCCSTSMI As System.Windows.Forms.ToolStripMenuItem

@@ -128,12 +128,23 @@ End Class
 
 Public Class Utils
     Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(Utils))
-    Public Shared Sub RunCommand(ByVal command As String)
+    Public Shared Sub RunCommand(ByVal command As String, ByVal args As String, Optional ByVal sh As Boolean = False)
         Try
-            Process.Start(command)
+            Dim prc As New ProcessStartInfo(command, args)
+            prc.UseShellExecute = sh
+            Process.Start(prc)
         Catch ex As Exception
-            Logger.WarnException("Failed to run command [" + command + "]", ex)
+            Logger.WarnException("Failed to run command [" + command + "] with args [" + args + "]", ex)
             Logger.Warn("Exception = {0}", ex)
+            Try
+                Dim prc As New ProcessStartInfo(command, args)
+                prc.UseShellExecute = sh
+                prc.Verb = "runas"
+                Process.Start(prc)
+            Catch ex1 As Exception
+                Logger.ErrorException("Failed to run command with admin rights request [" + command + "] with args [" + args + "]", ex)
+                Logger.Error("Exception = {0}", ex)
+            End Try
         End Try
     End Sub
 
