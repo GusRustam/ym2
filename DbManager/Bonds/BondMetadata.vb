@@ -78,8 +78,12 @@ Namespace Bonds
         Private ReadOnly _label3 As String
         Private ReadOnly _label4 As String
 
+        Private ReadOnly _industry As String
+        Private ReadOnly _subIndustry As String
+
+
         Sub New(ByVal ric As String, ByVal shortName As String, ByVal label As String, ByVal maturity As Date?, ByVal coupon As Double, ByVal paymentStructure As String, ByVal rateStructure As String, ByVal issueDate As Date, ByVal label1 As String, ByVal label2 As String, ByVal label3 As String, ByVal label4 As String,
-                ByVal issuerName As String, ByVal borrowerName As String, ByVal currency As String, ByVal putable As Boolean, ByVal callable As Boolean, ByVal floater As Boolean, ByVal lastIssueRating As RatingDescr, ByVal lastIssuerRating As RatingDescr, ByVal lastRating As RatingDescr, ByVal seniorityType As String)
+                ByVal issuerName As String, ByVal borrowerName As String, ByVal currency As String, ByVal putable As Boolean, ByVal callable As Boolean, ByVal floater As Boolean, ByVal lastIssueRating As RatingDescr, ByVal lastIssuerRating As RatingDescr, ByVal lastRating As RatingDescr, ByVal seniorityType As String, ByVal industry As String, ByVal subIndustry As String)
             _ric = ric
             _shortName = shortName
             _label = label
@@ -103,7 +107,27 @@ Namespace Bonds
             _lastIssuerRating = lastIssuerRating
             _lastRating = lastRating
             _seniorityType = seniorityType
+            _industry = industry
+            _subIndustry = subIndustry
         End Sub
+
+        <Hideable()>
+        <Sortable()>
+        <Filterable()>
+        Public ReadOnly Property Industry() As String
+            Get
+                Return _industry
+            End Get
+        End Property
+
+        <Hideable()>
+        <Sortable()>
+        <Filterable()>
+        Public ReadOnly Property SubIndustry() As String
+            Get
+                Return _subIndustry
+            End Get
+        End Property
 
         <Hideable()>
         <DisplayName("Ric")>

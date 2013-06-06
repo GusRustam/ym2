@@ -263,8 +263,23 @@
             Return r1.RatingDate.Value > r2.RatingDate.Value
         End Operator
 
+        Public Shared Operator >=(ByVal r1 As RatingDescr, ByVal r2 As RatingDescr) As Boolean
+            If r1 Is Nothing And r2 Is Nothing Then Return True
+            If r1 Is Nothing Then Return True
+            If r2 Is Nothing Then Return False
+
+            If Not r1.RatingDate.HasValue And Not r2.RatingDate.HasValue Then Return True
+            If r1.RatingDate.HasValue And Not r2.RatingDate.HasValue Then Return True
+            If r2.RatingDate.HasValue And Not r1.RatingDate.HasValue Then Return False
+            Return r1.RatingDate.Value >= r2.RatingDate.Value
+        End Operator
+
         Public Shared Operator <(ByVal r1 As RatingDescr, ByVal r2 As RatingDescr) As Boolean
             Return r2 > r1
+        End Operator
+
+        Public Shared Operator <=(ByVal r1 As RatingDescr, ByVal r2 As RatingDescr) As Boolean
+            Return r2 >= r1
         End Operator
 
         Public Function CompareTo(ByVal obj As Object) As Integer Implements IComparable.CompareTo
@@ -299,7 +314,6 @@
             End If
             Return hashCode
         End Function
-
 
         Public Shared Operator =(ByVal left As RatingDescr, ByVal right As RatingDescr) As Boolean
             Return Equals(left, right)

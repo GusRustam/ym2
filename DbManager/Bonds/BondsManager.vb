@@ -105,6 +105,8 @@ Namespace Bonds
             Dim isFloater = Not IsDBNull(descr("isFloater")) AndAlso descr.isFloater
             Dim sN = shortName & " " & series
             Dim seniorityType = If(Not IsDBNull(descr("seniorityType")), descr.seniorityType, "")
+            Dim industry = If(Not IsDBNull(descr("industry")), descr.industry, "")
+            Dim subIndustry = If(Not IsDBNull(descr("subIndustry")), descr.subIndustry, "")
 
             Dim issueRatings = (From row In _ldr.GetIssueRatingsTable()
                                 Where row.ric = _subRicToRic(aRic) And Not IsDBNull(row("date")) AndAlso IsDate(row("date"))
@@ -140,7 +142,7 @@ Namespace Bonds
                                        shortName & " " & If(coupon > 0, String.Format("{0}", coupon), "ZC"),
                                        description, series, issuerName, borrowerName, currency,
                                        isPutable, isCallable, isFloater, lastIssueRating, lastIssuerRating, lastRating,
-                                       seniorityType)
+                                       seniorityType, industry, subIndustry)
         End Function
 
         'Private Shared Function SkipSlash(ByVal aRic As String) As String
@@ -259,7 +261,9 @@ Namespace Bonds
             New Dex2Field("EJV.C.IssuerCountry", BondsTable.issuerCountryColumn.ColumnName),
             New Dex2Field("RI.ID.ISIN", BondsTable.isinColumn.ColumnName),
             New Dex2Field("EJV.C.ParentTicker", BondsTable.parentTickerColumn.ColumnName),
-            New Dex2Field("EJV.C.SeniorityTypeDescription ", BondsTable.seniorityTypeColumn.ColumnName)
+            New Dex2Field("EJV.C.SeniorityTypeDescription ", BondsTable.seniorityTypeColumn.ColumnName),
+            New Dex2Field("EJV.C.SPIndustryDescription ", BondsTable.industryColumn.ColumnName),
+            New Dex2Field("EJV.C.SPIndustrySubDescription ", BondsTable.subIndustryColumn.ColumnName)
         }.ToList(), "RH:In")
 
         Private Shared ReadOnly QueryIssueRating As New Dex2Query({

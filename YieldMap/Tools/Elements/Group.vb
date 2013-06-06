@@ -277,8 +277,12 @@ Namespace Tools.Elements
             UnfreezeEvents()
         End Sub
 
-        Public Function Bonds(ByVal clause As Func(Of Bond, Boolean)) As IEnumerable(Of Bond)
-            Return From elem In _elements Where clause(elem)
+        Public Function Bonds(Optional ByVal clause As Func(Of Bond, Boolean) = Nothing) As IEnumerable(Of Bond)
+            If clause IsNot Nothing Then
+                Return From elem In _elements Where clause(elem)
+            Else
+                Return _elements
+            End If
         End Function
 
         Public Function Bonds(ByVal clause As Func(Of BondMetadata, Boolean)) As IEnumerable(Of Bond)

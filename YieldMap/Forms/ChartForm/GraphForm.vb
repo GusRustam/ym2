@@ -940,5 +940,33 @@ Namespace Forms.ChartForm
             If datePicker.ShowDialog() = DialogResult.OK Then curve.CurveDate = datePicker.TheCalendar.SelectionEnd
         End Sub
 
+        Private Sub IssuerSeriesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles IssuerSeriesToolStripMenuItem.Click
+            For Each bnd In GetBonds()
+                bnd.LabelMode = LabelMode.IssuerAndSeries
+            Next
+        End Sub
+
+        Private Sub IssuerCouponMaturityToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles IssuerCouponMaturityToolStripMenuItem.Click
+            For Each bnd In GetBonds()
+                bnd.LabelMode = LabelMode.IssuerCpnMat
+            Next
+        End Sub
+
+        Private Function GetBonds() As IEnumerable(Of Bond)
+            If BondCurveCMS.Tag Is Nothing OrElse Not IsNumeric(BondCurveCMS.Tag) Then Return Nothing
+            Return _ansamble.Items(BondCurveCMS.Tag).Bonds()
+        End Function
+
+        Private Sub DescriptionToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DescriptionToolStripMenuItem.Click
+            For Each bnd In GetBonds()
+                bnd.LabelMode = LabelMode.Description
+            Next
+        End Sub
+
+        Private Sub SeriesOnlyToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SeriesOnlyToolStripMenuItem.Click
+            For Each bnd In GetBonds()
+                bnd.LabelMode = LabelMode.SeriesOnly
+            Next
+        End Sub
     End Class
 End Namespace

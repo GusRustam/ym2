@@ -32,8 +32,8 @@
             Dim Label4 As System.Windows.Forms.Label
             Dim Label5 As System.Windows.Forms.Label
             Dim Label7 As System.Windows.Forms.Label
-            Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-            Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+            Dim ChartArea5 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+            Dim Legend5 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
             Me.TheStatusStrip = New System.Windows.Forms.StatusStrip()
             Me.StatusMessage = New System.Windows.Forms.ToolStripStatusLabel()
             Me.TheToolStrip = New System.Windows.Forms.ToolStrip()
@@ -157,6 +157,11 @@
             Me.BootstrappingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Me.ToolStripMenuItem3 = New System.Windows.Forms.ToolStripSeparator()
             Me.SelectDateToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.LabelingModeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.IssuerSeriesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.IssuerCouponMaturityToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.DescriptionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.SeriesOnlyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Label8 = New System.Windows.Forms.Label()
             Label3 = New System.Windows.Forms.Label()
             Label6 = New System.Windows.Forms.Label()
@@ -181,6 +186,94 @@
             Me.BondSetCMS.SuspendLayout()
             Me.BondCurveCMS.SuspendLayout()
             Me.SuspendLayout()
+            '
+            'Label8
+            '
+            Label8.Anchor = System.Windows.Forms.AnchorStyles.Left
+            Label8.AutoSize = True
+            Label8.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Label8.Location = New System.Drawing.Point(250, 63)
+            Label8.Name = "Label8"
+            Label8.Size = New System.Drawing.Size(39, 13)
+            Label8.TabIndex = 6
+            Label8.Text = "PVBP"
+            '
+            'Label3
+            '
+            Label3.Anchor = System.Windows.Forms.AnchorStyles.Left
+            Label3.AutoSize = True
+            Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Label3.Location = New System.Drawing.Point(250, 23)
+            Label3.Name = "Label3"
+            Label3.Size = New System.Drawing.Size(55, 13)
+            Label3.TabIndex = 0
+            Label3.Text = "Duration"
+            '
+            'Label6
+            '
+            Label6.Anchor = System.Windows.Forms.AnchorStyles.Left
+            Label6.AutoSize = True
+            Label6.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Label6.Location = New System.Drawing.Point(3, 3)
+            Label6.Name = "Label6"
+            Label6.Size = New System.Drawing.Size(34, 13)
+            Label6.TabIndex = 0
+            Label6.Text = "Date"
+            '
+            'Label1
+            '
+            Label1.Anchor = System.Windows.Forms.AnchorStyles.Left
+            Label1.AutoSize = True
+            Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Label1.Location = New System.Drawing.Point(250, 3)
+            Label1.Name = "Label1"
+            Label1.Size = New System.Drawing.Size(35, 13)
+            Label1.TabIndex = 0
+            Label1.Text = "Yield"
+            '
+            'Label2
+            '
+            Label2.Anchor = System.Windows.Forms.AnchorStyles.Left
+            Label2.AutoSize = True
+            Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Label2.Location = New System.Drawing.Point(3, 23)
+            Label2.Name = "Label2"
+            Label2.Size = New System.Drawing.Size(40, 13)
+            Label2.TabIndex = 0
+            Label2.Text = "Descr"
+            '
+            'Label4
+            '
+            Label4.Anchor = System.Windows.Forms.AnchorStyles.Left
+            Label4.AutoSize = True
+            Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Label4.Location = New System.Drawing.Point(250, 43)
+            Label4.Name = "Label4"
+            Label4.Size = New System.Drawing.Size(62, 13)
+            Label4.TabIndex = 0
+            Label4.Text = "Convexity"
+            '
+            'Label5
+            '
+            Label5.Anchor = System.Windows.Forms.AnchorStyles.Left
+            Label5.AutoSize = True
+            Label5.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Label5.Location = New System.Drawing.Point(3, 43)
+            Label5.Name = "Label5"
+            Label5.Size = New System.Drawing.Size(52, 13)
+            Label5.TabIndex = 0
+            Label5.Text = "Maturity"
+            '
+            'Label7
+            '
+            Label7.Anchor = System.Windows.Forms.AnchorStyles.Left
+            Label7.AutoSize = True
+            Label7.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
+            Label7.Location = New System.Drawing.Point(3, 63)
+            Label7.Name = "Label7"
+            Label7.Size = New System.Drawing.Size(50, 13)
+            Label7.TabIndex = 0
+            Label7.Text = "Coupon"
             '
             'TheStatusStrip
             '
@@ -515,17 +608,6 @@
             Me.PVBPLabel.Size = New System.Drawing.Size(183, 14)
             Me.PVBPLabel.TabIndex = 7
             '
-            'Label8
-            '
-            Label8.Anchor = System.Windows.Forms.AnchorStyles.Left
-            Label8.AutoSize = True
-            Label8.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Label8.Location = New System.Drawing.Point(250, 63)
-            Label8.Name = "Label8"
-            Label8.Size = New System.Drawing.Size(39, 13)
-            Label8.TabIndex = 6
-            Label8.Text = "PVBP"
-            '
             'ASWLabel
             '
             Me.ASWLabel.AutoSize = True
@@ -558,17 +640,6 @@
             Me.CpnLabel.Name = "CpnLabel"
             Me.CpnLabel.Size = New System.Drawing.Size(183, 14)
             Me.CpnLabel.TabIndex = 3
-            '
-            'Label3
-            '
-            Label3.Anchor = System.Windows.Forms.AnchorStyles.Left
-            Label3.AutoSize = True
-            Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Label3.Location = New System.Drawing.Point(250, 23)
-            Label3.Name = "Label3"
-            Label3.Size = New System.Drawing.Size(55, 13)
-            Label3.TabIndex = 0
-            Label3.Text = "Duration"
             '
             'DurLabel
             '
@@ -603,17 +674,6 @@
             Me.DscrLabel.Size = New System.Drawing.Size(183, 14)
             Me.DscrLabel.TabIndex = 0
             '
-            'Label6
-            '
-            Label6.Anchor = System.Windows.Forms.AnchorStyles.Left
-            Label6.AutoSize = True
-            Label6.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Label6.Location = New System.Drawing.Point(3, 3)
-            Label6.Name = "Label6"
-            Label6.Size = New System.Drawing.Size(34, 13)
-            Label6.TabIndex = 0
-            Label6.Text = "Date"
-            '
             'DatLabel
             '
             Me.DatLabel.AutoSize = True
@@ -624,17 +684,6 @@
             Me.DatLabel.Name = "DatLabel"
             Me.DatLabel.Size = New System.Drawing.Size(183, 14)
             Me.DatLabel.TabIndex = 0
-            '
-            'Label1
-            '
-            Label1.Anchor = System.Windows.Forms.AnchorStyles.Left
-            Label1.AutoSize = True
-            Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Label1.Location = New System.Drawing.Point(250, 3)
-            Label1.Name = "Label1"
-            Label1.Size = New System.Drawing.Size(35, 13)
-            Label1.TabIndex = 0
-            Label1.Text = "Yield"
             '
             'YldLabel
             '
@@ -657,17 +706,6 @@
             Me.ZSpreadLabel.Name = "ZSpreadLabel"
             Me.ZSpreadLabel.Size = New System.Drawing.Size(183, 14)
             Me.ZSpreadLabel.TabIndex = 0
-            '
-            'Label2
-            '
-            Label2.Anchor = System.Windows.Forms.AnchorStyles.Left
-            Label2.AutoSize = True
-            Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Label2.Location = New System.Drawing.Point(3, 23)
-            Label2.Name = "Label2"
-            Label2.Size = New System.Drawing.Size(40, 13)
-            Label2.TabIndex = 0
-            Label2.Text = "Descr"
             '
             'SpreadLinkLabel
             '
@@ -701,17 +739,6 @@
             Me.ZSpreadLinkLabel.Text = "Z-Spread"
             Me.ZSpreadLinkLabel.VisitedLinkColor = System.Drawing.Color.Navy
             '
-            'Label4
-            '
-            Label4.Anchor = System.Windows.Forms.AnchorStyles.Left
-            Label4.AutoSize = True
-            Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Label4.Location = New System.Drawing.Point(250, 43)
-            Label4.Name = "Label4"
-            Label4.Size = New System.Drawing.Size(62, 13)
-            Label4.TabIndex = 0
-            Label4.Text = "Convexity"
-            '
             'ASWLinkLabel
             '
             Me.ASWLinkLabel.AutoSize = True
@@ -727,17 +754,6 @@
             Me.ASWLinkLabel.TabStop = True
             Me.ASWLinkLabel.Text = "ASW Spread"
             Me.ASWLinkLabel.VisitedLinkColor = System.Drawing.Color.Navy
-            '
-            'Label5
-            '
-            Label5.Anchor = System.Windows.Forms.AnchorStyles.Left
-            Label5.AutoSize = True
-            Label5.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Label5.Location = New System.Drawing.Point(3, 43)
-            Label5.Name = "Label5"
-            Label5.Size = New System.Drawing.Size(52, 13)
-            Label5.TabIndex = 0
-            Label5.Text = "Maturity"
             '
             'MatLabel
             '
@@ -760,17 +776,6 @@
             Me.ConvLabel.Name = "ConvLabel"
             Me.ConvLabel.Size = New System.Drawing.Size(183, 14)
             Me.ConvLabel.TabIndex = 2
-            '
-            'Label7
-            '
-            Label7.Anchor = System.Windows.Forms.AnchorStyles.Left
-            Label7.AutoSize = True
-            Label7.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(204, Byte))
-            Label7.Location = New System.Drawing.Point(3, 63)
-            Label7.Name = "Label7"
-            Label7.Size = New System.Drawing.Size(50, 13)
-            Label7.TabIndex = 0
-            Label7.Text = "Coupon"
             '
             'OASpreadLinkLabel
             '
@@ -815,12 +820,12 @@
             '
             'TheChart
             '
-            ChartArea1.Name = "ChartArea1"
-            Me.TheChart.ChartAreas.Add(ChartArea1)
+            ChartArea5.Name = "ChartArea1"
+            Me.TheChart.ChartAreas.Add(ChartArea5)
             Me.TheChart.Dock = System.Windows.Forms.DockStyle.Fill
-            Legend1.Enabled = False
-            Legend1.Name = "Legend1"
-            Me.TheChart.Legends.Add(Legend1)
+            Legend5.Enabled = False
+            Legend5.Name = "Legend1"
+            Me.TheChart.Legends.Add(Legend5)
             Me.TheChart.Location = New System.Drawing.Point(0, 0)
             Me.TheChart.Name = "TheChart"
             Me.TheChart.Size = New System.Drawing.Size(778, 417)
@@ -889,49 +894,49 @@
             '
             Me.MoneyCurveCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MMNameTSMI, Me.ShowCurveItemsTSMI, Me.DeleteMMCurveTSMI, Me.ToolStripSeparator10, Me.BrokerTSMI, Me.QuoteTSMI, Me.FitTSMI, Me.BootstrapTSMI, Me.ToolStripSeparator11, Me.SelDateTSMI})
             Me.MoneyCurveCMS.Name = "MoneyCurveCMS"
-            Me.MoneyCurveCMS.Size = New System.Drawing.Size(153, 214)
+            Me.MoneyCurveCMS.Size = New System.Drawing.Size(145, 192)
             '
             'MMNameTSMI
             '
             Me.MMNameTSMI.Enabled = False
             Me.MMNameTSMI.Name = "MMNameTSMI"
-            Me.MMNameTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.MMNameTSMI.Size = New System.Drawing.Size(144, 22)
             Me.MMNameTSMI.Text = "Name"
             '
             'ShowCurveItemsTSMI
             '
             Me.ShowCurveItemsTSMI.Name = "ShowCurveItemsTSMI"
-            Me.ShowCurveItemsTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.ShowCurveItemsTSMI.Size = New System.Drawing.Size(144, 22)
             Me.ShowCurveItemsTSMI.Text = "Show items..."
             '
             'DeleteMMCurveTSMI
             '
             Me.DeleteMMCurveTSMI.Name = "DeleteMMCurveTSMI"
-            Me.DeleteMMCurveTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.DeleteMMCurveTSMI.Size = New System.Drawing.Size(144, 22)
             Me.DeleteMMCurveTSMI.Text = "Delete curve"
             '
             'ToolStripSeparator10
             '
             Me.ToolStripSeparator10.Name = "ToolStripSeparator10"
-            Me.ToolStripSeparator10.Size = New System.Drawing.Size(149, 6)
+            Me.ToolStripSeparator10.Size = New System.Drawing.Size(141, 6)
             '
             'BrokerTSMI
             '
             Me.BrokerTSMI.Name = "BrokerTSMI"
-            Me.BrokerTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.BrokerTSMI.Size = New System.Drawing.Size(144, 22)
             Me.BrokerTSMI.Text = "Broker"
             '
             'QuoteTSMI
             '
             Me.QuoteTSMI.Name = "QuoteTSMI"
-            Me.QuoteTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.QuoteTSMI.Size = New System.Drawing.Size(144, 22)
             Me.QuoteTSMI.Text = "Quote"
             '
             'FitTSMI
             '
             Me.FitTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LinearRegressionTSMI, Me.LogarithmicRegressionTSMI, Me.InverseRegressionTSMI, Me.PowerRegressionTSMI, Me.Poly6RegressionTSMI, Me.NelsonSiegelSvenssonTSMI, Me.ToolStripSeparator8, Me.LinearInterpolationTSMI, Me.CubicSplineTSMI, Me.ToolStripSeparator9, Me.VasicekCurveTSMI, Me.CIRCurveTSMI})
             Me.FitTSMI.Name = "FitTSMI"
-            Me.FitTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.FitTSMI.Size = New System.Drawing.Size(144, 22)
             Me.FitTSMI.Text = "Interpolation"
             '
             'LinearRegressionTSMI
@@ -1012,18 +1017,18 @@
             '
             Me.BootstrapTSMI.CheckOnClick = True
             Me.BootstrapTSMI.Name = "BootstrapTSMI"
-            Me.BootstrapTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.BootstrapTSMI.Size = New System.Drawing.Size(144, 22)
             Me.BootstrapTSMI.Text = "Bootstrap"
             '
             'ToolStripSeparator11
             '
             Me.ToolStripSeparator11.Name = "ToolStripSeparator11"
-            Me.ToolStripSeparator11.Size = New System.Drawing.Size(149, 6)
+            Me.ToolStripSeparator11.Size = New System.Drawing.Size(141, 6)
             '
             'SelDateTSMI
             '
             Me.SelDateTSMI.Name = "SelDateTSMI"
-            Me.SelDateTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.SelDateTSMI.Size = New System.Drawing.Size(144, 22)
             Me.SelDateTSMI.Text = "Select date..."
             '
             'SpreadCMS
@@ -1111,9 +1116,9 @@
             '
             'BondCurveCMS
             '
-            Me.BondCurveCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ShowBondCurveItemsTSMI, Me.DeleteBondCurveTSMI, Me.ToolStripMenuItem2, Me.InterpolationTSMI, Me.BootstrappingToolStripMenuItem, Me.ToolStripMenuItem3, Me.SelectDateToolStripMenuItem})
+            Me.BondCurveCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ShowBondCurveItemsTSMI, Me.DeleteBondCurveTSMI, Me.ToolStripMenuItem2, Me.LabelingModeToolStripMenuItem, Me.InterpolationTSMI, Me.BootstrappingToolStripMenuItem, Me.ToolStripMenuItem3, Me.SelectDateToolStripMenuItem})
             Me.BondCurveCMS.Name = "BondCurveCMS"
-            Me.BondCurveCMS.Size = New System.Drawing.Size(150, 126)
+            Me.BondCurveCMS.Size = New System.Drawing.Size(153, 170)
             '
             'ShowBondCurveItemsTSMI
             '
@@ -1223,6 +1228,37 @@
             Me.SelectDateToolStripMenuItem.Name = "SelectDateToolStripMenuItem"
             Me.SelectDateToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
             Me.SelectDateToolStripMenuItem.Text = "Select date..."
+            '
+            'LabelingModeToolStripMenuItem
+            '
+            Me.LabelingModeToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.IssuerSeriesToolStripMenuItem, Me.IssuerCouponMaturityToolStripMenuItem, Me.DescriptionToolStripMenuItem, Me.SeriesOnlyToolStripMenuItem})
+            Me.LabelingModeToolStripMenuItem.Name = "LabelingModeToolStripMenuItem"
+            Me.LabelingModeToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.LabelingModeToolStripMenuItem.Text = "Labels"
+            '
+            'IssuerSeriesToolStripMenuItem
+            '
+            Me.IssuerSeriesToolStripMenuItem.Name = "IssuerSeriesToolStripMenuItem"
+            Me.IssuerSeriesToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
+            Me.IssuerSeriesToolStripMenuItem.Text = "Issuer Series"
+            '
+            'IssuerCouponMaturityToolStripMenuItem
+            '
+            Me.IssuerCouponMaturityToolStripMenuItem.Name = "IssuerCouponMaturityToolStripMenuItem"
+            Me.IssuerCouponMaturityToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
+            Me.IssuerCouponMaturityToolStripMenuItem.Text = "Issuer Coupon-Maturity"
+            '
+            'DescriptionToolStripMenuItem
+            '
+            Me.DescriptionToolStripMenuItem.Name = "DescriptionToolStripMenuItem"
+            Me.DescriptionToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
+            Me.DescriptionToolStripMenuItem.Text = "Description"
+            '
+            'SeriesOnlyToolStripMenuItem
+            '
+            Me.SeriesOnlyToolStripMenuItem.Name = "SeriesOnlyToolStripMenuItem"
+            Me.SeriesOnlyToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
+            Me.SeriesOnlyToolStripMenuItem.Text = "Series Only"
             '
             'GraphForm
             '
@@ -1382,5 +1418,10 @@
         Friend WithEvents VasicekTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents CIRRTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents InterpolationTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents LabelingModeToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents IssuerSeriesToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents IssuerCouponMaturityToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents DescriptionToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents SeriesOnlyToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     End Class
 End Namespace
