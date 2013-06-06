@@ -192,7 +192,6 @@ Namespace Tools.Elements
             Convexity = bondDeriv.GetValue(1, 7)
             PVBP = bondDeriv.GetValue(1, 4)
 
-            bestYield.Yield += ParentBond.UsedDefinedSpread
             Yld = bestYield
         End Sub
 

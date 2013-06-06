@@ -265,6 +265,14 @@ Namespace Tools.Elements
             NotifyUpdatedSpread(_lastCurve(ord), ord)
         End Sub
 
+        Protected Overrides Sub RecalculateWithSpread()
+            _lastCurve(Yield) = RecalculateYields()
+            For Each ord In From o In Ordinates Where o <> Yield
+                _lastCurve(ord) = RecalculateSpread(ord)
+            Next
+            If _lastCurve.ContainsKey(Ansamble.YSource) Then NotifyUpdated(_lastCurve(Ansamble.YSource))
+        End Sub
+
         Private Function RecalculateSpread(ByVal ord As IOrdinate) As List(Of CurveItem)
             SetSpread(ord)
             ' I can't calculate spreads of interpolated curves. It does make sense 'cos interpolated curve is of only XY points 
@@ -273,7 +281,7 @@ Namespace Tools.Elements
                         From item In AllElements
                         From quoteName In item.QuotesAndYields
                         Let q = item.QuotesAndYields(quoteName)
-                        Let theY = ord.GetValue(q)
+                        Let theY = ord.GetValue(q) + q.ParentBond.UserDefinedSpread(ord)
                         Where theY.HasValue AndAlso item.QuotesAndYields.Main IsNot Nothing AndAlso quoteName = item.QuotesAndYields.Main.QuoteName
                         Select New PointCurveItem(q.Duration, theY, Me))
             res.Sort()
@@ -318,7 +326,7 @@ Namespace Tools.Elements
                     For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
                         Dim matDate = Utils.FromExcelSerialDate(termStructure.GetValue(i, 1))
                         Dim dur = (matDate - _curveDate).TotalDays / 365.0
-                        Dim yld = termStructure.GetValue(i, 2)
+                        Dim yld = termStructure.GetValue(i, 2) + data(i).UserDefinedSpread(Yield)
                         If dur > 0 And yld > 0 Then
                             result.Add(New PointCurveItem(dur, yld, Me))
                         End If
@@ -341,7 +349,7 @@ Namespace Tools.Elements
                             x = (bnd.MetaData.Maturity.Value - Date.Today).Days / 365
                     End Select
 
-                    y = description.Yield
+                    y = description.Yield + description.ParentBond.UserDefinedSpread(Yield)
                     If x > 0 And y > 0 Then result.Add(New BondCurveItem(x, y, bnd, description.BackColor, description.Yld.ToWhat, description.MarkerStyle, bnd.Label))
                 Next
             End If
@@ -383,7 +391,7 @@ Namespace Tools.Elements
         End Sub
 
         Public Sub SetSpread(ByVal ySource As OrdinateBase) Implements ICurve.SetSpread
-            If Ansamble.Benchmarks(ySource) <> Me Then
+            If Ansamble.Benchmarks.Keys.Contains(ySource) AndAlso Ansamble.Benchmarks(ySource) <> Me Then
                 For Each qy In From item In AllElements From quoteName In item.QuotesAndYields Select item.QuotesAndYields(quoteName)
                     ySource.SetValue(qy, Ansamble.Benchmarks(ySource))
                 Next

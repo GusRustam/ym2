@@ -35,6 +35,7 @@ Namespace Tools.Elements
 
         Public MustOverride Sub Recalculate() Implements IChangeable.Recalculate
         Public MustOverride Sub Recalculate(ByVal ord As IOrdinate) Implements IChangeable.Recalculate
+        Protected MustOverride Sub RecalculateWithSpread()
 
         Private ReadOnly _ansamble As Ansamble
         Public ReadOnly Property Ansamble() As Ansamble
@@ -186,10 +187,10 @@ Namespace Tools.Elements
             Dim descr As New BondPointDescription(xmlName)
             descr.BackColor = BondFields.Fields.BackColor(xmlName)
             descr.MarkerStyle = BondFields.Fields.MarkerStyle(xmlName)
-            descr.ParentBond = Bond
+            descr.ParentBond = bond
             descr.Yield(calcDate) = fieldVal
 
-            Bond.QuotesAndYields(xmlName) = descr
+            bond.QuotesAndYields(xmlName) = descr
             Recalculate()
         End Sub
 
@@ -203,6 +204,7 @@ Namespace Tools.Elements
                 If descr IsNot Nothing Then
                     Dim bond = New Bond(Me, descr)
                     AddHandler bond.Changed, Sub() If Not _eventsFrozen Then Recalculate()
+                    AddHandler bond.SpreadChanged, Sub() If Not _eventsFrozen Then RecalculateWithSpread()
                     AddHandler bond.CustomPrice, AddressOf OnCustomCustomPrice
                     _elements.Add(bond)
                 Else
@@ -210,6 +212,7 @@ Namespace Tools.Elements
                 End If
             Next
         End Sub
+
 
         Private Sub OnCustomCustomPrice(ByVal bond As Bond, ByVal price As Double)
             HandleQuote(bond, BondFields.XmlName(bond.Fields.Custom), price, Today)

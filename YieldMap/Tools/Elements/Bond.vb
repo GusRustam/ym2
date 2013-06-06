@@ -7,6 +7,7 @@ Namespace Tools.Elements
         Inherits Identifyable
 
         Public Event Changed As Action
+        Public Event SpreadChanged As Action
         Public Event CustomPrice As Action(Of Bond, Double)
 
         Public TodayVolume As Double
@@ -113,16 +114,17 @@ Namespace Tools.Elements
             End Set
         End Property
 
-        Private _usedDefinedSpread As Double
-        Public Property UsedDefinedSpread() As Double
+        Private _userDefinedSpread As Double
+        Public Property UserDefinedSpread(Optional ByVal ord As IOrdinate = Nothing) As Double
             Get
-                Return _usedDefinedSpread
+                Return If(ord = Yield, _userDefinedSpread / 10000, _userDefinedSpread)
             End Get
             Set(ByVal value As Double)
-                _usedDefinedSpread = value
-                RaiseEvent Changed()
+                _userDefinedSpread = value
+                RaiseEvent SpreadChanged()
             End Set
         End Property
+
 
         Private _labelEnabled As Boolean = False
         Public Property LabelEnabled() As Boolean

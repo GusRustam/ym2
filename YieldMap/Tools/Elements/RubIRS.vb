@@ -203,7 +203,7 @@ Namespace Tools.Elements
                     Dim termStructure As Array = curveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
                     For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
                         Dim dur = (Utils.FromExcelSerialDate(termStructure.GetValue(i, 1)) - CurveDate).TotalDays / 365.0
-                        Dim yld = termStructure.GetValue(i, 2)
+                        Dim yld = termStructure.GetValue(i, 2) ' + data(i).RIC
                         If dur > 0 And yld > 0 Then result.Add(New SwapCurveItem(dur, yld, Me, data(i).RIC))
                     Next
                 Catch ex As Exception
@@ -331,7 +331,7 @@ Namespace Tools.Elements
         End Sub
 
         Public Overrides Sub SetSpread(ByVal ySource As OrdinateBase)
-            If Ansamble.Benchmarks(ySource) <> Me Then
+            If Ansamble.Benchmarks.Keys.Contains(ySource) AndAlso Ansamble.Benchmarks(ySource) <> Me Then
                 For Each item In Descrs
                     ySource.SetValue(item, Ansamble.Benchmarks(ySource))
                 Next

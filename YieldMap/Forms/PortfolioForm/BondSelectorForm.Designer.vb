@@ -31,13 +31,13 @@
             Me.OkButton = New System.Windows.Forms.Button()
             Me.IncludeCB = New System.Windows.Forms.CheckBox()
             Me.TableLayoutPanel3 = New System.Windows.Forms.TableLayoutPanel()
+            Me.SettingsButton = New System.Windows.Forms.Button()
             Me.IssuerTextBox = New System.Windows.Forms.TextBox()
             Me.Label1 = New System.Windows.Forms.Label()
             Me.RICTextBox = New System.Windows.Forms.TextBox()
             Me.Label2 = New System.Windows.Forms.Label()
             Me.SelectColumnsCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.SelectColumnsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-            Me.SettingsButton = New System.Windows.Forms.Button()
             Me.TableLayoutPanel1.SuspendLayout()
             CType(Me.BondListDGV, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.TableLayoutPanel2.SuspendLayout()
@@ -152,6 +152,17 @@
             Me.TableLayoutPanel3.Size = New System.Drawing.Size(738, 50)
             Me.TableLayoutPanel3.TabIndex = 9
             '
+            'SettingsButton
+            '
+            Me.SettingsButton.Dock = System.Windows.Forms.DockStyle.Right
+            Me.SettingsButton.Location = New System.Drawing.Point(663, 0)
+            Me.SettingsButton.Margin = New System.Windows.Forms.Padding(0)
+            Me.SettingsButton.Name = "SettingsButton"
+            Me.SettingsButton.Size = New System.Drawing.Size(75, 25)
+            Me.SettingsButton.TabIndex = 13
+            Me.SettingsButton.Text = "Settings..."
+            Me.SettingsButton.UseVisualStyleBackColor = True
+            '
             'IssuerTextBox
             '
             Me.IssuerTextBox.Dock = System.Windows.Forms.DockStyle.Top
@@ -199,17 +210,6 @@
             Me.SelectColumnsToolStripMenuItem.Name = "SelectColumnsToolStripMenuItem"
             Me.SelectColumnsToolStripMenuItem.Size = New System.Drawing.Size(163, 22)
             Me.SelectColumnsToolStripMenuItem.Text = "Choose columns..."
-            '
-            'SettingsButton
-            '
-            Me.SettingsButton.Dock = System.Windows.Forms.DockStyle.Right
-            Me.SettingsButton.Location = New System.Drawing.Point(663, 0)
-            Me.SettingsButton.Margin = New System.Windows.Forms.Padding(0)
-            Me.SettingsButton.Name = "SettingsButton"
-            Me.SettingsButton.Size = New System.Drawing.Size(75, 25)
-            Me.SettingsButton.TabIndex = 13
-            Me.SettingsButton.Text = "Settings..."
-            Me.SettingsButton.UseVisualStyleBackColor = True
             '
             'BondSelectorForm
             '

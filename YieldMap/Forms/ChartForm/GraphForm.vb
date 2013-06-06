@@ -194,12 +194,10 @@ Namespace Forms.ChartForm
                     End Sub
             Next
 
-            Dim newItem1 As ToolStripMenuItem
-
             ExtInfoTSMI.DropDownItems.Add("-")
             ExtInfoTSMI.DropDownItems.Add(String.Format("Today volume: {0:N0}", bondDataPoint.TodayVolume))
             ExtInfoTSMI.DropDownItems.Add("-")
-            newItem1 = ExtInfoTSMI.DropDownItems.Add("Set custom price...")
+            Dim newItem1 As ToolStripMenuItem = ExtInfoTSMI.DropDownItems.Add("Set custom price...")
             AddHandler newItem1.Click,
                        Sub(sender1 As Object, e1 As EventArgs)
                            Dim res = InputBox("Enter price", "Custom bond price")
@@ -210,6 +208,21 @@ Namespace Forms.ChartForm
                            End If
 
                        End Sub
+
+            Dim newItem2 As ToolStripMenuItem = ExtInfoTSMI.DropDownItems.Add("Set spread...")
+            AddHandler newItem2.Click,
+                       Sub(sender1 As Object, e1 As EventArgs)
+                           Dim res = InputBox("Enter spread in b.p.", "Custom bond spread")
+                           If IsNumeric(res) Then
+                               bondDataPoint.UserDefinedSpread = res
+                           ElseIf res <> "" Then
+                               MessageBox.Show("Invalid number")
+                           Else
+                               bondDataPoint.UserDefinedSpread = 0
+                           End If
+
+                       End Sub
+
             IssuerNameSeriesTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.IssuerAndSeries)
             ShortNameTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.IssuerCpnMat)
             DescriptionTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.Description)

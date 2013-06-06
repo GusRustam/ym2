@@ -281,6 +281,7 @@ Namespace Forms.ChartForm
                 elem.Checked = refCurve IsNot Nothing AndAlso item.Identity = CType(refCurve, Identifyable).Identity
                 elem.Tag = item
             Next item
+            SpreadCMS.Show(MousePosition)
         End Sub
 
         Private Sub OnBenchmarkSelected(ByVal sender As Object, ByVal eventArgs As EventArgs)

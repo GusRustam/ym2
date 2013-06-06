@@ -1,5 +1,6 @@
 ﻿Imports AdfinXAnalyticsFunctions
 Imports NLog
+Imports System.Collections.ObjectModel
 Imports ReutersData
 
 Namespace Tools.Elements
@@ -311,10 +312,11 @@ Namespace Tools.Elements
         Public ZSpread As OrdinateBase = OrdinateZSpread.Instance
         Public OaSpread As OrdinateBase = OrdinateOaSpread.Instance
 
-        Private ReadOnly Items As List(Of OrdinateBase) = {Yield, PointSpread, AswSpread, ZSpread, OaSpread}.ToList()
+        Public ReadOnly Ordinates As ReadOnlyCollection(Of OrdinateBase) = _
+            New ReadOnlyCollection(Of OrdinateBase)({Yield, PointSpread, AswSpread, ZSpread, OaSpread}.ToList())
 
         Public Function FromString(ByVal name As String) As OrdinateBase
-            Dim res = (From item In Items Where item.NameProperty = name).ToList
+            Dim res = (From item In Ordinates Where item.NameProperty = name).ToList
             Return If(res.Any, res.First, Nothing)
         End Function
     End Module
