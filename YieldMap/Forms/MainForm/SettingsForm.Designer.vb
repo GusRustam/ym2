@@ -28,6 +28,9 @@
             Me.SaveSettingsButton = New System.Windows.Forms.Button()
             Me.MainTabControl = New System.Windows.Forms.TabControl()
             Me.MainChartPage = New System.Windows.Forms.TabPage()
+            Me.ClearOtherCurvesCheckBox = New System.Windows.Forms.CheckBox()
+            Me.ClearBondCurvesCheckBox = New System.Windows.Forms.CheckBox()
+            Me.ClearPointsCheckBox = New System.Windows.Forms.CheckBox()
             Me.YieldCalcModeCB = New System.Windows.Forms.ComboBox()
             Me.Label8 = New System.Windows.Forms.Label()
             Me.MaxYieldTextBox = New System.Windows.Forms.MaskedTextBox()
@@ -74,9 +77,9 @@
             Me.LogErrRadioButton = New System.Windows.Forms.RadioButton()
             Me.LogNoneRadioButton = New System.Windows.Forms.RadioButton()
             Me.TheCancelButton = New System.Windows.Forms.Button()
-            Me.ClearPointsCheckBox = New System.Windows.Forms.CheckBox()
-            Me.ClearBondCurvesCheckBox = New System.Windows.Forms.CheckBox()
-            Me.ClearOtherCurvesCheckBox = New System.Windows.Forms.CheckBox()
+            Me.Label12 = New System.Windows.Forms.Label()
+            Me.FirstDateRB = New System.Windows.Forms.RadioButton()
+            Me.FirstLevelRB = New System.Windows.Forms.RadioButton()
             Label11 = New System.Windows.Forms.Label()
             Me.MainTableLayoutPanel.SuspendLayout()
             Me.MainTabControl.SuspendLayout()
@@ -87,6 +90,15 @@
             Me.Panel4.SuspendLayout()
             Me.MainLogPage.SuspendLayout()
             Me.SuspendLayout()
+            '
+            'Label11
+            '
+            Label11.AutoSize = True
+            Label11.Location = New System.Drawing.Point(326, 41)
+            Label11.Name = "Label11"
+            Label11.Size = New System.Drawing.Size(148, 13)
+            Label11.TabIndex = 44
+            Label11.Text = "When select a portfolio, clear:"
             '
             'MainTableLayoutPanel
             '
@@ -157,6 +169,36 @@
             Me.MainChartPage.TabIndex = 2
             Me.MainChartPage.Text = "Chart"
             Me.MainChartPage.UseVisualStyleBackColor = True
+            '
+            'ClearOtherCurvesCheckBox
+            '
+            Me.ClearOtherCurvesCheckBox.AutoSize = True
+            Me.ClearOtherCurvesCheckBox.Location = New System.Drawing.Point(338, 126)
+            Me.ClearOtherCurvesCheckBox.Name = "ClearOtherCurvesCheckBox"
+            Me.ClearOtherCurvesCheckBox.Size = New System.Drawing.Size(87, 17)
+            Me.ClearOtherCurvesCheckBox.TabIndex = 43
+            Me.ClearOtherCurvesCheckBox.Text = "Other curves"
+            Me.ClearOtherCurvesCheckBox.UseVisualStyleBackColor = True
+            '
+            'ClearBondCurvesCheckBox
+            '
+            Me.ClearBondCurvesCheckBox.AutoSize = True
+            Me.ClearBondCurvesCheckBox.Location = New System.Drawing.Point(338, 95)
+            Me.ClearBondCurvesCheckBox.Name = "ClearBondCurvesCheckBox"
+            Me.ClearBondCurvesCheckBox.Size = New System.Drawing.Size(86, 17)
+            Me.ClearBondCurvesCheckBox.TabIndex = 43
+            Me.ClearBondCurvesCheckBox.Text = "Bond curves"
+            Me.ClearBondCurvesCheckBox.UseVisualStyleBackColor = True
+            '
+            'ClearPointsCheckBox
+            '
+            Me.ClearPointsCheckBox.AutoSize = True
+            Me.ClearPointsCheckBox.Location = New System.Drawing.Point(338, 66)
+            Me.ClearPointsCheckBox.Name = "ClearPointsCheckBox"
+            Me.ClearPointsCheckBox.Size = New System.Drawing.Size(101, 17)
+            Me.ClearPointsCheckBox.TabIndex = 43
+            Me.ClearPointsCheckBox.Text = "Separate bonds"
+            Me.ClearPointsCheckBox.UseVisualStyleBackColor = True
             '
             'YieldCalcModeCB
             '
@@ -325,7 +367,7 @@
             Me.FieldPriorityTabPage.Location = New System.Drawing.Point(4, 22)
             Me.FieldPriorityTabPage.Name = "FieldPriorityTabPage"
             Me.FieldPriorityTabPage.Padding = New System.Windows.Forms.Padding(3)
-            Me.FieldPriorityTabPage.Size = New System.Drawing.Size(530, 213)
+            Me.FieldPriorityTabPage.Size = New System.Drawing.Size(530, 210)
             Me.FieldPriorityTabPage.TabIndex = 4
             Me.FieldPriorityTabPage.Text = "Field priorities"
             Me.FieldPriorityTabPage.UseVisualStyleBackColor = True
@@ -491,13 +533,16 @@
             Me.MainLoadColumnsPage.Location = New System.Drawing.Point(4, 22)
             Me.MainLoadColumnsPage.Name = "MainLoadColumnsPage"
             Me.MainLoadColumnsPage.Padding = New System.Windows.Forms.Padding(3)
-            Me.MainLoadColumnsPage.Size = New System.Drawing.Size(530, 213)
+            Me.MainLoadColumnsPage.Size = New System.Drawing.Size(530, 210)
             Me.MainLoadColumnsPage.TabIndex = 3
-            Me.MainLoadColumnsPage.Text = "Columns"
+            Me.MainLoadColumnsPage.Text = "Bond selection"
             Me.MainLoadColumnsPage.UseVisualStyleBackColor = True
             '
             'Panel4
             '
+            Me.Panel4.Controls.Add(Me.FirstLevelRB)
+            Me.Panel4.Controls.Add(Me.FirstDateRB)
+            Me.Panel4.Controls.Add(Me.Label12)
             Me.Panel4.Controls.Add(Me.AllColumnsCB)
             Me.Panel4.Controls.Add(Me.Label14)
             Me.Panel4.Controls.Add(Me.ColumnsCLB)
@@ -505,7 +550,7 @@
             Me.Panel4.Location = New System.Drawing.Point(3, 3)
             Me.Panel4.Margin = New System.Windows.Forms.Padding(0)
             Me.Panel4.Name = "Panel4"
-            Me.Panel4.Size = New System.Drawing.Size(524, 207)
+            Me.Panel4.Size = New System.Drawing.Size(524, 204)
             Me.Panel4.TabIndex = 0
             '
             'AllColumnsCB
@@ -524,14 +569,13 @@
             Me.Label14.Location = New System.Drawing.Point(2, 3)
             Me.Label14.Margin = New System.Windows.Forms.Padding(3)
             Me.Label14.Name = "Label14"
-            Me.Label14.Size = New System.Drawing.Size(142, 13)
+            Me.Label14.Size = New System.Drawing.Size(90, 13)
             Me.Label14.TabIndex = 1
-            Me.Label14.Text = "In bond selection form show:"
+            Me.Label14.Text = "Columns to show:"
             '
             'ColumnsCLB
             '
             Me.ColumnsCLB.FormattingEnabled = True
-            Me.ColumnsCLB.Items.AddRange(New Object() {"Bond name", "Description", "RIC", "Issuer", "Issue date", "Maturity", "Coupon", "Currency", "Next put", "Next call"})
             Me.ColumnsCLB.Location = New System.Drawing.Point(2, 45)
             Me.ColumnsCLB.Name = "ColumnsCLB"
             Me.ColumnsCLB.Size = New System.Drawing.Size(146, 154)
@@ -550,7 +594,7 @@
             Me.MainLogPage.Location = New System.Drawing.Point(4, 22)
             Me.MainLogPage.Name = "MainLogPage"
             Me.MainLogPage.Padding = New System.Windows.Forms.Padding(3)
-            Me.MainLogPage.Size = New System.Drawing.Size(530, 213)
+            Me.MainLogPage.Size = New System.Drawing.Size(530, 210)
             Me.MainLogPage.TabIndex = 0
             Me.MainLogPage.Text = "Logging"
             Me.MainLogPage.UseVisualStyleBackColor = True
@@ -648,44 +692,36 @@
             Me.TheCancelButton.Text = "Cancel"
             Me.TheCancelButton.UseVisualStyleBackColor = True
             '
-            'ClearPointsCheckBox
+            'Label12
             '
-            Me.ClearPointsCheckBox.AutoSize = True
-            Me.ClearPointsCheckBox.Location = New System.Drawing.Point(338, 66)
-            Me.ClearPointsCheckBox.Name = "ClearPointsCheckBox"
-            Me.ClearPointsCheckBox.Size = New System.Drawing.Size(101, 17)
-            Me.ClearPointsCheckBox.TabIndex = 43
-            Me.ClearPointsCheckBox.Text = "Separate bonds"
-            Me.ClearPointsCheckBox.UseVisualStyleBackColor = True
+            Me.Label12.AutoSize = True
+            Me.Label12.Location = New System.Drawing.Point(198, 3)
+            Me.Label12.Name = "Label12"
+            Me.Label12.Size = New System.Drawing.Size(101, 13)
+            Me.Label12.TabIndex = 3
+            Me.Label12.Text = "Rating sorting mode"
             '
-            'Label11
+            'FirstDateRB
             '
-            Label11.AutoSize = True
-            Label11.Location = New System.Drawing.Point(326, 41)
-            Label11.Name = "Label11"
-            Label11.Size = New System.Drawing.Size(148, 13)
-            Label11.TabIndex = 44
-            Label11.Text = "When select a portfolio, clear:"
+            Me.FirstDateRB.AutoSize = True
+            Me.FirstDateRB.Location = New System.Drawing.Point(305, 3)
+            Me.FirstDateRB.Name = "FirstDateRB"
+            Me.FirstDateRB.Size = New System.Drawing.Size(100, 17)
+            Me.FirstDateRB.TabIndex = 4
+            Me.FirstDateRB.TabStop = True
+            Me.FirstDateRB.Text = "Date, then level"
+            Me.FirstDateRB.UseVisualStyleBackColor = True
             '
-            'ClearBondCurvesCheckBox
+            'FirstLevelRB
             '
-            Me.ClearBondCurvesCheckBox.AutoSize = True
-            Me.ClearBondCurvesCheckBox.Location = New System.Drawing.Point(338, 95)
-            Me.ClearBondCurvesCheckBox.Name = "ClearBondCurvesCheckBox"
-            Me.ClearBondCurvesCheckBox.Size = New System.Drawing.Size(86, 17)
-            Me.ClearBondCurvesCheckBox.TabIndex = 43
-            Me.ClearBondCurvesCheckBox.Text = "Bond curves"
-            Me.ClearBondCurvesCheckBox.UseVisualStyleBackColor = True
-            '
-            'ClearOtherCurvesCheckBox
-            '
-            Me.ClearOtherCurvesCheckBox.AutoSize = True
-            Me.ClearOtherCurvesCheckBox.Location = New System.Drawing.Point(338, 126)
-            Me.ClearOtherCurvesCheckBox.Name = "ClearOtherCurvesCheckBox"
-            Me.ClearOtherCurvesCheckBox.Size = New System.Drawing.Size(87, 17)
-            Me.ClearOtherCurvesCheckBox.TabIndex = 43
-            Me.ClearOtherCurvesCheckBox.Text = "Other curves"
-            Me.ClearOtherCurvesCheckBox.UseVisualStyleBackColor = True
+            Me.FirstLevelRB.AutoSize = True
+            Me.FirstLevelRB.Location = New System.Drawing.Point(411, 3)
+            Me.FirstLevelRB.Name = "FirstLevelRB"
+            Me.FirstLevelRB.Size = New System.Drawing.Size(102, 17)
+            Me.FirstLevelRB.TabIndex = 5
+            Me.FirstLevelRB.TabStop = True
+            Me.FirstLevelRB.Text = "Level, then date"
+            Me.FirstLevelRB.UseVisualStyleBackColor = True
             '
             'SettingsForm
             '
@@ -771,5 +807,8 @@
         Friend WithEvents ClearPointsCheckBox As System.Windows.Forms.CheckBox
         Friend WithEvents ClearOtherCurvesCheckBox As System.Windows.Forms.CheckBox
         Friend WithEvents ClearBondCurvesCheckBox As System.Windows.Forms.CheckBox
+        Friend WithEvents FirstLevelRB As System.Windows.Forms.RadioButton
+        Friend WithEvents FirstDateRB As System.Windows.Forms.RadioButton
+        Friend WithEvents Label12 As System.Windows.Forms.Label
     End Class
 End Namespace

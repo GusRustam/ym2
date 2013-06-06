@@ -1,5 +1,4 @@
-﻿Imports System.Globalization
-Imports System.IO
+﻿Imports System.IO
 Imports NLog
 Imports System.Xml
 Imports Uitls
@@ -14,6 +13,7 @@ Public Class SettingsManager
     Public Event FieldsPriorityChanged As Action(Of String)
     Public Event ForbiddenFieldsChanged As Action(Of String)
     Public Event ShowBidAskChanged As Action(Of Boolean)
+    Public Event RatingSortModeChanged As Action(Of Boolean)
 
     Private Shared ReadOnly SettingsPath As String = Path.Combine(Utils.GetMyPath(), "config.xml")
     Private Shared ReadOnly Settings As New XmlDocument
@@ -276,6 +276,17 @@ Public Class SettingsManager
         End Set
     End Property
 
+    Private _ratingSortDate As Boolean = False
+    Public Property RatingSortDate() As Boolean
+        Get
+            Return _ratingSortDate
+        End Get
+        Set(ByVal value As Boolean)
+            SaveValue("/settings/property[@name='rating-sort-date']/@value", value.ToString())
+            _ratingSortDate = value
+            RaiseEvent RatingSortModeChanged(_ratingSortDate)
+        End Set
+    End Property
     Sub New()
         Settings.Load(SettingsPath)
 
@@ -295,6 +306,7 @@ Public Class SettingsManager
         GetBoolValue("/settings/property[@name='clear-points']/@value", _clearPoints)
         GetBoolValue("/settings/property[@name='clear-bond-curves']/@value", _clearBondCurves)
         GetBoolValue("/settings/property[@name='clear-other-curves']/@value", _clearOtherCurves)
+        GetBoolValue("/settings/property[@name='rating-sort-date']/@value", _ratingSortDate)
 
         GetStringValue("/settings/property[@name='fields-priority']/@value", _fieldsPriority)
         GetStringValue("/settings/property[@name='forbidden-fields']/@value", _forbiddenFields)
@@ -316,12 +328,6 @@ Public Class SettingsManager
         Dim val As XmlNode
         val = Settings.SelectSingleNode(address)
         If val IsNot Nothing AndAlso val.Value <> "" Then var = Boolean.Parse(val.Value)
-    End Sub
-
-    Private Shared Sub GetDateValue(ByVal address As String, ByRef var As Date?)
-        Dim val As XmlNode
-        val = Settings.SelectSingleNode(address)
-        If val IsNot Nothing AndAlso val.Value <> "" Then var = Date.ParseExact(var, "yyyyMMdd", CultureInfo.InvariantCulture)
     End Sub
 
     Private Shared Sub GetStringValue(ByVal address As String, ByRef var As String)

@@ -1,4 +1,6 @@
-﻿Namespace Bonds
+﻿Imports Settings
+
+Namespace Bonds
     Public Class RatingSource
         Public Shared SnP As New RatingSource("Standard and Poor's", "S&P", {"S&P", "SPI"})
         Public Shared Moodys As New RatingSource("Moody's Investor Services", "Moody's", {"MDL", "MIS", "MDY"})
@@ -94,6 +96,8 @@
         Public Shared Ca As New Rating(2, {"CC", "Ca"})
         Public Shared C As New Rating(1, {"C"})
         Public Shared Other As New Rating(0, {""})
+
+
 
         Public Shared ReadOnly Property AllRatings(ByVal mode As RatingSource) As List(Of RatingListItem)
             Get
@@ -225,6 +229,28 @@
         Private ReadOnly _ratingDate As Date?
         Private ReadOnly _ratingSource As RatingSource
 
+        Public Enum RatingSortMode
+            DateThenLevel
+            LevelThenDate
+        End Enum
+
+        Private Shared _sortMode As RatingSortMode = RatingSortMode.DateThenLevel
+
+        Public Shared Property SortMode() As RatingSortMode
+            Get
+                Return _sortMode
+            End Get
+            Set(ByVal value As RatingSortMode)
+                _sortMode = value
+            End Set
+        End Property
+
+
+        Private Shared WithEvents _settings As SettingsManager = SettingsManager.Instance
+        Private Shared Sub OnSortMode(ByVal dateFirst As Boolean) Handles _settings.RatingSortModeChanged
+            SortMode = If(dateFirst, RatingSortMode.DateThenLevel, RatingSortMode.LevelThenDate)
+        End Sub
+
         Public Sub New(ByVal rating As Rating, ByVal ratingDate As Date?, ByVal ratingSource As RatingSource)
             _rating = rating
             _ratingDate = ratingDate
@@ -252,45 +278,27 @@
             End Get
         End Property
 
-        Public Shared Operator >(ByVal r1 As RatingDescr, ByVal r2 As RatingDescr) As Boolean
-            If r1 Is Nothing And r2 Is Nothing Then Return True
-            If r1 Is Nothing Then Return True
-            If r2 Is Nothing Then Return False
-
-            If Not r1.RatingDate.HasValue And Not r2.RatingDate.HasValue Then Return True
-            If r1.RatingDate.HasValue And Not r2.RatingDate.HasValue Then Return True
-            If r2.RatingDate.HasValue And Not r1.RatingDate.HasValue Then Return False
-            Return r1.RatingDate.Value > r2.RatingDate.Value
-        End Operator
-
-        Public Shared Operator >=(ByVal r1 As RatingDescr, ByVal r2 As RatingDescr) As Boolean
-            If r1 Is Nothing And r2 Is Nothing Then Return True
-            If r1 Is Nothing Then Return True
-            If r2 Is Nothing Then Return False
-
-            If Not r1.RatingDate.HasValue And Not r2.RatingDate.HasValue Then Return True
-            If r1.RatingDate.HasValue And Not r2.RatingDate.HasValue Then Return True
-            If r2.RatingDate.HasValue And Not r1.RatingDate.HasValue Then Return False
-            Return r1.RatingDate.Value >= r2.RatingDate.Value
-        End Operator
-
-        Public Shared Operator <(ByVal r1 As RatingDescr, ByVal r2 As RatingDescr) As Boolean
-            Return r2 > r1
-        End Operator
-
-        Public Shared Operator <=(ByVal r1 As RatingDescr, ByVal r2 As RatingDescr) As Boolean
-            Return r2 >= r1
-        End Operator
-
         Public Function CompareTo(ByVal obj As Object) As Integer Implements IComparable.CompareTo
             If Not TypeOf obj Is RatingDescr Then Return 1
             Return CompareToo(CType(obj, RatingDescr))
         End Function
 
         Private Function CompareToo(ByVal other As RatingDescr) As Integer
+            If other Is Nothing Then Return 1
             If Me = other Then Return 0
-            If Me > other Then Return 1
-            Return -1
+            If other.Rating = Rating.Other Then Return 1
+            If _sortMode = RatingSortMode.DateThenLevel Then
+                If RatingDate > other.RatingDate Then Return 1
+                If RatingDate < other.RatingDate Then Return -1
+                If Rating > other.Rating Then Return 1
+                If Rating < other.Rating Then Return -1
+            Else
+                If Rating > other.Rating Then Return 1
+                If Rating < other.Rating Then Return -1
+                If RatingDate > other.RatingDate Then Return 1
+                If RatingDate < other.RatingDate Then Return -1
+            End If
+            Return 0
         End Function
 
         Protected Overloads Function Equals(ByVal other As RatingDescr) As Boolean

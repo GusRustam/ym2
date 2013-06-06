@@ -24,6 +24,14 @@ Namespace Forms.PortfolioForm
             End Get
         End Property
 
+        Private WithEvents _settings As SettingsManager = SettingsManager.Instance
+        Private Sub OnSortMode(ByVal dateFirst As Boolean) Handles _settings.RatingSortModeChanged
+            If _bonds.Sorted Then
+                RefreshList()
+                BondListDGV.Columns(_bonds.SortFieldName).HeaderCell.SortGlyphDirection = _bonds.SortOrder
+            End If
+        End Sub
+
         Private Sub BondSelectorFormLoad(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Load
             RefreshList()
             RefreshGrid()
@@ -111,6 +119,13 @@ Namespace Forms.PortfolioForm
         End Function
 
         Private Sub SelectColumnsToolStripMenuItem_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SelectColumnsToolStripMenuItem.Click
+            Dim sf As New SettingsForm
+            sf.MainTabControl.SelectedTab = sf.MainLoadColumnsPage
+            sf.ShowDialog()
+            RefreshColumns()
+        End Sub
+
+        Private Sub SettingsButton_Click(sender As Object, e As EventArgs) Handles SettingsButton.Click
             Dim sf As New SettingsForm
             sf.MainTabControl.SelectedTab = sf.MainLoadColumnsPage
             sf.ShowDialog()

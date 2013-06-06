@@ -37,6 +37,7 @@
             Me.Label2 = New System.Windows.Forms.Label()
             Me.SelectColumnsCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.SelectColumnsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.SettingsButton = New System.Windows.Forms.Button()
             Me.TableLayoutPanel1.SuspendLayout()
             CType(Me.BondListDGV, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.TableLayoutPanel2.SuspendLayout()
@@ -136,9 +137,10 @@
             Me.TableLayoutPanel3.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
             Me.TableLayoutPanel3.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
             Me.TableLayoutPanel3.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+            Me.TableLayoutPanel3.Controls.Add(Me.SettingsButton, 3, 0)
             Me.TableLayoutPanel3.Controls.Add(Me.IssuerTextBox, 1, 0)
             Me.TableLayoutPanel3.Controls.Add(Me.Label1, 0, 0)
-            Me.TableLayoutPanel3.Controls.Add(Me.RICTextBox, 0, 1)
+            Me.TableLayoutPanel3.Controls.Add(Me.RICTextBox, 1, 1)
             Me.TableLayoutPanel3.Controls.Add(Me.Label2, 0, 1)
             Me.TableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill
             Me.TableLayoutPanel3.Location = New System.Drawing.Point(0, 0)
@@ -190,13 +192,24 @@
             '
             Me.SelectColumnsCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SelectColumnsToolStripMenuItem})
             Me.SelectColumnsCMS.Name = "SelectColumnsCMS"
-            Me.SelectColumnsCMS.Size = New System.Drawing.Size(173, 26)
+            Me.SelectColumnsCMS.Size = New System.Drawing.Size(164, 26)
             '
             'SelectColumnsToolStripMenuItem
             '
             Me.SelectColumnsToolStripMenuItem.Name = "SelectColumnsToolStripMenuItem"
-            Me.SelectColumnsToolStripMenuItem.Size = New System.Drawing.Size(172, 22)
+            Me.SelectColumnsToolStripMenuItem.Size = New System.Drawing.Size(163, 22)
             Me.SelectColumnsToolStripMenuItem.Text = "Choose columns..."
+            '
+            'SettingsButton
+            '
+            Me.SettingsButton.Dock = System.Windows.Forms.DockStyle.Right
+            Me.SettingsButton.Location = New System.Drawing.Point(663, 0)
+            Me.SettingsButton.Margin = New System.Windows.Forms.Padding(0)
+            Me.SettingsButton.Name = "SettingsButton"
+            Me.SettingsButton.Size = New System.Drawing.Size(75, 25)
+            Me.SettingsButton.TabIndex = 13
+            Me.SettingsButton.Text = "Settings..."
+            Me.SettingsButton.UseVisualStyleBackColor = True
             '
             'BondSelectorForm
             '
@@ -235,5 +248,6 @@
         Friend WithEvents BondshortnameDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents RicDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents MaturitydateDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
+        Friend WithEvents SettingsButton As System.Windows.Forms.Button
     End Class
 End Namespace

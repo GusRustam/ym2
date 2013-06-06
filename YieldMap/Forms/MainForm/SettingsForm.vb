@@ -87,6 +87,12 @@ Namespace Forms.MainForm
             ClearOtherCurvesCheckBox.Checked = Settings.ClearOtherCurves
             ClearPointsCheckBox.Checked = Settings.ClearPoints
 
+            If Settings.RatingSortDate Then
+                FirstDateRB.Checked = True
+            Else
+                FirstLevelRB.Checked = True
+            End If
+
             Dim selectedFields = Settings.BondSelectorVisibleColumns.Split(",")
             ColumnsCLB.Items.Clear()
             For Each field In BondMetadata.GetHideableFields()
@@ -142,6 +148,8 @@ Namespace Forms.MainForm
             Settings.ClearBondCurves = ClearBondCurvesCheckBox.Checked
             Settings.ClearOtherCurves = ClearOtherCurvesCheckBox.Checked
             Settings.ClearPoints = ClearPointsCheckBox.Checked
+
+            Settings.RatingSortDate = FirstDateRB.Checked
 
             Dim columnsString As String = ""
 

@@ -135,7 +135,7 @@ Namespace Bonds
                 lastIssuerRating = New RatingDescr(Rating.Other, Nothing, Nothing)
             End If
 
-            Dim lastRating = If(lastIssueRating > lastIssuerRating, lastIssueRating, lastIssuerRating)
+            Dim lastRating = If(lastIssueRating.CompareTo(lastIssuerRating) > 0, lastIssueRating, lastIssuerRating)
 
             Return New BondMetadata(ric, sN, sN, maturityDate, coupon,
                                        paymentStructure, rateStructure, issueDate, sN,

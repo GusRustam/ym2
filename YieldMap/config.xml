@@ -15,6 +15,7 @@
   <property name="clear-points" value="False" />
   <property name="clear-bond-curves" value="False" />
   <property name="clear-other-curves" value="False" />
+  <property name="rating-sort-date" value="True" />
   <viewport>
     <yield min="" max="" />
     <spread min="" max="" />
