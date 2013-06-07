@@ -53,7 +53,7 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub TheSettings_ShowPointSizeChanged(ByVal show As Boolean) Handles _theSettings.ShowPointSizeChanged
-            _ansamble.Recalculate()
+            _ansamble.Replot()
         End Sub
 
         Private Sub TheSettings_ShowBidAskChanged(ByVal show As Boolean) Handles _theSettings.ShowBidAskChanged
@@ -61,7 +61,7 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub TheSettings_FieldsPriorityChanged(ByVal list As String) Handles _theSettings.FieldsPriorityChanged
-            _ansamble.Recalculate()
+            _ansamble.Replot()
         End Sub
 
 #Region "II) Form state manipulation"

@@ -15,6 +15,7 @@ Namespace Tools.Elements
         Sub FreezeEvents()
         Sub UnfreezeEvents()
         Sub UnfreezeEventsQuiet()
+        Sub RecalculateTotal()
     End Interface
 
     Public Interface IAswBenchmark
@@ -54,6 +55,7 @@ Namespace Tools.Elements
 
         '' ============ ICHANGEABLE INTERFACE ============
         Public MustOverride Sub Recalculate() Implements IChangeable.Recalculate
+        Public MustOverride Sub RecalculateTotal() Implements IChangeable.RecalculateTotal
         Public MustOverride Sub Recalculate(ByVal ord As IOrdinate) Implements IChangeable.Recalculate
         Public MustOverride ReadOnly Property Name() As String Implements INamed.Name
         Public MustOverride Sub Cleanup() Implements IChangeable.Cleanup

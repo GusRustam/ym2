@@ -128,7 +128,7 @@ Namespace Tools.Elements
                 _enabledElements.Sort()
                 _disabledElements.Sort()
                 _current = New List(Of CurveItem)(items)
-
+                '+ bond.UserDefinedSpread()
                 For Each ord In From q In Ordinate.Spreads Where _ansamble.Benchmarks.HasOrd(q)
                     Dim tmp = ord
                     _spreads(tmp) = New List(Of BondSpreadCurveItem)(
@@ -137,7 +137,7 @@ Namespace Tools.Elements
                         Where mainQuote IsNot Nothing
                         Let vle = tmp.GetValue(mainQuote)
                         Where vle.HasValue
-                        Select New BondSpreadCurveItem(mainQuote.Duration, tmp.GetValue(mainQuote) + bond.UserDefinedSpread(), bond.MetaData.RIC, bond.MetaData.ShortName)
+                        Select New BondSpreadCurveItem(mainQuote.Duration, tmp.GetValue(mainQuote), bond.MetaData.RIC, bond.MetaData.ShortName)
                     )
                     _spreads(tmp).Sort()
                 Next ord
@@ -260,12 +260,12 @@ Namespace Tools.Elements
                 Dim askData = ParseHistoricalItem(rawData, fieldsDescription.Ask, bond)
                 If bidData IsNot Nothing AndAlso askData IsNot Nothing AndAlso bidData.Item1 = askData.Item1 Then
                     Dim mid = (bidData.Item2 + askData.Item2) / 2
-                    HandleQuote(bond, _histFields.XmlName(_histFields.Fields.Mid), mid, bidData.Item1)
+                    HandleNewQuote(bond, _histFields.XmlName(_histFields.Fields.Mid), mid, bidData.Item1)
                 ElseIf (bidData IsNot Nothing Or askData IsNot Nothing) And Not SettingsManager.Instance.MidIfBoth Then
                     If bidData IsNot Nothing Then
-                        HandleQuote(bond, _histFields.XmlName(_histFields.Fields.Mid), bidData.Item2, bidData.Item1)
+                        HandleNewQuote(bond, _histFields.XmlName(_histFields.Fields.Mid), bidData.Item2, bidData.Item1)
                     Else
-                        HandleQuote(bond, _histFields.XmlName(_histFields.Fields.Mid), askData.Item2, askData.Item1)
+                        HandleNewQuote(bond, _histFields.XmlName(_histFields.Fields.Mid), askData.Item2, askData.Item1)
                     End If
                 End If
             End If
@@ -276,37 +276,37 @@ Namespace Tools.Elements
             Dim dates = (From key In datVal.Keys Where IsNumeric(datVal(key))).ToList()
             If dates.Any Then
                 Dim maxdate = dates.Max
-                HandleQuote(bond, _histFields.XmlName(field), datVal(maxdate), maxdate)
+                HandleNewQuote(bond, _histFields.XmlName(field), datVal(maxdate), maxdate)
                 Return Tuple.Create(maxdate, CDbl(rawData(field)(maxdate)))
             End If
             Return Nothing
         End Function
 
+        Public Overrides Sub RecalculateTotal()
+            For Each bnd In AllElements
+                For Each q In bnd.QuotesAndYields
+                    HandleNewQuote(bnd, q, bnd.QuotesAndYields(q).Price, bnd.QuotesAndYields(q).YieldAtDate, False)
+                Next
+            Next
+            Recalculate()
+        End Sub
+
         Public Overrides Sub Recalculate(ByVal ord As IOrdinate)
             ' yield can't be a source for benchmark
             If ord = Yield Then Throw New InvalidOperationException()
-            _lastCurve(Yield) = RecalculateYields()
-            _lastCurve(ord) = RecalculateSpread(ord)
+            '_lastCurve(Yield) = UpdateCurveShape()
+            _lastCurve(ord) = UpdateSpreads(ord)
             NotifyUpdatedSpread(_lastCurve(ord), ord)
         End Sub
 
-        'Protected Overrides Sub UpdateSpreads()
-        '    _lastCurve(Yield) = RecalculateYields()
-        '    For Each ord In From o In Ordinates Where o <> Yield
-        '        _lastCurve(ord) = RecalculateSpread(ord)
-        '    Next
-        '    If _lastCurve.ContainsKey(Ansamble.YSource) Then NotifyUpdated(_lastCurve(Ansamble.YSource))
-        'End Sub
-
-        Private Function RecalculateSpread(ByVal ord As IOrdinate) As List(Of CurveItem)
+        Private Function UpdateSpreads(ByVal ord As IOrdinate) As List(Of CurveItem)
             SetSpread(ord)
-            ' I can't calculate spreads of interpolated curves. It does make sense 'cos interpolated curve is of only XY points 
-            ' I could calculate point spread but would it (I mean troubles) make sence?
+            ' ord.GetValue(q) + q.ParentBond.UserDefinedSpread(ord)
             Dim res = New List(Of CurveItem)(
                         From item In AllElements
                         From quoteName In item.QuotesAndYields
                         Let q = item.QuotesAndYields(quoteName)
-                        Let theY = ord.GetValue(q) + q.ParentBond.UserDefinedSpread(ord)
+                        Let theY = ord.GetValue(q)
                         Where theY.HasValue AndAlso item.QuotesAndYields.Main IsNot Nothing AndAlso quoteName = item.QuotesAndYields.Main.QuoteName
                         Select New PointCurveItem(q.Duration, theY, Me))
             res.Sort()
@@ -314,20 +314,21 @@ Namespace Tools.Elements
         End Function
 
         Public Overrides Sub Recalculate()
-            _lastCurve(Yield) = RecalculateYields()
+            _lastCurve(Yield) = UpdateCurveShape()
+            For Each ord In Spreads
+                _lastCurve(ord) = UpdateSpreads(ord)
+            Next
+
             If Ansamble.YSource = Yield Then
                 NotifyUpdated(_lastCurve(Yield))
-
             ElseIf Ansamble.YSource.Belongs(AswSpread, OaSpread, ZSpread, PointSpread) Then
-                _lastCurve(Ansamble.YSource) = RecalculateSpread(Ansamble.YSource)
-                NotifyUpdated(_lastCurve(Ansamble.YSource))
+                If _lastCurve.ContainsKey(Ansamble.YSource) Then NotifyUpdated(_lastCurve(Ansamble.YSource))
             Else
                 Logger.Warn("Unknown spread type {0}", Ansamble.YSource)
             End If
-            'UpdateSpreads()
         End Sub
 
-        Private Function RecalculateYields() As List(Of CurveItem)
+        Private Function UpdateCurveShape() As List(Of CurveItem)
             Dim result As New List(Of CurveItem)
             If _bootstrapped Then
                 Try
@@ -375,7 +376,7 @@ Namespace Tools.Elements
                             x = (bnd.MetaData.Maturity.Value - Date.Today).Days / 365
                     End Select
 
-                    y = description.Yield + description.ParentBond.UserDefinedSpread(Yield)
+                    y = description.Yield '+ description.ParentBond.UserDefinedSpread(Yield)
                     If x > 0 And y > 0 Then result.Add(New BondCurveItem(x, y, bnd, description.BackColor, description.Yld.ToWhat, description.MarkerStyle, bnd.Label))
                 Next
             End If
@@ -420,6 +421,7 @@ Namespace Tools.Elements
             If Ansamble.Benchmarks.Keys.Contains(ySource) AndAlso Ansamble.Benchmarks(ySource) <> Me Then
                 For Each qy In From item In AllElements From quoteName In item.QuotesAndYields Select item.QuotesAndYields(quoteName)
                     ySource.SetValue(qy, Ansamble.Benchmarks(ySource))
+                    'todo that's why i cant calc spread of approximated curve - I calc spread of points which dont give a fuck about approximations
                 Next
             Else
                 For Each qy In From item In AllElements From quoteName In item.QuotesAndYields Select item.QuotesAndYields(quoteName)
@@ -435,7 +437,7 @@ Namespace Tools.Elements
             Dim len = list.Count - 1
             Dim res(0 To len, 1) As Object
             For i = 0 To len
-                res(i, 0) = DateTime.Today.AddDays(TimeSpan.FromDays(list(i).X * 365).TotalDays) ' todo and wut if mode is maturity?
+                res(i, 0) = DateTime.Today.AddDays(TimeSpan.FromDays(list(i).X * 365).TotalDays)
                 res(i, 1) = list(i).Y
             Next
             Return res

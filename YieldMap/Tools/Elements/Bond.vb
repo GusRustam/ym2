@@ -7,7 +7,6 @@ Namespace Tools.Elements
         Inherits Identifyable
 
         Public Event Changed As Action
-        Public Event SpreadChanged As Action
         Public Event CustomPrice As Action(Of Bond, Double)
 
         Public TodayVolume As Double
@@ -121,7 +120,7 @@ Namespace Tools.Elements
             End Get
             Set(ByVal value As Double)
                 _userDefinedSpread = value
-                RaiseEvent SpreadChanged()
+                RaiseEvent Changed()
             End Set
         End Property
 

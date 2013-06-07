@@ -35,9 +35,13 @@ Namespace Tools.Elements
             AddRics(rics)
         End Sub
 
+        Public Overrides Sub RecalculateTotal()
+            Throw New NotImplementedException()
+        End Sub
+
         Public Overrides Sub Recalculate(ByVal ord As IOrdinate)
-            RecalculateYield()
-            NotifyUpdatedSpread(RecalculateSpread(ord), ord)
+            'UpdatePoints()
+            NotifyUpdatedSpread(UpdateSpreads(ord), ord)
         End Sub
 
         'Protected Overrides Sub UpdateSpreads()
@@ -74,22 +78,29 @@ Namespace Tools.Elements
         End Sub
 
         Public Overrides Sub Recalculate()
+            Dim res As New Dictionary(Of IOrdinate, List(Of CurveItem))
+            res(Yield) = UpdatePoints()
+            For Each ord In Spreads
+                res(ord) = UpdateSpreads(ord)
+            Next
+
             If Ansamble.YSource = Yield Then
-                NotifyUpdated(RecalculateYield())
+                NotifyUpdated(res(Yield))
             ElseIf Ansamble.YSource.Belongs(AswSpread, OaSpread, ZSpread, PointSpread) Then
-                NotifyUpdated(RecalculateSpread(Ansamble.YSource))
+                If res.ContainsKey(Ansamble.YSource) Then NotifyUpdated(res(Ansamble.YSource))
             Else
                 Logger.Warn("Unknown spread type {0}", Ansamble.YSource)
             End If
         End Sub
 
-        Private Function RecalculateSpread(ByVal ordinate As IOrdinate) As List(Of CurveItem)
+        Private Function UpdateSpreads(ByVal ordinate As IOrdinate) As List(Of CurveItem)
             SetSpread(ordinate)
+            ''  ordinate.GetValue(q) + q.ParentBond.UserDefinedSpread(ordinate)
             Dim res = New List(Of CurveItem)(
                         From item In AllElements
                         From quoteName In item.QuotesAndYields
                         Let q = item.QuotesAndYields(quoteName)
-                        Let theY = ordinate.GetValue(q) + q.ParentBond.UserDefinedSpread(ordinate)
+                        Let theY = ordinate.GetValue(q)
                         Where theY.HasValue AndAlso item.QuotesAndYields.Main IsNot Nothing AndAlso quoteName = item.QuotesAndYields.Main.QuoteName
                         Select New BondCurveItem(q.Duration, theY, q.ParentBond,
                                                 q.BackColor, q.Yld.ToWhat, q.MarkerStyle,
@@ -98,7 +109,7 @@ Namespace Tools.Elements
             Return res
         End Function
 
-        Private Function RecalculateYield() As List(Of CurveItem)
+        Private Function UpdatePoints() As List(Of CurveItem)
             Dim result As New List(Of CurveItem)
 
             For Each bnd In Elements
@@ -113,7 +124,7 @@ Namespace Tools.Elements
                         x = (bnd.MetaData.Maturity.Value - Date.Today).Days / 365
                 End Select
 
-                y = description.Yield + bnd.UserDefinedSpread(Yield)
+                y = description.Yield ' + bnd.UserDefinedSpread(Yield)
                 If x > 0 And y > 0 Then result.Add(New BondCurveItem(x, y, bnd, description.BackColor, description.Yld.ToWhat, description.MarkerStyle, bnd.Label))
             Next
             result.Sort()

@@ -182,7 +182,7 @@ Namespace Tools.Elements
                     Dim res As Array = SwapModule.AdAssetSwapBdSpread(settleDate, data.Maturity, rateArray, dscr.Price / 100.0,
                                                                       data.Coupon / 100.0, floatingRate, data.PaymentStructure,
                                                                       floatLegStructure, "ZCTYPE:RATE IM:LIX RM:YC", "")
-                    Return res.GetValue(1, 1)
+                    Return res.GetValue(1, 1) + dscr.ParentBond.UserDefinedSpread(AswSpread)
                 Catch ex As Exception
                     Logger.ErrorException("Failed to calculate ASW Spread", ex)
                     Logger.Error("Exception = {0}", ex.ToString())
@@ -268,7 +268,10 @@ Namespace Tools.Elements
             If dscr.Price > 0 Then
                 Try
                     Dim settleDate = BondModule.BdSettle(DateTime.Today, data.PaymentStructure)
-                    Return BondModule.AdBondSpread(settleDate, rateArray, dscr.Price / 100.0, data.Maturity, data.Coupon / 100.0, data.PaymentStructure, "ZCTYPE:RATE IM:LIX RM:YC", "", "")
+                    Return BondModule.AdBondSpread(settleDate, rateArray, dscr.Price / 100.0,
+                                                   data.Maturity, data.Coupon / 100.0,
+                                                   data.PaymentStructure, "ZCTYPE:RATE IM:LIX RM:YC", "", ""
+                                                  ) + dscr.ParentBond.UserDefinedSpread(ZSpread)
                 Catch ex As Exception
                     Logger.ErrorException("Failed to calculate Z-Spread", ex)
                     Logger.Error("Exception = {0}", ex.ToString())

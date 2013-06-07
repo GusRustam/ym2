@@ -26,7 +26,7 @@
             End Get
             Set(ByVal value As XSource)
                 _xSource = value
-                Recalculate()
+                Replot()
             End Set
         End Property
 
@@ -38,7 +38,7 @@
             Set(ByVal value As OrdinateBase)
                 _ySource = value
                 RaiseEvent Ordinate(value)
-                Recalculate()
+                Replot()
             End Set
         End Property
 
@@ -71,9 +71,9 @@
             End Get
         End Property
 
-        Public Sub Recalculate()
+        Public Sub Replot()
             For Each item In AllItems()
-                item.Recalculate()
+                item.RecalculateTotal()
             Next
         End Sub
 

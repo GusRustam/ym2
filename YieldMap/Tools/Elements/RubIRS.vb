@@ -158,23 +158,30 @@ Namespace Tools.Elements
 
         Public Overrides Sub Recalculate(ByVal ord As IOrdinate)
             If ord = Yield Then Throw New InvalidOperationException()
-            _lastCurve(ord) = RecalculateSpread(ord)
+            _lastCurve(ord) = UpdateSpreads(ord)
             NotifyUpdatedSpread(_lastCurve(ord), ord)
         End Sub
 
         Public Overrides Sub Recalculate()
-            _lastCurve(Yield) = RecalculateYield()
+            _lastCurve(Yield) = UpdatePoints()
+            For Each ord In Spreads
+                _lastCurve(ord) = UpdateSpreads(ord)
+            Next
+
             If Ansamble.YSource = Yield Then
                 NotifyUpdated(_lastCurve(Yield))
             ElseIf Ansamble.YSource.Belongs(AswSpread, OaSpread, ZSpread, PointSpread) Then
-                _lastCurve(Ansamble.YSource) = RecalculateSpread(Ansamble.YSource)
-                NotifyUpdated(_lastCurve(Ansamble.YSource))
+                If _lastCurve.ContainsKey(Ansamble.YSource) Then NotifyUpdated(_lastCurve(Ansamble.YSource))
             Else
                 Logger.Warn("Unknown spread type {0}", Ansamble.YSource)
             End If
         End Sub
 
-        Private Function RecalculateSpread(ByVal ordinate As IOrdinate) As List(Of CurveItem)
+        Public Overrides Sub RecalculateTotal()
+            Recalculate()
+        End Sub
+
+        Private Function UpdateSpreads(ByVal ordinate As IOrdinate) As List(Of CurveItem)
             SetSpread(ordinate)
             Dim res = New List(Of CurveItem)(From item In Descrs
                                              Let theY = ordinate.GetValue(item)
@@ -184,7 +191,7 @@ Namespace Tools.Elements
             Return res
         End Function
 
-        Private Function RecalculateYield() As List(Of CurveItem)
+        Private Function UpdatePoints() As List(Of CurveItem)
             Dim result As New List(Of CurveItem)
             If _bootstrapped Then
                 Try
@@ -533,6 +540,7 @@ Namespace Tools.Elements
         Protected Overrides Property AllowedTenors() As String() = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "20", "25", "30"}
         Protected Overrides Property Brokers() As String() = {"TRDL", "ICAP", ""}
         Protected Overrides Property BaseInstrument As String = "USD3MFSR="
+
 
         Public Overrides ReadOnly Property OuterColor() As Color
             Get

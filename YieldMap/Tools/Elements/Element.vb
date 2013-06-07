@@ -182,6 +182,7 @@ Namespace Tools.Elements
             Logger.Trace("Coupon: {0}, settleDate: {1}, maturity: {2}", coupon, settleDate, dscr.Maturity)
             Dim bondYield As Array = _bondModule.AdBondYield(settleDate, price / 100, dscr.Maturity, coupon, dscr.PaymentStructure, dscr.RateStructure, "")
             Dim bestYield = ParseBondYield(bondYield).Max
+            bestYield.Yield += ParentBond.UserDefinedSpread(Ordinate.Yield)
             Logger.Trace("best Yield: {0}", bestYield)
 
             ' todo no best yield! (or else, best yield and other yields too), and todo modified duration

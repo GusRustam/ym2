@@ -22,6 +22,7 @@ Namespace Tools.Elements
         Public Event UpdatedSpread As Action(Of List(Of CurveItem), IOrdinate)
 
         Public MustOverride Sub Recalculate() Implements IChangeable.Recalculate
+        Public MustOverride Sub RecalculateTotal() Implements IChangeable.RecalculateTotal
         Public MustOverride Sub Recalculate(ByVal ord As IOrdinate) Implements IChangeable.Recalculate
         'Protected MustOverride Sub UpdateSpreads()
 
@@ -145,7 +146,7 @@ Namespace Tools.Elements
                         If BondFields.IsPriceByName(fieldName) AndAlso fieldsAndValues(fieldName) > 0 Then
                             Dim fieldValue = fieldsAndValues(fieldName)
                             Try
-                                HandleQuote(bond, BondFields.XmlName(fieldName), fieldValue, Date.Today)
+                                HandleNewQuote(bond, BondFields.XmlName(fieldName), fieldValue, Date.Today)
                                 Dim bid = BondFields.Fields.Bid
                                 Dim ask = BondFields.Fields.Ask
                                 If fieldName.Belongs(bid, ask) Then
@@ -170,7 +171,7 @@ Namespace Tools.Elements
                                         End If
                                     End If
 
-                                    If midPrice > 0 Then HandleQuote(bond, BondFields.XmlName(BondFields.Fields.Mid), midPrice, Date.Today)
+                                    If midPrice > 0 Then HandleNewQuote(bond, BondFields.XmlName(BondFields.Fields.Mid), midPrice, Date.Today)
                                 End If
                             Catch ex As Exception
                                 Logger.WarnException("Failed to plot the point", ex)
@@ -185,15 +186,21 @@ Namespace Tools.Elements
             Next
         End Sub
 
-        Protected Sub HandleQuote(ByRef bond As Bond, ByVal xmlName As String, ByVal fieldVal As Double?, ByVal calcDate As Date)
-            Dim descr As New BondPointDescription(xmlName)
-            descr.BackColor = BondFields.Fields.BackColor(xmlName)
-            descr.MarkerStyle = BondFields.Fields.MarkerStyle(xmlName)
-            descr.ParentBond = bond
-            descr.Yield(calcDate) = fieldVal
+        Protected Sub HandleNewQuote(ByRef bond As Bond, ByVal xmlName As String, ByVal fieldVal As Double?, ByVal calcDate As Date, Optional _
+                                        ByVal recalc As Boolean = True)
+            If Not bond.QuotesAndYields.Contains(xmlName) Then
+                Dim descr As New BondPointDescription(xmlName)
+                descr.BackColor = BondFields.Fields.BackColor(xmlName)
+                descr.MarkerStyle = BondFields.Fields.MarkerStyle(xmlName)
+                descr.ParentBond = bond
+                descr.Yield(calcDate) = fieldVal ' we won't calc right here
 
-            bond.QuotesAndYields(xmlName) = descr
-            Recalculate()
+                bond.QuotesAndYields(xmlName) = descr
+            Else
+                bond.QuotesAndYields(xmlName).Yield(calcDate) = fieldVal
+            End If
+
+            If recalc Then Recalculate()
         End Sub
 
         Public Function HasRic(ByVal instrument As String) As Boolean
@@ -205,8 +212,7 @@ Namespace Tools.Elements
                 Dim descr = BondsData.Instance.GetBondInfo(ric)
                 If descr IsNot Nothing Then
                     Dim bond = New Bond(Me, descr)
-                    AddHandler bond.Changed, Sub() If Not _eventsFrozen Then Recalculate()
-                    AddHandler bond.SpreadChanged, Sub() If Not _eventsFrozen Then Recalculate() ' UpdateSpreads()
+                    AddHandler bond.Changed, Sub() If Not _eventsFrozen Then RecalculateTotal()
                     AddHandler bond.CustomPrice, AddressOf OnCustomCustomPrice
                     _elements.Add(bond)
                 Else
@@ -215,9 +221,8 @@ Namespace Tools.Elements
             Next
         End Sub
 
-
         Private Sub OnCustomCustomPrice(ByVal bond As Bond, ByVal price As Double)
-            HandleQuote(bond, BondFields.XmlName(bond.Fields.Custom), price, Today)
+            HandleNewQuote(bond, BondFields.XmlName(bond.Fields.Custom), price, Today)
         End Sub
 
         Protected Sub New(ByVal ansamble As Ansamble)
