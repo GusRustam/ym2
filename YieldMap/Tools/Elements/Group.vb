@@ -14,12 +14,17 @@ Namespace Tools.Elements
         Inherits Identifyable
         Implements IChangeable
 
+        Protected Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(Group))
+
         Public Event Cleared As Action Implements IChangeable.Cleared
         Public Event Volume As Action(Of Bond)
         Public Event Updated As Action(Of List(Of CurveItem))
         Public Event UpdatedSpread As Action(Of List(Of CurveItem), IOrdinate)
 
-        Protected Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(Group))
+        Public MustOverride Sub Recalculate() Implements IChangeable.Recalculate
+        Public MustOverride Sub Recalculate(ByVal ord As IOrdinate) Implements IChangeable.Recalculate
+        'Protected MustOverride Sub UpdateSpreads()
+
 
         Public YieldMode As String ' todo currently unused
 
@@ -33,9 +38,6 @@ Namespace Tools.Elements
         Friend BondFields As FieldContainer
         Public PortfolioID As Long
 
-        Public MustOverride Sub Recalculate() Implements IChangeable.Recalculate
-        Public MustOverride Sub Recalculate(ByVal ord As IOrdinate) Implements IChangeable.Recalculate
-        Protected MustOverride Sub RecalculateWithSpread()
 
         Private ReadOnly _ansamble As Ansamble
         Public ReadOnly Property Ansamble() As Ansamble
@@ -204,7 +206,7 @@ Namespace Tools.Elements
                 If descr IsNot Nothing Then
                     Dim bond = New Bond(Me, descr)
                     AddHandler bond.Changed, Sub() If Not _eventsFrozen Then Recalculate()
-                    AddHandler bond.SpreadChanged, Sub() If Not _eventsFrozen Then RecalculateWithSpread()
+                    AddHandler bond.SpreadChanged, Sub() If Not _eventsFrozen Then Recalculate() ' UpdateSpreads()
                     AddHandler bond.CustomPrice, AddressOf OnCustomCustomPrice
                     _elements.Add(bond)
                 Else

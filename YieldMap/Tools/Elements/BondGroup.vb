@@ -36,30 +36,30 @@ Namespace Tools.Elements
         End Sub
 
         Public Overrides Sub Recalculate(ByVal ord As IOrdinate)
+            RecalculateYield()
             NotifyUpdatedSpread(RecalculateSpread(ord), ord)
         End Sub
 
-        Protected Overrides Sub RecalculateWithSpread()
-            'RecalculateYield()
-            Dim res As List(Of CurveItem)
-            'this is fuckingly poor code. This must be moved into ordinate
-            For Each ord In Ordinates
-                If ord <> Yield Then
-                    If ord = Ansamble.YSource Then
-                        res = RecalculateSpread(ord)
-                    Else
-                        RecalculateSpread(ord)
-                    End If
-                Else
-                    If ord = Ansamble.YSource Then
-                        res = RecalculateYield()
-                    Else
-                        RecalculateYield()
-                    End If
-                End If
-            Next
-            If res IsNot Nothing Then NotifyUpdated(res)
-        End Sub
+        'Protected Overrides Sub UpdateSpreads()
+        '    Dim res As List(Of CurveItem)
+        '    'this is fuckingly poor code. This must be moved into ordinate or wut?
+        '    For Each ord In Ordinates
+        '        If ord <> Yield Then
+        '            If ord = Ansamble.YSource Then
+        '                res = RecalculateSpread(ord)
+        '            Else
+        '                RecalculateSpread(ord)
+        '            End If
+        '        Else
+        '            If ord = Ansamble.YSource Then
+        '                res = RecalculateYield()
+        '            Else
+        '                RecalculateYield()
+        '            End If
+        '        End If
+        '    Next
+        '    If res IsNot Nothing Then NotifyUpdated(res)
+        'End Sub
 
         Public Sub SetSpread(ByVal ySource As OrdinateBase)
             If Ansamble.Benchmarks.Keys.Contains(ySource) AndAlso Ansamble.Benchmarks(ySource) <> Me Then

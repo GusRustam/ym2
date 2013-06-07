@@ -83,6 +83,16 @@ Namespace Tools.Elements
                 End Function
             End Class
 
+            Private ReadOnly _ansamble As Ansamble
+
+            Private ReadOnly _spreads As New Dictionary(Of IOrdinate, List(Of BondSpreadCurveItem))
+
+            Public ReadOnly Property Spreads() As Dictionary(Of IOrdinate, List(Of BondSpreadCurveItem))
+                Get
+                    Return _spreads
+                End Get
+            End Property
+
             Private ReadOnly _current As List(Of CurveItem)
             Public ReadOnly Property Current() As List(Of CurveItem)
                 Get
@@ -104,7 +114,8 @@ Namespace Tools.Elements
                 End Get
             End Property
 
-            Public Sub New(ByVal bonds As List(Of Bond), ByVal items As List(Of CurveItem))
+            Public Sub New(ByVal bonds As List(Of Bond), ByVal items As List(Of CurveItem), ByVal ansamble As Ansamble)
+                _ansamble = Ansamble
                 For Each bond In bonds
                     Dim mainQuote = bond.QuotesAndYields.Main
                     If mainQuote Is Nothing Then Continue For
@@ -117,6 +128,19 @@ Namespace Tools.Elements
                 _enabledElements.Sort()
                 _disabledElements.Sort()
                 _current = New List(Of CurveItem)(items)
+
+                For Each ord In From q In Ordinate.Spreads Where _ansamble.Benchmarks.HasOrd(q)
+                    Dim tmp = ord
+                    _spreads(tmp) = New List(Of BondSpreadCurveItem)(
+                        From bond In bonds
+                        Let mainQuote = bond.QuotesAndYields.Main
+                        Where mainQuote IsNot Nothing
+                        Let vle = tmp.GetValue(mainQuote)
+                        Where vle.HasValue
+                        Select New BondSpreadCurveItem(mainQuote.Duration, tmp.GetValue(mainQuote) + bond.UserDefinedSpread(), bond.MetaData.RIC, bond.MetaData.ShortName)
+                    )
+                    _spreads(tmp).Sort()
+                Next ord
             End Sub
         End Class
 
@@ -261,17 +285,18 @@ Namespace Tools.Elements
         Public Overrides Sub Recalculate(ByVal ord As IOrdinate)
             ' yield can't be a source for benchmark
             If ord = Yield Then Throw New InvalidOperationException()
+            _lastCurve(Yield) = RecalculateYields()
             _lastCurve(ord) = RecalculateSpread(ord)
             NotifyUpdatedSpread(_lastCurve(ord), ord)
         End Sub
 
-        Protected Overrides Sub RecalculateWithSpread()
-            _lastCurve(Yield) = RecalculateYields()
-            For Each ord In From o In Ordinates Where o <> Yield
-                _lastCurve(ord) = RecalculateSpread(ord)
-            Next
-            If _lastCurve.ContainsKey(Ansamble.YSource) Then NotifyUpdated(_lastCurve(Ansamble.YSource))
-        End Sub
+        'Protected Overrides Sub UpdateSpreads()
+        '    _lastCurve(Yield) = RecalculateYields()
+        '    For Each ord In From o In Ordinates Where o <> Yield
+        '        _lastCurve(ord) = RecalculateSpread(ord)
+        '    Next
+        '    If _lastCurve.ContainsKey(Ansamble.YSource) Then NotifyUpdated(_lastCurve(Ansamble.YSource))
+        'End Sub
 
         Private Function RecalculateSpread(ByVal ord As IOrdinate) As List(Of CurveItem)
             SetSpread(ord)
@@ -299,6 +324,7 @@ Namespace Tools.Elements
             Else
                 Logger.Warn("Unknown spread type {0}", Ansamble.YSource)
             End If
+            'UpdateSpreads()
         End Sub
 
         Private Function RecalculateYields() As List(Of CurveItem)
@@ -376,7 +402,7 @@ Namespace Tools.Elements
         Public Function GetSnapshot() As BondCurveSnapshot
             If Not _lastCurve.ContainsKey(Yield) Then Return Nothing
             ' todo add spreads to snapshot /?
-            Return New BondCurveSnapshot(AllElements, _lastCurve(Yield))
+            Return New BondCurveSnapshot(AllElements, _lastCurve(Yield), Ansamble)
         End Function
 
         Public Sub SetFitMode(ByVal mode As String)

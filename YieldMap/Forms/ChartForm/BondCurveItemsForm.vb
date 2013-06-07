@@ -23,7 +23,20 @@ Namespace Forms.ChartForm
         End Property
 
         Private Sub OnCurveUpdatedSpread(ByVal arg1 As List(Of CurveItem), ByVal arg2 As IOrdinate)
-            'todo
+            'Dim pg As TabPage = Nothing
+            'For Each page In From page1 As Object In MainTC.TabPages Where TypeOf (page1.tag) Is IOrdinate AndAlso CType(page1.tag, IOrdinate).Equals(arg2)
+            '    pg = page
+            '    Exit For
+            'Next
+            'If pg Is Nothing Then
+            '    CreatePage(arg2, arg1)
+            'Else
+            '    Dim ctl = pg.Controls(arg2.NameProperty + "_DGV")
+            '    If ctl Is Nothing Then Return
+            '    Dim dgv = CType(ctl, DataGridView)
+            '    dgv.DataSource = arg1
+            'End If
+            CurveUpdate()
         End Sub
 
         Private Sub CurveUpdate()
@@ -32,12 +45,33 @@ Namespace Forms.ChartForm
                 BondsDGV.DataSource = curveSnapshot.EnabledElements
                 CurrentDGV.DataSource = curveSnapshot.Current
                 FormulaTB.Text = Curve.Formula
+                Dim i As Integer = 0
+                Do
+                    If MainTC.TabPages(i).Tag IsNot Nothing Then
+                        MainTC.TabPages.RemoveAt(i)
+                    Else
+                        i = i + 1
+                    End If
+                Loop While i < MainTC.TabPages.Count
+                For Each key In curveSnapshot.Spreads.Keys
+                    CreatePage(key, curveSnapshot.Spreads(key))
+                Next
             Else
                 BondsDGV.DataSource = Nothing
                 CurrentDGV.DataSource = Nothing
                 FormulaTB.Text = ""
             End If
             ResetEnabled()
+        End Sub
+
+        Private Sub CreatePage(key As IOrdinate, data As List(Of BondSpreadCurveItem))
+            Dim pg As New TabPage(key.DescrProperty) With {.Tag = key}
+            Dim dgv As New DataGridView With {.Name = key.NameProperty + "_DGV"}
+            dgv.DataSource = data
+            pg.Controls.Add(dgv)
+            dgv.Dock = DockStyle.Fill
+            MainTC.TabPages.Add(pg)
+            MainTC.SelectedTab = pg
         End Sub
 
         Private Sub ResetEnabled()
@@ -65,8 +99,6 @@ Namespace Forms.ChartForm
             Dim frm As New AddBondCurveItemsForm
             frm.Curve = Curve
             frm.ShowDialog()
-            ' todo 3) спреды
-            ' todo 5) сделать контекстное меню группы и бондовой кривой в легенде
         End Sub
 
         Private Sub RemoveItemsTSB_Click(ByVal sender As Object, ByVal e As EventArgs) Handles RemoveItemsTSB.Click

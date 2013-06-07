@@ -17,6 +17,7 @@ Namespace Tools.Elements
         Implements IEquatable(Of OrdinateBase)
         Protected ReadOnly BondModule As AdxBondModule = Eikon.Sdk.CreateAdxBondModule()
         Public MustOverride Sub SetValue(ByVal bpd As BasePointDescription, ByVal curve As ICurve, Optional ByVal val As Double? = Nothing) Implements IOrdinate.SetValue
+        Public MustOverride Function GetValue(ByVal bpd As BasePointDescription) As Double? Implements IOrdinate.GetValue
         Public MustOverride Sub ClearValue(ByVal bpd As BasePointDescription) Implements IOrdinate.ClearValue
         Protected ReadOnly Name As String
         Protected ReadOnly Descr As String
@@ -63,7 +64,6 @@ Namespace Tools.Elements
             End Get
         End Property
 
-        Public MustOverride Function GetValue(ByVal bpd As BasePointDescription) As Double? Implements IOrdinate.GetValue
 
         Protected Sub New(ByVal name As String, ByVal descr As String)
             Me.Name = name
@@ -314,6 +314,8 @@ Namespace Tools.Elements
 
         Public ReadOnly Ordinates As ReadOnlyCollection(Of OrdinateBase) = _
             New ReadOnlyCollection(Of OrdinateBase)({Yield, PointSpread, AswSpread, ZSpread, OaSpread}.ToList())
+        Public ReadOnly Spreads As ReadOnlyCollection(Of OrdinateBase) = _
+            New ReadOnlyCollection(Of OrdinateBase)({PointSpread, AswSpread, ZSpread, OaSpread}.ToList())
 
         Public Function FromString(ByVal name As String) As OrdinateBase
             Dim res = (From item In Ordinates Where item.NameProperty = name).ToList

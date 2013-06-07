@@ -212,7 +212,7 @@ Namespace Forms.ChartForm
             Dim newItem2 As ToolStripMenuItem = ExtInfoTSMI.DropDownItems.Add("Set spread...")
             AddHandler newItem2.Click,
                        Sub(sender1 As Object, e1 As EventArgs)
-                           Dim res = InputBox("Enter spread in b.p.", "Custom bond spread")
+                           Dim res = InputBox("Enter spread in b.p.", "Custom bond spread", If(bondDataPoint.UserDefinedSpread > 0, bondDataPoint.UserDefinedSpread, ""))
                            If IsNumeric(res) Then
                                bondDataPoint.UserDefinedSpread = res
                            ElseIf res <> "" Then

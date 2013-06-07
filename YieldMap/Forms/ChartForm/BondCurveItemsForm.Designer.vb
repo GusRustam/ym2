@@ -129,7 +129,7 @@
             Me.CurrentTP.Location = New System.Drawing.Point(4, 22)
             Me.CurrentTP.Name = "CurrentTP"
             Me.CurrentTP.Padding = New System.Windows.Forms.Padding(3)
-            Me.CurrentTP.Size = New System.Drawing.Size(659, 445)
+            Me.CurrentTP.Size = New System.Drawing.Size(659, 395)
             Me.CurrentTP.TabIndex = 1
             Me.CurrentTP.Text = "Current representation"
             Me.CurrentTP.UseVisualStyleBackColor = True
@@ -141,7 +141,7 @@
             Me.CurrentDGV.Location = New System.Drawing.Point(3, 3)
             Me.CurrentDGV.Name = "CurrentDGV"
             Me.CurrentDGV.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-            Me.CurrentDGV.Size = New System.Drawing.Size(653, 439)
+            Me.CurrentDGV.Size = New System.Drawing.Size(653, 389)
             Me.CurrentDGV.TabIndex = 0
             '
             'FormulaTB

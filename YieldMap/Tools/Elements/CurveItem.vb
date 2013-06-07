@@ -3,16 +3,16 @@ Imports System.ComponentModel
 Namespace Tools.Elements
     Public MustInherit Class CurveItem
         Implements IComparable(Of CurveItem)
-        Private ReadOnly _x As Double
-        Private ReadOnly _y As Double
+        Protected ReadOnly _x As Double
+        Protected ReadOnly _y As Double
 
-        Public ReadOnly Property X() As String
+        Public Overridable ReadOnly Property X() As String
             Get
                 Return String.Format("{0:F2}", _x)
             End Get
         End Property
 
-        Public ReadOnly Property Y() As String
+        Public Overridable ReadOnly Property Y() As String
             Get
                 Return String.Format("{0:P2}", _y)
             End Get
@@ -141,5 +141,40 @@ Namespace Tools.Elements
             MyBase.New(x, y)
             _curve = curve
         End Sub
+    End Class
+
+    Public Class BondSpreadCurveItem
+        Inherits CurveItem
+        Private ReadOnly _ric As String
+        Private ReadOnly _name As String
+
+        Public ReadOnly Property RIC() As String
+            Get
+                Return _ric
+            End Get
+        End Property
+
+        Public ReadOnly Property Name() As String
+            Get
+                Return _name
+            End Get
+        End Property
+
+        Public Sub New(ByVal x As Double, ByVal y As Double, ByVal ric As String, ByVal name As String)
+            MyBase.New(x, y)
+            _ric = ric
+            _name = name
+        End Sub
+        Public Overrides ReadOnly Property X() As String
+            Get
+                Return String.Format("{0:F2}", _x)
+            End Get
+        End Property
+
+        Public Overrides ReadOnly Property Y() As String
+            Get
+                Return String.Format("{0:N2}", _y)
+            End Get
+        End Property
     End Class
 End Namespace
