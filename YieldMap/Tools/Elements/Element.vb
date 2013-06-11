@@ -177,7 +177,7 @@ Namespace Tools.Elements
             Dim dscr = ParentBond.MetaData
             Logger.Trace("CalculateYields({0}, {1})", Price, dscr.RIC)
 
-            Dim coupon = BondsData.Instance.GetBondPayments(dscr.RIC).GetCoupon(YieldAtDate)
+            Dim coupon = ParentBond.Coupon(YieldAtDate)
             Dim settleDate = _bondModule.BdSettle(YieldAtDate, dscr.PaymentStructure)
             Logger.Trace("Coupon: {0}, settleDate: {1}, maturity: {2}", coupon, settleDate, dscr.Maturity)
             Dim bondYield As Array = _bondModule.AdBondYield(settleDate, price / 100, dscr.Maturity, coupon, dscr.PaymentStructure, dscr.RateStructure, "")

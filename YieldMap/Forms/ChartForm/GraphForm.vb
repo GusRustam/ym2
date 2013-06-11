@@ -558,7 +558,7 @@ Namespace Forms.ChartForm
             Logger.Debug("RubCCSTSMIClick()")
             Dim rubCCS = New RubCCS(_ansamble)
 
-            AddHandler rubCCS.Cleared, Sub() OnSwapCurveRemoved(rubCCS)
+            AddHandler rubCCS.Cleared, Sub() ClearSeries(rubCCS.Identity)
             AddHandler rubCCS.Updated, Sub(data As List(Of CurveItem)) OnSwapCurvePaint(data, rubCCS)
             AddHandler rubCCS.UpdatedSpread, Sub(data As List(Of CurveItem), ord As IOrdinate) If _ansamble.YSource = ord Then OnSwapCurvePaint(data, rubCCS)
 
@@ -569,7 +569,7 @@ Namespace Forms.ChartForm
         Private Sub RubIRS_TSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles RubIRSTSMI.Click
             Logger.Debug("RubIRSTSMIClick()")
             Dim rubIRS = New RubIRS(_ansamble)
-            AddHandler rubIRS.Cleared, Sub() OnSwapCurveRemoved(rubIRS)
+            AddHandler rubIRS.Cleared, Sub() ClearSeries(rubIRS.Identity)
             AddHandler rubIRS.Updated, Sub(data As List(Of CurveItem)) OnSwapCurvePaint(data, rubIRS)
             AddHandler rubIRS.UpdatedSpread, Sub(data As List(Of CurveItem), ord As IOrdinate) If _ansamble.YSource = ord Then OnSwapCurvePaint(data, rubIRS)
 
@@ -580,7 +580,7 @@ Namespace Forms.ChartForm
         Private Sub UsdIRS_TSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles UsdIRSTSMI.Click
             Logger.Debug("UsdIRS_TSMIClick()")
             Dim usdIRS = New UsdIRS(_ansamble)
-            AddHandler usdIRS.Cleared, Sub() OnSwapCurveRemoved(usdIRS)
+            AddHandler usdIRS.Cleared, Sub() ClearSeries(usdIRS.Identity)
             AddHandler usdIRS.Updated, Sub(data As List(Of CurveItem)) OnSwapCurvePaint(data, usdIRS)
             AddHandler usdIRS.UpdatedSpread, Sub(data As List(Of CurveItem), ord As IOrdinate) If _ansamble.YSource = ord Then OnSwapCurvePaint(data, usdIRS)
 
@@ -591,7 +591,7 @@ Namespace Forms.ChartForm
         Private Sub NDFTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles NDFTSMI.Click
             Logger.Debug("NDFTSMI_Click()")
             Dim rubNDF = New RubNDF(_ansamble)
-            AddHandler rubNDF.Cleared, Sub() OnSwapCurveRemoved(rubNDF)
+            AddHandler rubNDF.Cleared, Sub() ClearSeries(rubNDF.Identity)
             AddHandler rubNDF.Updated, Sub(data As List(Of CurveItem)) OnSwapCurvePaint(data, rubNDF)
             AddHandler rubNDF.UpdatedSpread, Sub(data As List(Of CurveItem), ord As IOrdinate) If _ansamble.YSource = ord Then OnSwapCurvePaint(data, rubNDF)
 
@@ -836,10 +836,6 @@ Namespace Forms.ChartForm
 #End Region
 
 #Region "e) Assembly and curves events"
-        Private Sub OnGroupClear(ByVal group As Identifyable) Handles _ansamble.GroupCleared, _ansamble.SwapCleared
-            ClearSeries(group.Identity)
-        End Sub
-
         Private Sub ClearSeries(ByVal id As Long)
             Logger.Trace("ClearSeries({0})", id)
             GuiAsync(
@@ -856,6 +852,8 @@ Namespace Forms.ChartForm
                             .Remove(.First(Function(elem) elem.Tag = id))
                         End While
                     End With
+
+                    SetChartMinMax()
                 End Sub)
         End Sub
 

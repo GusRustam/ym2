@@ -1,14 +1,35 @@
 Imports AdfinXAnalyticsFunctions
 Imports System.ComponentModel
+Imports DbManager.Bonds
 Imports DbManager
 Imports Settings
 Imports Uitls
 Imports ReutersData
 
 Namespace Tools.Elements
+    Public Class SyntheticZcb
+        Inherits Bond
+        Public Sub New(ByVal parent As Group, ByVal metaData As BondMetadata)
+            MyBase.New(parent, metaData)
+        End Sub
+
+        Public Overrides ReadOnly Property Coupon(ByVal dt As Date) As Object
+            Get
+                Return 0
+            End Get
+        End Property
+    End Class
+
     Public Class BondCurve
         Inherits Group
         Implements ICurve
+
+        Private Const ZcbPmtStructure As String = _
+           "ACC:A5 IC:L1 CLDR:RUS_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY FRQ:ZERO " &
+           "PX:CLEAN REFDATE:MATURITY YM:DISCA5 ISSUE:01JAN2013"
+
+        Private ReadOnly _bondModule As AdxBondModule = New AdxBondModule
+        Private ReadOnly _curveModule As AdxYieldCurveModule = New AdxYieldCurveModule
 
         Public Class BondCurveSnapshot
             ''' <summary>
@@ -115,7 +136,7 @@ Namespace Tools.Elements
             End Property
 
             Public Sub New(ByVal bonds As List(Of Bond), ByVal items As List(Of CurveItem), ByVal ansamble As Ansamble)
-                _ansamble = Ansamble
+                _ansamble = ansamble
                 For Each bond In bonds
                     Dim mainQuote = bond.QuotesAndYields.Main
                     If mainQuote Is Nothing Then Continue For
@@ -161,6 +182,7 @@ Namespace Tools.Elements
 
         ' Last curve snapshot
         Private ReadOnly _lastCurve As New Dictionary(Of IOrdinate, List(Of CurveItem))
+        Private _lastSyntCurve As List(Of SyntheticZcb)
 
         Private _formula As String
         Public ReadOnly Property Formula() As String
@@ -168,6 +190,22 @@ Namespace Tools.Elements
                 Return _formula
             End Get
         End Property
+
+        Public ReadOnly Property IsSynthetic() As Boolean
+            Get
+                Return _bootstrapped OrElse _estModel IsNot Nothing
+            End Get
+        End Property
+
+        Private Function GetSyntBond(dur As Double, yield As Double) As SyntheticZcb
+            Dim mat = _curveDate.AddDays(dur * 365)
+            Dim bond = New SyntheticZcb(Me, New BondMetadata(String.Format("ZCB {0:N2}", dur), mat, 0, ZcbPmtStructure, "RM:YTM", Name))
+            Dim settleDate = _bondModule.BdSettle(_curveDate, ZcbPmtStructure)
+            Dim priceObject As Array = _bondModule.AdBondPrice(settleDate, yield, mat, 0, 0, ZcbPmtStructure, "RM:YTM", "", "RES:BDPRICE")
+            AddHandler bond.CustomPrice, Sub(bnd, prc) HandleNewQuote(bnd, BondFields.XmlName(bond.Fields.Custom), prc, _curveDate, False)
+            bond.SetCustomPrice(100 * priceObject.GetValue(1))
+            Return bond
+        End Function
 
         Private _bootstrapped As Boolean
 
@@ -294,14 +332,18 @@ Namespace Tools.Elements
         Public Overrides Sub Recalculate(ByVal ord As IOrdinate)
             ' yield can't be a source for benchmark
             If ord = Yield Then Throw New InvalidOperationException()
-            '_lastCurve(Yield) = UpdateCurveShape()
-            _lastCurve(ord) = UpdateSpreads(ord)
-            NotifyUpdatedSpread(_lastCurve(ord), ord)
+            If IsSynthetic Then
+                UpdateSyntSpreads(_lastSyntCurve, ord)
+                NotifyUpdatedSpread(ExtractPoints(_lastSyntCurve, ord), ord)
+            Else
+                _lastCurve(ord) = UpdateSpreads(ord)
+                NotifyUpdatedSpread(_lastCurve(ord), ord)
+            End If
+
         End Sub
 
         Private Function UpdateSpreads(ByVal ord As IOrdinate) As List(Of CurveItem)
             SetSpread(ord)
-            ' ord.GetValue(q) + q.ParentBond.UserDefinedSpread(ord)
             Dim res = New List(Of CurveItem)(
                         From item In AllElements
                         From quoteName In item.QuotesAndYields
@@ -315,16 +357,45 @@ Namespace Tools.Elements
 
         Public Overrides Sub Recalculate()
             _lastCurve(Yield) = UpdateCurveShape()
-            For Each ord In Spreads
-                _lastCurve(ord) = UpdateSpreads(ord)
-            Next
-
-            If Ansamble.YSource = Yield Then
-                NotifyUpdated(_lastCurve(Yield))
-            ElseIf Ansamble.YSource.Belongs(AswSpread, OaSpread, ZSpread, PointSpread) Then
-                If _lastCurve.ContainsKey(Ansamble.YSource) Then NotifyUpdated(_lastCurve(Ansamble.YSource))
+            If IsSynthetic Then
+                _lastSyntCurve = (From item In _lastCurve(Yield) Select GetSyntBond(item.TheX, item.TheY)).ToList()
+                For Each ord In Spreads
+                    UpdateSyntSpreads(_lastSyntCurve, ord)
+                Next
+                NotifyUpdated(ExtractPoints(_lastSyntCurve, Ansamble.YSource))
             Else
-                Logger.Warn("Unknown spread type {0}", Ansamble.YSource)
+                _lastSyntCurve = Nothing
+                For Each ord In Spreads
+                    _lastCurve(ord) = UpdateSpreads(ord)
+                Next
+                If Ansamble.YSource = Yield Then
+                    NotifyUpdated(_lastCurve(Yield))
+                ElseIf Ansamble.YSource.Belongs(AswSpread, OaSpread, ZSpread, PointSpread) Then
+                    If _lastCurve.ContainsKey(Ansamble.YSource) Then NotifyUpdated(_lastCurve(Ansamble.YSource))
+                Else
+                    Logger.Warn("Unknown spread type {0}", Ansamble.YSource)
+                End If
+            End If
+        End Sub
+
+        Private Function ExtractPoints(ByVal crv As List(Of SyntheticZcb), ByVal ord As OrdinateBase) As List(Of CurveItem)
+            Return (From item In crv
+                    From quoteName In item.QuotesAndYields
+                    Let m = item.QuotesAndYields(quoteName)
+                    Let vl = ord.GetValue(m)
+                    Where vl.HasValue
+                    Select New PointCurveItem(m.Duration, ord.GetValue(m), Me)).Cast(Of CurveItem).ToList
+        End Function
+
+        Private Sub UpdateSyntSpreads(ByVal crv As List(Of SyntheticZcb), ByVal ord As OrdinateBase)
+            If Ansamble.Benchmarks.Keys.Contains(ord) AndAlso Ansamble.Benchmarks(ord) <> Me Then
+                For Each qy In From item In crv From quoteName In item.QuotesAndYields Select item.QuotesAndYields(quoteName)
+                    ord.SetValue(qy, Ansamble.Benchmarks(ord))
+                Next
+            Else
+                For Each qy In From item In crv From quoteName In item.QuotesAndYields Select item.QuotesAndYields(quoteName)
+                    ord.ClearValue(qy)
+                Next
             End If
         End Sub
 
@@ -340,23 +411,32 @@ Namespace Tools.Elements
                     Dim params(0 To data.Count() - 1, 5) As Object
                     For i = 0 To data.Count - 1
                         Dim meta = data(i).MetaData
+                        Dim main As BondPointDescription = data(i).QuotesAndYields.Main
                         params(i, 0) = "B"
                         params(i, 1) = _curveDate
                         params(i, 2) = meta.Maturity
                         params(i, 3) = meta.GetCouponByDate(_curveDate)
-                        params(i, 4) = data(i).QuotesAndYields.Main.Price / 100.0
+
+                        ' incorporating spread
+                        If data(i).UserDefinedSpread(Yield) > 0 Then
+                            Dim settleDate = _bondModule.BdSettle(_curveDate, meta.PaymentStructure)
+                            Dim priceObject As Array = _bondModule.AdBondPrice(settleDate, main.Yield + data(i).UserDefinedSpread(Yield),
+                                                                              meta.Maturity, params(i, 3), 0, meta.PaymentStructure,
+                                                                              meta.RateStructure, "", "RES:BDPRICE")
+                            params(i, 4) = priceObject.GetValue(1)
+                        Else
+                            params(i, 4) = main.Price / 100.0
+                        End If
+
                         params(i, 5) = meta.PaymentStructure
                     Next
-                    Dim curveModule = New AdxYieldCurveModule
 
-                    Dim termStructure As Array = curveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
+                    Dim termStructure As Array = _curveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
                     For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
                         Dim matDate = Utils.FromExcelSerialDate(termStructure.GetValue(i, 1))
                         Dim dur = (matDate - _curveDate).TotalDays / 365.0
-                        Dim yld = termStructure.GetValue(i, 2) + data(i).UserDefinedSpread(Yield)
-                        If dur > 0 And yld > 0 Then
-                            result.Add(New PointCurveItem(dur, yld, Me))
-                        End If
+                        Dim yld = termStructure.GetValue(i, 2)
+                        If dur > 0 And yld > 0 Then result.Add(New PointCurveItem(dur, yld, Me))
                     Next
                 Catch ex As Exception
                     Logger.ErrorException("Failed to bootstrap", ex)
@@ -376,7 +456,7 @@ Namespace Tools.Elements
                             x = (bnd.MetaData.Maturity.Value - Date.Today).Days / 365
                     End Select
 
-                    y = description.Yield '+ description.ParentBond.UserDefinedSpread(Yield)
+                    y = description.Yield
                     If x > 0 And y > 0 Then result.Add(New BondCurveItem(x, y, bnd, description.BackColor, description.Yld.ToWhat, description.MarkerStyle, bnd.Label))
                 Next
             End If
@@ -402,7 +482,6 @@ Namespace Tools.Elements
 
         Public Function GetSnapshot() As BondCurveSnapshot
             If Not _lastCurve.ContainsKey(Yield) Then Return Nothing
-            ' todo add spreads to snapshot /?
             Return New BondCurveSnapshot(AllElements, _lastCurve(Yield), Ansamble)
         End Function
 
@@ -421,7 +500,6 @@ Namespace Tools.Elements
             If Ansamble.Benchmarks.Keys.Contains(ySource) AndAlso Ansamble.Benchmarks(ySource) <> Me Then
                 For Each qy In From item In AllElements From quoteName In item.QuotesAndYields Select item.QuotesAndYields(quoteName)
                     ySource.SetValue(qy, Ansamble.Benchmarks(ySource))
-                    'todo that's why i cant calc spread of approximated curve - I calc spread of points which dont give a fuck about approximations
                 Next
             Else
                 For Each qy In From item In AllElements From quoteName In item.QuotesAndYields Select item.QuotesAndYields(quoteName)
@@ -443,4 +521,4 @@ Namespace Tools.Elements
             Return res
         End Function
     End Class
-End NameSpace
+End Namespace

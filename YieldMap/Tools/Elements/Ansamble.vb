@@ -1,8 +1,6 @@
 ﻿Namespace Tools.Elements
     Public Class Ansamble
         Private Shared ReadOnly Identities As New HashSet(Of Long)
-        Public Event GroupCleared As Action(Of Group)
-        Public Event SwapCleared As Action(Of SwapCurve)
         Public Event Ordinate As Action(Of IOrdinate)
 
         Public Shared Sub ReleaseID(ByVal id As Long)
@@ -75,14 +73,6 @@
             For Each item In AllItems()
                 item.RecalculateTotal()
             Next
-        End Sub
-
-        Private Sub GroupsCleared(ByVal obj As Group) Handles _items.Cleared
-            RaiseEvent GroupCleared(obj)
-        End Sub
-
-        Private Sub SwapCurveCleared(ByVal obj As SwapCurve) Handles _swapCurves.Cleared
-            RaiseEvent SwapCleared(obj)
         End Sub
 
         Public Sub Cleanup()

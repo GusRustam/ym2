@@ -70,6 +70,12 @@ Namespace Tools.Elements
             End Sub
         End Class
 
+        Public Overridable ReadOnly Property Coupon(ByVal dt As Date)
+            Get
+                Return BondsData.Instance.GetBondPayments(MetaData.RIC).GetCoupon(dt)
+            End Get
+        End Property
+
         Private ReadOnly _quotesAndYields As New QyContainer(Me)
         Public ReadOnly Property QuotesAndYields As QyContainer
             Get

@@ -63,7 +63,7 @@ Namespace Tools.Elements
             If Ansamble.YSource <> Yield Then Recalculate(Ansamble.YSource)
         End Sub
 
-        Protected Sub NotifyUpdated(ByVal curveItems As List(Of CurveItem))
+        Protected Overridable Sub NotifyUpdated(ByVal curveItems As List(Of CurveItem))
             If Not _eventsFrozen Then RaiseEvent Updated(curveItems)
         End Sub
 

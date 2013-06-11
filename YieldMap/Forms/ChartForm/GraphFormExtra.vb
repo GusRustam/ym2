@@ -465,12 +465,6 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
-        Public Sub OnSwapCurveRemoved(ByVal crv As SwapCurve)
-            Dim srs = TheChart.Series.FindByName(crv.Identity)
-            If srs IsNot Nothing Then TheChart.Series.Remove(srs)
-            SetChartMinMax()
-        End Sub
-
         Private Sub OnSwapCurvePaint(ByVal data As List(Of CurveItem), ByVal crv As SwapCurve)
             GuiAsync(
                 Sub()
