@@ -23,19 +23,6 @@ Namespace Forms.ChartForm
         End Property
 
         Private Sub OnCurveUpdatedSpread(ByVal arg1 As List(Of CurveItem), ByVal arg2 As IOrdinate)
-            'Dim pg As TabPage = Nothing
-            'For Each page In From page1 As Object In MainTC.TabPages Where TypeOf (page1.tag) Is IOrdinate AndAlso CType(page1.tag, IOrdinate).Equals(arg2)
-            '    pg = page
-            '    Exit For
-            'Next
-            'If pg Is Nothing Then
-            '    CreatePage(arg2, arg1)
-            'Else
-            '    Dim ctl = pg.Controls(arg2.NameProperty + "_DGV")
-            '    If ctl Is Nothing Then Return
-            '    Dim dgv = CType(ctl, DataGridView)
-            '    dgv.DataSource = arg1
-            'End If
             CurveUpdate()
         End Sub
 
@@ -56,12 +43,12 @@ Namespace Forms.ChartForm
                 For Each key In From k In curveSnapshot.Spreads.Keys Where curveSnapshot.Spreads(k).Any
                     CreatePage(key, curveSnapshot.Spreads(key))
                 Next
+                ResetEnabled()
             Else
                 BondsDGV.DataSource = Nothing
                 CurrentDGV.DataSource = Nothing
                 FormulaTB.Text = ""
             End If
-            ResetEnabled()
         End Sub
 
         Private Sub CreatePage(key As IOrdinate, data As List(Of BondSpreadCurveItem))

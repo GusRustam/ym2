@@ -4,6 +4,7 @@ Imports System.Drawing
 Imports AdfinXAnalyticsFunctions
 Imports System.ComponentModel
 Imports System.IO
+Imports System.Threading
 Imports YieldMap.Tools.Elements
 Imports YieldMap.Forms.PortfolioForm
 Imports Settings
@@ -978,6 +979,17 @@ Namespace Forms.ChartForm
             For Each bnd In GetBonds()
                 bnd.LabelMode = LabelMode.SeriesOnly
             Next
+        End Sub
+
+        Private Sub BondCurveTSMI_DropDownOpening(sender As Object, e As EventArgs) Handles BondCurveTSMI.DropDownOpened
+            If BondCMS.Tag Is Nothing Then Return
+
+            Dim a = New Thread(New ThreadStart(Sub() GuiAsync(Sub()
+                                                                  XxxToolStripMenuItem.PerformClick()
+                                                                  BondCurveCMS.Tag = CType(BondCMS.Tag, Bond).Parent.Identity
+                                                                  BondCurveCMS.Show(MousePosition)
+                                                              End Sub)))
+            a.Start()
         End Sub
     End Class
 End Namespace

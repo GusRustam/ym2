@@ -220,14 +220,14 @@ Namespace Tools.Elements
         End Property
 
         Private Function GetSyntBond(dur As Double, yield As Double) As SyntheticZcb
-            Dim mat = _curveDate.AddDays(dur * 365)
+            Dim mat = _curveDate.AddDays(dur * 365 / (1 + yield * dur))
             Dim paymentStructure As String = ZcbPmtStructure
             Dim bond = New SyntheticZcb(Me, New BondMetadata(String.Format("ZCB {0:N2}", dur), mat, 0, paymentStructure, "RM:YTM", Name))
             Dim settleDate = _bondModule.BdSettle(_curveDate, paymentStructure)
             Dim priceObject As Array = _bondModule.AdBondPrice(settleDate, yield, mat, 0, 0, paymentStructure, "RM:YTM", "", "RES:BDPRICE")
             AddHandler bond.CustomPrice, Sub(bnd, prc) HandleNewQuote(bnd, BondFields.XmlName(bond.Fields.Custom), prc, _curveDate, False)
             bond.SetCustomPrice(100 * priceObject.GetValue(1))
-            bond.QuotesAndYields.Main.Duration = dur 'hack
+            'bond.QuotesAndYields.Main.Duration = dur ' todo its a hack. i have to calculate
             Return bond
         End Function
 
