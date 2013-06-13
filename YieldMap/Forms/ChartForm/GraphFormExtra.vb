@@ -438,12 +438,8 @@ Namespace Forms.ChartForm
                     series.SmartLabelStyle.AllowOutsidePlotArea = LabelOutsidePlotAreaStyle.No
                     TheChart.Series.Add(series)
 
-                    Dim legendItems = TheChart.Legends(0).CustomItems
-                    While legendItems.Any(Function(item) item.Tag = group.Identity)
-                        legendItems.Remove(legendItems.First(Function(item) item.Tag = group.Identity))
-                    End While
-                    Dim legendItem = New LegendItem(group.Name, clr, "") With {.Tag = group.Identity}
-                    legendItems.Add(legendItem)
+                    ClearLegendItems(group.Identity)
+                    TheChart.Legends(0).CustomItems.Add(New LegendItem(group.Name, clr, "") With {.Tag = group.Identity})
 
                     For Each pnt In dt
                         Dim point = New DataPoint(pnt.TheX, pnt.TheY) With {
@@ -485,12 +481,8 @@ Namespace Forms.ChartForm
                         .markerSize = 4
                     }
                     TheChart.Series.Add(srs)
-                    Dim legendItems = TheChart.Legends(0).CustomItems
-                    While legendItems.Any(Function(item) item.Tag = crv.Identity)
-                        legendItems.Remove(legendItems.First(Function(item) item.Tag = crv.Identity))
-                    End While
-                    Dim legendItem = New LegendItem(crv.Name, crv.OuterColor, "") With {.Tag = crv.Identity}
-                    legendItems.Add(legendItem)
+                    ClearLegendItems(crv.Identity)
+                    TheChart.Legends(0).CustomItems.Add(New LegendItem(crv.Name, crv.OuterColor, "") With {.Tag = crv.Identity})
 
                     For Each pnt In From point In data Select New DataPoint(point.TheX, point.TheY) With {.Tag = crv}
                         srs.Points.Add(pnt)
@@ -527,12 +519,8 @@ Namespace Forms.ChartForm
                         .Tag = crv.Identity
                     }
                     TheChart.Series.Add(srs)
-                    Dim legendItems = TheChart.Legends(0).CustomItems
-                    While legendItems.Any(Function(item) item.Tag = crv.Identity)
-                        legendItems.Remove(legendItems.First(Function(item) item.Tag = crv.Identity))
-                    End While
-                    Dim legendItem = New LegendItem(crv.Name, clr, "") With {.Tag = crv.Identity}
-                    legendItems.Add(legendItem)
+                    ClearLegendItems(crv.Identity)
+                    TheChart.Legends(0).CustomItems.Add(New LegendItem(crv.Name, clr, "") With {.Tag = crv.Identity})
 
                     If itsBond Then
                         For Each point In data.Cast(Of BondCurveItem)()
@@ -552,5 +540,11 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
+        Private Sub ClearLegendItems(ByVal id As Long)
+            Dim legendItems = TheChart.Legends(0).CustomItems
+            While legendItems.Any(Function(item) item.Tag = id)
+                legendItems.Remove(legendItems.First(Function(item) item.Tag = id))
+            End While
+        End Sub
     End Class
 End Namespace

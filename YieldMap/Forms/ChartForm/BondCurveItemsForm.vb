@@ -53,7 +53,7 @@ Namespace Forms.ChartForm
                         i = i + 1
                     End If
                 Loop While i < MainTC.TabPages.Count
-                For Each key In curveSnapshot.Spreads.Keys
+                For Each key In From k In curveSnapshot.Spreads.Keys Where curveSnapshot.Spreads(k).Any
                     CreatePage(key, curveSnapshot.Spreads(key))
                 Next
             Else
@@ -75,8 +75,8 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub ResetEnabled()
-            AddItemsTSB.Enabled = MainTC.SelectedTab.Name = BondsTP.Name AndAlso Curve.DisabledElements.Any
-            RemoveItemsTSB.Enabled = MainTC.SelectedTab.Name = BondsTP.Name
+            AddItemsTSB.Enabled = MainTC.SelectedTab.Name = BondsTP.Name AndAlso Curve.DisabledElements.Any AndAlso Not Curve.IsSynthetic
+            RemoveItemsTSB.Enabled = MainTC.SelectedTab.Name = BondsTP.Name AndAlso Not Curve.IsSynthetic
         End Sub
 
         Private Sub OnCurveUpdated(ByVal obj As List(Of CurveItem))

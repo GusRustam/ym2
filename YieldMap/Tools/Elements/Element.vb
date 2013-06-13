@@ -150,6 +150,8 @@ Namespace Tools.Elements
         Public MarkerStyle As String
 
         Private ReadOnly _quoteName As String
+        Private _modDuration As Double
+        Private _averageLife As Double
 
         Sub New(ByVal quoteName As String)
             _quoteName = quoteName
@@ -180,7 +182,7 @@ Namespace Tools.Elements
             Dim coupon = ParentBond.Coupon(YieldAtDate)
             Dim settleDate = _bondModule.BdSettle(YieldAtDate, dscr.PaymentStructure)
             Logger.Trace("Coupon: {0}, settleDate: {1}, maturity: {2}", coupon, settleDate, dscr.Maturity)
-            Dim bondYield As Array = _bondModule.AdBondYield(settleDate, price / 100, dscr.Maturity, coupon, dscr.PaymentStructure, dscr.RateStructure, "")
+            Dim bondYield As Array = _bondModule.AdBondYield(settleDate, Price / 100, dscr.Maturity, coupon, dscr.PaymentStructure, dscr.RateStructure, "")
             Dim bestYield = ParseBondYield(bondYield).Max
             bestYield.Yield += ParentBond.UserDefinedSpread(Ordinate.Yield)
             Logger.Trace("best Yield: {0}", bestYield)
@@ -188,13 +190,43 @@ Namespace Tools.Elements
             ' todo no best yield! (or else, best yield and other yields too), and todo modified duration
 
             Dim bondDeriv As Array = _bondModule.AdBondDeriv(settleDate, bestYield.Yield, dscr.Maturity, coupon, 0, dscr.PaymentStructure, Regex.Replace(dscr.RateStructure, "YT[A-Z]", bestYield.ToWhat.Abbr), "", "")
+            ' 1. Price                 - Price of the bond
+            ' 2. Option Free Price     - Option free price of the bond
+            ' 3. Volatility            - Modified Duration of the bond (see Modified Duration), or its price sensitivity to movements in yield. 
+            '                            This is only a measure of fixed income sensitivity, and should not be confused with volatility in the 
+            '                            sense of option pricing, or volatility of a random market price.
+            ' 4. PVBP                  - Price variation per basis point (see PVBP)
+            ' 5. Duration              - Duration (see Duration)
+            ' 6. Average(Life)         - Average life (see Average Life)
+            ' 7. Convexity             - Convexity (see Convexity)
+            ' 8. YTW/YTB date          - Yield to worst/yield to best date
 
-            Duration = bondDeriv.GetValue(1, 5)
-            Convexity = bondDeriv.GetValue(1, 7)
+            ModDuration = bondDeriv.GetValue(1, 3)
             PVBP = bondDeriv.GetValue(1, 4)
+            Duration = bondDeriv.GetValue(1, 5)
+            AverageLife = bondDeriv.GetValue(1, 6)
+            Convexity = bondDeriv.GetValue(1, 7)
 
             Yld = bestYield
         End Sub
+
+        Public Property AverageLife() As Double
+            Get
+                Return _averageLife
+            End Get
+            Set(ByVal value As Double)
+                _averageLife = value
+            End Set
+        End Property
+
+        Public Property ModDuration() As Double
+            Get
+                Return _modDuration
+            End Get
+            Set(ByVal value As Double)
+                _modDuration = value
+            End Set
+        End Property
 
         Public Overrides Sub ClearYield()
             Yld = New YieldStructure()

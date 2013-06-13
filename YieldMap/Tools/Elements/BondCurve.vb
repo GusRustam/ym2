@@ -24,9 +24,21 @@ Namespace Tools.Elements
         Inherits Group
         Implements ICurve
 
-        Private Const ZcbPmtStructure As String = _
+        Private Const ZcbPmtStructureTemplate As String = _
            "ACC:A5 IC:L1 CLDR:RUS_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY FRQ:ZERO " &
-           "PX:CLEAN REFDATE:MATURITY YM:DISCA5 ISSUE:01JAN2013"
+           "PX:CLEAN REFDATE:MATURITY YM:DISCA5 ISSUE:{0}"
+
+        Private ReadOnly Property ZcbPmtStructure As String
+            Get
+                Return String.Format(ZcbPmtStructureTemplate, ReutersDate.DateToReuters(_curveDate))
+            End Get
+        End Property
+
+        Private ReadOnly Property ZcbPmtStructure(dt As Date) As String
+            Get
+                Return String.Format(ZcbPmtStructureTemplate, ReutersDate.DateToReuters(dt))
+            End Get
+        End Property
 
         Private ReadOnly _bondModule As AdxBondModule = New AdxBondModule
         Private ReadOnly _curveModule As AdxYieldCurveModule = New AdxYieldCurveModule
@@ -129,15 +141,25 @@ Namespace Tools.Elements
             End Property
 
             Private ReadOnly _enabledElements As New List(Of BondCurveElement)
+            Private ReadOnly _synthetic As Boolean
+
             Public ReadOnly Property EnabledElements() As List(Of BondCurveElement)
                 Get
                     Return _enabledElements
                 End Get
             End Property
 
-            Public Sub New(ByVal bonds As List(Of Bond), ByVal items As List(Of CurveItem), ByVal ansamble As Ansamble)
+            Public ReadOnly Property Synthetic As Boolean
+                Get
+                    Return _synthetic
+                End Get
+            End Property
+
+            Public Sub New(ByVal bonds As List(Of Bond), ByVal items As List(Of CurveItem), ByVal syntCurve As List(Of SyntheticZcb), ByVal ansamble As Ansamble)
                 _ansamble = ansamble
-                For Each bond In bonds
+                _synthetic = syntCurve IsNot Nothing
+                Dim lst = If(syntCurve IsNot Nothing, syntCurve.Cast(Of Bond).ToList(), bonds)
+                For Each bond In lst
                     Dim mainQuote = bond.QuotesAndYields.Main
                     If mainQuote Is Nothing Then Continue For
                     If bond.Enabled Then
@@ -149,11 +171,11 @@ Namespace Tools.Elements
                 _enabledElements.Sort()
                 _disabledElements.Sort()
                 _current = New List(Of CurveItem)(items)
-                '+ bond.UserDefinedSpread()
+
                 For Each ord In From q In Ordinate.Spreads Where _ansamble.Benchmarks.HasOrd(q)
                     Dim tmp = ord
                     _spreads(tmp) = New List(Of BondSpreadCurveItem)(
-                        From bond In bonds
+                        From bond In lst
                         Let mainQuote = bond.QuotesAndYields.Main
                         Where mainQuote IsNot Nothing
                         Let vle = tmp.GetValue(mainQuote)
@@ -199,16 +221,17 @@ Namespace Tools.Elements
 
         Private Function GetSyntBond(dur As Double, yield As Double) As SyntheticZcb
             Dim mat = _curveDate.AddDays(dur * 365)
-            Dim bond = New SyntheticZcb(Me, New BondMetadata(String.Format("ZCB {0:N2}", dur), mat, 0, ZcbPmtStructure, "RM:YTM", Name))
-            Dim settleDate = _bondModule.BdSettle(_curveDate, ZcbPmtStructure)
-            Dim priceObject As Array = _bondModule.AdBondPrice(settleDate, yield, mat, 0, 0, ZcbPmtStructure, "RM:YTM", "", "RES:BDPRICE")
+            Dim paymentStructure As String = ZcbPmtStructure
+            Dim bond = New SyntheticZcb(Me, New BondMetadata(String.Format("ZCB {0:N2}", dur), mat, 0, paymentStructure, "RM:YTM", Name))
+            Dim settleDate = _bondModule.BdSettle(_curveDate, paymentStructure)
+            Dim priceObject As Array = _bondModule.AdBondPrice(settleDate, yield, mat, 0, 0, paymentStructure, "RM:YTM", "", "RES:BDPRICE")
             AddHandler bond.CustomPrice, Sub(bnd, prc) HandleNewQuote(bnd, BondFields.XmlName(bond.Fields.Custom), prc, _curveDate, False)
             bond.SetCustomPrice(100 * priceObject.GetValue(1))
+            bond.QuotesAndYields.Main.Duration = dur 'hack
             Return bond
         End Function
 
         Private _bootstrapped As Boolean
-
         Public ReadOnly Property CanBootstrap() As Boolean Implements ICurve.CanBootstrap
             Get
                 Return True
@@ -482,7 +505,7 @@ Namespace Tools.Elements
 
         Public Function GetSnapshot() As BondCurveSnapshot
             If Not _lastCurve.ContainsKey(Yield) Then Return Nothing
-            Return New BondCurveSnapshot(AllElements, _lastCurve(Yield), Ansamble)
+            Return New BondCurveSnapshot(AllElements, _lastCurve(Yield), _lastSyntCurve, Ansamble)
         End Function
 
         Public Sub SetFitMode(ByVal mode As String)
