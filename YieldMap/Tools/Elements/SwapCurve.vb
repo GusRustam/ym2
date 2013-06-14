@@ -1,50 +1,16 @@
 Imports System.Drawing
 
 Namespace Tools.Elements
-    Public Interface INamed
-        ReadOnly Property Name As String
-    End Interface
-
-    Public Interface IChangeable
-        Inherits INamed
-        Event Cleared As Action
-        Sub Cleanup()
-        Sub Recalculate()
-        Sub Recalculate(ByVal ord As IOrdinate)
-        Sub Subscribe()
-        Sub FreezeEvents()
-        Sub UnfreezeEvents()
-        Sub UnfreezeEventsQuiet()
-        Sub RecalculateTotal()
-    End Interface
-
-    Public Interface IAswBenchmark
-        Function CanBeBenchmark() As Boolean
-
-        ReadOnly Property FloatLegStructure() As String
-        ReadOnly Property FloatingPointValue() As Double
-    End Interface
-
-    Public Interface ICurve
-        Inherits INamed
-        ReadOnly Property CanBootstrap() As Boolean
-        Property Bootstrapped() As Boolean
-        Property CurveDate() As Date
-        Sub Bootstrap()
-
-        Sub ClearSpread(ByVal ySource As OrdinateBase)
-        Sub SetSpread(ByVal ySource As OrdinateBase)
-        Function RateArray() As Array
-    End Interface
-
     Public MustInherit Class SwapCurve
         Inherits Identifyable
         Implements ICurve, IChangeable
 
+        '' ============ EVENTS ============
         Public Event Cleared As Action Implements IChangeable.Cleared
-        Public Event Updated As Action(Of List(Of CurveItem))
-        Public Event UpdatedSpread As Action(Of List(Of CurveItem), IOrdinate)
+        Public Event Updated As Action(Of List(Of CurveItem)) Implements IChangeable.Updated
+        Public Event UpdatedSpread As Action(Of List(Of CurveItem), IOrdinate) Implements IChangeable.UpdatedSpread
 
+        '' ============ OWN METHODS ============
         Private ReadOnly _ansamble As Ansamble
 
         Public ReadOnly Property Ansamble() As Ansamble
@@ -53,20 +19,11 @@ Namespace Tools.Elements
             End Get
         End Property
 
-        '' ============ ICHANGEABLE INTERFACE ============
-        Public MustOverride Sub Recalculate() Implements IChangeable.Recalculate
-        Public MustOverride Sub RecalculateTotal() Implements IChangeable.RecalculateTotal
-        Public MustOverride Sub Recalculate(ByVal ord As IOrdinate) Implements IChangeable.Recalculate
-        Public MustOverride ReadOnly Property Name() As String Implements INamed.Name
-        Public MustOverride Sub Cleanup() Implements IChangeable.Cleanup
-        Public MustOverride Sub Subscribe() Implements IChangeable.Subscribe
-
-        Private _eventsFrozen As Boolean
-
         Sub New(ByVal ansamble As Ansamble)
             _ansamble = ansamble
         End Sub
 
+        Private _eventsFrozen As Boolean
         Public Sub FreezeEvents() Implements IChangeable.FreezeEvents
             _eventsFrozen = True
         End Sub
@@ -81,6 +38,26 @@ Namespace Tools.Elements
             If Ansamble.YSource <> Yield Then Recalculate(_ansamble.YSource)
         End Sub
 
+        Protected Sub NotifyCleanup()
+            RaiseEvent Cleared()
+        End Sub
+
+        Protected Sub NotifyUpdated(ByVal data As List(Of CurveItem))
+            If Not _eventsFrozen Then RaiseEvent Updated(data)
+        End Sub
+
+        Protected Sub NotifyUpdatedSpread(ByVal data As List(Of CurveItem), ByVal ord As IOrdinate)
+            If Not _eventsFrozen Then RaiseEvent UpdatedSpread(data, ord)
+        End Sub
+
+        '' ============ ICHANGEABLE INTERFACE ============
+        Public MustOverride Sub Recalculate() Implements IChangeable.Recalculate
+        Public MustOverride Sub RecalculateTotal() Implements IChangeable.RecalculateTotal
+        Public MustOverride Sub Recalculate(ByVal ord As IOrdinate) Implements IChangeable.Recalculate
+        Public MustOverride ReadOnly Property Name() As String Implements INamed.Name
+        Public MustOverride Sub Cleanup() Implements IChangeable.Cleanup
+        Public MustOverride Sub Subscribe() Implements IChangeable.Subscribe
+
         '' ============ ICURVE INTERFACE ============
         Public MustOverride Property CurveDate() As Date Implements ICurve.CurveDate
         Public MustOverride ReadOnly Property CanBootstrap() As Boolean Implements ICurve.CanBootstrap
@@ -89,6 +66,7 @@ Namespace Tools.Elements
         Public MustOverride Sub ClearSpread(ByVal ySource As OrdinateBase) Implements ICurve.ClearSpread
         Public MustOverride Sub SetSpread(ByVal ySource As OrdinateBase) Implements ICurve.SetSpread
         Public MustOverride Function RateArray() As Array Implements ICurve.RateArray
+        Public MustOverride ReadOnly Property IsSynthetic() As Boolean Implements ICurve.IsSynthetic
 
         '' ============ BROKERS ============
         Public MustOverride Function GetBrokers() As String()
@@ -106,18 +84,5 @@ Namespace Tools.Elements
 
         '' ============ DESCRIPTIONS ============
         Public MustOverride Function GetSnapshot() As List(Of Tuple(Of String, String, Double?, Double))
-
-        Protected Sub NotifyCleanup()
-            RaiseEvent Cleared()
-        End Sub
-
-        Protected Sub NotifyUpdated(ByVal data As List(Of CurveItem))
-            If Not _eventsFrozen Then RaiseEvent Updated(data)
-        End Sub
-
-        Protected Sub NotifyUpdatedSpread(ByVal data As List(Of CurveItem), ByVal ord As IOrdinate)
-            If Not _eventsFrozen Then RaiseEvent UpdatedSpread(data, ord)
-        End Sub
-
     End Class
 End Namespace

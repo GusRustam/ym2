@@ -18,8 +18,8 @@ Namespace Tools.Elements
 
         Public Event Cleared As Action Implements IChangeable.Cleared
         Public Event Volume As Action(Of Bond)
-        Public Event Updated As Action(Of List(Of CurveItem))
-        Public Event UpdatedSpread As Action(Of List(Of CurveItem), IOrdinate)
+        Public Event Updated As Action(Of List(Of CurveItem)) Implements IChangeable.Updated
+        Public Event UpdatedSpread As Action(Of List(Of CurveItem), IOrdinate) Implements IChangeable.UpdatedSpread
 
         Public MustOverride Sub Recalculate() Implements IChangeable.Recalculate
         Public MustOverride Sub RecalculateTotal() Implements IChangeable.RecalculateTotal

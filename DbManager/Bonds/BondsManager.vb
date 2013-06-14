@@ -89,7 +89,7 @@ Namespace Bonds
             Dim descr As BondsDataSet.BondRow = items.First()
 
             Dim coupon = If(Not IsDBNull(descr("currentCoupon")) AndAlso IsNumeric(descr.currentCoupon), CDbl(descr.currentCoupon), 0)
-            Dim maturityDate As Date = If(Not IsDBNull(descr("maturityDate")) AndAlso IsDate(descr.maturityDate), CDate(descr.maturityDate), Nothing)
+            Dim maturityDate As Date? = If(Not IsDBNull(descr("maturityDate")) AndAlso IsDate(descr.maturityDate), CDate(descr.maturityDate), Nothing)
             Dim issueDate As Date = If(Not IsDBNull(descr("issueDate")) AndAlso IsDate(descr.issueDate), CDate(descr.issueDate), Date.MinValue)
             Dim series = If(Not IsDBNull(descr("series")), descr.series, "")
             Dim rateStructure = If(Not IsDBNull(descr("rateStructure")), descr.rateStructure, "")
@@ -137,10 +137,9 @@ Namespace Bonds
 
             Dim lastRating = If(lastIssueRating.CompareTo(lastIssuerRating) > 0, lastIssueRating, lastIssuerRating)
 
-            Return New BondMetadata(ric, sN, sN, maturityDate, coupon,
-                                       paymentStructure, rateStructure, issueDate, sN,
-                                       shortName & " " & If(coupon > 0, String.Format("{0}", coupon), "ZC"),
-                                       description, series, issuerName, borrowerName, currency,
+            Dim label2 As String = shortName & " " & If(coupon > 0, String.Format("{0}", coupon), "ZC") & " " & If(maturityDate.HasValue, String.Format("{0:MMM-YY}", maturityDate), "PRP")
+            Return New BondMetadata(ric, sN, sN, maturityDate, coupon, paymentStructure, rateStructure, issueDate, sN,
+                                       label2, description, series, issuerName, borrowerName, currency,
                                        isPutable, isCallable, isFloater, lastIssueRating, lastIssuerRating, lastRating,
                                        seniorityType, industry, subIndustry)
         End Function

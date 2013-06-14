@@ -34,14 +34,8 @@ Namespace Tools.Elements
             End Get
         End Property
 
-        Private ReadOnly Property ZcbPmtStructure(dt As Date) As String
-            Get
-                Return String.Format(ZcbPmtStructureTemplate, ReutersDate.DateToReuters(dt))
-            End Get
-        End Property
-
-        Private ReadOnly _bondModule As AdxBondModule = New AdxBondModule
-        Private ReadOnly _curveModule As AdxYieldCurveModule = New AdxYieldCurveModule
+        Private ReadOnly _bondModule As AdxBondModule = Eikon.Sdk.CreateAdxBondModule()
+        Private ReadOnly _curveModule As AdxYieldCurveModule = Eikon.Sdk.CreateAdxYieldCurveModule()
 
         Public Class BondCurveSnapshot
             ''' <summary>
@@ -213,21 +207,20 @@ Namespace Tools.Elements
             End Get
         End Property
 
-        Public ReadOnly Property IsSynthetic() As Boolean
+        Public ReadOnly Property IsSynthetic() As Boolean Implements ICurve.IsSynthetic
             Get
                 Return _bootstrapped OrElse _estModel IsNot Nothing
             End Get
         End Property
 
         Private Function GetSyntBond(dur As Double, yield As Double) As SyntheticZcb
-            Dim mat = _curveDate.AddDays(dur * 365 / (1 + yield * dur))
+            Dim mat = _curveDate.AddDays(dur * 365 / (1 + yield * dur)) ' cool hack to make Macauley duration equal to dur parameter
             Dim paymentStructure As String = ZcbPmtStructure
             Dim bond = New SyntheticZcb(Me, New BondMetadata(String.Format("ZCB {0:N2}", dur), mat, 0, paymentStructure, "RM:YTM", Name))
             Dim settleDate = _bondModule.BdSettle(_curveDate, paymentStructure)
             Dim priceObject As Array = _bondModule.AdBondPrice(settleDate, yield, mat, 0, 0, paymentStructure, "RM:YTM", "", "RES:BDPRICE")
             AddHandler bond.CustomPrice, Sub(bnd, prc) HandleNewQuote(bnd, BondFields.XmlName(bond.Fields.Custom), prc, _curveDate, False)
             bond.SetCustomPrice(100 * priceObject.GetValue(1))
-            'bond.QuotesAndYields.Main.Duration = dur ' todo its a hack. i have to calculate
             Return bond
         End Function
 

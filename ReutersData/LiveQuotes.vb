@@ -137,6 +137,8 @@ Public Class LiveQuotes
     End Sub
 
     Private Sub ShutdownNow() Handles _shutdownManager.ShutdownNow
+        Logger.Warn("Shutdown()")
+        If _listManager Is Nothing Then Return
         CancelAll()
         Marshal.ReleaseComObject(_listManager)
         _listManager = Nothing

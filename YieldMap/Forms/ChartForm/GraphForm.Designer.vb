@@ -32,8 +32,8 @@
             Dim Label4 As System.Windows.Forms.Label
             Dim Label5 As System.Windows.Forms.Label
             Dim Label7 As System.Windows.Forms.Label
-            Dim ChartArea3 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-            Dim Legend3 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+            Dim ChartArea4 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+            Dim Legend4 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
             Me.TheStatusStrip = New System.Windows.Forms.StatusStrip()
             Me.StatusMessage = New System.Windows.Forms.ToolStripStatusLabel()
             Me.TheToolStrip = New System.Windows.Forms.ToolStrip()
@@ -433,7 +433,7 @@
             '
             Me.BondCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainInfoLine1TSMI, Me.ExtInfoTSMI, Me.BondLabelsTSMI, Me.BondCurveTSMI, Me.ToolStripSeparator5, Me.BondDescriptionTSMI, Me.RelatedQuoteTSMI, Me.RelatedChartTSMI, Me.ToolStripSeparator4, Me.ShowHistoryTSMI, Me.ToolStripSeparator1, Me.RemovePointTSMI})
             Me.BondCMS.Name = "BondContextMenuStrip"
-            Me.BondCMS.Size = New System.Drawing.Size(167, 242)
+            Me.BondCMS.Size = New System.Drawing.Size(167, 220)
             '
             'MainInfoLine1TSMI
             '
@@ -829,12 +829,12 @@
             '
             'TheChart
             '
-            ChartArea3.Name = "ChartArea1"
-            Me.TheChart.ChartAreas.Add(ChartArea3)
+            ChartArea4.Name = "ChartArea1"
+            Me.TheChart.ChartAreas.Add(ChartArea4)
             Me.TheChart.Dock = System.Windows.Forms.DockStyle.Fill
-            Legend3.Enabled = False
-            Legend3.Name = "Legend1"
-            Me.TheChart.Legends.Add(Legend3)
+            Legend4.Enabled = False
+            Legend4.Name = "Legend1"
+            Me.TheChart.Legends.Add(Legend4)
             Me.TheChart.Location = New System.Drawing.Point(0, 0)
             Me.TheChart.Name = "TheChart"
             Me.TheChart.Size = New System.Drawing.Size(778, 417)
@@ -947,6 +947,7 @@
             Me.FitTSMI.Name = "FitTSMI"
             Me.FitTSMI.Size = New System.Drawing.Size(140, 22)
             Me.FitTSMI.Text = "Interpolation"
+            Me.FitTSMI.Visible = False
             '
             'LinearRegressionTSMI
             '

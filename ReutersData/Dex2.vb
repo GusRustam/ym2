@@ -145,7 +145,10 @@ Public Class Dex2
     End Sub
 
     Private Sub ShutdownNow() Handles _shutdownManager.ShutdownNow
-        Marshal.ReleaseComObject(_rData)
-        _rData = Nothing
+        Logger.Warn("Shutdown()")
+        If _rData IsNot Nothing Then
+            Marshal.ReleaseComObject(_rData)
+            _rData = Nothing
+        End If
     End Sub
 End Class

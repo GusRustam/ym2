@@ -115,6 +115,7 @@ Public Class Chain
     End Sub
 
     Private Sub ShutdownNow() Handles _shutdownManager.ShutdownNow
+        Logger.Warn("Shutdown()")
         For Each hM In _chainManagers
             Marshal.ReleaseComObject(hM)
             hM = Nothing

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Runtime.InteropServices;
 using Uitls;
 
 namespace CommonController {
@@ -12,10 +8,7 @@ namespace CommonController {
 
 
         public static ShutdownController Instance  {
-            get {
-                if (_instance == null) _instance = new ShutdownController();
-                return _instance;
-            }
+            get { return _instance ?? (_instance = new ShutdownController()); }
         }
 
         private ShutdownController() {

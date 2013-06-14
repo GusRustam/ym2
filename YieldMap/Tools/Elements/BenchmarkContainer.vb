@@ -24,7 +24,7 @@ Namespace Tools.Elements
             If src = Yield Then Throw New InvalidOperationException()
 
             ' saving current Y Source
-            Dim _tempYSrc = _ansamble.YSource
+            Dim tempYSrc = _ansamble.YSource
 
             ' removing old benchmark (this will clear all calculated spreads)
             If _items.ContainsKey(src) Then Clear(src)
@@ -36,7 +36,7 @@ Namespace Tools.Elements
             RaiseEvent NewBmk(src)
 
             ' restoring Y Source mode
-            If _tempYSrc <> _ansamble.YSource Then _ansamble.YSource = _tempYSrc
+            If tempYSrc <> _ansamble.YSource Then _ansamble.YSource = tempYSrc
         End Sub
 
         Public Function HasOrd(ByVal src As IOrdinate) As Boolean
@@ -50,6 +50,15 @@ Namespace Tools.Elements
         Public Sub Clear(ByVal src As IOrdinate)
             _items.Remove(src)
             RaiseEvent ClearBmk(src)
+        End Sub
+
+        Public Sub Clear(ByVal id As Long)
+            Dim itms = (From kvp In _items Where TypeOf kvp.Value Is Identifyable AndAlso CType(kvp.Value, Identifyable).Identity = id Select kvp.Key).ToList()
+            If Not itms.Any Then Return
+            For Each q In itms
+                _items.Remove(q)
+                RaiseEvent ClearBmk(q)
+            Next
         End Sub
 
         Public Function Any() As Boolean

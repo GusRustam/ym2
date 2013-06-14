@@ -61,7 +61,6 @@
         End Property
 
         Private WithEvents _benchmarks As New BenchmarkContainer(Me)
-        Private _eventsFrozen As Boolean
 
         Public ReadOnly Property Benchmarks() As BenchmarkContainer
             Get
@@ -98,21 +97,18 @@
         End Sub
 
         Private Sub UnfreezeEvents()
-            _eventsFrozen = false
             For Each item In AllItems()
                 item.UnfreezeEvents()
             Next
         End Sub
 
         Private Sub FreezeEvents()
-            _eventsFrozen = True
             For Each item In AllItems()
                 item.FreezeEvents()
             Next
         End Sub
 
         Private Sub UnfreezeEventsQuiet()
-            _eventsFrozen = False
             For Each item In AllItems()
                 item.UnfreezeEventsQuiet()
             Next
@@ -129,6 +125,15 @@
             res.AddRange(_swapCurves.Cast(Of IChangeable))
             Return res
         End Function
+
+        Private Sub GroupCleared(obj As Group) Handles _items.Cleared
+            If Not TypeOf obj Is ICurve Then Return
+            If _benchmarks.HasCurve(obj) Then _benchmarks.Clear(obj.Identity)
+        End Sub
+
+        Private Sub SwapCurveCleared(obj As SwapCurve) Handles _swapCurves.Cleared
+            If _benchmarks.HasCurve(obj) Then _benchmarks.Clear(obj.Identity)
+        End Sub
 
         ' сюда можно попасть двумя путями - либо когда пересчитали ВСЕ в ответ на одну из глобальных команд,
         ' или когда пересчитали только одну сущность в ответ на новые данные.

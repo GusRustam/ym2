@@ -242,6 +242,7 @@ Public Class HistoryBlock
     Private Shared ReadOnly _historyManagers As New List(Of AdxRtHistory)
 
     Private Sub ShutdownNow() Handles _shutdownManager.ShutdownNow
+        Logger.Warn("Shutdown()")
         For Each hM In _historyManagers
             Marshal.ReleaseComObject(hM)
             hM = Nothing
@@ -520,6 +521,8 @@ Public Class History
     End Sub
 
     Private Sub ShutdownNow() Handles _shutdownManager.ShutdownNow
+        Logger.Warn("Shutdown()")
+        If _historyManager Is Nothing Then Return
         Marshal.ReleaseComObject(_historyManager)
         _historyManager = Nothing
     End Sub

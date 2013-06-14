@@ -1,10 +1,10 @@
 ﻿Imports System.Windows.Forms
 Imports System.Windows.Forms.DataVisualization.Charting
 Imports System.Drawing
-Imports AdfinXAnalyticsFunctions
 Imports System.ComponentModel
 Imports System.IO
 Imports System.Threading
+Imports ReutersData
 Imports YieldMap.Tools.Elements
 Imports YieldMap.Forms.PortfolioForm
 Imports Settings
@@ -64,6 +64,7 @@ Namespace Forms.ChartForm
         Private Sub TheSettings_FieldsPriorityChanged(ByVal list As String) Handles _theSettings.FieldsPriorityChanged
             _ansamble.Replot()
         End Sub
+        Protected ReadOnly DateModule = Eikon.Sdk.CreateAdxDateModule()
 
 #Region "II) Form state manipulation"
         Private Enum FormDataStatus
@@ -109,7 +110,7 @@ Namespace Forms.ChartForm
 
                 Dim portfolioStructure = PortfolioManager.Instance.GetPortfolioStructure(currentPortId)
                 For Each grp As BondGroup In From port In portfolioStructure.Sources
-                                           Where TypeOf port.Source Is Chain Or TypeOf port.Source Is UserList
+                                           Where TypeOf port.Source Is DbManager.Chain Or TypeOf port.Source Is UserList
                                            Select New BondGroup(_ansamble, port, portfolioStructure)
                     ' todo add custom bonds
                     AddHandler grp.Updated, AddressOf OnGroupUpdated
@@ -330,7 +331,7 @@ Namespace Forms.ChartForm
                         DscrLabel.Text = curve.Name
                         DatLabel.Text = String.Format("{0:dd/MM/yyyy}", curve.CurveDate)
                         Dim period = String.Format("{0:F0}D", 365 * point.XValue)
-                        Dim aDate = (New AdxDateModule).DfAddPeriod("RUS", Date.Today, period, "")
+                        Dim aDate = DateModule.DfAddPeriod("RUS", Date.Today, period, "")
                         MatLabel.Text = String.Format("{0:dd/MM/yyyy}", Utils.FromExcelSerialDate(aDate.GetValue(1, 1)))
 
                         Select Case _ansamble.YSource

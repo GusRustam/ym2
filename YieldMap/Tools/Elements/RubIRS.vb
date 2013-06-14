@@ -12,6 +12,7 @@ Namespace Tools.Elements
 
         Protected ReadOnly Descrs As New List(Of SwapPointDescription)
         Protected Overridable Property BaseInstrumentPrice As Double
+        Protected ReadOnly DateModule = Eikon.Sdk.CreateAdxDateModule()
 
         '' LOGGER
         Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(RubIRS))
@@ -49,7 +50,14 @@ Namespace Tools.Elements
         Private _broker As String = ""
         Private _quote As String = "MID"
         Private ReadOnly _lastCurve As New Dictionary(Of IOrdinate, List(Of CurveItem))
+        Private ReadOnly _yieldCurveModule As AdxYieldCurveModule = Eikon.Sdk.CreateAdxYieldCurveModule()
         Private Const InstrumentType As String = "S"
+
+        Public Overrides ReadOnly Property IsSynthetic() As Boolean
+            Get
+                Return _bootstrapped
+            End Get
+        End Property
 
         Sub New(ByVal ansamble As Ansamble)
             MyBase.new(ansamble)
@@ -58,7 +66,7 @@ Namespace Tools.Elements
         Public Overrides Sub Subscribe()
             Logger.Debug("Subscirbe({0})", Identity)
 
-            Cleanup()
+            Clear()
             GetRICs(GetBroker()).ForEach(Sub(ric As String) Descrs.Add(New SwapPointDescription(ric)))
 
             If CurveDate() = Date.Today Then
@@ -151,9 +159,14 @@ Namespace Tools.Elements
         End Sub
 
         Public Overrides Sub Cleanup()
+            Clear()
+            NotifyCleanup()
+        End Sub
+
+        Private Sub Clear()
+            Descrs.Clear()
             _quoteLoader.CancelItems(GetRICs(_broker))
             If BaseInstrument <> "" Then _quoteLoader.CancelItem(BaseInstrument)
-            NotifyCleanup()
         End Sub
 
         Public Overrides Sub Recalculate(ByVal ord As IOrdinate)
@@ -206,12 +219,12 @@ Namespace Tools.Elements
                         params(i, 4) = data(i).Yield
                         params(i, 5) = Struct
                     Next
-                    Dim curveModule = New AdxYieldCurveModule
+                    Dim curveModule = _yieldCurveModule
                     Dim termStructure As Array = curveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
                     For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
                         Dim dur = (Utils.FromExcelSerialDate(termStructure.GetValue(i, 1)) - CurveDate).TotalDays / 365.0
-                        Dim yld = termStructure.GetValue(i, 2) ' + data(i).RIC
-                        If dur > 0 And yld > 0 Then result.Add(New SwapCurveItem(dur, yld, Me, data(i).RIC))
+                        Dim yld = termStructure.GetValue(i, 2)
+                        If dur > 0 And yld > 0 Then result.Add(New PointCurveItem(dur, yld, Me))
                     Next
                 Catch ex As Exception
                     Logger.ErrorException("Failed to bootstrap", ex)
@@ -516,7 +529,6 @@ Namespace Tools.Elements
         Protected Overrides Function GetDuration(ByVal ric As String) As Double
             Dim match = Regex.Match(ric, String.Format("{0}(?<term>[0-9]+?[DWMY])ID=.*", InstrumentName))
             Dim term = match.Groups("term").Value
-            Dim dateModule As New AdxDateModule
             Dim aDate As Array = dateModule.DfAddPeriod("RUS", CurveDate(), term, "")
             Return dateModule.DfCountYears(CurveDate(), Utils.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
         End Function
@@ -563,7 +575,6 @@ Namespace Tools.Elements
         Protected Overrides Function GetDuration(ByVal ric As String) As Double
             Dim match = Regex.Match(ric, String.Format("{0}(?<term>[0-9]+?Y)=.*", InstrumentName))
             Dim term = match.Groups("term").Value
-            Dim dateModule As New AdxDateModule
             Dim aDate As Array = dateModule.DfAddPeriod("RUS", CurveDate, term, "")
             Return dateModule.DfCountYears(CurveDate, Utils.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
         End Function

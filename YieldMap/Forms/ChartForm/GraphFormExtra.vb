@@ -102,7 +102,6 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub HideBidAsk()
-            If Not _theSettings.ShowBidAsk Then Return
             Dim bidAskSeries = TheChart.Series.FindByName("BidAskSeries")
             If bidAskSeries IsNot Nothing Then TheChart.Series.Remove(bidAskSeries)
         End Sub

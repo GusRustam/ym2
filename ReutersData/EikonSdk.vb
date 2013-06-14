@@ -39,8 +39,11 @@ Public Class EikonConnector
     Private WithEvents _shutdownManager As ShutdownController = ShutdownController.Instance
 
     Private Sub ShutdownNow() Handles _shutdownManager.ShutdownNow
-        Marshal.ReleaseComObject(_sdk)
-        _sdk = Nothing
+        Logger.Warn("Shutdown()")
+        If _sdk IsNot Nothing Then
+            Marshal.ReleaseComObject(_sdk)
+            _sdk = Nothing
+        End If
     End Sub
 
     Private Sub New(ByVal sdk As EikonDesktopDataAPI)

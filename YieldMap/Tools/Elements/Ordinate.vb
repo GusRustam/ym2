@@ -270,8 +270,7 @@ Namespace Tools.Elements
                     Dim settleDate = BondModule.BdSettle(DateTime.Today, data.PaymentStructure)
                     Return BondModule.AdBondSpread(settleDate, rateArray, dscr.Price / 100.0,
                                                    data.Maturity, data.Coupon / 100.0,
-                                                   data.PaymentStructure, "ZCTYPE:RATE IM:LIX RM:YC", "", ""
-                                                  ) + dscr.ParentBond.UserDefinedSpread(ZSpread)
+                                                   data.PaymentStructure, "ZCTYPE:RATE IM:LIX RM:YC", "", "")
                 Catch ex As Exception
                     Logger.ErrorException("Failed to calculate Z-Spread", ex)
                     Logger.Error("Exception = {0}", ex.ToString())

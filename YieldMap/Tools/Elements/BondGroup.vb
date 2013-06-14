@@ -36,34 +36,17 @@ Namespace Tools.Elements
         End Sub
 
         Public Overrides Sub RecalculateTotal()
-            Throw New NotImplementedException()
+            For Each bnd In AllElements
+                For Each q In bnd.QuotesAndYields
+                    HandleNewQuote(bnd, q, bnd.QuotesAndYields(q).Price, bnd.QuotesAndYields(q).YieldAtDate, False)
+                Next
+            Next
+            Recalculate()
         End Sub
 
         Public Overrides Sub Recalculate(ByVal ord As IOrdinate)
-            'UpdatePoints()
             NotifyUpdatedSpread(UpdateSpreads(ord), ord)
         End Sub
-
-        'Protected Overrides Sub UpdateSpreads()
-        '    Dim res As List(Of CurveItem)
-        '    'this is fuckingly poor code. This must be moved into ordinate or wut?
-        '    For Each ord In Ordinates
-        '        If ord <> Yield Then
-        '            If ord = Ansamble.YSource Then
-        '                res = RecalculateSpread(ord)
-        '            Else
-        '                RecalculateSpread(ord)
-        '            End If
-        '        Else
-        '            If ord = Ansamble.YSource Then
-        '                res = RecalculateYield()
-        '            Else
-        '                RecalculateYield()
-        '            End If
-        '        End If
-        '    Next
-        '    If res IsNot Nothing Then NotifyUpdated(res)
-        'End Sub
 
         Public Sub SetSpread(ByVal ySource As OrdinateBase)
             If Ansamble.Benchmarks.Keys.Contains(ySource) AndAlso Ansamble.Benchmarks(ySource) <> Me Then
@@ -95,7 +78,6 @@ Namespace Tools.Elements
 
         Private Function UpdateSpreads(ByVal ordinate As IOrdinate) As List(Of CurveItem)
             SetSpread(ordinate)
-            ''  ordinate.GetValue(q) + q.ParentBond.UserDefinedSpread(ordinate)
             Dim res = New List(Of CurveItem)(
                         From item In AllElements
                         From quoteName In item.QuotesAndYields
@@ -124,7 +106,7 @@ Namespace Tools.Elements
                         x = (bnd.MetaData.Maturity.Value - Date.Today).Days / 365
                 End Select
 
-                y = description.Yield ' + bnd.UserDefinedSpread(Yield)
+                y = description.Yield
                 If x > 0 And y > 0 Then result.Add(New BondCurveItem(x, y, bnd, description.BackColor, description.Yld.ToWhat, description.MarkerStyle, bnd.Label))
             Next
             result.Sort()

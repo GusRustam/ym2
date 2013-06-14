@@ -189,7 +189,7 @@ Namespace Tools.Elements
         End Sub
 
         Public Sub Annihilate()
-            Parent.Elements.Remove(Me)
+            Parent.AllElements.Remove(Me)
             RaiseEvent Changed()
         End Sub
 
