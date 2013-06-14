@@ -4,9 +4,6 @@ Imports System.Xml
 Imports Uitls
 
 Public Class SettingsManager
-    Public Event YieldRangeChanged As Action
-    Public Event DurRangeChanged As Action
-    Public Event SpreadRangeChanged As Action
     Public Event ShowPointSizeChanged As Action(Of Boolean)
     Public Event YieldCalcModeChanged As Action(Of String)
     Public Event DataSourceChanged As Action(Of String)
@@ -14,6 +11,7 @@ Public Class SettingsManager
     Public Event ForbiddenFieldsChanged As Action(Of String)
     Public Event ShowBidAskChanged As Action(Of Boolean)
     Public Event RatingSortModeChanged As Action(Of Boolean)
+    Public Event ViewPortChanged As Action
 
     Private Shared ReadOnly SettingsPath As String = Path.Combine(Utils.GetMyPath(), "config.xml")
     Private Shared ReadOnly Settings As New XmlDocument
@@ -30,7 +28,7 @@ Public Class SettingsManager
         Set(ByVal value As Double?)
             SaveValue("/settings/viewport/yield/@min", If(value.HasValue, value.Value.ToString("F2"), ""))
             _minYield = value
-            RaiseEvent YieldRangeChanged()
+            RaiseEvent ViewPortChanged()
         End Set
         Get
             Return _minYield
@@ -42,7 +40,7 @@ Public Class SettingsManager
         Set(ByVal value As Double?)
             SaveValue("/settings/viewport/yield/@max", If(value.HasValue, value.Value.ToString("F2"), ""))
             _maxYield = value
-            RaiseEvent YieldRangeChanged()
+            RaiseEvent ViewPortChanged()
         End Set
         Get
             Return _maxYield
@@ -54,7 +52,7 @@ Public Class SettingsManager
         Set(ByVal value As Double?)
             SaveValue("/settings/viewport/duration/@min", If(value.HasValue, value.Value.ToString("F2"), ""))
             _minDur = value
-            RaiseEvent DurRangeChanged()
+            RaiseEvent ViewPortChanged()
         End Set
         Get
             Return _minDur
@@ -66,7 +64,7 @@ Public Class SettingsManager
         Set(ByVal value As Double?)
             SaveValue("/settings/viewport/duration/@max", If(value.HasValue, value.Value.ToString("F2"), ""))
             _maxDur = value
-            RaiseEvent DurRangeChanged()
+            RaiseEvent ViewPortChanged()
         End Set
         Get
             Return _maxDur
@@ -78,7 +76,7 @@ Public Class SettingsManager
         Set(ByVal value As Double?)
             SaveValue("/settings/viewport/spread/@min", If(value.HasValue, value.Value.ToString("F2"), ""))
             _minSpread = value
-            RaiseEvent SpreadRangeChanged()
+            RaiseEvent ViewPortChanged()
         End Set
         Get
             Return _minSpread
@@ -90,7 +88,7 @@ Public Class SettingsManager
         Set(ByVal value As Double?)
             SaveValue("/settings/viewport/spread/@max", If(value.HasValue, value.Value.ToString("F2"), ""))
             _maxSpread = value
-            RaiseEvent SpreadRangeChanged()
+            RaiseEvent ViewPortChanged()
         End Set
         Get
             Return _maxSpread
@@ -287,6 +285,68 @@ Public Class SettingsManager
             RaiseEvent RatingSortModeChanged(_ratingSortDate)
         End Set
     End Property
+
+    Private _minYStrict As Boolean
+    Public Property MinYStrict() As Boolean
+        Get
+            Return _minYStrict
+        End Get
+        Set(ByVal value As Boolean)
+            SaveValue("/settings/viewport/y-axis/property[@name='min-strict']/@value", value.ToString())
+            _minYStrict = value
+            RaiseEvent ViewPortChanged()
+        End Set
+    End Property
+
+
+    Private _maxYStrict As Boolean
+    Public Property MaxYStrict() As Boolean
+        Get
+            Return _maxYStrict
+        End Get
+        Set(ByVal value As Boolean)
+            SaveValue("/settings/viewport/y-axis/property[@name='max-strict']/@value", value.ToString())
+            _maxYStrict = value
+            RaiseEvent ViewPortChanged()
+        End Set
+    End Property
+
+    Private _minXStrict As Boolean
+    Public Property MinXStrict() As Boolean
+        Get
+            Return _minXStrict
+        End Get
+        Set(ByVal value As Boolean)
+            SaveValue("/settings/viewport/x-axis/property[@name='min-strict']/@value", value.ToString())
+            _minXStrict = value
+            RaiseEvent ViewPortChanged()
+        End Set
+    End Property
+
+    Private _maxXStrict As Boolean
+
+    Public Property MaxXStrict() As Boolean
+        Get
+            Return _maxXStrict
+        End Get
+        Set(ByVal value As Boolean)
+            SaveValue("/settings/viewport/x-axis/property[@name='max-strict']/@value", value.ToString())
+            _maxXStrict = value
+            RaiseEvent ViewPortChanged()
+        End Set
+    End Property
+
+    Private _numInterpPoints As Integer
+    Public Property NumInterpPoints() As Integer
+        Get
+            Return _numInterpPoints
+        End Get
+        Set(ByVal value As Integer)
+            _numInterpPoints = value
+            SaveValue("/settings/property[@name='num-interp-point']/@value", value)
+        End Set
+    End Property
+
     Sub New()
         Settings.Load(SettingsPath)
 
@@ -296,6 +356,8 @@ Public Class SettingsManager
         GetDoubleValue("/settings/viewport/spread/@min", _minSpread)
         GetDoubleValue("/settings/viewport/duration/@max", _maxDur)
         GetDoubleValue("/settings/viewport/duration/@min", _minDur)
+
+        GetIntegerValue("/settings/property[@name='num-interp-point']/@value", _numInterpPoints)
 
         GetBoolValue("/settings/property[@name='mid-if-both']/@value", _midIfBoth)
         GetBoolValue("/settings/property[@name='show-bid-ask']/@value", _showBidAsk)
@@ -307,6 +369,10 @@ Public Class SettingsManager
         GetBoolValue("/settings/property[@name='clear-bond-curves']/@value", _clearBondCurves)
         GetBoolValue("/settings/property[@name='clear-other-curves']/@value", _clearOtherCurves)
         GetBoolValue("/settings/property[@name='rating-sort-date']/@value", _ratingSortDate)
+        GetBoolValue("/settings/viewport/y-axis/property[@name='min-strict']/@value", _minYStrict)
+        GetBoolValue("/settings/viewport/y-axis/property[@name='max-strict']/@value", _maxYStrict)
+        GetBoolValue("/settings/viewport/x-axis/property[@name='min-strict']/@value", _minXStrict)
+        GetBoolValue("/settings/viewport/x-axis/property[@name='max-strict']/@value", _maxXStrict)
 
         GetStringValue("/settings/property[@name='fields-priority']/@value", _fieldsPriority)
         GetStringValue("/settings/property[@name='forbidden-fields']/@value", _forbiddenFields)
@@ -319,26 +385,31 @@ Public Class SettingsManager
     End Sub
 
     Private Shared Sub GetDoubleValue(ByVal address As String, ByRef var As Double?)
-        Dim val As XmlNode
-        val = Settings.SelectSingleNode(address)
-        If val IsNot Nothing AndAlso val.Value <> "" Then var = Double.Parse(val.Value)
+        Dim val = Settings.SelectSingleNode(address)
+        If val IsNot Nothing AndAlso val.Value <> "" Then
+            var = Double.Parse(val.Value)
+        Else
+            var = Nothing
+        End If
+    End Sub
+
+    Private Shared Sub GetIntegerValue(ByVal address As String, ByRef var As Integer?)
+        Dim val = Settings.SelectSingleNode(address)
+        If val IsNot Nothing AndAlso val.Value <> "" Then var = Integer.Parse(val.Value)
     End Sub
 
     Private Shared Sub GetBoolValue(ByVal address As String, ByRef var As Boolean)
-        Dim val As XmlNode
-        val = Settings.SelectSingleNode(address)
+        Dim val = Settings.SelectSingleNode(address)
         If val IsNot Nothing AndAlso val.Value <> "" Then var = Boolean.Parse(val.Value)
     End Sub
 
     Private Shared Sub GetStringValue(ByVal address As String, ByRef var As String)
-        Dim val As XmlNode
-        val = Settings.SelectSingleNode(address)
+        Dim val = Settings.SelectSingleNode(address)
         var = If(val IsNot Nothing, val.Value, "")
     End Sub
 
     Private Shared Sub SaveValue(ByVal address As String, ByVal value As String)
-        Dim val As XmlNode
-        val = Settings.SelectSingleNode(address)
+        Dim val = Settings.SelectSingleNode(address)
         If val IsNot Nothing Then
             val.Value = value
             Settings.Save(SettingsPath)

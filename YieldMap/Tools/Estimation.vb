@@ -1,4 +1,5 @@
 ﻿Imports DotNumerics.Optimization
+Imports Settings
 Imports Uitls
 Imports MathNet.Numerics.Interpolation.Algorithms
 Imports MathNet.Numerics.LinearAlgebra.Double
@@ -387,7 +388,7 @@ Namespace Tools
             Dim lbfgsb As New L_BFGS_B
             Dim minimum = lbfgsb.ComputeMin(AddressOf NSSCost, AddressOf NSSCg, vars)
 
-            Return Utils.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = avgY * NSS(anX, minimum) / 10}).ToList()
+            Return Utils.GetRange(_xv.Min, _xv.Max, SettingsManager.Instance.NumInterpPoints).Select(Function(anX) New XY With {.X = anX, .Y = avgY * NSS(anX, minimum) / 10}).ToList()
         End Function
 
         Public Function GetFormula() As String Implements IFormulable.GetFormula
@@ -448,9 +449,9 @@ Namespace Tools
             Dim valByAvg = VasicekCostRel(minByAvg, Function(val) yavg * val / 10)
 
             If valByAvg < valByRange Then
-                Return Utils.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = yavg * Vasicek(anX, minByAvg) / 10}).ToList()
+                Return Utils.GetRange(_xv.Min, _xv.Max, SettingsManager.Instance.NumInterpPoints).Select(Function(anX) New XY With {.X = anX, .Y = yavg * Vasicek(anX, minByAvg) / 10}).ToList()
             Else
-                Return Utils.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = ymin + (ymax - ymin) * Vasicek(anX, minByRange)}).ToList()
+                Return Utils.GetRange(_xv.Min, _xv.Max, SettingsManager.Instance.NumInterpPoints).Select(Function(anX) New XY With {.X = anX, .Y = ymin + (ymax - ymin) * Vasicek(anX, minByRange)}).ToList()
             End If
         End Function
 
@@ -516,9 +517,9 @@ Namespace Tools
             Dim valByAvg = CIRCostRel(minByAvg, Function(val) 10 * val / yavg)
 
             If valByAvg < valByRange Then
-                Return Utils.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = 10 * CIR(anX, minByAvg) / yavg}).ToList()
+                Return Utils.GetRange(_xv.Min, _xv.Max, SettingsManager.Instance.NumInterpPoints).Select(Function(anX) New XY With {.X = anX, .Y = 10 * CIR(anX, minByAvg) / yavg}).ToList()
             Else
-                Return Utils.GetRange(_xv.Min, _xv.Max, 50).Select(Function(anX) New XY With {.X = anX, .Y = ymin + (ymax - ymin) * CIR(anX, minByRange)}).ToList()
+                Return Utils.GetRange(_xv.Min, _xv.Max, SettingsManager.Instance.NumInterpPoints).Select(Function(anX) New XY With {.X = anX, .Y = ymin + (ymax - ymin) * CIR(anX, minByRange)}).ToList()
             End If
         End Function
 
@@ -592,7 +593,7 @@ Namespace Tools
                     _regression.Fit(x, y)
                 End If
 
-                Return Utils.GetRange(x.Min, x.Max, 100).Select(Function(anX) New XY With {.X = anX, .Y = _regression.Estimate(anX)}).ToList()
+                Return Utils.GetRange(x.Min, x.Max, SettingsManager.Instance.NumInterpPoints).Select(Function(anX) New XY With {.X = anX, .Y = _regression.Estimate(anX)}).ToList()
             Else
                 If _estimationModel = EstimationModel.CubicSpline Then
                     Return (New CubicSpline).Interpolate(x, y)

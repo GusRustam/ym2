@@ -87,6 +87,13 @@ Namespace Forms.MainForm
             ClearOtherCurvesCheckBox.Checked = Settings.ClearOtherCurves
             ClearPointsCheckBox.Checked = Settings.ClearPoints
 
+            MaxXStrictCB.Checked = Settings.MaxXStrict
+            MaxYStrictCB.Checked = Settings.MaxYStrict
+            MinXStrictCB.Checked = Settings.MinXStrict
+            MinYStrictCB.Checked = Settings.MinYStrict
+
+            NumInterpPointsTB.Text = Settings.NumInterpPoints
+
             If Settings.RatingSortDate Then
                 FirstDateRB.Checked = True
             Else
@@ -167,21 +174,42 @@ Namespace Forms.MainForm
             End If
             Settings.BondSelectorVisibleColumns = columnsString
 
+            Dim errored As Boolean = False
+            If MinXStrictCB.Checked AndAlso Settings.MinDur Is Nothing Then
+                ErrProv.SetError(MinDurTextBox, "Minimum X axis value is fixed, please specify minimum duration")
+                errored = True
+            End If
+            If MaxXStrictCB.Checked AndAlso Settings.MaxDur Is Nothing Then
+                ErrProv.SetError(MaxDurTextBox, "Maximum X axis value is fixed, please specify maximum duration")
+                errored = True
+            End If
+            If MinYStrictCB.Checked AndAlso (Settings.MinSpread Is Nothing OrElse Settings.MinYield) Then
+                ErrProv.SetError(If(Settings.MinSpread Is Nothing, MinSpreadTextBox, MinYieldTextBox),
+                                 "Minimum Y axis value is fixed, please specify minimum yield and spread")
+                errored = True
+            End If
+            If MaxYStrictCB.Checked AndAlso (Settings.MaxSpread Is Nothing OrElse Settings.MaxYield) Then
+                ErrProv.SetError(If(Settings.MinSpread Is Nothing, MinSpreadTextBox, MinYieldTextBox),
+                                 "Maximum Y axis value is fixed, please specify maximum yield and spread")
+                errored = True
+            End If
+
+            If NumInterpPointsTB.Text <> "" AndAlso IsNumeric(NumInterpPointsTB.Text) Then
+                Settings.NumInterpPoints = NumInterpPointsTB.Text
+            End If
+
+            If errored Then Return
+
+            Settings.MaxXStrict = MaxXStrictCB.Checked
+            Settings.MaxYStrict = MaxYStrictCB.Checked
+            Settings.MinXStrict = MinXStrictCB.Checked
+            Settings.MinYStrict = MinYStrictCB.Checked
+
             Close()
         End Sub
 
         Private Shared Function ParseDouble(ByVal txt As String) As Double?
-            Dim regex As New Regex("^(?<number>[\-0-9]+)")
-            Dim match As Match
-            Dim result As Double? = Nothing
-
-            match = regex.Match(txt)
-
-            If match.Success Then
-                txt = match.Groups("number").Value
-                result = If(IsNumeric(txt), Double.Parse(txt), Nothing)
-            End If
-            Return result
+            Return If(txt <> "" AndAlso IsNumeric(txt), Double.Parse(txt), Nothing)
         End Function
 
         Private Sub AllColumnsCB_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles AllColumnsCB.Click

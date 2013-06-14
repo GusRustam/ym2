@@ -179,81 +179,136 @@ Namespace Forms.ChartForm
         End Sub
 
         ' this method simply updates the chart by selecting appropriate y-coordinates for points
+        ' and wut 'bout x?
         Private Sub SetChartMinMax()
             Logger.Debug("SetChartMinMax()")
-            GuiAsync(AddressOf DoSetMinMax)
+            GuiAsync(AddressOf DoSetMinMax1)
         End Sub
 
-        Private Sub DoSetMinMax()
-            TheChart.Invalidate()
-            With TheChart.ChartAreas(0).AxisY
-                Try
-                    Dim lstMax = From srs In TheChart.Series
-                                 Where srs.Enabled And srs.Points.Any
-                                 Select (
-                                     From pnt In srs.Points
-                                     Where pnt.YValues.Any
-                                     Select pnt.YValues.First).Max
+        Private Sub DoSetMinMax1()
+            Dim minMinYStrict As Boolean = _theSettings.MinYStrict
+            Dim maxMaxYStrict As Boolean = _theSettings.MaxYStrict
+            Dim minMinXStrict As Boolean = _theSettings.MinXStrict
+            Dim maxMaxXStrict As Boolean = _theSettings.MaxXStrict
 
-                    If Not lstMax.Any Then
-                        Logger.Warn("Nothing to use as maximum")
-                        Return
-                    End If
+            Dim minMinY As Double?, maxMaxY As Double?
+            Dim minMinX As Double?, maxMaxX As Double?
+            If _ansamble.YSource = Yield Then
+                minMinY = _theSettings.MinYield / 100
+                maxMaxY = _theSettings.MaxYield / 100
+            Else
+                minMinY = _theSettings.MinSpread
+                maxMaxY = _theSettings.MaxSpread
+            End If
+            minMinX = _theSettings.MinDur
+            maxMaxX = _theSettings.MaxDur
+ 
 
-                    Dim newMax = lstMax.Max
-
-                    Dim lstMin = From srs In TheChart.Series
-                                 Where srs.Enabled And srs.Points.Any
-                                 Select (
-                                     From pnt In srs.Points
-                                     Where pnt.YValues.Any And (_ansamble.YSource <> Yield OrElse pnt.YValues.First > 0)
-                                     Select pnt.YValues.First).Min
-
-
-                    If Not lstMin.Any Then
-                        Logger.Warn("Nothing to use as minimum")
-                        Return
-                    End If
-
-                    Dim newMin = lstMin.Min
-
-                    Dim minMin As Double?, maxMax As Double?
-                    If _ansamble.YSource = Yield Then
-                        minMin = _theSettings.MinYield / 100
-                        maxMax = _theSettings.MaxYield / 100
+            If minMinYStrict And maxMaxYStrict And minMinY.HasValue And maxMaxY.HasValue Then
+                TheChart.ChartAreas(0).AxisY.Minimum = minMinY.Value
+                TheChart.ChartAreas(0).AxisY.Maximum = maxMaxY.Value
+            Else
+                Dim minMaxY = CalcMinMax(Function(pnt) If(pnt.YValues.Any, pnt.YValues.First, Nothing))
+                If minMaxY IsNot Nothing Then
+                    Dim pow = If(_ansamble.YSource = Yield, 3, 0)
+                    Dim theMinY As Double
+                    If minMinYStrict Then
+                        theMinY = minMinY
                     Else
-                        minMin = _theSettings.MinSpread
-                        maxMax = _theSettings.MaxSpread
+                        theMinY = If(minMinY.HasValue, Math.Max(minMinY.Value, minMaxY.Item1), minMaxY.Item1)
                     End If
+                    theMinY = Math.Floor(theMinY * (10 ^ pow)) / (10 ^ pow)
 
-                    If newMax > newMin Then
-                        Dim theMin As Double, theMax As Double
-                        theMin = If(minMin.HasValue, Math.Max(minMin.Value, newMin), newMin)
-                        theMax = If(maxMax.HasValue, Math.Min(maxMax.Value, newMax), newMax)
-
-                        Dim pow = If(_ansamble.YSource = Yield, 3, 0)
-                        theMax = Math.Ceiling(theMax * (10 ^ pow)) / (10 ^ pow)
-                        theMin = Math.Floor(theMin * (10 ^ pow)) / (10 ^ pow)
-                        If theMax > theMin Then
-                            .Maximum = theMax
-                            .Minimum = theMin
-                        Else
-                            .Maximum = newMin
-                            .Minimum = newMax
-                            StatusMessage.Text = "Ignoring default chart range settings"
-                            Logger.Warn("Min > Max")
-                        End If
-                        .MinorGrid.Interval = (.Maximum - .Minimum) / 20
-                        .MajorGrid.Interval = (.Maximum - .Minimum) / 10
+                    Dim theMaxY As Double
+                    If maxMaxYStrict Then
+                        theMaxY = maxMaxY
                     Else
-                        Logger.Warn("Min > Max 2")
+                        theMaxY = If(maxMaxY.HasValue, Math.Min(maxMaxY.Value, minMaxY.Item2), minMaxY.Item2)
                     End If
-                Catch ex As Exception
-                    Logger.WarnException("Failed to set minmax", ex)
-                    Logger.Warn("Exception = {0}", ex.ToString())
-                End Try
-            End With
+                    theMaxY = Math.Ceiling(theMaxY * (10 ^ pow)) / (10 ^ pow)
+
+                    If theMaxY > theMinY Then
+                        Logger.Trace(String.Format("Y: {0:N2} -> {1:N2}", theMinY, theMaxY))
+                        TheChart.ChartAreas(0).AxisY.Minimum = theMinY
+                        TheChart.ChartAreas(0).AxisY.Maximum = theMaxY
+                    Else
+                        Logger.Warn("Min Y > Max Y")
+                    End If
+                Else
+                    Logger.Warn("Failed to determine min/max Y")
+                End If
+            End If
+
+            If minMinXStrict And maxMaxXStrict And minMinX.HasValue And maxMaxX.HasValue Then
+                TheChart.ChartAreas(0).AxisY.Minimum = minMinX.Value
+                TheChart.ChartAreas(0).AxisY.Maximum = maxMaxX.Value
+            Else
+                Dim minmaxX = CalcMinMax(Function(pnt) pnt.XValue)
+                If minmaxX IsNot Nothing Then
+                    Dim theMinX As Double
+                    If minMinXStrict Then
+                        theminX = minMinX
+                    Else
+                        theminX = If(minMinX.HasValue, Math.Max(minMinX.Value, minmaxX.Item1), minmaxX.Item1)
+                    End If
+                    theminX = Math.Floor(theminX)
+
+                    Dim theMaxX As Double
+                    If maxMaxXStrict Then
+                        themaxX = maxMaxX
+                    Else
+                        themaxX = If(maxMaxX.HasValue, Math.Min(maxMaxX.Value, minmaxX.Item2), minmaxX.Item2)
+                    End If
+                    themaxX = Math.Ceiling(themaxX)
+
+                    If themaxX > theminX Then
+                        Logger.Trace(String.Format("Y: {0:N2} -> {1:N2}", theminX, themaxX))
+                        TheChart.ChartAreas(0).AxisX.Minimum = theMinX
+                        TheChart.ChartAreas(0).AxisX.Maximum = theMaxX
+                    Else
+                        Logger.Warn("Min X > Max X")
+                    End If
+                Else
+                    Logger.Warn("Failed to determine min/max X")
+                End If
+            End If
         End Sub
+
+        Private Function CalcMinMax(getter As Func(Of DataPoint, Double?)) As Tuple(Of Double, Double)
+            Try
+                Dim lstMax = From srs In TheChart.Series
+                                Where srs.Enabled And srs.Points.Any
+                                Select (From pnt In srs.Points
+                                        Let vl = getter(pnt)
+                                        Where vl.HasValue
+                                        Select vl.Value).Max
+
+                If Not lstMax.Any Then
+                    Logger.Warn("Nothing to use as maximum")
+                    Return Nothing
+                End If
+
+                Dim lstMin = From srs In TheChart.Series
+                                Where srs.Enabled And srs.Points.Any
+                                Select (From pnt In srs.Points
+                                        Where pnt.YValues.Any And (_ansamble.YSource <> Yield OrElse pnt.YValues.First > 0)
+                                        Let vl = getter(pnt)
+                                        Where vl.HasValue
+                                        Select vl.Value).Min
+
+
+                If Not lstMin.Any Then
+                    Logger.Warn("Nothing to use as minimum")
+                    Return Nothing
+                End If
+
+                Return tuple.Create(lstMin.Min, lstMax.Max)
+            Catch ex As Exception
+                Logger.WarnException("Failed to set minmax", ex)
+                Logger.Warn("Exception = {0}", ex.ToString())
+            End Try
+            Return Nothing
+        End Function
 
         Private Sub MakeAxisY(ByVal title As String, ByVal format As String)
             With TheChart.ChartAreas(0).AxisY

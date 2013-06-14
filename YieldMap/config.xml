@@ -16,9 +16,18 @@
   <property name="clear-bond-curves" value="False" />
   <property name="clear-other-curves" value="False" />
   <property name="rating-sort-date" value="True" />
+  <property name="num-interp-points" value="50" />
   <viewport>
     <yield min="" max="" />
     <spread min="" max="" />
     <duration min="" max="" />
+    <x-axis>
+      <property name="min-strict" value="False"/>
+      <property name="max-strict" value="False"/>
+    </x-axis>
+    <y-axis>
+      <property name="min-strict" value="False"/>
+      <property name="max-strict" value="False"/>
+    </y-axis>
   </viewport>
 </settings>

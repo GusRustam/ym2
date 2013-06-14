@@ -49,19 +49,19 @@ Namespace Forms.ChartForm
         Private WithEvents _tableForm As TableForm.TableForm = New TableForm.TableForm()
         Private WithEvents _ansamble As New Ansamble
 
-        Private Sub TheSettings_DurRangeChanged() Handles _theSettings.DurRangeChanged, _theSettings.SpreadRangeChanged, _theSettings.YieldRangeChanged
+        Private Sub ViewPortChanged() Handles _theSettings.ViewPortChanged
             SetChartMinMax()
         End Sub
 
-        Private Sub TheSettings_ShowPointSizeChanged(ByVal show As Boolean) Handles _theSettings.ShowPointSizeChanged
+        Private Sub ShowPointSizeChanged(ByVal show As Boolean) Handles _theSettings.ShowPointSizeChanged
             _ansamble.Replot()
         End Sub
 
-        Private Sub TheSettings_ShowBidAskChanged(ByVal show As Boolean) Handles _theSettings.ShowBidAskChanged
+        Private Sub ShowBidAskChanged(ByVal show As Boolean) Handles _theSettings.ShowBidAskChanged
             If Not show Then HideBidAsk()
         End Sub
 
-        Private Sub TheSettings_FieldsPriorityChanged(ByVal list As String) Handles _theSettings.FieldsPriorityChanged
+        Private Sub FieldsPriorityChanged(ByVal list As String) Handles _theSettings.FieldsPriorityChanged
             _ansamble.Replot()
         End Sub
         Protected ReadOnly DateModule = Eikon.Sdk.CreateAdxDateModule()
@@ -992,5 +992,6 @@ Namespace Forms.ChartForm
                                                               End Sub)))
             a.Start()
         End Sub
+
     End Class
 End Namespace

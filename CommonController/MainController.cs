@@ -6,7 +6,6 @@ namespace CommonController {
         public event Action ShutdownNow;
         private static ShutdownController _instance; 
 
-
         public static ShutdownController Instance  {
             get { return _instance ?? (_instance = new ShutdownController()); }
         }

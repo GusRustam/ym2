@@ -529,8 +529,9 @@ Namespace Tools.Elements
         Protected Overrides Function GetDuration(ByVal ric As String) As Double
             Dim match = Regex.Match(ric, String.Format("{0}(?<term>[0-9]+?[DWMY])ID=.*", InstrumentName))
             Dim term = match.Groups("term").Value
-            Dim aDate As Array = dateModule.DfAddPeriod("RUS", CurveDate(), term, "")
-            Return dateModule.DfCountYears(CurveDate(), Utils.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
+            Dim dt As Date = CurveDate()
+            Dim aDate As Array = DateModule.DfAddPeriod("RUS", dt, term, "")
+            Return DateModule.DfCountYears(dt, Utils.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
         End Function
 
         Public Overrides Function BenchmarkEnabled() As Boolean
@@ -575,8 +576,9 @@ Namespace Tools.Elements
         Protected Overrides Function GetDuration(ByVal ric As String) As Double
             Dim match = Regex.Match(ric, String.Format("{0}(?<term>[0-9]+?Y)=.*", InstrumentName))
             Dim term = match.Groups("term").Value
-            Dim aDate As Array = dateModule.DfAddPeriod("RUS", CurveDate, term, "")
-            Return dateModule.DfCountYears(CurveDate, Utils.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
+            Dim dt As Date = CurveDate
+            Dim aDate As Array = DateModule.DfAddPeriod("RUS", dt, term, "")
+            Return DateModule.DfCountYears(dt, Utils.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
         End Function
 
         Public Overrides Function BenchmarkEnabled() As Boolean
