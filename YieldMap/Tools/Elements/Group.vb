@@ -240,7 +240,8 @@ Namespace Tools.Elements
         Public Sub Disable(ByVal rics As List(Of String)) Implements IChangeable.Disable
             FreezeEvents()
             For Each ric In rics
-                For Each item In (From elem In _elements Where elem.MetaData.RIC = ric)
+                Dim rc = ric
+                For Each item In (From elem In _elements Where elem.MetaData.RIC = rc)
                     item.Enabled = False
                 Next
             Next

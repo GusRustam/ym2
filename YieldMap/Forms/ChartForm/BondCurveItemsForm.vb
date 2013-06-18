@@ -22,14 +22,27 @@ Namespace Forms.ChartForm
             End Set
         End Property
 
-        Private Sub OnCurveUpdatedSpread(ByVal arg1 As List(Of PointOfCurve), ByVal arg2 As IOrdinate)
+        Private Sub OnCurveUpdatedSpread(ByVal items As List(Of PointOfCurve), ByVal ord As IOrdinate)
             CurveUpdate()
         End Sub
 
         Private Sub CurveUpdate()
             If Curve IsNot Nothing Then
                 Dim curveSnapshot = Curve.Snapshot()
-                BondsDGV.DataSource = curveSnapshot.EnabledElements
+                Dim els  = curveSnapshot.EnabledElements
+                If Not els.Any Then
+                    BondsDGV.DataSource = Nothing
+                    MainTC.SelectedTab = CurrentTP
+                    MainTC.TabPages.Remove(BondsTP)
+                Else
+                    If TypeOf els.First Is BondCurveSnapshotElement Then
+                        BondsDGV.DataSource = els.Cast(Of BondCurveSnapshotElement).ToList()
+                    ElseIf TypeOf els.First Is SwapCurveSnapshotElement Then
+                        BondsDGV.DataSource = els.Cast(Of SwapCurveSnapshotElement).ToList()
+                    Else
+                        BondsDGV.DataSource = els
+                    End If
+                End If
                 CurrentDGV.DataSource = curveSnapshot.Current
                 FormulaTB.Text = Curve.Formula
                 Dim i As Integer = 0
@@ -51,7 +64,7 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub CreatePage(Of T As PointOfCurve)(key As IOrdinate, data As List(Of T))
+        Private Sub CreatePage(key As IOrdinate, data As List(Of PointOfCurve))
             Dim pg As New TabPage(key.DescrProperty) With {.Tag = key}
             Dim dgv As New DataGridView With {.Name = key.NameProperty + "_DGV"}
             dgv.DataSource = data

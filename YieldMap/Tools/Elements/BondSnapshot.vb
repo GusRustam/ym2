@@ -62,8 +62,7 @@ Namespace Tools.Elements
                     Where mainQuote IsNot Nothing
                     Let vle = tmp.GetValue(mainQuote)
                     Where vle.HasValue
-                    Select New PointOfBondSpread(mainQuote.Duration, tmp.GetValue(mainQuote),
-                                                   Bond.MetaData.RIC, Bond.MetaData.ShortName)).Cast(Of PointOfCurve).ToList()
+                    Select New JustPoint(mainQuote.Duration, tmp.GetValue(mainQuote), Nothing)).Cast(Of PointOfCurve).ToList()
                 _spreads(tmp).Sort()
             Next ord
         End Sub

@@ -682,7 +682,9 @@ Namespace Forms.ChartForm
             If MoneyCurveCMS.Tag Is Nothing Then Return
             Dim frm As New BondCurveItemsForm
 
-            frm.Curve = CType(_ansamble.SwapCurves(MoneyCurveCMS.Tag), SwapCurve)
+            frm.Curve = _ansamble.SwapCurves(MoneyCurveCMS.Tag)
+            frm.BondsTP.Visible = False
+            frm.Text = "Swap curve items"
             frm.Show()
         End Sub
 

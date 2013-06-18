@@ -112,7 +112,7 @@ Namespace Forms.ChartForm
             Me.BondsTP.Padding = New System.Windows.Forms.Padding(3)
             Me.BondsTP.Size = New System.Drawing.Size(659, 395)
             Me.BondsTP.TabIndex = 0
-            Me.BondsTP.Text = "Bonds"
+            Me.BondsTP.Text = "Items"
             Me.BondsTP.UseVisualStyleBackColor = True
             '
             'BondsDGV
