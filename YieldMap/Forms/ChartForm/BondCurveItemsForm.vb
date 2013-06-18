@@ -71,7 +71,7 @@ Namespace Forms.ChartForm
             pg.Controls.Add(dgv)
             dgv.Dock = DockStyle.Fill
             MainTC.TabPages.Add(pg)
-            MainTC.SelectedTab = pg
+            'MainTC.SelectedTab = pg
         End Sub
 
         Private Sub ResetEnabled()

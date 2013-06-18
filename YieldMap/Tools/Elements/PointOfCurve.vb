@@ -42,6 +42,26 @@ Namespace Tools.Elements
         End Sub
     End Class
 
+    Public Class PointOfSpread
+        Inherits PointOfCurve
+
+        Public Sub New(ByVal x As Double, ByVal y As Double)
+            MyBase.New(x, y)
+        End Sub
+
+        Public Overrides ReadOnly Property X() As String
+            Get
+                Return String.Format("{0:F2}", _x)
+            End Get
+        End Property
+
+        Public Overrides ReadOnly Property Y() As String
+            Get
+                Return String.Format("{0:N2}", _y)
+            End Get
+        End Property
+    End Class
+
     Public Class PointOfBondCurve
         Inherits PointOfCurve
         Private ReadOnly _bond As Bond

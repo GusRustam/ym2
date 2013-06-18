@@ -216,7 +216,7 @@ Namespace Tools.Elements
         Public Overrides Sub Recalculate()
             _lastCurve(Yield) = UpdateCurveShape()
             If IsSynthetic Then
-                _lastSyntCurve = (From item In _lastCurve(Yield) Select GetSyntBond(item.TheX, item.TheY)).ToList()
+                _lastSyntCurve = (From item In _lastCurve(Yield) Where item.TheY > 0 Select GetSyntBond(item.TheX, item.TheY)).ToList()
                 For Each ord In Spreads
                     UpdateSyntSpreads(_lastSyntCurve, ord)
                 Next

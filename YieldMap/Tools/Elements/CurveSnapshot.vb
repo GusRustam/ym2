@@ -40,7 +40,8 @@ Namespace Tools.Elements
             _current = lastCurve(Yield)
             For Each ord In From q In Ordinate.Spreads
                 Where _ansamble.Benchmarks.HasOrd(q) AndAlso lastCurve.ContainsKey(q)
-                _spreads(ord) = lastCurve(ord)
+                Dim o = ord
+                _spreads(ord) = (From item In lastCurve(o) Select New PointOfSpread(item.TheX, item.TheY)).Cast(Of PointOfCurve).ToList()
                 _spreads(ord).Sort()
             Next
         End Sub

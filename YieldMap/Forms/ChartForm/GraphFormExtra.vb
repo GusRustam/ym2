@@ -231,6 +231,8 @@ Namespace Forms.ChartForm
                         Logger.Trace(String.Format("Y: {0:N2} -> {1:N2}", theMinY, theMaxY))
                         TheChart.ChartAreas(0).AxisY.Minimum = theMinY
                         TheChart.ChartAreas(0).AxisY.Maximum = theMaxY
+                        TheChart.ChartAreas(0).AxisY.MajorGrid.Interval = (theMaxY - theMinY) / 5
+                        TheChart.ChartAreas(0).AxisY.MinorGrid.Interval = (theMaxY - theMinY) / 10
                     Else
                         Logger.Warn("Min Y > Max Y")
                     End If
@@ -265,6 +267,8 @@ Namespace Forms.ChartForm
                         Logger.Trace(String.Format("Y: {0:N2} -> {1:N2}", theminX, themaxX))
                         TheChart.ChartAreas(0).AxisX.Minimum = theMinX
                         TheChart.ChartAreas(0).AxisX.Maximum = theMaxX
+                        TheChart.ChartAreas(0).AxisX.MajorGrid.Interval = (theMaxX - theMinX) / 5
+                        TheChart.ChartAreas(0).AxisX.MinorGrid.Interval = (theMaxX - theMinX) / 10
                     Else
                         Logger.Warn("Min X > Max X")
                     End If

@@ -62,7 +62,7 @@ Namespace Tools.Elements
                     Where mainQuote IsNot Nothing
                     Let vle = tmp.GetValue(mainQuote)
                     Where vle.HasValue
-                    Select New JustPoint(mainQuote.Duration, tmp.GetValue(mainQuote), Nothing)).Cast(Of PointOfCurve).ToList()
+                    Select New PointOfSpread(mainQuote.Duration, tmp.GetValue(mainQuote))).Cast(Of PointOfCurve).ToList()
                 _spreads(tmp).Sort()
             Next ord
         End Sub
