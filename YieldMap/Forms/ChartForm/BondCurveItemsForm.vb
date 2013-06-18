@@ -1,8 +1,10 @@
-﻿Imports YieldMap.Tools.Elements
+﻿Imports NLog
+Imports YieldMap.Tools.Elements
 
 Namespace Forms.ChartForm
     Public Class BondCurveItemsForm
         Private _curve As IChangeable
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(BondCurveItemsForm))
 
         Public Property Curve() As ICurve
             Get
@@ -28,8 +30,9 @@ Namespace Forms.ChartForm
 
         Private Sub CurveUpdate()
             If Curve IsNot Nothing Then
+                Dim currentPageName = MainTC.SelectedTab.Name
                 Dim curveSnapshot = Curve.Snapshot()
-                Dim els  = curveSnapshot.EnabledElements
+                Dim els = curveSnapshot.EnabledElements
                 If Not els.Any Then
                     BondsDGV.DataSource = Nothing
                     MainTC.SelectedTab = CurrentTP
@@ -45,18 +48,16 @@ Namespace Forms.ChartForm
                 End If
                 CurrentDGV.DataSource = curveSnapshot.Current
                 FormulaTB.Text = Curve.Formula
-                Dim i As Integer = 0
-                Do
-                    If MainTC.TabPages(i).Tag IsNot Nothing Then
-                        MainTC.TabPages.RemoveAt(i)
+
+                For Each key In From k In curveSnapshot.Spreads.Keys
+                    If curveSnapshot.Spreads(key).Any Then
+                        CreatePage(key, curveSnapshot.Spreads(key))
                     Else
-                        i = i + 1
+                        KillPage(key)
                     End If
-                Loop While i < MainTC.TabPages.Count
-                For Each key In From k In curveSnapshot.Spreads.Keys Where curveSnapshot.Spreads(k).Any
-                    CreatePage(key, curveSnapshot.Spreads(key))
                 Next
                 ResetEnabled()
+                OpenPage(currentPageName)
             Else
                 BondsDGV.DataSource = Nothing
                 CurrentDGV.DataSource = Nothing
@@ -64,14 +65,59 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
+        Private Sub OpenPage(ByVal nm As String)
+            Dim i As Integer = 0
+            Do
+                If MainTC.TabPages(i).Name = nm Then
+                    MainTC.SelectedIndex = i
+                    Exit Do
+                Else
+                    i = i + 1
+                End If
+            Loop While i < MainTC.TabPages.Count
+        End Sub
+
+        Private Sub KillPage(ByVal key As IOrdinate)
+            Dim i As Integer = 0
+            Do
+                If MainTC.TabPages(i).Tag IsNot Nothing AndAlso CType(MainTC.TabPages(i).Tag, OrdinateBase) = key Then
+                    MainTC.TabPages.RemoveAt(i)
+                Else
+                    i = i + 1
+                End If
+            Loop While i < MainTC.TabPages.Count
+        End Sub
+
         Private Sub CreatePage(key As IOrdinate, data As List(Of PointOfCurve))
-            Dim pg As New TabPage(key.DescrProperty) With {.Tag = key}
-            Dim dgv As New DataGridView With {.Name = key.NameProperty + "_DGV"}
-            dgv.DataSource = data
-            pg.Controls.Add(dgv)
-            dgv.Dock = DockStyle.Fill
-            MainTC.TabPages.Add(pg)
-            'MainTC.SelectedTab = pg
+            Try
+                Dim i As Integer = 0
+                Dim found As Boolean = False
+                Do
+                    If MainTC.TabPages(i).Tag IsNot Nothing AndAlso CType(MainTC.TabPages(i).Tag, OrdinateBase) = key Then
+                        found = True
+                        Exit Do
+                    Else
+                        i = i + 1
+                    End If
+                Loop While i < MainTC.TabPages.Count
+
+                Dim dgvName = key.NameProperty + "_DGV"
+                If Not found Then
+                    Dim pg = New TabPage(key.DescrProperty) With {.Tag = key}
+                    Dim dgv = New DataGridView With {.Name = dgvName}
+                    dgv.DataSource = data
+                    pg.Controls.Add(dgv)
+                    dgv.Dock = DockStyle.Fill
+                    MainTC.TabPages.Add(pg)
+                Else
+                    Dim pg = MainTC.TabPages(i)
+                    Dim dgv = CType(pg.Controls(dgvName), DataGridView)
+                    dgv.DataSource = data
+                End If
+            Catch ex As Exception
+                Logger.ErrorException("Failed to add page", ex)
+                Logger.Error("Exception = {0}", ex.ToString())
+            End Try
         End Sub
 
         Private Sub ResetEnabled()
