@@ -2,13 +2,13 @@
 
 Namespace Forms.ChartForm
     Public Class BondCurveItemsForm
-        Private _curve As BondCurve
+        Private _curve As IChangeable
 
-        Public Property Curve() As BondCurve
+        Public Property Curve() As ICurve
             Get
                 Return _curve
             End Get
-            Set(ByVal value As BondCurve)
+            Set(ByVal value As ICurve)
                 If _curve IsNot Nothing Then
                     RemoveHandler _curve.Cleared, AddressOf OnCurveCleared
                     RemoveHandler _curve.Updated, AddressOf OnCurveUpdated
@@ -22,13 +22,13 @@ Namespace Forms.ChartForm
             End Set
         End Property
 
-        Private Sub OnCurveUpdatedSpread(ByVal arg1 As List(Of CurveItem), ByVal arg2 As IOrdinate)
+        Private Sub OnCurveUpdatedSpread(ByVal arg1 As List(Of PointOfCurve), ByVal arg2 As IOrdinate)
             CurveUpdate()
         End Sub
 
         Private Sub CurveUpdate()
             If Curve IsNot Nothing Then
-                Dim curveSnapshot = Curve.GetSnapshot()
+                Dim curveSnapshot = Curve.Snapshot()
                 BondsDGV.DataSource = curveSnapshot.EnabledElements
                 CurrentDGV.DataSource = curveSnapshot.Current
                 FormulaTB.Text = Curve.Formula
@@ -51,7 +51,7 @@ Namespace Forms.ChartForm
             End If
         End Sub
 
-        Private Sub CreatePage(key As IOrdinate, data As List(Of BondSpreadCurveItem))
+        Private Sub CreatePage(Of T As PointOfCurve)(key As IOrdinate, data As List(Of T))
             Dim pg As New TabPage(key.DescrProperty) With {.Tag = key}
             Dim dgv As New DataGridView With {.Name = key.NameProperty + "_DGV"}
             dgv.DataSource = data
@@ -62,11 +62,11 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub ResetEnabled()
-            AddItemsTSB.Enabled = MainTC.SelectedTab.Name = BondsTP.Name AndAlso Curve.DisabledElements.Any AndAlso Not Curve.IsSynthetic
+            AddItemsTSB.Enabled = MainTC.SelectedTab.Name = BondsTP.Name AndAlso _curve.DisabledElements.Any AndAlso Not Curve.IsSynthetic
             RemoveItemsTSB.Enabled = MainTC.SelectedTab.Name = BondsTP.Name AndAlso Not Curve.IsSynthetic
         End Sub
 
-        Private Sub OnCurveUpdated(ByVal obj As List(Of CurveItem))
+        Private Sub OnCurveUpdated(ByVal obj As List(Of PointOfCurve))
             CurveUpdate()
         End Sub
 
@@ -94,8 +94,8 @@ Namespace Forms.ChartForm
                 MessageBox.Show("There must be at least two points in curve", "Cannot remove point", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Return
             End If
-            Dim elements = (From elem As DataGridViewRow In BondsDGV.SelectedRows Select CType(elem.DataBoundItem, BondCurve.BondCurveSnapshot.BondCurveElement).RIC).ToList()
-            Curve.Disable(elements)
+            Dim elements = (From elem As DataGridViewRow In BondsDGV.SelectedRows Select CType(elem.DataBoundItem, BondCurveSnapshotElement).RIC).ToList()
+            _curve.Disable(elements)
         End Sub
 
         Private Sub BondCurveItemsForm_Shown(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Shown

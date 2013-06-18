@@ -135,7 +135,13 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Tools\Elements\BenchmarkContainer.vb" />
-    <Compile Include="Tools\Elements\CurveItem.vb" />
+    <Compile Include="Tools\Elements\BondCurveSnapshotElement.vb" />
+    <Compile Include="Tools\Elements\BondSnapshot.vb" />
+    <Compile Include="Tools\Elements\CurveSnapshot.vb" />
+    <Compile Include="Tools\Elements\CurveSnapshotElement.vb" />
+    <Compile Include="Tools\Elements\ICurveSnapshotElement.vb" />
+    <Compile Include="Tools\Elements\ISnapshot.vb" />
+    <Compile Include="Tools\Elements\PointOfCurve.vb" />
     <Compile Include="Tools\Elements\IAswBenchmark.vb" />
     <Compile Include="Tools\Elements\IChangeable.vb" />
     <Compile Include="Tools\Elements\ICurve.vb" />
@@ -263,6 +269,8 @@
     <Compile Include="Tools\Elements\Identifyable.vb" />
     <Compile Include="Tools\Elements\SwapCurveContainer.vb" />
     <Compile Include="Tools\Elements\Ordinate.vb" />
+    <Compile Include="Tools\Elements\SwapCurveSnapshotElement.vb" />
+    <Compile Include="Tools\Elements\SyntheticZcb.vb" />
     <Compile Include="Tools\Estimation.vb" />
     <Compile Include="Tools\YieldCalc.vb" />
   </ItemGroup>
@@ -486,7 +494,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_BuildVersioningStyle="None.MonthStamp.Increment.TimeStamp" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" />
+      <UserProperties BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_BuildVersioningStyle="None.MonthStamp.Increment.TimeStamp" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

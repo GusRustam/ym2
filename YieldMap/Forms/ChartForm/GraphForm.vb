@@ -114,7 +114,7 @@ Namespace Forms.ChartForm
                                            Select New BondGroup(_ansamble, port, portfolioStructure)
                     ' todo add custom bonds
                     AddHandler grp.Updated, AddressOf OnGroupUpdated
-                    AddHandler grp.UpdatedSpread, Sub(data As List(Of CurveItem), ord As IOrdinate) If _ansamble.YSource = ord Then OnGroupUpdated(data)
+                    AddHandler grp.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnGroupUpdated(data)
                     _ansamble.Items.Add(grp)
                 Next
                 _ansamble.Items.Start()
@@ -561,8 +561,8 @@ Namespace Forms.ChartForm
             Dim rubCCS = New RubCCS(_ansamble)
 
             AddHandler rubCCS.Cleared, Sub() ClearSeries(rubCCS.Identity)
-            AddHandler rubCCS.Updated, Sub(data As List(Of CurveItem)) OnSwapCurvePaint(data, rubCCS)
-            AddHandler rubCCS.UpdatedSpread, Sub(data As List(Of CurveItem), ord As IOrdinate) If _ansamble.YSource = ord Then OnSwapCurvePaint(data, rubCCS)
+            AddHandler rubCCS.Updated, Sub(data As List(Of PointOfCurve)) OnSwapCurvePaint(data, rubCCS)
+            AddHandler rubCCS.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnSwapCurvePaint(data, rubCCS)
 
             rubCCS.Subscribe()
             _ansamble.SwapCurves.Add(rubCCS)
@@ -572,8 +572,8 @@ Namespace Forms.ChartForm
             Logger.Debug("RubIRSTSMIClick()")
             Dim rubIRS = New RubIRS(_ansamble)
             AddHandler rubIRS.Cleared, Sub() ClearSeries(rubIRS.Identity)
-            AddHandler rubIRS.Updated, Sub(data As List(Of CurveItem)) OnSwapCurvePaint(data, rubIRS)
-            AddHandler rubIRS.UpdatedSpread, Sub(data As List(Of CurveItem), ord As IOrdinate) If _ansamble.YSource = ord Then OnSwapCurvePaint(data, rubIRS)
+            AddHandler rubIRS.Updated, Sub(data As List(Of PointOfCurve)) OnSwapCurvePaint(data, rubIRS)
+            AddHandler rubIRS.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnSwapCurvePaint(data, rubIRS)
 
             rubIRS.Subscribe()
             _ansamble.SwapCurves.Add(rubIRS)
@@ -583,8 +583,8 @@ Namespace Forms.ChartForm
             Logger.Debug("UsdIRS_TSMIClick()")
             Dim usdIRS = New UsdIRS(_ansamble)
             AddHandler usdIRS.Cleared, Sub() ClearSeries(usdIRS.Identity)
-            AddHandler usdIRS.Updated, Sub(data As List(Of CurveItem)) OnSwapCurvePaint(data, usdIRS)
-            AddHandler usdIRS.UpdatedSpread, Sub(data As List(Of CurveItem), ord As IOrdinate) If _ansamble.YSource = ord Then OnSwapCurvePaint(data, usdIRS)
+            AddHandler usdIRS.Updated, Sub(data As List(Of PointOfCurve)) OnSwapCurvePaint(data, usdIRS)
+            AddHandler usdIRS.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnSwapCurvePaint(data, usdIRS)
 
             usdIRS.Subscribe()
             _ansamble.SwapCurves.Add(usdIRS)
@@ -594,8 +594,8 @@ Namespace Forms.ChartForm
             Logger.Debug("NDFTSMI_Click()")
             Dim rubNDF = New RubNDF(_ansamble)
             AddHandler rubNDF.Cleared, Sub() ClearSeries(rubNDF.Identity)
-            AddHandler rubNDF.Updated, Sub(data As List(Of CurveItem)) OnSwapCurvePaint(data, rubNDF)
-            AddHandler rubNDF.UpdatedSpread, Sub(data As List(Of CurveItem), ord As IOrdinate) If _ansamble.YSource = ord Then OnSwapCurvePaint(data, rubNDF)
+            AddHandler rubNDF.Updated, Sub(data As List(Of PointOfCurve)) OnSwapCurvePaint(data, rubNDF)
+            AddHandler rubNDF.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnSwapCurvePaint(data, rubNDF)
 
             rubNDF.Subscribe()
             _ansamble.SwapCurves.Add(rubNDF)
@@ -679,7 +679,11 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub ShowCurveItemsTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles ShowCurveItemsTSMI.Click
-            ' todo snapshottin'
+            If MoneyCurveCMS.Tag Is Nothing Then Return
+            Dim frm As New BondCurveItemsForm
+
+            frm.Curve = CType(_ansamble.SwapCurves(MoneyCurveCMS.Tag), SwapCurve)
+            frm.Show()
         End Sub
 
         Private Sub AsTableTSBClick(ByVal sender As Object, ByVal e As EventArgs) Handles AsTableTSB.Click
@@ -726,7 +730,7 @@ Namespace Forms.ChartForm
             Dim src = CType(CType(sender, ToolStripMenuItem).Tag, Source)
 
             Dim curve = New BondCurve(_ansamble, src)
-            AddHandler curve.UpdatedSpread, Sub(data As List(Of CurveItem), ord As IOrdinate) If _ansamble.YSource = ord Then OnNewCurvePaint(data)
+            AddHandler curve.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnNewCurvePaint(data)
             AddHandler curve.Updated, AddressOf OnNewCurvePaint
             AddHandler curve.Cleared, Sub()
                                           Dim srs = TheChart.Series.FindByName(curve.Identity)
@@ -825,7 +829,7 @@ Namespace Forms.ChartForm
                     If groupSelect.UseNew Then
                         grp = New BondGroup(_ansamble, groupSelect.NewName, bondSelector.SelectedRICs, groupSelect.NewColor, New FieldSet(groupSelect.LayoutId))
                         AddHandler grp.Updated, AddressOf OnGroupUpdated
-                        AddHandler grp.UpdatedSpread, Sub(data As List(Of CurveItem), ord As IOrdinate) If _ansamble.YSource = ord Then OnGroupUpdated(data)
+                        AddHandler grp.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnGroupUpdated(data)
                         _ansamble.Items.Add(grp)
                     Else
                         grp = _ansamble.Items(groupSelect.ExistingGroupId)

@@ -18,8 +18,8 @@ Namespace Tools.Elements
 
         Public Event Cleared As Action Implements IChangeable.Cleared
         Public Event Volume As Action(Of Bond)
-        Public Event Updated As Action(Of List(Of CurveItem)) Implements IChangeable.Updated
-        Public Event UpdatedSpread As Action(Of List(Of CurveItem), IOrdinate) Implements IChangeable.UpdatedSpread
+        Public Event Updated As Action(Of List(Of PointOfCurve)) Implements IChangeable.Updated
+        Public Event UpdatedSpread As Action(Of List(Of PointOfCurve), IOrdinate) Implements IChangeable.UpdatedSpread
 
         Public MustOverride Sub Recalculate() Implements IChangeable.Recalculate
         Public MustOverride Sub RecalculateTotal() Implements IChangeable.RecalculateTotal
@@ -63,11 +63,11 @@ Namespace Tools.Elements
             If Ansamble.YSource <> Yield Then Recalculate(Ansamble.YSource)
         End Sub
 
-        Protected Overridable Sub NotifyUpdated(ByVal curveItems As List(Of CurveItem))
+        Protected Overridable Sub NotifyUpdated(ByVal curveItems As List(Of PointOfCurve))
             If Not _eventsFrozen Then RaiseEvent Updated(curveItems)
         End Sub
 
-        Protected Sub NotifyUpdatedSpread(ByVal curveItems As List(Of CurveItem), ord As IOrdinate)
+        Protected Sub NotifyUpdatedSpread(ByVal curveItems As List(Of PointOfCurve), ord As IOrdinate)
             If Not _eventsFrozen Then RaiseEvent UpdatedSpread(curveItems, ord)
         End Sub
 
@@ -84,7 +84,7 @@ Namespace Tools.Elements
             End Get
         End Property
 
-        Public ReadOnly Property DisabledElements() As List(Of Bond)
+        Public ReadOnly Property DisabledElements() As List(Of Bond) Implements IChangeable.DisabledElements
             Get
                 Return (From elem In _elements Where Not elem.Enabled).ToList()
             End Get
@@ -229,7 +229,7 @@ Namespace Tools.Elements
             _ansamble = ansamble
         End Sub
 
-        Public Sub Disable(ByVal ric As String)
+        Public Sub Disable(ByVal ric As String) Implements IChangeable.Disable
             FreezeEvents()
             For Each item In (From elem In _elements Where elem.MetaData.RIC = ric)
                 item.Enabled = False
@@ -237,23 +237,17 @@ Namespace Tools.Elements
             UnfreezeEvents()
         End Sub
 
-        Public Sub Disable(ByVal rics As List(Of String))
+        Public Sub Disable(ByVal rics As List(Of String)) Implements IChangeable.Disable
             FreezeEvents()
-            For Each item In (From elem In _elements Where rics.Contains(elem.MetaData.RIC))
-                item.Enabled = False
+            For Each ric In rics
+                For Each item In (From elem In _elements Where elem.MetaData.RIC = ric)
+                    item.Enabled = False
+                Next
             Next
             UnfreezeEvents()
         End Sub
 
-        Public Sub Enable(ByVal ric As String)
-            FreezeEvents()
-            For Each item In (From elem In _elements Where elem.MetaData.RIC = ric)
-                item.Enabled = True
-            Next
-            UnfreezeEvents()
-        End Sub
-
-        Public Sub Enable(ByVal rics As List(Of String))
+        Public Sub Enable(ByVal rics As List(Of String)) Implements IChangeable.Enable
             FreezeEvents()
             For Each item In (From elem In _elements Where rics.Contains(elem.MetaData.RIC))
                 item.Enabled = True

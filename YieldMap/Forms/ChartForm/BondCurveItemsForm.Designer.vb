@@ -1,7 +1,9 @@
-﻿Namespace Forms.ChartForm
+﻿Imports YieldMap.Tools.Elements
+
+Namespace Forms.ChartForm
     <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
     Partial Class BondCurveItemsForm
-        Inherits System.Windows.Forms.Form
+        Inherits Form
 
         'Form overrides dispose to clean up the component list.
         <System.Diagnostics.DebuggerNonUserCode()> _

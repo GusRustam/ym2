@@ -61,7 +61,7 @@ Namespace Tools.Elements
         End Sub
 
         Public Overrides Sub Recalculate()
-            Dim res As New Dictionary(Of IOrdinate, List(Of CurveItem))
+            Dim res As New Dictionary(Of IOrdinate, List(Of PointOfCurve))
             res(Yield) = UpdatePoints()
             For Each ord In Spreads
                 res(ord) = UpdateSpreads(ord)
@@ -76,23 +76,23 @@ Namespace Tools.Elements
             End If
         End Sub
 
-        Private Function UpdateSpreads(ByVal ordinate As IOrdinate) As List(Of CurveItem)
+        Private Function UpdateSpreads(ByVal ordinate As IOrdinate) As List(Of PointOfCurve)
             SetSpread(ordinate)
-            Dim res = New List(Of CurveItem)(
+            Dim res = New List(Of PointOfCurve)(
                         From item In AllElements
                         From quoteName In item.QuotesAndYields
                         Let q = item.QuotesAndYields(quoteName)
                         Let theY = ordinate.GetValue(q)
                         Where theY.HasValue AndAlso item.QuotesAndYields.Main IsNot Nothing AndAlso quoteName = item.QuotesAndYields.Main.QuoteName
-                        Select New BondCurveItem(q.Duration, theY, q.ParentBond,
+                        Select New PointOfBondCurve(q.Duration, theY, q.ParentBond,
                                                 q.BackColor, q.Yld.ToWhat, q.MarkerStyle,
                                                 q.ParentBond.Label))
             res.Sort()
             Return res
         End Function
 
-        Private Function UpdatePoints() As List(Of CurveItem)
-            Dim result As New List(Of CurveItem)
+        Private Function UpdatePoints() As List(Of PointOfCurve)
+            Dim result As New List(Of PointOfCurve)
 
             For Each bnd In Elements
                 Dim x As Double, y As Double
@@ -107,7 +107,7 @@ Namespace Tools.Elements
                 End Select
 
                 y = description.Yield
-                If x > 0 And y > 0 Then result.Add(New BondCurveItem(x, y, bnd, description.BackColor, description.Yld.ToWhat, description.MarkerStyle, bnd.Label))
+                If x > 0 And y > 0 Then result.Add(New PointOfBondCurve(x, y, bnd, description.BackColor, description.Yld.ToWhat, description.MarkerStyle, bnd.Label))
             Next
             result.Sort()
             Return result

@@ -7,8 +7,8 @@ Namespace Tools.Elements
 
         '' ============ EVENTS ============
         Public Event Cleared As Action Implements IChangeable.Cleared
-        Public Event Updated As Action(Of List(Of CurveItem)) Implements IChangeable.Updated
-        Public Event UpdatedSpread As Action(Of List(Of CurveItem), IOrdinate) Implements IChangeable.UpdatedSpread
+        Public Event Updated As Action(Of List(Of PointOfCurve)) Implements IChangeable.Updated
+        Public Event UpdatedSpread As Action(Of List(Of PointOfCurve), IOrdinate) Implements IChangeable.UpdatedSpread
 
         '' ============ OWN METHODS ============
         Private ReadOnly _ansamble As Ansamble
@@ -42,24 +42,35 @@ Namespace Tools.Elements
             RaiseEvent Cleared()
         End Sub
 
-        Protected Sub NotifyUpdated(ByVal data As List(Of CurveItem))
+        Protected Sub NotifyUpdated(ByVal data As List(Of PointOfCurve))
             If Not _eventsFrozen Then RaiseEvent Updated(data)
         End Sub
 
-        Protected Sub NotifyUpdatedSpread(ByVal data As List(Of CurveItem), ByVal ord As IOrdinate)
+        Protected Sub NotifyUpdatedSpread(ByVal data As List(Of PointOfCurve), ByVal ord As IOrdinate)
             If Not _eventsFrozen Then RaiseEvent UpdatedSpread(data, ord)
         End Sub
 
         '' ============ ICHANGEABLE INTERFACE ============
         Public MustOverride Sub Recalculate() Implements IChangeable.Recalculate
         Public MustOverride Sub RecalculateTotal() Implements IChangeable.RecalculateTotal
+
+        Public MustOverride Sub Disable(ByVal ric As String) Implements IChangeable.Disable
+        Public MustOverride Sub Disable(ByVal rics As List(Of String)) Implements IChangeable.Disable
+        Public MustOverride Sub Enable(ByVal rics As List(Of String)) Implements IChangeable.Enable
+        Public MustOverride ReadOnly Property DisabledElements() As List(Of Bond) Implements IChangeable.DisabledElements
+
         Public MustOverride Sub Recalculate(ByVal ord As IOrdinate) Implements IChangeable.Recalculate
         Public MustOverride ReadOnly Property Name() As String Implements INamed.Name
+
+
         Public MustOverride Sub Cleanup() Implements IChangeable.Cleanup
         Public MustOverride Sub Subscribe() Implements IChangeable.Subscribe
 
+        Public MustOverride ReadOnly Property Snapshot() As ISnapshot Implements ICurve.Snapshot
+
         '' ============ ICURVE INTERFACE ============
         Public MustOverride Property CurveDate() As Date Implements ICurve.CurveDate
+        Public MustOverride ReadOnly Property Formula() As String Implements ICurve.Formula
         Public MustOverride ReadOnly Property CanBootstrap() As Boolean Implements ICurve.CanBootstrap
         Public MustOverride Property Bootstrapped() As Boolean Implements ICurve.Bootstrapped
         Public MustOverride Sub Bootstrap() Implements ICurve.Bootstrap
@@ -81,8 +92,5 @@ Namespace Tools.Elements
         '' ============ COLORS ============
         Public MustOverride ReadOnly Property OuterColor() As Color
         Public MustOverride ReadOnly Property InnerColor() As Color
-
-        '' ============ DESCRIPTIONS ============
-        Public MustOverride Function GetSnapshot() As List(Of Tuple(Of String, String, Double?, Double))
     End Class
 End Namespace

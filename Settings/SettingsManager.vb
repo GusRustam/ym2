@@ -298,7 +298,6 @@ Public Class SettingsManager
         End Set
     End Property
 
-
     Private _maxYStrict As Boolean
     Public Property MaxYStrict() As Boolean
         Get
@@ -324,7 +323,6 @@ Public Class SettingsManager
     End Property
 
     Private _maxXStrict As Boolean
-
     Public Property MaxXStrict() As Boolean
         Get
             Return _maxXStrict
@@ -336,14 +334,14 @@ Public Class SettingsManager
         End Set
     End Property
 
-    Private _numInterpPoints As Integer
+    Private _numInterpPoints As Integer = 50
     Public Property NumInterpPoints() As Integer
         Get
             Return _numInterpPoints
         End Get
         Set(ByVal value As Integer)
             _numInterpPoints = value
-            SaveValue("/settings/property[@name='num-interp-point']/@value", value)
+            SaveValue("/settings/property[@name='num-interp-points']/@value", value)
         End Set
     End Property
 
@@ -357,7 +355,7 @@ Public Class SettingsManager
         GetDoubleValue("/settings/viewport/duration/@max", _maxDur)
         GetDoubleValue("/settings/viewport/duration/@min", _minDur)
 
-        GetIntegerValue("/settings/property[@name='num-interp-point']/@value", _numInterpPoints)
+        GetIntegerValue("/settings/property[@name='num-interp-points']/@value", _numInterpPoints)
 
         GetBoolValue("/settings/property[@name='mid-if-both']/@value", _midIfBoth)
         GetBoolValue("/settings/property[@name='show-bid-ask']/@value", _showBidAsk)

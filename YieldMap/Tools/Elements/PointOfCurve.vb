@@ -1,8 +1,8 @@
 Imports System.ComponentModel
 
 Namespace Tools.Elements
-    Public MustInherit Class CurveItem
-        Implements IComparable(Of CurveItem)
+    Public MustInherit Class PointOfCurve
+        Implements IComparable(Of PointOfCurve)
         Protected ReadOnly _x As Double
         Protected ReadOnly _y As Double
 
@@ -32,7 +32,7 @@ Namespace Tools.Elements
             End Get
         End Property
 
-        Public Function CompareTo(ByVal other As CurveItem) As Integer Implements IComparable(Of CurveItem).CompareTo
+        Public Function CompareTo(ByVal other As PointOfCurve) As Integer Implements IComparable(Of PointOfCurve).CompareTo
             Return _x.CompareTo(other._x)
         End Function
 
@@ -42,8 +42,8 @@ Namespace Tools.Elements
         End Sub
     End Class
 
-    Public Class BondCurveItem
-        Inherits CurveItem
+    Public Class PointOfBondCurve
+        Inherits PointOfCurve
         Private ReadOnly _bond As Bond
         Private ReadOnly _backColor As String
         Private ReadOnly _label As String
@@ -100,8 +100,8 @@ Namespace Tools.Elements
         End Sub
     End Class
 
-    Public Class SwapCurveItem
-        Inherits CurveItem
+    Public Class PointOfSwapCurve
+        Inherits PointOfCurve
 
         Private ReadOnly _curve As SwapCurve
         Private ReadOnly _ric As String
@@ -126,8 +126,8 @@ Namespace Tools.Elements
         End Property
     End Class
 
-    Public Class PointCurveItem
-        Inherits CurveItem
+    Public Class JustPoint
+        Inherits PointOfCurve
         Private ReadOnly _curve As ICurve
 
         <Browsable(False)>
@@ -143,8 +143,8 @@ Namespace Tools.Elements
         End Sub
     End Class
 
-    Public Class BondSpreadCurveItem
-        Inherits CurveItem
+    Public Class PointOfBondSpread
+        Inherits PointOfCurve
         Private ReadOnly _ric As String
         Private ReadOnly _name As String
 

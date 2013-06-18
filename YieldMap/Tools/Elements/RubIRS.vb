@@ -49,7 +49,7 @@ Namespace Tools.Elements
         Private _theCurveDate As Date = Date.Today
         Private _broker As String = ""
         Private _quote As String = "MID"
-        Private ReadOnly _lastCurve As New Dictionary(Of IOrdinate, List(Of CurveItem))
+        Private ReadOnly _lastCurve As New Dictionary(Of IOrdinate, List(Of PointOfCurve))
         Private ReadOnly _yieldCurveModule As AdxYieldCurveModule = Eikon.Sdk.CreateAdxYieldCurveModule()
         Private Const InstrumentType As String = "S"
 
@@ -75,7 +75,6 @@ Namespace Tools.Elements
                 LoadHistory()
             End If
         End Sub
-
 
         ''' <summary>
         ''' Parsing swap name to retrieve term
@@ -194,18 +193,34 @@ Namespace Tools.Elements
             Recalculate()
         End Sub
 
-        Private Function UpdateSpreads(ByVal ordinate As IOrdinate) As List(Of CurveItem)
+        Public Overrides Sub Disable(ByVal ric As String)
+        End Sub
+
+        Public Overrides Sub Disable(ByVal rics As List(Of String))
+        End Sub
+
+        Public Overrides Sub Enable(ByVal rics As List(Of String))
+        End Sub
+
+        Public Overrides ReadOnly Property DisabledElements() As List(Of Bond)
+            Get
+                Return New List(Of Bond)()
+            End Get
+        End Property
+
+
+        Private Function UpdateSpreads(ByVal ordinate As IOrdinate) As List(Of PointOfCurve)
             SetSpread(ordinate)
-            Dim res = New List(Of CurveItem)(From item In Descrs
+            Dim res = New List(Of PointOfCurve)(From item In Descrs
                                              Let theY = ordinate.GetValue(item)
                                              Where theY.HasValue
-                                             Select New PointCurveItem(item.Duration, theY, Me))
+                                             Select New JustPoint(item.Duration, theY, Me))
             res.Sort()
             Return res
         End Function
 
-        Private Function UpdatePoints() As List(Of CurveItem)
-            Dim result As New List(Of CurveItem)
+        Private Function UpdatePoints() As List(Of PointOfCurve)
+            Dim result As New List(Of PointOfCurve)
             If _bootstrapped Then
                 Try
                     Dim data = (From elem In Descrs Where elem.Yield.HasValue AndAlso elem.Yield > 0).ToList()
@@ -219,12 +234,11 @@ Namespace Tools.Elements
                         params(i, 4) = data(i).Yield
                         params(i, 5) = Struct
                     Next
-                    Dim curveModule = _yieldCurveModule
-                    Dim termStructure As Array = curveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
+                    Dim termStructure As Array = _yieldCurveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
                     For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
                         Dim dur = (Utils.FromExcelSerialDate(termStructure.GetValue(i, 1)) - CurveDate).TotalDays / 365.0
                         Dim yld = termStructure.GetValue(i, 2)
-                        If dur > 0 And yld > 0 Then result.Add(New PointCurveItem(dur, yld, Me))
+                        If dur > 0 And yld > 0 Then result.Add(New JustPoint(dur, yld, Me))
                     Next
                 Catch ex As Exception
                     Logger.ErrorException("Failed to bootstrap", ex)
@@ -235,8 +249,8 @@ Namespace Tools.Elements
                 result.AddRange((From item In Descrs
                                    Let x = item.Duration, y = item.Yield
                                    Where x > 0 And y > 0
-                                   Select New SwapCurveItem(x, y, Me, item.RIC)).
-                                   Cast(Of CurveItem))
+                                   Select New PointOfSwapCurve(x, y, Me, item.RIC)).
+                                   Cast(Of PointOfCurve))
             End If
             result.Sort()
             Return result
@@ -324,6 +338,18 @@ Namespace Tools.Elements
             Next
         End Sub
 
+        Public Overrides ReadOnly Property Snapshot() As ISnapshot
+            Get
+                Return New CurveSnapshot(_lastCurve, Ansamble)
+            End Get
+        End Property
+
+        Public Overrides ReadOnly Property Formula() As String
+            Get
+                Return "N/A"
+            End Get
+        End Property
+
         Public Overrides ReadOnly Property CanBootstrap() As Boolean
             Get
                 Return True
@@ -376,12 +402,6 @@ Namespace Tools.Elements
             Else
                 Return Nothing
             End If
-        End Function
-
-        Public Overrides Function GetSnapshot() As List(Of Tuple(Of String, String, Double?, Double))
-            'Return Descrs.Values.Select(Function(elem) New Tuple(Of String, String, Double?, Double)(elem.RIC, String.Format("{0:N}Y", GetDuration(elem.RIC)), elem.Yield, elem.Duration)).ToList()
-            ' todo snapshotting :/
-            Return Nothing
         End Function
 
         '' OVERRIDEN METHODS

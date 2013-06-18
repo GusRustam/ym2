@@ -1,10 +1,9 @@
 ﻿Imports YieldMap.Tools.Elements
-Imports YieldMap.Tools
 
 Namespace Forms.ChartForm
     Public Class AddBondCurveItemsForm
         Private _curve As BondCurve
-        Private _snapshot As BondCurve.BondCurveSnapshot
+        Private _snapshot As ISnapshot
 
         Public Property Curve() As BondCurve
             Get
@@ -24,7 +23,7 @@ Namespace Forms.ChartForm
 
         Private Sub OkButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles OkButton.Click
             If ItemsDGV.SelectedRows.Count <= 0 Then Return
-            Dim elements = (From elem As DataGridViewRow In ItemsDGV.SelectedRows Select CType(elem.DataBoundItem, BondCurve.BondCurveSnapshot.BondCurveElement).RIC).ToList()
+            Dim elements = (From elem As DataGridViewRow In ItemsDGV.SelectedRows Select CType(elem.DataBoundItem, ICurveSnapshotElement).RIC).ToList()
             Curve.Enable(elements)
             Close()
         End Sub

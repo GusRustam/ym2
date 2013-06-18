@@ -2,6 +2,8 @@ Namespace Tools.Elements
     Public Interface ICurve
         Inherits INamed
 
+        ReadOnly Property Snapshot() As ISnapshot
+        ReadOnly Property Formula() As String
         ReadOnly Property CanBootstrap() As Boolean
         Property Bootstrapped() As Boolean
         Property CurveDate() As Date
@@ -12,4 +14,4 @@ Namespace Tools.Elements
         Sub SetSpread(ByVal ySource As OrdinateBase)
         Function RateArray() As Array
     End Interface
-End NameSpace
+End Namespace

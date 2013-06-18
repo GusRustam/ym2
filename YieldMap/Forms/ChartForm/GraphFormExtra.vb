@@ -458,13 +458,13 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
-        Private Sub OnGroupUpdated(ByVal data As List(Of CurveItem))
+        Private Sub OnGroupUpdated(ByVal data As List(Of PointOfCurve))
             Logger.Trace("OnGroupUpdated()")
             GuiAsync(
                 Sub()
                     If Not data.Any Then Return
-                    If Not TypeOf data.First Is BondCurveItem Then Return
-                    Dim dt = data.Cast(Of BondCurveItem).ToList()
+                    If Not TypeOf data.First Is PointOfBondCurve Then Return
+                    Dim dt = data.Cast(Of PointOfBondCurve).ToList()
                     Dim group = dt.First.Bond.Parent
                     Dim series As Series = TheChart.Series.FindByName(group.Identity)
                     Dim clr = Color.FromName(group.Color)
@@ -515,7 +515,7 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
-        Private Sub OnSwapCurvePaint(ByVal data As List(Of CurveItem), ByVal crv As SwapCurve)
+        Private Sub OnSwapCurvePaint(ByVal data As List(Of PointOfCurve), ByVal crv As SwapCurve)
             GuiAsync(
                 Sub()
                     Dim srs = TheChart.Series.FindByName(crv.Identity)
@@ -545,17 +545,17 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
-        Private Sub OnNewCurvePaint(ByVal data As List(Of CurveItem))
+        Private Sub OnNewCurvePaint(ByVal data As List(Of PointOfCurve))
             GuiAsync(
                 Sub()
                     If Not data.Any Then Return
                     Dim crv As BondCurve
                     Dim itsBond As Boolean
-                    If TypeOf data.First Is BondCurveItem Then
-                        crv = CType(CType(data.First, BondCurveItem).Bond.Parent, BondCurve)
+                    If TypeOf data.First Is PointOfBondCurve Then
+                        crv = CType(CType(data.First, PointOfBondCurve).Bond.Parent, BondCurve)
                         itsBond = True
-                    ElseIf TypeOf data.First Is PointCurveItem Then
-                        crv = CType(data.First, PointCurveItem).Curve
+                    ElseIf TypeOf data.First Is JustPoint Then
+                        crv = CType(data.First, JustPoint).Curve
                         itsBond = False
                     Else
                         Logger.Warn("Unexpected items type for a bond-based curve")
@@ -577,7 +577,7 @@ Namespace Forms.ChartForm
                     TheChart.Legends(0).CustomItems.Add(New LegendItem(crv.Name, clr, "") With {.Tag = crv.Identity})
 
                     If itsBond Then
-                        For Each point In data.Cast(Of BondCurveItem)()
+                        For Each point In data.Cast(Of PointOfBondCurve)()
                             Dim pnt = New DataPoint(point.TheX, point.TheY) With {
                                 .Tag = point.Bond,
                                 .Label = point.Label
@@ -585,7 +585,7 @@ Namespace Forms.ChartForm
                             srs.Points.Add(pnt)
                         Next
                     Else
-                        For Each point In data.Cast(Of PointCurveItem)()
+                        For Each point In data.Cast(Of JustPoint)()
                             Dim pnt = New DataPoint(point.TheX, point.TheY) With {.Tag = point.Curve}
                             srs.Points.Add(pnt)
                         Next

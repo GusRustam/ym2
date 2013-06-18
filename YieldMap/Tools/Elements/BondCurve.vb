@@ -1,5 +1,4 @@
 Imports AdfinXAnalyticsFunctions
-Imports System.ComponentModel
 Imports DbManager.Bonds
 Imports DbManager
 Imports Settings
@@ -7,19 +6,6 @@ Imports Uitls
 Imports ReutersData
 
 Namespace Tools.Elements
-    Public Class SyntheticZcb
-        Inherits Bond
-        Public Sub New(ByVal parent As Group, ByVal metaData As BondMetadata)
-            MyBase.New(parent, metaData)
-        End Sub
-
-        Public Overrides ReadOnly Property Coupon(ByVal dt As Date) As Object
-            Get
-                Return 0
-            End Get
-        End Property
-    End Class
-
     Public Class BondCurve
         Inherits Group
         Implements ICurve
@@ -37,150 +23,6 @@ Namespace Tools.Elements
         Private ReadOnly _bondModule As AdxBondModule = Eikon.Sdk.CreateAdxBondModule()
         Private ReadOnly _curveModule As AdxYieldCurveModule = Eikon.Sdk.CreateAdxYieldCurveModule()
 
-        Public Class BondCurveSnapshot
-            ''' <summary>
-            ''' Technical class to represent bond curve structure
-            ''' </summary>
-            ''' <remarks></remarks>
-            Public Class BondCurveElement
-                Implements IComparable(Of BondCurveElement)
-                Private ReadOnly _ric As String
-                Private ReadOnly _descr As String
-                Private ReadOnly _yield As Double
-                Private ReadOnly _duration As Double
-                Private ReadOnly _price As Double
-                Private ReadOnly _quote As String
-                Private ReadOnly _yieldDate As Date
-
-                Public Sub New(ByVal ric As String, ByVal descr As String, ByVal [yield] As Double, ByVal duration As Double, ByVal price As Double, ByVal quote As String, ByVal yieldDate As Date)
-                    _ric = ric
-                    _descr = descr
-                    _yield = yield
-                    _duration = duration
-                    _price = price
-                    _quote = quote
-                    _yieldDate = yieldDate
-                End Sub
-
-                Public ReadOnly Property RIC() As String
-                    Get
-                        Return _ric
-                    End Get
-                End Property
-
-                Public ReadOnly Property Descr() As String
-                    Get
-                        Return _descr
-                    End Get
-                End Property
-
-                Public ReadOnly Property Yield() As String
-                    Get
-                        Return String.Format("{0:P2}", _yield)
-                    End Get
-                End Property
-
-                Public ReadOnly Property Duration() As String
-                    Get
-                        Return String.Format("{0:F2}", _duration)
-                    End Get
-                End Property
-
-                Public ReadOnly Property Price() As String
-                    Get
-                        Return String.Format("{0:F4}", _price)
-                    End Get
-                End Property
-
-                Public ReadOnly Property Quote() As String
-                    Get
-                        Return _quote
-                    End Get
-                End Property
-
-                <DisplayName("Yield date")>
-                Public ReadOnly Property YieldDate() As String
-                    Get
-                        Return String.Format("{0:dd/MM/yyyy}", _yieldDate)
-                    End Get
-                End Property
-
-                Public Function CompareTo(ByVal other As BondCurveElement) As Integer Implements IComparable(Of BondCurveElement).CompareTo
-                    Return _duration.CompareTo(other._duration)
-                End Function
-            End Class
-
-            Private ReadOnly _ansamble As Ansamble
-
-            Private ReadOnly _spreads As New Dictionary(Of IOrdinate, List(Of BondSpreadCurveItem))
-
-            Public ReadOnly Property Spreads() As Dictionary(Of IOrdinate, List(Of BondSpreadCurveItem))
-                Get
-                    Return _spreads
-                End Get
-            End Property
-
-            Private ReadOnly _current As List(Of CurveItem)
-            Public ReadOnly Property Current() As List(Of CurveItem)
-                Get
-                    Return _current
-                End Get
-            End Property
-
-            Private ReadOnly _disabledElements As New List(Of BondCurveElement)
-            Public ReadOnly Property DisabledElements() As List(Of BondCurveElement)
-                Get
-                    Return _disabledElements
-                End Get
-            End Property
-
-            Private ReadOnly _enabledElements As New List(Of BondCurveElement)
-            Private ReadOnly _synthetic As Boolean
-
-            Public ReadOnly Property EnabledElements() As List(Of BondCurveElement)
-                Get
-                    Return _enabledElements
-                End Get
-            End Property
-
-            Public ReadOnly Property Synthetic As Boolean
-                Get
-                    Return _synthetic
-                End Get
-            End Property
-
-            Public Sub New(ByVal bonds As List(Of Bond), ByVal items As List(Of CurveItem), ByVal syntCurve As List(Of SyntheticZcb), ByVal ansamble As Ansamble)
-                _ansamble = ansamble
-                _synthetic = syntCurve IsNot Nothing
-                Dim lst = If(syntCurve IsNot Nothing, syntCurve.Cast(Of Bond).ToList(), bonds)
-                For Each bond In lst
-                    Dim mainQuote = bond.QuotesAndYields.Main
-                    If mainQuote Is Nothing Then Continue For
-                    If bond.Enabled Then
-                        _enabledElements.Add(New BondCurveElement(bond.MetaData.RIC, bond.Label, mainQuote.Yield, mainQuote.Duration, mainQuote.Price, bond.QuotesAndYields.MaxPriorityField, mainQuote.YieldAtDate))
-                    Else
-                        _disabledElements.Add(New BondCurveElement(bond.MetaData.RIC, bond.Label, mainQuote.Yield, mainQuote.Duration, mainQuote.Price, bond.QuotesAndYields.MaxPriorityField, mainQuote.YieldAtDate))
-                    End If
-                Next
-                _enabledElements.Sort()
-                _disabledElements.Sort()
-                _current = New List(Of CurveItem)(items)
-
-                For Each ord In From q In Ordinate.Spreads Where _ansamble.Benchmarks.HasOrd(q)
-                    Dim tmp = ord
-                    _spreads(tmp) = New List(Of BondSpreadCurveItem)(
-                        From bond In lst
-                        Let mainQuote = bond.QuotesAndYields.Main
-                        Where mainQuote IsNot Nothing
-                        Let vle = tmp.GetValue(mainQuote)
-                        Where vle.HasValue
-                        Select New BondSpreadCurveItem(mainQuote.Duration, tmp.GetValue(mainQuote), bond.MetaData.RIC, bond.MetaData.ShortName)
-                    )
-                    _spreads(tmp).Sort()
-                Next ord
-            End Sub
-        End Class
-
         Private _curveDate As Date = Today
         Public Property CurveDate() As Date Implements ICurve.CurveDate
             Get
@@ -197,11 +39,11 @@ Namespace Tools.Elements
         Private ReadOnly _histFields As FieldContainer
 
         ' Last curve snapshot
-        Private ReadOnly _lastCurve As New Dictionary(Of IOrdinate, List(Of CurveItem))
+        Private ReadOnly _lastCurve As New Dictionary(Of IOrdinate, List(Of PointOfCurve))
         Private _lastSyntCurve As List(Of SyntheticZcb)
 
         Private _formula As String
-        Public ReadOnly Property Formula() As String
+        Public ReadOnly Property Formula() As String Implements ICurve.Formula
             Get
                 Return _formula
             End Get
@@ -358,15 +200,15 @@ Namespace Tools.Elements
 
         End Sub
 
-        Private Function UpdateSpreads(ByVal ord As IOrdinate) As List(Of CurveItem)
+        Private Function UpdateSpreads(ByVal ord As IOrdinate) As List(Of PointOfCurve)
             SetSpread(ord)
-            Dim res = New List(Of CurveItem)(
+            Dim res = New List(Of PointOfCurve)(
                         From item In AllElements
                         From quoteName In item.QuotesAndYields
                         Let q = item.QuotesAndYields(quoteName)
                         Let theY = ord.GetValue(q)
                         Where theY.HasValue AndAlso item.QuotesAndYields.Main IsNot Nothing AndAlso quoteName = item.QuotesAndYields.Main.QuoteName
-                        Select New PointCurveItem(q.Duration, theY, Me))
+                        Select New JustPoint(q.Duration, theY, Me))
             res.Sort()
             Return res
         End Function
@@ -394,13 +236,13 @@ Namespace Tools.Elements
             End If
         End Sub
 
-        Private Function ExtractPoints(ByVal crv As List(Of SyntheticZcb), ByVal ord As OrdinateBase) As List(Of CurveItem)
+        Private Function ExtractPoints(ByVal crv As List(Of SyntheticZcb), ByVal ord As OrdinateBase) As List(Of PointOfCurve)
             Return (From item In crv
                     From quoteName In item.QuotesAndYields
                     Let m = item.QuotesAndYields(quoteName)
                     Let vl = ord.GetValue(m)
                     Where vl.HasValue
-                    Select New PointCurveItem(m.Duration, ord.GetValue(m), Me)).Cast(Of CurveItem).ToList
+                    Select New JustPoint(m.Duration, ord.GetValue(m), Me)).Cast(Of PointOfCurve).ToList
         End Function
 
         Private Sub UpdateSyntSpreads(ByVal crv As List(Of SyntheticZcb), ByVal ord As OrdinateBase)
@@ -415,8 +257,8 @@ Namespace Tools.Elements
             End If
         End Sub
 
-        Private Function UpdateCurveShape() As List(Of CurveItem)
-            Dim result As New List(Of CurveItem)
+        Private Function UpdateCurveShape() As List(Of PointOfCurve)
+            Dim result As New List(Of PointOfCurve)
             If _bootstrapped Then
                 Try
                     Dim data = (From elem In Elements
@@ -452,7 +294,7 @@ Namespace Tools.Elements
                         Dim matDate = Utils.FromExcelSerialDate(termStructure.GetValue(i, 1))
                         Dim dur = (matDate - _curveDate).TotalDays / 365.0
                         Dim yld = termStructure.GetValue(i, 2)
-                        If dur > 0 And yld > 0 Then result.Add(New PointCurveItem(dur, yld, Me))
+                        If dur > 0 And yld > 0 Then result.Add(New JustPoint(dur, yld, Me))
                     Next
                 Catch ex As Exception
                     Logger.ErrorException("Failed to bootstrap", ex)
@@ -473,17 +315,17 @@ Namespace Tools.Elements
                     End Select
 
                     y = description.Yield
-                    If x > 0 And y > 0 Then result.Add(New BondCurveItem(x, y, bnd, description.BackColor, description.Yld.ToWhat, description.MarkerStyle, bnd.Label))
+                    If x > 0 And y > 0 Then result.Add(New PointOfBondCurve(x, y, bnd, description.BackColor, description.Yld.ToWhat, description.MarkerStyle, bnd.Label))
                 Next
             End If
             result.Sort()
 
             If _estModel IsNot Nothing Then
                 Dim est As New Estimator(_estModel)
-                Dim tmp = New List(Of CurveItem)(result)
+                Dim tmp = New List(Of PointOfCurve)(result)
                 Dim list As List(Of XY) = (From item In tmp Select New XY(item.TheX, item.TheY)).ToList()
                 Dim apprXY = est.Approximate(list)
-                result = (From item In apprXY Select New PointCurveItem(item.X, item.Y, Me)).Cast(Of CurveItem).ToList()
+                result = (From item In apprXY Select New JustPoint(item.X, item.Y, Me)).Cast(Of PointOfCurve).ToList()
                 _formula = est.GetFormula()
             Else
                 _formula = "N/A"
@@ -496,10 +338,12 @@ Namespace Tools.Elements
             Bootstrapped = Not Bootstrapped
         End Sub
 
-        Public Function GetSnapshot() As BondCurveSnapshot
-            If Not _lastCurve.ContainsKey(Yield) Then Return Nothing
-            Return New BondCurveSnapshot(AllElements, _lastCurve(Yield), _lastSyntCurve, Ansamble)
-        End Function
+        Public ReadOnly Property GetSnapshot() As ISnapshot Implements ICurve.Snapshot
+            Get
+                If Not _lastCurve.ContainsKey(Yield) Then Return Nothing
+                Return New BondSnapshot(AllElements, _lastCurve(Yield), _lastSyntCurve, Ansamble)
+            End Get
+        End Property
 
         Public Sub SetFitMode(ByVal mode As String)
             Dim model = EstimationModel.FromName(mode)
