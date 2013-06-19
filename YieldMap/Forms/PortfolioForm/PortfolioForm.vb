@@ -855,8 +855,7 @@ Namespace Forms.PortfolioForm
             OtherRulesML.Text = bondStructure.ToString()
             If MainForm.MainForm.Connected Then
                 MessagesTB.Text = ""
-                Dim bondModule As AdxBondModule = Eikon.Sdk.CreateAdxBondModule()
-                bondStructure.SetBondModule(bondModule)
+                bondStructure.SetBondModule(Eikon.Sdk.CreateAdxBondModule())
                 Try
                     CashFlowsDGV.DataSource = bondStructure.GetCashFlows(If(_currentBond.Maturity.HasValue, ReutersDate.DateToReuters(_currentBond.Maturity), ""), _currentBond.CurrentCouponRate)
                 Catch ex As Exception

@@ -24,8 +24,6 @@ Namespace Tools.Elements
         Public MustOverride Sub Recalculate() Implements IChangeable.Recalculate
         Public MustOverride Sub RecalculateTotal() Implements IChangeable.RecalculateTotal
         Public MustOverride Sub Recalculate(ByVal ord As IOrdinate) Implements IChangeable.Recalculate
-        'Protected MustOverride Sub UpdateSpreads()
-
 
         Public YieldMode As String ' todo currently unused
 
@@ -48,6 +46,12 @@ Namespace Tools.Elements
         End Property
 
         Private _eventsFrozen As Boolean = False
+
+        Public ReadOnly Property EventsFrozen() As Boolean
+            Get
+                Return _eventsFrozen
+            End Get
+        End Property
 
         Public Sub FreezeEvents() Implements IChangeable.FreezeEvents
             _eventsFrozen = True
@@ -207,7 +211,7 @@ Namespace Tools.Elements
             Return _elements.Any(Function(elem) elem.MetaData.RIC = instrument)
         End Function
 
-        Public Sub AddRics(ByVal rics As IEnumerable(Of String))
+        Public Overridable Sub AddRics(ByVal rics As IEnumerable(Of String))
             For Each ric In rics
                 Dim descr = BondsData.Instance.GetBondInfo(ric)
                 If descr IsNot Nothing Then
@@ -221,7 +225,7 @@ Namespace Tools.Elements
             Next
         End Sub
 
-        Private Sub OnCustomCustomPrice(ByVal bond As Bond, ByVal price As Double)
+        Protected Sub OnCustomCustomPrice(ByVal bond As Bond, ByVal price As Double)
             HandleNewQuote(bond, BondFields.XmlName(bond.Fields.Custom), price, Today)
         End Sub
 

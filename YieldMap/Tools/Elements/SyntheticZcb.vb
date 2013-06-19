@@ -7,7 +7,7 @@ Namespace Tools.Elements
             MyBase.New(parent, metaData)
         End Sub
 
-        Public Overrides ReadOnly Property Coupon(ByVal dt As Date) As Object
+        Public Overrides ReadOnly Property Coupon(ByVal dt As Date) As Double
             Get
                 Return 0
             End Get

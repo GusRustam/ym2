@@ -192,7 +192,7 @@ Public Class PortfolioManager
                             source = UserList.Load(srcId)
                         Case "custom-bond"
                             srcId = item.Attributes("id").Value
-                            source = CustomBond.Load(srcId)
+                            source = CustomBond.LoadById(srcId)
                         Case Else
                             srcId = -1
                             Logger.Warn("Unsupported item {0}", what)

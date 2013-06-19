@@ -181,7 +181,7 @@ Namespace Tools.Elements
 
             Dim coupon = ParentBond.Coupon(YieldAtDate)
             Dim settleDate = _bondModule.BdSettle(YieldAtDate, dscr.PaymentStructure)
-            Logger.Trace("Coupon: {0}, settleDate: {1}, maturity: {2}", coupon, settleDate, dscr.Maturity)
+            Logger.Trace("Coupon: {0}, settleDate: {1}, maturity: {2}", coupon, Utils.FromExcelSerialDate(settleDate), dscr.Maturity)
             Dim bondYield As Array = _bondModule.AdBondYield(settleDate, Price / 100, dscr.Maturity, coupon, dscr.PaymentStructure, dscr.RateStructure, "")
             Dim bestYield = ParseBondYield(bondYield).Max
             bestYield.Yield += ParentBond.UserDefinedSpread(Ordinate.Yield)
@@ -204,7 +204,7 @@ Namespace Tools.Elements
             ModDuration = bondDeriv.GetValue(1, 3)
             PVBP = bondDeriv.GetValue(1, 4)
             Duration = bondDeriv.GetValue(1, 5)
-            AverageLife = bondDeriv.GetValue(1, 6)
+            AverageLife = bondDeriv.GetValue(1, 6) 'non-macauley duration
             Convexity = bondDeriv.GetValue(1, 7)
 
             Yld = bestYield

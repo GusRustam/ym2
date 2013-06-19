@@ -339,14 +339,8 @@ Public Class RegularBond
     End Function
 End Class
 
-
-' todo think of it
-' Два принципиально разных подхода к созданию объекта
-' 1) виртуализировать существующую xml запись
-' 2) создать "висячий" объект, который может быть сохранен, а может и не быть сохранен
 Public Class CustomBond
     Inherits SourceBase
-    ' todo equality members
 
     Private ReadOnly _code As String
     Private ReadOnly _struct As ReutersBondStructure
@@ -413,12 +407,26 @@ Public Class CustomBond
         Return {_code}.ToList()
     End Function
 
-
     Public Overrides Function ToString() As String
         Return "Custom Bond"
     End Function
 
-    Public Shared Function Load(ByVal bndId As String) As CustomBond
+    Public Shared Function LoadByCode(ByVal cd As String) As CustomBond
+        Dim node = PortfolioManager.ClassInstance.GetConfigDocument().SelectSingleNode(String.Format("/bonds/custom-bonds/bond[@code='{0}']", cd))
+        If node Is Nothing Then Throw New NoSourceException(String.Format("Failed to find custom bond with code {0}", cd))
+        Try
+            Dim color = node.GetAttrStrict("color")
+            Dim name = node.GetAttrStrict("name")
+            Dim struct = node.GetAttrStrict("bondStructure")
+            Dim maturity = node.GetAttrStrict("maturity")
+            Dim coupon = node.GetAttrStrict("coupon")
+            Dim bndId = node.GetAttrStrict("id")
+            Return New CustomBond(bndId, color, name, cd, struct, maturity, coupon)
+        Catch ex As Exception
+            Throw New NoSourceException(String.Format("Failed to find custom bond with code {0}", cd), ex)
+        End Try
+    End Function
+    Public Shared Function LoadById(ByVal bndId As String) As CustomBond
         Dim node = PortfolioManager.ClassInstance.GetConfigDocument().SelectSingleNode(String.Format("/bonds/custom-bonds/bond[@id='{0}']", bndId))
         If node Is Nothing Then Throw New NoSourceException(String.Format("Failed to find custom bond with id {0}", bndId))
         Try
@@ -430,7 +438,11 @@ Public Class CustomBond
             Dim coupon = node.GetAttrStrict("coupon")
             Return New CustomBond(bndId, color, name, code, struct, maturity, coupon)
         Catch ex As Exception
-            Throw New NoSourceException(String.Format("Failed to find list with id {0}", bndId), ex)
+            Throw New NoSourceException(String.Format("Failed to find custom bond with id {0}", bndId), ex)
         End Try
+    End Function
+
+    Public Function GetDescription() As BondMetadata
+        Return New BondMetadata(_code, _maturity, _currentCouponRate, _struct.ToString(), "RM:YTM", "Custom")
     End Function
 End Class

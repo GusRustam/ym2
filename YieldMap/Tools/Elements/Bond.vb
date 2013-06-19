@@ -70,7 +70,7 @@ Namespace Tools.Elements
             End Sub
         End Class
 
-        Public Overridable ReadOnly Property Coupon(ByVal dt As Date)
+        Public Overridable ReadOnly Property Coupon(ByVal dt As Date) As Double
             Get
                 Return BondsData.Instance.GetBondPayments(MetaData.RIC).GetCoupon(dt)
             End Get

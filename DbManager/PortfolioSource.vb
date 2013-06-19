@@ -235,17 +235,24 @@ Public Class PortfolioStructure
                 End Try
 
             End If
-            For Each ric In From item In src.Source.GetDefaultRics() Where Not _excludes.Contains(item)
+            For Each ric In From item In src.Source.GetDefaultRics()
+                            Where Not _excludes.Contains(item)
                 Try
-                    Dim descr = BondsData.Instance.GetBondInfo(ric)
-                    If filter Then
-                        Try
-                            If Not interpreter.Allows(descr) Then Continue For
-                        Catch ex As Exception
-                            Logger.ErrorException(String.Format("Failed to apply filter to bond {0}", ric), ex)
-                            Logger.Error("Exception = {0}", ex.ToString())
-                        End Try
+                    If Not TypeOf src.Source Is CustomBond Then
+                        Dim descr = BondsData.Instance.GetBondInfo(ric)
+                        If filter Then
+                            Try
+                                If Not interpreter.Allows(descr) Then
+                                    Logger.Debug("Skipping bond {0} because it's banned by dynamic filter", ric)
+                                    Continue For
+                                End If
+                            Catch ex As Exception
+                                Logger.ErrorException(String.Format("Failed to apply filter to bond {0}", ric), ex)
+                                Logger.Error("Exception = {0}", ex.ToString())
+                            End Try
+                        End If
                     End If
+
                     res.Add(ric)
                 Catch ex As NoBondException
                     Logger.Warn("No bond {0}", ric)

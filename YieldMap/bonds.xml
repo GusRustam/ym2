@@ -2,6 +2,11 @@
 <bonds>
   <!-- Field sets -->
   <field-sets>
+    <field-set id="Custom bonds" name="Custom bonds">
+      <realtime>
+        <field type="CUSTOM">CUSTOM</field>
+      </realtime>
+    </field-set>
     <field-set id="MICEX" name="Micex bonds description">
       <historical>
         <field type="DATE">DATE</field>
@@ -34,7 +39,7 @@
     <chain id="2" ric="0#RUMOSB=MM" field-set-id="MICEX" name="Moscow" color="Green" curve="True" />
     <chain id="3" ric="0#RUSOVB=MM" field-set-id="MICEX" name="Regional" color="Blue" />
     <chain id="4" ric="0#RUCORP=MM" field-set-id="MICEX" name="Corporate bonds" color="Cyan" enabled="False" />
-    <chain id="5" ric="0#RFGOVBONDS=" field-set-id="Eurobonds" name="Russian eurobonds" color="DarkOlive" curve="True" />
+    <chain id="5" ric="0#RFGOVBONDS=" field-set-id="MICEX" name="Russian eurobonds" color="IndianRed" curve="True" enabled="True" />
   </chains>
   <!-- Lists -->
   <lists>
@@ -64,6 +69,8 @@
       <folder id="2" name="Stuff">
         <portfolio id="3" name="Mos">
           <include what="chain" id="2" name="Moskau" color="Blue" />
+          <include what="custom-bond" id="1" name="Bond 1" color="MidnightBlue" />
+          <include what="custom-bond" id="39240" name="Bond 2" color="DarkSlateGray" />
         </portfolio>
         <portfolio id="4" name="Main">
           <include what="chain" id="1" name="All OFZs" />
@@ -84,7 +91,7 @@
     </folder>
   </portfolios>
   <custom-bonds>
-    <bond id="1" name="Base case 3Y 12% bond" code="NewIssueBase" rateStructure="" bondStructure="ACC:A5 IC:L1 CLDR:RUS_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY FRQ:28D PX:CLEAN REFDATE:MATURITY YM:DISCA5 ISSUE:01JAN2013 RATE:0.10 AMORT:23JUL2013:0.20 AMORT:01JAN2014:0.80   STEP:01SEP2013:0.14 " maturity="23APR2013" coupon="0.1" color="Red" />
+    <bond id="1" name="Base case 3Y 12% bond" code="NewIssueBase" rateStructure="" bondStructure="ACC:A5 IC:L1 CLDR:RUS_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY FRQ:28D PX:CLEAN REFDATE:MATURITY YM:DISCA5 ISSUE:01JAN2013 RATE:0.10 AMORT:23JUL2013:0.20 AMORT:01JAN2014:0.80   STEP:01SEP2013:0.14 " maturity="23APR2014" coupon="0.1" color="Red" />
     <bond id="39240" name="ss" color="Gray" code="22" maturity="23APR2014" coupon="0" bondStructure="ACC:A5 IC:L1 CLDR:RUS_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY PX:CLEAN REFDATE:MATURITY YM:DISCA5 RATE:0.00     " />
   </custom-bonds>
 </bonds>

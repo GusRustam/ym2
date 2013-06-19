@@ -133,6 +133,7 @@
     <Compile Include="Bonds\FilterParser.vb" />
     <Compile Include="Bonds\Rating.vb" />
     <Compile Include="Bonds\ReutersBond.vb" />
+    <Compile Include="Bonds\ReutersDate.vb" />
     <Compile Include="FieldsDescription.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

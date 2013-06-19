@@ -117,6 +117,14 @@ Namespace Forms.ChartForm
                     AddHandler grp.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnGroupUpdated(data)
                     _ansamble.Items.Add(grp)
                 Next
+                For Each grp As CustomBondGroup In From port In portfolioStructure.Sources
+                                           Where TypeOf port.Source Is CustomBond
+                                           Select New CustomBondGroup(_ansamble, port, portfolioStructure)
+                    ' todo add custom bonds
+                    AddHandler grp.Updated, AddressOf OnGroupUpdated
+                    AddHandler grp.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnGroupUpdated(data)
+                    _ansamble.Items.Add(grp)
+                Next
                 _ansamble.Items.Start()
             End Set
         End Property
