@@ -1,5 +1,4 @@
-﻿Imports AdfinXAnalyticsFunctions
-Imports DbManager
+﻿Imports DbManager
 Imports DbManager.Bonds
 Imports System.Runtime.InteropServices
 Imports NLog
@@ -746,7 +745,7 @@ Namespace Forms.PortfolioForm
             CustomBondChanged = False
         End Sub
 
-        Private Sub RefreshCustomBondList(Optional ByVal toselect As CustomBond = Nothing)
+        Private Sub RefreshCustomBondList(Optional ByVal toselect As CustomBond = Nothing, Optional ByVal furtherRefresh As Boolean = True)
             CustomBondsList.DataSource = PortfolioManager.CustomBondsView()
             If toselect IsNot Nothing Then
                 Dim x = (From row As DataGridViewRow In CustomBondsList.Rows
@@ -754,6 +753,7 @@ Namespace Forms.PortfolioForm
                          Select row.Index).ToList()
                 If x.Any Then CustomBondsList.Rows(x.First).Selected = True
             End If
+            If Not furtherRefresh Then Exit Sub
             If CustomBondsList.Rows.Count > 0 Then
                 EnableEverythingComplete()
                 RefreshBondView()
@@ -947,6 +947,16 @@ Namespace Forms.PortfolioForm
             RecalculateCashFlows()
             CustomBondChanged = True
         End Sub
+
+        Private Sub RenameCustomBondTSMI_Click(sender As Object, e As EventArgs) Handles RenameCustomBondTSMI.Click
+            If _currentBond Is Nothing Then Return
+            Dim newName = InputBox("Please enter new bond name", "Rename custom bond", _currentBond.Name)
+            If newName <> "" Then
+                _currentBond.Name = newName
+            End If
+            CustomBondChanged = True
+        End Sub
+
 
         Private Sub AddNewCustomBondTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AddNewCustomBondTSMI.Click
             Dim src = GetSource(CustomBondListCMS.Tag)
