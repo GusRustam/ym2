@@ -1,5 +1,4 @@
-﻿Imports DbManager.Bonds
-Imports DbManager
+﻿Imports DbManager
 
 Namespace Tools.Elements
     Public Class CustomCouponBond
@@ -14,9 +13,7 @@ Namespace Tools.Elements
 
         Public Overrides ReadOnly Property Coupon(ByVal dt As Date) As Double
             Get
-                Dim descriptions = _cstmBond.Struct.GetCouponsList()
-                Dim greatest = (From item1 In descriptions Where item1.Dt > dt)
-                Return greatest.First.Rate
+                Return _cstmBond.CurrentCouponRate
             End Get
         End Property
     End Class

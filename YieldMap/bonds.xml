@@ -91,7 +91,7 @@
     </folder>
   </portfolios>
   <custom-bonds>
-    <bond id="1" name="Base case 3Y 12% bond" code="NewIssueBase" rateStructure="" bondStructure="ACC:A5 IC:L1 CLDR:RUS_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY FRQ:28D PX:CLEAN REFDATE:MATURITY YM:DISCA5 ISSUE:01JAN2013 RATE:0.10 AMORT:23JUL2013:0.20 AMORT:01JAN2014:0.80   STEP:01SEP2013:0.14 " maturity="23APR2014" coupon="0.1" color="Red" />
-    <bond id="39240" name="ss" color="Gray" code="22" maturity="23APR2014" coupon="0" bondStructure="ACC:A5 IC:L1 CLDR:RUS_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY PX:CLEAN REFDATE:MATURITY YM:DISCA5 RATE:0.00     " />
+    <bond id="1" name="Base case 3Y 12% bond" code="NewIssueBase" rateStructure="" bondStructure="ACC:A5 IC:L1 CLDR:RUS_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY FRQ:28D PX:CLEAN REFDATE:MATURITY ISSUE:01JAN2013 RATE:0.10 AMORT:23JUL2013:0.20 AMORT:01JAN2014:0.80   STEP:01SEP2013:0.14 " maturity="23APR2014" coupon="0.1" color="Red" />
+    <bond id="39240" name="ss" color="Gray" code="22" maturity="23APR2014" coupon="0" bondStructure="ACC:A5 IC:L1 CLDR:RUS_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY PX:CLEAN REFDATE:MATURITY RATE:0.13     " />
   </custom-bonds>
 </bonds>

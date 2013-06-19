@@ -462,7 +462,7 @@ Namespace Bonds
         End Function
 
         Public Function GetCashFlows(ByVal matDate As String, ByVal couponRate As Double) As List(Of CashFlowDescription)
-            Dim cashFlows As Array = _bondModule.BdCashflows(Date.Today, matDate, couponRate, ToString(), "IAC RET:A100")
+            Dim cashFlows As Array = _bondModule.BdCashflows(Today, matDate, couponRate, ToString(), "IAC RET:A100")
             Dim res As New List(Of CashFlowDescription)
             Dim i As Integer
             For i = cashFlows.GetLowerBound(0) To cashFlows.GetUpperBound(0)

@@ -976,7 +976,7 @@ Namespace Forms.PortfolioForm
 
                     If frm.ShowDialog() = DialogResult.OK Then
                         SaveCustomBond()
-                        Const struct = "ACC:A5 IC:L1 CLDR:RUS_FI SETTLE:0WD  CFADJ:NO DMC:FOLLOWING EMC:LASTDAY PX:CLEAN REFDATE:MATURITY YM:DISCA5"
+                        Const struct = "ACC:A5 IC:L1 CLDR:RUS_FI SETTLE:0WD  CFADJ:NO DMC:FOLLOWING EMC:LASTDAY PX:CLEAN REFDATE:MATURITY"
                         _currentBond = New CustomBond(Color.Gray.Name, nameTb.Text, descrTb.Text, struct,
                                                       ReutersDate.DateToReuters(Date.Today.AddYears(1)), 0.1)
                         PortfolioManager.AddSource(_currentBond)
