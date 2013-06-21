@@ -103,7 +103,6 @@ Namespace Tools.Elements
             Color = src.Color
             _histFields = src.Fields.History.AsContainer()
 
-            YieldMode = SettingsManager.Instance.YieldCalcMode
             AddRics(src.GetDefaultRics())
         End Sub
 

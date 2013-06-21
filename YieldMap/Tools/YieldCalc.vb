@@ -120,6 +120,56 @@ Namespace Tools
         Public Yield As Double
         Public YieldToDate As Date
 
+        Private _convexity As Double
+        Public Property Convexity As Double
+            Get
+                Return _convexity
+            End Get
+            Set(value As Double)
+                _convexity = value
+            End Set
+        End Property
+
+        Private _pvbp As Double
+        Public Property Pvbp As Double
+            Get
+                Return _pvbp
+            End Get
+            Set(value As Double)
+                _pvbp = value
+            End Set
+        End Property
+
+        Private _averageLife As Double
+        Public Property AverageLife() As Double
+            Get
+                Return _averageLife
+            End Get
+            Set(ByVal value As Double)
+                _averageLife = value
+            End Set
+        End Property
+
+        Private _modDuration As Double
+        Public Property ModDuration() As Double
+            Get
+                Return _modDuration
+            End Get
+            Set(ByVal value As Double)
+                _modDuration = value
+            End Set
+        End Property
+
+        Private _duration As Double
+        Public Property Duration() As Double
+            Get
+                Return _duration
+            End Get
+            Set(ByVal value As Double)
+                _duration = value
+            End Set
+        End Property
+
         Public Function CompareTo(ByVal other As YieldStructure) As Integer Implements IComparable(Of YieldStructure).CompareTo
             Return IIf(Yield < other.Yield, -1, 1)
         End Function

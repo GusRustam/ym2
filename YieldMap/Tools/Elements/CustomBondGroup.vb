@@ -1,5 +1,4 @@
 ﻿Imports DbManager
-Imports Settings
 Imports Uitls
 
 Namespace Tools.Elements
@@ -15,7 +14,6 @@ Namespace Tools.Elements
             Color = If(port.Color <> "", port.Color, port.Source.Color)
             Dim flds = New FieldSet("Custom bonds")
             BondFields = flds.Realtime.AsContainer()
-            YieldMode = SettingsManager.Instance.YieldCalcMode
             AddRics(portfolioStructure.Rics(port))
         End Sub
 

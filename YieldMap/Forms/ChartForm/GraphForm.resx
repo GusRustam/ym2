@@ -151,7 +151,7 @@
     <value>454, 17</value>
   </metadata>
   <metadata name="BondCMS.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
+    <value>660, 16</value>
   </metadata>
   <metadata name="ChartCMS.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>115, 17</value>
@@ -166,7 +166,7 @@
     <value>17, 56</value>
   </metadata>
   <metadata name="DurConvCMS.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>663, 13</value>
+    <value>689, 54</value>
   </metadata>
   <metadata name="BidAskCMS.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>376, 56</value>

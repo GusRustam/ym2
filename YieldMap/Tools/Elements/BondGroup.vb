@@ -20,7 +20,6 @@ Namespace Tools.Elements
             BondFields = source.Fields.Realtime.AsContainer()
             Color = If(port.Color <> "", port.Color, source.Color)
 
-            YieldMode = SettingsManager.Instance.YieldCalcMode
 
             AddRics(portfolioStructure.Rics(port))
         End Sub
@@ -31,7 +30,6 @@ Namespace Tools.Elements
             PortfolioID = -1 ' ??
             BondFields = fields.Realtime.AsContainer()
             Color = clr
-            YieldMode = SettingsManager.Instance.YieldCalcMode
             AddRics(rics)
         End Sub
 

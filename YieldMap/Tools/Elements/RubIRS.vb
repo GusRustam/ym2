@@ -106,7 +106,7 @@ Namespace Tools.Elements
             DoLoadRIC(BaseInstrument, "DATE, CLOSE", _theCurveDate)
         End Sub
 
-        Protected Sub DoLoadRIC(ByVal ric As String, ByVal fields As String, ByVal aDate As Date)
+        Protected Sub DoLoadRic(ByVal ric As String, ByVal fields As String, ByVal aDate As Date)
             Logger.Debug("DoLoadRIC({0})", ric)
             If ric = "" Then Return
 

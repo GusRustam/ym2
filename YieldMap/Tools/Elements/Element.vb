@@ -74,7 +74,7 @@ Namespace Tools.Elements
     Public MustInherit Class BasePointDescription
         Implements IComparable(Of BasePointDescription)
 
-        Public Duration As Double
+        Public MustOverride Property Duration As Double
         Public Price As Double
         Public YieldAtDate As Date
         Public PointSpread As Double?
@@ -106,6 +106,15 @@ Namespace Tools.Elements
 
         Private _yield As Double?
 
+        Public Overrides Property Duration() As Double
+            Get
+                Return _duration
+            End Get
+            Set(value As Double)
+                _duration = value
+            End Set
+        End Property
+
         Public Overrides Sub ClearYield()
             _yield = Nothing
         End Sub
@@ -121,7 +130,9 @@ Namespace Tools.Elements
         End Property
 
         Private ReadOnly _ric As String
-        Public ReadOnly Property RIC As String
+        Private _duration As Double
+
+        Public ReadOnly Property Ric As String
             Get
                 Return _ric
             End Get
@@ -132,35 +143,28 @@ Namespace Tools.Elements
         End Sub
 
         Public Overrides Function ToString() As String
-            Return String.Format("{0} {1:P2}:{2:F2}", RIC, _yield / 100, Duration)
+            Return String.Format("{0} {1:P2}:{2:F2}", Ric, _yield / 100, Duration)
         End Function
     End Class
 
-    Public Class BondPointDescription
-        Inherits BasePointDescription
-        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(BondPointDescription))
-        Private ReadOnly _bondModule As AdxBondModule = Eikon.Sdk.CreateAdxBondModule()
+    Public Class YieldContainer
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(YieldContainer))
+        Private ReadOnly _yields As New List(Of YieldStructure)
+        Private ReadOnly _best As YieldStructure
 
-        Public ParentBond As Bond
+        Public ReadOnly Property Yields() As List(Of YieldStructure)
+            Get
+                Return _yields
+            End Get
+        End Property
 
-        Public Yld As New YieldStructure
-        Public Convexity As Double
-        Public PVBP As Double
+        Public ReadOnly Property Best() As YieldStructure
+            Get
+                Return _best
+            End Get
+        End Property
 
-        Public BackColor As String
-        Public MarkerStyle As String
-
-        Private ReadOnly _quoteName As String
-        Private _modDuration As Double
-        Private _averageLife As Double
-
-        Sub New(ByVal quoteName As String)
-            _quoteName = quoteName
-        End Sub
-
-        Private Shared Function ParseBondYield(ByVal bondYield As Array) As List(Of YieldStructure)
-            Dim res As New List(Of YieldStructure)
-
+        Public Sub New(ByVal bondYield As Array, ByVal spread As Double)
             For j = bondYield.GetLowerBound(0) To bondYield.GetUpperBound(0)
                 Dim yield = CSng(bondYield.GetValue(j, 1))
                 Dim itsDate = Utils.FromExcelSerialDate(bondYield.GetValue(j, 2))
@@ -169,32 +173,13 @@ Namespace Tools.Elements
                 If Not YieldToWhat.TryParse(bondYield.GetValue(j, 4).ToString(), toWhat) Then
                     toWhat = YieldToWhat.Maturity
                 End If
-                Dim yieldDescr = New YieldStructure With {.Yield = yield, .YieldToDate = itsDate, .ToWhat = toWhat}
-                res.Add(yieldDescr)
+                Dim yieldDescr = New YieldStructure With {.Yield = yield + spread, .YieldToDate = itsDate, .ToWhat = toWhat}
+                _yields.Add(yieldDescr)
             Next
-            Return res
-        End Function
+            _best = _yields.Max
+        End Sub
 
-        Private Sub CalculateYields(ByVal prc As Double)
-            Price = prc
-            Dim dscr = ParentBond.MetaData
-            Logger.Trace("CalculateYields({0}, {1})", Price, dscr.RIC)
-
-            Dim coupon = ParentBond.Coupon(YieldAtDate)
-            Dim settleDate = _bondModule.BdSettle(YieldAtDate, dscr.PaymentStructure)
-            Logger.Trace("Coupon: {0}, settleDate: {1}, maturity: {2}", coupon, Utils.FromExcelSerialDate(settleDate), dscr.Maturity)
-
-            Dim yieldCalcMode = SettingsManager.Instance.YieldCalcMode
-            Dim rateStructure = If(yieldCalcMode <> "Default", Regex.Replace(dscr.RateStructure, "YT[A-Z]", yieldCalcMode), dscr.RateStructure)
-
-            Dim bondYield As Array = _bondModule.AdBondYield(settleDate, Price / 100, dscr.Maturity, coupon, dscr.PaymentStructure, rateStructure, "")
-            Dim bestYield = ParseBondYield(bondYield).Max
-            bestYield.Yield += ParentBond.UserDefinedSpread(Ordinate.Yield)
-            Logger.Trace("best Yield: {0}", bestYield)
-
-            ' todo no best yield! (or else, best yield and other yields too), and todo modified duration
-
-            Dim bondDeriv As Array = _bondModule.AdBondDeriv(settleDate, bestYield.Yield, dscr.Maturity, coupon, 0, dscr.PaymentStructure, Regex.Replace(dscr.RateStructure, "YT[A-Z]", bestYield.ToWhat.Abbr), "", "")
+        Public Sub AddDerivatives(ByVal i As Integer, ByVal bondDeriv As Array)
             ' 1. Price                 - Price of the bond
             ' 2. Option Free Price     - Option free price of the bond
             ' 3. Volatility            - Modified Duration of the bond (see Modified Duration), or its price sensitivity to movements in yield. 
@@ -206,35 +191,98 @@ Namespace Tools.Elements
             ' 7. Convexity             - Convexity (see Convexity)
             ' 8. YTW/YTB date          - Yield to worst/yield to best date
 
-            ModDuration = bondDeriv.GetValue(1, 3)
-            PVBP = bondDeriv.GetValue(1, 4)
-            Duration = bondDeriv.GetValue(1, 5)
-            AverageLife = bondDeriv.GetValue(1, 6) 'non-macauley duration
-            Convexity = bondDeriv.GetValue(1, 7)
+            _yields(i).ModDuration = bondDeriv.GetValue(1, 3)
+            _yields(i).Pvbp = bondDeriv.GetValue(1, 4)
+            _yields(i).Duration = bondDeriv.GetValue(1, 5)
+            _yields(i).AverageLife = bondDeriv.GetValue(1, 6) 'non-macauley duration
+            _yields(i).Convexity = bondDeriv.GetValue(1, 7)
+        End Sub
+    End Class
 
-            Yld = bestYield
+    Public Class BondPointDescription
+        Inherits BasePointDescription
+        Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(BondPointDescription))
+        Private ReadOnly _bondModule As AdxBondModule = Eikon.Sdk.CreateAdxBondModule()
+
+        Private ReadOnly _quoteName As String
+
+        Public BackColor As String
+        Public MarkerStyle As String
+        Public ParentBond As Bond
+
+        Private _yields As YieldContainer
+
+        Public ReadOnly Property Yld As YieldStructure
+            Get
+                Return _yields.Best
+            End Get
+        End Property
+
+        Public Overrides Property Duration() As Double
+            Get
+                Return _yields.Best.Duration
+            End Get
+            Set(value As Double)
+                ' todo  do nothing
+            End Set
+        End Property
+
+
+        Public ReadOnly Property Convexity As Double
+            Get
+                Return Yld.Convexity
+            End Get
+        End Property
+
+        Public ReadOnly Property Pvbp As Double
+            Get
+                Return Yld.Pvbp
+            End Get
+        End Property
+
+        Public ReadOnly Property AverageLife() As Double
+            Get
+                Return Yld.AverageLife
+            End Get
+        End Property
+
+        Public ReadOnly Property ModDuration() As Double
+            Get
+                Return Yld.ModDuration
+            End Get
+        End Property
+
+        Sub New(ByVal quoteName As String)
+            _quoteName = quoteName
         End Sub
 
-        Public Property AverageLife() As Double
-            Get
-                Return _averageLife
-            End Get
-            Set(ByVal value As Double)
-                _averageLife = value
-            End Set
-        End Property
+        Private Sub CalculateYields(ByVal prc As Double)
+            Price = prc
+            Dim dscr = ParentBond.MetaData
+            Logger.Trace("CalculateYields({0}, {1})", Price, dscr.RIC)
 
-        Public Property ModDuration() As Double
-            Get
-                Return _modDuration
-            End Get
-            Set(ByVal value As Double)
-                _modDuration = value
-            End Set
-        End Property
+            Dim coupon = ParentBond.Coupon(YieldAtDate)
+            Dim settleDate = _bondModule.BdSettle(YieldAtDate, dscr.PaymentStructure)
+            Logger.Trace("Coupon: {0}, settleDate: {1}, maturity: {2}", coupon, Utils.FromExcelSerialDate(settleDate), dscr.Maturity)
+
+            Dim yieldCalcMode = ParentBond.YieldMode
+            Dim rateStructure = If(yieldCalcMode <> "Default", Regex.Replace(dscr.RateStructure, "YT[A-Z]", yieldCalcMode), dscr.RateStructure)
+
+            Dim bondYield As Array = _bondModule.AdBondYield(settleDate, Price / 100, dscr.Maturity, coupon, dscr.PaymentStructure, rateStructure, "")
+            _yields = New YieldContainer(bondYield, ParentBond.UserDefinedSpread(Ordinate.Yield))
+
+            For i = 0 To _yields.Yields.Count() - 1
+                Dim bondDeriv As Array = _bondModule.AdBondDeriv(settleDate, _yields.Yields(i).Yield, dscr.Maturity, coupon, 0, dscr.PaymentStructure,
+                                                                 Regex.Replace(dscr.RateStructure, "YT[A-Z]", _yields.Yields(i).ToWhat.Abbr),
+                                                                 "", "")
+                _yields.AddDerivatives(i, bondDeriv)
+            Next
+
+        End Sub
+
 
         Public Overrides Sub ClearYield()
-            Yld = New YieldStructure()
+            ' _yields.Cleanup() todo why the hell?
         End Sub
 
         Public Overrides Property Yield(Optional ByVal dt As Date? = Nothing) As Double?

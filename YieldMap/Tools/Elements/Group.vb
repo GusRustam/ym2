@@ -3,6 +3,8 @@ Imports DbManager
 Imports NLog
 Imports ReutersData
 Imports Settings
+Imports System.Threading.Tasks
+Imports System.Threading
 Imports Uitls
 
 Namespace Tools.Elements
@@ -24,8 +26,6 @@ Namespace Tools.Elements
         Public MustOverride Sub Recalculate() Implements IChangeable.Recalculate
         Public MustOverride Sub RecalculateTotal() Implements IChangeable.RecalculateTotal
         Public MustOverride Sub Recalculate(ByVal ord As IOrdinate) Implements IChangeable.Recalculate
-
-        Public YieldMode As String ' todo currently unused
 
         Protected Nm As String
         Public ReadOnly Property Name() As String Implements INamed.Name
@@ -102,6 +102,7 @@ Namespace Tools.Elements
         End Property
 
         Private _color As String
+        Private _countdown As CountdownEvent
 
         Public Property Color() As String
             Get
@@ -297,5 +298,28 @@ Namespace Tools.Elements
         Public Function Bonds(ByVal clause As Func(Of BondMetadata, Boolean)) As IEnumerable(Of Bond)
             Return From elem In _elements Where clause(elem.MetaData)
         End Function
+
+        Public Sub SetYieldMode(ByVal mode As String)
+            FreezeEvents()
+            If _countdown.CurrentCount > 0 Then
+                Logger.Warn("Previous recalc in progress")
+                Return
+            End If
+
+            _countdown = New CountdownEvent(_elements.Count())
+            Dim waiter = New Thread(New ThreadStart(
+                                    Sub()
+                                        Logger.Info("WaiterThread()")
+                                        If Not _countdown.Wait(TimeSpan.FromSeconds(30)) Then
+                                            Logger.Warn("{0} threads are still working", _countdown.CurrentCount)
+                                        Else
+                                            Logger.Info("Ok!")
+                                            UnfreezeEvents()
+                                        End If
+                                    End Sub))
+            waiter.Start()
+
+            Parallel.ForEach(_elements, Sub(elem) elem.YieldMode = mode)
+        End Sub
     End Class
 End Namespace

@@ -116,8 +116,9 @@ Namespace Forms.ChartForm
                 For Each grp As BondGroup In From port In portfolioStructure.Sources
                                            Where TypeOf port.Source Is DbManager.Chain Or TypeOf port.Source Is UserList
                                            Select New BondGroup(_ansamble, port, portfolioStructure)
+                    Dim tmp = grp
                     AddHandler grp.Updated, AddressOf OnGroupUpdated
-                    AddHandler grp.Cleared, Sub() ClearSeries(grp.Identity)
+                    AddHandler grp.Cleared, Sub() ClearSeries(tmp.Identity)
                     AddHandler grp.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnGroupUpdated(data)
                     _ansamble.Items.Add(grp)
                 Next
@@ -1010,5 +1011,24 @@ Namespace Forms.ChartForm
             a.Start()
         End Sub
 
+        Private Sub DefaultToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DefaultToolStripMenuItem.Click, _
+            YTMToolStripMenuItem.Click, YTWToolStripMenuItem.Click, YTAToolStripMenuItem.Click, YTBToolStripMenuItem.Click, _
+            YTPToolStripMenuItem.Click, YTCToolStripMenuItem.Click
+
+            Dim nm = CType(sender, ToolStripMenuItem).Text
+            If nm = "Default" Then nm = ""
+
+            Dim bond = CType(BondCMS.Tag, Bond)
+            bond.YieldMode = nm
+        End Sub
+
+        Private Sub DefaultTSMI_Click(sender As Object, e As EventArgs) Handles DefaultTSMI.Click, _
+            YtmTSMI.Click, YtwTSMI.Click, YtaTSMI.Click, YtbTSMI.Click, YtpTSMI.Click, YtcTSMI.Click
+            Dim nm = CType(sender, ToolStripMenuItem).Text
+            If nm = "Default" Then nm = ""
+
+            Dim group = _ansamble.Items(BondSetCMS.Tag)
+            group.SetYieldMode(nm)
+        End Sub
     End Class
 End Namespace

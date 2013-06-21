@@ -143,6 +143,7 @@ Namespace Tools.Elements
         End Property
 
         Private _labelMode As LabelMode = LabelMode.IssuerAndSeries
+
         Public Property LabelMode As LabelMode
             Get
                 Return _labelMode
@@ -176,6 +177,17 @@ Namespace Tools.Elements
             Get
                 Return Parent.BondFields.Fields
             End Get
+        End Property
+
+        Private _yieldMode As String = SettingsManager.Instance.YieldCalcMode
+        Public Property YieldMode() As String
+            Get
+                Return _yieldMode
+            End Get
+            Set(ByVal value As String)
+                _yieldMode = value
+                RaiseEvent Changed()
+            End Set
         End Property
 
         Public Sub Disable()
