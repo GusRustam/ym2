@@ -39,6 +39,7 @@
             Me.SaveSettingsButton = New System.Windows.Forms.Button()
             Me.MainTabControl = New System.Windows.Forms.TabControl()
             Me.MainChartPage = New System.Windows.Forms.TabPage()
+            Me.NumInterpPointsTB = New System.Windows.Forms.TextBox()
             Me.ClearOtherCurvesCheckBox = New System.Windows.Forms.CheckBox()
             Me.ClearBondCurvesCheckBox = New System.Windows.Forms.CheckBox()
             Me.ClearPointsCheckBox = New System.Windows.Forms.CheckBox()
@@ -95,7 +96,6 @@
             Me.LogNoneRadioButton = New System.Windows.Forms.RadioButton()
             Me.TheCancelButton = New System.Windows.Forms.Button()
             Me.ErrProv = New System.Windows.Forms.ErrorProvider(Me.components)
-            Me.NumInterpPointsTB = New System.Windows.Forms.TextBox()
             Label11 = New System.Windows.Forms.Label()
             Label4 = New System.Windows.Forms.Label()
             Label15 = New System.Windows.Forms.Label()
@@ -232,6 +232,15 @@
             Label18.TabIndex = 61
             Label18.Text = "Set strict limit"
             '
+            'Label19
+            '
+            Label19.AutoSize = True
+            Label19.Location = New System.Drawing.Point(6, 150)
+            Label19.Name = "Label19"
+            Label19.Size = New System.Drawing.Size(192, 13)
+            Label19.TabIndex = 44
+            Label19.Text = "Number of points for curve interpolation"
+            '
             'MainTableLayoutPanel
             '
             Me.MainTableLayoutPanel.ColumnCount = 2
@@ -295,6 +304,13 @@
             Me.MainChartPage.Text = "Chart"
             Me.MainChartPage.UseVisualStyleBackColor = True
             '
+            'NumInterpPointsTB
+            '
+            Me.NumInterpPointsTB.Location = New System.Drawing.Point(204, 147)
+            Me.NumInterpPointsTB.Name = "NumInterpPointsTB"
+            Me.NumInterpPointsTB.Size = New System.Drawing.Size(100, 20)
+            Me.NumInterpPointsTB.TabIndex = 45
+            '
             'ClearOtherCurvesCheckBox
             '
             Me.ClearOtherCurvesCheckBox.AutoSize = True
@@ -328,8 +344,8 @@
             'YieldCalcModeCB
             '
             Me.YieldCalcModeCB.FormattingEnabled = True
-            Me.YieldCalcModeCB.Items.AddRange(New Object() {"YTM", "YTW", "YTB", "YTA"})
-            Me.YieldCalcModeCB.Location = New System.Drawing.Point(330, 35)
+            Me.YieldCalcModeCB.Items.AddRange(New Object() {"Default", "YTM", "YTP", "YTC", "YTW", "YTB", "YTA"})
+            Me.YieldCalcModeCB.Location = New System.Drawing.Point(351, 12)
             Me.YieldCalcModeCB.Name = "YieldCalcModeCB"
             Me.YieldCalcModeCB.Size = New System.Drawing.Size(73, 21)
             Me.YieldCalcModeCB.TabIndex = 42
@@ -337,7 +353,7 @@
             'Label8
             '
             Me.Label8.AutoSize = True
-            Me.Label8.Location = New System.Drawing.Point(211, 38)
+            Me.Label8.Location = New System.Drawing.Point(232, 15)
             Me.Label8.Name = "Label8"
             Me.Label8.Size = New System.Drawing.Size(113, 13)
             Me.Label8.TabIndex = 41
@@ -348,7 +364,7 @@
             Me.ShowPointSizeCheckBox.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                 Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
             Me.ShowPointSizeCheckBox.AutoSize = True
-            Me.ShowPointSizeCheckBox.Location = New System.Drawing.Point(214, 12)
+            Me.ShowPointSizeCheckBox.Location = New System.Drawing.Point(204, 81)
             Me.ShowPointSizeCheckBox.Margin = New System.Windows.Forms.Padding(0)
             Me.ShowPointSizeCheckBox.Name = "ShowPointSizeCheckBox"
             Me.ShowPointSizeCheckBox.Size = New System.Drawing.Size(257, 17)
@@ -880,22 +896,6 @@
             'ErrProv
             '
             Me.ErrProv.ContainerControl = Me
-            '
-            'Label19
-            '
-            Label19.AutoSize = True
-            Label19.Location = New System.Drawing.Point(6, 150)
-            Label19.Name = "Label19"
-            Label19.Size = New System.Drawing.Size(192, 13)
-            Label19.TabIndex = 44
-            Label19.Text = "Number of points for curve interpolation"
-            '
-            'NumInterpPointsTB
-            '
-            Me.NumInterpPointsTB.Location = New System.Drawing.Point(204, 147)
-            Me.NumInterpPointsTB.Name = "NumInterpPointsTB"
-            Me.NumInterpPointsTB.Size = New System.Drawing.Size(100, 20)
-            Me.NumInterpPointsTB.TabIndex = 45
             '
             'SettingsForm
             '

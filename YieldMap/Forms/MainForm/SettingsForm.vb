@@ -1,5 +1,4 @@
-﻿Imports System.Text.RegularExpressions
-Imports DbManager.Bonds
+﻿Imports DbManager.Bonds
 Imports NLog
 Imports Settings
 
@@ -110,6 +109,15 @@ Namespace Forms.MainForm
                 AllColumnsCB.Checked = True
                 SetAllCheckState()
             End If
+
+            If Settings.YieldCalcMode <> "" Then
+                For Each item In YieldCalcModeCB.Items
+                    If item = Settings.YieldCalcMode Then
+                        YieldCalcModeCB.SelectedItem = item
+                        Exit For
+                    End If
+                Next
+            End If
         End Sub
 
         Private Sub CancelButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles TheCancelButton.Click
@@ -205,6 +213,8 @@ Namespace Forms.MainForm
             Settings.MinXStrict = MinXStrictCB.Checked
             Settings.MinYStrict = MinYStrictCB.Checked
 
+
+            Settings.YieldCalcMode = YieldCalcModeCB.SelectedItem
             Close()
         End Sub
 

@@ -76,15 +76,6 @@ Module MainModule
         Logger.Trace("Main method started")
         Logging.LoggingLevel = SettingsManager.Instance.LogLevel
 
-        ' Uninstall:  http://www.codeproject.com/Articles/11377/Add-an-uninstall-start-menu-item-to-your-NET-deplo
-        Dim arguments As String() = Environment.GetCommandLineArgs()
-        For Each guid As String In From argument In arguments
-                                   Where argument.Split("=")(0).ToLower = "/u" Select argument.Split("=")(1)
-            Process.Start(Environment.GetFolderPath(Environment.SpecialFolder.System) & "\msiexec.exe", "/x " & guid)
-            Application.Exit()
-            End
-        Next
-
         ' Error handling 
         AddHandler Application.ThreadException, New ThreadExceptionEventHandler(AddressOf ThreadEventHandler)
         Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException)
@@ -96,7 +87,9 @@ Module MainModule
 
     Private Sub DomainEventHandler(ByVal sender As Object, ByVal e As UnhandledExceptionEventArgs)
         Logger.Fatal("Domain error {0}", e.ExceptionObject.ToString())
+        ' ReSharper disable VBPossibleMistakenCallToGetType.2
         If MessageBox.Show(String.Format("Unhandled exception of type {0} occured.{1}Would you like to close the application?", e.ExceptionObject.GetType(), Environment.NewLine), "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error) = MsgBoxResult.Yes Then
+            ' ReSharper restore VBPossibleMistakenCallToGetType.2
             Controller.Shutdown()
         End If
     End Sub

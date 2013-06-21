@@ -53,6 +53,10 @@ Namespace Forms.ChartForm
             SetChartMinMax()
         End Sub
 
+        Private Sub YieldCalcModeChanged() Handles _theSettings.YieldCalcModeChanged
+            _ansamble.Replot()
+        End Sub
+
         Private Sub ShowPointSizeChanged(ByVal show As Boolean) Handles _theSettings.ShowPointSizeChanged
             _ansamble.Replot()
         End Sub
@@ -112,15 +116,14 @@ Namespace Forms.ChartForm
                 For Each grp As BondGroup In From port In portfolioStructure.Sources
                                            Where TypeOf port.Source Is DbManager.Chain Or TypeOf port.Source Is UserList
                                            Select New BondGroup(_ansamble, port, portfolioStructure)
-                    ' todo add custom bonds
                     AddHandler grp.Updated, AddressOf OnGroupUpdated
+                    AddHandler grp.Cleared, Sub() ClearSeries(grp.Identity)
                     AddHandler grp.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnGroupUpdated(data)
                     _ansamble.Items.Add(grp)
                 Next
                 For Each grp As CustomBondGroup In From port In portfolioStructure.Sources
                                            Where TypeOf port.Source Is CustomBond
                                            Select New CustomBondGroup(_ansamble, port, portfolioStructure)
-                    ' todo add custom bonds
                     AddHandler grp.Updated, AddressOf OnGroupUpdated
                     AddHandler grp.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnGroupUpdated(data)
                     _ansamble.Items.Add(grp)
@@ -808,7 +811,7 @@ Namespace Forms.ChartForm
         Private Sub ShowHistoryTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles ShowHistoryTSMI.Click
             Logger.Trace("ShowHistQuotesTSMIClick")
             Try
-                Dim historyLoader As New ReutersData.History
+                Dim historyLoader As New History
                 AddHandler historyLoader.HistoricalData, AddressOf OnHistoricalData
                 Dim item = CType(BondCMS.Tag, Bond)
                 historyLoader.StartTask(item.MetaData.RIC, "DATE, CLOSE", DateTime.Today.AddDays(-90), DateTime.Today, timeOut:=15)

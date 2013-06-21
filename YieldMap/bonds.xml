@@ -40,6 +40,7 @@
     <chain id="3" ric="0#RUSOVB=MM" field-set-id="MICEX" name="Regional" color="Blue" />
     <chain id="4" ric="0#RUCORP=MM" field-set-id="MICEX" name="Corporate bonds" color="Cyan" enabled="False" />
     <chain id="5" ric="0#RFGOVBONDS=" field-set-id="MICEX" name="Russian eurobonds" color="IndianRed" curve="True" enabled="True" />
+    <chain id="93560" ric="0#RUCORP=MM" field-set-id="MICEX" name="Russian MICEX corporates" color="MediumSeaGreen" curve="False" enabled="True" />
   </chains>
   <!-- Lists -->
   <lists>
@@ -88,6 +89,7 @@
       <portfolio id="76699" name="EUR">
         <include what="chain" id="5" name="Russia Eur" color="ForestGreen" />
       </portfolio>
+      <portfolio id="97046" name="New PPP" />
     </folder>
   </portfolios>
   <custom-bonds>

@@ -3,6 +3,7 @@ Imports DbManager.Bonds
 Imports System.Text.RegularExpressions
 Imports NLog
 Imports ReutersData
+Imports Settings
 Imports Uitls
 
 Namespace Tools.Elements
@@ -182,7 +183,11 @@ Namespace Tools.Elements
             Dim coupon = ParentBond.Coupon(YieldAtDate)
             Dim settleDate = _bondModule.BdSettle(YieldAtDate, dscr.PaymentStructure)
             Logger.Trace("Coupon: {0}, settleDate: {1}, maturity: {2}", coupon, Utils.FromExcelSerialDate(settleDate), dscr.Maturity)
-            Dim bondYield As Array = _bondModule.AdBondYield(settleDate, Price / 100, dscr.Maturity, coupon, dscr.PaymentStructure, dscr.RateStructure, "")
+
+            Dim yieldCalcMode = SettingsManager.Instance.YieldCalcMode
+            Dim rateStructure = If(yieldCalcMode <> "Default", Regex.Replace(dscr.RateStructure, "YT[A-Z]", yieldCalcMode), dscr.RateStructure)
+
+            Dim bondYield As Array = _bondModule.AdBondYield(settleDate, Price / 100, dscr.Maturity, coupon, dscr.PaymentStructure, rateStructure, "")
             Dim bestYield = ParseBondYield(bondYield).Max
             bestYield.Yield += ParentBond.UserDefinedSpread(Ordinate.Yield)
             Logger.Trace("best Yield: {0}", bestYield)

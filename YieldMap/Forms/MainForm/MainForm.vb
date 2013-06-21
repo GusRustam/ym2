@@ -110,19 +110,32 @@ Namespace Forms.MainForm
 
 #Region "II. Connecting to Eikon"
         Private Sub ConnectToEikon()
+            Logger.Trace("ConnectToEikon()")
             _connector.ConnectToEikon()
         End Sub
 
         Private Sub ConnectorTimeout() Handles _connector.Timeout
-            GuiAsync(Sub()
-                         _connected = False
-                         ConnectTSMI.Enabled = True
-                         ConnectButton.Enabled = True
-                         YieldMapButton.Enabled = False
-                         StatusPicture.Image = Red
-                         StatusLabel.Text = "Connection timeout"
-                         MessageBox.Show("Connection timed out. Please try to connect again or restart Eikon and this app manually", "Connection Timeout", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                     End Sub)
+            'GuiAsync(Sub()
+            Try
+                _connected = False
+                ConnectTSMI.Enabled = True
+                ConnectButton.Enabled = True
+                YieldMapButton.Enabled = False
+                StatusPicture.Image = Red
+                StatusLabel.Text = "Connection timeout"
+                'MessageBox.Show("Connection timed out. Please try to connect again or restart Eikon and this app manually", "Connection Timeout", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Catch ex As Exception
+                GuiAsync(
+                    Sub()
+                        _connected = False
+                        ConnectTSMI.Enabled = True
+                        ConnectButton.Enabled = True
+                        YieldMapButton.Enabled = False
+                        StatusPicture.Image = Red
+                        StatusLabel.Text = "Connection timeout"
+                        'MessageBox.Show("Connection timed out. Please try to connect again or restart Eikon and this app manually", "Connection Timeout", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                    End Sub)
+            End Try
         End Sub
 
         Private Sub ConnectorConnected() Handles _connector.Connected
