@@ -280,9 +280,7 @@ Namespace Tools.Elements
 
         End Sub
 
-
         Public Overrides Sub ClearYield()
-            ' _yields.Cleanup() todo why the hell?
         End Sub
 
         Public Overrides Property Yield(Optional ByVal dt As Date? = Nothing) As Double?

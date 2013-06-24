@@ -463,14 +463,16 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
-        Private Sub OnGroupUpdated(ByVal data As List(Of PointOfCurve))
+        Private Sub OnGroupUpdated(ByVal group As Group, ByVal data As List(Of PointOfCurve))
             Logger.Trace("OnGroupUpdated()")
             GuiAsync(
                 Sub()
-                    If Not data.Any Then Return
+                    If Not data.Any Then
+                        ClearSeries(group.Identity)
+                        Return
+                    End If
                     If Not TypeOf data.First Is PointOfBondCurve Then Return
                     Dim dt = data.Cast(Of PointOfBondCurve).ToList()
-                    Dim group = dt.First.Bond.Parent
                     Dim series As Series = TheChart.Series.FindByName(group.Identity)
                     Dim clr = Color.FromName(group.Color)
 

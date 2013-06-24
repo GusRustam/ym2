@@ -117,16 +117,16 @@ Namespace Forms.ChartForm
                                            Where TypeOf port.Source Is DbManager.Chain Or TypeOf port.Source Is UserList
                                            Select New BondGroup(_ansamble, port, portfolioStructure)
                     Dim tmp = grp
-                    AddHandler grp.Updated, AddressOf OnGroupUpdated
+                    AddHandler grp.Updated, Sub(items) OnGroupUpdated(grp, items)
                     AddHandler grp.Cleared, Sub() ClearSeries(tmp.Identity)
-                    AddHandler grp.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnGroupUpdated(data)
+                    AddHandler grp.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnGroupUpdated(grp, data)
                     _ansamble.Items.Add(grp)
                 Next
                 For Each grp As CustomBondGroup In From port In portfolioStructure.Sources
                                            Where TypeOf port.Source Is CustomBond
                                            Select New CustomBondGroup(_ansamble, port, portfolioStructure)
-                    AddHandler grp.Updated, AddressOf OnGroupUpdated
-                    AddHandler grp.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnGroupUpdated(data)
+                    AddHandler grp.Updated, Sub(items) OnGroupUpdated(grp, items)
+                    AddHandler grp.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnGroupUpdated(grp, data)
                     _ansamble.Items.Add(grp)
                 Next
                 _ansamble.Items.Start()
@@ -856,8 +856,8 @@ Namespace Forms.ChartForm
                     Dim grp As BondGroup
                     If groupSelect.UseNew Then
                         grp = New BondGroup(_ansamble, groupSelect.NewName, bondSelector.SelectedRICs, groupSelect.NewColor, New FieldSet(groupSelect.LayoutId))
-                        AddHandler grp.Updated, AddressOf OnGroupUpdated
-                        AddHandler grp.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnGroupUpdated(data)
+                        AddHandler grp.Updated, Sub(items) OnGroupUpdated(grp, items)
+                        AddHandler grp.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnGroupUpdated(grp, data)
                         _ansamble.Items.Add(grp)
                     Else
                         grp = _ansamble.Items(groupSelect.ExistingGroupId)
