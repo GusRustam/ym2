@@ -266,7 +266,7 @@ Namespace Tools.Elements
             Logger.Trace("Coupon: {0}, settleDate: {1}, maturity: {2}", coupon, Utils.FromExcelSerialDate(settleDate), dscr.Maturity)
 
             Dim yieldCalcMode = ParentBond.YieldMode
-            Dim rateStructure = If(yieldCalcMode <> "Default", Regex.Replace(dscr.RateStructure, "YT[A-Z]", yieldCalcMode), dscr.RateStructure)
+            Dim rateStructure = If(Not yieldCalcMode.Belongs("Default", ""), Regex.Replace(dscr.RateStructure, "YT[A-Z]", yieldCalcMode), dscr.RateStructure)
 
             Dim bondYield As Array = _bondModule.AdBondYield(settleDate, Price / 100, dscr.Maturity, coupon, dscr.PaymentStructure, rateStructure, "")
             _yields = New YieldContainer(bondYield, ParentBond.UserDefinedSpread(Ordinate.Yield))

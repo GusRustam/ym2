@@ -1,5 +1,4 @@
 Imports DbManager
-Imports Settings
 Imports Uitls
 
 Namespace Tools.Elements

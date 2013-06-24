@@ -102,7 +102,6 @@ Namespace Tools.Elements
         End Property
 
         Private _color As String
-        Private _countdown As CountdownEvent
 
         Public Property Color() As String
             Get
@@ -301,25 +300,12 @@ Namespace Tools.Elements
 
         Public Sub SetYieldMode(ByVal mode As String)
             FreezeEvents()
-            If _countdown.CurrentCount > 0 Then
-                Logger.Warn("Previous recalc in progress")
-                Return
-            End If
 
-            _countdown = New CountdownEvent(_elements.Count())
-            Dim waiter = New Thread(New ThreadStart(
-                                    Sub()
-                                        Logger.Info("WaiterThread()")
-                                        If Not _countdown.Wait(TimeSpan.FromSeconds(30)) Then
-                                            Logger.Warn("{0} threads are still working", _countdown.CurrentCount)
-                                        Else
-                                            Logger.Info("Ok!")
-                                            UnfreezeEvents()
-                                        End If
-                                    End Sub))
-            waiter.Start()
-
-            Parallel.ForEach(_elements, Sub(elem) elem.YieldMode = mode)
+            _elements.ForEach(Sub(elem)
+                                  elem.YieldMode = mode
+                                  Logger.Info("Elem {0} done!", elem.MetaData.ShortName)
+                              End Sub)
+            UnfreezeEvents()
         End Sub
     End Class
 End Namespace

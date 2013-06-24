@@ -38,7 +38,6 @@
     <chain id="1" ric="0#RUTSY=MM" field-set-id="MICEX" name="OFZ" color="Red" />
     <chain id="2" ric="0#RUMOSB=MM" field-set-id="MICEX" name="Moscow" color="Green" curve="True" />
     <chain id="3" ric="0#RUSOVB=MM" field-set-id="MICEX" name="Regional" color="Blue" />
-    <chain id="4" ric="0#RUCORP=MM" field-set-id="MICEX" name="Corporate bonds" color="Cyan" enabled="False" />
     <chain id="5" ric="0#RFGOVBONDS=" field-set-id="MICEX" name="Russian eurobonds" color="IndianRed" curve="True" enabled="True" />
     <chain id="93560" ric="0#RUCORP=MM" field-set-id="MICEX" name="Russian MICEX corporates" color="MediumSeaGreen" curve="False" enabled="True" />
   </chains>
@@ -60,11 +59,15 @@
   <!-- Portfolios -->
   <portfolios>
     <folder id="0" name="Main">
-      <folder id="1" name="Specific">
+      <folder id="1" name="By rating">
         <portfolio id="82762" name="Regionals by rating">
           <include what="chain" id="3" name="Muni B" color="DarkOrchid" condition="$LastRating.Rating &gt;= [B-] and $LastRating.Rating &lt;= [B+] " />
           <include what="chain" id="3" name="Muni BB" color="Blue" condition="$LastRating.Rating &gt;= [BB-] and $LastRating.Rating &lt;= [BB+] " />
           <include what="chain" id="3" name="Muni BBB" color="CornflowerBlue" condition="$LastRating.Rating &gt;= [BBB-] and $LastRating.Rating &lt;= [BBB+] " />
+        </portfolio>
+        <portfolio id="97046" name="Corporates by rating">
+          <include what="chain" id="93560" name="Corp BBB" color="DarkOliveGreen" condition="$LastRating.Rating &gt;= [BBB-] And $LastRating.Rating &lt;= [BBB+] And $Putable = True" />
+          <include what="chain" id="5" name="Corp BB" color="CornflowerBlue" condition="$LastRating.Rating &gt;= [BB-] and $LastRating.Rating &lt;= [BB+] ANd $Putable = True" />
         </portfolio>
       </folder>
       <folder id="2" name="Stuff">
@@ -80,16 +83,10 @@
           <!-- todo -->
           <exclude what="ric" name="XXXXX" />
         </portfolio>
+        <portfolio id="76699" name="EUR">
+          <include what="chain" id="5" name="Russia Eur" color="ForestGreen" />
+        </portfolio>
       </folder>
-      <portfolio id="11" name="Regional w/o Moscow">
-        <include what="chain" id="3" />
-        <exclude what="chain" id="2" />
-        <include what="custom-bond" id="1" />
-      </portfolio>
-      <portfolio id="76699" name="EUR">
-        <include what="chain" id="5" name="Russia Eur" color="ForestGreen" />
-      </portfolio>
-      <portfolio id="97046" name="New PPP" />
     </folder>
   </portfolios>
   <custom-bonds>
