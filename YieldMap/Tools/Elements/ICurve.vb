@@ -6,7 +6,6 @@ Namespace Tools.Elements
         ReadOnly Property Formula() As String
         ReadOnly Property CanBootstrap() As Boolean
         Property Bootstrapped() As Boolean
-        Property CurveDate() As Date
         Sub Bootstrap()
         ReadOnly Property IsSynthetic() As Boolean
 

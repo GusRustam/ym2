@@ -104,6 +104,9 @@ Namespace Tools.Elements
             While _items.Any(Function(item) TypeOf item.Value Is BondGroup)
                 _items.First(Function(item) TypeOf item.Value Is BondGroup).Value.Cleanup()
             End While
+            While _items.Any(Function(item) TypeOf item.Value Is CustomBondGroup)
+                _items.First(Function(item) TypeOf item.Value Is CustomBondGroup).Value.Cleanup()
+            End While
         End Sub
 
         Public Sub CleanupOnlyCurves()

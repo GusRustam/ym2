@@ -62,6 +62,7 @@ Namespace Tools.Elements
         Public MustOverride Sub Recalculate(ByVal ord As IOrdinate) Implements IChangeable.Recalculate
         Public MustOverride ReadOnly Property Name() As String Implements INamed.Name
 
+        Public MustOverride Property GroupDate() As Date Implements IChangeable.GroupDate
 
         Public MustOverride Sub Cleanup() Implements IChangeable.Cleanup
         Public MustOverride Sub Subscribe() Implements IChangeable.Subscribe
@@ -69,7 +70,6 @@ Namespace Tools.Elements
         Public MustOverride ReadOnly Property Snapshot() As ISnapshot Implements ICurve.Snapshot
 
         '' ============ ICURVE INTERFACE ============
-        Public MustOverride Property CurveDate() As Date Implements ICurve.CurveDate
         Public MustOverride ReadOnly Property Formula() As String Implements ICurve.Formula
         Public MustOverride ReadOnly Property CanBootstrap() As Boolean Implements ICurve.CanBootstrap
         Public MustOverride Property Bootstrapped() As Boolean Implements ICurve.Bootstrapped

@@ -128,12 +128,6 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Forms\ChartForm\BondYieldSpread.Designer.vb">
-      <DependentUpon>BondYieldSpread.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\ChartForm\BondYieldSpread.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Forms\ChartForm\GroupSelectForm.Designer.vb">
       <DependentUpon>GroupSelectForm.vb</DependentUpon>
     </Compile>
@@ -288,9 +282,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ChartForm\BondCurveItemsForm.resx">
       <DependentUpon>BondCurveItemsForm.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ChartForm\BondYieldSpread.resx">
-      <DependentUpon>BondYieldSpread.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ChartForm\GroupSelectForm.resx">
       <DependentUpon>GroupSelectForm.vb</DependentUpon>
@@ -505,7 +496,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_BuildVersioningStyle="None.MonthStamp.Increment.TimeStamp" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" />
+      <UserProperties BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_BuildVersioningStyle="None.MonthStamp.Increment.TimeStamp" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

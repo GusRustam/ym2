@@ -5,6 +5,7 @@ Namespace Tools.Elements
         Event Updated As Action(Of List(Of PointOfCurve))
         Event UpdatedSpread As Action(Of List(Of PointOfCurve), IOrdinate)
         ReadOnly Property DisabledElements() As List(Of Bond)
+        Property GroupDate() As Date
         Sub Cleanup()
         Sub Recalculate()
         Sub Recalculate(ByVal ord As IOrdinate)

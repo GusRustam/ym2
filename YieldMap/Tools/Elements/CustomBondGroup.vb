@@ -7,13 +7,11 @@ Namespace Tools.Elements
         Inherits Group
 
         Public Sub New(ByVal ansamble As Ansamble, ByVal port As PortfolioSource, ByVal portfolioStructure As PortfolioStructure)
-            MyBase.New(ansamble)
+            MyBase.New(ansamble, New FieldSet("Custom bonds")) ' todo ugly (todo make them invisible at UI)
 
             Nm = If(port.Name <> "", port.Name, port.Source.Name)
             PortfolioID = port.Source.ID
             Color = If(port.Color <> "", port.Color, port.Source.Color)
-            Dim flds = New FieldSet("Custom bonds")
-            BondFields = flds.Realtime.AsContainer()
             AddRics(portfolioStructure.Rics(port))
         End Sub
 

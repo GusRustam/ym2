@@ -16,27 +16,14 @@ Namespace Tools.Elements
 
         Private ReadOnly Property ZcbPmtStructure As String
             Get
-                Return String.Format(ZcbPmtStructureTemplate, ReutersDate.DateToReuters(_curveDate))
+                Return String.Format(ZcbPmtStructureTemplate, ReutersDate.DateToReuters(GroupDate))
             End Get
         End Property
 
         Private ReadOnly _bondModule As AdxBondModule = Eikon.Sdk.CreateAdxBondModule()
         Private ReadOnly _curveModule As AdxYieldCurveModule = Eikon.Sdk.CreateAdxYieldCurveModule()
 
-        Private _curveDate As Date = Today
-        Public Property CurveDate() As Date Implements ICurve.CurveDate
-            Get
-                Return _curveDate
-            End Get
-            Set(ByVal value As Date)
-                If _curveDate <> value Then
-                    _curveDate = value
-                    Subscribe()
-                End If
-            End Set
-        End Property
 
-        Private ReadOnly _histFields As FieldContainer
 
         ' Last curve snapshot
         Private ReadOnly _lastCurve As New Dictionary(Of IOrdinate, List(Of PointOfCurve))
@@ -56,12 +43,12 @@ Namespace Tools.Elements
         End Property
 
         Private Function GetSyntBond(dur As Double, yield As Double) As SyntheticZcb
-            Dim mat = _curveDate.AddDays(dur * 365 / (1 + yield * dur)) ' cool hack to make Macauley duration equal to dur parameter
+            Dim mat = GroupDate.AddDays(dur * 365 / (1 + yield * dur)) ' cool hack to make Macauley duration equal to dur parameter
             Dim paymentStructure As String = ZcbPmtStructure
             Dim bond = New SyntheticZcb(Me, New BondMetadata(String.Format("ZCB {0:N2}", dur), mat, 0, paymentStructure, "RM:YTM", Name))
-            Dim settleDate = _bondModule.BdSettle(_curveDate, paymentStructure)
+            Dim settleDate = _bondModule.BdSettle(GroupDate, paymentStructure)
             Dim priceObject As Array = _bondModule.AdBondPrice(settleDate, yield, mat, 0, 0, paymentStructure, "RM:YTM", "", "RES:BDPRICE")
-            AddHandler bond.CustomPrice, Sub(bnd, prc) HandleNewQuote(bnd, BondFields.XmlName(bond.Fields.Custom), prc, _curveDate, False)
+            AddHandler bond.CustomPrice, Sub(bnd, prc) HandleNewQuote(bnd, BondFields.XmlName(bond.Fields.Custom), prc, GroupDate, False)
             bond.SetCustomPrice(100 * priceObject.GetValue(1))
             Return bond
         End Function
@@ -95,87 +82,31 @@ Namespace Tools.Elements
         End Property
 
         Public Sub New(ByVal ansamble As Ansamble, ByVal src As Source)
-            MyBase.new(ansamble)
+            MyBase.new(ansamble, src.Fields)
 
             Nm = src.Name
             PortfolioID = src.ID
-            BondFields = src.Fields.Realtime.AsContainer()
             Color = src.Color
-            _histFields = src.Fields.History.AsContainer()
 
             AddRics(src.GetDefaultRics())
         End Sub
 
-        Public Overrides Sub Subscribe()
-            Dim rics As List(Of String) = (From elem In AllElements Select elem.MetaData.RIC).ToList()
-            If rics.Count = 0 Then Return
-            If _curveDate = Today Then
-                QuoteLoader.AddItems(rics, BondFields.AllNames)
-            Else
-                QuoteLoader.CancelAll()
-                Dim historyBlock As New HistoryBlock
-                AddHandler historyBlock.History, AddressOf OnHistory
-                historyBlock.Load(rics, _histFields.AllNames, _curveDate.AddDays(-10), _curveDate)
-            End If
-        End Sub
+        'Public Overrides Sub Subscribe()
+        '    Dim rics As List(Of String) = (From elem In AllElements Select elem.MetaData.RIC).ToList()
+        '    If rics.Count = 0 Then Return
+        '    If GroupDate = Today Then
+        '        QuoteLoader.AddItems(rics, BondFields.AllNames)
+        '    Else
+        '        QuoteLoader.CancelAll()
+        '        Dim historyBlock As New HistoryBlock
+        '        AddHandler historyBlock.History, AddressOf OnHistory
+        '        historyBlock.Load(rics, _histFields.AllNames, GroupDate.AddDays(-10), GroupDate)
+        '    End If
+        'End Sub
 
-        Private Sub OnHistory(ByVal obj As HistoryBlock.DataCube)
-            If obj Is Nothing Then
-                CurveDate = Today
-            Else
-                ' doing some cleanup
-                For Each elem In AllElements
-                    elem.QuotesAndYields.Clear()
-                Next
-                ' parsing historical data
-                For Each ric In obj.Rics
-                    ParseHistory(ric, obj.RicData2(ric))
-                Next
-            End If
-        End Sub
 
-        Private Sub ParseHistory(ByVal ric As String, ByVal rawData As Dictionary(Of String, Dictionary(Of Date, String)))
-            If rawData Is Nothing Then
-                Logger.Error("No data on bond {0}", ric)
-                Return
-            End If
-            Dim bonds = (From elem In AllElements Where elem.MetaData.RIC = ric)
-            If Not bonds.Any Then
-                Logger.Warn("Instrument {0} does not belong to serie {1}", ric, Name)
-                Return
-            End If
-            Dim bond = bonds.First()
 
-            Dim fieldsDescription As FieldsDescription = _histFields.Fields
-            If rawData.ContainsKey(fieldsDescription.Last) Then
-                ParseHistoricalItem(rawData, fieldsDescription.Last, bond)
-            End If
-            If rawData.ContainsKey(fieldsDescription.Bid) Or rawData.ContainsKey(fieldsDescription.Ask) Then
-                Dim bidData = ParseHistoricalItem(rawData, fieldsDescription.Bid, bond)
-                Dim askData = ParseHistoricalItem(rawData, fieldsDescription.Ask, bond)
-                If bidData IsNot Nothing AndAlso askData IsNot Nothing AndAlso bidData.Item1 = askData.Item1 Then
-                    Dim mid = (bidData.Item2 + askData.Item2) / 2
-                    HandleNewQuote(bond, _histFields.XmlName(_histFields.Fields.Mid), mid, bidData.Item1)
-                ElseIf (bidData IsNot Nothing Or askData IsNot Nothing) And Not SettingsManager.Instance.MidIfBoth Then
-                    If bidData IsNot Nothing Then
-                        HandleNewQuote(bond, _histFields.XmlName(_histFields.Fields.Mid), bidData.Item2, bidData.Item1)
-                    Else
-                        HandleNewQuote(bond, _histFields.XmlName(_histFields.Fields.Mid), askData.Item2, askData.Item1)
-                    End If
-                End If
-            End If
-        End Sub
 
-        Private Function ParseHistoricalItem(ByVal rawData As Dictionary(Of String, Dictionary(Of Date, String)), ByVal field As String, ByVal bond As Bond) As Tuple(Of Date, Double)
-            Dim datVal = rawData(field)
-            Dim dates = (From key In datVal.Keys Where IsNumeric(datVal(key))).ToList()
-            If dates.Any Then
-                Dim maxdate = dates.Max
-                HandleNewQuote(bond, _histFields.XmlName(field), datVal(maxdate), maxdate)
-                Return Tuple.Create(maxdate, CDbl(rawData(field)(maxdate)))
-            End If
-            Return Nothing
-        End Function
 
         Public Overrides Sub RecalculateTotal()
             For Each bnd In AllElements
@@ -261,8 +192,8 @@ Namespace Tools.Elements
             If _bootstrapped Then
                 Try
                     Dim data = (From elem In Elements
-                            Where elem.MetaData.IssueDate <= _curveDate And
-                                  elem.MetaData.Maturity > _curveDate And
+                            Where elem.MetaData.IssueDate <= GroupDate And
+                                  elem.MetaData.Maturity > GroupDate And
                                   elem.QuotesAndYields.Any()).ToList()
 
                     Dim params(0 To data.Count() - 1, 5) As Object
@@ -270,13 +201,13 @@ Namespace Tools.Elements
                         Dim meta = data(i).MetaData
                         Dim main As BondPointDescription = data(i).QuotesAndYields.Main
                         params(i, 0) = "B"
-                        params(i, 1) = _curveDate
+                        params(i, 1) = GroupDate
                         params(i, 2) = meta.Maturity
-                        params(i, 3) = meta.GetCouponByDate(_curveDate)
+                        params(i, 3) = meta.GetCouponByDate(GroupDate)
 
                         ' incorporating spread
                         If data(i).UserDefinedSpread(Yield) > 0 Then
-                            Dim settleDate = _bondModule.BdSettle(_curveDate, meta.PaymentStructure)
+                            Dim settleDate = _bondModule.BdSettle(GroupDate, meta.PaymentStructure)
                             Dim priceObject As Array = _bondModule.AdBondPrice(settleDate, main.Yield + data(i).UserDefinedSpread(Yield),
                                                                               meta.Maturity, params(i, 3), 0, meta.PaymentStructure,
                                                                               meta.RateStructure, "", "RES:BDPRICE")
@@ -291,7 +222,7 @@ Namespace Tools.Elements
                     Dim termStructure As Array = _curveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
                     For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
                         Dim matDate = Utils.FromExcelSerialDate(termStructure.GetValue(i, 1))
-                        Dim dur = (matDate - _curveDate).TotalDays / 365.0
+                        Dim dur = (matDate - GroupDate).TotalDays / 365.0
                         Dim yld = termStructure.GetValue(i, 2)
                         If dur > 0 And yld > 0 Then result.Add(New JustPoint(dur, yld, Me))
                     Next

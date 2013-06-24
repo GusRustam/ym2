@@ -420,6 +420,7 @@ Namespace Forms.ChartForm
             For Each dt In data.Keys
                 Try
                     Dim calc As New BondPointDescription("HST")
+                    calc.ParentBond = elem
                     If data(dt).Close > 0 Then
                         calc.Yield(dt) = data(dt).Close
                         points.Add(Tuple.Create(calc, bondDataPoint))

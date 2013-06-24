@@ -68,6 +68,18 @@
             End Get
         End Property
 
+        Public WriteOnly Property GroupDate() As Date
+            Set(value As Date)
+                For Each item In AllItems()
+                    item.GroupDate = value
+                Next
+                For Each item In _swapCurves
+                    item.GroupDate = value
+                Next
+            End Set
+        End Property
+
+
         Public Sub Replot()
             For Each item In AllItems()
                 item.RecalculateTotal()

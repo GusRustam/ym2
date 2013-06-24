@@ -3,8 +3,6 @@ Imports DbManager
 Imports NLog
 Imports ReutersData
 Imports Settings
-Imports System.Threading.Tasks
-Imports System.Threading
 Imports Uitls
 
 Namespace Tools.Elements
@@ -34,7 +32,28 @@ Namespace Tools.Elements
             End Get
         End Property
 
-        Friend BondFields As FieldContainer
+        Private ReadOnly _histFields As FieldContainer
+
+        Private _groupDate As Date = Today
+        Public Property GroupDate() As Date Implements IChangeable.GroupDate
+            Get
+                Return _groupDate
+            End Get
+            Set(ByVal value As Date)
+                If _groupDate <> value Then
+                    _groupDate = value
+                    Subscribe()
+                End If
+            End Set
+        End Property
+
+        Private ReadOnly _bondFields As FieldContainer
+        Public ReadOnly Property BondFields() As FieldContainer
+            Get
+                Return _bondFields
+            End Get
+        End Property
+
         Public PortfolioID As Long
 
 
@@ -119,10 +138,80 @@ Namespace Tools.Elements
         End Sub
 
         Public Overridable Sub Subscribe() Implements IChangeable.Subscribe
-            Dim rics As List(Of String) = (From elem In _elements Select elem.MetaData.RIC).ToList()
+            'Dim rics As List(Of String) = (From elem In _elements Select elem.MetaData.RIC).ToList()
+            'If rics.Count = 0 Then Return
+            '_quoteLoader.AddItems(rics, BondFields.AllNames)
+            Dim rics As List(Of String) = (From elem In AllElements Select elem.MetaData.RIC).ToList()
             If rics.Count = 0 Then Return
-            _quoteLoader.AddItems(rics, BondFields.AllNames)
+            If GroupDate = Today Then
+                QuoteLoader.AddItems(rics, _bondFields.AllNames)
+            Else
+                QuoteLoader.CancelAll()
+                Dim historyBlock As New HistoryBlock
+                AddHandler historyBlock.History, AddressOf OnHistory
+                historyBlock.Load(rics, _histFields.AllNames, GroupDate.AddDays(-10), GroupDate)
+            End If
         End Sub
+
+
+        Private Sub OnHistory(ByVal obj As HistoryBlock.DataCube)
+            If obj Is Nothing Then
+                GroupDate = Today
+            Else
+                ' doing some cleanup
+                For Each elem In AllElements
+                    elem.QuotesAndYields.Clear()
+                Next
+                ' parsing historical data
+                For Each ric In obj.Rics
+                    ParseHistory(ric, obj.RicData2(ric))
+                Next
+            End If
+        End Sub
+
+        Private Sub ParseHistory(ByVal ric As String, ByVal rawData As Dictionary(Of String, Dictionary(Of Date, String)))
+            If rawData Is Nothing Then
+                Logger.Error("No data on bond {0}", ric)
+                Return
+            End If
+            Dim bonds = (From elem In AllElements Where elem.MetaData.RIC = ric)
+            If Not bonds.Any Then
+                Logger.Warn("Instrument {0} does not belong to serie {1}", ric, Name)
+                Return
+            End If
+            Dim bond = bonds.First()
+
+            Dim fieldsDescription As FieldsDescription = _histFields.Fields
+            If rawData.ContainsKey(fieldsDescription.Last) Then
+                ParseHistoricalItem(rawData, fieldsDescription.Last, bond)
+            End If
+            If rawData.ContainsKey(fieldsDescription.Bid) Or rawData.ContainsKey(fieldsDescription.Ask) Then
+                Dim bidData = ParseHistoricalItem(rawData, fieldsDescription.Bid, bond)
+                Dim askData = ParseHistoricalItem(rawData, fieldsDescription.Ask, bond)
+                If bidData IsNot Nothing AndAlso askData IsNot Nothing AndAlso bidData.Item1 = askData.Item1 Then
+                    Dim mid = (bidData.Item2 + askData.Item2) / 2
+                    HandleNewQuote(bond, _histFields.XmlName(_histFields.Fields.Mid), mid, bidData.Item1)
+                ElseIf (bidData IsNot Nothing Or askData IsNot Nothing) And Not SettingsManager.Instance.MidIfBoth Then
+                    If bidData IsNot Nothing Then
+                        HandleNewQuote(bond, _histFields.XmlName(_histFields.Fields.Mid), bidData.Item2, bidData.Item1)
+                    Else
+                        HandleNewQuote(bond, _histFields.XmlName(_histFields.Fields.Mid), askData.Item2, askData.Item1)
+                    End If
+                End If
+            End If
+        End Sub
+
+
+        Private Function ParseHistoricalItem(ByVal rawData As Dictionary(Of String, Dictionary(Of Date, String)), ByVal field As String, ByVal bond As Bond) As Tuple(Of Date, Double)
+            Dim datVal = rawData(field)
+            Dim dates = (From key In datVal.Keys Where IsNumeric(datVal(key))).ToList()
+            If dates.Any Then
+                Dim maxdate = dates.Max
+                HandleNewQuote(bond, _histFields.XmlName(field), datVal(maxdate), maxdate)
+                Return Tuple.Create(maxdate, CDbl(rawData(field)(maxdate)))
+            End If
+            Return Nothing
+        End Function
 
         Private Sub OnQuotes(ByVal data As Dictionary(Of String, Dictionary(Of String, Double))) Handles _quoteLoader.NewData
             Logger.Trace("QuoteLoaderOnNewData()")
@@ -141,26 +230,26 @@ Namespace Tools.Elements
                     ' now update data point
                     Dim bond = bonds.First()
 
-                    If fieldsAndValues.ContainsKey(BondFields.Fields.Volume) Then
-                        bond.TodayVolume = fieldsAndValues(BondFields.Fields.Volume)
+                    If fieldsAndValues.ContainsKey(_bondFields.Fields.Volume) Then
+                        bond.TodayVolume = fieldsAndValues(_bondFields.Fields.Volume)
                         RaiseEvent Volume(bond)
                     End If
 
                     For Each fieldName In fieldsAndValues.Keys
-                        If BondFields.IsPriceByName(fieldName) AndAlso fieldsAndValues(fieldName) > 0 Then
+                        If _bondFields.IsPriceByName(fieldName) AndAlso fieldsAndValues(fieldName) > 0 Then
                             Dim fieldValue = fieldsAndValues(fieldName)
                             Try
-                                HandleNewQuote(bond, BondFields.XmlName(fieldName), fieldValue, Date.Today)
-                                Dim bid = BondFields.Fields.Bid
-                                Dim ask = BondFields.Fields.Ask
+                                HandleNewQuote(bond, _bondFields.XmlName(fieldName), fieldValue, Date.Today)
+                                Dim bid = _bondFields.Fields.Bid
+                                Dim ask = _bondFields.Fields.Ask
                                 If fieldName.Belongs(bid, ask) Then
                                     Dim bidPrice As Double
-                                    Dim xmlBid = BondFields.XmlName(bid)
+                                    Dim xmlBid = _bondFields.XmlName(bid)
                                     If bond.QuotesAndYields.Has(xmlBid) Then
                                         bidPrice = bond.QuotesAndYields(xmlBid).Price
                                     End If
                                     Dim askPrice As Double
-                                    Dim xmlAsk = BondFields.XmlName(ask)
+                                    Dim xmlAsk = _bondFields.XmlName(ask)
                                     If bond.QuotesAndYields.Has(xmlAsk) Then
                                         askPrice = bond.QuotesAndYields(xmlAsk).Price
                                     End If
@@ -175,7 +264,7 @@ Namespace Tools.Elements
                                         End If
                                     End If
 
-                                    If midPrice > 0 Then HandleNewQuote(bond, BondFields.XmlName(BondFields.Fields.Mid), midPrice, Date.Today)
+                                    If midPrice > 0 Then HandleNewQuote(bond, _bondFields.XmlName(_bondFields.Fields.Mid), midPrice, Date.Today)
                                 End If
                             Catch ex As Exception
                                 Logger.WarnException("Failed to plot the point", ex)
@@ -194,8 +283,8 @@ Namespace Tools.Elements
                                         ByVal recalc As Boolean = True)
             If Not bond.QuotesAndYields.Contains(xmlName) Then
                 Dim descr As New BondPointDescription(xmlName)
-                descr.BackColor = BondFields.Fields.BackColor(xmlName)
-                descr.MarkerStyle = BondFields.Fields.MarkerStyle(xmlName)
+                descr.BackColor = _bondFields.Fields.BackColor(xmlName)
+                descr.MarkerStyle = _bondFields.Fields.MarkerStyle(xmlName)
                 descr.ParentBond = bond
                 descr.Yield(calcDate) = fieldVal ' we won't calc right here
 
@@ -226,11 +315,13 @@ Namespace Tools.Elements
         End Sub
 
         Protected Sub OnCustomCustomPrice(ByVal bond As Bond, ByVal price As Double)
-            HandleNewQuote(bond, BondFields.XmlName(bond.Fields.Custom), price, Today)
+            HandleNewQuote(bond, _bondFields.XmlName(bond.Fields.Custom), price, Today)
         End Sub
 
-        Protected Sub New(ByVal ansamble As Ansamble)
+        Protected Sub New(ByVal ansamble As Ansamble, fields As FieldSet)
             _ansamble = ansamble
+            _histFields = fields.History.AsContainer()
+            _bondFields = fields.Realtime.AsContainer()
         End Sub
 
         Public Sub Disable(ByVal ric As String) Implements IChangeable.Disable
@@ -300,11 +391,7 @@ Namespace Tools.Elements
 
         Public Sub SetYieldMode(ByVal mode As String)
             FreezeEvents()
-
-            _elements.ForEach(Sub(elem)
-                                  elem.YieldMode = mode
-                                  Logger.Info("Elem {0} done!", elem.MetaData.ShortName)
-                              End Sub)
+            _elements.ForEach(Sub(elem) elem.YieldMode = mode)
             UnfreezeEvents()
         End Sub
     End Class

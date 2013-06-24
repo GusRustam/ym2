@@ -46,7 +46,7 @@ Namespace Tools.Elements
         Private WithEvents _quoteLoader As New LiveQuotes
 
         '' DATA LOADING PARAMETERS
-        Private _theCurveDate As Date = Date.Today
+        Private _theGroupDate As Date = Date.Today
         Private _broker As String = ""
         Private _quote As String = "MID"
         Private ReadOnly _lastCurve As New Dictionary(Of IOrdinate, List(Of PointOfCurve))
@@ -69,7 +69,7 @@ Namespace Tools.Elements
             Clear()
             GetRICs(GetBroker()).ForEach(Sub(ric As String) Descrs.Add(New SwapPointDescription(ric)))
 
-            If CurveDate() = Date.Today Then
+            If GroupDate() = Date.Today Then
                 StartRealTime()
             Else
                 LoadHistory()
@@ -102,8 +102,8 @@ Namespace Tools.Elements
         Protected Sub LoadHistory()
             Logger.Debug("LoadHistory")
             Dim rics = GetRICs(_broker)
-            rics.ForEach(Sub(ric) DoLoadRIC(ric, "DATE, BID, ASK", _theCurveDate))
-            DoLoadRIC(BaseInstrument, "DATE, CLOSE", _theCurveDate)
+            rics.ForEach(Sub(ric) DoLoadRIC(ric, "DATE, BID, ASK", _theGroupDate))
+            DoLoadRIC(BaseInstrument, "DATE, CLOSE", _theGroupDate)
         End Sub
 
         Protected Sub DoLoadRic(ByVal ric As String, ByVal fields As String, ByVal aDate As Date)
@@ -228,15 +228,15 @@ Namespace Tools.Elements
                     Dim params(0 To data.Count() - 1, 5) As Object
                     For i = 0 To data.Count - 1
                         params(i, 0) = InstrumentType
-                        params(i, 1) = CurveDate
-                        params(i, 2) = CurveDate.AddDays(data(i).Duration * 365.0)
+                        params(i, 1) = GroupDate
+                        params(i, 2) = GroupDate.AddDays(data(i).Duration * 365.0)
                         params(i, 3) = BaseInstrumentPrice / 100
                         params(i, 4) = data(i).Yield
                         params(i, 5) = Struct
                     Next
                     Dim termStructure As Array = _yieldCurveModule.AdTermStructure(params, "RM:YC ZCTYPE:RATE IM:CUBX ND:DIS", Nothing)
                     For i = termStructure.GetLowerBound(0) To termStructure.GetUpperBound(0)
-                        Dim dur = (Utils.FromExcelSerialDate(termStructure.GetValue(i, 1)) - CurveDate).TotalDays / 365.0
+                        Dim dur = (Utils.FromExcelSerialDate(termStructure.GetValue(i, 1)) - GroupDate).TotalDays / 365.0
                         Dim yld = termStructure.GetValue(i, 2)
                         If dur > 0 And yld > 0 Then result.Add(New JustPoint(dur, yld, Me))
                     Next
@@ -270,7 +270,7 @@ Namespace Tools.Elements
                     If fv.Keys.Contains("393") Or fv.Keys.Contains("275") Then
                         Try
                             Dim elem = (From descr In Descrs Where descr.RIC = ric).First
-                            elem.YieldAtDate = CurveDate
+                            elem.YieldAtDate = GroupDate
                             If _quote = "BID" Or _quote = "ASK" Then
                                 Dim yld As Double
                                 yld = CDbl(fv(IIf(_quote = "BID", "393", "275")))
@@ -431,19 +431,19 @@ Namespace Tools.Elements
             Return _quote
         End Function
 
-        Public Overrides Property CurveDate() As Date
+        Public Overrides Property GroupDate() As Date
             Get
-                Return _theCurveDate
+                Return _theGroupDate
             End Get
             Set(ByVal value As Date)
-                _theCurveDate = value
+                _theGroupDate = value
                 Subscribe()
             End Set
         End Property
 
         Public Overrides ReadOnly Property Name As String
             Get
-                Dim dt = CurveDate()
+                Dim dt = GroupDate()
                 Dim dateStr = IIf(dt <> DateTime.Today, String.Format("{0:dd/MM/yy}", dt), "Today")
 
                 Dim broker = GetBroker()
@@ -549,7 +549,7 @@ Namespace Tools.Elements
         Protected Overrides Function GetDuration(ByVal ric As String) As Double
             Dim match = Regex.Match(ric, String.Format("{0}(?<term>[0-9]+?[DWMY])ID=.*", InstrumentName))
             Dim term = match.Groups("term").Value
-            Dim dt As Date = CurveDate()
+            Dim dt As Date = GroupDate()
             Dim aDate As Array = DateModule.DfAddPeriod("RUS", dt, term, "")
             Return DateModule.DfCountYears(dt, Utils.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
         End Function
@@ -596,7 +596,7 @@ Namespace Tools.Elements
         Protected Overrides Function GetDuration(ByVal ric As String) As Double
             Dim match = Regex.Match(ric, String.Format("{0}(?<term>[0-9]+?Y)=.*", InstrumentName))
             Dim term = match.Groups("term").Value
-            Dim dt As Date = CurveDate
+            Dim dt As Date = GroupDate
             Dim aDate As Array = DateModule.DfAddPeriod("RUS", dt, term, "")
             Return DateModule.DfCountYears(dt, Utils.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
         End Function

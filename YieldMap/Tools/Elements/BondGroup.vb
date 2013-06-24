@@ -6,28 +6,20 @@ Namespace Tools.Elements
         Inherits Group
 
         Public Sub New(ByVal ans As Ansamble, ByVal port As PortfolioSource, ByVal portfolioStructure As PortfolioStructure)
-            MyBase.new(ans)
-            Dim source = TryCast(port.Source, Source)
-
-            If source Is Nothing Then
-                Logger.Warn("Unsupported source {0}", source)
-                Throw New InvalidOperationException(String.Format("Unsupported source {0}", source))
-            End If
+            MyBase.new(ans,  CType(port.Source, Source).Fields)
+            Dim source = CType(port.Source, Source)
 
             Nm = If(port.Name <> "", port.Name, source.Name)
             PortfolioID = source.ID
-            BondFields = source.Fields.Realtime.AsContainer()
             Color = If(port.Color <> "", port.Color, source.Color)
-
 
             AddRics(portfolioStructure.Rics(port))
         End Sub
 
         Public Sub New(ByVal ans As Ansamble, ByVal name As String, ByVal rics As List(Of String), ByVal clr As String, ByVal fields As FieldSet)
-            MyBase.new(ans)
+            MyBase.new(ans, fields)
             Nm = name
             PortfolioID = -1 ' ??
-            BondFields = fields.Realtime.AsContainer()
             Color = clr
             AddRics(rics)
         End Sub

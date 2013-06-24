@@ -241,6 +241,20 @@ Namespace Forms.ChartForm
             ShortNameTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.IssuerCpnMat)
             DescriptionTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.Description)
             SeriesOnlyTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.SeriesOnly)
+
+            Dim found As Boolean = False
+            For Each item In YieldCalculationModeToolStripMenuItem.DropDownItems
+                Dim elem = CType(item, ToolStripMenuItem)
+                If elem IsNot Nothing Then
+                    If elem.Text = bondDataPoint.YieldMode Then
+                        item.checked = True
+                        found = True
+                    Else
+                        item.checked = False
+                    End If
+                End If
+            Next
+            If Not found Then DefaultToolStripMenuItem.Checked = True
         End Sub
 
         ' The chart
@@ -341,7 +355,7 @@ Namespace Forms.ChartForm
                         Dim curve = CType(point.Tag, SwapCurve)
 
                         DscrLabel.Text = curve.Name
-                        DatLabel.Text = String.Format("{0:dd/MM/yyyy}", curve.CurveDate)
+                        DatLabel.Text = String.Format("{0:dd/MM/yyyy}", curve.GroupDate)
                         Dim period = String.Format("{0:F0}D", 365 * point.XValue)
                         Dim aDate = DateModule.DfAddPeriod("RUS", Date.Today, period, "")
                         MatLabel.Text = String.Format("{0:dd/MM/yyyy}", Utils.FromExcelSerialDate(aDate.GetValue(1, 1)))
@@ -366,7 +380,7 @@ Namespace Forms.ChartForm
                         ConvLabel.Text = String.Format("{0:F2}", historyDataPoint.Descr.Convexity)
                         MatLabel.Text = String.Format("{0:dd/MM/yyyy}", historyDataPoint.Meta.Maturity)
                         CpnLabel.Text = String.Format("{0:F2}%", historyDataPoint.Meta.Coupon)
-                        PVBPLabel.Text = String.Format("{0:F4}", historyDataPoint.Descr.PVBP)
+                        PVBPLabel.Text = String.Format("{0:F4}", historyDataPoint.Descr.Pvbp)
                     Else
                         hasShown = False
                     End If
@@ -763,7 +777,7 @@ Namespace Forms.ChartForm
                 If curve Is Nothing Then
                     Logger.Warn("No such curve {0}", MoneyCurveCMS.Tag.ToString())
                 Else
-                    curve.CurveDate = datePicker.TheCalendar.SelectionEnd
+                    curve.GroupDate = datePicker.TheCalendar.SelectionEnd
                 End If
             End If
         End Sub
@@ -968,7 +982,7 @@ Namespace Forms.ChartForm
             If BondCurveCMS.Tag Is Nothing Then Return
             Dim curve = CType(_ansamble(BondCurveCMS.Tag), BondCurve)
             Dim datePicker = New DatePickerForm
-            If datePicker.ShowDialog() = DialogResult.OK Then curve.CurveDate = datePicker.TheCalendar.SelectionEnd
+            If datePicker.ShowDialog() = DialogResult.OK Then curve.GroupDate = datePicker.TheCalendar.SelectionEnd
         End Sub
 
         Private Sub IssuerSeriesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles IssuerSeriesToolStripMenuItem.Click
@@ -1029,6 +1043,20 @@ Namespace Forms.ChartForm
 
             Dim group = _ansamble.Items(BondSetCMS.Tag)
             group.SetYieldMode(nm)
+        End Sub
+
+        Private Sub SelectDateTSMI_Click(sender As Object, e As EventArgs) Handles SelectDateTSMI.Click
+            If BondSetCMS.Tag Is Nothing Then Return
+            Dim curve = CType(_ansamble(BondSetCMS.Tag), BondGroup)
+            If curve Is Nothing Then Return
+            Dim datePicker = New DatePickerForm
+            If datePicker.ShowDialog() = DialogResult.OK Then curve.GroupDate = datePicker.TheCalendar.SelectionEnd
+        End Sub
+
+        Private Sub SelectChartDateTSMI_Click(sender As Object, e As EventArgs) Handles SelectChartDateTSMI.Click
+            Dim datePicker = New DatePickerForm
+            If datePicker.ShowDialog() = DialogResult.OK Then _ansamble.GroupDate = datePicker.TheCalendar.SelectionEnd
+
         End Sub
     End Class
 End Namespace

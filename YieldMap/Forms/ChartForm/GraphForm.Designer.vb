@@ -181,6 +181,10 @@
             Me.BootstrappingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Me.ToolStripMenuItem3 = New System.Windows.Forms.ToolStripSeparator()
             Me.SelectDateToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.ToolStripSeparator13 = New System.Windows.Forms.ToolStripSeparator()
+            Me.SelectDateTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.ToolStripSeparator14 = New System.Windows.Forms.ToolStripSeparator()
+            Me.SelectChartDateTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Label8 = New System.Windows.Forms.Label()
             Label3 = New System.Windows.Forms.Label()
             Label6 = New System.Windows.Forms.Label()
@@ -526,43 +530,43 @@
             'DefaultToolStripMenuItem
             '
             Me.DefaultToolStripMenuItem.Name = "DefaultToolStripMenuItem"
-            Me.DefaultToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.DefaultToolStripMenuItem.Size = New System.Drawing.Size(112, 22)
             Me.DefaultToolStripMenuItem.Text = "Default"
             '
             'YTMToolStripMenuItem
             '
             Me.YTMToolStripMenuItem.Name = "YTMToolStripMenuItem"
-            Me.YTMToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.YTMToolStripMenuItem.Size = New System.Drawing.Size(112, 22)
             Me.YTMToolStripMenuItem.Text = "YTM"
             '
             'YTPToolStripMenuItem
             '
             Me.YTPToolStripMenuItem.Name = "YTPToolStripMenuItem"
-            Me.YTPToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.YTPToolStripMenuItem.Size = New System.Drawing.Size(112, 22)
             Me.YTPToolStripMenuItem.Text = "YTP"
             '
             'YTCToolStripMenuItem
             '
             Me.YTCToolStripMenuItem.Name = "YTCToolStripMenuItem"
-            Me.YTCToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.YTCToolStripMenuItem.Size = New System.Drawing.Size(112, 22)
             Me.YTCToolStripMenuItem.Text = "YTC"
             '
             'YTBToolStripMenuItem
             '
             Me.YTBToolStripMenuItem.Name = "YTBToolStripMenuItem"
-            Me.YTBToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.YTBToolStripMenuItem.Size = New System.Drawing.Size(112, 22)
             Me.YTBToolStripMenuItem.Text = "YTB"
             '
             'YTAToolStripMenuItem
             '
             Me.YTAToolStripMenuItem.Name = "YTAToolStripMenuItem"
-            Me.YTAToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.YTAToolStripMenuItem.Size = New System.Drawing.Size(112, 22)
             Me.YTAToolStripMenuItem.Text = "YTA"
             '
             'YTWToolStripMenuItem
             '
             Me.YTWToolStripMenuItem.Name = "YTWToolStripMenuItem"
-            Me.YTWToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.YTWToolStripMenuItem.Size = New System.Drawing.Size(112, 22)
             Me.YTWToolStripMenuItem.Text = "YTW"
             '
             'ToolStripSeparator7
@@ -925,9 +929,9 @@
             '
             'ChartCMS
             '
-            Me.ChartCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToClipboardTSMI, Me.ClipboardSeparator, Me.AddBondToChartTSMI, Me.SelectFromAListTSMI})
+            Me.ChartCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToClipboardTSMI, Me.ClipboardSeparator, Me.AddBondToChartTSMI, Me.SelectFromAListTSMI, Me.ToolStripSeparator14, Me.SelectChartDateTSMI})
             Me.ChartCMS.Name = "ChartCMS"
-            Me.ChartCMS.Size = New System.Drawing.Size(186, 76)
+            Me.ChartCMS.Size = New System.Drawing.Size(186, 126)
             '
             'CopyToClipboardTSMI
             '
@@ -1156,9 +1160,9 @@
             '
             'BondSetCMS
             '
-            Me.BondSetCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LabelToolStripMenuItem, Me.ToolStripMenuItem4, Me.ToolStripSeparator12, Me.RemoveFromChartTSMI})
+            Me.BondSetCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LabelToolStripMenuItem, Me.ToolStripMenuItem4, Me.ToolStripSeparator12, Me.SelectDateTSMI, Me.ToolStripSeparator13, Me.RemoveFromChartTSMI})
             Me.BondSetCMS.Name = "BondSetCMS"
-            Me.BondSetCMS.Size = New System.Drawing.Size(196, 98)
+            Me.BondSetCMS.Size = New System.Drawing.Size(196, 104)
             '
             'LabelToolStripMenuItem
             '
@@ -1202,43 +1206,43 @@
             'DefaultTSMI
             '
             Me.DefaultTSMI.Name = "DefaultTSMI"
-            Me.DefaultTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.DefaultTSMI.Size = New System.Drawing.Size(112, 22)
             Me.DefaultTSMI.Text = "Default"
             '
             'YtmTSMI
             '
             Me.YtmTSMI.Name = "YtmTSMI"
-            Me.YtmTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.YtmTSMI.Size = New System.Drawing.Size(112, 22)
             Me.YtmTSMI.Text = "YTM"
             '
             'YtpTSMI
             '
             Me.YtpTSMI.Name = "YtpTSMI"
-            Me.YtpTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.YtpTSMI.Size = New System.Drawing.Size(112, 22)
             Me.YtpTSMI.Text = "YTP"
             '
             'YtcTSMI
             '
             Me.YtcTSMI.Name = "YtcTSMI"
-            Me.YtcTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.YtcTSMI.Size = New System.Drawing.Size(112, 22)
             Me.YtcTSMI.Text = "YTC"
             '
             'YtbTSMI
             '
             Me.YtbTSMI.Name = "YtbTSMI"
-            Me.YtbTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.YtbTSMI.Size = New System.Drawing.Size(112, 22)
             Me.YtbTSMI.Text = "YTB"
             '
             'YtaTSMI
             '
             Me.YtaTSMI.Name = "YtaTSMI"
-            Me.YtaTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.YtaTSMI.Size = New System.Drawing.Size(112, 22)
             Me.YtaTSMI.Text = "YTA"
             '
             'YtwTSMI
             '
             Me.YtwTSMI.Name = "YtwTSMI"
-            Me.YtwTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.YtwTSMI.Size = New System.Drawing.Size(112, 22)
             Me.YtwTSMI.Text = "YTW"
             '
             'ToolStripSeparator12
@@ -1397,6 +1401,28 @@
             Me.SelectDateToolStripMenuItem.Name = "SelectDateToolStripMenuItem"
             Me.SelectDateToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
             Me.SelectDateToolStripMenuItem.Text = "Select date..."
+            '
+            'ToolStripSeparator13
+            '
+            Me.ToolStripSeparator13.Name = "ToolStripSeparator13"
+            Me.ToolStripSeparator13.Size = New System.Drawing.Size(192, 6)
+            '
+            'SelectDateTSMI
+            '
+            Me.SelectDateTSMI.Name = "SelectDateTSMI"
+            Me.SelectDateTSMI.Size = New System.Drawing.Size(195, 22)
+            Me.SelectDateTSMI.Text = "Select date..."
+            '
+            'ToolStripSeparator14
+            '
+            Me.ToolStripSeparator14.Name = "ToolStripSeparator14"
+            Me.ToolStripSeparator14.Size = New System.Drawing.Size(182, 6)
+            '
+            'SelectChartDateTSMI
+            '
+            Me.SelectChartDateTSMI.Name = "SelectChartDateTSMI"
+            Me.SelectChartDateTSMI.Size = New System.Drawing.Size(185, 22)
+            Me.SelectChartDateTSMI.Text = "Select date..."
             '
             'GraphForm
             '
@@ -1580,5 +1606,9 @@
         Friend WithEvents YtaTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents YtwTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents ToolStripSeparator12 As System.Windows.Forms.ToolStripSeparator
+        Friend WithEvents SelectDateTSMI As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents ToolStripSeparator13 As System.Windows.Forms.ToolStripSeparator
+        Friend WithEvents ToolStripSeparator14 As System.Windows.Forms.ToolStripSeparator
+        Friend WithEvents SelectChartDateTSMI As System.Windows.Forms.ToolStripMenuItem
     End Class
 End Namespace
