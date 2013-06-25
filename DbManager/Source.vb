@@ -443,6 +443,6 @@ Public Class CustomBond
     End Function
 
     Public Function GetDescription() As BondMetadata
-        Return New BondMetadata(_code, _maturity, _currentCouponRate, _struct.ToString(), "RM:YTM", "Custom")
+        Return New BondMetadata(_code, _maturity, _currentCouponRate, _struct.ToString(), "RM:YTM", "Custom", _code)
     End Function
 End Class

@@ -82,12 +82,13 @@ Namespace Bonds
         Private ReadOnly _subIndustry As String
 
         Sub New(ByVal ric As String, ByVal maturity As Date?, ByVal coupon As Double, ByVal paymentStructure As String, ByVal rateStructure As String,
-                ByVal issuerName As String)
+                ByVal issuerName As String, ByVal shortName As String)
             _ric = ric
             _maturity = maturity
             _coupon = coupon
             _paymentStructure = paymentStructure
             _rateStructure = rateStructure
+            _shortName = shortName
 
             _issuerName = issuerName
             _putable = False

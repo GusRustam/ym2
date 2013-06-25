@@ -73,7 +73,7 @@ Namespace Tools.Elements
         End Sub
 
         Public Sub Remove(ByVal id As Long)
-            _items.Remove(id)
+            _items(id).Cleanup()
         End Sub
 
         Public Function IEnumerable_GetEnumerator() As IEnumerator(Of KeyValuePair(Of Long, Group)) Implements IEnumerable(Of KeyValuePair(Of Long, Group)).GetEnumerator

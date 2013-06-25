@@ -269,6 +269,19 @@ Namespace Forms.ChartForm
                         Dim point As DataPoint = CType(htr.Object, DataPoint)
                         If TypeOf point.Tag Is Bond Then
                             BondCMS.Tag = point.Tag
+
+                            Dim isNotSynt As Boolean = Not TypeOf point.Tag Is CustomCouponBond
+
+                            YieldCalcModeSep.Visible = isNotSynt
+                            YieldCalculationModeToolStripMenuItem.Visible = isNotSynt
+                            DescriptionSep.Visible = isNotSynt
+                            BondDescriptionTSMI.Visible = isNotSynt
+                            RelatedQuoteTSMI.Visible = isNotSynt
+                            RelatedChartTSMI.Visible = isNotSynt
+                            HistorySep.Visible = isNotSynt
+                            ShowHistoryTSMI.Visible = isNotSynt
+                            BondLabelsTSMI.Visible = isNotSynt
+
                             BondCMS.Show(TheChart, mouseEvent.Location)
 
                         ElseIf TypeOf point.Tag Is SwapCurve Then
@@ -300,6 +313,9 @@ Namespace Forms.ChartForm
                             ElseIf TypeOf _ansamble(item.Tag) Is BondCurve Then
                                 BondCurveCMS.Tag = item.Tag
                                 BondCurveCMS.Show(TheChart, mouseEvent.Location)
+                            ElseIf TypeOf _ansamble(item.Tag) Is SwapCurve Then
+                                MoneyCurveCMS.Tag = item.Tag
+                                MoneyCurveCMS.Show(TheChart, mouseEvent.Location)
                             End If
                         End If
                     End If
@@ -761,10 +777,7 @@ Namespace Forms.ChartForm
             Dim curve = New BondCurve(_ansamble, src)
             AddHandler curve.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnNewCurvePaint(data)
             AddHandler curve.Updated, AddressOf OnNewCurvePaint
-            AddHandler curve.Cleared, Sub()
-                                          Dim srs = TheChart.Series.FindByName(curve.Identity)
-                                          If srs IsNot Nothing Then TheChart.Series.Remove(srs)
-                                      End Sub
+            AddHandler curve.Cleared, Sub() ClearSeries(curve.Identity)
             _ansamble.Items.Add(curve)
             curve.Subscribe()
         End Sub

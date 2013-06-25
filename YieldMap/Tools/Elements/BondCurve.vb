@@ -1,7 +1,6 @@
 Imports AdfinXAnalyticsFunctions
 Imports DbManager.Bonds
 Imports DbManager
-Imports Settings
 Imports Uitls
 Imports ReutersData
 
@@ -23,8 +22,6 @@ Namespace Tools.Elements
         Private ReadOnly _bondModule As AdxBondModule = Eikon.Sdk.CreateAdxBondModule()
         Private ReadOnly _curveModule As AdxYieldCurveModule = Eikon.Sdk.CreateAdxYieldCurveModule()
 
-
-
         ' Last curve snapshot
         Private ReadOnly _lastCurve As New Dictionary(Of IOrdinate, List(Of PointOfCurve))
         Private _lastSyntCurve As List(Of SyntheticZcb)
@@ -45,7 +42,7 @@ Namespace Tools.Elements
         Private Function GetSyntBond(dur As Double, yield As Double) As SyntheticZcb
             Dim mat = GroupDate.AddDays(dur * 365 / (1 + yield * dur)) ' cool hack to make Macauley duration equal to dur parameter
             Dim paymentStructure As String = ZcbPmtStructure
-            Dim bond = New SyntheticZcb(Me, New BondMetadata(String.Format("ZCB {0:N2}", dur), mat, 0, paymentStructure, "RM:YTM", Name))
+            Dim bond = New SyntheticZcb(Me, New BondMetadata(String.Format("ZCB {0:N2}", dur), mat, 0, paymentStructure, "RM:YTM", Name, String.Format("ZCB {0:N2}", dur)))
             Dim settleDate = _bondModule.BdSettle(GroupDate, paymentStructure)
             Dim priceObject As Array = _bondModule.AdBondPrice(settleDate, yield, mat, 0, 0, paymentStructure, "RM:YTM", "", "RES:BDPRICE")
             AddHandler bond.CustomPrice, Sub(bnd, prc) HandleNewQuote(bnd, BondFields.XmlName(bond.Fields.Custom), prc, GroupDate, False)
