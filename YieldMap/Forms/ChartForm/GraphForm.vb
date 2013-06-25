@@ -117,17 +117,18 @@ Namespace Forms.ChartForm
                                            Where TypeOf port.Source Is DbManager.Chain Or TypeOf port.Source Is UserList
                                            Select New BondGroup(_ansamble, port, portfolioStructure)
                     Dim tmp = grp
-                    AddHandler grp.Updated, Sub(items) OnGroupUpdated(grp, items)
-                    AddHandler grp.Cleared, Sub() ClearSeries(tmp.Identity)
-                    AddHandler grp.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnGroupUpdated(grp, data)
-                    _ansamble.Items.Add(grp)
+                    AddHandler tmp.Updated, Sub(items) OnGroupUpdated(tmp, items)
+                    AddHandler tmp.Cleared, Sub() ClearSeries(tmp.Identity)
+                    AddHandler tmp.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnGroupUpdated(tmp, data)
+                    _ansamble.Items.Add(tmp)
                 Next
                 For Each grp As CustomBondGroup In From port In portfolioStructure.Sources
                                            Where TypeOf port.Source Is CustomBond
                                            Select New CustomBondGroup(_ansamble, port, portfolioStructure)
-                    AddHandler grp.Updated, Sub(items) OnGroupUpdated(grp, items)
-                    AddHandler grp.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnGroupUpdated(grp, data)
-                    _ansamble.Items.Add(grp)
+                    Dim tmp = grp
+                    AddHandler tmp.Updated, Sub(items) OnGroupUpdated(tmp, items)
+                    AddHandler tmp.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnGroupUpdated(tmp, data)
+                    _ansamble.Items.Add(tmp)
                 Next
                 _ansamble.Items.Start()
             End Set

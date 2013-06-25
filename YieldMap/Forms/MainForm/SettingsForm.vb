@@ -135,12 +135,14 @@ Namespace Forms.MainForm
                 Settings.LogLevel = LogLevel.Warn
             ElseIf LogErrRadioButton.Checked Then
                 Settings.LogLevel = LogLevel.Error
+            ElseIf LogFatalRadioButton.Checked Then
+                Settings.LogLevel = LogLevel.Fatal
             ElseIf LogNoneRadioButton.Checked Then
                 Settings.LogLevel = LogLevel.Off
             End If
 
             Logging.LoggingLevel = Settings.LogLevel
-            Logger.Log(Settings.LogLevel, "Log level set to {0}", Settings.LogLevel)
+            If Settings.LogLevel <> LogLevel.Off Then Logger.Log(Settings.LogLevel, "Log level set to {0}", Settings.LogLevel)
 
             Settings.MinYield = ParseDouble(MinYieldTextBox.Text)
             Settings.MaxYield = ParseDouble(MaxYieldTextBox.Text)
@@ -193,12 +195,12 @@ Namespace Forms.MainForm
             End If
             If MinYStrictCB.Checked AndAlso (Settings.MinSpread Is Nothing OrElse Settings.MinYield) Then
                 ErrProv.SetError(If(Settings.MinSpread Is Nothing, MinSpreadTextBox, MinYieldTextBox),
-                                 "Minimum Y axis value is fixed, please specify minimum yield and spread")
+                                    "Minimum Y axis value is fixed, please specify minimum yield and spread")
                 errored = True
             End If
             If MaxYStrictCB.Checked AndAlso (Settings.MaxSpread Is Nothing OrElse Settings.MaxYield) Then
                 ErrProv.SetError(If(Settings.MinSpread Is Nothing, MinSpreadTextBox, MinYieldTextBox),
-                                 "Maximum Y axis value is fixed, please specify maximum yield and spread")
+                                    "Maximum Y axis value is fixed, please specify maximum yield and spread")
                 errored = True
             End If
 
