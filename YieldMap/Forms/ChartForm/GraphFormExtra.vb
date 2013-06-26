@@ -262,7 +262,7 @@ Namespace Forms.ChartForm
                         If maxMaxXStrict Then
                             theMaxX = maxMaxX
                         Else
-                            theMaxX = If(maxMaxX.HasValue, Math.Min(maxMaxX.Value, minmaxX.Item2), minmaxX.Item2)
+                            theMaxX = If(maxMaxX.HasValue AndAlso maxMaxX.Value > 0, Math.Min(maxMaxX.Value, minmaxX.Item2), minmaxX.Item2)
                         End If
                         theMaxX = Math.Ceiling(theMaxX)
 
@@ -583,6 +583,7 @@ Namespace Forms.ChartForm
                         .color = clr,
                         .Tag = crv.Identity
                     }
+
                     TheChart.Series.Add(srs)
                     ClearLegendItems(crv.Identity)
                     TheChart.Legends(0).CustomItems.Add(New LegendItem(crv.Name, clr, "") With {.Tag = crv.Identity})

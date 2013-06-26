@@ -144,12 +144,12 @@ Namespace Forms.MainForm
             Logging.LoggingLevel = Settings.LogLevel
             If Settings.LogLevel <> LogLevel.Off Then Logger.Log(Settings.LogLevel, "Log level set to {0}", Settings.LogLevel)
 
-            Settings.MinYield = ParseDouble(MinYieldTextBox.Text)
-            Settings.MaxYield = ParseDouble(MaxYieldTextBox.Text)
-            Settings.MinDur = ParseDouble(MinDurTextBox.Text)
-            Settings.MaxDur = ParseDouble(MaxDurTextBox.Text)
-            Settings.MinSpread = ParseDouble(MinSpreadTextBox.Text)
-            Settings.MaxSpread = ParseDouble(MaxSpreadTextBox.Text)
+            Dim minY As Double? = ParseDouble(MinYieldTextBox.Text)
+            Dim maxY As Double? = ParseDouble(MaxYieldTextBox.Text)
+            Dim minDur As Double? = ParseDouble(MinDurTextBox.Text)
+            Dim maxDur As Double? = ParseDouble(MaxDurTextBox.Text)
+            Dim minSpr As Double? = ParseDouble(MinSpreadTextBox.Text)
+            Dim maxSpr As Double? = ParseDouble(MaxSpreadTextBox.Text)
 
             Settings.ShowBidAsk = ShowBidAskCheckBox.Checked
             Settings.ShowPointSize = ShowPointSizeCheckBox.Checked
@@ -204,11 +204,36 @@ Namespace Forms.MainForm
                 errored = True
             End If
 
+            ' ReSharper disable CompareOfFloatsByEqualityOperator
+            If (minY.HasValue And maxY.HasValue) AndAlso (minY.Value = maxY.Value) Then
+                errored = True
+                ErrProv.SetError(MaxYieldTextBox, "Minimum yield value = maximum yield value")
+            End If
+
+            If (minSpr.HasValue And maxSpr.HasValue) AndAlso (minSpr.Value = maxSpr.Value) Then
+                errored = True
+                ErrProv.SetError(MaxSpreadTextBox, "Minimum spread value = maximum spread value")
+            End If
+
+            If (minDur.HasValue And maxDur.HasValue) AndAlso (minDur.Value = maxDur.Value) Then
+                errored = True
+                ErrProv.SetError(MaxDurTextBox, "Minimum duration value = maximum duration value")
+            End If
+            ' ReSharper restore CompareOfFloatsByEqualityOperator
+
             If NumInterpPointsTB.Text <> "" AndAlso IsNumeric(NumInterpPointsTB.Text) Then
                 Settings.NumInterpPoints = NumInterpPointsTB.Text
             End If
 
             If errored Then Return
+
+            Settings.MinYield = minY
+            Settings.MaxYield = maxY
+            Settings.MinDur = minDur
+            Settings.MaxDur = maxDur
+            Settings.MinSpread = minSpr
+            Settings.MaxSpread = maxSpr
+
 
             Settings.MaxXStrict = MaxXStrictCB.Checked
             Settings.MaxYStrict = MaxYStrictCB.Checked
@@ -221,7 +246,11 @@ Namespace Forms.MainForm
         End Sub
 
         Private Shared Function ParseDouble(ByVal txt As String) As Double?
-            Return If(txt <> "" AndAlso IsNumeric(txt), Double.Parse(txt), Nothing)
+            If txt.Trim() <> "" AndAlso IsNumeric(txt) Then
+                Return Double.Parse(txt)
+            Else
+                Return Nothing
+            End If
         End Function
 
         Private Sub AllColumnsCB_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles AllColumnsCB.Click

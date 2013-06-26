@@ -137,7 +137,7 @@ Namespace Bonds
 
             Dim lastRating = If(lastIssueRating.CompareTo(lastIssuerRating) > 0, lastIssueRating, lastIssuerRating)
 
-            Dim label2 As String = shortName & " " & If(coupon > 0, String.Format("{0}", coupon), "ZC") & " " & If(maturityDate.HasValue, String.Format("{0:MMM-YY}", maturityDate), "PRP")
+            Dim label2 As String = shortName & " " & If(coupon > 0, String.Format("{0}", coupon), "ZC") & " " & If(maturityDate.HasValue, String.Format("{0:MMM-yy}", maturityDate), "PRP")
             Return New BondMetadata(ric, sN, sN, maturityDate, coupon, paymentStructure, rateStructure, issueDate, sN,
                                        label2, description, series, issuerName, borrowerName, currency,
                                        isPutable, isCallable, isFloater, lastIssueRating, lastIssuerRating, lastRating,

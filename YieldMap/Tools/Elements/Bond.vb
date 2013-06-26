@@ -130,7 +130,6 @@ Namespace Tools.Elements
             End Set
         End Property
 
-
         Private _labelEnabled As Boolean = False
         Public Property LabelEnabled() As Boolean
             Get
@@ -149,8 +148,12 @@ Namespace Tools.Elements
                 Return _labelMode
             End Get
             Set(ByVal value As LabelMode)
-                _labelMode = value
-                RaiseEvent Changed()
+                If value <> _labelMode Then
+                    _labelMode = value
+                    LabelEnabled = True
+                Else
+                    LabelEnabled = False
+                End If
             End Set
         End Property
 
