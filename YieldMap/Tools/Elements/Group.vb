@@ -141,7 +141,7 @@ Namespace Tools.Elements
             'Dim rics As List(Of String) = (From elem In _elements Select elem.MetaData.RIC).ToList()
             'If rics.Count = 0 Then Return
             '_quoteLoader.AddItems(rics, BondFields.AllNames)
-            Dim rics As List(Of String) = (From elem In AllElements Select elem.MetaData.RIC).ToList()
+            Dim rics As List(Of String) = (From elem In AllElements Select elem.MetaData.Ric).ToList()
             If rics.Count = 0 Then Return
             If GroupDate = Today Then
                 QuoteLoader.AddItems(rics, _bondFields.AllNames)

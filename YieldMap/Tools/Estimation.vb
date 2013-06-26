@@ -300,6 +300,8 @@ Namespace Tools
         Private _xv, _yv As List(Of Double)
         Private _n As Double
 
+        Private _b1 As Double, _b2 As Double, _b3 As Double, _b4 As Double, _l1 As Double, _l2 As Double, _avgY As Double
+
         Private Shared Function NSS(ByVal t As Double, ByVal p() As Double) As Double
             Dim b1 = p(0), b2 = p(1), b3 = p(2), b4 = p(3), l1 = p(4), l2 = p(5)
             Dim tl1 = t / l1, tl2 = t / l2
@@ -372,8 +374,8 @@ Namespace Tools
 
         Public Function Fit(ByVal x As List(Of Double), ByVal y As List(Of Double)) As List(Of XY)
             _xv = x
-            Dim avgY = y.Average()
-            _yv = y.Select(Function(yValue) 10 * yValue / avgY).ToList()
+            _avgY = y.Average()
+            _yv = y.Select(Function(yValue) 10 * yValue / _avgY).ToList()
             _n = x.Count()
 
             Dim vars = New OptBoundVariable() {
@@ -388,11 +390,25 @@ Namespace Tools
             Dim lbfgsb As New L_BFGS_B
             Dim minimum = lbfgsb.ComputeMin(AddressOf NSSCost, AddressOf NSSCg, vars)
 
-            Return Utils.GetRange(_xv.Min, _xv.Max, SettingsManager.Instance.NumInterpPoints).Select(Function(anX) New XY With {.X = anX, .Y = avgY * NSS(anX, minimum) / 10}).ToList()
+            _b1 = minimum(0)
+            _b2 = minimum(1)
+            _b3 = minimum(2)
+            _b4 = minimum(3)
+            _l1 = minimum(4)
+            _l2 = minimum(5)
+
+            Return Utils.GetRange(_xv.Min, _xv.Max, SettingsManager.Instance.NumInterpPoints).Select(Function(anX) New XY With {.X = anX, .Y = _avgY * NSS(anX, minimum) / 10}).ToList()
         End Function
 
         Public Function GetFormula() As String Implements IFormulable.GetFormula
-            Return "N/A"
+            Dim tl1 = String.Format("X/{0:F4}", _l1)
+            Dim tl2 = String.Format("X/{0:F4}", _l2)
+            Dim etl1 = String.Format("Exp(-{0})", tl1)
+            Dim etl2 = String.Format("Exp(-{0})", tl2)
+            Dim metl1 = String.Format("(1 - {0})/({1})", etl1, tl1)
+            Dim metl2 = String.Format("(1 - {0})/({1})", etl2, tl2)
+            Dim res = String.Format("{0:F4} + {1:F4}*{2} + {3:N4}*({4}-{5}) + {6:N4}*({7}-{8})", _b1 * _avgY / 10, _b2 * _avgY / 10, metl1, _b3 * _avgY / 10, metl1, etl1, _b4 * _avgY / 10, metl2, etl2)
+            Return res
         End Function
     End Class
 
@@ -534,6 +550,8 @@ Namespace Tools
     Public NotInheritable Class Estimator
         Private ReadOnly _estimationModel As EstimationModel
 
+        Private _formula As IFormulable
+
         Private _regression As LinearRegression
         Private ReadOnly _regressions() As LinearRegression = {
             New LinearRegression,
@@ -583,8 +601,11 @@ Namespace Tools
                         End Function).ToList()
                     Dim minSSE = fits.Select(Function(fit) fit.SSE).Min
                     _regression = fits.First(Function(fit) Math.Abs(fit.SSE - minSSE) < Epsilon).Regression
+                    _formula = _regression
                 ElseIf _estimationModel = EstimationModel.NSS Then
-                    Return (New NelsonSiegelSvensson).Fit(x, y)
+                    Dim xx = New NelsonSiegelSvensson
+                    _formula = xx
+                    Return xx.Fit(x, y)
                 ElseIf _estimationModel = EstimationModel.CoxIngersollRoss Then
                     Return (New CoxIngersollRossEstimation).Fit(x, y)
                 ElseIf _estimationModel = EstimationModel.Vasicek Then
@@ -609,7 +630,7 @@ Namespace Tools
         End Class
 
         Public Function GetFormula() As String
-            Return If(_regression IsNot Nothing, _regression.GetFormula(), "N/A")
+            Return If(_formula IsNot Nothing, _formula.GetFormula(), "N/A")
         End Function
     End Class
 

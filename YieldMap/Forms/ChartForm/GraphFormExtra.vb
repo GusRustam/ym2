@@ -185,97 +185,101 @@ Namespace Forms.ChartForm
             GuiAsync(AddressOf DoSetMinMax1)
         End Sub
 
+        Private ReadOnly _screenLock As New Object
+
         Private Sub DoSetMinMax1()
-            Dim minMinYStrict As Boolean = _theSettings.MinYStrict
-            Dim maxMaxYStrict As Boolean = _theSettings.MaxYStrict
-            Dim minMinXStrict As Boolean = _theSettings.MinXStrict
-            Dim maxMaxXStrict As Boolean = _theSettings.MaxXStrict
+            SyncLock _screenLock
+                Dim minMinYStrict As Boolean = _theSettings.MinYStrict
+                Dim maxMaxYStrict As Boolean = _theSettings.MaxYStrict
+                Dim minMinXStrict As Boolean = _theSettings.MinXStrict
+                Dim maxMaxXStrict As Boolean = _theSettings.MaxXStrict
 
-            Dim minMinY As Double?, maxMaxY As Double?
-            Dim minMinX As Double?, maxMaxX As Double?
-            If _ansamble.YSource = Yield Then
-                minMinY = _theSettings.MinYield / 100
-                maxMaxY = _theSettings.MaxYield / 100
-            Else
-                minMinY = _theSettings.MinSpread
-                maxMaxY = _theSettings.MaxSpread
-            End If
-            minMinX = _theSettings.MinDur
-            maxMaxX = _theSettings.MaxDur
- 
-
-            If minMinYStrict And maxMaxYStrict And minMinY.HasValue And maxMaxY.HasValue Then
-                TheChart.ChartAreas(0).AxisY.Minimum = minMinY.Value
-                TheChart.ChartAreas(0).AxisY.Maximum = maxMaxY.Value
-            Else
-                Dim minMaxY = CalcMinMax(Function(pnt) If(pnt.YValues.Any, pnt.YValues.First, Nothing))
-                If minMaxY IsNot Nothing Then
-                    Dim pow = If(_ansamble.YSource = Yield, 3, 0)
-                    Dim theMinY As Double
-                    If minMinYStrict Then
-                        theMinY = minMinY
-                    Else
-                        theMinY = If(minMinY.HasValue, Math.Max(minMinY.Value, minMaxY.Item1), minMaxY.Item1)
-                    End If
-                    theMinY = Math.Floor(theMinY * (10 ^ pow)) / (10 ^ pow)
-
-                    Dim theMaxY As Double
-                    If maxMaxYStrict Then
-                        theMaxY = maxMaxY
-                    Else
-                        theMaxY = If(maxMaxY.HasValue, Math.Min(maxMaxY.Value, minMaxY.Item2), minMaxY.Item2)
-                    End If
-                    theMaxY = Math.Ceiling(theMaxY * (10 ^ pow)) / (10 ^ pow)
-
-                    If theMaxY > theMinY Then
-                        Logger.Trace(String.Format("Y: {0:N2} -> {1:N2}", theMinY, theMaxY))
-                        TheChart.ChartAreas(0).AxisY.Minimum = theMinY
-                        TheChart.ChartAreas(0).AxisY.Maximum = theMaxY
-                        TheChart.ChartAreas(0).AxisY.MajorGrid.Interval = (theMaxY - theMinY) / 5
-                        TheChart.ChartAreas(0).AxisY.MinorGrid.Interval = (theMaxY - theMinY) / 10
-                    Else
-                        Logger.Warn("Min Y > Max Y")
-                    End If
+                Dim minMinY As Double?, maxMaxY As Double?
+                Dim minMinX As Double?, maxMaxX As Double?
+                If _ansamble.YSource = Yield Then
+                    minMinY = _theSettings.MinYield / 100
+                    maxMaxY = _theSettings.MaxYield / 100
                 Else
-                    Logger.Warn("Failed to determine min/max Y")
+                    minMinY = _theSettings.MinSpread
+                    maxMaxY = _theSettings.MaxSpread
                 End If
-            End If
+                minMinX = _theSettings.MinDur
+                maxMaxX = _theSettings.MaxDur
 
-            If minMinXStrict And maxMaxXStrict And minMinX.HasValue And maxMaxX.HasValue Then
-                TheChart.ChartAreas(0).AxisY.Minimum = minMinX.Value
-                TheChart.ChartAreas(0).AxisY.Maximum = maxMaxX.Value
-            Else
-                Dim minmaxX = CalcMinMax(Function(pnt) pnt.XValue)
-                If minmaxX IsNot Nothing Then
-                    Dim theMinX As Double
-                    If minMinXStrict Then
-                        theminX = minMinX
-                    Else
-                        theminX = If(minMinX.HasValue, Math.Max(minMinX.Value, minmaxX.Item1), minmaxX.Item1)
-                    End If
-                    theminX = Math.Floor(theminX)
 
-                    Dim theMaxX As Double
-                    If maxMaxXStrict Then
-                        themaxX = maxMaxX
-                    Else
-                        themaxX = If(maxMaxX.HasValue, Math.Min(maxMaxX.Value, minmaxX.Item2), minmaxX.Item2)
-                    End If
-                    themaxX = Math.Ceiling(themaxX)
-
-                    If themaxX > theminX Then
-                        Logger.Trace(String.Format("Y: {0:N2} -> {1:N2}", theminX, themaxX))
-                        TheChart.ChartAreas(0).AxisX.Minimum = theMinX
-                        TheChart.ChartAreas(0).AxisX.Maximum = theMaxX
-                        TheChart.ChartAreas(0).AxisX.MajorGrid.Interval = (theMaxX - theMinX) / 5
-                        TheChart.ChartAreas(0).AxisX.MinorGrid.Interval = (theMaxX - theMinX) / 10
-                    Else
-                        Logger.Warn("Min X > Max X")
-                    End If
+                If minMinYStrict And maxMaxYStrict And minMinY.HasValue And maxMaxY.HasValue Then
+                    TheChart.ChartAreas(0).AxisY.Minimum = minMinY.Value
+                    TheChart.ChartAreas(0).AxisY.Maximum = maxMaxY.Value
                 Else
-                    Logger.Warn("Failed to determine min/max X")
+                    Dim minMaxY = CalcMinMax(Function(pnt) If(pnt.YValues.Any, pnt.YValues.First, Nothing))
+                    If minMaxY IsNot Nothing Then
+                        Dim pow = If(_ansamble.YSource = Yield, 3, 0)
+                        Dim theMinY As Double
+                        If minMinYStrict Then
+                            theMinY = minMinY
+                        Else
+                            theMinY = If(minMinY.HasValue, Math.Max(minMinY.Value, minMaxY.Item1), minMaxY.Item1)
+                        End If
+                        theMinY = Math.Floor(theMinY * (10 ^ pow)) / (10 ^ pow)
+
+                        Dim theMaxY As Double
+                        If maxMaxYStrict Then
+                            theMaxY = maxMaxY
+                        Else
+                            theMaxY = If(maxMaxY.HasValue, Math.Min(maxMaxY.Value, minMaxY.Item2), minMaxY.Item2)
+                        End If
+                        theMaxY = Math.Ceiling(theMaxY * (10 ^ pow)) / (10 ^ pow)
+
+                        If theMaxY > theMinY Then
+                            Logger.Trace(String.Format("Y: {0:N2} -> {1:N2}", theMinY, theMaxY))
+                            TheChart.ChartAreas(0).AxisY.Minimum = theMinY
+                            TheChart.ChartAreas(0).AxisY.Maximum = theMaxY
+                            TheChart.ChartAreas(0).AxisY.MajorGrid.Interval = (theMaxY - theMinY) / 5
+                            TheChart.ChartAreas(0).AxisY.MinorGrid.Interval = (theMaxY - theMinY) / 10
+                        Else
+                            Logger.Warn("Min Y > Max Y")
+                        End If
+                    Else
+                        Logger.Warn("Failed to determine min/max Y")
+                    End If
                 End If
-            End If
+
+                If minMinXStrict And maxMaxXStrict And minMinX.HasValue And maxMaxX.HasValue Then
+                    TheChart.ChartAreas(0).AxisY.Minimum = minMinX.Value
+                    TheChart.ChartAreas(0).AxisY.Maximum = maxMaxX.Value
+                Else
+                    Dim minmaxX = CalcMinMax(Function(pnt) pnt.XValue)
+                    If minmaxX IsNot Nothing Then
+                        Dim theMinX As Double
+                        If minMinXStrict Then
+                            theMinX = minMinX
+                        Else
+                            theMinX = If(minMinX.HasValue, Math.Max(minMinX.Value, minmaxX.Item1), minmaxX.Item1)
+                        End If
+                        theMinX = Math.Floor(theMinX)
+
+                        Dim theMaxX As Double
+                        If maxMaxXStrict Then
+                            theMaxX = maxMaxX
+                        Else
+                            theMaxX = If(maxMaxX.HasValue, Math.Min(maxMaxX.Value, minmaxX.Item2), minmaxX.Item2)
+                        End If
+                        theMaxX = Math.Ceiling(theMaxX)
+
+                        If theMaxX > theMinX Then
+                            Logger.Trace(String.Format("Y: {0:N2} -> {1:N2}", theMinX, theMaxX))
+                            TheChart.ChartAreas(0).AxisX.Minimum = theMinX
+                            TheChart.ChartAreas(0).AxisX.Maximum = theMaxX
+                            TheChart.ChartAreas(0).AxisX.MajorGrid.Interval = (theMaxX - theMinX) / 5
+                            TheChart.ChartAreas(0).AxisX.MinorGrid.Interval = (theMaxX - theMinX) / 10
+                        Else
+                            Logger.Warn("Min X > Max X")
+                        End If
+                    Else
+                        Logger.Warn("Failed to determine min/max X")
+                    End If
+                End If
+            End SyncLock
         End Sub
 
         Private Function CalcMinMax(getter As Func(Of DataPoint, Double?)) As Tuple(Of Double, Double)

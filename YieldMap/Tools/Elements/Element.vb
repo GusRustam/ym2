@@ -190,12 +190,21 @@ Namespace Tools.Elements
             ' 6. Average(Life)         - Average life (see Average Life)
             ' 7. Convexity             - Convexity (see Convexity)
             ' 8. YTW/YTB date          - Yield to worst/yield to best date
+            If bondDeriv IsNot Nothing Then
+                _yields(i).ModDuration = bondDeriv.GetValue(1, 3)
+                _yields(i).Pvbp = bondDeriv.GetValue(1, 4)
+                _yields(i).Duration = bondDeriv.GetValue(1, 5)
+                _yields(i).AverageLife = bondDeriv.GetValue(1, 6) 'non-macauley duration
+                _yields(i).Convexity = bondDeriv.GetValue(1, 7)
+            Else
+                _yields(i).ModDuration = 0
+                _yields(i).Pvbp = 0
+                _yields(i).Duration = 0
+                _yields(i).AverageLife = 0
+                _yields(i).Convexity = 0
+            End If
 
-            _yields(i).ModDuration = bondDeriv.GetValue(1, 3)
-            _yields(i).Pvbp = bondDeriv.GetValue(1, 4)
-            _yields(i).Duration = bondDeriv.GetValue(1, 5)
-            _yields(i).AverageLife = bondDeriv.GetValue(1, 6) 'non-macauley duration
-            _yields(i).Convexity = bondDeriv.GetValue(1, 7)
+
         End Sub
     End Class
 
@@ -272,10 +281,15 @@ Namespace Tools.Elements
             _yields = New YieldContainer(bondYield, ParentBond.UserDefinedSpread(Ordinate.Yield))
 
             For i = 0 To _yields.Yields.Count() - 1
-                Dim bondDeriv As Array = _bondModule.AdBondDeriv(settleDate, _yields.Yields(i).Yield, dscr.Maturity, coupon, 0, dscr.PaymentStructure,
-                                                                 Regex.Replace(dscr.RateStructure, "YT[A-Z]", _yields.Yields(i).ToWhat.Abbr),
-                                                                 "", "")
-                _yields.AddDerivatives(i, bondDeriv)
+                Try
+                    Dim bondDeriv As Array = _bondModule.AdBondDeriv(settleDate, _yields.Yields(i).Yield, dscr.Maturity, coupon, 0, dscr.PaymentStructure,
+                                                 Regex.Replace(dscr.RateStructure, "YT[A-Z]", _yields.Yields(i).ToWhat.Abbr),
+                                                 "", "")
+                    _yields.AddDerivatives(i, bondDeriv)
+                Catch ex As Exception
+                    _yields.AddDerivatives(i, Nothing)
+                End Try
+
             Next
 
         End Sub

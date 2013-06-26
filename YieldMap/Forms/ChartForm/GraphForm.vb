@@ -536,9 +536,9 @@ Namespace Forms.ChartForm
 
 #Region "c) Toolbar events"
         Private Sub ZoomAllButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles ZoomAllButton.Click
-            SetChartMinMax()
             TheChart.ChartAreas(0).AxisX.ScaleView.ZoomReset()
             TheChart.ChartAreas(0).AxisY.ScaleView.ZoomReset()
+            SetChartMinMax()
         End Sub
 
         Private Sub ZoomCustomButtonClick(ByVal sender As Object, ByVal e As EventArgs) Handles ZoomCustomButton.Click

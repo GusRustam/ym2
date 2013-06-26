@@ -90,6 +90,11 @@ Namespace Bonds
             _rateStructure = rateStructure
             _shortName = shortName
 
+            _label1 = shortName
+            _label2 = shortName
+            _label3 = shortName
+            _label4 = shortName
+
             _issuerName = issuerName
             _putable = False
             _callable = False
@@ -146,7 +151,7 @@ Namespace Bonds
         <Hideable()>
         <DisplayName("Ric")>
         <Filterable()>
-        Public ReadOnly Property RIC As String
+        Public ReadOnly Property Ric As String
             Get
                 Return _ric
             End Get
