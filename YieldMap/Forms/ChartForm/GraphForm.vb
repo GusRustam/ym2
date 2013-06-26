@@ -871,6 +871,7 @@ Namespace Forms.ChartForm
                     If groupSelect.UseNew Then
                         grp = New BondGroup(_ansamble, groupSelect.NewName, bondSelector.SelectedRICs, groupSelect.NewColor, New FieldSet(groupSelect.LayoutId))
                         AddHandler grp.Updated, Sub(items) OnGroupUpdated(grp, items)
+                        AddHandler grp.Cleared, Sub() ClearSeries(grp.Identity)
                         AddHandler grp.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnGroupUpdated(grp, data)
                         _ansamble.Items.Add(grp)
                     Else
