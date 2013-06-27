@@ -327,7 +327,8 @@ Namespace Forms.PortfolioForm
                 Return
             End If
             If e.Button = MouseButtons.Right Then
-                PortTreeCM.Tag = Nothing
+                If PortfolioTree.SelectedNode Is Nothing Then Return
+                PortTreeCM.Tag = PortfolioTree.SelectedNode
                 PortTreeCM.Show(PortfolioTree, e.Location)
             End If
         End Sub
@@ -665,7 +666,7 @@ Namespace Forms.PortfolioForm
             Dim rics = (From row As DataGridViewRow In ChainListItemsGrid.SelectedRows
                         Let descr = TryCast(row.DataBoundItem, BondMetadata)
                         Where descr IsNot Nothing
-                        Select RIC = descr.RIC).ToList()
+                        Select descr.Ric).ToList()
             If rics.Any Then
                 src.RemoveItems(rics)
                 RefreshChainListItemGrid(src)

@@ -234,12 +234,10 @@ Namespace Forms.MainForm
             Settings.MinSpread = minSpr
             Settings.MaxSpread = maxSpr
 
-
             Settings.MaxXStrict = MaxXStrictCB.Checked
             Settings.MaxYStrict = MaxYStrictCB.Checked
             Settings.MinXStrict = MinXStrictCB.Checked
             Settings.MinYStrict = MinYStrictCB.Checked
-
 
             Settings.YieldCalcMode = YieldCalcModeCB.SelectedItem
             Close()

@@ -124,20 +124,16 @@ Namespace Forms.PortfolioForm
             ColorComboBox.SelectedIndex = New Random().NextDouble() * ColorComboBox.Items.Count
         End Sub
 
-        Private Sub CancelButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles CancelButton.Click
-            Close()
-        End Sub
-
-        Private Sub OkButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles OkButton.Click
-            If DoValidate() Then Close()
-        End Sub
-
         Private Sub ColorComboBox_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs) Handles ColorComboBox.SelectedIndexChanged
             If ColorComboBox.SelectedIndex < 0 Then
                 ColorBox.BackColor = Color.White
             Else
                 ColorBox.BackColor = Color.FromName(ColorComboBox.SelectedItem)
             End If
+        End Sub
+
+        Private Sub AddEditChainList_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+            If DialogResult = DialogResult.OK Then e.Cancel = Not DoValidate()
         End Sub
     End Class
 End Namespace

@@ -567,19 +567,41 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub PortfolioTssbDropDownOpening(ByVal sender As Object, ByVal e As EventArgs) Handles PortfolioTSSB.DropDownOpening
-            Dim portDescrList As List(Of IdName(Of Integer)) =
-                (From rw In PortfolioManager.Instance.GetAllPortfolios()
-                 Select New IdName(Of Integer)() With {.Id = rw.Id, .Value = rw.Value}).ToList()
-
             PortfolioTSSB.DropDownItems.Clear()
+            AddPortfoliosByFolder("")
+            'Dim portDescrList As List(Of IdName(Of Integer)) =
+            '    (From rw In PortfolioManager.Instance.GetAllPortfolios()
+            '     Select New IdName(Of Integer)() With {.Id = rw.Id, .Value = rw.Value}).ToList()
 
-            If portDescrList.Any Then
-                portDescrList.ForEach(
-                    Sub(idname)
-                        Dim item = PortfolioTSSB.DropDownItems.Add(idname.Value, Nothing, AddressOf PortfolioSelectTSCBSelectedIndexChanged)
-                        item.Tag = idname.Id
-                    End Sub)
-            End If
+            'PortfolioTSSB.DropDownItems.Clear()
+
+            'If portDescrList.Any Then
+            '    portDescrList.ForEach(
+            '        Sub(idname)
+            '            Dim item = PortfolioTSSB.DropDownItems.Add(idname.Value, Nothing, AddressOf PortfolioSelectTSCBSelectedIndexChanged)
+            '            item.Tag = idname.Id
+            '        End Sub)
+            'End If
+
+
+        End Sub
+
+        Private Sub AddPortfoliosByFolder(ByVal theId As String, Optional ByVal whereTo As ToolStripMenuItem = Nothing)
+            Dim portMan As PortfolioManager = PortfolioManager.Instance
+            Dim descrs = portMan.GetPortfoliosByFolder(theId)
+
+            For Each descr In descrs
+                Dim newNode As ToolStripMenuItem
+                If whereTo IsNot Nothing Then
+                    newNode = whereTo.DropDownItems.Add(descr.Name, Nothing, AddressOf PortfolioSelectTSCBSelectedIndexChanged)
+                Else
+                    newNode = PortfolioTSSB.DropDownItems.Add(descr.Name, Nothing, AddressOf PortfolioSelectTSCBSelectedIndexChanged)
+                End If
+                newNode.Tag = descr.Id
+                If descr.IsFolder Then
+                    AddPortfoliosByFolder(descr.Id, newNode)
+                End If
+            Next
         End Sub
 
         Private Sub PortfolioSelectTSCBSelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs)
