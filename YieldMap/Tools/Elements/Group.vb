@@ -279,7 +279,7 @@ Namespace Tools.Elements
             Next
         End Sub
 
-        Protected Sub HandleNewQuote(ByRef bond As Bond, ByVal xmlName As String, ByVal fieldVal As Double?, ByVal calcDate As Date, Optional _
+        Protected Overridable Sub HandleNewQuote(ByRef bond As Bond, ByVal xmlName As String, ByVal fieldVal As Double?, ByVal calcDate As Date, Optional _
                                         ByVal recalc As Boolean = True)
             If Not bond.QuotesAndYields.Contains(xmlName) Then
                 Dim descr As New BondPointDescription(xmlName)
@@ -297,7 +297,7 @@ Namespace Tools.Elements
         End Sub
 
         Public Function HasRic(ByVal instrument As String) As Boolean
-            Return _elements.Any(Function(elem) elem.MetaData.RIC = instrument)
+            Return _elements.Any(Function(elem) elem.MetaData.Ric = instrument)
         End Function
 
         Public Overridable Sub AddRics(ByVal rics As IEnumerable(Of String))
@@ -326,7 +326,7 @@ Namespace Tools.Elements
 
         Public Sub Disable(ByVal ric As String) Implements IChangeable.Disable
             FreezeEvents()
-            For Each item In (From elem In _elements Where elem.MetaData.RIC = ric)
+            For Each item In (From elem In _elements Where elem.MetaData.Ric = ric)
                 item.Enabled = False
             Next
             UnfreezeEvents()
@@ -336,7 +336,7 @@ Namespace Tools.Elements
             FreezeEvents()
             For Each ric In rics
                 Dim rc = ric
-                For Each item In (From elem In _elements Where elem.MetaData.RIC = rc)
+                For Each item In (From elem In _elements Where elem.MetaData.Ric = rc)
                     item.Enabled = False
                 Next
             Next
@@ -345,7 +345,7 @@ Namespace Tools.Elements
 
         Public Sub Enable(ByVal rics As List(Of String)) Implements IChangeable.Enable
             FreezeEvents()
-            For Each item In (From elem In _elements Where rics.Contains(elem.MetaData.RIC))
+            For Each item In (From elem In _elements Where rics.Contains(elem.MetaData.Ric))
                 item.Enabled = True
             Next
             UnfreezeEvents()

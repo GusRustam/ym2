@@ -3,7 +3,6 @@ Imports DbManager.Bonds
 Imports System.Text.RegularExpressions
 Imports NLog
 Imports ReutersData
-Imports Settings
 Imports Uitls
 
 Namespace Tools.Elements
@@ -179,6 +178,12 @@ Namespace Tools.Elements
             _best = _yields.Max
         End Sub
 
+
+        Public Sub New(ByVal fieldVal As Double?)
+            _yields.Add(New YieldStructure With {.Yield = fieldVal, .YieldToDate = Today, .ToWhat = YieldToWhat.Maturity})
+            _best = _yields(0)
+        End Sub
+
         Public Sub AddDerivatives(ByVal i As Integer, ByVal bondDeriv As Array)
             ' 1. Price                 - Price of the bond
             ' 2. Option Free Price     - Option free price of the bond
@@ -206,6 +211,7 @@ Namespace Tools.Elements
 
 
         End Sub
+
     End Class
 
     Public Class BondPointDescription
@@ -289,9 +295,7 @@ Namespace Tools.Elements
                 Catch ex As Exception
                     _yields.AddDerivatives(i, Nothing)
                 End Try
-
             Next
-
         End Sub
 
         Public Overrides Sub ClearYield()
@@ -312,5 +316,11 @@ Namespace Tools.Elements
                 Return _quoteName
             End Get
         End Property
+
+        'Public Sub SetYield(ByVal fieldVal As Double?, ByVal dur As Double)
+        '    _yields = New YieldContainer(fieldVal)
+        '    _yields.Yields(0).Duration = dur
+        '    _yields.Yields(0).AverageLife = dur / (1 + fieldVal)
+        'End Sub
     End Class
 End Namespace

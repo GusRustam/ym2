@@ -23,7 +23,7 @@ Namespace Tools.Elements
 
         Public Overrides Sub AddRics(ByVal rics As IEnumerable(Of String))
             For Each ric In rics
-                Dim cstmBond = CustomBond.LoadByCode(ric)
+                Dim cstmBond = CustomBondSrc.LoadByCode(ric)
                 If cstmBond IsNot Nothing Then
                     Dim bond = New CustomCouponBond(Me, cstmBond)
                     AddHandler bond.Changed, Sub() If Not EventsFrozen Then RecalculateTotal()

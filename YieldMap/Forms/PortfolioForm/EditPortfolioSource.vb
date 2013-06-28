@@ -83,14 +83,14 @@ Namespace Forms.PortfolioForm
             Next
             If _color <> "" Then CustomColorCB.SelectedItem = _color
 
-            If TypeOf Portfolio Is Chain OrElse TypeOf Portfolio Is UserList Then
+            If TypeOf Portfolio Is ChainSrc OrElse TypeOf Portfolio Is UserListSrc Then
                 MainTabControl.SelectedTab = ChainOrListTP
 
                 IndividualAndCustomBondsTP.Visible = False
                 IndividualAndCustomBondsTP.Enabled = False
 
                 ChainOrListTP.Visible = True
-                ShowChainsRB.Checked = TypeOf Portfolio Is Chain
+                ShowChainsRB.Checked = TypeOf Portfolio Is ChainSrc
                 ShowListsRB.Checked = Not ShowChainsRB.Checked
                 ShowChainsRB.Enabled = ShowChainsRB.Checked
                 ShowListsRB.Enabled = Not ShowChainsRB.Checked
@@ -103,7 +103,7 @@ Namespace Forms.PortfolioForm
                 Dim itms = (From elem In ChainsListsLB.Items Let id = CType(elem, Source).ID Where id = Portfolio.ID Select elem).ToList()
                 If itms.Any() Then ChainsListsLB.SelectedItem = itms.First()
 
-            ElseIf TypeOf Portfolio Is CustomBond OrElse TypeOf Portfolio Is RegularBond Then
+            ElseIf TypeOf Portfolio Is CustomBondSrc OrElse TypeOf Portfolio Is RegularBondSrc Then
                 MainTabControl.SelectedTab = IndividualAndCustomBondsTP
 
                 IndividualAndCustomBondsTP.Visible = True
@@ -112,7 +112,7 @@ Namespace Forms.PortfolioForm
                 ChainOrListTP.Visible = False
                 ChainOrListTP.Enabled = False
 
-                IndBondsRB.Checked = TypeOf Portfolio Is RegularBond
+                IndBondsRB.Checked = TypeOf Portfolio Is RegularBondSrc
                 IndBondsRB.Enabled = IndBondsRB.Checked
                 CustomBondsRB.Checked = Not IndBondsRB.Checked
                 CustomBondsRB.Enabled = Not IndBondsRB.Checked

@@ -76,7 +76,7 @@ Namespace Forms.PortfolioForm
         Private _flag As Boolean
 
         Private _currentItem As Portfolio
-        Private _currentBond As CustomBond
+        Private _currentBond As CustomBondSrc
         Private _locked As Boolean
 
         Private Property CurrentItem As Portfolio
@@ -606,8 +606,8 @@ Namespace Forms.PortfolioForm
             End If
 
             Dim items = (From row As DataGridViewRow In ChainsListsGrid.SelectedRows
-                         Where TypeOf row.DataBoundItem Is DbManager.Chain
-                         Select CType(row.DataBoundItem, DbManager.Chain).ChainRic).ToList()
+                         Where TypeOf row.DataBoundItem Is DbManager.ChainSrc
+                         Select CType(row.DataBoundItem, DbManager.ChainSrc).ChainRic).ToList()
 
             If Not items.Any Then
                 MessageBox.Show("Please select one or more chains to reload", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
@@ -638,7 +638,7 @@ Namespace Forms.PortfolioForm
             If ChainsListsGrid.SelectedRows.Count <= 0 Then Return
 
             Dim elem = ChainsListsGrid.SelectedRows.Item(0).DataBoundItem
-            Dim src As UserList = TryCast(elem, UserList)
+            Dim src As UserListSrc = TryCast(elem, UserListSrc)
             If src Is Nothing Then Return
 
             Dim a As New BondSelectorForm
@@ -660,7 +660,7 @@ Namespace Forms.PortfolioForm
             If ChainsListsGrid.SelectedRows.Count <= 0 Then Return
 
             Dim elem = ChainsListsGrid.SelectedRows.Item(0).DataBoundItem
-            Dim src As UserList = TryCast(elem, UserList)
+            Dim src As UserListSrc = TryCast(elem, UserListSrc)
             If src Is Nothing Then Return
 
             Dim rics = (From row As DataGridViewRow In ChainListItemsGrid.SelectedRows
@@ -746,11 +746,11 @@ Namespace Forms.PortfolioForm
             CustomBondChanged = False
         End Sub
 
-        Private Sub RefreshCustomBondList(Optional ByVal toselect As CustomBond = Nothing, Optional ByVal furtherRefresh As Boolean = True)
+        Private Sub RefreshCustomBondList(Optional ByVal toselect As CustomBondSrc = Nothing, Optional ByVal furtherRefresh As Boolean = True)
             CustomBondsList.DataSource = PortfolioManager.CustomBondsView()
             If toselect IsNot Nothing Then
                 Dim x = (From row As DataGridViewRow In CustomBondsList.Rows
-                         Where CType(row.DataBoundItem, CustomBond).ID = toselect.ID
+                         Where CType(row.DataBoundItem, CustomBondSrc).ID = toselect.ID
                          Select row.Index).ToList()
                 If x.Any Then CustomBondsList.Rows(x.First).Selected = True
             End If
@@ -988,7 +988,7 @@ Namespace Forms.PortfolioForm
                     If frm.ShowDialog() = DialogResult.OK Then
                         SaveCustomBond()
                         Const struct = "ACC:A5 IC:L1 CLDR:RUS_FI SETTLE:0WD  CFADJ:NO DMC:FOLLOWING EMC:LASTDAY PX:CLEAN REFDATE:MATURITY"
-                        _currentBond = New CustomBond(Color.Gray.Name, nameTb.Text, descrTb.Text, struct,
+                        _currentBond = New CustomBondSrc(Color.Gray.Name, nameTb.Text, descrTb.Text, struct,
                                                       ReutersDate.DateToReuters(Date.Today.AddYears(1)), 0.1)
                         PortfolioManager.AddSource(_currentBond)
                         RefreshCustomBondList()
@@ -1153,7 +1153,7 @@ Namespace Forms.PortfolioForm
                         MessageBox.Show("Please select custom bond to delete", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
                         Return
                     End If
-                    Dim item = CType(CustomBondsList.SelectedRows(0).DataBoundItem, CustomBond)
+                    Dim item = CType(CustomBondsList.SelectedRows(0).DataBoundItem, CustomBondSrc)
                     PortfolioManager.DeleteSource(item)
                     RefreshCustomBondList()
                 Case CMSSource.AmortSchedule

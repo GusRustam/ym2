@@ -23,14 +23,14 @@ Namespace Forms.PortfolioForm
                         .Curve = curve
                         .Enabled = enbld
                         .Name = nme
-                        If ChainRadioButton.Checked Then CType(_src, Chain).ChainRic = chainRic
+                        If ChainRadioButton.Checked Then CType(_src, ChainSrc).ChainRic = chainRic
                     End With
                     Return _src
                 Else
                     If ListRadioButton.Checked Then
-                        Return New UserList(color, fieldSetId, enbld, curve, nme)
+                        Return New UserListSrc(color, fieldSetId, enbld, curve, nme)
                     Else
-                        Return New Chain(color, fieldSetId, enbld, curve, nme, chainRic)
+                        Return New ChainSrc(color, fieldSetId, enbld, curve, nme, chainRic)
                     End If
                 End If
             End Get
@@ -45,7 +45,7 @@ Namespace Forms.PortfolioForm
 
                 EnabledCheckBox.Checked = _src.Enabled
                 CurveCheckBox.Checked = _src.Curve
-                Dim source = TryCast(_src, Chain)
+                Dim source = TryCast(_src, ChainSrc)
                 If source Is Nothing Then
                     Text = "Edit list"
                     ListRadioButton.Checked = True

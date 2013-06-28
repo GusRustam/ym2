@@ -4,9 +4,9 @@ Namespace Tools.Elements
     Public Class CustomCouponBond
         Inherits Bond
 
-        Private ReadOnly _cstmBond As CustomBond
+        Private ReadOnly _cstmBond As CustomBondSrc
 
-        Public Sub New(ByVal parent As Group, ByVal cstmBond As CustomBond)
+        Public Sub New(ByVal parent As Group, ByVal cstmBond As CustomBondSrc)
             MyBase.New(parent, cstmBond.GetDescription())
             _cstmBond = cstmBond
         End Sub

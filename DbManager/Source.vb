@@ -155,7 +155,7 @@ Public MustInherit Class Source
     End Function
 End Class
 
-Public Class Chain
+Public Class ChainSrc
     Inherits Source
     Private _chainRic As String
     Private ReadOnly _bondsManager As IBondsLoader = BondsLoader.Instance
@@ -197,7 +197,7 @@ Public Class Chain
         Return PortMan.GenerateNewChainId()
     End Function
 
-    Public Shared Function Load(ByVal id As String) As Chain
+    Public Shared Function Load(ByVal id As String) As ChainSrc
         Dim xml = PortfolioManager.ClassInstance.GetConfigDocument()
         Dim node = xml.SelectSingleNode(String.Format("/bonds/chains//chain[@id='{0}']", id))
         If node Is Nothing Then Throw New NoSourceException(String.Format("Failed to find chain with id {0}", id))
@@ -208,13 +208,13 @@ Public Class Chain
             Dim curve = node.GetAttr("curve", "False")
             Dim chainRic = node.GetAttrStrict("ric")
             Dim fields = New FieldSet(node.GetAttrStrict("field-set-id"))
-            Return New Chain(id, color, fields, enabled, curve, chainRic, name)
+            Return New ChainSrc(id, color, fields, enabled, curve, chainRic, name)
         Catch ex As Exception
             Throw New NoSourceException(String.Format("Failed to find chain with id {0}", id), ex)
         End Try
     End Function
 
-    Protected Overloads Function Equals(ByVal other As Chain) As Boolean
+    Protected Overloads Function Equals(ByVal other As ChainSrc) As Boolean
         Return MyBase.Equals(other) AndAlso String.Equals(_chainRic, other._chainRic)
     End Function
 
@@ -222,7 +222,7 @@ Public Class Chain
         If ReferenceEquals(Nothing, obj) Then Return False
         If ReferenceEquals(Me, obj) Then Return True
         If obj.GetType IsNot Me.GetType Then Return False
-        Return Equals(DirectCast(obj, Chain))
+        Return Equals(DirectCast(obj, ChainSrc))
     End Function
 
     Public Overrides Function GetHashCode() As Integer
@@ -233,16 +233,16 @@ Public Class Chain
         Return hashCode
     End Function
 
-    Public Shared Shadows Operator =(ByVal left As Chain, ByVal right As Chain) As Boolean
+    Public Shared Shadows Operator =(ByVal left As ChainSrc, ByVal right As ChainSrc) As Boolean
         Return Equals(left, right)
     End Operator
 
-    Public Shared Shadows Operator <>(ByVal left As Chain, ByVal right As Chain) As Boolean
+    Public Shared Shadows Operator <>(ByVal left As ChainSrc, ByVal right As ChainSrc) As Boolean
         Return Not Equals(left, right)
     End Operator
 End Class
 
-Public Class UserList
+Public Class UserListSrc
     Inherits Source
 
     Public Sub New(ByVal color As String, ByVal fieldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
@@ -276,7 +276,7 @@ Public Class UserList
         Return PortMan.GenerateNewListId()
     End Function
 
-    Public Shared Function Load(ByVal listId As String) As UserList
+    Public Shared Function Load(ByVal listId As String) As UserListSrc
         Dim node = PortfolioManager.ClassInstance.GetConfigDocument().SelectSingleNode(String.Format("/bonds/lists/list[@id='{0}']", listId))
         If node Is Nothing Then Throw New NoSourceException(String.Format("Failed to find list with id {0}", listId))
         Try
@@ -285,7 +285,7 @@ Public Class UserList
             Dim enabled = node.GetAttr("enabled", "True")
             Dim curve = node.GetAttr("curve", "False")
             Dim fields = New FieldSet(node.GetAttrStrict("field-set-id"))
-            Return New UserList(listId, color, fields, enabled, curve, name)
+            Return New UserListSrc(listId, color, fields, enabled, curve, name)
         Catch ex As Exception
             Throw New NoSourceException(String.Format("Failed to find list with id {0}", listId), ex)
         End Try
@@ -319,7 +319,7 @@ Public Class UserList
     End Sub
 End Class
 
-Public Class RegularBond
+Public Class RegularBondSrc
     Inherits SourceBase
     ' todo equality members
     Public Sub New(ByVal id As String, ByVal color As String, ByVal name As String)
@@ -339,7 +339,7 @@ Public Class RegularBond
     End Function
 End Class
 
-Public Class CustomBond
+Public Class CustomBondSrc
     Inherits SourceBase
 
     Private ReadOnly _code As String
@@ -411,7 +411,7 @@ Public Class CustomBond
         Return "Custom Bond"
     End Function
 
-    Public Shared Function LoadByCode(ByVal cd As String) As CustomBond
+    Public Shared Function LoadByCode(ByVal cd As String) As CustomBondSrc
         Dim node = PortfolioManager.ClassInstance.GetConfigDocument().SelectSingleNode(String.Format("/bonds/custom-bonds/bond[@code='{0}']", cd))
         If node Is Nothing Then Throw New NoSourceException(String.Format("Failed to find custom bond with code {0}", cd))
         Try
@@ -421,12 +421,12 @@ Public Class CustomBond
             Dim maturity = node.GetAttrStrict("maturity")
             Dim coupon = node.GetAttrStrict("coupon")
             Dim bndId = node.GetAttrStrict("id")
-            Return New CustomBond(bndId, color, name, cd, struct, maturity, coupon)
+            Return New CustomBondSrc(bndId, color, name, cd, struct, maturity, coupon)
         Catch ex As Exception
             Throw New NoSourceException(String.Format("Failed to find custom bond with code {0}", cd), ex)
         End Try
     End Function
-    Public Shared Function LoadById(ByVal bndId As String) As CustomBond
+    Public Shared Function LoadById(ByVal bndId As String) As CustomBondSrc
         Dim node = PortfolioManager.ClassInstance.GetConfigDocument().SelectSingleNode(String.Format("/bonds/custom-bonds/bond[@id='{0}']", bndId))
         If node Is Nothing Then Throw New NoSourceException(String.Format("Failed to find custom bond with id {0}", bndId))
         Try
@@ -436,7 +436,7 @@ Public Class CustomBond
             Dim struct = node.GetAttrStrict("bondStructure")
             Dim maturity = node.GetAttrStrict("maturity")
             Dim coupon = node.GetAttrStrict("coupon")
-            Return New CustomBond(bndId, color, name, code, struct, maturity, coupon)
+            Return New CustomBondSrc(bndId, color, name, code, struct, maturity, coupon)
         Catch ex As Exception
             Throw New NoSourceException(String.Format("Failed to find custom bond with id {0}", bndId), ex)
         End Try
@@ -444,5 +444,89 @@ Public Class CustomBond
 
     Public Function GetDescription() As BondMetadata
         Return New BondMetadata(_code, _maturity, _currentCouponRate, _struct.ToString(), "RM:YTM", "Custom", _code)
+    End Function
+End Class
+
+Public Class ChainCurveSrc
+    Inherits Source
+
+    Private ReadOnly _pattern As String
+    Private ReadOnly _ric As String
+    Private ReadOnly _skip As String
+    Private ReadOnly _fields As FieldSet
+
+
+    Public ReadOnly Property Ric() As String
+        Get
+            Return _ric
+        End Get
+    End Property
+
+    Public ReadOnly Property Pattern() As String
+        Get
+            Return _pattern
+        End Get
+    End Property
+
+    Public ReadOnly Property Skip() As String
+        Get
+            Return _skip
+        End Get
+    End Property
+
+    <Browsable(False)>
+    Public ReadOnly Property FieldsProperty() As FieldSet
+        Get
+            Return _fields
+        End Get
+    End Property
+
+    Public Sub New(ByVal id As String, ByVal color As String, ByVal name As String, ByVal pattern As String, ByVal ric As String, ByVal skip As String, ByVal fields As FieldSet)
+        MyBase.New(id, color, fields, True, False, name)
+        _pattern = pattern
+        _ric = ric
+        _skip = skip
+        _fields = fields
+    End Sub
+
+
+    Public Sub New(ByVal color As String, ByVal name As String, ByVal pattern As String, ByVal ric As String, ByVal skip As String, ByVal fields As FieldSet)
+        MyBase.New(color, fields.ID, True, False, name)
+        _pattern = pattern
+        _ric = ric
+        _skip = skip
+        _fields = fields
+    End Sub
+
+    Public Overrides Function GetXmlTypeName() As String
+        Return "chain-curves"
+    End Function
+
+    Protected Overrides Function GenerateId() As String
+        Return PortMan.GenerateNewCustomBondId()
+    End Function
+
+    Public Overrides Function GetDefaultRics() As List(Of String)
+        Return {_ric}.ToList()
+    End Function
+
+    Public Overrides Function ToString() As String
+        Return "Chain Curve"
+    End Function
+
+    Public Shared Function LoadById(ByVal bndId As String) As ChainCurveSrc
+        Dim node = PortfolioManager.ClassInstance.GetConfigDocument().SelectSingleNode(String.Format("/bonds/chain-curves/curve[@id='{0}']", bndId))
+        If node Is Nothing Then Throw New NoSourceException(String.Format("Failed to find chain curve with id {0}", bndId))
+        Try
+            Dim color = node.GetAttrStrict("color")
+            Dim name = node.GetAttrStrict("name")
+            Dim pattern = node.GetAttrStrict("pattern")
+            Dim ric = node.GetAttrStrict("ric")
+            Dim skip = node.GetAttrStrict("skip")
+            Dim fsId = node.GetAttrStrict("field-set")
+            Return New ChainCurveSrc(bndId, color, name, pattern, ric, skip, New FieldSet(fsId))
+        Catch ex As Exception
+            Throw New NoSourceException(String.Format("Failed to find chain curve with id {0}", bndId), ex)
+        End Try
     End Function
 End Class

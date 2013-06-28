@@ -114,7 +114,7 @@ Namespace Forms.ChartForm
 
                 Dim portfolioStructure = PortfolioManager.Instance.GetPortfolioStructure(currentPortId)
                 For Each grp As BondGroup In From port In portfolioStructure.Sources
-                                           Where TypeOf port.Source Is DbManager.Chain Or TypeOf port.Source Is UserList
+                                           Where TypeOf port.Source Is ChainSrc Or TypeOf port.Source Is UserListSrc
                                            Select New BondGroup(_ansamble, port, portfolioStructure)
                     Dim tmp = grp
                     AddHandler tmp.Updated, Sub(items) OnGroupUpdated(tmp, items)
@@ -123,7 +123,7 @@ Namespace Forms.ChartForm
                     _ansamble.Items.Add(tmp)
                 Next
                 For Each grp As CustomBondGroup In From port In portfolioStructure.Sources
-                                           Where TypeOf port.Source Is CustomBond
+                                           Where TypeOf port.Source Is CustomBondSrc
                                            Select New CustomBondGroup(_ansamble, port, portfolioStructure)
                     Dim tmp = grp
                     AddHandler tmp.Updated, Sub(items) OnGroupUpdated(tmp, items)
@@ -790,6 +790,24 @@ Namespace Forms.ChartForm
             BondCurvesNewTSMI.DropDownItems.Clear()
             DoAddNew(From chain In portfolioManager.ChainsView Where chain.Curve)
             DoAddNew(From list In portfolioManager.UserListsView Where list.Curve)
+
+            ChainCurvesToolStripMenuItem.DropDownItems.Clear()
+            For Each curve In portfolioManager.CurveChainsView
+                Dim tmp = curve
+                ChainCurvesToolStripMenuItem.DropDownItems.Add(tmp.Name, Nothing, Sub() AddChainCurve(tmp.ID))
+            Next
+        End Sub
+
+        Private Sub AddChainCurve(ByVal id As Long)
+            Logger.Info("AddChainCurve({0})", id)
+            Dim src = ChainCurveSrc.LoadById(id)
+
+            Dim curve = New ChainCurve(_ansamble, src)
+            AddHandler curve.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnChainCurvePaint(data)
+            AddHandler curve.Updated, AddressOf OnChainCurvePaint
+            AddHandler curve.Cleared, Sub() ClearSeries(curve.Identity)
+            _ansamble.Items.Add(curve)
+            curve.Subscribe()
         End Sub
 
         Private Sub AddBondCurveNewTSMIClick(ByVal sender As Object, ByVal e As EventArgs)

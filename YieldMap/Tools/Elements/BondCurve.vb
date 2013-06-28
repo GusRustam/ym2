@@ -1,5 +1,4 @@
 Imports AdfinXAnalyticsFunctions
-Imports DbManager.Bonds
 Imports DbManager
 Imports Uitls
 Imports ReutersData
@@ -8,16 +7,6 @@ Namespace Tools.Elements
     Public Class BondCurve
         Inherits Group
         Implements ICurve
-
-        Private Const ZcbPmtStructureTemplate As String = _
-           "ACC:A5 IC:L1 CLDR:RUS_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY FRQ:ZERO " &
-           "PX:CLEAN REFDATE:MATURITY YM:DISCA5 ISSUE:{0}"
-
-        Private ReadOnly Property ZcbPmtStructure As String
-            Get
-                Return String.Format(ZcbPmtStructureTemplate, ReutersDate.DateToReuters(GroupDate))
-            End Get
-        End Property
 
         Private ReadOnly _bondModule As AdxBondModule = Eikon.Sdk.CreateAdxBondModule()
         Private ReadOnly _curveModule As AdxYieldCurveModule = Eikon.Sdk.CreateAdxYieldCurveModule()
@@ -40,9 +29,10 @@ Namespace Tools.Elements
         End Property
 
         Private Function GetSyntBond(dur As Double, yield As Double) As SyntheticZcb
-            Dim mat = GroupDate.AddDays(dur * 365 / (1 + yield * dur)) ' cool hack to make Macauley duration equal to dur parameter
-            Dim paymentStructure As String = ZcbPmtStructure
-            Dim bond = New SyntheticZcb(Me, New BondMetadata(String.Format("ZCB {0:N2}", dur), mat, 0, paymentStructure, "RM:YTM", Name, String.Format("ZCB {0:N2}", dur)))
+            Dim bond = New SyntheticZcb(Me, GroupDate, yield, dur, Name)
+            Dim mat = bond.MetaData.Maturity
+            Dim paymentStructure = bond.MetaData.PaymentStructure
+
             Dim settleDate = _bondModule.BdSettle(GroupDate, paymentStructure)
             Dim priceObject As Array = _bondModule.AdBondPrice(settleDate, yield, mat, 0, 0, paymentStructure, "RM:YTM", "", "RES:BDPRICE")
             AddHandler bond.CustomPrice, Sub(bnd, prc) HandleNewQuote(bnd, BondFields.XmlName(bond.Fields.Custom), prc, GroupDate, False)
@@ -87,23 +77,6 @@ Namespace Tools.Elements
 
             AddRics(src.GetDefaultRics())
         End Sub
-
-        'Public Overrides Sub Subscribe()
-        '    Dim rics As List(Of String) = (From elem In AllElements Select elem.MetaData.RIC).ToList()
-        '    If rics.Count = 0 Then Return
-        '    If GroupDate = Today Then
-        '        QuoteLoader.AddItems(rics, BondFields.AllNames)
-        '    Else
-        '        QuoteLoader.CancelAll()
-        '        Dim historyBlock As New HistoryBlock
-        '        AddHandler historyBlock.History, AddressOf OnHistory
-        '        historyBlock.Load(rics, _histFields.AllNames, GroupDate.AddDays(-10), GroupDate)
-        '    End If
-        'End Sub
-
-
-
-
 
         Public Overrides Sub RecalculateTotal()
             For Each bnd In AllElements

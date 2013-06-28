@@ -13,7 +13,7 @@ Public Class Chain
     Private ReadOnly _rics As New ConcurrentBag(Of String)
     Private _mode As String
     Private _failedFlag As Integer = 0
-    Private Shared ReadOnly _chainManagers As New List(Of AdxRtChain)
+    Private Shared ReadOnly ChainManagers As New List(Of AdxRtChain)
 
     Private WithEvents _shutdownManager As ShutdownController = ShutdownController.Instance
 
@@ -59,7 +59,7 @@ Public Class Chain
         Parallel.ForEach(chains, AddressOf LoadRics)
     End Sub
 
-    Sub LoadRics(ByVal ricName As String)
+    Private Sub LoadRics(ByVal ricName As String)
         Logger.Info("LoadRics({0})", ricName)
 
         Dim chainMan As AdxRtChain
@@ -69,7 +69,7 @@ Public Class Chain
         End If
         Try
             chainMan = Eikon.Sdk.CreateAdxRtChain()
-            _chainManagers.Add(chainMan)
+            ChainManagers.Add(chainMan)
             chainMan.Source = SettingsManager.Instance.ReutersDataSource
             chainMan.ItemName = ricName
             chainMan.Mode = _mode
@@ -114,12 +114,12 @@ Public Class Chain
         chainMan.RequestChain()
     End Sub
 
-    Private Sub ShutdownNow() Handles _shutdownManager.ShutdownNow
+    Private Shared Sub ShutdownNow() Handles _shutdownManager.ShutdownNow
         Logger.Warn("Shutdown()")
-        For Each hM In _chainManagers
+        For Each hM In ChainManagers
             Marshal.ReleaseComObject(hM)
             hM = Nothing
         Next
-        _chainManagers.Clear()
+        ChainManagers.Clear()
     End Sub
 End Class

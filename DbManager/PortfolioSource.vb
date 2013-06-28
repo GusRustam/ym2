@@ -192,13 +192,13 @@ Public Class PortfolioStructure
         Get
             Dim data As New List(Of PortfolioSource)
             If what And List Then
-                data.AddRange(From src In _sources Where TypeOf src.Source Is UserList)
+                data.AddRange(From src In _sources Where TypeOf src.Source Is UserListSrc)
             End If
             If what And Chain Then
-                data.AddRange(From src In _sources Where TypeOf src.Source Is Chain)
+                data.AddRange(From src In _sources Where TypeOf src.Source Is ChainSrc)
             End If
             If what And CustomBond Then
-                data.AddRange(From src In _sources Where TypeOf src.Source Is CustomBond)
+                data.AddRange(From src In _sources Where TypeOf src.Source Is CustomBondSrc)
             End If
             Return New ReadOnlyCollection(Of PortfolioSource)(data)
         End Get
@@ -238,7 +238,7 @@ Public Class PortfolioStructure
             For Each ric In From item In src.Source.GetDefaultRics()
                             Where Not _excludes.Contains(item)
                 Try
-                    If Not TypeOf src.Source Is CustomBond Then
+                    If Not TypeOf src.Source Is CustomBondSrc Then
                         Dim descr = BondsData.Instance.GetBondInfo(ric)
                         If filter Then
                             Try
