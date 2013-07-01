@@ -426,6 +426,7 @@ Public Class CustomBondSrc
             Throw New NoSourceException(String.Format("Failed to find custom bond with code {0}", cd), ex)
         End Try
     End Function
+
     Public Shared Function LoadById(ByVal bndId As String) As CustomBondSrc
         Dim node = PortfolioManager.ClassInstance.GetConfigDocument().SelectSingleNode(String.Format("/bonds/custom-bonds/bond[@id='{0}']", bndId))
         If node Is Nothing Then Throw New NoSourceException(String.Format("Failed to find custom bond with id {0}", bndId))
@@ -443,7 +444,13 @@ Public Class CustomBondSrc
     End Function
 
     Public Function GetDescription() As BondMetadata
-        Return New BondMetadata(_code, _maturity, _currentCouponRate, _struct.ToString(), "RM:YTM", "Custom", _code)
+        Dim newDt As Date
+        Try
+            newDt = ReutersDate.ReutersToDate(_struct.IssueDate)
+        Catch ex As Exception
+            newDt = Today
+        End Try
+        Return New BondMetadata(_code, _maturity, _currentCouponRate, _struct.ToString(), "RM:YTM", "Custom", _code, newDt)
     End Function
 End Class
 

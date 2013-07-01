@@ -1,4 +1,5 @@
 Imports DbManager.Bonds
+Imports Settings
 
 Namespace Tools.Elements
     Public Class SyntheticZcb
@@ -19,11 +20,11 @@ Namespace Tools.Elements
         End Sub
 
         Public Sub New(ByVal parent As Group, ByVal dt As Date, ByVal yield As Double, ByVal dur As Double, ByVal issName As String)
-            MyBase.New(parent, New BondMetadata(GetName(dur), dt.AddDays(dur * 365 / (1 + yield * dur)), 0, ZcbPmtStructure(dt), "RM:YTM", issName, GetName(dur)))
+            MyBase.New(parent, New BondMetadata(GetName(dur), dt.AddDays(dur * 365 / (1 + yield * dur)), 0, ZcbPmtStructure(dt), "RM:" + SettingsManager.Instance.YieldCalcMode, issName, GetName(dur), dt))
         End Sub
 
         Public Sub New(ByVal parent As Group, ByVal dt As Date, ByVal yield As Double, ByVal dur As Double, ByVal issName As String, ric As String)
-            MyBase.New(parent, New BondMetadata(ric, dt.AddDays(dur * 365 / (1 + yield * dur)), 0, ZcbPmtStructure(dt), "RM:YTM", issName, GetName(dur)))
+            MyBase.New(parent, New BondMetadata(ric, dt.AddDays(dur * 365 / (1 + yield * dur)), 0, ZcbPmtStructure(dt), "RM:" + SettingsManager.Instance.YieldCalcMode, issName, GetName(dur), dt))
         End Sub
 
         Private Shared Function GetName(ByVal dur As Double) As String
