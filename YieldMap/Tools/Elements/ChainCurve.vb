@@ -155,7 +155,7 @@ Namespace Tools.Elements
             'Dim tmp = New List(Of Bond)(AllElements)
             For Each bnd In AllElements
                 For Each q In bnd.QuotesAndYields
-                    HandleNewQuote(bnd, q, bnd.QuotesAndYields(q).Price, bnd.QuotesAndYields(q).YieldAtDate, False)
+                    HandleNewQuote(bnd, q, bnd.QuotesAndYields(q).Yld.Yield * 100, bnd.QuotesAndYields(q).YieldAtDate, False)
                 Next
             Next
             Recalculate()

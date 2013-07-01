@@ -4,22 +4,37 @@ Imports CommonController
 Imports System.Runtime.InteropServices
 
 Public Class Eikon
-    Private Shared _myEikonDesktopSdk As New EikonDesktopDataAPI
+    Private Shared _eikon As Eikon
+    Private ReadOnly _myEikonDesktopSdk As EikonDesktopDataAPI
+    Private WithEvents _shutdownManager As ShutdownController = ShutdownController.Instance
+
+    ReadOnly Property MyEikonDesktopSdk() As EikonDesktopDataAPI
+        Get
+            Return _myEikonDesktopSdk
+        End Get
+    End Property
+
 
     Private Sub New()
         ' ReSharper disable UnusedVariable
+        _myEikonDesktopSdk = New EikonDesktopDataAPI()
         Dim eikonStatus = _myEikonDesktopSdk.Status
         ' ReSharper restore UnusedVariable
     End Sub
 
     Public Shared ReadOnly Property Sdk As EikonDesktopDataAPI
         Get
-            Return _myEikonDesktopSdk
+            If _eikon Is Nothing Then _eikon = New Eikon
+            Return _eikon.MyEikonDesktopSdk
         End Get
     End Property
 
     Public Sub Clear()
-        _myEikonDesktopSdk = Nothing
+        '_myEikonDesktopSdk = Nothing
+    End Sub
+
+    Private Sub ShutdownNow() Handles _shutdownManager.ShutdownNow
+
     End Sub
 End Class
 
