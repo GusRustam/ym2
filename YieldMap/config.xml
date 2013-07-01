@@ -18,9 +18,9 @@
   <property name="rating-sort-date" value="True" />
   <property name="num-interp-points" value="50" />
   <viewport>
-    <yield min="0.00" max="0.00" />
-    <spread min="0.00" max="0.00" />
-    <duration min="0.00" max="0.00" />
+    <yield min="" max="" />
+    <spread min="" max="" />
+    <duration min="" max="" />
     <x-axis>
       <property name="min-strict" value="False" />
       <property name="max-strict" value="False" />

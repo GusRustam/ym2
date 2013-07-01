@@ -54,7 +54,7 @@ Namespace Bonds
         Private ReadOnly _shortName As String
         Private ReadOnly _label As String
 
-        Private ReadOnly _maturity As Date?
+        Private _maturity As Date? ' this item is not ReadOnly 'cause in case ZCB's the only way to obatin necessary yield and duration is to vary maturity
         Private ReadOnly _coupon As Double
 
         Private ReadOnly _paymentStructure As String
@@ -179,10 +179,13 @@ Namespace Bonds
         <Filterable()>
         <Sortable()>
         <Hideable()>
-        Public ReadOnly Property Maturity As Date?
+        Public Property Maturity As Date?
             Get
                 Return _maturity
             End Get
+            Set(ByVal value As Date?)
+                _maturity = value
+            End Set
         End Property
 
         <DisplayName("Current coupon")>

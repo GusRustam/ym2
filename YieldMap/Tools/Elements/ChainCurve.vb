@@ -52,8 +52,6 @@ Namespace Tools.Elements
             Next
             result.Sort()
 
-            
-
             Return result
         End Function
 
@@ -154,7 +152,7 @@ Namespace Tools.Elements
         End Function
 
         Public Overrides Sub RecalculateTotal()
-            ' well well well collection gets changed; wut shall we do now?
+            'Dim tmp = New List(Of Bond)(AllElements)
             For Each bnd In AllElements
                 For Each q In bnd.QuotesAndYields
                     HandleNewQuote(bnd, q, bnd.QuotesAndYields(q).Price, bnd.QuotesAndYields(q).YieldAtDate, False)
@@ -193,9 +191,9 @@ Namespace Tools.Elements
         End Sub
 
         Private Function GetZcbPrice(bond As SyntheticZcb, yield As Double) As Double
-            'Dim dur = (bond.MetaData.Maturity.Value - Today).Days / 365
-            'Dim newMat = Today.AddDays(dur * 365 / (1 + yield * dur))
-            'bond.MetaData.Maturity = newMat
+            Dim dur = _terms(bond.MetaData.Ric)
+            Dim newMat = Today.AddDays(dur * 365 / (1 + yield * dur))
+            bond.MetaData.Maturity = newMat
 
             Dim paymentStructure = bond.MetaData.PaymentStructure
             Dim rateStructure = bond.MetaData.RateStructure
@@ -208,29 +206,21 @@ Namespace Tools.Elements
 
         Protected Overrides Sub HandleNewQuote(ByRef bond As Bond, ByVal xmlName As String, ByVal fieldVal As Double?, ByVal calcDate As Date, Optional _
                                         ByVal recalc As Boolean = True)
-            AllElements.Remove(bond)
-            bond = New SyntheticZcb(Me, Today, fieldVal / 100, _terms(bond.MetaData.Ric), Name, bond.MetaData.Ric)
-            AllElements.Add(bond)
+            'AllElements.Remove(bond)
+            'bond = New SyntheticZcb(Me, Today, fieldVal / 100, _terms(bond.MetaData.Ric), Name, bond.MetaData.Ric)
+            'AllElements.Add(bond)
+
             Dim zcbPrice = GetZcbPrice(bond, fieldVal / 100)
             If Not bond.QuotesAndYields.Contains(xmlName) Then
                 Dim descr As New BondPointDescription(xmlName)
                 descr.BackColor = BondFields.Fields.BackColor(xmlName)
                 descr.MarkerStyle = BondFields.Fields.MarkerStyle(xmlName)
-
-                '_bonds.AdBondPrice()
-
                 descr.ParentBond = bond
-
-                'descr.YieldAtDate = calcDate
-                'descr.SetYield(fieldVal / 100, _terms(bond.MetaData.Ric)) ' we won't calc right here
-                'descr.Price = 1 ' todo is that ok?
-
                 descr.Yield(Today) = zcbPrice
 
                 bond.QuotesAndYields(xmlName) = descr
             Else
-                'bond.QuotesAndYields(xmlName).Yield(Today) = zcbPrice
-                Throw New NotImplementedException()
+                bond.QuotesAndYields(xmlName).Yield(Today) = zcbPrice
             End If
 
             If recalc Then Recalculate()

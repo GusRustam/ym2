@@ -1,5 +1,4 @@
 ﻿Imports EikonDesktopDataAPILib
-'Imports System.Threading
 Imports NLog
 Imports CommonController
 Imports System.Runtime.InteropServices
@@ -7,8 +6,10 @@ Imports System.Runtime.InteropServices
 Public Class Eikon
     Private Shared _myEikonDesktopSdk As New EikonDesktopDataAPI
 
-
     Private Sub New()
+        ' ReSharper disable UnusedVariable
+        Dim eikonStatus = _myEikonDesktopSdk.Status
+        ' ReSharper restore UnusedVariable
     End Sub
 
     Public Shared ReadOnly Property Sdk As EikonDesktopDataAPI
