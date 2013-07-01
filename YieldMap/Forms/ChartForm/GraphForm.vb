@@ -1039,7 +1039,7 @@ Namespace Forms.ChartForm
                 InterpolationTSMI.Visible = True
                 BootstrappingToolStripMenuItem.Visible = True
                 BondCurveImportantTSS.Visible = True
-                SelectDateTSMI.Visible = True
+                SelectDateToolStripMenuItem.Visible = True
                 BondCurveImportantTSS0.Visible = True
 
                 Dim curve = CType(_ansamble(BondCurveCMS.Tag), BondCurve)
@@ -1055,7 +1055,7 @@ Namespace Forms.ChartForm
                 BondCurveImportantTSS.Visible = False
                 SelectDateTSMI.Visible = False
                 BondCurveImportantTSS0.Visible = False
-                SelectDateTSMI.Visible = False
+                SelectDateToolStripMenuItem.Visible = False
                 BondCurveImportantTSS0.Visible = False
             End If
         End Sub
