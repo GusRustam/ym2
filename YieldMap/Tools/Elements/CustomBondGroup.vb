@@ -7,7 +7,7 @@ Namespace Tools.Elements
         Inherits Group
 
         Public Sub New(ByVal ansamble As Ansamble, ByVal port As PortfolioSource, ByVal portfolioStructure As PortfolioStructure)
-            MyBase.New(ansamble, New FieldSet("Custom bonds")) ' todo ugly (todo make them invisible at UI)
+            MyBase.New(ansamble, New FieldSet("Custom bonds"))
 
             Nm = If(port.Name <> "", port.Name, port.Source.Name)
             PortfolioID = port.Source.ID

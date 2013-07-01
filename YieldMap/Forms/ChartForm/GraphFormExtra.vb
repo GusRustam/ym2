@@ -615,22 +615,10 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
-        Private Sub OnChainCurvePaint(ByVal data As List(Of PointOfCurve))
+        Private Sub OnChainCurvePaint(ByVal crv As ChainCurve, ByVal data As List(Of PointOfCurve))
             GuiAsync(
                 Sub()
                     If Not data.Any Then Return
-                    Dim crv As ChainCurve
-                    Dim itsBond As Boolean
-                    If TypeOf data.First Is PointOfBondCurve Then
-                        crv = CType(CType(data.First, PointOfBondCurve).Bond.Parent, ChainCurve)
-                        itsBond = True
-                    ElseIf TypeOf data.First Is JustPoint Then
-                        crv = CType(data.First, JustPoint).Curve
-                        itsBond = False
-                    Else
-                        Logger.Warn("Unexpected items type for a bond-based curve")
-                        Return
-                    End If
                     Dim srs = TheChart.Series.FindByName(crv.Identity)
                     If srs IsNot Nothing Then TheChart.Series.Remove(srs)
                     Dim clr = Color.FromName(crv.Color)
@@ -647,20 +635,10 @@ Namespace Forms.ChartForm
                     ClearLegendItems(crv.Identity)
                     TheChart.Legends(0).CustomItems.Add(New LegendItem(crv.Name, clr, "") With {.Tag = crv.Identity})
 
-                    If itsBond Then
-                        For Each point In data.Cast(Of PointOfBondCurve)()
-                            Dim pnt = New DataPoint(point.TheX, point.TheY) With {
-                                .Tag = point.Bond,
-                                .Label = point.Label
-                            }
-                            srs.Points.Add(pnt)
-                        Next
-                    Else
-                        For Each point In data.Cast(Of JustPoint)()
-                            Dim pnt = New DataPoint(point.TheX, point.TheY) With {.Tag = point.Curve}
-                            srs.Points.Add(pnt)
-                        Next
-                    End If
+                    For Each point In data.Cast(Of PointOfBondCurve)()
+                        Dim pnt = New DataPoint(point.TheX, point.TheY) With {.Tag = crv}
+                        srs.Points.Add(pnt)
+                    Next
                     SetChartMinMax()
                 End Sub)
         End Sub

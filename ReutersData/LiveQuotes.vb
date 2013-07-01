@@ -14,8 +14,6 @@ Public Class LiveQuotes
     Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(LiveQuotes))
     Private WithEvents _listManager As AdxRtList = Eikon.Sdk.CreateAdxRtList()
 
-    ' TODO событие- завершение работы приложения ловить вот в таких вот классах и корректно убивать все объекты
-
     Public Sub CancelAll()
         Try
             _listManager.UnregisterAllItems()

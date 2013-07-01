@@ -395,7 +395,7 @@ Namespace Tools.Elements
                 Dim len = list.Count - 1
                 Dim res(0 To len, 1) As Object
                 For i = 0 To len
-                    res(i, 0) = DateTime.Today.AddDays(TimeSpan.FromDays(list(i).X * 365).TotalDays) ' todo and wut if mode is maturity?
+                    res(i, 0) = DateTime.Today.AddDays(TimeSpan.FromDays(list(i).X * 365).TotalDays)
                     res(i, 1) = list(i).Y
                 Next
                 Return res

@@ -300,6 +300,10 @@ Namespace Forms.ChartForm
                             BondCurveCMS.Tag = CType(point.Tag, BondCurve).Identity
                             BondCurveCMS.Show(TheChart, mouseEvent.Location)
 
+                        ElseIf TypeOf point.Tag Is ChainCurve Then
+                            BondCurveCMS.Tag = CType(point.Tag, ChainCurve).Identity
+                            BondCurveCMS.Show(TheChart, mouseEvent.Location)
+
                         End If
                     ElseIf htr.ChartElementType = ChartElementType.PlottingArea Or htr.ChartElementType = ChartElementType.Gridlines Then
                         ChartCMS.Show(TheChart, mouseEvent.Location)
@@ -311,6 +315,9 @@ Namespace Forms.ChartForm
                                 BondSetCMS.Tag = item.Tag
                                 BondSetCMS.Show(TheChart, mouseEvent.Location)
                             ElseIf TypeOf _ansamble(item.Tag) Is BondCurve Then
+                                BondCurveCMS.Tag = item.Tag
+                                BondCurveCMS.Show(TheChart, mouseEvent.Location)
+                            ElseIf TypeOf _ansamble(item.Tag) Is ChainCurve Then
                                 BondCurveCMS.Tag = item.Tag
                                 BondCurveCMS.Show(TheChart, mouseEvent.Location)
                             ElseIf TypeOf _ansamble(item.Tag) Is SwapCurve Then
@@ -803,8 +810,8 @@ Namespace Forms.ChartForm
             Dim src = ChainCurveSrc.LoadById(id)
 
             Dim curve = New ChainCurve(_ansamble, src)
-            AddHandler curve.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnChainCurvePaint(data)
-            AddHandler curve.Updated, AddressOf OnChainCurvePaint
+            AddHandler curve.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnChainCurvePaint(curve, data)
+            AddHandler curve.Updated, Sub(lst) OnChainCurvePaint(curve, lst)
             AddHandler curve.Cleared, Sub() ClearSeries(curve.Identity)
             _ansamble.Items.Add(curve)
             curve.Subscribe()
@@ -996,7 +1003,7 @@ Namespace Forms.ChartForm
 
         Private Sub DeleteBondCurveTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles DeleteBondCurveTSMI.Click
             If BondCurveCMS.Tag Is Nothing Then Return
-            Dim crv = CType(_ansamble(BondCurveCMS.Tag), BondCurve)
+            Dim crv = CType(_ansamble(BondCurveCMS.Tag), Group)
             _ansamble(crv.Identity).Cleanup()
         End Sub
 
@@ -1026,11 +1033,31 @@ Namespace Forms.ChartForm
 
         Private Sub BondCurveCMS_Opening(ByVal sender As Object, ByVal e As CancelEventArgs) Handles BondCurveCMS.Opening
             If BondCurveCMS.Tag Is Nothing Then Return
-            Dim curve = CType(_ansamble(BondCurveCMS.Tag), BondCurve)
-            BootstrappingToolStripMenuItem.Checked = curve.Bootstrapped
-            For Each item As ToolStripMenuItem In (From elem In InterpolationTSMI.DropDownItems Where TypeOf elem Is ToolStripMenuItem)
-                item.Checked = curve.EstModel IsNot Nothing AndAlso item.Tag = curve.EstModel.ItemName
-            Next
+            If TypeOf _ansamble(BondCurveCMS.Tag) Is BondCurve Then
+                ShowBondCurveItemsTSMI.Visible = True
+                LabelingModeToolStripMenuItem.Visible = True
+                InterpolationTSMI.Visible = True
+                BootstrappingToolStripMenuItem.Visible = True
+                BondCurveImportantTSS.Visible = True
+                SelectDateTSMI.Visible = True
+                BondCurveImportantTSS0.Visible = True
+
+                Dim curve = CType(_ansamble(BondCurveCMS.Tag), BondCurve)
+                BootstrappingToolStripMenuItem.Checked = curve.Bootstrapped
+                For Each item As ToolStripMenuItem In (From elem In InterpolationTSMI.DropDownItems Where TypeOf elem Is ToolStripMenuItem)
+                    item.Checked = curve.EstModel IsNot Nothing AndAlso item.Tag = curve.EstModel.ItemName
+                Next
+            ElseIf TypeOf _ansamble(BondCurveCMS.Tag) Is ChainCurve Then
+                ShowBondCurveItemsTSMI.Visible = False
+                LabelingModeToolStripMenuItem.Visible = False
+                InterpolationTSMI.Visible = False
+                BootstrappingToolStripMenuItem.Visible = False
+                BondCurveImportantTSS.Visible = False
+                SelectDateTSMI.Visible = False
+                BondCurveImportantTSS0.Visible = False
+                SelectDateTSMI.Visible = False
+                BondCurveImportantTSS0.Visible = False
+            End If
         End Sub
 
         Private Sub SelectDateToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As EventArgs) Handles SelectDateToolStripMenuItem.Click
