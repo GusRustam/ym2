@@ -18,6 +18,7 @@ Namespace Tools.Elements
         Public Sub New(ByVal ansamble As Ansamble, ByVal src As ChainCurveSrc)
             MyBase.New(ansamble, src.Fields)
             Color = src.Color
+            Nm = src.Name
 
             ' Loading curve items (getDefaultRics returns chain ric and I am loading items)
             _chainLoader.StartChains(src.GetDefaultRics(), src.Skip)

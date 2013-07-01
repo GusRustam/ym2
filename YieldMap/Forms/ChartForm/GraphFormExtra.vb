@@ -343,6 +343,15 @@ Namespace Forms.ChartForm
                 elem.Checked = refCurve IsNot Nothing AndAlso item.Identity = CType(refCurve, Identifyable).Identity
                 elem.Tag = item
             Next item
+
+            items = (From elem In _ansamble.Items Where TypeOf elem.Value Is ChainCurve Select elem.Value).ToList()
+            If SpreadCMS.Items.Count > 0 And items.Any Then SpreadCMS.Items.Add(New ToolStripSeparator)
+            For Each item In items
+                Dim elem = CType(SpreadCMS.Items.Add(item.Name, Nothing, AddressOf OnBenchmarkSelected), ToolStripMenuItem)
+                elem.CheckOnClick = True
+                elem.Checked = refCurve IsNot Nothing AndAlso item.Identity = CType(refCurve, Identifyable).Identity
+                elem.Tag = item
+            Next item
             SpreadCMS.Show(MousePosition)
         End Sub
 
