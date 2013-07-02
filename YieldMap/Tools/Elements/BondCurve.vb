@@ -269,8 +269,15 @@ Namespace Tools.Elements
         End Sub
 
         Public Function RateArray() As Array Implements ICurve.RateArray
-            If Not _lastCurve.ContainsKey(Yield) Then Return Nothing
-            Dim list = (From elem In _lastCurve(Yield) Select New XY(elem.TheX, elem.TheY)).ToList()
+            Dim list As List(Of XY)
+            If IsSynthetic Then
+                list = (From elem In _lastSyntCurve
+                        Let q = elem.QuotesAndYields.Main
+                        Select New XY(q.Duration, q.Yield)).ToList()
+            Else
+                If Not _lastCurve.ContainsKey(Yield) Then Return Nothing
+                list = (From elem In _lastCurve(Yield) Select New XY(elem.TheX, elem.TheY)).ToList()
+            End If
             list.Sort()
             Dim len = list.Count - 1
             Dim res(0 To len, 1) As Object

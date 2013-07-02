@@ -635,10 +635,7 @@ Namespace Forms.ChartForm
                     ClearLegendItems(crv.Identity)
                     TheChart.Legends(0).CustomItems.Add(New LegendItem(crv.Name, clr, "") With {.Tag = crv.Identity})
 
-                    For Each point In data.Cast(Of PointOfBondCurve)()
-                        Dim pnt = New DataPoint(point.TheX, point.TheY) With {.Tag = crv}
-                        srs.Points.Add(pnt)
-                    Next
+                    srs.Points.AddRange(From point In data Select New DataPoint(point.TheX, point.TheY) With {.Tag = crv})
                     SetChartMinMax()
                 End Sub)
         End Sub

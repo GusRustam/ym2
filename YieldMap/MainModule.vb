@@ -61,6 +61,7 @@ Module MainModule
             CloseAllCharts()
             ShutdownController.Shutdown()
             CoUninitialize()
+            Application.Exit()
         End Sub
     End Class
 

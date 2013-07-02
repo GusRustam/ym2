@@ -1,4 +1,5 @@
-﻿Imports System.Reflection
+﻿Imports System.Windows.Forms.DataVisualization.Charting
+Imports System.Reflection
 Imports System.IO
 Imports System.Runtime.CompilerServices
 Imports System.Windows.Forms
@@ -282,5 +283,12 @@ Public Module Extensions
         attr = xml.CreateAttribute(attrName)
         attr.Value = attrVal
         node.Attributes.Append(attr)
+    End Sub
+
+    <Extension()>
+    Public Sub AddRange(ByVal this As DataPointCollection, ByVal points As IEnumerable(Of DataPoint))
+        For Each pnt In points
+            this.Add(pnt)
+        Next
     End Sub
 End Module
