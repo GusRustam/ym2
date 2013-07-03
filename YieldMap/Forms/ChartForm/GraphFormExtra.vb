@@ -460,17 +460,15 @@ Namespace Forms.ChartForm
                             .Tag = id
                         }
                         TheChart.Series.Add(theSeries)
-                        For Each tpl In points
-                            Dim point = New DataPoint(tpl.Item1.Duration, tpl.Item1.Yield.Value) With {
-                                            .Tag = New HistoryPointTag With {
-                                                .Ric = bondDataPoint.RIC,
-                                                .Descr = tpl.Item1,
-                                                .Meta = tpl.Item2,
-                                                .SeriesId = id
-                                            }
-                                }
-                            theSeries.Points.Add(point)
-                        Next
+                        theSeries.Points.AddRange(From tpl In points
+                                                  Select New DataPoint(tpl.Item1.Duration, tpl.Item1.Yield.Value) With {
+                                                        .Tag = New HistoryPointTag With {
+                                                            .Ric = bondDataPoint.Ric,
+                                                            .Descr = tpl.Item1,
+                                                            .Meta = tpl.Item2,
+                                                            .SeriesId = id
+                                                            }
+                                                    })
                     End If
 
                 End Sub)
@@ -558,9 +556,7 @@ Namespace Forms.ChartForm
                     ClearLegendItems(crv.Identity)
                     TheChart.Legends(0).CustomItems.Add(New LegendItem(crv.Name, crv.OuterColor, "") With {.Tag = crv.Identity})
 
-                    For Each pnt In From point In data Select New DataPoint(point.TheX, point.TheY) With {.Tag = crv}
-                        srs.Points.Add(pnt)
-                    Next
+                    srs.Points.AddRange(From point In data Select New DataPoint(point.TheX, point.TheY) With {.Tag = crv})
                     SetChartMinMax()
                 End Sub)
         End Sub
@@ -598,18 +594,14 @@ Namespace Forms.ChartForm
                     TheChart.Legends(0).CustomItems.Add(New LegendItem(crv.Name, clr, "") With {.Tag = crv.Identity})
 
                     If itsBond Then
-                        For Each point In data.Cast(Of PointOfBondCurve)()
-                            Dim pnt = New DataPoint(point.TheX, point.TheY) With {
-                                .Tag = point.Bond,
-                                .Label = point.Label
-                            }
-                            srs.Points.Add(pnt)
-                        Next
+                        srs.Points.AddRange(From point In data.Cast(Of PointOfBondCurve)()
+                                            Select New DataPoint(point.TheX, point.TheY) With {
+                                                .Tag = point.Bond,
+                                                .Label = point.Label
+                                            })
                     Else
-                        For Each point In data.Cast(Of JustPoint)()
-                            Dim pnt = New DataPoint(point.TheX, point.TheY) With {.Tag = point.Curve}
-                            srs.Points.Add(pnt)
-                        Next
+                        srs.Points.AddRange(From point In data.Cast(Of JustPoint)()
+                                            Select New DataPoint(point.TheX, point.TheY) With {.Tag = point.Curve})
                     End If
                     SetChartMinMax()
                 End Sub)

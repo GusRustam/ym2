@@ -1476,35 +1476,36 @@
             Me.MenuStrip1.Size = New System.Drawing.Size(913, 24)
             Me.MenuStrip1.TabIndex = 0
             Me.MenuStrip1.Text = "MenuStrip1"
+            Me.MenuStrip1.Visible = False
             '
             'FileToolStripMenuItem
             '
             Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.OpenToolStripMenuItem, Me.ImportToolStripMenuItem, Me.ToolStripMenuItem1, Me.CloseToolStripMenuItem})
             Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
-            Me.FileToolStripMenuItem.Size = New System.Drawing.Size(37, 20)
+            Me.FileToolStripMenuItem.Size = New System.Drawing.Size(35, 20)
             Me.FileToolStripMenuItem.Text = "File"
             '
             'OpenToolStripMenuItem
             '
             Me.OpenToolStripMenuItem.Name = "OpenToolStripMenuItem"
-            Me.OpenToolStripMenuItem.Size = New System.Drawing.Size(119, 22)
+            Me.OpenToolStripMenuItem.Size = New System.Drawing.Size(118, 22)
             Me.OpenToolStripMenuItem.Text = "Open..."
             '
             'ImportToolStripMenuItem
             '
             Me.ImportToolStripMenuItem.Name = "ImportToolStripMenuItem"
-            Me.ImportToolStripMenuItem.Size = New System.Drawing.Size(119, 22)
+            Me.ImportToolStripMenuItem.Size = New System.Drawing.Size(118, 22)
             Me.ImportToolStripMenuItem.Text = "Import..."
             '
             'ToolStripMenuItem1
             '
             Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(116, 6)
+            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(115, 6)
             '
             'CloseToolStripMenuItem
             '
             Me.CloseToolStripMenuItem.Name = "CloseToolStripMenuItem"
-            Me.CloseToolStripMenuItem.Size = New System.Drawing.Size(119, 22)
+            Me.CloseToolStripMenuItem.Size = New System.Drawing.Size(118, 22)
             Me.CloseToolStripMenuItem.Text = "Close"
             '
             'PortfolioForm

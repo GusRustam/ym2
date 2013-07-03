@@ -2,6 +2,7 @@
 Imports System.Reflection
 Imports AdfinXAnalyticsFunctions
 Imports System.ComponentModel
+Imports System.Globalization
 Imports NLog
 Imports Uitls
 
@@ -95,7 +96,7 @@ Namespace Bonds
             Dim vl As Single
             Try
                 dt = CDate(values(1))
-                vl = CSng(values(2))
+                vl = Single.Parse(values(2), CultureInfo.InvariantCulture)
             Catch ex As Exception
                 Throw New InvalidExpressionException(String.Format("Invalid format for simple variable {0}", value), ex)
             End Try
@@ -142,11 +143,11 @@ Namespace Bonds
                 If values.Count = 3 Then
                     dt1 = ReutersDate.ReutersToDate(values(1))
                     dt2 = dt1
-                    vl = CSng(values(2))
+                    vl = Single.Parse(values(2), CultureInfo.InvariantCulture)
                 Else
                     dt1 = ReutersDate.ReutersToDate(values(1))
                     dt2 = ReutersDate.ReutersToDate(values(2))
-                    vl = CSng(values(3))
+                    vl = Single.Parse(values(3), CultureInfo.InvariantCulture)
                 End If
             Catch ex As Exception
                 Throw New InvalidExpressionException(String.Format("Invalid format for simple variable {0}", value), ex)
@@ -662,8 +663,8 @@ Namespace Bonds
         End Function
 
         Public Function GetFixedRate() As Single
-            If _rate <> "" Then Return CSng(_rate)
-            If _stepCouponPattern.Any Then Return CSng(_stepCouponPattern(0).Item2)
+            If _rate <> "" Then Return Single.Parse(_rate, CultureInfo.InvariantCulture)
+            If _stepCouponPattern.Any Then Return Single.Parse(_stepCouponPattern(0).Item2, CultureInfo.InvariantCulture)
             Return 0
         End Function
 

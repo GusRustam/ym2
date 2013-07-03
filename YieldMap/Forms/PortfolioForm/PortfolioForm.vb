@@ -481,6 +481,7 @@ Namespace Forms.PortfolioForm
             a.CustomName = item.Name
             a.CustomColor = item.Color
             a.Condition = item.Condition
+            a.Include = item.Included
 
             If a.ShowDialog() = DialogResult.OK Then
                 If a.Data.Src Is Nothing Then Return

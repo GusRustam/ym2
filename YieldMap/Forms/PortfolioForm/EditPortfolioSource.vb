@@ -31,6 +31,15 @@ Namespace Forms.PortfolioForm
             End Set
         End Property
 
+        Public Property Include() As Boolean
+            Get
+                Return IncludeCB.Checked
+            End Get
+            Set(ByVal value As Boolean)
+                IncludeCB.Checked = value
+            End Set
+        End Property
+
         Public Property Condition() As String
             Get
                 Return ConditionTB.Text

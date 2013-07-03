@@ -1,6 +1,7 @@
 ﻿Imports System.Xml
 Imports System.IO
 Imports DbManager.Bonds
+Imports System.Globalization
 Imports NLog
 Imports Uitls
 
@@ -597,7 +598,7 @@ Public Class PortfolioManager
                                            Select New CustomBondSrc(node.GetAttrStrict("id"), node.GetAttr("color"),
                                                                  node.GetAttrStrict("name"), node.GetAttr("code"),
                                                                  node.GetAttr("bondStructure"), node.GetAttr("maturity").Trim(),
-                                                                 node.GetAttrStrict("coupon")))
+                                                                 Double.Parse(node.GetAttrStrict("coupon"), CultureInfo.InvariantCulture)))
         End Get
     End Property
 

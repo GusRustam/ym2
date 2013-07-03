@@ -602,10 +602,9 @@
             Me.Label9.Location = New System.Drawing.Point(202, 12)
             Me.Label9.Margin = New System.Windows.Forms.Padding(0)
             Me.Label9.Name = "Label9"
-            Me.Label9.Size = New System.Drawing.Size(135, 13)
+            Me.Label9.Size = New System.Drawing.Size(81, 13)
             Me.Label9.TabIndex = 45
-            Me.Label9.Text = "Fields not shown by default"
-            Me.Label9.Visible = False
+            Me.Label9.Text = "Excluded fields:"
             '
             'Label3
             '
@@ -615,10 +614,9 @@
             Me.Label3.Location = New System.Drawing.Point(3, 12)
             Me.Label3.Margin = New System.Windows.Forms.Padding(0)
             Me.Label3.Name = "Label3"
-            Me.Label3.Size = New System.Drawing.Size(70, 13)
+            Me.Label3.Size = New System.Drawing.Size(74, 13)
             Me.Label3.TabIndex = 45
-            Me.Label3.Text = "Fields priority:"
-            Me.Label3.Visible = False
+            Me.Label3.Text = "Allowed fields:"
             '
             'MainGeneralTabPage
             '
