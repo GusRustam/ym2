@@ -125,6 +125,7 @@ Namespace Forms.PortfolioForm
             RefreshChainsLists()
             RefreshFieldsList()
             RefreshCustomBondList()
+            RefreshChainCurves()
 
             For Each clr In Utils.GetColorList()
                 CustomBondColorCB.Items.Add(clr)
@@ -607,8 +608,8 @@ Namespace Forms.PortfolioForm
             End If
 
             Dim items = (From row As DataGridViewRow In ChainsListsGrid.SelectedRows
-                         Where TypeOf row.DataBoundItem Is DbManager.ChainSrc
-                         Select CType(row.DataBoundItem, DbManager.ChainSrc).ChainRic).ToList()
+                         Where TypeOf row.DataBoundItem Is ChainSrc
+                         Select CType(row.DataBoundItem, ChainSrc).ChainRic).ToList()
 
             If Not items.Any Then
                 MessageBox.Show("Please select one or more chains to reload", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
@@ -1229,6 +1230,198 @@ Namespace Forms.PortfolioForm
         Private Sub DisableEveryThing()
             DoToggle(False)
         End Sub
+#End Region
+
+#Region "Chain curves TAB"
+        Private Sub RefreshChainCurves()
+            For Each clr In Utils.GetColorList()
+                ChainCurveColorCB.Items.Add(clr)
+            Next
+            ChainCurveFieldSetCB.DataSource = PortfolioManager.GetFieldLayouts
+            ChainCurvesDGV.DataSource = PortfolioManager.CurveChainsView
+            ClearChainCurveFields()
+        End Sub
+
+        Private Sub ChainCurveRandomColorButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles RandomColorChainCurveButton.Click
+            ChainCurveColorCB.SelectedIndex = New Random().NextDouble() * ChainCurveColorCB.Items.Count
+            ChainCurveColorPB.BackColor = Color.FromName(ChainCurveColorCB.SelectedItem)
+        End Sub
+
+        Private Sub CustomBondColorCB_DrawItem(ByVal sender As Object, ByVal e As DrawItemEventArgs) Handles ChainCurveColorCB.DrawItem
+            Dim g As Graphics = e.Graphics
+            Dim r As Rectangle = e.Bounds
+            If e.Index > 0 Then
+                Dim txt As String = ChainCurveColorCB.Items(e.Index)
+                g.DrawString(txt, ChainCurveColorCB.Font, Brushes.Black, r.X, r.Top)
+                Dim m = g.MeasureString(txt, CustomBondColorCB.Font)
+                Dim c As Color = Color.FromName(txt)
+                g.FillRectangle(New SolidBrush(c), r.X + m.Width + 10, r.Y + 2, r.Width - m.Width - 15, r.Height - 6)
+                g.DrawRectangle(New Pen(New SolidBrush(Color.Black)), r.X + m.Width + 10, r.Y + 2, r.Width - m.Width - 15, r.Height - 6)
+            End If
+        End Sub
+
+        Private Sub ChainCurveColorCB_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs) Handles ChainCurveColorCB.SelectedIndexChanged, CustomBondColorCB.SelectedIndexChanged
+            If ChainCurveColorCB.SelectedIndex < 0 Then
+                ChainCurveColorPB.BackColor = Color.White
+            Else
+                ChainCurveColorPB.BackColor = Color.FromName(ChainCurveColorCB.SelectedItem)
+            End If
+        End Sub
+
+        Private Enum ChainCurveMode
+            NewCc
+            EditCc
+        End Enum
+        Private _ccMode As ChainCurveMode = ChainCurveMode.NewCC
+        Private _currentChainCurveId As String
+
+        Private Class ChainCurveDescr
+            Public ReadOnly Id As String
+            Public ReadOnly Ric As String
+            Public ReadOnly Name As String
+            Public ReadOnly Color As String
+            Public ReadOnly Skip As String
+            Public ReadOnly Pattern As String
+            Public ReadOnly FsId As String
+
+            Public Sub New(ByVal color As String, ByVal fsId As String, ByVal id As String, ByVal name As String, ByVal ric As String, ByVal skip As String, ByVal pattern As String)
+                Me.Color = color
+                Me.FsId = fsId
+                Me.Id = id
+                Me.Name = name
+                Me.Ric = ric
+                Me.Skip = skip
+                Me.Pattern = pattern
+            End Sub
+        End Class
+
+        Private _tmp As ChainCurveDescr
+
+        Private Sub AddNewChainCurveButton_Click(sender As Object, e As EventArgs) Handles AddNewChainCurveButton.Click
+            _ccMode = ChainCurveMode.NewCc
+            _currentChainCurveId = ""
+            ClearChainCurveFields()
+            For i = 0 To ChainCurvesDGV.Rows.Count - 1
+                ChainCurvesDGV.Rows(i).Selected = False
+            Next
+        End Sub
+
+        Private Sub ClearChainCurveFields()
+            ChainCurveRicTB.Text = ""
+            ChainCurveNameTB.Text = ""
+            ChainCurveColorCB.SelectedIndex = -1
+            ChainCurvePatternTB.Text = ""
+            ChainCurveSkipTB.Text = ""
+            ChainCurveFieldSetCB.SelectedIndex = -1
+        End Sub
+
+        Private Sub FillChainCurveFields(ByVal chainCrv As ChainCurveSrc)
+            ChainCurveRicTB.Text = chainCrv.Ric
+            ChainCurveNameTB.Text = chainCrv.Name
+            ChainCurveColorCB.SelectedItem = chainCrv.Color
+            ChainCurvePatternTB.Text = chainCrv.Pattern
+            ChainCurveSkipTB.Text = chainCrv.Skip
+
+            Dim i = 0
+            Do
+                Dim item = CType(ChainCurveFieldSetCB.Items(i), IdName(Of String))
+                If item.Id = chainCrv.FieldSetId Then
+                    ChainCurveFieldSetCB.SelectedIndex = i
+                    Exit Do
+                End If
+                i += 1
+            Loop While i < ChainCurveFieldSetCB.Items.Count
+        End Sub
+
+        Private Sub EditChainCurveButton_Click(sender As Object, e As EventArgs) Handles EditChainCurveButton.Click
+            If ChainCurvesDGV.SelectedRows.Count = 0 Then
+                MessageBox.Show("Please select chain curve to edit", "Edit chain curve", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Return
+            End If
+            Dim chainCrv = CType(ChainCurvesDGV.SelectedRows(0).DataBoundItem, ChainCurveSrc)
+            _currentChainCurveId = chainCrv.ID
+            FillChainCurveFields(chainCrv)
+        End Sub
+
+        Private Sub ChainCurvesDGV_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs) Handles ChainCurvesDGV.CellDoubleClick
+            Dim chainCrv = CType(ChainCurvesDGV.Rows(e.RowIndex).DataBoundItem, ChainCurveSrc)
+            _currentChainCurveId = chainCrv.ID
+            FillChainCurveFields(chainCrv)
+        End Sub
+
+        Private Sub SaveChainCurveChangesButton_Click(sender As Object, e As EventArgs) Handles SaveChainCurveChangesButton.Click
+            If _ccMode = ChainCurveMode.EditCc Then
+            Else
+            End If
+        End Sub
+
+        Private Sub DeleteChainCurveButton_Click(sender As Object, e As EventArgs) Handles DeleteChainCurveButton.Click
+            If ChainCurvesDGV.SelectedRows.Count = 0 Then
+                MessageBox.Show("Please select chain curve to delete", "Delete chain curve", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            ElseIf MessageBox.Show("Are you sure you would like to delete the curve?", "Delete chain curve", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
+                Dim chainCrv = CType(ChainCurvesDGV.SelectedRows(0).DataBoundItem, ChainCurveSrc)
+                PortfolioManager.DeleteSource(chainCrv)
+
+                StoreCurrentFields()
+                RefreshChainCurves()
+                RestoreCurrentFields()
+
+                If chainCrv.ID = _currentChainCurveId Then
+                    _ccMode = ChainCurveMode.NewCc
+                    _currentChainCurveId = ""
+                End If
+            End If
+        End Sub
+
+        Private Sub RestoreCurrentFields()
+            If _tmp Is Nothing Then Return
+            ChainCurveRicTB.Text = _tmp.Ric
+            ChainCurveNameTB.Text = _tmp.Name
+            ChainCurvePatternTB.Text = _tmp.Pattern
+            ChainCurveSkipTB.Text = _tmp.Skip
+
+            If _tmp.Color IsNot Nothing Then ChainCurveColorCB.SelectedItem = _tmp.Color
+
+            If _tmp.FsId IsNot Nothing Then
+                Dim i = 0
+                Do
+                    Dim item = CType(ChainCurveFieldSetCB.Items(i), IdName(Of String))
+                    If item.Id = _tmp.FsId Then
+                        ChainCurveFieldSetCB.SelectedIndex = i
+                        Exit Do
+                    End If
+                    i += 1
+                Loop While i < ChainCurveFieldSetCB.Items.Count
+            End If
+
+            If _tmp.Id IsNot Nothing AndAlso ChainCurvesDGV.Rows.Count > 0 Then
+                _currentChainCurveId = _tmp.Id
+                Dim i = 0
+                Do
+                    Dim item = CType(ChainCurvesDGV.Rows(i).DataBoundItem, ChainCurveSrc)
+                    If item.ID = _tmp.Id Then
+                        ChainCurvesDGV.Rows(i).Selected = True
+                    Else
+                        ChainCurvesDGV.Rows(i).Selected = False
+                    End If
+                    i += 1
+                Loop While i < ChainCurvesDGV.Rows.Count
+            End If
+            _tmp = Nothing
+        End Sub
+
+        Private Sub StoreCurrentFields()
+            _tmp = New ChainCurveDescr(ChainCurveColorCB.SelectedItem,
+                                       If(ChainCurveFieldSetCB.SelectedValue IsNot Nothing,
+                                          CType(ChainCurveFieldSetCB.SelectedValue, 
+                                              IdName(Of String)).Id, Nothing),
+                                       _currentChainCurveId,
+                                       ChainCurveNameTB.Text,
+                                       ChainCurveRicTB.Text,
+                                       ChainCurveSkipTB.Text,
+                                       ChainCurvePatternTB.Text)
+        End Sub
+
 #End Region
 
     End Class

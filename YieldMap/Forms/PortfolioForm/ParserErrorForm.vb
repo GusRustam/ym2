@@ -73,7 +73,7 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub AddDateButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AddDateButton.Click
-            InsertText(DateTimePckr.Value.Date, "#{0:dd/MM/yyyy}# ")
+            InsertText(DateTimePckr.Value.Date.ToString("#{0:dd/MM/yyyy}#").Replace(".", "\"), "{0} ")
         End Sub
     End Class
 End Namespace

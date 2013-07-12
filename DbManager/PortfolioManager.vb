@@ -576,6 +576,9 @@ Public Class PortfolioManager
             Next
             Dim elem = _bonds.SelectSingleNode(String.Format("/bonds/custom-bonds/bond[@id='{0}']", src.ID))
             elem.ParentNode.RemoveChild(elem)
+        ElseIf TypeOf src Is ChainCurveSrc Then
+            Dim elem = _bonds.SelectSingleNode(String.Format("/bonds/chain-curves/curve[@id='{0}']", src.ID))
+            elem.ParentNode.RemoveChild(elem)
         Else
             Logger.Warn("DeleteSource(): unsupported source type {0}", src.GetType())
             Return
