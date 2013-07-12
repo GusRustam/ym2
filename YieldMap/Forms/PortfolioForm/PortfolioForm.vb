@@ -1353,14 +1353,19 @@ Namespace Forms.PortfolioForm
 
         Private Sub SaveChainCurveChangesButton_Click(sender As Object, e As EventArgs) Handles SaveChainCurveChangesButton.Click
             If ValidToSave Then
-                Dim chainCurveSrc = GetCurrentSource()
                 If _ccMode = ChainCurveMode.EditCc Then
+                    Dim chainCurveSrc = GetCurrentSource()
                     PortfolioManager.UpdateSource(chainCurveSrc)
                 Else
+                    Dim chainCurveSrc = GetCurrentSourceNew()
                     PortfolioManager.AddSource(chainCurveSrc)
                     _ccMode = ChainCurveMode.EditCc
                     _currentChainCurveId = chainCurveSrc.ID
                 End If
+
+                StoreCurrentFields()
+                RefreshChainCurves()
+                RestoreCurrentFields()
             End If
         End Sub
 
@@ -1392,6 +1397,15 @@ Namespace Forms.PortfolioForm
         Private Function GetCurrentSource() As ChainCurveSrc
             Return New ChainCurveSrc(_currentChainCurveId,
                                      ChainCurveColorCB.SelectedItem,
+                                     ChainCurveNameTB.Text,
+                                     ChainCurvePatternTB.Text,
+                                     ChainCurveRicTB.Text,
+                                     ChainCurveSkipTB.Text,
+                                     New FieldSet(CType(ChainCurveFieldSetCB.SelectedValue, IdName(Of String)).Id))
+        End Function
+
+        Private Function GetCurrentSourceNew() As ChainCurveSrc
+            Return New ChainCurveSrc(ChainCurveColorCB.SelectedItem,
                                      ChainCurveNameTB.Text,
                                      ChainCurvePatternTB.Text,
                                      ChainCurveRicTB.Text,

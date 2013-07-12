@@ -529,7 +529,7 @@ Public Class ChainCurveSrc
             Dim name = node.GetAttrStrict("name")
             Dim pattern = node.GetAttrStrict("pattern")
             Dim ric = node.GetAttrStrict("ric")
-            Dim skip = node.GetAttrStrict("skip")
+            Dim skip = node.GetAttr("skip")
             Dim fsId = node.GetAttrStrict("field-set")
             Return New ChainCurveSrc(bndId, color, name, pattern, ric, skip, New FieldSet(fsId))
         Catch ex As Exception
