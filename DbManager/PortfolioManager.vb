@@ -479,6 +479,19 @@ Public Class PortfolioManager
             _bonds.AppendAttr(newBondNode, "bondStructure", bond.Struct.ToString())
             parent.AppendChild(newBondNode)
             SaveBonds()
+        ElseIf TypeOf src Is ChainCurveSrc Then
+            Dim bond = CType(src, ChainCurveSrc)
+            Dim parent = _bonds.SelectSingleNode("/bonds/chain-curves")
+            Dim newBondNode = _bonds.CreateNode(XmlNodeType.Element, "curve", "")
+            _bonds.AppendAttr(newBondNode, "id", bond.ID)
+            _bonds.AppendAttr(newBondNode, "name", bond.Name)
+            _bonds.AppendAttr(newBondNode, "color", bond.Color)
+            _bonds.AppendAttr(newBondNode, "ric", bond.Ric)
+            _bonds.AppendAttr(newBondNode, "skip", bond.Skip)
+            _bonds.AppendAttr(newBondNode, "pattern", bond.Pattern)
+            _bonds.AppendAttr(newBondNode, "field-set", bond.Fields.ID)
+            parent.AppendChild(newBondNode)
+            SaveBonds()
         Else
             Logger.Warn("AddSource(): unsupported source type {0}", src.GetType())
         End If
@@ -528,6 +541,21 @@ Public Class PortfolioManager
             _bonds.UpdateAttr(bondNode, "maturity", If(bond.Maturity.HasValue, ReutersDate.DateToReuters(bond.Maturity), ""))
             _bonds.UpdateAttr(bondNode, "coupon", bond.CurrentCouponRate)
             _bonds.UpdateAttr(bondNode, "bondStructure", bond.Struct.ToString())
+            SaveBonds()
+        ElseIf TypeOf src Is ChainCurveSrc Then
+            Dim bond = CType(src, ChainCurveSrc)
+            Dim bondNode = _bonds.SelectSingleNode(String.Format("/bonds/chain-curves/curve[@id='{0}']", src.ID))
+            If bondNode Is Nothing Then
+                Logger.Error("No chain curve with id {0} found", src.ID)
+                Return
+            End If
+            _bonds.UpdateAttr(bondNode, "id", bond.ID)
+            _bonds.UpdateAttr(bondNode, "name", bond.Name)
+            _bonds.UpdateAttr(bondNode, "color", bond.Color)
+            _bonds.UpdateAttr(bondNode, "ric", bond.Ric)
+            _bonds.UpdateAttr(bondNode, "skip", bond.Skip)
+            _bonds.UpdateAttr(bondNode, "pattern", bond.Pattern)
+            _bonds.UpdateAttr(bondNode, "field-set", bond.Fields.ID)
             SaveBonds()
         Else
             Logger.Warn("UpdateSource(): unsupported source type {0}", src.GetType())

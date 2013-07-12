@@ -1298,6 +1298,7 @@ Namespace Forms.PortfolioForm
         Private _tmp As ChainCurveDescr
 
         Private Sub AddNewChainCurveButton_Click(sender As Object, e As EventArgs) Handles AddNewChainCurveButton.Click
+            ErrProv.Clear()
             _ccMode = ChainCurveMode.NewCc
             _currentChainCurveId = ""
             ClearChainCurveFields()
@@ -1334,6 +1335,7 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub EditChainCurveButton_Click(sender As Object, e As EventArgs) Handles EditChainCurveButton.Click
+            ErrProv.Clear()
             If ChainCurvesDGV.SelectedRows.Count = 0 Then
                 MessageBox.Show("Please select chain curve to edit", "Edit chain curve", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Return
@@ -1350,10 +1352,52 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub SaveChainCurveChangesButton_Click(sender As Object, e As EventArgs) Handles SaveChainCurveChangesButton.Click
-            If _ccMode = ChainCurveMode.EditCc Then
-            Else
+            If ValidToSave Then
+                Dim chainCurveSrc = GetCurrentSource()
+                If _ccMode = ChainCurveMode.EditCc Then
+                    PortfolioManager.UpdateSource(chainCurveSrc)
+                Else
+                    PortfolioManager.AddSource(chainCurveSrc)
+                    _ccMode = ChainCurveMode.EditCc
+                    _currentChainCurveId = chainCurveSrc.ID
+                End If
             End If
         End Sub
+
+        Private Function ValidToSave() As Boolean
+            ErrProv.Clear()
+            If ChainCurveRicTB.Text = "" Then
+                ErrProv.SetError(ChainCurveRicTB, "Please enter ric")
+                Return False
+            End If
+            If ChainCurveNameTB.Text = "" Then
+                ErrProv.SetError(ChainCurveNameTB, "Please enter name")
+                Return False
+            End If
+            If ChainCurveColorCB.SelectedIndex < 0 Then
+                ErrProv.SetError(ChainCurveColorCB, "Please select color")
+                Return False
+            End If
+            If ChainCurvePatternTB.Text = "" Then
+                ErrProv.SetError(ChainCurvePatternTB, "Please enter pattern")
+                Return False
+            End If
+            If ChainCurveFieldSetCB.SelectedIndex < 0 Then
+                ErrProv.SetError(ChainCurveFieldSetCB, "Please select field set")
+                Return False
+            End If
+            Return True
+        End Function
+
+        Private Function GetCurrentSource() As ChainCurveSrc
+            Return New ChainCurveSrc(_currentChainCurveId,
+                                     ChainCurveColorCB.SelectedItem,
+                                     ChainCurveNameTB.Text,
+                                     ChainCurvePatternTB.Text,
+                                     ChainCurveRicTB.Text,
+                                     ChainCurveSkipTB.Text,
+                                     New FieldSet(CType(ChainCurveFieldSetCB.SelectedValue, IdName(Of String)).Id))
+        End Function
 
         Private Sub DeleteChainCurveButton_Click(sender As Object, e As EventArgs) Handles DeleteChainCurveButton.Click
             If ChainCurvesDGV.SelectedRows.Count = 0 Then
@@ -1413,8 +1457,8 @@ Namespace Forms.PortfolioForm
         Private Sub StoreCurrentFields()
             _tmp = New ChainCurveDescr(ChainCurveColorCB.SelectedItem,
                                        If(ChainCurveFieldSetCB.SelectedValue IsNot Nothing,
-                                          CType(ChainCurveFieldSetCB.SelectedValue, 
-                                              IdName(Of String)).Id, Nothing),
+                                          CType(ChainCurveFieldSetCB.SelectedValue, IdName(Of String)).Id,
+                                          Nothing),
                                        _currentChainCurveId,
                                        ChainCurveNameTB.Text,
                                        ChainCurveRicTB.Text,
