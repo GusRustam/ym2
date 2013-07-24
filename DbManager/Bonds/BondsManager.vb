@@ -85,7 +85,7 @@ Namespace Bonds
                          Where _subRicToRic.Keys.Contains(aRic) AndAlso row.ric = _subRicToRic(aRic)
                          Select row).ToList()
 
-            If Not items.Any Then Throw New NoBondException(aRic) ' todo will anybody catch it?
+            If Not items.Any Then Return Nothing
             Dim descr As BondsDataSet.BondRow = items.First()
 
             Dim coupon = If(Not IsDBNull(descr("currentCoupon")) AndAlso IsNumeric(descr.currentCoupon), CDbl(descr.currentCoupon), 0)
@@ -166,7 +166,10 @@ Namespace Bonds
         End Function
 
         Public Function GetBondInfo(ByVal rics As List(Of String)) As List(Of BondMetadata) Implements IBondsData.GetBondInfo
-            Return (From item In rics Select GetBondInfo(item)).ToList()
+            Return (From item In rics
+                    Let descr = GetBondInfo(item)
+                    Where descr IsNot Nothing
+                    Select descr).ToList()
         End Function
     End Class
 
@@ -205,7 +208,7 @@ Namespace Bonds
     Public Class BondLoaderProgressProcess
         Implements IProgressProcess
 
-        Private WithEvents _chainLoader As New ReutersData.Chain
+        Private WithEvents _chainLoader As New Chain
         Private ReadOnly _progress As New ProgressLog
         Private ReadOnly _handlers As New List(Of Action(Of ProgressEvent))
         Private Shared ReadOnly Logger As Logger = GetLogger(GetType(BondLoaderProgressProcess))

@@ -1,5 +1,7 @@
 Imports AdfinXAnalyticsFunctions
 Imports DbManager
+Imports System.Text.RegularExpressions
+Imports Settings
 Imports Uitls
 Imports ReutersData
 
@@ -34,7 +36,7 @@ Namespace Tools.Elements
             Dim paymentStructure = bond.MetaData.PaymentStructure
 
             Dim settleDate = _bondModule.BdSettle(GroupDate, paymentStructure)
-            Dim priceObject As Array = _bondModule.AdBondPrice(settleDate, yield, mat, 0, 0, paymentStructure, "RM:YTM", "", "RES:BDPRICE")
+            Dim priceObject As Array = _bondModule.AdBondPrice(settleDate, yield, mat, 0, 0, paymentStructure, "RM:" + SettingsManager.Instance.YieldCalcMode, "", "RES:BDPRICE")
             AddHandler bond.CustomPrice, Sub(bnd, prc) HandleNewQuote(bnd, BondFields.XmlName(bond.Fields.Custom), prc, GroupDate, False)
             bond.SetCustomPrice(100 * priceObject.GetValue(1))
             Return bond
@@ -180,7 +182,7 @@ Namespace Tools.Elements
                             Dim settleDate = _bondModule.BdSettle(GroupDate, meta.PaymentStructure)
                             Dim priceObject As Array = _bondModule.AdBondPrice(settleDate, main.Yield + data(i).UserDefinedSpread(Yield),
                                                                               meta.Maturity, params(i, 3), 0, meta.PaymentStructure,
-                                                                              meta.RateStructure, "", "RES:BDPRICE")
+                                                                              Regex.Replace(meta.RateStructure, "YT[A-Z]", SettingsManager.Instance.YieldCalcMode), "", "RES:BDPRICE")
                             params(i, 4) = priceObject.GetValue(1)
                         Else
                             params(i, 4) = main.Price / 100.0

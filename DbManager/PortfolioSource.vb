@@ -237,9 +237,9 @@ Public Class PortfolioStructure
             End If
             For Each ric In From item In src.Source.GetDefaultRics()
                             Where Not _excludes.Contains(item)
-                Try
-                    If Not TypeOf src.Source Is CustomBondSrc Then
-                        Dim descr = BondsData.Instance.GetBondInfo(ric)
+                If Not TypeOf src.Source Is CustomBondSrc Then
+                    Dim descr = BondsData.Instance.GetBondInfo(ric)
+                    If descr IsNot Nothing Then
                         If filter Then
                             Try
                                 If Not interpreter.Allows(descr) Then
@@ -251,12 +251,12 @@ Public Class PortfolioStructure
                                 Logger.Error("Exception = {0}", ex.ToString())
                             End Try
                         End If
+                    Else
+                        Logger.Warn("No bond {0}", ric)
                     End If
+                End If
 
-                    res.Add(ric)
-                Catch ex As NoBondException
-                    Logger.Warn("No bond {0}", ric)
-                End Try
+                res.Add(ric)
             Next
             Return New ReadOnlyCollection(Of String)(res)
         End Get
@@ -281,12 +281,11 @@ Public Class PortfolioStructure
                         Logger.ErrorException(String.Format("Failed to parse condition {0}", cond), ex)
                         Logger.Error("Exception = {0}", ex.ToString())
                     End Try
-
                 End If
-                For Each ric In src.Source.GetDefaultRics()
-                    If netted AndAlso _excludes.Contains(ric) Then Continue For
-                    Try
-                        Dim descr = BondsData.Instance.GetBondInfo(ric)
+                Dim tmp = src
+                For Each ric In From rc In tmp.Source.GetDefaultRics() Where Not (netted AndAlso _excludes.Contains(rc))
+                    Dim descr = BondsData.Instance.GetBondInfo(ric)
+                    If descr IsNot Nothing Then
                         If filter Then
                             Try
                                 If Not interpreter.Allows(descr) Then Continue For
@@ -298,9 +297,9 @@ Public Class PortfolioStructure
                         Dim type = src.Source.GetType().Name
                         description = New RicDescription(ric, descr.Label1, type, src.Name, src.Color, src.Included)
                         res.Add(description)
-                    Catch ex As NoBondException
+                    Else
                         Logger.Warn("No bond {0}", ric)
-                    End Try
+                    End If
                 Next
             Next
             Return New ReadOnlyCollection(Of RicDescription)(res)

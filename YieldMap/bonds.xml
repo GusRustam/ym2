@@ -17,7 +17,6 @@
         <field type="VOLUME">CF_VOLUME</field>
       </realtime>
     </field-set>
-    
     <field-set id="Eurobonds" name="Eurobonds description">
       <realtime>
         <field type="BID">275</field>
@@ -28,20 +27,17 @@
         <field type="LAST">CLOSE</field>
       </historical>
     </field-set>
-    
     <field-set id="Russian chain curves" name="Russian chain curves">
       <realtime>
         <field type="LAST">393</field>
       </realtime>
     </field-set>
-
     <field-set id="US chain curves" name="US chain curves">
       <realtime>
         <field type="LAST">356</field>
         <!--<field type="ASK">970</field>-->
       </realtime>
     </field-set>
-    
     <field-set id="Custom bonds" name="Custom bonds">
       <realtime>
         <field type="CUSTOM">CUSTOM</field>
@@ -58,17 +54,29 @@
   </chains>
   <!-- Lists -->
   <lists>
-    <list id="1" name="test" color="Violet" curve="False" field-set-id="MICEX">
-      <ric>/RU0A0GKKB7=MM</ric>
-      <ric>/RU0A0JR3B1=MM</ric>
-      <ric>/RU0A0DF2U3=MM</ric>
-      <ric>/RU0A0JTDR3=MM</ric>
-      <ric>/RU0A0JS0N1=MM</ric>
-      <ric>/RU0A0JTGE4=MM</ric>
-      <ric>/RU0A0JT1G2=MM</ric>
-      <ric>/RU0A0JPTP1=MM</ric>
-      <ric>/RU0A0JRWS5=MM</ric>
-      <ric>/RU0A0JP6R2=MM</ric>
+    <list id="89317" field-set-id="MICEX" name="OFZ" color="DarkKhaki" curve="True" enabled="True">
+      <ric>RU26212RMFS=MM</ric>
+      <ric>RU26211RMFS=MM</ric>
+      <ric>RU26210RMFS=MM</ric>
+      <ric>RU26209RMFS=MM</ric>
+      <ric>RU26208RMFS=MM</ric>
+      <ric>RU26207RMFS=MM</ric>
+      <ric>RU26206RMFS=MM</ric>
+      <ric>RU26205RMFS=MM</ric>
+      <ric>RU26204RMFS=MM</ric>
+      <ric>RU26203RMFS=MM</ric>
+      <ric>RU26202RMFS=MM</ric>
+      <ric>RU26201RMFS=MM</ric>
+      <ric>RU26200RMFS=MM</ric>
+      <ric>RU25082RMFS=MM</ric>
+      <ric>RU25081RMFS=MM</ric>
+      <ric>RU25080RMFS=MM</ric>
+      <ric>RU25079RMFS=MM</ric>
+      <ric>RU25077RMFS=MM</ric>
+      <ric>RU25076RMFS=MM</ric>
+      <ric>RU25075RMFS=MM</ric>
+      <ric>RU25071RMFS=MM</ric>
+      <ric>RU25068RMFS=MM</ric>
     </list>
   </lists>
   <!-- Portfolios -->
@@ -109,10 +117,8 @@
     <bond id="39240" name="ss" color="Gray" code="22" maturity="23APR2014" coupon="0" bondStructure="ACC:A5 IC:L1 CLDR:RUS_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY PX:CLEAN REFDATE:MATURITY RATE:0.13     " />
   </custom-bonds>
   <chain-curves>
-    <curve id="1" ric="0#RUBCCSZ=R" color="Red" name="Rouble CCS" pattern="RUBCCS(?&lt;term&gt;.+?)Z=R"  skip="" field-set="Russian chain curves"/>
-    <curve id="2" ric="0#USBMK=" color="Green" name="US Benchmark" pattern="US(?&lt;term&gt;.+?)T=RR" skip="" field-set="US chain curves"/>
-    <curve id="3" ric="0#USBMK=" color="Green" name="US Benchmark1" pattern="US(?&lt;term&gt;.+?)T=RR" skip="" field-set="US chain curves"/>
-    <curve id="4" ric="0#USBMK=" color="Green" name="US Benchmark2" pattern="US(?&lt;term&gt;.+?)T=RR" skip="" field-set="US chain curves"/>
-    <curve id="5" ric="0#USBMK=" color="Green" name="US Benchmark3" pattern="US(?&lt;term&gt;.+?)T=RR" skip="" field-set="US chain curves"/>
+    <curve id="1" ric="0#RUBCCSZ=R" color="Tomato" name="Rouble CCS" pattern="RUBCCS(?&lt;term&gt;.+?)Z=R" skip="" field-set="Russian chain curves" />
+    <curve id="2" ric="0#USBMK=" color="Green" name="US Benchmark" pattern="US(?&lt;term&gt;.+?)T=RR" skip="" field-set="US chain curves" />
+    <curve id="66400" name="Reuters OFZ curve" color="BlueViolet" ric="0#RUXZ=MM" pattern="RUGOV(?&lt;term&gt;.+?)Z=MM" field-set="US chain curves" />
   </chain-curves>
 </bonds>

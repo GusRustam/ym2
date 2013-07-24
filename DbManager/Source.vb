@@ -151,7 +151,9 @@ Public MustInherit Class Source
         Dim bondsData As IBondsData = Bonds.BondsData.Instance
         Return (From ric In GetDefaultRics()
             Where bondsData.BondExists(ric)
-            Select bondsData.GetBondInfo(ric)).ToList()
+            Let descr = bondsData.GetBondInfo(ric)
+            Where descr IsNot Nothing
+            Select descr).ToList()
     End Function
 End Class
 

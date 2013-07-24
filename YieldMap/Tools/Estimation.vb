@@ -612,6 +612,7 @@ Namespace Tools
                     Return (New VasicekEstimation1).Fit(x, y)
                 Else
                     _regression.Fit(x, y)
+                    _formula = _regression
                 End If
 
                 Return Utils.GetRange(x.Min, x.Max, SettingsManager.Instance.NumInterpPoints).Select(Function(anX) New XY With {.X = anX, .Y = _regression.Estimate(anX)}).ToList()
