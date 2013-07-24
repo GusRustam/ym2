@@ -32,6 +32,12 @@
         <field type="LAST">393</field>
       </realtime>
     </field-set>
+    <field-set id="Russian depo curves" name="Russian depo curves">
+      <realtime>
+        <field type="BID">22</field>
+        <field type="ASK">25</field>
+      </realtime>
+    </field-set>
     <field-set id="US chain curves" name="US chain curves">
       <realtime>
         <field type="LAST">356</field>
@@ -120,5 +126,6 @@
     <curve id="1" ric="0#RUBCCSZ=R" color="Tomato" name="Rouble CCS" pattern="RUBCCS(?&lt;term&gt;.+?)Z=R" skip="" field-set="Russian chain curves" />
     <curve id="2" ric="0#USBMK=" color="Green" name="US Benchmark" pattern="US(?&lt;term&gt;.+?)T=RR" skip="" field-set="US chain curves" />
     <curve id="66400" name="Reuters OFZ curve" color="BlueViolet" ric="0#RUXZ=MM" pattern="RUGOV(?&lt;term&gt;.+?)Z=MM" field-set="US chain curves" />
+    <curve id="26534" name="Ruble Depo" color="Olive" ric="0#RUBID=" pattern="RUB(?&lt;term&gt;.+?)ID=" field-set="Russian depo curves" />
   </chain-curves>
 </bonds>

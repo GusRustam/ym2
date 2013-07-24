@@ -207,11 +207,14 @@ Namespace Tools.Elements
 
         Protected Overrides Sub HandleNewQuote(ByRef bond As Bond, ByVal xmlName As String, ByVal fieldVal As Double?, ByVal calcDate As Date, Optional _
                                         ByVal recalc As Boolean = True)
-            'AllElements.Remove(bond)
-            'bond = New SyntheticZcb(Me, Today, fieldVal / 100, _terms(bond.MetaData.Ric), Name, bond.MetaData.Ric)
-            'AllElements.Add(bond)
+            Logger.Trace("HandleNewQuote({0}, {1}, {2}, {3:ddMMyy}, {4})", bond.MetaData.Ric, xmlName, fieldVal, calcDate, recalc)
 
-            Dim zcbPrice = GetZcbPrice(bond, fieldVal / 100)
+            Dim zcbPrice As Double
+            If xmlName <> BondFields.Fields.Mid Then
+                zcbPrice = GetZcbPrice(bond, fieldVal / 100)
+            Else
+                zcbPrice = fieldVal
+            End If
             If Not bond.QuotesAndYields.Contains(xmlName) Then
                 Dim descr As New BondPointDescription(xmlName)
                 descr.BackColor = BondFields.Fields.BackColor(xmlName)
