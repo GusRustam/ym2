@@ -87,6 +87,7 @@ Namespace Tools.Elements
         End Sub
 
         Protected Overridable Sub NotifyUpdated(ByVal curveItems As List(Of PointOfCurve))
+            Logger.Trace("NotifyUpdated({0} items)", curveItems.Count)
             If Not _eventsFrozen Then RaiseEvent Updated(curveItems)
         End Sub
 
@@ -214,7 +215,7 @@ Namespace Tools.Elements
         End Function
 
         Private Sub OnQuotes(ByVal data As Dictionary(Of String, Dictionary(Of String, Double))) Handles _quoteLoader.NewData
-            Logger.Trace("QuoteLoaderOnNewData()")
+            Logger.Trace("OnQuotes()")
             For Each instrAndFields As KeyValuePair(Of String, Dictionary(Of String, Double)) In data
                 Try
                     Dim instrument As String = instrAndFields.Key
@@ -281,6 +282,7 @@ Namespace Tools.Elements
 
         Protected Overridable Sub HandleNewQuote(ByRef bond As Bond, ByVal xmlName As String, ByVal fieldVal As Double?, ByVal calcDate As Date, Optional _
                                         ByVal recalc As Boolean = True)
+            Logger.Trace("HandleNewQuote({0}, {1}, {2}, {3:ddMMyy}, {4})", bond.MetaData.Ric, xmlName, fieldVal, calcDate, recalc)
             If Not bond.QuotesAndYields.Contains(xmlName) Then
                 Dim descr As New BondPointDescription(xmlName)
                 descr.BackColor = _bondFields.Fields.BackColor(xmlName)

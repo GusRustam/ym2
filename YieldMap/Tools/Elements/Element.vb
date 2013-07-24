@@ -307,6 +307,7 @@ Namespace Tools.Elements
                 Return Yld.Yield
             End Get
             Set(value As Double?)
+                Logger.Trace("Yield({0}, {1:ddMMyy}, {2})", ParentBond.MetaData.Ric, dt, value)
                 If dt.HasValue Then YieldAtDate = dt.Value
                 CalculateYields(value)
             End Set

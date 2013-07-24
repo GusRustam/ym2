@@ -1,4 +1,5 @@
 ﻿Imports NLog
+Imports Uitls
 Imports YieldMap.Tools.Elements
 
 Namespace Forms.ChartForm
@@ -29,40 +30,43 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub CurveUpdate()
-            If Curve IsNot Nothing Then
-                Dim currentPageName = MainTC.SelectedTab.Name
-                Dim curveSnapshot = Curve.Snapshot()
-                Dim els = curveSnapshot.EnabledElements
-                If Not els.Any Then
-                    BondsDGV.DataSource = Nothing
-                    MainTC.SelectedTab = CurrentTP
-                    MainTC.TabPages.Remove(BondsTP)
-                Else
-                    If TypeOf els.First Is BondCurveSnapshotElement Then
-                        BondsDGV.DataSource = els.Cast(Of BondCurveSnapshotElement).ToList()
-                    ElseIf TypeOf els.First Is SwapCurveSnapshotElement Then
-                        BondsDGV.DataSource = els.Cast(Of SwapCurveSnapshotElement).ToList()
-                    Else
-                        BondsDGV.DataSource = els
-                    End If
-                End If
-                CurrentDGV.DataSource = curveSnapshot.Current
-                FormulaTB.Text = Curve.Formula
+            GuiAsync(
+                Sub()
+                    If Curve IsNot Nothing Then
+                        Dim currentPageName = MainTC.SelectedTab.Name
+                        Dim curveSnapshot = Curve.Snapshot()
+                        Dim els = curveSnapshot.EnabledElements
+                        If Not els.Any Then
+                            BondsDGV.DataSource = Nothing
+                            MainTC.SelectedTab = CurrentTP
+                            MainTC.TabPages.Remove(BondsTP)
+                        Else
+                            If TypeOf els.First Is BondCurveSnapshotElement Then
+                                BondsDGV.DataSource = els.Cast(Of BondCurveSnapshotElement).ToList()
+                            ElseIf TypeOf els.First Is SwapCurveSnapshotElement Then
+                                BondsDGV.DataSource = els.Cast(Of SwapCurveSnapshotElement).ToList()
+                            Else
+                                BondsDGV.DataSource = els
+                            End If
+                        End If
+                        CurrentDGV.DataSource = curveSnapshot.Current
+                        FormulaTB.Text = Curve.Formula
 
-                For Each key In From k In curveSnapshot.Spreads.Keys
-                    If curveSnapshot.Spreads(key).Any Then
-                        CreatePage(key, curveSnapshot.Spreads(key))
+                        For Each key In From k In curveSnapshot.Spreads.Keys
+                            If curveSnapshot.Spreads(key).Any Then
+                                CreatePage(key, curveSnapshot.Spreads(key))
+                            Else
+                                KillPage(key)
+                            End If
+                        Next
+                        ResetEnabled()
+                        OpenPage(currentPageName)
                     Else
-                        KillPage(key)
+                        BondsDGV.DataSource = Nothing
+                        CurrentDGV.DataSource = Nothing
+                        FormulaTB.Text = ""
                     End If
-                Next
-                ResetEnabled()
-                OpenPage(currentPageName)
-            Else
-                BondsDGV.DataSource = Nothing
-                CurrentDGV.DataSource = Nothing
-                FormulaTB.Text = ""
-            End If
+                End Sub)
         End Sub
 
         Private Sub OpenPage(ByVal nm As String)

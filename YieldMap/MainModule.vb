@@ -41,7 +41,10 @@ Module MainModule
         End Function
 
         Public Sub PortfolioManager()
-            If _portManForm IsNot Nothing Then _portManForm.Activate()
+            If _portManForm IsNot Nothing Then
+                _portManForm.Activate()
+                Return
+            End If
             _portManForm = New PortfolioForm()
             _portManForm.Show()
             AddHandler _portManForm.Closed, Sub() _portManForm = Nothing

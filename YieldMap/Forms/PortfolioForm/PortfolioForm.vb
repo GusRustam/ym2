@@ -1,4 +1,5 @@
-﻿Imports DbManager
+﻿Imports System.ComponentModel
+Imports DbManager
 Imports DbManager.Bonds
 Imports System.Runtime.InteropServices
 Imports NLog
@@ -223,8 +224,6 @@ Namespace Forms.PortfolioForm
                 If PortfolioTree.SelectedNode IsNot Nothing Then
                     Dim descr = CType(PortfolioTree.SelectedNode.Tag, Portfolio)
                     selectedNodeId = descr.Id
-                    ''Else
-                    ''    Return
                 End If
             Else
                 selectedNodeId = selId
@@ -328,20 +327,28 @@ Namespace Forms.PortfolioForm
                 Return
             End If
             If e.Button = MouseButtons.Right Then
-                If PortfolioTree.SelectedNode Is Nothing Then Return
                 PortTreeCM.Tag = PortfolioTree.SelectedNode
                 PortTreeCM.Show(PortfolioTree, e.Location)
             End If
         End Sub
 
-        Private Sub AddToolStripMenuItem_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AddToolStripMenuItem.Click
-            Dim node = TryCast(PortTreeCM.Tag, TreeNode)
-            If node Is Nothing Then Return
+        Private Sub PortTreeCM_Opening(sender As Object, e As CancelEventArgs) Handles PortTreeCM.Opening
+            RenameToolStripMenuItem.Enabled = PortTreeCM.Tag IsNot Nothing
+            DeleteToolStripMenuItem.Enabled = PortTreeCM.Tag IsNot Nothing
+        End Sub
 
-            PortfolioTree.SelectedNode = node
-            Dim descr = TryCast(node.Tag, Portfolio)
-            If descr Is Nothing Then Return
-            Dim theId = descr.Id
+        Private Sub AddToolStripMenuItem_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AddToolStripMenuItem.Click
+            Dim theId As String
+            Dim node = TryCast(PortTreeCM.Tag, TreeNode)
+            If node Is Nothing Then
+                theId = ""
+            Else
+                PortfolioTree.SelectedNode = node
+                Dim descr = TryCast(node.Tag, Portfolio)
+                If descr Is Nothing Then Return
+                theId = descr.Id
+            End If
+
 
             Dim adder As New AddPortfolioForm With {
              .EditMode = False,
@@ -1343,6 +1350,7 @@ Namespace Forms.PortfolioForm
             Dim chainCrv = CType(ChainCurvesDGV.SelectedRows(0).DataBoundItem, ChainCurveSrc)
             _currentChainCurveId = chainCrv.ID
             FillChainCurveFields(chainCrv)
+            _ccMode = ChainCurveMode.EditCc
         End Sub
 
         Private Sub ChainCurvesDGV_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs) Handles ChainCurvesDGV.CellDoubleClick
@@ -1366,6 +1374,7 @@ Namespace Forms.PortfolioForm
                 StoreCurrentFields()
                 RefreshChainCurves()
                 RestoreCurrentFields()
+                ErrProv.Clear()
             End If
         End Sub
 

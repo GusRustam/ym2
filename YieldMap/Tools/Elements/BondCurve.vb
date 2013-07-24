@@ -116,6 +116,7 @@ Namespace Tools.Elements
         End Function
 
         Public Overrides Sub Recalculate()
+            Logger.Trace("Recalculate()")
             _lastCurve(Yield) = UpdateCurveShape()
             If IsSynthetic Then
                 _lastSyntCurve = (From item In _lastCurve(Yield) Where item.TheY > 0 Select GetSyntBond(item.TheX, item.TheY)).ToList()
@@ -148,6 +149,7 @@ Namespace Tools.Elements
         End Function
 
         Private Sub UpdateSyntSpreads(ByVal crv As List(Of SyntheticZcb), ByVal ord As OrdinateBase)
+            Logger.Trace("UpdateSyntSpreads()")
             If Ansamble.Benchmarks.Keys.Contains(ord) AndAlso Ansamble.Benchmarks(ord) <> Me Then
                 For Each qy In From item In crv From quoteName In item.QuotesAndYields Select item.QuotesAndYields(quoteName)
                     ord.SetValue(qy, Ansamble.Benchmarks(ord))
@@ -160,6 +162,7 @@ Namespace Tools.Elements
         End Sub
 
         Private Function UpdateCurveShape() As List(Of PointOfCurve)
+            Logger.Trace("UpdateCurveShape()")
             Dim result As New List(Of PointOfCurve)
             If _bootstrapped Then
                 Try
@@ -227,11 +230,16 @@ Namespace Tools.Elements
                 Dim tmp = New List(Of PointOfCurve)(result)
                 Dim list As List(Of XY) = (From item In tmp Select New XY(item.TheX, item.TheY)).ToList()
                 Dim apprXY = est.Approximate(list)
-                result = (From item In apprXY Select New JustPoint(item.X, item.Y, Me)).Cast(Of PointOfCurve).ToList()
-                _formula = est.GetFormula()
+                If apprXY IsNot Nothing Then
+                    result = (From item In apprXY Select New JustPoint(item.X, item.Y, Me)).Cast(Of PointOfCurve).ToList()
+                    _formula = est.GetFormula()
+                Else
+                    _formula = "N/A"
+                End If
             Else
                 _formula = "N/A"
             End If
+
 
             Return result
         End Function

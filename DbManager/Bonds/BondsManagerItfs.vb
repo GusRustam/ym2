@@ -1,22 +1,6 @@
-﻿Imports System.ComponentModel
-Imports Uitls
+﻿Imports Uitls
 
 Namespace Bonds
-    Public Class NoBondException
-        Inherits Exception
-
-        Public Sub New()
-        End Sub
-
-        Public Sub New(ByVal message As String)
-            MyBase.New(message)
-        End Sub
-
-        Public Sub New(ByVal message As String, ByVal innerException As Exception)
-            MyBase.New(message, innerException)
-        End Sub
-    End Class
-
     Public Interface IBondsData
         Sub Refresh()
         Function BondExists(ByVal ric As String) As Boolean
