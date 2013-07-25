@@ -1,4 +1,9 @@
 ﻿Imports System.Threading
+Imports System.Drawing.Imaging
+Imports System.IO
+Imports System.Reflection
+Imports DbManager
+Imports Logging
 Imports YieldMap.Forms.PortfolioForm
 Imports YieldMap.Forms.ChartForm
 Imports NLog
@@ -6,10 +11,11 @@ Imports Settings
 Imports YieldMap.Forms.MainForm
 Imports CommonController
 Imports Uitls
+Imports Ionic.Zip
 
 Module MainModule
     Private _mainForm As MainForm
-    Private ReadOnly Logger As Logger = Logging.GetLogger(GetType(MainModule))
+    Private ReadOnly Logger As Logger = GetLogger(GetType(MainModule))
 
     Public Class MainController
         Private ReadOnly _charts As New List(Of GraphForm)
@@ -78,7 +84,7 @@ Module MainModule
 
     Public Sub Main()
         Logger.Trace("Main method started")
-        Logging.LoggingLevel = SettingsManager.Instance.LogLevel
+        LoggingLevel = SettingsManager.Instance.LogLevel
 
         ' Error handling 
         AddHandler Application.ThreadException, New ThreadExceptionEventHandler(AddressOf ThreadEventHandler)
@@ -103,5 +109,53 @@ Module MainModule
         If MessageBox.Show(String.Format("Unhandled exception {0} occured.{1}Would you like to close the application?", e.Exception.GetType(), Environment.NewLine), "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error) = MsgBoxResult.Yes Then
             Controller.Shutdown()
         End If
+    End Sub
+
+    Public Function GetMyPath() As String
+        Dim installPath = Path.GetDirectoryName(Assembly.GetAssembly(GetType(MainModule)).CodeBase)
+        Return installPath.Substring(6)
+    End Function
+
+    Public Sub ZipAndAttachFiles(ByVal mail As MAPI)
+        Using zip As New ZipFile
+            Dim logName = Path.Combine(LogFilePath, LogFileName)
+            If File.Exists(logName) Then zip.AddFile(logName, "")
+
+            Dim dbName = Path.Combine(GetMyPath(), PortfolioManager.Instance.ConfigFile())
+            If File.Exists(dbName) Then zip.AddFile(dbName, "")
+
+            Dim timestampStr = Date.Now.ToString("yyyy-MM-dd hh-mm-ss")
+            Dim num As Integer
+            Screen.AllScreens.ToList().ForEach(
+                  Sub(screen)
+                      Dim bmpScreenshot = New Bitmap(screen.Bounds.Width, screen.Bounds.Height, PixelFormat.Format32bppArgb)
+                      Dim gfxScreenshot = Graphics.FromImage(bmpScreenshot)
+                      gfxScreenshot.CopyFromScreen(screen.Bounds.X, screen.Bounds.Y, 0, 0, screen.PrimaryScreen.Bounds.Size, CopyPixelOperation.SourceCopy)
+                      bmpScreenshot.Save(Path.Combine(LogFilePath, String.Format("{0}_{1}.png", timestampStr, num)), ImageFormat.Png)
+                      num += 1
+                  End Sub)
+
+            For i = 0 To num - 1
+                Dim fName = Path.Combine(LogFilePath, String.Format("{0}_{1}.png", timestampStr, i))
+                If File.Exists(fName) Then zip.AddFile(fName, "")
+            Next
+
+            Dim dbZipName = Path.Combine(LogFilePath, ZipFileName)
+            zip.Save(dbZipName)
+            If File.Exists(dbZipName) Then mail.AddAttachment(dbZipName)
+        End Using
+    End Sub
+
+    Public Sub SendErrorReport(ByVal header As String, ByVal message As String)
+        Try
+            Dim mail As New MAPI
+            mail.AddRecipientTo("rustam.guseynov@thomsonreuters.com")
+            ZipAndAttachFiles(mail)
+
+            mail.SendMailPopup(header, message)
+        Catch ex As Exception
+            Clipboard.SetText(message)
+            Utils.RunCommand("mailto:rustam.guseynov@thomsonreuters.com?subject=YieldMap%20Error&body=---Paste%20error%20info%20here---", "")
+        End Try
     End Sub
 End Module

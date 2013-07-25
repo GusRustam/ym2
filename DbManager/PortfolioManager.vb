@@ -46,6 +46,7 @@ Public Interface IPortfolioManager
     Sub DeleteSource(ByVal source As SourceBase)
 
     Sub SelectConfigFile(ByVal fileName As String)
+    Function ConfigFile() As String
     Sub SelectDefaultConfigFile()
 End Interface
 
@@ -617,6 +618,10 @@ Public Class PortfolioManager
     Public Sub SelectConfigFile(ByVal fileName As String) Implements IPortfolioManager.SelectConfigFile
         ConfigFile = fileName
     End Sub
+
+    Public Function IPortfolioManager_ConfigFile() As String Implements IPortfolioManager.ConfigFile
+        Return _configFile
+    End Function
 
     Public Sub SelectDefaultConfigFile() Implements IPortfolioManager.SelectDefaultConfigFile
         ConfigFile = DefaultConfigFile

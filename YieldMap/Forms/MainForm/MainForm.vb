@@ -227,5 +227,9 @@ Namespace Forms.MainForm
             Dim sf As New SettingsForm
             sf.ShowDialog()
         End Sub
+
+        Private Shared Sub RaiseExcTSMI_Click(sender As Object, e As EventArgs) Handles RaiseExcTSMI.Click
+            SendErrorReport("Yield Map Info", Utils.GetEnvironment())
+        End Sub
     End Class
 End Namespace

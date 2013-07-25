@@ -226,7 +226,6 @@ Namespace Forms.MainForm
             Me.RaiseExcTSMI.Name = "RaiseExcTSMI"
             Me.RaiseExcTSMI.Size = New System.Drawing.Size(195, 22)
             Me.RaiseExcTSMI.Text = "Send report to developer"
-            Me.RaiseExcTSMI.Visible = False
             '
             'MenuStrip1
             '
