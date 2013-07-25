@@ -51,6 +51,10 @@ Namespace Forms.ChartForm
                 .AxisY.ScrollBar.ButtonStyle = ScrollBarButtonStyles.All
                 .AxisY.ScrollBar.IsPositionedInside = True
             End With
+            Dim title = TheChart.Titles.Add("Data Source: Thomson Reuters Eikon")
+            title.IsDockedInsideChartArea = False 'True
+            title.Docking = Docking.Bottom
+            title.Alignment = ContentAlignment.BottomLeft
         End Sub
 
         Private Sub ShowCurveParameters(ByVal curve As SwapCurve)

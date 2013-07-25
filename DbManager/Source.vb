@@ -462,6 +462,7 @@ Public Class ChainCurveSrc
     Private ReadOnly _pattern As String
     Private ReadOnly _ric As String
     Private ReadOnly _skip As String
+    Private ReadOnly _type As String
     Private ReadOnly _fields As FieldSet
 
 
@@ -483,6 +484,12 @@ Public Class ChainCurveSrc
         End Get
     End Property
 
+    Public ReadOnly Property Type() As String
+        Get
+            Return _type
+        End Get
+    End Property
+
     <Browsable(False)>
     Public ReadOnly Property FieldsProperty() As FieldSet
         Get
@@ -490,21 +497,23 @@ Public Class ChainCurveSrc
         End Get
     End Property
 
-    Public Sub New(ByVal id As String, ByVal color As String, ByVal name As String, ByVal pattern As String, ByVal ric As String, ByVal skip As String, ByVal fields As FieldSet)
+    Public Sub New(ByVal id As String, ByVal color As String, ByVal name As String, ByVal pattern As String, ByVal ric As String, ByVal skip As String, ByVal fields As FieldSet, Optional ByVal type As String = "Regular")
         MyBase.New(id, color, fields, True, False, name)
         _pattern = pattern
         _ric = ric
         _skip = skip
         _fields = fields
+        _type = type
     End Sub
 
 
-    Public Sub New(ByVal color As String, ByVal name As String, ByVal pattern As String, ByVal ric As String, ByVal skip As String, ByVal fields As FieldSet)
+    Public Sub New(ByVal color As String, ByVal name As String, ByVal pattern As String, ByVal ric As String, ByVal skip As String, ByVal fields As FieldSet, Optional ByVal type As String = "Regular")
         MyBase.New(color, fields.ID, True, False, name)
         _pattern = pattern
         _ric = ric
         _skip = skip
         _fields = fields
+        _type = type
     End Sub
 
     Public Overrides Function GetXmlTypeName() As String
@@ -533,7 +542,8 @@ Public Class ChainCurveSrc
             Dim ric = node.GetAttrStrict("ric")
             Dim skip = node.GetAttr("skip")
             Dim fsId = node.GetAttrStrict("field-set")
-            Return New ChainCurveSrc(bndId, color, name, pattern, ric, skip, New FieldSet(fsId))
+            Dim type = node.GetAttr("type", "Regular")
+            Return New ChainCurveSrc(bndId, color, name, pattern, ric, skip, New FieldSet(fsId), type)
         Catch ex As Exception
             Throw New NoSourceException(String.Format("Failed to find chain curve with id {0}", bndId), ex)
         End Try

@@ -1489,6 +1489,9 @@ Namespace Forms.PortfolioForm
                                        ChainCurvePatternTB.Text)
         End Sub
 
+        Private Sub AddItemTagButton_Click(sender As Object, e As EventArgs) Handles AddItemTagButton.Click
+            ChainCurvePatternTB.Text += "(?<term>.+?)"
+        End Sub
 #End Region
 
     End Class

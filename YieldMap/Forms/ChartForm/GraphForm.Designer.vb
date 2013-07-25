@@ -535,43 +535,43 @@
             'DefaultToolStripMenuItem
             '
             Me.DefaultToolStripMenuItem.Name = "DefaultToolStripMenuItem"
-            Me.DefaultToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.DefaultToolStripMenuItem.Size = New System.Drawing.Size(109, 22)
             Me.DefaultToolStripMenuItem.Text = "Default"
             '
             'YTMToolStripMenuItem
             '
             Me.YTMToolStripMenuItem.Name = "YTMToolStripMenuItem"
-            Me.YTMToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.YTMToolStripMenuItem.Size = New System.Drawing.Size(109, 22)
             Me.YTMToolStripMenuItem.Text = "YTM"
             '
             'YTPToolStripMenuItem
             '
             Me.YTPToolStripMenuItem.Name = "YTPToolStripMenuItem"
-            Me.YTPToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.YTPToolStripMenuItem.Size = New System.Drawing.Size(109, 22)
             Me.YTPToolStripMenuItem.Text = "YTP"
             '
             'YTCToolStripMenuItem
             '
             Me.YTCToolStripMenuItem.Name = "YTCToolStripMenuItem"
-            Me.YTCToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.YTCToolStripMenuItem.Size = New System.Drawing.Size(109, 22)
             Me.YTCToolStripMenuItem.Text = "YTC"
             '
             'YTBToolStripMenuItem
             '
             Me.YTBToolStripMenuItem.Name = "YTBToolStripMenuItem"
-            Me.YTBToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.YTBToolStripMenuItem.Size = New System.Drawing.Size(109, 22)
             Me.YTBToolStripMenuItem.Text = "YTB"
             '
             'YTAToolStripMenuItem
             '
             Me.YTAToolStripMenuItem.Name = "YTAToolStripMenuItem"
-            Me.YTAToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.YTAToolStripMenuItem.Size = New System.Drawing.Size(109, 22)
             Me.YTAToolStripMenuItem.Text = "YTA"
             '
             'YTWToolStripMenuItem
             '
             Me.YTWToolStripMenuItem.Name = "YTWToolStripMenuItem"
-            Me.YTWToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.YTWToolStripMenuItem.Size = New System.Drawing.Size(109, 22)
             Me.YTWToolStripMenuItem.Text = "YTW"
             '
             'DescriptionSep
@@ -911,6 +911,10 @@
             '
             'TheChart
             '
+            Me.TheChart.BackImageAlignment = System.Windows.Forms.DataVisualization.Charting.ChartImageAlignmentStyle.Center
+            Me.TheChart.BackImageWrapMode = System.Windows.Forms.DataVisualization.Charting.ChartImageWrapMode.Unscaled
+            ChartArea1.BackImageAlignment = System.Windows.Forms.DataVisualization.Charting.ChartImageAlignmentStyle.Center
+            ChartArea1.BackImageWrapMode = System.Windows.Forms.DataVisualization.Charting.ChartImageWrapMode.Unscaled
             ChartArea1.Name = "ChartArea1"
             Me.TheChart.ChartAreas.Add(ChartArea1)
             Me.TheChart.Dock = System.Windows.Forms.DockStyle.Fill
@@ -1208,43 +1212,43 @@
             'DefaultTSMI
             '
             Me.DefaultTSMI.Name = "DefaultTSMI"
-            Me.DefaultTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.DefaultTSMI.Size = New System.Drawing.Size(109, 22)
             Me.DefaultTSMI.Text = "Default"
             '
             'YtmTSMI
             '
             Me.YtmTSMI.Name = "YtmTSMI"
-            Me.YtmTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.YtmTSMI.Size = New System.Drawing.Size(109, 22)
             Me.YtmTSMI.Text = "YTM"
             '
             'YtpTSMI
             '
             Me.YtpTSMI.Name = "YtpTSMI"
-            Me.YtpTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.YtpTSMI.Size = New System.Drawing.Size(109, 22)
             Me.YtpTSMI.Text = "YTP"
             '
             'YtcTSMI
             '
             Me.YtcTSMI.Name = "YtcTSMI"
-            Me.YtcTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.YtcTSMI.Size = New System.Drawing.Size(109, 22)
             Me.YtcTSMI.Text = "YTC"
             '
             'YtbTSMI
             '
             Me.YtbTSMI.Name = "YtbTSMI"
-            Me.YtbTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.YtbTSMI.Size = New System.Drawing.Size(109, 22)
             Me.YtbTSMI.Text = "YTB"
             '
             'YtaTSMI
             '
             Me.YtaTSMI.Name = "YtaTSMI"
-            Me.YtaTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.YtaTSMI.Size = New System.Drawing.Size(109, 22)
             Me.YtaTSMI.Text = "YTA"
             '
             'YtwTSMI
             '
             Me.YtwTSMI.Name = "YtwTSMI"
-            Me.YtwTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.YtwTSMI.Size = New System.Drawing.Size(109, 22)
             Me.YtwTSMI.Text = "YTW"
             '
             'ToolStripSeparator12

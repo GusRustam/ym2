@@ -127,5 +127,6 @@
     <curve id="2" ric="0#USBMK=" color="Green" name="US Benchmark" pattern="US(?&lt;term&gt;.+?)T=RR" skip="" field-set="US chain curves" />
     <curve id="66400" name="Reuters OFZ curve" color="BlueViolet" ric="0#RUXZ=MM" pattern="RUGOV(?&lt;term&gt;.+?)Z=MM" field-set="US chain curves" />
     <curve id="26534" name="Ruble Depo" color="Olive" ric="0#RUBID=" pattern="RUB(?&lt;term&gt;.+?)ID=" field-set="Russian depo curves" />
+    <curve id="88771" name="Ruble Government CDS" color="Red" ric="0#RUGVUSACRBMK=" pattern="RUGV(?&lt;term&gt;.+?)USAC=R" field-set="Eurobonds" type="Spread"/>
   </chain-curves>
 </bonds>

@@ -120,7 +120,6 @@ Namespace Tools.Elements
             End Get
         End Property
 
-
         Public Sub ClearSpread(ByVal ySource As OrdinateBase) Implements ICurve.ClearSpread
             For Each qy In From item In AllElements From quoteName In item.QuotesAndYields Select item.QuotesAndYields(quoteName)
                 ySource.ClearValue(qy)
@@ -155,7 +154,8 @@ Namespace Tools.Elements
         Public Overrides Sub RecalculateTotal()
             'Dim tmp = New List(Of Bond)(AllElements)
             For Each bnd In AllElements
-                For Each q In bnd.QuotesAndYields
+                Dim tmp = bnd
+                For Each q As String In From qName In tmp.QuotesAndYields Where qName <> BondFields.Fields.Mid
                     HandleNewQuote(bnd, q, bnd.QuotesAndYields(q).Yld.Yield * 100, bnd.QuotesAndYields(q).YieldAtDate, False)
                 Next
             Next
@@ -204,13 +204,14 @@ Namespace Tools.Elements
             Return 100 * priceObject.GetValue(1)
         End Function
 
-
         Protected Overrides Sub HandleNewQuote(ByRef bond As Bond, ByVal xmlName As String, ByVal fieldVal As Double?, ByVal calcDate As Date, Optional _
                                         ByVal recalc As Boolean = True)
             Logger.Trace("HandleNewQuote({0}, {1}, {2}, {3:ddMMyy}, {4})", bond.MetaData.Ric, xmlName, fieldVal, calcDate, recalc)
 
+            'If _src.Type = "Regular" Then
             Dim zcbPrice As Double
             If xmlName <> BondFields.Fields.Mid Then
+                ' it's a dirty trick, but what can I do?
                 zcbPrice = GetZcbPrice(bond, fieldVal / 100)
             Else
                 zcbPrice = fieldVal
@@ -226,6 +227,8 @@ Namespace Tools.Elements
             Else
                 bond.QuotesAndYields(xmlName).Yield(Today) = zcbPrice
             End If
+            'Else
+            'End If
 
             If recalc Then Recalculate()
         End Sub
