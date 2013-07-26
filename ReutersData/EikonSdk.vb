@@ -2,6 +2,7 @@
 Imports NLog
 Imports CommonController
 Imports System.Runtime.InteropServices
+Imports System.Threading
 
 Public Class Eikon
     Private Shared _eikon As Eikon
@@ -74,7 +75,7 @@ Public Class EikonConnector
     'End Enum
 
     Public Sub ConnectToEikon()
-        Logger.Trace("ConnectToEikon()")
+        Logger.Trace("ConnectToEikon(), current status = {0}", _sdk.Status)
         'SyncLock _lock
         '    If _timeOutState = InterlockedState.Waiter Then
         '        Logger.Info("Unable to reconnect while waiter is alive")
@@ -83,11 +84,15 @@ Public Class EikonConnector
         '        _timeOutState = InterlockedState.BrandNew
         '    End If
         'End SyncLock
-        Dim lResult = _sdk.Initialize()
-        If lResult = EEikonDataAPIInitializeResult.Error_InitializeFail Then
-            Logger.Warn("Failed to connect, result is {0}", lResult)
-            RaiseEvent Disconnected()
-            Return
+        If _sdk.Status = EEikonStatus.Connected Then
+            RaiseEvent Connected()
+        Else
+            Dim lResult = _sdk.Initialize()
+            If lResult = EEikonDataAPIInitializeResult.Error_InitializeFail Then
+                Logger.Warn("Failed to connect, result is {0}", lResult)
+                RaiseEvent Disconnected()
+                Return
+            End If
         End If
 
         'ThreadPool.QueueUserWorkItem(
@@ -146,4 +151,8 @@ Public Class EikonConnector
             Return _instance
         End Get
     End Property
+
+    Public Sub Disconnect()
+        'todo can I disconnect
+    End Sub
 End Class

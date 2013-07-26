@@ -2,6 +2,7 @@
 Imports DbManager.Bonds
 Imports ReutersData
 Imports Settings
+Imports System.Threading
 Imports Uitls
 Imports YieldMap.My.Resources
 Imports NLog
@@ -109,47 +110,54 @@ Namespace Forms.MainForm
 #End Region
 
 #Region "II. Connecting to Eikon"
+        Private _mRE As ManualResetEvent
+        Private _thisWaitFailed As Boolean
         Private Sub ConnectToEikon()
             Logger.Trace("ConnectToEikon()")
+            ' todo report if failed to connect
+            ' todo make a timeout on each step of initialization
+            ' todo propose to restart program if hangs
+            _mRE = New ManualResetEvent(False)
+            _thisWaitFailed = False
+            Dim waiter = New Thread(New ThreadStart(
+                Sub()
+                    If Not _mRE.WaitOne(TimeSpan.FromSeconds(1)) Then
+                        SyncLock (Me)
+                            _thisWaitFailed = True
+                            ConnectorTimeout()
+                        End SyncLock
+                    End If
+                End Sub))
+            waiter.Start()
             _connector.ConnectToEikon()
         End Sub
 
         Private Sub ConnectorTimeout() Handles _connector.Timeout
-            'GuiAsync(Sub()
-            Try
-                _connected = False
-                ConnectTSMI.Enabled = True
-                ConnectButton.Enabled = True
-                YieldMapButton.Enabled = False
-                StatusPicture.Image = Red
-                StatusLabel.Text = "Connection timeout"
-                'MessageBox.Show("Connection timed out. Please try to connect again or restart Eikon and this app manually", "Connection Timeout", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            Catch ex As Exception
-                GuiAsync(
-                    Sub()
-                        _connected = False
-                        ConnectTSMI.Enabled = True
-                        ConnectButton.Enabled = True
-                        YieldMapButton.Enabled = False
-                        StatusPicture.Image = Red
-                        StatusLabel.Text = "Connection timeout"
-                        'MessageBox.Show("Connection timed out. Please try to connect again or restart Eikon and this app manually", "Connection Timeout", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                    End Sub)
-            End Try
+            GuiAsync(
+                Sub()
+                    _connected = False
+                    ConnectTSMI.Enabled = True
+                    ConnectButton.Enabled = True
+                    YieldMapButton.Enabled = False
+                    StatusPicture.Image = Red
+                    StatusLabel.Text = "Connection timeout"
+                End Sub)
         End Sub
 
         Private Sub ConnectorConnected() Handles _connector.Connected
-            ConnectTSMI.Enabled = False
-            ConnectButton.Enabled = False
-            StatusPicture.Image = Green
-            StatusLabel.Text = Status_Connected
-            _connected = True
+            If Not _thisWaitFailed Then
+                ConnectTSMI.Enabled = False
+                ConnectButton.Enabled = False
+                StatusPicture.Image = Green
+                StatusLabel.Text = Status_Connected
+                _connected = True
+                _mRE.Set()
+                BondsData.Instance.Refresh()
 
-            BondsData.Instance.Refresh()
-
-            'If Not _theSettings.LastDbUpdate.HasValue OrElse _theSettings.LastDbUpdate < Today Then
-            _ldr.Initialize()
-            'End If
+                _ldr.Initialize()
+            Else
+                ConnectorTimeout()
+            End If
         End Sub
 
         Private Sub ConnectorDisconnected() Handles _connector.Disconnected
@@ -159,7 +167,7 @@ Namespace Forms.MainForm
             YieldMapButton.Enabled = False
             StatusPicture.Image = Red
             StatusLabel.Text = Status_Disconnected
-            'Controller.CloseAllCharts()
+            Controller.CloseAllCharts() 'todo was commented
         End Sub
 
         Public Shared ReadOnly Property Connected() As Boolean

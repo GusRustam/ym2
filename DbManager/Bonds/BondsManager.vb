@@ -411,9 +411,7 @@ Namespace Bonds
             RaiseEvent Progress(New ProgressEvent(MessageKind.Positive, String.Format("Chain {0} arrived", ricOfChain), New ChainProgress(ricOfChain)))
             If Not finished Then Return
 
-            If chainsAndRics.Count = 0 Then
-                Exit Sub
-            End If
+            If chainsAndRics.Count = 0 Then Exit Sub
 
             Dim chainRics = chainsAndRics.Keys.ToList()
             chainRics.ForEach(Sub(chainRic) StoreRicsAndChains(chainRic, chainsAndRics(chainRic)))
