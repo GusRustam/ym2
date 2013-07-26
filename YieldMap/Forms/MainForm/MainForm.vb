@@ -40,6 +40,7 @@ Namespace Forms.MainForm
             ElseIf message.Log.Failed() Then
                 InitEventLabel.Text = FailedToUpdateDatabase
                 RemoveHandler _ldr.Progress, AddressOf ProgressHandler
+                ConnectorDisconnected("Failed to update database. Try once again, or try restarting Yield Map and/or Eikon first")
             End If
         End Sub
 #End Region
@@ -114,14 +115,11 @@ Namespace Forms.MainForm
         Private _thisWaitFailed As Boolean
         Private Sub ConnectToEikon()
             Logger.Trace("ConnectToEikon()")
-            ' todo report if failed to connect
-            ' todo make a timeout on each step of initialization
-            ' todo propose to restart program if hangs
             _mRE = New ManualResetEvent(False)
             _thisWaitFailed = False
             Dim waiter = New Thread(New ThreadStart(
                 Sub()
-                    If Not _mRE.WaitOne(TimeSpan.FromSeconds(1)) Then
+                    If Not _mRE.WaitOne(TimeSpan.FromMinutes(2)) Then
                         SyncLock (Me)
                             _thisWaitFailed = True
                             ConnectorTimeout()
@@ -160,14 +158,16 @@ Namespace Forms.MainForm
             End If
         End Sub
 
-        Private Sub ConnectorDisconnected() Handles _connector.Disconnected
-            _connected = False
-            ConnectTSMI.Enabled = True
-            ConnectButton.Enabled = True
-            YieldMapButton.Enabled = False
-            StatusPicture.Image = Red
-            StatusLabel.Text = Status_Disconnected
-            Controller.CloseAllCharts() 'todo was commented
+        Private Sub ConnectorDisconnected(Optional ByVal msg = "") Handles _connector.Disconnected
+            GuiAsync(Sub()
+                         _connected = False
+                         ConnectTSMI.Enabled = True
+                         ConnectButton.Enabled = True
+                         YieldMapButton.Enabled = False
+                         StatusPicture.Image = Red
+                         StatusLabel.Text = If(msg = "", Status_Disconnected, msg)
+                         Controller.CloseAllCharts()
+                     End Sub)
         End Sub
 
         Public Shared ReadOnly Property Connected() As Boolean

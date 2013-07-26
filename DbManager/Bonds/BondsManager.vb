@@ -3,6 +3,7 @@ Imports Logging
 Imports NLog
 Imports ReutersData
 Imports Settings
+Imports System.Threading
 Imports Uitls
 
 Namespace Bonds
@@ -337,7 +338,9 @@ Namespace Bonds
         End Sub
 
         Private Sub LoadStep1(ByVal rics As HashSet(Of String))
-            Logger.Info("LoadIssuerRatings")
+            Logger.Info("LoadIssuerRatings / {0}", _evt.CurrentCount)
+            If _thisWaitFailed Then Return
+            _evt.Signal()
             LoadGeneral(IssuerRatingsTable, QueryIssuerRating, "Loading bonds issuers ratings",
                          Sub(data As LinkedList(Of Dictionary(Of String, Object)))
                              ImportData(data, IssuerRatingsTable, QueryIssuerRating)
@@ -346,7 +349,9 @@ Namespace Bonds
         End Sub
 
         Private Sub LoadStep2(ByVal rics As HashSet(Of String))
-            Logger.Info("LoadIssueRatings")
+            Logger.Info("LoadIssueRatings / {0}", _evt.CurrentCount)
+            If _thisWaitFailed Then Return
+            _evt.Signal()
             LoadGeneral(IssueRatingsTable, QueryIssueRating, "Loading bonds ratings",
                          Sub(data As LinkedList(Of Dictionary(Of String, Object)))
                              ImportData(data, IssueRatingsTable, QueryIssueRating)
@@ -355,7 +360,10 @@ Namespace Bonds
         End Sub
 
         Private Sub LoadStep3(ByVal rics As HashSet(Of String))
-            Logger.Info("LoadCoupons")
+            Logger.Info("LoadCoupons / {0}", _evt.CurrentCount)
+            If _thisWaitFailed Then Return
+            _evt.Signal()
+
             LoadGeneral(CouponTable, QueryCoupon, "Loading bonds coupons",
                         Sub(data As LinkedList(Of Dictionary(Of String, Object)))
                             ImportData(data, CouponTable, QueryCoupon)
@@ -364,17 +372,21 @@ Namespace Bonds
         End Sub
 
         Private Sub LoadStep4(ByVal rics As HashSet(Of String))
-            Logger.Info("LoadFrns")
+            Logger.Info("LoadFrns / {0}", _evt.CurrentCount)
+            _evt.Signal()
             Dim floaterRics = New HashSet(Of String)(From row In BondsTable Where rics.Contains(row.ric) And row.isFloater Select row.ric)
             LoadGeneral(FrnTable, QueryFrn, "Loading FRN structures",
                          Sub(data As LinkedList(Of Dictionary(Of String, Object)))
                              ImportData(data, FrnTable, QueryFrn)
-                             LoadStep5()
+                             RaiseEvent Progress(New ProgressEvent(MessageKind.Finished, "All data loaded"))
+                             'LoadStep5()
                          End Sub,
                          floaterRics)
         End Sub
 
         Private Sub LoadStep5()
+            If _thisWaitFailed Then Return
+            _evt.Signal()
             If SettingsManager.Instance.LoadRics Then
                 Logger.Info("LoadAllRics")
                 LoadGeneral(RicsTable, QueryRics, "Loading all rics",
@@ -388,10 +400,33 @@ Namespace Bonds
             End If
         End Sub
 
+        Private Sub Awaiter()
+            Logger.Debug("Awaiter()")
+            If Not _evt.Wait(TimeSpan.FromMinutes(3)) Then
+                Logger.Error("Failed to wait")
+                SyncLock (Me)
+                    _thisWaitFailed = True
+                    NotifyFailure()
+                End SyncLock
+            Else
+                Logger.Info("Waiting load steps finished")
+            End If
+        End Sub
+
+        Private Sub NotifyFailure()
+            RaiseEvent Progress(New ProgressEvent(MessageKind.Fail, "Timeout!"))
+        End Sub
+
+        Private _evt As CountdownEvent
+        Private _thisWaitFailed As Boolean
 
         Public Sub Start(ByVal ParamArray params()) Implements IProgressProcess.Start
+            Logger.Info("Start()")
             Dim chainRics As List(Of String) = params(0)
             Dim dexParams As String = params(1)
+            _evt = New CountdownEvent(6) '  +1 if loads rics
+            Dim waiter = New Thread(AddressOf Awaiter)
+            waiter.Start()
             _chainLoader.StartChains(chainRics, dexParams)
         End Sub
 
@@ -408,8 +443,12 @@ Namespace Bonds
         End Function
 
         Private Sub OnChainData(ByVal ricOfChain As String, ByVal chainsAndRics As Dictionary(Of String, List(Of String)), ByVal finished As Boolean) Handles _chainLoader.Chain
+            Logger.Info("OnChainData / {0}", _evt.CurrentCount)
+            If _thisWaitFailed Then Return
+
             RaiseEvent Progress(New ProgressEvent(MessageKind.Positive, String.Format("Chain {0} arrived", ricOfChain), New ChainProgress(ricOfChain)))
             If Not finished Then Return
+            _evt.Signal()
 
             If chainsAndRics.Count = 0 Then Exit Sub
 
@@ -455,7 +494,9 @@ Namespace Bonds
         End Sub
 
         Private Sub StartLoad(ByVal requiredRics As List(Of String))
-            Logger.Info("LoadMetadata")
+            Logger.Info("StartLoad / {0}", _evt.CurrentCount)
+            If _thisWaitFailed Then Return
+            _evt.Signal()
             LoadGeneral(BondsTable, QueryBondDescr, "Loading bonds descriptions",
                          Sub(data As LinkedList(Of Dictionary(Of String, Object)))
                              If data IsNot Nothing Then
@@ -515,6 +556,7 @@ Namespace Bonds
         ''' <summary>
         ''' Entry point. Loads all data from configuration file and stores them into IMDB
         ''' </summary>
+
         Public Sub Initialize() Implements IBondsLoader.Initialize
             Dim ppp As New BondLoaderProgressProcess
             Dim chainRics = PortfolioManager.Instance().GetChainRics()
