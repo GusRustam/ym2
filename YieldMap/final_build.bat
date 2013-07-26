@@ -9,10 +9,6 @@ rem http://ss64.com/nt/delayedexpansion.html
 setlocal EnableDelayedExpansion
 
 rem http://stackoverflow.com/questions/10166386/arrays-linked-lists-and-other-data-structures-in-cmd-exe-batch-script
-set fldrs[1]=debug
-set fldrs[2]=release
-set fldrs[3]=yield map v2
-
 set FileNames[1]=CommonController.*
 set FileNames[2]=DbManager.*
 set FileNames[3]=DotNumerics.*
@@ -25,38 +21,24 @@ set FileNames[9]=ReutersData.*
 set FileNames[10]=Settings.*
 set FileNames[11]=YieldMap.vshost.*
 
-rem http://superuser.com/questions/160702/get-current-folder-name-by-a-dos-command
-for %%* in (.) do set CurrDirName=%%~n*
-echo Current folder is !CurrDirName!
-
-
-rem 100 must be enough
-for /L %%i in (1,1,100) do (
-	if not defined fldrs[%%i] (
-		echo Nothing foung, quitting
-		goto stop
-	) else echo Searching myself in folder %%i: !fldrs[%%i]!
-	
-	rem http://stackoverflow.com/questions/8438511/if-or-if-in-a-windows-batch-file
-	rem http://ss64.com/nt/if.html
-	if /I !CurrDirName! EQU !fldrs[%%i]! (
-	 	echo ... found myself in !fldrs[%%i]! folder
-	 	goto enough
-	) else echo ... didn't find myself in !fldrs[%%i]! folder
-	
-	echo ---
+mkdir "Yield Map" 
+rem http://stackoverflow.com/questions/138497/batch-scripting-iterating-over-files-in-a-directory
+for /r %%i in (*) do (
+	echo will copy %%i
+	rem http://stackoverflow.com/questions/8797983/can-a-dos-batch-file-determine-its-own-file-name
+	for %%f in (%%i) do set fn=%%~nxf
+	echo name now is !fn!
+	if not %0 EQU !fn! copy !fn! "Yield Map"
 )
-goto stop
 
-:enough
 echo Moving files
-mkdir lib
+mkdir "Yield Map"\lib
 for /L %%i in (1,1,100) do (
 	if not defined FileNames[%%i] (
 		echo file name %%i not defined, will stop
 		goto stop
 	) else echo file name %%i is defined, will copy it
 
-	move !FileNames[%%i]! .\lib >> nul
+	move "Yield Map"\!FileNames[%%i]! ./"Yield Map"\lib >> nul
 )
 :stop
