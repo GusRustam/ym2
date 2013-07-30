@@ -335,9 +335,14 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="drivers_reset.bat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="final_build.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="My Project\app.manifest" />
     <None Include="My Project\Application.myapp">
@@ -501,7 +506,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_BuildVersioningStyle="None.MonthStamp.Increment.TimeStamp" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" />
+      <UserProperties BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_BuildVersioningStyle="None.MonthStamp.Increment.TimeStamp" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
