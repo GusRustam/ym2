@@ -595,7 +595,10 @@ Namespace Forms.ChartForm
 
                     TheChart.Series.Add(srs)
                     ClearLegendItems(crv.Identity)
-                    TheChart.Legends(0).CustomItems.Add(New LegendItem(crv.Name, clr, "") With {.Tag = crv.Identity})
+
+                    Dim legendName = crv.Name
+                    If crv.GroupDate <> Today Then legendName = String.Format("{0} ({1:dd/MM/yyy})", legendName, crv.GroupDate)
+                    TheChart.Legends(0).CustomItems.Add(New LegendItem(legendName, clr, "") With {.Tag = crv.Identity})
 
                     If itsBond Then
                         srs.Points.AddRange(From point In data.Cast(Of PointOfBondCurve)()

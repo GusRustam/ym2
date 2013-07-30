@@ -353,7 +353,7 @@ Namespace Tools.Elements
             UnfreezeEvents()
         End Sub
 
-        Public WriteOnly Property LabelsOn As Boolean
+        Public WriteOnly Property LabelEnabled As Boolean
             Set(ByVal value As Boolean)
                 FreezeEvents()
                 For Each elem In _elements
@@ -363,19 +363,13 @@ Namespace Tools.Elements
             End Set
         End Property
 
-        Public Sub ToggleLabels()
-            FreezeEvents()
-            For Each elem In _elements
-                elem.ToggleLabel()
-            Next
-            UnfreezeEvents()
-        End Sub
-
         Public Sub SetLabelMode(ByVal mode As LabelMode)
             FreezeEvents()
-            For Each elem In _elements
-                elem.LabelMode = mode
-            Next
+            Dim enable = (From el In _elements Where el.LabelEnabled).Count() <= _elements.Count() / 2
+            _elements.ForEach(Sub(el)
+                                  el.LabelMode = mode
+                                  el.LabelEnabled = enable
+                              End Sub)
             UnfreezeEvents()
         End Sub
 

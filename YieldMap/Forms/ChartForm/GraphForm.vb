@@ -374,6 +374,9 @@ Namespace Forms.ChartForm
                         CType(htr.Series.Tag, BondSetSeries).SelectedPointIndex = htr.PointIndex
 
                         PlotBidAsk(bondData)
+                    ElseIf TypeOf point.Tag Is JustPoint Then
+                        YldLabel.Text = String.Format("{0:P2}", point.YValues(0))
+                        DurLabel.Text = String.Format("{0:F2}", point.XValue)
 
                     ElseIf TypeOf point.Tag Is SwapCurve Then
                         Dim curve = CType(point.Tag, SwapCurve)
@@ -680,7 +683,7 @@ Namespace Forms.ChartForm
         Private Sub ShowLabelsTSBClick(ByVal sender As Object, ByVal e As EventArgs) Handles ShowLabelsTSB.Click
             Logger.Trace("ShowLabelsTSBClick")
             For Each grp As KeyValuePair(Of Long, Group) In _ansamble.Items
-                grp.Value.LabelsOn = ShowLabelsTSB.Checked
+                grp.Value.LabelEnabled = ShowLabelsTSB.Checked
             Next
         End Sub
 
@@ -1034,15 +1037,16 @@ Namespace Forms.ChartForm
         Private Sub BondCurveCMS_Opening(ByVal sender As Object, ByVal e As CancelEventArgs) Handles BondCurveCMS.Opening
             If BondCurveCMS.Tag Is Nothing Then Return
             If TypeOf _ansamble(BondCurveCMS.Tag) Is BondCurve Then
+                Dim curve = CType(_ansamble(BondCurveCMS.Tag), BondCurve)
+
                 ShowBondCurveItemsTSMI.Visible = True
-                LabelingModeToolStripMenuItem.Visible = True
+                LabelingModeToolStripMenuItem.Visible = Not curve.IsSynthetic
                 InterpolationTSMI.Visible = True
                 BootstrappingToolStripMenuItem.Visible = True
                 BondCurveImportantTSS.Visible = True
                 SelectDateToolStripMenuItem.Visible = True
                 BondCurveImportantTSS0.Visible = True
 
-                Dim curve = CType(_ansamble(BondCurveCMS.Tag), BondCurve)
                 BootstrappingToolStripMenuItem.Checked = curve.Bootstrapped
                 For Each item As ToolStripMenuItem In (From elem In InterpolationTSMI.DropDownItems Where TypeOf elem Is ToolStripMenuItem)
                     item.Checked = curve.EstModel IsNot Nothing AndAlso item.Tag = curve.EstModel.ItemName
@@ -1068,32 +1072,23 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub IssuerSeriesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles IssuerSeriesToolStripMenuItem.Click
-            For Each bnd In GetBonds()
-                bnd.LabelMode = LabelMode.IssuerAndSeries
-            Next
+            Dim grp = TryCast(BondCurveCMS.Tag, Group)
+            If grp IsNot Nothing Then grp.SetLabelMode(LabelMode.IssuerAndSeries)
         End Sub
 
         Private Sub IssuerCouponMaturityToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles IssuerCouponMaturityToolStripMenuItem.Click
-            For Each bnd In GetBonds()
-                bnd.LabelMode = LabelMode.IssuerCpnMat
-            Next
+            Dim grp = TryCast(BondCurveCMS.Tag, Group)
+            If grp IsNot Nothing Then grp.SetLabelMode(LabelMode.IssuerCpnMat)
         End Sub
 
-        Private Function GetBonds() As IEnumerable(Of Bond)
-            If BondCurveCMS.Tag Is Nothing OrElse Not IsNumeric(BondCurveCMS.Tag) Then Return Nothing
-            Return _ansamble.Items(BondCurveCMS.Tag).Bonds()
-        End Function
-
         Private Sub DescriptionToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DescriptionToolStripMenuItem.Click
-            For Each bnd In GetBonds()
-                bnd.LabelMode = LabelMode.Description
-            Next
+            Dim grp = TryCast(BondCurveCMS.Tag, Group)
+            If grp IsNot Nothing Then grp.SetLabelMode(LabelMode.Description)
         End Sub
 
         Private Sub SeriesOnlyToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SeriesOnlyToolStripMenuItem.Click
-            For Each bnd In GetBonds()
-                bnd.LabelMode = LabelMode.SeriesOnly
-            Next
+            Dim grp = TryCast(BondCurveCMS.Tag, Group)
+            If grp IsNot Nothing Then grp.SetLabelMode(LabelMode.SeriesOnly)
         End Sub
 
         Private Sub BondCurveTSMI_DropDownOpening(sender As Object, e As EventArgs) Handles BondCurveTSMI.DropDownOpened
