@@ -2,6 +2,7 @@
 Imports DbManager.Bonds
 Imports System.Reflection
 Imports NLog
+Imports System.Text.RegularExpressions
 Imports Settings
 Imports YieldMap.Forms.MainForm
 
@@ -59,12 +60,24 @@ Namespace Forms.PortfolioForm
         Private Sub RefreshGrid()
             Dim strFitler As String = ""
 
+            ' ReSharper disable UnusedVariable
             If IssuerTextBox.Text <> "" Then
-                strFitler = String.Format("$issuerName Like ""{0}""", IssuerTextBox.Text)
+                Try
+                    Dim x As New Regex(IssuerTextBox.Text)
+                    strFitler = String.Format("$issuerName Like ""{0}""", IssuerTextBox.Text)
+                Catch ex As Exception
+                    strFitler = String.Format("$issuerName = ""{0}""", IssuerTextBox.Text)
+                End Try
             End If
             If RICTextBox.Text <> "" Then
-                strFitler = If(strFitler <> "", strFitler & " AND ", "") & String.Format("$ric LIKE ""{0}""", RICTextBox.Text)
+                Try
+                    Dim x As New Regex(IssuerTextBox.Text)
+                    strFitler = If(strFitler <> "", strFitler & " AND ", "") & String.Format("$ric LIKE ""{0}""", RICTextBox.Text)
+                Catch ex As Exception
+                    strFitler = If(strFitler <> "", strFitler & " AND ", "") & String.Format("$ric = ""{0}""", RICTextBox.Text)
+                End Try
             End If
+            ' ReSharper restore UnusedVariable
             Try
                 _bonds.SetFilter(strFitler)
                 RefreshList()

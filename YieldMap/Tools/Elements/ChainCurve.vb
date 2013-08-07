@@ -197,10 +197,11 @@ Namespace Tools.Elements
             bond.MetaData.Maturity = newMat
 
             Dim paymentStructure = bond.MetaData.PaymentStructure
-            Dim rateStructure = bond.MetaData.RateStructure
 
             Dim settleDate = _bonds.BdSettle(Today, paymentStructure)
-            Dim priceObject As Array = _bonds.AdBondPrice(settleDate, yield, bond.MetaData.Maturity, 0, 0, paymentStructure, Regex.Replace(rateStructure, "YT[A-Z]", SettingsManager.Instance.YieldCalcMode), "", "RES:BDPRICE")
+            Dim rateStructure As String = Utils.GetRateStructure(SettingsManager.Instance.YieldCalcMode, "YTM", "YTM")
+            'Dim rateStructure As String = Regex.Replace(bond.MetaData.RateStructure, "YT[A-Z]", SettingsManager.Instance.YieldCalcMode)
+            Dim priceObject As Array = _bonds.AdBondPrice(settleDate, yield, bond.MetaData.Maturity, 0, 0, paymentStructure, rateStructure, "", "RES:BDPRICE")
             Return 100 * priceObject.GetValue(1)
         End Function
 

@@ -7,6 +7,7 @@ Imports System.Drawing
 Imports System.Xml
 Imports NLog
 Imports System.Runtime.InteropServices
+Imports System.Text.RegularExpressions
 
 Public Interface IProgressObject
     ReadOnly Property Name() As String
@@ -199,6 +200,29 @@ Public Class Utils
             currX += stepX
         Next
         Return res
+    End Function
+
+    Private Shared Function IsNone(ByVal str As String) As Boolean
+        Return str = "" Or str = "Default"
+    End Function
+
+    ''' <summary>
+    ''' Returns adjusted rate structure
+    ''' </summary>
+    ''' <param name="main">Rate mode fixed in settings</param>
+    ''' <param name="parent">Rate mode fixed in bond</param>
+    ''' <param name="original">Rate mode in question</param>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Priority is as follows:
+    ''' 1) First, apply mode in parent (if not Default)
+    ''' 2) Then, apply mode in settings (if not Default)
+    ''' 3) If failed, return original
+    ''' </remarks>
+    Public Shared Function GetRateStructure(ByVal main As String, ByVal parent As String, ByVal original As String) As String
+        If Not IsNone(parent) Then Return Regex.Replace(original, "YT[A-Z]", parent)
+        If Not IsNone(main) Then Return Regex.Replace(original, "YT[A-Z]", main)
+        Return original
     End Function
 End Class
 

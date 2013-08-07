@@ -283,8 +283,9 @@ Namespace Tools.Elements
 
             Dim yieldCalcMode = ParentBond.YieldMode
             Dim rateStructure = If(Not yieldCalcMode.Belongs("Default", ""), Regex.Replace(dscr.RateStructure, "YT[A-Z]", yieldCalcMode), dscr.RateStructure)
+            Dim bondYield As Array = _bondModule.AdBondYield(settleDate, Price / 100, dscr.Maturity, coupon, dscr.PaymentStructure, rateStructure, "")
 
-            Dim bondYield As Array = _bondModule.AdBondYield(settleDate, Price / 100, dscr.Maturity, coupon, dscr.PaymentStructure, Regex.Replace(rateStructure, "YT[A-Z]", SettingsManager.Instance.YieldCalcMode), "")
+            'Dim bondYield As Array = _bondModule.AdBondYield(settleDate, Price / 100, dscr.Maturity, coupon, dscr.PaymentStructure, Regex.Replace(rateStructure, "YT[A-Z]", SettingsManager.Instance.YieldCalcMode), "")
             _yields = New YieldContainer(bondYield, ParentBond.UserDefinedSpread(Ordinate.Yield))
 
             For i = 0 To _yields.Yields.Count() - 1

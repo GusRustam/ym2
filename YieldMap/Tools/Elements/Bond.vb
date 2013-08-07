@@ -182,13 +182,19 @@ Namespace Tools.Elements
             End Get
         End Property
 
+        Private _indvidualBondMode As Boolean = False
         Private _yieldMode As String = SettingsManager.Instance.YieldCalcMode
         Public Property YieldMode() As String
             Get
-                Return _yieldMode
+                Return If(_indvidualBondMode, _yieldMode, SettingsManager.Instance.YieldCalcMode)
             End Get
             Set(ByVal value As String)
                 _yieldMode = value
+                If value = "Default" Or value = "" Then
+                    _indvidualBondMode = False
+                Else
+                    _indvidualBondMode = True
+                End If
                 RaiseEvent Changed()
             End Set
         End Property

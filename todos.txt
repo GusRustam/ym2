@@ -36,33 +36,149 @@
  // - для интерполированной/бутстрепленной кривой в меню кривой убирать подменю labels
  // - показывать дату исторический бондовой кривой в легенде
  // - по бондовой кривой показывать X, Y наверху
+ // - неверно рисовал доходность RU0A0JS3D6=MM (точнее, не позволял по-человечески менять YTM/YTP)
+ // - ошибка когда ставишь YM:Default в settings
+ // - если начать писать неправильное регулярное выражение в диалоге select bond, вылетает эксепшен (туду - проверить, как он убивает YieldMap)
+ // - режим метки issuer-купон-date дату показывать только год 2 цифры (-yy or 'yy)
 
  ? на семерке не пошла без административных привилегий (возможно, дело было в том, что надо класть не на рабочий стол, а в папку пользователя)
- 
+
+ - после восстановления от ошибки загрузки данных почему-то не включилась кнопка chart. И после потери соединения и восстановления соединения тоже!
+ - купон кастомного бонда почему-то делится на 100 при отображении
+ - может, не стоит скрывать bond menu когда открываем curve menu?
+ - не показывать галочку над режимом метки по облигации, если метка скрыта
+ - в меню бондовой кривой в легенде показывать галочку перед режимом меток если у всех один и тот же режим
+ - сортировка по любым столбцам при просмотре элементов кривой
+ - возможность добавить custom bond через меню Add bond
+ - перерисовка кастомного бонда при изменении его структуры через бондовый калькулятор
  - в редакторе add bond to chart показывать случайный цвет (выбор есть, показа нет)
- 
  - на кривых справа опционально показывать ее метку
  - при пересчете дерева портфелей разколлапсивать последнюю ветку
  - чейн/лист эдитор - кривой порядок столбцов
  - чейн керв эдитор - add term tag исчезает и не текст влезает
  - отключить редактирование в редакторе полей и браузере данных
+ - в диалоге set spread не показывает отрицательный спред
+ - добавить выбор quotes в меню кривой
+ - не показывает Descr в диалоге Curve Items
+ - когда удаляешь бенчмарк, вкладки спреда не удаляются из curve items диалога
+ - переименовать IR curves в Built-in curves 
  - в браузере данных контрол+ц копирует всю строку, а не выбранный текст
- 
  - включение CUSTOM BONDS в кривые 
- - т.к. свопов в EJV нету, генерировать структуры свопов самостоятельно (или с минимальным участием пользователя)
- - настройка округления цифр по осям
- - управление стилями (шрифт и размер шрифта) 
+ - настройка округления цифр по осям - типа на right click по оси (после этого рисовать цифры типа италиком, чтобы помнить о том, что они фиксированы)
+ - управление стилями (шрифт и размер шрифта) - то есть это отдельный конфиг файл
  - помечать кривые тонкими линиями, попробовать победить постоянное обновление легенды
- 
- - распараллеливать сложные вычисления (???)
+ - если в list добавить облигации без /, а данные с задержкой, то list рисоваться не будет, а кривая появится в списке бенчмарков
+	 - а если к ней попробовать построить спред, будет эксепшен.
+ - добавить FloatLegStructure и Reference RIC и Reference RIC в чейн кёрвз, чтобы превратить их в своповую кривую
+ - z spread по кастом бонду кажется неверным (-700 vs 160 в экселе)
+ - в режиме з-спреда нет доступа к контекстному меню облигации
+ - попробовать загружать рейтеровские библиотеки при помощи CoLoadLibrary если они не зарегистрированы
+ - сделать шоу айтемз для группы (через контекстное меню облигации (шоу рилейтед груп айтемз) или графика (шоу груп айтемз))
+ - Москва 32025 - бид 93, мид 96, а аска нет. Как вышло - вообще непонятно!
+ - сделал все поля запрещенными. Почти все облигации пропали, но две - остались. И кривая осталась.
+ - в списке полей после того как я перенес все поля влево, справа возникло пустое поле
  
  ----------------------------------------------------------------------------------------------------------
+ Архитектурно получается так. У меня сносный ансамбль и сносные элементы чарта, но абсолютно ублюдочные механизмы представления.
+ То есть тот факт, что в ивенте я кидаю массив для отрисовки - это пиздец, господа. Чарт должен сам запрашивать то, что ему надо.
+ Когда бросаем event, надо просто передавать ID обновленного элемента, а чарт должен по айди обращаться и получать от него то, что ему нужно.
+ Если быть более точным, ансамбль должен уведомить чарт об обновлении, чарт должен спросить, что же обновилось, да и обновить это. То есть
+ декаплим пересчет от перерисовки.
+
+ Тогда можно будет делать и других получателей, например таблицу итп итп.
+ 
+ 
+ ----------------------------------------------------------------------------------------------------------
+ Интересный сценарий разрыва коннекта. Оставил на выходные с включенной кривой
+	1) 02:24:18 	 Info 	 ReutersData.LiveQuotes.OnStatusChangeHandler | OnStatusChangeHandler(RT_LIST_RUNNING, RT_SOURCE_DOWN, RT_MODE_ONTIME_IF_UPDATED)
+	   произошел разрыв соединения (точнее, отвалился IDN), и сразу же пришли сообщения о том, что все rics are stale
+	   
+	2) 02:26:12 	 Trace 	 ReutersData.EikonConnector.OnStatusChanged | OnStatusChanged(Offline)
+	   сообщил, что потеряно соединение с Айконом. В ответ ничего не предпринималось
+	   
+	3) 02:54:46 	 Trace 	 ReutersData.EikonConnector.OnStatusChanged | OnStatusChanged(Connected)
+	   сообщил о восстановлении коннекта, последовало
+	   
+	4) 02:54:46 	 Info 	 DbManager.Bonds.BondsData.Refresh | Refresh() |  | EikonConnector.OnStatusChanged => MainForm.ConnectorConnected => BondsData.Refresh
+	   пошли обновляться данные. Нахрена?
+	   вот запросы в chains:
+	   02:54:46 	 Info 	 ReutersData.Chain.LoadRics | LoadRics(0#RUTSY=MM) |  | <>c__DisplayClassf`1.<ForWorker>b__c => <>c__DisplayClass2d`2.<ForEachWorker>b__23 => Chain.LoadRics
+	   02:54:46 	 Info 	 ReutersData.Chain.LoadRics | LoadRics(0#RUSOVB=MM) |  | <>c__DisplayClassf`1.<ForWorker>b__c => <>c__DisplayClass2d`2.<ForEachWorker>b__23 => Chain.LoadRics
+	   02:54:46 	 Info 	 ReutersData.Chain.LoadRics | LoadRics(0#RUCORP=MM) |  | <>c__DisplayClassf`1.<ForWorker>b__c => <>c__DisplayClass2d`2.<ForEachWorker>b__23 => Chain.LoadRics
+	   02:54:46 	 Info 	 ReutersData.Chain.LoadRics | LoadRics(0#RUMOSB=MM) |  | <>c__DisplayClassf`1.<ForWorker>b__c => <>c__DisplayClass2d`2.<ForEachWorker>b__23 => Chain.LoadRics
+	   02:54:46 	 Info 	 ReutersData.Chain.LoadRics | LoadRics(0#RFGOVBONDS=) |  | <>c__DisplayClassf`1.<ForWorker>b__c => <>c__DisplayClass2d`2.<ForEachWorker>b__23 => Chain.LoadRics
+	   02:54:46 	 Info 	 ReutersData.Chain.LoadRics | LoadRics(0#RFGOVBONDS=) |
+	
+	5) примерно через секунду видимо начали приходить данные по чейнз, поскольку произошло следующее
+	   ожил источник живых данных
+	   02:55:21 	 Info 	 ReutersData.LiveQuotes.OnStatusChangeHandler | OnStatusChangeHandler(RT_LIST_RUNNING, RT_SOURCE_UP, RT_MODE_ONTIME_IF_UPDATED)
+	   и одновременно пришло сообщение о загрузке данных
+	   02:55:21 	 Trace 	 ReutersData.Chain+_Closure$__3._Lambda$__3 | Got data on chain 0#RFGOVBONDS=, status is RT_DS_FULL |  | RuntimeMethodHandle.InvokeMethodFast => RuntimeMethodHandle._InvokeMethodFast => _Closure$__3._Lambda$__3
+	   02:55:21 	 Info 	 DbManager.Bonds.BondLoaderProgressProcess.OnChainData | OnChainData / 6 |  | List`1.ForEach => _Closure$__2._Lambda$__2 => BondLoaderProgressProcess.OnChainData
+	
+	6) и одновременно начали приходить живые котировки
+	   02:55:21 	 Trace 	 YieldMap.Tools.Elements.Group.OnQuotes | OnQuotes() |  | RuntimeMethodHandle._InvokeMethodFast => LiveQuotes.OnTimeHandler => Group.OnQuotes
+	   02:55:21 	 Trace 	 YieldMap.Tools.Elements.Group.HandleNewQuote | HandleNewQuote(/MOSZ39=MM, HIST, 100, 040813, True)
+	   и падать с ошибкой
+	   02:55:21 	 Warn 	 YieldMap.Tools.Elements.Group.OnQuotes | Exception = System.Collections.Generic.KeyNotFoundException: The given key was not present in the dictionary.
+	   
+	   так как новая загрузка фундаментальных данных почистила реестр облигаций
+	   
+	7) после этого пошли загружаться остальные чейны и данные
+	   02:55:22 	 Trace 	 ReutersData.Chain+_Closure$__3._Lambda$__3 | Got data on chain 0#RUMOSB=MM, status is RT_DS_FULL |  | RuntimeMethodHandle.InvokeMethodFast => RuntimeMethodHandle._InvokeMethodFast => _Closure$__3._Lambda$__3
+	   02:55:22 	 Info 	 DbManager.Bonds.BondLoaderProgressProcess.OnChainData | OnChainData / 6 |  | List`1.ForEach => _Closure$__2._Lambda$__2 => BondLoaderProgressProcess.OnChainData
+	   02:55:22 	 Trace 	 ReutersData.Chain+_Closure$__3._Lambda$__3 | Got data on chain 0#RUTSY=MM, status is RT_DS_FULL
+	   .
+	   .
+	   .
+	   
+	8) и наконец обновился реестр облигаций
+	   02:56:16 	 Info 	 DbManager.Bonds.BondsData.Refresh | Refresh() |  | BondsLoader._Lambda$__49 => BondsData.OnBondsLoaded => BondsData.Refresh
+	   
+	9) и наступила тишина до следующего обрыва связи
+	   06:07:28 	 Info 	 ReutersData.LiveQuotes.OnStatusChangeHandler | OnStatusChangeHandler(RT_LIST_RUNNING, RT_SOURCE_DOWN, RT_MODE_ONTIME_IF_UPDATED)
+	
+	10) однако тут отвала от айкона не произошло
+	    06:07:59 	 Info 	 ReutersData.LiveQuotes.OnStatusChangeHandler | OnStatusChangeHandler(RT_LIST_RUNNING, RT_SOURCE_UP, RT_MODE_ONTIME_IF_UPDATED)
+	    и данные снова загрузились (только живые котировки) и успешно пересчитались
+	   
+	11) аналогичное случилось в 10:30
+	    10:31:05 	 Info 	 ReutersData.LiveQuotes.OnStatusChangeHandler | OnStatusChangeHandler(RT_LIST_RUNNING, RT_SOURCE_DOWN, RT_MODE_ONTIME_IF_UPDATED)
+		.
+		.
+		.
+		10:32:43 	 Trace 	 ReutersData.EikonConnector.OnStatusChanged | OnStatusChanged(Offline)
+		
+	12) Но только в этом случае соединение установить толком не получилось:
+		10:34:10 	 Trace 	 ReutersData.EikonConnector.OnStatusChanged | OnStatusChanged(Connected)
+		.
+		.
+		.
+		10:34:10 	 Info 	 ReutersData.Chain.LoadRics | LoadRics(0#RFGOVBONDS=)
+		10:37:10 	 Error 	 DbManager.Bonds.BondLoaderProgressProcess.Awaiter | Failed to wait
+		
+		И вот после этого никакого восстановления не происходило, реест облигаций был чист, график был нарисован, 
+		при движении мыши вылетали ошибки из-за отсутствия реестра, равно как и при попытки вывести группу на график
+		
+	13) В общем, очень интересный сценарий. Из него следует, что
+		1) сейчас у меня source = eikon, хотя это не так. На самом деле, может быть много различных источников, но как их корректно разделять, я пока не знаю.
+		2) Допустим, все идет от чейнов, т.е. данные = {chain, source}
+		3) Если некий сорс отваливается, то надо все, порожденное им, или убить, или пометить неактивным, т.е. должен быть явный статус.
+		4) Если отваливается айкон, то пометить все сорсы неактивными, если таковое ранее не случалось
+		
+		Следовательно, нужен механизм
+		1) пометки детей сорса неактивными
+		2) визуализации этой неактивности
+	
+  
+ ----------------------------------------------------------------------------------------------------------
  - сделать некоторый информер о неочевидном
+ - кривые, созданные ручками (т.е. заданные в виде XY)
  - множественные рики - чо делать та? Может быть, когда юзер открывает менюшку, сразу начинать их всех грузить, смотреть, где есть котировки и показывать те, где они есть?
  - сидиэсы рисует, но их надо делить на 100. Нужен отдельный тип кривой - spread curve.
  - в прототип кривой добавить проперти CanBeBenchmark(IOrdinate of Spread)
  - унаследовать все от кривой! В том числе и набор точек
- - сделать методы преобразования разных кривых друг в друга.
+ - сделать методы преобразования разных кривых друг в друга (и групп в кривые).
  - импорт конфигураций и сохранение View, merge view
  - применение фильтров к не чейну или листу, а ко всем!
  - настройка цвета кривой и ее названия прямо на графике
@@ -86,3 +202,5 @@
  - двигать график мышкой 
  - чо с историей, особенно спреды? Пока ничо
  - начать делать какое-то систематическое тестирование
+ - распараллеливать сложные вычисления (???)
+ - т.к. свопов в EJV нету, генерировать структуры свопов самостоятельно (или с минимальным участием пользователя). Тогда chain curves и bond curves станут ASW бенчмарками
