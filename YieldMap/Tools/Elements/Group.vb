@@ -365,7 +365,7 @@ Namespace Tools.Elements
 
         Public Sub SetLabelMode(ByVal mode As LabelMode)
             FreezeEvents()
-            Dim enable = (From el In _elements Where el.LabelEnabled).Count() <= _elements.Count() / 2
+            Dim enable = (From el In _elements Where el.LabelEnabled AndAlso el.LabelMode = mode).Count() <= _elements.Count() / 2
             _elements.ForEach(Sub(el)
                                   el.LabelMode = mode
                                   el.LabelEnabled = enable
@@ -389,6 +389,11 @@ Namespace Tools.Elements
             FreezeEvents()
             _elements.ForEach(Sub(elem) elem.YieldMode = mode)
             UnfreezeEvents()
+        End Sub
+
+        Public Sub RemoveBond(ByVal bond As Bond)
+            AllElements.Remove(bond)
+            If Not Elements.Any Then Cleanup()
         End Sub
     End Class
 End Namespace

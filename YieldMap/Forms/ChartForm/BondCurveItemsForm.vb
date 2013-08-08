@@ -25,6 +25,10 @@ Namespace Forms.ChartForm
             End Set
         End Property
 
+        Private Sub OnBondRemoved(id As Long)
+            Throw New NotImplementedException()
+        End Sub
+
         Private Sub OnCurveUpdatedSpread(ByVal items As List(Of PointOfCurve), ByVal ord As IOrdinate)
             CurveUpdate()
         End Sub

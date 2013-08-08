@@ -144,8 +144,8 @@ Namespace Forms.MainForm
             Logging.LoggingLevel = Settings.LogLevel
             If Settings.LogLevel <> LogLevel.Off Then Logger.Log(Settings.LogLevel, "Log level set to {0}", Settings.LogLevel)
 
-            Dim minY As Double? = ParseDouble(MinYieldTextBox.Text)
-            Dim maxY As Double? = ParseDouble(MaxYieldTextBox.Text)
+            Dim minYld As Double? = ParseDouble(MinYieldTextBox.Text)
+            Dim maxYld As Double? = ParseDouble(MaxYieldTextBox.Text)
             Dim minDur As Double? = ParseDouble(MinDurTextBox.Text)
             Dim maxDur As Double? = ParseDouble(MaxDurTextBox.Text)
             Dim minSpr As Double? = ParseDouble(MinSpreadTextBox.Text)
@@ -184,40 +184,55 @@ Namespace Forms.MainForm
             End If
             Settings.BondSelectorVisibleColumns = columnsString
 
+            ErrProv.Clear()
             Dim errored As Boolean = False
-            If MinXStrictCB.Checked AndAlso Settings.MinDur Is Nothing Then
+            Dim erroredPage As TabPage
+            If MinXStrictCB.Checked AndAlso Not minDur.HasValue Then
                 ErrProv.SetError(MinDurTextBox, "Minimum X axis value is fixed, please specify minimum duration")
                 errored = True
+                erroredPage = ViewportTP
             End If
-            If MaxXStrictCB.Checked AndAlso Settings.MaxDur Is Nothing Then
+            If MaxXStrictCB.Checked AndAlso Not maxDur.HasValue Then
                 ErrProv.SetError(MaxDurTextBox, "Maximum X axis value is fixed, please specify maximum duration")
                 errored = True
+                erroredPage = ViewportTP
             End If
-            If MinYStrictCB.Checked AndAlso (Settings.MinSpread Is Nothing OrElse Settings.MinYield) Then
-                ErrProv.SetError(If(Settings.MinSpread Is Nothing, MinSpreadTextBox, MinYieldTextBox),
+            If MinYStrictCB.Checked AndAlso (Not minYld.HasValue OrElse Not minSpr.HasValue) Then
+                ErrProv.SetError(If(minYld.HasValue, MinSpreadTextBox, MinYieldTextBox),
                                     "Minimum Y axis value is fixed, please specify minimum yield and spread")
                 errored = True
+                erroredPage = ViewportTP
             End If
-            If MaxYStrictCB.Checked AndAlso (Settings.MaxSpread Is Nothing OrElse Settings.MaxYield) Then
-                ErrProv.SetError(If(Settings.MinSpread Is Nothing, MinSpreadTextBox, MinYieldTextBox),
+            If MaxYStrictCB.Checked AndAlso (Not maxYld.HasValue OrElse Not maxSpr.HasValue) Then
+                ErrProv.SetError(If(maxYld.HasValue, MinSpreadTextBox, MinYieldTextBox),
                                     "Maximum Y axis value is fixed, please specify maximum yield and spread")
                 errored = True
+                erroredPage = ViewportTP
             End If
 
             ' ReSharper disable CompareOfFloatsByEqualityOperator
-            If (minY.HasValue And maxY.HasValue) AndAlso (minY.Value = maxY.Value) Then
+            If (minYld.HasValue And maxYld.HasValue) AndAlso (minYld.Value <= maxYld.Value) Then
                 errored = True
-                ErrProv.SetError(MaxYieldTextBox, "Minimum yield value = maximum yield value")
+                erroredPage = ViewportTP
+                ErrProv.SetError(MaxYieldTextBox, "Minimum yield value <= maximum yield value")
             End If
 
-            If (minSpr.HasValue And maxSpr.HasValue) AndAlso (minSpr.Value = maxSpr.Value) Then
+            If maxYld.HasValue AndAlso maxYld.Value <= 0 Then
                 errored = True
-                ErrProv.SetError(MaxSpreadTextBox, "Minimum spread value = maximum spread value")
+                erroredPage = ViewportTP
+                ErrProv.SetError(MaxYieldTextBox, "Maximum yield value must be > 0")
             End If
 
-            If (minDur.HasValue And maxDur.HasValue) AndAlso (minDur.Value = maxDur.Value) Then
+            If (minSpr.HasValue And maxSpr.HasValue) AndAlso (minSpr.Value <= maxSpr.Value) Then
                 errored = True
-                ErrProv.SetError(MaxDurTextBox, "Minimum duration value = maximum duration value")
+                erroredPage = ViewportTP
+                ErrProv.SetError(MaxSpreadTextBox, "Minimum spread value <= maximum spread value")
+            End If
+
+            If (minDur.HasValue And maxDur.HasValue) AndAlso (minDur.Value <= maxDur.Value) Then
+                errored = True
+                erroredPage = ViewportTP
+                ErrProv.SetError(MaxDurTextBox, "Minimum duration value <= maximum duration value")
             End If
             ' ReSharper restore CompareOfFloatsByEqualityOperator
 
@@ -225,10 +240,13 @@ Namespace Forms.MainForm
                 Settings.NumInterpPoints = NumInterpPointsTB.Text
             End If
 
-            If errored Then Return
+            If errored Then
+                If erroredPage IsNot Nothing Then MainTabControl.SelectTab(erroredPage)
+                Return
+            End If
 
-            Settings.MinYield = minY
-            Settings.MaxYield = maxY
+            Settings.MinYield = minYld
+            Settings.MaxYield = maxYld
             Settings.MinDur = minDur
             Settings.MaxDur = maxDur
             Settings.MinSpread = minSpr

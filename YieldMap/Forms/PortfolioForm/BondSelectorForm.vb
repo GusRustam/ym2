@@ -71,7 +71,7 @@ Namespace Forms.PortfolioForm
             End If
             If RICTextBox.Text <> "" Then
                 Try
-                    Dim x As New Regex(IssuerTextBox.Text)
+                    Dim x As New Regex(RICTextBox.Text)
                     strFitler = If(strFitler <> "", strFitler & " AND ", "") & String.Format("$ric LIKE ""{0}""", RICTextBox.Text)
                 Catch ex As Exception
                     strFitler = If(strFitler <> "", strFitler & " AND ", "") & String.Format("$ric = ""{0}""", RICTextBox.Text)

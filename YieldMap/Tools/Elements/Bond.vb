@@ -1,5 +1,6 @@
 Imports DbManager
 Imports DbManager.Bonds
+Imports NLog
 Imports Settings
 
 Namespace Tools.Elements
@@ -15,6 +16,7 @@ Namespace Tools.Elements
             Implements IEnumerable(Of String)
             Private ReadOnly _parent As Bond
             Private ReadOnly _quotesAndYields As New Dictionary(Of String, BondPointDescription)
+            Protected Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(QyContainer))
 
             Sub New(ByVal parent As Bond)
                 _parent = parent
@@ -61,7 +63,10 @@ Namespace Tools.Elements
             Public ReadOnly Property Main() As BondPointDescription
                 Get
                     Dim priorityField = MaxPriorityField
-                    Return If(priorityField <> "", _quotesAndYields(priorityField), Nothing)
+                    If priorityField <> "" AndAlso Not _quotesAndYields.ContainsKey(priorityField) Then
+                        Logger.Warn("MaxPriorityField {0} not found in bond {1}!", priorityField, _parent.MetaData.Ric)
+                    End If
+                    Return If(priorityField <> "" AndAlso _quotesAndYields.ContainsKey(priorityField), _quotesAndYields(priorityField), Nothing)
                 End Get
             End Property
 
@@ -210,7 +215,7 @@ Namespace Tools.Elements
         End Sub
 
         Public Sub Annihilate()
-            Parent.AllElements.Remove(Me)
+            Parent.RemoveBond(Me)
             RaiseEvent Changed()
         End Sub
 
