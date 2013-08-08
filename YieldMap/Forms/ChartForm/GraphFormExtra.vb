@@ -565,46 +565,58 @@ Namespace Forms.ChartForm
                 End Sub)
         End Sub
 
-        Private Sub OnNewCurvePaint(ByVal data As List(Of PointOfCurve))
+        Private Sub OnNewCurvePaint(ByVal curve As BondCurve, ByVal data As List(Of PointOfCurve))
             GuiAsync(
                 Sub()
+                    Dim srs = TheChart.Series.FindByName(curve.Identity)
+                    If srs IsNot Nothing Then TheChart.Series.Remove(srs)
+
                     If Not data.Any Then Return
-                    Dim crv As BondCurve
                     Dim itsBond As Boolean
                     If TypeOf data.First Is PointOfBondCurve Then
-                        crv = CType(CType(data.First, PointOfBondCurve).Bond.Parent, BondCurve)
                         itsBond = True
                     ElseIf TypeOf data.First Is JustPoint Then
-                        crv = CType(data.First, JustPoint).Curve
                         itsBond = False
                     Else
                         Logger.Warn("Unexpected items type for a bond-based curve")
                         Return
                     End If
-                    Dim srs = TheChart.Series.FindByName(crv.Identity)
-                    If srs IsNot Nothing Then TheChart.Series.Remove(srs)
-                    Dim clr = Color.FromName(crv.Color)
+
+                    Dim clr = Color.FromName(curve.Color)
                     srs = New Series() With {
-                        .Name = crv.Identity,
+                        .Name = curve.Identity,
                         .ChartType = SeriesChartType.Line,
                         .IsVisibleInLegend = False,
                         .borderWidth = 2,
                         .color = clr,
-                        .Tag = crv.Identity
+                        .Tag = curve.Identity
                     }
 
-                    TheChart.Series.Add(srs)
-                    ClearLegendItems(crv.Identity)
+                    If itsBond Then
+                        With srs
+                            .MarkerSize = 6
+                            .MarkerBorderWidth = 1
+                            .MarkerBorderColor = clr
+                            .MarkerStyle = MarkerStyle.Circle
+                        End With
+                    End If
 
-                    Dim legendName = crv.Name
-                    If crv.GroupDate <> Today Then legendName = String.Format("{0} ({1:dd/MM/yyy})", legendName, crv.GroupDate)
-                    TheChart.Legends(0).CustomItems.Add(New LegendItem(legendName, clr, "") With {.Tag = crv.Identity})
+                    TheChart.Series.Add(srs)
+                    ClearLegendItems(curve.Identity)
+
+                    Dim legendName = curve.Name
+                    If curve.GroupDate <> Today Then legendName = String.Format("{0} ({1:dd/MM/yyy})", legendName, curve.GroupDate)
+                    TheChart.Legends(0).CustomItems.Add(New LegendItem(legendName, clr, "") With {.Tag = curve.Identity})
 
                     If itsBond Then
+                        ' another option would be to show mark only if only one point exists
                         srs.Points.AddRange(From point In data.Cast(Of PointOfBondCurve)()
+                                            Let style = MarkerStyle.Diamond
+                                            Let parsed = MarkerStyle.TryParse(point.MarkerStyle, style)
                                             Select New DataPoint(point.TheX, point.TheY) With {
                                                 .Tag = point.Bond,
-                                                .Label = point.Label
+                                                .Label = point.Label,
+                                                .MarkerStyle = If(parsed, style, If(point.ToWhat.Equals(YieldToWhat.Maturity), MarkerStyle.Circle, MarkerStyle.Triangle))
                                             })
                     Else
                         srs.Points.AddRange(From point In data.Cast(Of JustPoint)()

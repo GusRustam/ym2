@@ -825,8 +825,8 @@ Namespace Forms.ChartForm
             Dim src = CType(CType(sender, ToolStripMenuItem).Tag, Source)
 
             Dim curve = New BondCurve(_ansamble, src)
-            AddHandler curve.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnNewCurvePaint(data)
-            AddHandler curve.Updated, AddressOf OnNewCurvePaint
+            AddHandler curve.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnNewCurvePaint(curve, data)
+            AddHandler curve.Updated, Sub(data) OnNewCurvePaint(curve, data)
             AddHandler curve.Cleared, Sub() ClearSeries(curve.Identity)
             _ansamble.Items.Add(curve)
             curve.Subscribe()
