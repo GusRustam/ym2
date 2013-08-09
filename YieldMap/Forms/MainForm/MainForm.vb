@@ -130,7 +130,7 @@ Namespace Forms.MainForm
             _connector.ConnectToEikon()
         End Sub
 
-        Private Sub ConnectorTimeout() Handles _connector.Timeout
+        Private Sub ConnectorTimeout()
             GuiAsync(
                 Sub()
                     _connected = False

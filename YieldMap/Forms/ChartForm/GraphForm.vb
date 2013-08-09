@@ -4,6 +4,7 @@ Imports System.Drawing
 Imports System.ComponentModel
 Imports System.IO
 Imports System.Threading
+Imports YieldMap.Forms.MainForm
 Imports ReutersData
 Imports YieldMap.Tools.Elements
 Imports YieldMap.Forms.PortfolioForm
@@ -227,7 +228,7 @@ Namespace Forms.ChartForm
             Dim newItem2 As ToolStripMenuItem = ExtInfoTSMI.DropDownItems.Add("Set spread...")
             AddHandler newItem2.Click,
                        Sub(sender1 As Object, e1 As EventArgs)
-                           Dim res = InputBox("Enter spread in b.p.", "Custom bond spread", If(bondDataPoint.UserDefinedSpread > 0, bondDataPoint.UserDefinedSpread, ""))
+                           Dim res = InputBox("Enter spread in b.p.", "Custom bond spread", bondDataPoint.UserDefinedSpread)
                            If IsNumeric(res) Then
                                bondDataPoint.UserDefinedSpread = res
                            ElseIf res <> "" Then
@@ -325,6 +326,14 @@ Namespace Forms.ChartForm
                                 MoneyCurveCMS.Show(TheChart, mouseEvent.Location)
                             End If
                         End If
+
+                    ElseIf htr.ChartElementType.Belongs(ChartElementType.Axis, ChartElementType.AxisLabelImage, ChartElementType.AxisLabels) Then
+                        Dim strip As New ContextMenuStrip()
+                        strip.Items.Add("Set axis limits...", Nothing, Sub()
+                                                                          Controller.SettingsManager(SettingsForm.ViewportTP)
+                                                                      End Sub)
+                        strip.Show(TheChart, mouseEvent.Location)
+
                     End If
                 Catch ex As Exception
                     Logger.WarnException("Something went wrong", ex)
@@ -370,10 +379,15 @@ Namespace Forms.ChartForm
                         DatLabel.Text = String.Format("{0:dd/MM/yyyy}", mainYield.YieldAtDate)
                         MatLabel.Text = String.Format("{0:dd/MM/yyyy}", bondData.MetaData.Maturity)
                         CpnLabel.Text = String.Format("{0:F2}%", bondData.MetaData.Coupon)
-                        PVBPLabel.Text = String.Format("{0:F4}", mainYield.PVBP)
-                        CType(htr.Series.Tag, BondSetSeries).SelectedPointIndex = htr.PointIndex
+                        PVBPLabel.Text = String.Format("{0:F4}", mainYield.Pvbp)
 
-                        PlotBidAsk(bondData)
+                        Dim bondSetSeries = TryCast(htr.Series.Tag, BondSetSeries)
+                        If bondSetSeries IsNot Nothing Then
+                            ' such an ugly way to check if this bond is part of bond set...
+                            bondSetSeries.SelectedPointIndex = htr.PointIndex
+                            PlotBidAsk(bondData)
+                        End If
+
                     ElseIf TypeOf point.Tag Is JustPoint Then
                         YldLabel.Text = String.Format("{0:P2}", point.YValues(0))
                         DurLabel.Text = String.Format("{0:F2}", point.XValue)
@@ -816,6 +830,9 @@ Namespace Forms.ChartForm
             AddHandler curve.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnChainCurvePaint(curve, data)
             AddHandler curve.Updated, Sub(lst) OnChainCurvePaint(curve, lst)
             AddHandler curve.Cleared, Sub() ClearSeries(curve.Identity)
+            AddHandler curve.InvalidChain, Sub()
+                                               'todo say that it's invalid!!!!!
+                                           End Sub
             _ansamble.Items.Add(curve)
             curve.Subscribe()
         End Sub

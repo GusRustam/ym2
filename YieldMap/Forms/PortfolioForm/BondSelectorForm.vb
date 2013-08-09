@@ -57,29 +57,29 @@ Namespace Forms.PortfolioForm
             BondListDGV.DataSource = _bonds.Items
         End Sub
 
-        Private Sub RefreshGrid()
-            Dim strFitler As String = ""
-
-            ' ReSharper disable UnusedVariable
-            If IssuerTextBox.Text <> "" Then
-                Try
-                    Dim x As New Regex(IssuerTextBox.Text)
-                    strFitler = String.Format("$issuerName Like ""{0}""", IssuerTextBox.Text)
-                Catch ex As Exception
-                    strFitler = String.Format("$issuerName = ""{0}""", IssuerTextBox.Text)
-                End Try
-            End If
-            If RICTextBox.Text <> "" Then
+        Sub AppendFilter(ByVal tb As TextBox, ByVal fieldName As String, ByRef filter As String)
+            Dim newText = tb.Text
+            If newText <> "" Then
+                ' ReSharper disable UnusedVariable
                 Try
                     Dim x As New Regex(RICTextBox.Text)
-                    strFitler = If(strFitler <> "", strFitler & " AND ", "") & String.Format("$ric LIKE ""{0}""", RICTextBox.Text)
+                    filter = If(filter <> "", filter & " AND ", "") & String.Format("${0} LIKE ""{1}""", fieldName, newText)
                 Catch ex As Exception
-                    strFitler = If(strFitler <> "", strFitler & " AND ", "") & String.Format("$ric = ""{0}""", RICTextBox.Text)
+                    filter = If(filter <> "", filter & " AND ", "") & String.Format("${0} = ""{1}""", fieldName, newText)
                 End Try
+                ' ReSharper restore UnusedVariable
             End If
-            ' ReSharper restore UnusedVariable
+        End Sub
+
+        Private Sub RefreshGrid()
+            Dim strFilter = ""
+            AppendFilter(IssuerTextBox, "ric", strFilter)
+            AppendFilter(RICTextBox, "issuerName", strFilter)
+            AppendFilter(SectorTextBox, "industry", strFilter)
+            AppendFilter(CurrencyTextBox, "currency", strFilter)
+           
             Try
-                _bonds.SetFilter(strFitler)
+                _bonds.SetFilter(strFilter)
                 RefreshList()
             Catch ex As ParserException
                 Logger.ErrorException("Failed to set filtering", ex)
@@ -96,7 +96,9 @@ Namespace Forms.PortfolioForm
             IncludeCB.Text = IIf(IncludeCB.Checked, "Include", "Exclude")
         End Sub
 
-        Private Sub FilterTextChanged(ByVal sender As Object, ByVal e As EventArgs) Handles IssuerTextBox.TextChanged, RICTextBox.TextChanged
+        Private Sub FilterTextChanged(ByVal sender As Object, ByVal e As EventArgs) _
+            Handles IssuerTextBox.TextChanged, RICTextBox.TextChanged, CurrencyTextBox.TextChanged, SectorTextBox.TextChanged
+
             RefreshGrid()
         End Sub
 
@@ -131,18 +133,10 @@ Namespace Forms.PortfolioForm
             Return SortOrder.Descending
         End Function
 
-        Private Sub SelectColumnsToolStripMenuItem_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SelectColumnsToolStripMenuItem.Click
-            Dim sf As New SettingsForm
-            sf.MainTabControl.SelectedTab = sf.MainLoadColumnsPage
-            sf.ShowDialog()
+        Private Sub SelectColumnsToolStripMenuItem_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SelectColumnsToolStripMenuItem.Click, SettingsButton.Click
+            Controller.SettingsManager(SettingsForm.MainLoadColumnsPage)
             RefreshColumns()
         End Sub
 
-        Private Sub SettingsButton_Click(sender As Object, e As EventArgs) Handles SettingsButton.Click
-            Dim sf As New SettingsForm
-            sf.MainTabControl.SelectedTab = sf.MainLoadColumnsPage
-            sf.ShowDialog()
-            RefreshColumns()
-        End Sub
     End Class
 End Namespace

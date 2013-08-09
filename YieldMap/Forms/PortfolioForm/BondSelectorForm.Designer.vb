@@ -24,6 +24,8 @@
         <System.Diagnostics.DebuggerStepThrough()> _
         Private Sub InitializeComponent()
             Me.components = New System.ComponentModel.Container()
+            Dim Label3 As System.Windows.Forms.Label
+            Dim Label4 As System.Windows.Forms.Label
             Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
             Me.BondListDGV = New System.Windows.Forms.DataGridView()
             Me.TableLayoutPanel2 = New System.Windows.Forms.TableLayoutPanel()
@@ -38,6 +40,10 @@
             Me.Label2 = New System.Windows.Forms.Label()
             Me.SelectColumnsCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.SelectColumnsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.CurrencyTextBox = New System.Windows.Forms.TextBox()
+            Me.SectorTextBox = New System.Windows.Forms.TextBox()
+            Label3 = New System.Windows.Forms.Label()
+            Label4 = New System.Windows.Forms.Label()
             Me.TableLayoutPanel1.SuspendLayout()
             CType(Me.BondListDGV, System.ComponentModel.ISupportInitialize).BeginInit()
             Me.TableLayoutPanel2.SuspendLayout()
@@ -131,17 +137,21 @@
             '
             'TableLayoutPanel3
             '
-            Me.TableLayoutPanel3.ColumnCount = 4
+            Me.TableLayoutPanel3.ColumnCount = 5
             Me.TableLayoutPanel3.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50.0!))
             Me.TableLayoutPanel3.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
+            Me.TableLayoutPanel3.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60.0!))
             Me.TableLayoutPanel3.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
             Me.TableLayoutPanel3.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
-            Me.TableLayoutPanel3.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-            Me.TableLayoutPanel3.Controls.Add(Me.SettingsButton, 3, 0)
+            Me.TableLayoutPanel3.Controls.Add(Me.SectorTextBox, 3, 1)
+            Me.TableLayoutPanel3.Controls.Add(Me.CurrencyTextBox, 3, 0)
+            Me.TableLayoutPanel3.Controls.Add(Label4, 2, 1)
+            Me.TableLayoutPanel3.Controls.Add(Me.SettingsButton, 4, 0)
             Me.TableLayoutPanel3.Controls.Add(Me.IssuerTextBox, 1, 0)
             Me.TableLayoutPanel3.Controls.Add(Me.Label1, 0, 0)
             Me.TableLayoutPanel3.Controls.Add(Me.RICTextBox, 1, 1)
             Me.TableLayoutPanel3.Controls.Add(Me.Label2, 0, 1)
+            Me.TableLayoutPanel3.Controls.Add(Label3, 2, 0)
             Me.TableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill
             Me.TableLayoutPanel3.Location = New System.Drawing.Point(0, 0)
             Me.TableLayoutPanel3.Margin = New System.Windows.Forms.Padding(0)
@@ -149,6 +159,8 @@
             Me.TableLayoutPanel3.RowCount = 2
             Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
             Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
+            Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+            Me.TableLayoutPanel3.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
             Me.TableLayoutPanel3.Size = New System.Drawing.Size(738, 50)
             Me.TableLayoutPanel3.TabIndex = 9
             '
@@ -168,7 +180,7 @@
             Me.IssuerTextBox.Dock = System.Windows.Forms.DockStyle.Top
             Me.IssuerTextBox.Location = New System.Drawing.Point(53, 3)
             Me.IssuerTextBox.Name = "IssuerTextBox"
-            Me.IssuerTextBox.Size = New System.Drawing.Size(223, 20)
+            Me.IssuerTextBox.Size = New System.Drawing.Size(203, 20)
             Me.IssuerTextBox.TabIndex = 11
             '
             'Label1
@@ -186,7 +198,7 @@
             Me.RICTextBox.Dock = System.Windows.Forms.DockStyle.Top
             Me.RICTextBox.Location = New System.Drawing.Point(53, 28)
             Me.RICTextBox.Name = "RICTextBox"
-            Me.RICTextBox.Size = New System.Drawing.Size(223, 20)
+            Me.RICTextBox.Size = New System.Drawing.Size(203, 20)
             Me.RICTextBox.TabIndex = 10
             '
             'Label2
@@ -210,6 +222,42 @@
             Me.SelectColumnsToolStripMenuItem.Name = "SelectColumnsToolStripMenuItem"
             Me.SelectColumnsToolStripMenuItem.Size = New System.Drawing.Size(163, 22)
             Me.SelectColumnsToolStripMenuItem.Text = "Choose columns..."
+            '
+            'Label3
+            '
+            Label3.AutoSize = True
+            Label3.Location = New System.Drawing.Point(262, 3)
+            Label3.Margin = New System.Windows.Forms.Padding(3)
+            Label3.Name = "Label3"
+            Label3.Size = New System.Drawing.Size(49, 13)
+            Label3.TabIndex = 14
+            Label3.Text = "Currency"
+            '
+            'Label4
+            '
+            Label4.AutoSize = True
+            Label4.Location = New System.Drawing.Point(262, 28)
+            Label4.Margin = New System.Windows.Forms.Padding(3)
+            Label4.Name = "Label4"
+            Label4.Size = New System.Drawing.Size(38, 13)
+            Label4.TabIndex = 15
+            Label4.Text = "Sector"
+            '
+            'CurrencyTextBox
+            '
+            Me.CurrencyTextBox.Dock = System.Windows.Forms.DockStyle.Top
+            Me.CurrencyTextBox.Location = New System.Drawing.Point(322, 3)
+            Me.CurrencyTextBox.Name = "CurrencyTextBox"
+            Me.CurrencyTextBox.Size = New System.Drawing.Size(203, 20)
+            Me.CurrencyTextBox.TabIndex = 16
+            '
+            'SectorTextBox
+            '
+            Me.SectorTextBox.Dock = System.Windows.Forms.DockStyle.Top
+            Me.SectorTextBox.Location = New System.Drawing.Point(322, 28)
+            Me.SectorTextBox.Name = "SectorTextBox"
+            Me.SectorTextBox.Size = New System.Drawing.Size(203, 20)
+            Me.SectorTextBox.TabIndex = 17
             '
             'BondSelectorForm
             '
@@ -249,5 +297,7 @@
         Friend WithEvents RicDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents MaturitydateDataGridViewTextBoxColumn As System.Windows.Forms.DataGridViewTextBoxColumn
         Friend WithEvents SettingsButton As System.Windows.Forms.Button
+        Friend WithEvents SectorTextBox As System.Windows.Forms.TextBox
+        Friend WithEvents CurrencyTextBox As System.Windows.Forms.TextBox
     End Class
 End Namespace

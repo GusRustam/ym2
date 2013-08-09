@@ -56,10 +56,11 @@ Module MainModule
             AddHandler _portManForm.Closed, Sub() _portManForm = Nothing
         End Sub
 
-        Public Sub SettingsManager()
+        Public Sub SettingsManager(Optional ByVal page As TabPage = Nothing)
             If _settingsForm IsNot Nothing Then _settingsForm.Activate()
             _settingsForm = New SettingsForm()
             _settingsForm.Show()
+            If page IsNot Nothing Then _settingsForm.MainTabControl.SelectTab(page.Name)
             AddHandler _settingsForm.Closed, Sub() _settingsForm = Nothing
         End Sub
 

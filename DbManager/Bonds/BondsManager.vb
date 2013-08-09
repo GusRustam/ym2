@@ -384,6 +384,7 @@ Namespace Bonds
                          floaterRics)
         End Sub
 
+        ' ReSharper disable UnusedMember.Local
         Private Sub LoadStep5()
             If _thisWaitFailed Then Return
             _evt.Signal()
@@ -399,6 +400,7 @@ Namespace Bonds
                 RaiseEvent Progress(New ProgressEvent(MessageKind.Finished, "All data loaded"))
             End If
         End Sub
+        ' ReSharper restore UnusedMember.Local
 
         Private Sub Awaiter()
             Logger.Debug("Awaiter()")
@@ -442,18 +444,26 @@ Namespace Bonds
             Return res.Distinct().ToList()
         End Function
 
-        Private Sub OnChainData(ByVal ricOfChain As String, ByVal chainsAndRics As Dictionary(Of String, List(Of String)), ByVal finished As Boolean) Handles _chainLoader.Chain
+        Private Sub OnChainData(ByVal ricOfChain As String, ByVal chainFailed As Boolean, ByVal chainsAndRics As Dictionary(Of String, List(Of String)), ByVal finished As Boolean) Handles _chainLoader.Chain
             Logger.Info("OnChainData / {0}", _evt.CurrentCount)
             If _thisWaitFailed Then Return
+            If Not chainFailed Then
+                RaiseEvent Progress(New ProgressEvent(MessageKind.Positive, String.Format("Chain {0} arrived", ricOfChain), New ChainProgress(ricOfChain)))
+            Else
+                RaiseEvent Progress(New ProgressEvent(MessageKind.Negative, String.Format("Chain {0} is invalid", ricOfChain), New ChainProgress(ricOfChain)))
+            End If
 
-            RaiseEvent Progress(New ProgressEvent(MessageKind.Positive, String.Format("Chain {0} arrived", ricOfChain), New ChainProgress(ricOfChain)))
             If Not finished Then Return
             _evt.Signal()
 
             If chainsAndRics.Count = 0 Then Exit Sub
 
             Dim chainRics = chainsAndRics.Keys.ToList()
-            chainRics.ForEach(Sub(chainRic) StoreRicsAndChains(chainRic, chainsAndRics(chainRic)))
+            chainRics.ForEach(Sub(chainRic)
+                                  If chainsAndRics.ContainsKey(chainRic) And chainsAndRics(chainRic) IsNot Nothing Then
+                                      StoreRicsAndChains(chainRic, chainsAndRics(chainRic))
+                                  End If
+                              End Sub)
 
             Dim rics = GetRics(chainRics)
             If rics.Count = 0 Then

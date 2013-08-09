@@ -46,9 +46,9 @@ Namespace Tools.Elements
                 Dim mainQuote = bond.QuotesAndYields.Main
                 If mainQuote Is Nothing Then Continue For
                 If bond.Enabled Then
-                    _enabledElements.Add(New BondCurveSnapshotElement(bond.MetaData.RIC, bond.Label, mainQuote.Yield, mainQuote.Duration, mainQuote.Price, bond.QuotesAndYields.MaxPriorityField, mainQuote.YieldAtDate))
+                    _enabledElements.Add(New BondCurveSnapshotElement(bond.MetaData.Ric, bond.MetaData.Label3, mainQuote.Yield, mainQuote.Duration, mainQuote.Price, bond.QuotesAndYields.MaxPriorityField, mainQuote.YieldAtDate))
                 Else
-                    _disabledElements.Add(New BondCurveSnapshotElement(bond.MetaData.RIC, bond.Label, mainQuote.Yield, mainQuote.Duration, mainQuote.Price, bond.QuotesAndYields.MaxPriorityField, mainQuote.YieldAtDate))
+                    _disabledElements.Add(New BondCurveSnapshotElement(bond.MetaData.Ric, bond.MetaData.Label3, mainQuote.Yield, mainQuote.Duration, mainQuote.Price, bond.QuotesAndYields.MaxPriorityField, mainQuote.YieldAtDate))
                 End If
             Next
             _enabledElements.Sort()

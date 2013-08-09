@@ -164,32 +164,38 @@ Namespace Tools.Elements
 
         Private ReadOnly _terms As New Dictionary(Of String, Double)
 
-        Private Sub OnChainData(ric As String, data As Dictionary(Of String, List(Of String)), done As Boolean) Handles _chainLoader.Chain
+        Private Sub OnChainData(ric As String, ByVal chainFailed As Boolean, data As Dictionary(Of String, List(Of String)), done As Boolean) Handles _chainLoader.Chain
             ' Parsing rics, extracting terms, creating ZCB's and storing them
-            Dim rics = data(ric)
-            Dim rex As New Regex(_src.Pattern)
-            For Each rc In rics
-                Dim mtch = rex.Match(rc)
-                If mtch.Success Then
-                    Dim trm = mtch.Groups("term").Value
-                    If trm.Trim() <> "ON" Then
-                        Dim dt = _dates.DfAddPeriod("RUS", Today, trm, "")
-                        _terms(rc) = Utils.FromExcelSerialDate(dt.GetValue(1, 1)).Subtract(Today).Days / 365
+            If Not chainFailed Then
+                Dim rics = data(ric)
+                Dim rex As New Regex(_src.Pattern)
+                For Each rc In rics
+                    Dim mtch = rex.Match(rc)
+                    If mtch.Success Then
+                        Dim trm = mtch.Groups("term").Value
+                        If trm.Trim() <> "ON" Then
+                            Dim dt = _dates.DfAddPeriod("RUS", Today, trm, "")
+                            _terms(rc) = Utils.FromExcelSerialDate(dt.GetValue(1, 1)).Subtract(Today).Days / 365
+                        Else
+                            _terms(rc) = 1 / 365
+                        End If
+                        AllElements.Add(New SyntheticZcb(Me, Today, 0, _terms(rc), Name, rc))
                     Else
-                        _terms(rc) = 1 / 365
+                        Logger.Warn("Failed to parse ric {0}", rc)
                     End If
-                    AllElements.Add(New SyntheticZcb(Me, Today, 0, _terms(rc), Name, rc))
-                Else
-                    Logger.Warn("Failed to parse ric {0}", rc)
-                End If
-            Next
+                Next
 
-            If AllElements.Any Then
-                Subscribe()
+                If AllElements.Any Then
+                    Subscribe()
+                Else
+                    Logger.Error("Failed to find any suitable ric in chain {0}", ric)
+                End If
             Else
-                Logger.Error("Failed to find any suitable ric in chain {0}", ric)
+                RaiseEvent InvalidChain()
             End If
         End Sub
+
+        Public Event InvalidChain As Action
 
         Private Function GetZcbPrice(bond As SyntheticZcb, yield As Double) As Double
             Dim dur = _terms(bond.MetaData.Ric)

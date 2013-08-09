@@ -1354,6 +1354,7 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub ChainCurvesDGV_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs) Handles ChainCurvesDGV.CellDoubleClick
+            If e.RowIndex < 0 Then Return
             Dim chainCrv = CType(ChainCurvesDGV.Rows(e.RowIndex).DataBoundItem, ChainCurveSrc)
             _currentChainCurveId = chainCrv.ID
             FillChainCurveFields(chainCrv)

@@ -1,6 +1,5 @@
 Imports AdfinXAnalyticsFunctions
 Imports DbManager
-Imports System.Text.RegularExpressions
 Imports Settings
 Imports Uitls
 Imports ReutersData

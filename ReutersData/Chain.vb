@@ -6,6 +6,7 @@ Imports NLog
 Imports Settings
 Imports System.Threading
 Imports CommonController
+Imports Uitls
 
 Public Class Chain
     Private Shared ReadOnly Logger As Logger = Logging.GetLogger(GetType(Chain))
@@ -34,7 +35,7 @@ Public Class Chain
         End RaiseEvent
     End Event
 
-    Delegate Sub ChainHandler(ByVal ric As String, ByVal data As Dictionary(Of String, List(Of String)), ByVal done As Boolean)
+    Delegate Sub ChainHandler(ByVal ric As String, ByVal chainError As Boolean, ByVal data As Dictionary(Of String, List(Of String)), ByVal done As Boolean)
 
     Private ReadOnly _chainHandlers As New List(Of ChainHandler)
     Public Custom Event Chain As ChainHandler
@@ -44,8 +45,8 @@ Public Class Chain
         RemoveHandler(ByVal value As ChainHandler)
             _chainHandlers.Remove(value)
         End RemoveHandler
-        RaiseEvent(ByVal arg1 As String, ByVal arg2 As Dictionary(Of String, List(Of String)), ByVal arg3 As Boolean)
-            _chainHandlers.ForEach(Sub(handler) handler(arg1, arg2, arg3))
+        RaiseEvent(ByVal ric As String, ByVal chainError As Boolean, ByVal data As Dictionary(Of String, List(Of String)), ByVal done As Boolean)
+            _chainHandlers.ForEach(Sub(handler) handler(ric, chainError, data, done))
         End RaiseEvent
     End Event
 
@@ -104,7 +105,10 @@ Public Class Chain
                         _result(ricName) = Nothing
                         _rics.TryTake(ricName)
                     End If
-                    RaiseEvent Chain(ricName, New Dictionary(Of String, List(Of String))(_result), Not _rics.Any)
+                    RaiseEvent Chain(ricName,
+                                     datastatus.Belongs(RT_DataStatus.RT_DS_NULL_EMPTY, RT_DataStatus.RT_DS_NULL_ERROR, RT_DataStatus.RT_DS_NULL_TIMEOUT),
+                                     New Dictionary(Of String, List(Of String))(_result),
+                                     Not _rics.Any)
                 Catch ex As Exception
                     Logger.ErrorException("Failed to parse chain [" + ricName + "] data", ex)
                     Logger.Error("Exception = {0}", ex.ToString())
