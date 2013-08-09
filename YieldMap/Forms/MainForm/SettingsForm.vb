@@ -53,14 +53,17 @@ Namespace Forms.MainForm
             Dim items = Settings.FieldsPriority.Split(",")
             Dim i As Integer
             For i = 0 To items.Count() - 1
-                _lst.Add(New IndexedItem(i, items(i)))
+                If Not String.IsNullOrEmpty(items(i)) Then _lst.Add(New IndexedItem(i, items(i)))
             Next
-            FieldsPriorityLB.DataSource = _lst
-            FieldsPriorityLB.DisplayMember = "Name"
-            FieldsPriorityLB.ValueMember = "Order"
+            If _lst.Any Then
+                FieldsPriorityLB.DataSource = _lst
+                FieldsPriorityLB.DisplayMember = "Name"
+                FieldsPriorityLB.ValueMember = "Order"
+            End If
 
             Dim strings = Settings.ForbiddenFields.Split(",")
-            HiddenFieldsListBox.Items.AddRange((From anStr In strings Where anStr <> "").ToArray())
+            Dim hiddenItems As String() = (From anStr In strings Where anStr <> "").ToArray()
+            If hiddenItems.Any Then HiddenFieldsListBox.Items.AddRange(hiddenItems)
 
             MinYieldTextBox.Text = If(Settings.MinYield.HasValue, Settings.MinYield, "")
             MaxYieldTextBox.Text = If(Settings.MaxYield.HasValue, Settings.MaxYield, "")
@@ -157,8 +160,6 @@ Namespace Forms.MainForm
             Settings.ShowMainToolBar = MainWindowCheckBox.Checked
             Settings.ShowChartToolBar = ChartWindowCheckBox.Checked
 
-            Settings.FieldsPriority = String.Join(",", From elem In _lst Select elem.Name)
-            Settings.ForbiddenFields = String.Join(",", HiddenFieldsListBox.Items.Cast(Of String))
             Settings.MidIfBoth = MidIfBothCB.Checked
             Settings.LoadRics = LoadRicsCB.Checked
 
@@ -258,6 +259,14 @@ Namespace Forms.MainForm
             Settings.MinYStrict = MinYStrictCB.Checked
 
             Settings.YieldCalcMode = YieldCalcModeCB.SelectedItem
+
+            Settings.ForbiddenFields = String.Join(",", HiddenFieldsListBox.Items.Cast(Of String))
+            Settings.FieldsPriority = String.Join(",", From elem In _lst Select elem.Name)
+            'todo these actions have side effects - i.e. they raise event that recalculates all chart. 
+            'and when I set FortbiddenFields after FieldsPriority, change of FieldPriority made the chart 
+            'to recalculate while FortbiddenFields were not updated. I don't like it you know.
+            '
+
             Close()
         End Sub
 
@@ -352,7 +361,7 @@ Namespace Forms.MainForm
             If HiddenFieldsListBox.SelectedIndex < 0 Then Return
             Dim item = CStr(HiddenFieldsListBox.Items(HiddenFieldsListBox.SelectedIndex))
             HiddenFieldsListBox.Items.RemoveAt(HiddenFieldsListBox.SelectedIndex)
-            _lst.Add(New IndexedItem(_lst.Last.Order + 1, item))
+            _lst.Add(New IndexedItem(If(_lst.Any, _lst.Last.Order + 1, 0), item))
             Dim i As Integer
             For i = 0 To _lst.Count - 1
                 _lst(i).Order = i

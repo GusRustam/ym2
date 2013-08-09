@@ -8,7 +8,6 @@ Public Class SettingsManager
     Public Event YieldCalcModeChanged As Action(Of String)
     Public Event DataSourceChanged As Action(Of String)
     Public Event FieldsPriorityChanged As Action(Of String)
-    Public Event ForbiddenFieldsChanged As Action(Of String)
     Public Event ShowBidAskChanged As Action(Of Boolean)
     Public Event RatingSortModeChanged As Action(Of Boolean)
     Public Event ViewPortChanged As Action
@@ -225,7 +224,6 @@ Public Class SettingsManager
             If _forbiddenFields <> value Then
                 SaveValue("/settings/property[@name='forbidden-fields']/@value", value)
                 _forbiddenFields = value
-                RaiseEvent ForbiddenFieldsChanged(value)
             End If
         End Set
     End Property

@@ -245,7 +245,6 @@ Namespace Tools.Elements
                 _formula = "N/A"
             End If
 
-
             Return result
         End Function
 
