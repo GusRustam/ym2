@@ -248,7 +248,9 @@ Namespace Forms.ChartForm
             For Each item In YieldCalculationModeToolStripMenuItem.DropDownItems
                 Dim elem = CType(item, ToolStripMenuItem)
                 If elem IsNot Nothing Then
-                    If elem.Text = bondDataPoint.YieldMode Then
+                    If Not bondDataPoint.IndvidualBondMode Then
+                        item.checked = (elem.Text = "Default")
+                    ElseIf elem.Text = bondDataPoint.YieldMode Then
                         item.checked = True
                         found = True
                     Else
@@ -1151,6 +1153,38 @@ Namespace Forms.ChartForm
             Dim datePicker = New DatePickerForm
             If datePicker.ShowDialog() = DialogResult.OK Then _ansamble.GroupDate = datePicker.TheCalendar.SelectionEnd
 
+        End Sub
+
+        Private Sub BondSetCMS_Opening(sender As Object, e As CancelEventArgs) Handles BondSetCMS.Opening
+            If BondSetCMS.Tag Is Nothing Then
+                e.Cancel = True
+                Return
+            End If
+            Dim changeable = _ansamble(BondSetCMS.Tag)
+            If Not TypeOf changeable Is BondGroup Then
+                e.Cancel = True
+                Return
+            End If
+            Dim bondset = CType(changeable, BondGroup)
+
+            If Not bondset.AllElements.Any Then Return
+            Dim im = bondset.AllElements.First.IndvidualBondMode
+            Dim ym = bondset.AllElements.First.YieldMode
+
+            Dim allequal = bondset.AllElements.All(Function(el) el.YieldMode = ym)
+
+            If allequal Then
+                For Each item In BondSetYCMTSMI.DropDownItems
+                    Dim elem = TryCast(item, ToolStripMenuItem)
+                    item.checked = elem IsNot Nothing AndAlso elem.Text = If(Not im, "Default", ym)
+                Next
+            Else
+                For Each item In From el In BondSetYCMTSMI.DropDownItems
+                                 Let elem = TryCast(el, ToolStripMenuItem)
+                                 Where elem IsNot Nothing Select elem
+                    item.Checked = False
+                Next
+            End If
         End Sub
     End Class
 End Namespace

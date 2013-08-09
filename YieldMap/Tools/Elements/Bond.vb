@@ -188,6 +188,13 @@ Namespace Tools.Elements
         End Property
 
         Private _indvidualBondMode As Boolean = False
+
+        Public ReadOnly Property IndvidualBondMode() As Boolean
+            Get
+                Return _indvidualBondMode
+            End Get
+        End Property
+
         Private _yieldMode As String = SettingsManager.Instance.YieldCalcMode
         Public Property YieldMode() As String
             Get

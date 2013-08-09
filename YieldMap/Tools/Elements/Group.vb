@@ -78,7 +78,7 @@ Namespace Tools.Elements
 
         Public Sub UnfreezeEvents() Implements IChangeable.UnfreezeEvents
             _eventsFrozen = False
-            Recalculate()
+            RecalculateTotal()
         End Sub
 
         Public Sub UnfreezeEventsQuiet() Implements IChangeable.UnfreezeEventsQuiet

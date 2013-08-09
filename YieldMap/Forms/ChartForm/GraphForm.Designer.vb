@@ -32,8 +32,8 @@
             Dim Label4 As System.Windows.Forms.Label
             Dim Label5 As System.Windows.Forms.Label
             Dim Label7 As System.Windows.Forms.Label
-            Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-            Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+            Dim ChartArea2 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+            Dim Legend2 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
             Me.TheStatusStrip = New System.Windows.Forms.StatusStrip()
             Me.StatusMessage = New System.Windows.Forms.ToolStripStatusLabel()
             Me.TheToolStrip = New System.Windows.Forms.ToolStrip()
@@ -149,7 +149,7 @@
             Me.IssuerCouponMaturityTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.SeriesDescriptionTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.SeriesSeriesOnlyTSMI = New System.Windows.Forms.ToolStripMenuItem()
-            Me.ToolStripMenuItem4 = New System.Windows.Forms.ToolStripMenuItem()
+            Me.BondSetYCMTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.DefaultTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.YtmTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.YtpTSMI = New System.Windows.Forms.ToolStripMenuItem()
@@ -378,25 +378,25 @@
             'RubIRSTSMI
             '
             Me.RubIRSTSMI.Name = "RubIRSTSMI"
-            Me.RubIRSTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.RubIRSTSMI.Size = New System.Drawing.Size(116, 22)
             Me.RubIRSTSMI.Text = "Rub IRS"
             '
             'RubCCSTSMI
             '
             Me.RubCCSTSMI.Name = "RubCCSTSMI"
-            Me.RubCCSTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.RubCCSTSMI.Size = New System.Drawing.Size(116, 22)
             Me.RubCCSTSMI.Text = "Rub CCS"
             '
             'NDFTSMI
             '
             Me.NDFTSMI.Name = "NDFTSMI"
-            Me.NDFTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.NDFTSMI.Size = New System.Drawing.Size(116, 22)
             Me.NDFTSMI.Text = "NDF"
             '
             'UsdIRSTSMI
             '
             Me.UsdIRSTSMI.Name = "UsdIRSTSMI"
-            Me.UsdIRSTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.UsdIRSTSMI.Size = New System.Drawing.Size(116, 22)
             Me.UsdIRSTSMI.Text = "Usd IRS"
             '
             'ChainCurvesToolStripMenuItem
@@ -535,43 +535,43 @@
             'DefaultToolStripMenuItem
             '
             Me.DefaultToolStripMenuItem.Name = "DefaultToolStripMenuItem"
-            Me.DefaultToolStripMenuItem.Size = New System.Drawing.Size(109, 22)
+            Me.DefaultToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
             Me.DefaultToolStripMenuItem.Text = "Default"
             '
             'YTMToolStripMenuItem
             '
             Me.YTMToolStripMenuItem.Name = "YTMToolStripMenuItem"
-            Me.YTMToolStripMenuItem.Size = New System.Drawing.Size(109, 22)
+            Me.YTMToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
             Me.YTMToolStripMenuItem.Text = "YTM"
             '
             'YTPToolStripMenuItem
             '
             Me.YTPToolStripMenuItem.Name = "YTPToolStripMenuItem"
-            Me.YTPToolStripMenuItem.Size = New System.Drawing.Size(109, 22)
+            Me.YTPToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
             Me.YTPToolStripMenuItem.Text = "YTP"
             '
             'YTCToolStripMenuItem
             '
             Me.YTCToolStripMenuItem.Name = "YTCToolStripMenuItem"
-            Me.YTCToolStripMenuItem.Size = New System.Drawing.Size(109, 22)
+            Me.YTCToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
             Me.YTCToolStripMenuItem.Text = "YTC"
             '
             'YTBToolStripMenuItem
             '
             Me.YTBToolStripMenuItem.Name = "YTBToolStripMenuItem"
-            Me.YTBToolStripMenuItem.Size = New System.Drawing.Size(109, 22)
+            Me.YTBToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
             Me.YTBToolStripMenuItem.Text = "YTB"
             '
             'YTAToolStripMenuItem
             '
             Me.YTAToolStripMenuItem.Name = "YTAToolStripMenuItem"
-            Me.YTAToolStripMenuItem.Size = New System.Drawing.Size(109, 22)
+            Me.YTAToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
             Me.YTAToolStripMenuItem.Text = "YTA"
             '
             'YTWToolStripMenuItem
             '
             Me.YTWToolStripMenuItem.Name = "YTWToolStripMenuItem"
-            Me.YTWToolStripMenuItem.Size = New System.Drawing.Size(109, 22)
+            Me.YTWToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
             Me.YTWToolStripMenuItem.Text = "YTW"
             '
             'DescriptionSep
@@ -913,14 +913,14 @@
             '
             Me.TheChart.BackImageAlignment = System.Windows.Forms.DataVisualization.Charting.ChartImageAlignmentStyle.Center
             Me.TheChart.BackImageWrapMode = System.Windows.Forms.DataVisualization.Charting.ChartImageWrapMode.Unscaled
-            ChartArea1.BackImageAlignment = System.Windows.Forms.DataVisualization.Charting.ChartImageAlignmentStyle.Center
-            ChartArea1.BackImageWrapMode = System.Windows.Forms.DataVisualization.Charting.ChartImageWrapMode.Unscaled
-            ChartArea1.Name = "ChartArea1"
-            Me.TheChart.ChartAreas.Add(ChartArea1)
+            ChartArea2.BackImageAlignment = System.Windows.Forms.DataVisualization.Charting.ChartImageAlignmentStyle.Center
+            ChartArea2.BackImageWrapMode = System.Windows.Forms.DataVisualization.Charting.ChartImageWrapMode.Unscaled
+            ChartArea2.Name = "ChartArea1"
+            Me.TheChart.ChartAreas.Add(ChartArea2)
             Me.TheChart.Dock = System.Windows.Forms.DockStyle.Fill
-            Legend1.Enabled = False
-            Legend1.Name = "Legend1"
-            Me.TheChart.Legends.Add(Legend1)
+            Legend2.Enabled = False
+            Legend2.Name = "Legend1"
+            Me.TheChart.Legends.Add(Legend2)
             Me.TheChart.Location = New System.Drawing.Point(0, 0)
             Me.TheChart.Name = "TheChart"
             Me.TheChart.Size = New System.Drawing.Size(778, 417)
@@ -1166,9 +1166,9 @@
             '
             'BondSetCMS
             '
-            Me.BondSetCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LabelToolStripMenuItem, Me.ToolStripMenuItem4, Me.ToolStripSeparator12, Me.SelectDateTSMI, Me.ToolStripSeparator13, Me.RemoveFromChartTSMI})
+            Me.BondSetCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LabelToolStripMenuItem, Me.BondSetYCMTSMI, Me.ToolStripSeparator12, Me.SelectDateTSMI, Me.ToolStripSeparator13, Me.RemoveFromChartTSMI})
             Me.BondSetCMS.Name = "BondSetCMS"
-            Me.BondSetCMS.Size = New System.Drawing.Size(179, 104)
+            Me.BondSetCMS.Size = New System.Drawing.Size(179, 126)
             '
             'LabelToolStripMenuItem
             '
@@ -1201,54 +1201,54 @@
             Me.SeriesSeriesOnlyTSMI.Size = New System.Drawing.Size(188, 22)
             Me.SeriesSeriesOnlyTSMI.Text = "Series Only"
             '
-            'ToolStripMenuItem4
+            'BondSetYCMTSMI
             '
-            Me.ToolStripMenuItem4.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DefaultTSMI, Me.YtmTSMI, Me.YtpTSMI, Me.YtcTSMI, Me.YtbTSMI, Me.YtaTSMI, Me.YtwTSMI})
-            Me.ToolStripMenuItem4.Font = New System.Drawing.Font("Tahoma", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-            Me.ToolStripMenuItem4.Name = "ToolStripMenuItem4"
-            Me.ToolStripMenuItem4.Size = New System.Drawing.Size(178, 22)
-            Me.ToolStripMenuItem4.Text = "Yield calculation mode"
+            Me.BondSetYCMTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DefaultTSMI, Me.YtmTSMI, Me.YtpTSMI, Me.YtcTSMI, Me.YtbTSMI, Me.YtaTSMI, Me.YtwTSMI})
+            Me.BondSetYCMTSMI.Font = New System.Drawing.Font("Tahoma", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+            Me.BondSetYCMTSMI.Name = "BondSetYCMTSMI"
+            Me.BondSetYCMTSMI.Size = New System.Drawing.Size(178, 22)
+            Me.BondSetYCMTSMI.Text = "Yield calculation mode"
             '
             'DefaultTSMI
             '
             Me.DefaultTSMI.Name = "DefaultTSMI"
-            Me.DefaultTSMI.Size = New System.Drawing.Size(109, 22)
+            Me.DefaultTSMI.Size = New System.Drawing.Size(152, 22)
             Me.DefaultTSMI.Text = "Default"
             '
             'YtmTSMI
             '
             Me.YtmTSMI.Name = "YtmTSMI"
-            Me.YtmTSMI.Size = New System.Drawing.Size(109, 22)
+            Me.YtmTSMI.Size = New System.Drawing.Size(152, 22)
             Me.YtmTSMI.Text = "YTM"
             '
             'YtpTSMI
             '
             Me.YtpTSMI.Name = "YtpTSMI"
-            Me.YtpTSMI.Size = New System.Drawing.Size(109, 22)
+            Me.YtpTSMI.Size = New System.Drawing.Size(152, 22)
             Me.YtpTSMI.Text = "YTP"
             '
             'YtcTSMI
             '
             Me.YtcTSMI.Name = "YtcTSMI"
-            Me.YtcTSMI.Size = New System.Drawing.Size(109, 22)
+            Me.YtcTSMI.Size = New System.Drawing.Size(152, 22)
             Me.YtcTSMI.Text = "YTC"
             '
             'YtbTSMI
             '
             Me.YtbTSMI.Name = "YtbTSMI"
-            Me.YtbTSMI.Size = New System.Drawing.Size(109, 22)
+            Me.YtbTSMI.Size = New System.Drawing.Size(152, 22)
             Me.YtbTSMI.Text = "YTB"
             '
             'YtaTSMI
             '
             Me.YtaTSMI.Name = "YtaTSMI"
-            Me.YtaTSMI.Size = New System.Drawing.Size(109, 22)
+            Me.YtaTSMI.Size = New System.Drawing.Size(152, 22)
             Me.YtaTSMI.Text = "YTA"
             '
             'YtwTSMI
             '
             Me.YtwTSMI.Name = "YtwTSMI"
-            Me.YtwTSMI.Size = New System.Drawing.Size(109, 22)
+            Me.YtwTSMI.Size = New System.Drawing.Size(152, 22)
             Me.YtwTSMI.Text = "YTW"
             '
             'ToolStripSeparator12
@@ -1590,7 +1590,7 @@
         Friend WithEvents YTAToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents YTWToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents DescriptionSep As System.Windows.Forms.ToolStripSeparator
-        Friend WithEvents ToolStripMenuItem4 As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents BondSetYCMTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents DefaultTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents YtmTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents YtpTSMI As System.Windows.Forms.ToolStripMenuItem

@@ -13,7 +13,7 @@ Namespace Forms.MainForm
         Private Shared ReadOnly Logger As Logger = GetLogger(GetType(MainForm))
         Private WithEvents _theSettings As SettingsManager = SettingsManager.Instance
         Private WithEvents _connector As EikonConnector = EikonConnector.Instance(Eikon.Sdk)
-        Private WithEvents _ldr As IBondsLoader = BondsLoader.Instance()
+        Private Shared ReadOnly _ldr As IBondsLoader = BondsLoader.Instance()
         Private Shared _connected As Boolean
         Private _initialized As Boolean = False
 
@@ -31,7 +31,7 @@ Namespace Forms.MainForm
         End Property
 
 #Region "0. Settings and Loader Events"
-        Sub ProgressHandler(ByVal message As ProgressEvent) Handles _ldr.Progress
+        Sub ProgressHandler(ByVal message As ProgressEvent)
             InitEventLabel.Text = message.Msg
             If message.Log.Success() Then
                 Initialized = True
@@ -127,6 +127,7 @@ Namespace Forms.MainForm
                     End If
                 End Sub))
             waiter.Start()
+            AddHandler _ldr.Progress, AddressOf ProgressHandler
             _connector.ConnectToEikon()
         End Sub
 

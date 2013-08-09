@@ -176,7 +176,7 @@ Namespace Tools.Elements
                 Dim yieldDescr = New YieldStructure With {.Yield = yield + spread, .YieldToDate = itsDate, .ToWhat = toWhat}
                 _yields.Add(yieldDescr)
             Next
-            _best = _yields.Max
+            _best = _yields.First 'Max
         End Sub
 
 
@@ -275,7 +275,7 @@ Namespace Tools.Elements
         Private Sub CalculateYields(ByVal prc As Double)
             Price = prc
             Dim dscr = ParentBond.MetaData
-            Logger.Trace("CalculateYields({0}, {1})", Price, dscr.RIC)
+            Logger.Trace("CalculateYields({0}, {1}, {2})", Price, dscr.Ric, ParentBond.YieldMode)
 
             Dim coupon = ParentBond.Coupon(YieldAtDate)
             Dim settleDate = _bondModule.BdSettle(YieldAtDate, dscr.PaymentStructure)

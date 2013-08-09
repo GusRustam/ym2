@@ -73,8 +73,8 @@ Namespace Forms.PortfolioForm
 
         Private Sub RefreshGrid()
             Dim strFilter = ""
-            AppendFilter(IssuerTextBox, "ric", strFilter)
-            AppendFilter(RICTextBox, "issuerName", strFilter)
+            AppendFilter(IssuerTextBox, "issuerName", strFilter)
+            AppendFilter(RICTextBox, "ric", strFilter)
             AppendFilter(SectorTextBox, "industry", strFilter)
             AppendFilter(CurrencyTextBox, "currency", strFilter)
            

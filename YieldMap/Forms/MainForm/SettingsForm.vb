@@ -212,10 +212,10 @@ Namespace Forms.MainForm
             End If
 
             ' ReSharper disable CompareOfFloatsByEqualityOperator
-            If (minYld.HasValue And maxYld.HasValue) AndAlso (minYld.Value <= maxYld.Value) Then
+            If (minYld.HasValue And maxYld.HasValue) AndAlso (minYld.Value > maxYld.Value) Then
                 errored = True
                 erroredPage = ViewportTP
-                ErrProv.SetError(MaxYieldTextBox, "Minimum yield value <= maximum yield value")
+                ErrProv.SetError(MaxYieldTextBox, "Minimum yield value must be <= maximum yield value")
             End If
 
             If maxYld.HasValue AndAlso maxYld.Value <= 0 Then
@@ -224,16 +224,16 @@ Namespace Forms.MainForm
                 ErrProv.SetError(MaxYieldTextBox, "Maximum yield value must be > 0")
             End If
 
-            If (minSpr.HasValue And maxSpr.HasValue) AndAlso (minSpr.Value <= maxSpr.Value) Then
+            If (minSpr.HasValue And maxSpr.HasValue) AndAlso (minSpr.Value > maxSpr.Value) Then
                 errored = True
                 erroredPage = ViewportTP
-                ErrProv.SetError(MaxSpreadTextBox, "Minimum spread value <= maximum spread value")
+                ErrProv.SetError(MaxSpreadTextBox, "Minimum spread value must be <= maximum spread value")
             End If
 
-            If (minDur.HasValue And maxDur.HasValue) AndAlso (minDur.Value <= maxDur.Value) Then
+            If (minDur.HasValue And maxDur.HasValue) AndAlso (minDur.Value > maxDur.Value) Then
                 errored = True
                 erroredPage = ViewportTP
-                ErrProv.SetError(MaxDurTextBox, "Minimum duration value <= maximum duration value")
+                ErrProv.SetError(MaxDurTextBox, "Minimum duration value must be <= maximum duration value")
             End If
             ' ReSharper restore CompareOfFloatsByEqualityOperator
 
