@@ -333,7 +333,10 @@ Namespace Forms.ChartForm
             SpreadCMS.Items.Clear()
             SpreadCMS.Tag = nm
             For Each item As SwapCurve In _ansamble.SwapCurves
+                Dim tmp = item
                 Dim elem = CType(SpreadCMS.Items.Add(item.Name, Nothing, AddressOf OnBenchmarkSelected), ToolStripMenuItem)
+                AddHandler elem.MouseEnter, Sub() HighlightCurve(tmp, True)
+                AddHandler elem.MouseLeave, Sub() HighlightCurve(tmp, False)
                 elem.CheckOnClick = True
                 elem.Checked = refCurve IsNot Nothing AndAlso item.Identity = CType(refCurve, Identifyable).Identity
                 elem.Tag = item
@@ -342,7 +345,10 @@ Namespace Forms.ChartForm
             Dim items = (From elem In _ansamble.Items Where TypeOf elem.Value Is BondCurve Select elem.Value).ToList()
             If SpreadCMS.Items.Count > 0 And items.Any Then SpreadCMS.Items.Add(New ToolStripSeparator)
             For Each item In items
+                Dim tmp = item
                 Dim elem = CType(SpreadCMS.Items.Add(item.Name, Nothing, AddressOf OnBenchmarkSelected), ToolStripMenuItem)
+                AddHandler elem.MouseEnter, Sub() HighlightCurve(tmp, True)
+                AddHandler elem.MouseLeave, Sub() HighlightCurve(tmp, False)
                 elem.CheckOnClick = True
                 elem.Checked = refCurve IsNot Nothing AndAlso item.Identity = CType(refCurve, Identifyable).Identity
                 elem.Tag = item
@@ -351,12 +357,41 @@ Namespace Forms.ChartForm
             items = (From elem In _ansamble.Items Where TypeOf elem.Value Is ChainCurve Select elem.Value).ToList()
             If SpreadCMS.Items.Count > 0 And items.Any Then SpreadCMS.Items.Add(New ToolStripSeparator)
             For Each item In items
+                Dim tmp = item
                 Dim elem = CType(SpreadCMS.Items.Add(item.Name, Nothing, AddressOf OnBenchmarkSelected), ToolStripMenuItem)
+                AddHandler elem.MouseEnter, Sub() HighlightCurve(tmp, True)
+                AddHandler elem.MouseLeave, Sub() HighlightCurve(tmp, False)
                 elem.CheckOnClick = True
                 elem.Checked = refCurve IsNot Nothing AndAlso item.Identity = CType(refCurve, Identifyable).Identity
                 elem.Tag = item
             Next item
             SpreadCMS.Show(MousePosition)
+        End Sub
+
+        Private _lastBorderWidth As Integer
+        Private _lastHighlightedSeries As Series
+        Private Sub HighlightCurve(ByVal group As Identifyable, ByVal highlight As Boolean)
+            Dim srs = TheChart.Series.FindByName(group.Identity)
+            If srs Is Nothing Then Return
+            If highlight Then
+                If _lastHighlightedSeries Is Nothing Then
+                    SaveAndHighlight(srs)
+                ElseIf srs.Name <> _lastHighlightedSeries.Name Then
+                    _lastHighlightedSeries.BorderWidth = _lastBorderWidth
+                    SaveAndHighlight(srs)
+                End If
+            Else
+                If _lastHighlightedSeries IsNot Nothing AndAlso _lastHighlightedSeries.Name = srs.Name Then
+                    _lastHighlightedSeries = Nothing
+                    srs.BorderWidth = _lastBorderWidth
+                End If
+            End If
+        End Sub
+
+        Private Sub SaveAndHighlight(srs As Series)
+            _lastHighlightedSeries = srs
+            _lastBorderWidth = srs.BorderWidth
+            srs.BorderWidth = 2 * _lastBorderWidth
         End Sub
 
         Private Sub OnBenchmarkSelected(ByVal sender As Object, ByVal eventArgs As EventArgs)

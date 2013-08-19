@@ -189,7 +189,7 @@ Namespace Tools.Elements
                             Dim rateStructure As String = Utils.GetRateStructure(SettingsManager.Instance.YieldCalcMode, data(i).YieldMode, meta.RateStructure)
                             Dim priceObject As Array = _bondModule.AdBondPrice(settleDate, main.Yield + data(i).UserDefinedSpread(Yield),
                                                                               meta.Maturity, params(i, 3), 0, meta.PaymentStructure,
-                                                                              rateStructure, "", "RES:BDPRICE")
+                                                                              "RM:" & rateStructure, "", "RES:BDPRICE")
                             params(i, 4) = priceObject.GetValue(1)
                         Else
                             params(i, 4) = main.Price / 100.0

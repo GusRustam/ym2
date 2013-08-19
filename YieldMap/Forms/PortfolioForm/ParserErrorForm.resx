@@ -143,7 +143,7 @@
   </metadata>
   <data name="GrammarTB.Text" xml:space="preserve">
     <value>General expression is a combination of terms {$var} {binaryOperation} {value} with logical operators. You can use parentheses to group operators.
-Logical operations are AND and OR, binary operations are =, &gt;, &lt;, &gt;=, &lt;=, LIKE
+Logical operations are AND and OR, binary operations are =, &gt;, &lt;, &gt;=, &lt;=, LIKE and NLIKE (latter is "not like")
 
 Values can be string, number, date and rating: 
  - String must be enclosed in "";

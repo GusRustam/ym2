@@ -331,9 +331,7 @@ Namespace Forms.ChartForm
 
                     ElseIf htr.ChartElementType.Belongs(ChartElementType.Axis, ChartElementType.AxisLabelImage, ChartElementType.AxisLabels) Then
                         Dim strip As New ContextMenuStrip()
-                        strip.Items.Add("Set axis limits...", Nothing, Sub()
-                                                                          Controller.SettingsManager(SettingsForm.ViewportTP)
-                                                                      End Sub)
+                        strip.Items.Add("Set axis limits...", Nothing, Sub() Controller.SettingsManager(SettingsForm.ViewportTP.Name))
                         strip.Show(TheChart, mouseEvent.Location)
 
                     End If

@@ -55,8 +55,7 @@ Namespace Forms.MainForm
         End Sub
 
         Private Shared Sub LogSettingsTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles LogSettingsTSMI.Click
-            Dim sf = New SettingsForm
-            sf.ShowDialog()
+            Controller.SettingsManager(SettingsForm.MainLogPage.Name)
         End Sub
 
         Private Sub MainToolStripMouseDoubleClick(ByVal sender As Object, ByVal e As MouseEventArgs) Handles MainToolStrip.MouseDoubleClick

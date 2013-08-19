@@ -1,5 +1,6 @@
 ﻿Imports System.Text.RegularExpressions
 Imports System.Reflection
+Imports System.Globalization
 
 Namespace Bonds
     Public Class FilterParser
@@ -12,8 +13,8 @@ Namespace Bonds
         Private Shared ReadOnly VarName1 As Regex = New Regex("^\s*?\$(?<varname>\w+\.\w+|\w+)")
         Private Shared ReadOnly ObjName1 As Regex = New Regex("^\s*?\$(?<objname>\w+)\.(?<fieldname>\w+)")
         Private Shared ReadOnly LogOp As Regex = New Regex("^\s*?(?<lop>AND|OR)")
-        Private Shared ReadOnly BinOp As Regex = New Regex("^\s*?(?<bop>\<=|\>=|=|\<\>|\<|\>|like)")
-        Private Shared ReadOnly NumValue As Regex = New Regex("^\s*?(?<num>\d+.\d+|\d+)")
+        Private Shared ReadOnly BinOp As Regex = New Regex("^\s*?(?<bop>\<=|\>=|=|\<\>|\<|\>|like|nlike)")
+        Private Shared ReadOnly NumValue As Regex = New Regex("^\s*?(?<num>-?\d+.\d+|-?\d+)")
         Private Shared ReadOnly BoolValue As Regex = New Regex("^\s*?(?<bool>True|False)")
         Private Shared ReadOnly StrValue As Regex = New Regex("^\s*?""(?<str>[^""]*)""")
         Private Shared ReadOnly DatValue As Regex = New Regex("^\s*?#(?<dd>\d{1,2})/(?<mm>\d{1,2})/(?<yy>\d{2}|\d{4})#")
@@ -93,6 +94,7 @@ Namespace Bonds
                 OpLessOrEquals
                 OpNotEqual
                 OpLike
+                OpNLike
             End Enum
 
             Private ReadOnly _binaryOperation As BinaryOperation
@@ -107,6 +109,7 @@ Namespace Bonds
                     Case BinaryOperation.OpLessOrEquals : res = "<="
                     Case BinaryOperation.OpNotEqual : res = "<>"
                     Case BinaryOperation.OpLike : res = "like"
+                    Case BinaryOperation.OpLike : res = "nlike"
                 End Select
                 Return res
             End Function
@@ -121,6 +124,7 @@ Namespace Bonds
                     Case ">=" : _binaryOperation = Bop.BinaryOperation.OpGreaterOrEquals
                     Case "<=" : _binaryOperation = Bop.BinaryOperation.OpLessOrEquals
                     Case "like" : _binaryOperation = Bop.BinaryOperation.OpLike
+                    Case "nlike" : _binaryOperation = Bop.BinaryOperation.OpNLike
                     Case Else : Throw New ConditionLexicalException(String.Format("Invalid binary operation {0}", binaryOperation))
                 End Select
             End Sub
@@ -697,8 +701,11 @@ Namespace Bonds
                 Dim boolOp = TryCast(node.Value, FilterParser.Bop)
                 If boolOp Is Nothing Then Throw New InterpreterException(String.Format("Invalid filter expression; boolean operation expected instead of {0}", node.Value.ToString()))
 
+                Dim fieldVarValue = fav(var.Name)
+                If fieldVarValue Is Nothing Then fieldVarValue = ""
+
                 If TypeOf val Is FilterParser.Val(Of String) Then
-                    Dim strObjVal = fav(var.Name).ToString().ToUpper()
+                    Dim strObjVal = fieldVarValue.ToString().ToUpper()
                     Dim strValVal = CType(val, FilterParser.Val(Of String)).Value.ToUpper()
 
                     Select Case boolOp.BinOperation
@@ -713,100 +720,113 @@ Namespace Bonds
                             Catch ex As ArgumentException
                                 Throw New InterpreterException(String.Format("Invalid regular expression pattern {0}", strValVal)) ' invalid pattern
                             End Try
+                        Case FilterParser.Bop.BinaryOperation.OpNLike
+                            Try
+                                Dim rx = New Regex(strValVal)
+                                resultStack.Push(Not rx.Match(strObjVal).Success)
+                            Catch ex As ArgumentException
+                                Throw New InterpreterException(String.Format("Invalid regular expression pattern {0}", strValVal)) ' invalid pattern
+                            End Try
                         Case Else
                             Throw New InterpreterException(String.Format("Operation {0} is not applicable to strings", boolOp.BinOperation)) ' invalid string operation
                     End Select
 
                 ElseIf TypeOf val Is FilterParser.Val(Of Date) Then
-                    If Not IsDate(fav(var.Name)) Then Throw New InterpreterException(String.Format("Value {0} is not in date format", fav(var.Name)))
-                    Dim datObjVal = CType(fav(var.Name), Date)
-                    Dim datValVal = CType(val, FilterParser.Val(Of Date)).Value
+                    If IsDate(fieldVarValue) Then
+                        Dim datObjVal As Date
+                        If Date.TryParse(fieldVarValue, CultureInfo.InvariantCulture, DateTimeStyles.None, datObjVal) Then
+                            Dim datValVal = CType(val, FilterParser.Val(Of Date)).Value
 
-                    Select Case boolOp.BinOperation
-                        Case FilterParser.Bop.BinaryOperation.OpEquals
-                            resultStack.Push(datObjVal = datValVal)
-                        Case FilterParser.Bop.BinaryOperation.OpNotEqual
-                            resultStack.Push(datObjVal <> datValVal)
-                        Case FilterParser.Bop.BinaryOperation.OpGreater
-                            resultStack.Push(datObjVal > datValVal)
-                        Case FilterParser.Bop.BinaryOperation.OpGreaterOrEquals
-                            resultStack.Push(datObjVal >= datValVal)
-                        Case FilterParser.Bop.BinaryOperation.OpLess
-                            resultStack.Push(datObjVal < datValVal)
-                        Case FilterParser.Bop.BinaryOperation.OpLessOrEquals
-                            resultStack.Push(datObjVal <= datValVal)
-                        Case Else
-                            Throw New InterpreterException(String.Format("Operation {0} is not applicable to dates", boolOp.BinOperation)) ' invalid date operation
-                    End Select
-
-                ElseIf TypeOf val Is FilterParser.Val(Of Double) Then
-                    ' todo in theory I could separate double and integer so that to disallow = and <> for double
-                    If Not IsNumeric(fav(var.Name)) Then Throw New InterpreterException(String.Format("Value {0} is not in numeric format", fav(var.Name)))
-                    Dim dblObjVal = CType(fav(var.Name), Double)
-                    Dim dblValVal = CType(val, FilterParser.Val(Of Double)).Value
-                    Select Case boolOp.BinOperation
-                        Case FilterParser.Bop.BinaryOperation.OpEquals
-                            ' ReSharper disable CompareOfFloatsByEqualityOperator
-                            resultStack.Push(dblObjVal = dblValVal)
-                            ' ReSharper restore CompareOfFloatsByEqualityOperator
-                        Case FilterParser.Bop.BinaryOperation.OpNotEqual
-                            ' ReSharper disable CompareOfFloatsByEqualityOperator
-                            resultStack.Push(dblObjVal <> dblValVal)
-                            ' ReSharper restore CompareOfFloatsByEqualityOperator
-                        Case FilterParser.Bop.BinaryOperation.OpGreater
-                            resultStack.Push(dblObjVal > dblValVal)
-                        Case FilterParser.Bop.BinaryOperation.OpGreaterOrEquals
-                            resultStack.Push(dblObjVal >= dblValVal)
-                        Case FilterParser.Bop.BinaryOperation.OpLess
-                            resultStack.Push(dblObjVal < dblValVal)
-                        Case FilterParser.Bop.BinaryOperation.OpLessOrEquals
-                            resultStack.Push(dblObjVal <= dblValVal)
-                        Case Else
-                            Throw New InterpreterException(String.Format("Operation {0} is not applicable to numbers", boolOp.BinOperation)) ' invalid date operation
-                    End Select
-
-                ElseIf TypeOf val Is FilterParser.Val(Of Boolean) Then
-                    ' todo interpretation of booleans
-                    Try
-                        Dim boolObjVal = CType(fav(var.Name), Boolean)
-                        Dim boolValVal = CType(val, FilterParser.Val(Of Boolean)).Value
+                            Select Case boolOp.BinOperation
+                                Case FilterParser.Bop.BinaryOperation.OpEquals
+                                    resultStack.Push(datObjVal = datValVal)
+                                Case FilterParser.Bop.BinaryOperation.OpNotEqual
+                                    resultStack.Push(datObjVal <> datValVal)
+                                Case FilterParser.Bop.BinaryOperation.OpGreater
+                                    resultStack.Push(datObjVal > datValVal)
+                                Case FilterParser.Bop.BinaryOperation.OpGreaterOrEquals
+                                    resultStack.Push(datObjVal >= datValVal)
+                                Case FilterParser.Bop.BinaryOperation.OpLess
+                                    resultStack.Push(datObjVal < datValVal)
+                                Case FilterParser.Bop.BinaryOperation.OpLessOrEquals
+                                    resultStack.Push(datObjVal <= datValVal)
+                                Case Else
+                                    Throw New InterpreterException(String.Format("Operation {0} is not applicable to dates", boolOp.BinOperation)) ' invalid date operation
+                            End Select
+                        Else
+                            resultStack.Push(True)
+                        End If
+                    Else
+                        resultStack.Push(True)
+                    End If
+                    ElseIf TypeOf val Is FilterParser.Val(Of Double) Then
+                        ' todo in theory I could separate double and integer so that to disallow = and <> for double
+                        If Not IsNumeric(fieldVarValue) Then Throw New InterpreterException(String.Format("Value {0} is not in numeric format", fieldVarValue))
+                        Dim dblObjVal = CType(fieldVarValue, Double)
+                        Dim dblValVal = CType(val, FilterParser.Val(Of Double)).Value
                         Select Case boolOp.BinOperation
                             Case FilterParser.Bop.BinaryOperation.OpEquals
-                                resultStack.Push(boolObjVal = boolValVal)
+                                ' ReSharper disable CompareOfFloatsByEqualityOperator
+                                resultStack.Push(dblObjVal = dblValVal)
+                                ' ReSharper restore CompareOfFloatsByEqualityOperator
                             Case FilterParser.Bop.BinaryOperation.OpNotEqual
-                                resultStack.Push(boolObjVal <> boolValVal)
+                                ' ReSharper disable CompareOfFloatsByEqualityOperator
+                                resultStack.Push(dblObjVal <> dblValVal)
+                                ' ReSharper restore CompareOfFloatsByEqualityOperator
+                            Case FilterParser.Bop.BinaryOperation.OpGreater
+                                resultStack.Push(dblObjVal > dblValVal)
+                            Case FilterParser.Bop.BinaryOperation.OpGreaterOrEquals
+                                resultStack.Push(dblObjVal >= dblValVal)
+                            Case FilterParser.Bop.BinaryOperation.OpLess
+                                resultStack.Push(dblObjVal < dblValVal)
+                            Case FilterParser.Bop.BinaryOperation.OpLessOrEquals
+                                resultStack.Push(dblObjVal <= dblValVal)
                             Case Else
-                                Throw New InterpreterException(String.Format("Operation {0} is not applicable to booleans", boolOp.BinOperation)) ' invalid bool operation
+                                Throw New InterpreterException(String.Format("Operation {0} is not applicable to numbers", boolOp.BinOperation)) ' invalid date operation
                         End Select
-                    Catch ex As Exception
-                        Throw New InterpreterException(String.Format("Value {0} is not in boolean format", fav(var.Name)), ex)
-                    End Try
 
-                ElseIf TypeOf val Is FilterParser.Val(Of Rating) Then
-                    Dim rateObjVal = TryCast(fav(var.Name), Rating)
-                    If rateObjVal Is Nothing Then Throw New InterpreterException(String.Format("Value {0} is not in rating format", fav(var.Name)))
-                    Dim rateValVal = CType(val, FilterParser.Val(Of Rating)).Value
-                    Select Case boolOp.BinOperation
-                        Case FilterParser.Bop.BinaryOperation.OpEquals
-                            resultStack.Push(rateObjVal = rateValVal)
-                        Case FilterParser.Bop.BinaryOperation.OpNotEqual
-                            resultStack.Push(rateObjVal <> rateValVal)
-                        Case FilterParser.Bop.BinaryOperation.OpGreater
-                            resultStack.Push(rateObjVal > rateValVal)
-                        Case FilterParser.Bop.BinaryOperation.OpGreaterOrEquals
-                            resultStack.Push(rateObjVal >= rateValVal)
-                        Case FilterParser.Bop.BinaryOperation.OpLess
-                            resultStack.Push(rateObjVal < rateValVal)
-                        Case FilterParser.Bop.BinaryOperation.OpLessOrEquals
-                            resultStack.Push(rateObjVal <= rateValVal)
-                        Case Else
-                            Throw New InterpreterException(String.Format("Operation {0} is not applicable to ratings", boolOp.BinOperation)) ' invalid rating operation
-                    End Select
-                Else
-                    ' ReSharper disable VBPossibleMistakenCallToGetType.2
-                    Throw New InterpreterException(String.Format("Unknown operand type {0} ", node.Value.GetType().ToString())) ' unknown type
-                    ' ReSharper restore VBPossibleMistakenCallToGetType.2
-                End If
+                    ElseIf TypeOf val Is FilterParser.Val(Of Boolean) Then
+                        ' todo interpretation of booleans
+                        Try
+                            Dim boolObjVal = CType(fieldVarValue, Boolean)
+                            Dim boolValVal = CType(val, FilterParser.Val(Of Boolean)).Value
+                            Select Case boolOp.BinOperation
+                                Case FilterParser.Bop.BinaryOperation.OpEquals
+                                    resultStack.Push(boolObjVal = boolValVal)
+                                Case FilterParser.Bop.BinaryOperation.OpNotEqual
+                                    resultStack.Push(boolObjVal <> boolValVal)
+                                Case Else
+                                    Throw New InterpreterException(String.Format("Operation {0} is not applicable to booleans", boolOp.BinOperation)) ' invalid bool operation
+                            End Select
+                        Catch ex As Exception
+                            Throw New InterpreterException(String.Format("Value {0} is not in boolean format", fieldVarValue), ex)
+                        End Try
+
+                    ElseIf TypeOf val Is FilterParser.Val(Of Rating) Then
+                        Dim rateObjVal = TryCast(fieldVarValue, Rating)
+                        If rateObjVal Is Nothing Then Throw New InterpreterException(String.Format("Value {0} is not in rating format", fieldVarValue))
+                        Dim rateValVal = CType(val, FilterParser.Val(Of Rating)).Value
+                        Select Case boolOp.BinOperation
+                            Case FilterParser.Bop.BinaryOperation.OpEquals
+                                resultStack.Push(rateObjVal = rateValVal)
+                            Case FilterParser.Bop.BinaryOperation.OpNotEqual
+                                resultStack.Push(rateObjVal <> rateValVal)
+                            Case FilterParser.Bop.BinaryOperation.OpGreater
+                                resultStack.Push(rateObjVal > rateValVal)
+                            Case FilterParser.Bop.BinaryOperation.OpGreaterOrEquals
+                                resultStack.Push(rateObjVal >= rateValVal)
+                            Case FilterParser.Bop.BinaryOperation.OpLess
+                                resultStack.Push(rateObjVal < rateValVal)
+                            Case FilterParser.Bop.BinaryOperation.OpLessOrEquals
+                                resultStack.Push(rateObjVal <= rateValVal)
+                            Case Else
+                                Throw New InterpreterException(String.Format("Operation {0} is not applicable to ratings", boolOp.BinOperation)) ' invalid rating operation
+                        End Select
+                    Else
+                        ' ReSharper disable VBPossibleMistakenCallToGetType.2
+                        Throw New InterpreterException(String.Format("Unknown operand type {0} ", node.Value.GetType().ToString())) ' unknown type
+                        ' ReSharper restore VBPossibleMistakenCallToGetType.2
+                    End If
             Catch ex As NullReferenceException
                 Throw New InterpreterException("Failed to interpret, NPE occured", ex) ' unknown type
 

@@ -68,6 +68,13 @@
 		   at DbManager.Bonds.BondLoaderProgressProcess.StoreRicsAndChains(String chain, List`1& rics) in Z:\Virtual Shared Folder\VS 2010 Projects\YieldMap_v2\DbManager\Bonds\BondsManager.vb:line 514 |  | List`1.ForEach => _Closure$__12._Lambda$__45 => BondLoaderProgressProcess.StoreRicsAndChains
  // - настройка осей - ссылка на редактор вьюпорта
  
+ // - подсветка текущей кривой при наведении курсора мыши на пункт меню
+ // - в редакторе формул: неправильно подставлялась дата 
+ // - в редакторе формул: NPE на lastrating.date и lastrating.source
+ // - в редакторе формул: добавил операцию nlike = not like
+ // - окно настроек журналирирования открывается сразу
+ // - при выборе облигаций не проверялась ошибка регулярного выражения, что приводило к сбою уровня приложения
+ 
  - смена цвета кривой
  - что еще за недоделанный Type в Chain Curve?
  - когда удаляешь бенчмарк, вкладки спреда не удаляются из curve items диалога

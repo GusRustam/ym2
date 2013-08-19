@@ -62,7 +62,7 @@ Namespace Forms.PortfolioForm
             If newText <> "" Then
                 ' ReSharper disable UnusedVariable
                 Try
-                    Dim x As New Regex(RICTextBox.Text)
+                    Dim x As New Regex(tb.Text)
                     filter = If(filter <> "", filter & " AND ", "") & String.Format("${0} LIKE ""{1}""", fieldName, newText)
                 Catch ex As Exception
                     filter = If(filter <> "", filter & " AND ", "") & String.Format("${0} = ""{1}""", fieldName, newText)
@@ -134,7 +134,7 @@ Namespace Forms.PortfolioForm
         End Function
 
         Private Sub SelectColumnsToolStripMenuItem_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SelectColumnsToolStripMenuItem.Click, SettingsButton.Click
-            Controller.SettingsManager(SettingsForm.MainLoadColumnsPage)
+            Controller.SettingsManager(SettingsForm.MainLoadColumnsPage.Name)
             RefreshColumns()
         End Sub
 
