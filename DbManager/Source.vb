@@ -1,5 +1,7 @@
 ﻿Imports System.ComponentModel
 Imports DbManager.Bonds
+Imports Logging
+Imports NLog
 Imports Uitls
 Imports System.Xml
 
@@ -247,6 +249,8 @@ End Class
 Public Class UserListSrc
     Inherits Source
 
+    Private Shared ReadOnly Logger As Logger = GetLogger(GetType(UserListSrc))
+
     Public Sub New(ByVal color As String, ByVal fieldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
         MyBase.New(color, fieldSetId, enabled, curve, name)
         PortMan.AddSource(Me)
@@ -267,7 +271,27 @@ Public Class UserListSrc
     Public Overrides Function GetDefaultRics() As List(Of String)
         Dim node = PortfolioManager.ClassInstance.GetConfigDocument().SelectSingleNode(String.Format("/bonds/lists/list[@id='{0}']", ID))
         If node Is Nothing Then Throw New NoSourceException(String.Format("Failed to find list with id {0}", ID))
-        Return ExtractRics(node)
+        Dim availableRics = New HashSet(Of String)(From row As BondsDataSet.BondRow In BondsLoader.Instance.GetBondsTable().Rows Select row.ric)
+        Dim foundRics = ExtractRics(node)
+        Dim resultingRics As New List(Of String)
+        For Each foundRic In foundRics
+            If availableRics.Contains(foundRic) Then
+                resultingRics.Add(foundRic)
+            Else
+                Dim newRic As String
+                If foundRic(0) = "/" Then
+                    newRic = foundRic.Substring(1)
+                Else
+                    newRic = "/" + foundRic
+                End If
+                If availableRics.Contains(newRic) Then
+                    resultingRics.Add(newRic)
+                Else
+                    Logger.Warn("Failed to find both old {0} and updated ric {1}", foundRic, newRic)
+                End If
+            End If
+        Next
+        Return resultingRics
     End Function
 
     Public Overrides Function GetXmlTypeName() As String

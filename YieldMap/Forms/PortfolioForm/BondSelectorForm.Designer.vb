@@ -33,6 +33,8 @@
             Me.OkButton = New System.Windows.Forms.Button()
             Me.IncludeCB = New System.Windows.Forms.CheckBox()
             Me.TableLayoutPanel3 = New System.Windows.Forms.TableLayoutPanel()
+            Me.SectorTextBox = New System.Windows.Forms.TextBox()
+            Me.CurrencyTextBox = New System.Windows.Forms.TextBox()
             Me.SettingsButton = New System.Windows.Forms.Button()
             Me.IssuerTextBox = New System.Windows.Forms.TextBox()
             Me.Label1 = New System.Windows.Forms.Label()
@@ -40,8 +42,6 @@
             Me.Label2 = New System.Windows.Forms.Label()
             Me.SelectColumnsCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.SelectColumnsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-            Me.CurrencyTextBox = New System.Windows.Forms.TextBox()
-            Me.SectorTextBox = New System.Windows.Forms.TextBox()
             Label3 = New System.Windows.Forms.Label()
             Label4 = New System.Windows.Forms.Label()
             Me.TableLayoutPanel1.SuspendLayout()
@@ -50,6 +50,26 @@
             Me.TableLayoutPanel3.SuspendLayout()
             Me.SelectColumnsCMS.SuspendLayout()
             Me.SuspendLayout()
+            '
+            'Label3
+            '
+            Label3.AutoSize = True
+            Label3.Location = New System.Drawing.Point(262, 3)
+            Label3.Margin = New System.Windows.Forms.Padding(3)
+            Label3.Name = "Label3"
+            Label3.Size = New System.Drawing.Size(49, 13)
+            Label3.TabIndex = 14
+            Label3.Text = "Currency"
+            '
+            'Label4
+            '
+            Label4.AutoSize = True
+            Label4.Location = New System.Drawing.Point(262, 28)
+            Label4.Margin = New System.Windows.Forms.Padding(3)
+            Label4.Name = "Label4"
+            Label4.Size = New System.Drawing.Size(38, 13)
+            Label4.TabIndex = 15
+            Label4.Text = "Sector"
             '
             'TableLayoutPanel1
             '
@@ -164,6 +184,22 @@
             Me.TableLayoutPanel3.Size = New System.Drawing.Size(738, 50)
             Me.TableLayoutPanel3.TabIndex = 9
             '
+            'SectorTextBox
+            '
+            Me.SectorTextBox.Dock = System.Windows.Forms.DockStyle.Top
+            Me.SectorTextBox.Location = New System.Drawing.Point(322, 28)
+            Me.SectorTextBox.Name = "SectorTextBox"
+            Me.SectorTextBox.Size = New System.Drawing.Size(203, 20)
+            Me.SectorTextBox.TabIndex = 17
+            '
+            'CurrencyTextBox
+            '
+            Me.CurrencyTextBox.Dock = System.Windows.Forms.DockStyle.Top
+            Me.CurrencyTextBox.Location = New System.Drawing.Point(322, 3)
+            Me.CurrencyTextBox.Name = "CurrencyTextBox"
+            Me.CurrencyTextBox.Size = New System.Drawing.Size(203, 20)
+            Me.CurrencyTextBox.TabIndex = 16
+            '
             'SettingsButton
             '
             Me.SettingsButton.Dock = System.Windows.Forms.DockStyle.Right
@@ -222,42 +258,6 @@
             Me.SelectColumnsToolStripMenuItem.Name = "SelectColumnsToolStripMenuItem"
             Me.SelectColumnsToolStripMenuItem.Size = New System.Drawing.Size(163, 22)
             Me.SelectColumnsToolStripMenuItem.Text = "Choose columns..."
-            '
-            'Label3
-            '
-            Label3.AutoSize = True
-            Label3.Location = New System.Drawing.Point(262, 3)
-            Label3.Margin = New System.Windows.Forms.Padding(3)
-            Label3.Name = "Label3"
-            Label3.Size = New System.Drawing.Size(49, 13)
-            Label3.TabIndex = 14
-            Label3.Text = "Currency"
-            '
-            'Label4
-            '
-            Label4.AutoSize = True
-            Label4.Location = New System.Drawing.Point(262, 28)
-            Label4.Margin = New System.Windows.Forms.Padding(3)
-            Label4.Name = "Label4"
-            Label4.Size = New System.Drawing.Size(38, 13)
-            Label4.TabIndex = 15
-            Label4.Text = "Sector"
-            '
-            'CurrencyTextBox
-            '
-            Me.CurrencyTextBox.Dock = System.Windows.Forms.DockStyle.Top
-            Me.CurrencyTextBox.Location = New System.Drawing.Point(322, 3)
-            Me.CurrencyTextBox.Name = "CurrencyTextBox"
-            Me.CurrencyTextBox.Size = New System.Drawing.Size(203, 20)
-            Me.CurrencyTextBox.TabIndex = 16
-            '
-            'SectorTextBox
-            '
-            Me.SectorTextBox.Dock = System.Windows.Forms.DockStyle.Top
-            Me.SectorTextBox.Location = New System.Drawing.Point(322, 28)
-            Me.SectorTextBox.Name = "SectorTextBox"
-            Me.SectorTextBox.Size = New System.Drawing.Size(203, 20)
-            Me.SectorTextBox.TabIndex = 17
             '
             'BondSelectorForm
             '
