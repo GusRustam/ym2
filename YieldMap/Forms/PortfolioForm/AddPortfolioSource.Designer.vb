@@ -52,6 +52,8 @@
             Me.SampleColorPB = New System.Windows.Forms.PictureBox()
             Me.RandomColorB = New System.Windows.Forms.Button()
             Me.IncludeCB = New System.Windows.Forms.CheckBox()
+            Me.AddBondsButton = New System.Windows.Forms.Button()
+            Me.RemoveBondsButton = New System.Windows.Forms.Button()
             Me.TableLayoutPanel1.SuspendLayout()
             Me.MainTabControl.SuspendLayout()
             Me.ChainOrListTP.SuspendLayout()
@@ -191,17 +193,19 @@
             'FlowLayoutPanel4
             '
             Me.FlowLayoutPanel4.Controls.Add(Me.IndBondsRB)
+            Me.FlowLayoutPanel4.Controls.Add(Me.AddBondsButton)
+            Me.FlowLayoutPanel4.Controls.Add(Me.RemoveBondsButton)
             Me.FlowLayoutPanel4.Controls.Add(Me.CustomBondsRB)
             Me.FlowLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.FlowLayoutPanel4.Location = New System.Drawing.Point(3, 3)
+            Me.FlowLayoutPanel4.Location = New System.Drawing.Point(0, 0)
+            Me.FlowLayoutPanel4.Margin = New System.Windows.Forms.Padding(0)
             Me.FlowLayoutPanel4.Name = "FlowLayoutPanel4"
-            Me.FlowLayoutPanel4.Size = New System.Drawing.Size(396, 24)
+            Me.FlowLayoutPanel4.Size = New System.Drawing.Size(402, 30)
             Me.FlowLayoutPanel4.TabIndex = 0
             '
             'IndBondsRB
             '
             Me.IndBondsRB.AutoSize = True
-            Me.IndBondsRB.Enabled = False
             Me.IndBondsRB.Location = New System.Drawing.Point(3, 3)
             Me.IndBondsRB.Name = "IndBondsRB"
             Me.IndBondsRB.Size = New System.Drawing.Size(62, 17)
@@ -213,7 +217,7 @@
             '
             Me.CustomBondsRB.AutoSize = True
             Me.CustomBondsRB.Checked = True
-            Me.CustomBondsRB.Location = New System.Drawing.Point(71, 3)
+            Me.CustomBondsRB.Location = New System.Drawing.Point(188, 3)
             Me.CustomBondsRB.Name = "CustomBondsRB"
             Me.CustomBondsRB.Size = New System.Drawing.Size(60, 17)
             Me.CustomBondsRB.TabIndex = 1
@@ -396,6 +400,26 @@
             Me.IncludeCB.Text = "Yes"
             Me.IncludeCB.UseVisualStyleBackColor = True
             '
+            'AddBondsButton
+            '
+            Me.AddBondsButton.Location = New System.Drawing.Point(71, 3)
+            Me.AddBondsButton.Name = "AddBondsButton"
+            Me.AddBondsButton.Size = New System.Drawing.Size(42, 23)
+            Me.AddBondsButton.TabIndex = 2
+            Me.AddBondsButton.Text = "Add..."
+            Me.AddBondsButton.UseVisualStyleBackColor = True
+            Me.AddBondsButton.Visible = False
+            '
+            'RemoveBondsButton
+            '
+            Me.RemoveBondsButton.Location = New System.Drawing.Point(119, 3)
+            Me.RemoveBondsButton.Name = "RemoveBondsButton"
+            Me.RemoveBondsButton.Size = New System.Drawing.Size(63, 23)
+            Me.RemoveBondsButton.TabIndex = 2
+            Me.RemoveBondsButton.Text = "Remove"
+            Me.RemoveBondsButton.UseVisualStyleBackColor = True
+            Me.RemoveBondsButton.Visible = False
+            '
             'AddPortfolioSource
             '
             Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -453,5 +477,7 @@
         Friend WithEvents BondsDGV As System.Windows.Forms.DataGridView
         Friend WithEvents Label2 As System.Windows.Forms.Label
         Friend WithEvents IncludeCB As System.Windows.Forms.CheckBox
+        Friend WithEvents AddBondsButton As System.Windows.Forms.Button
+        Friend WithEvents RemoveBondsButton As System.Windows.Forms.Button
     End Class
 End Namespace

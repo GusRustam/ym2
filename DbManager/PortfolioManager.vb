@@ -112,7 +112,7 @@ Public Class PortfolioManager
         Dim res As New HashSet(Of Long)
         For Each node As XmlNode In nodes
             If Not IsNumeric(node.Value) Then
-                Logger.Error("Node {0} id is not numeric: {1}", node.Name, node.Value)
+                Logger.Warn("Node {0} id is not numeric: {1}", node.Name, node.Value)
             Else
                 Dim id = CLng(node.Value)
                 If _ids.Contains(id) Then
@@ -124,7 +124,6 @@ Public Class PortfolioManager
         Next
         Return res
     End Function
-
 
     Public Function GetPortfoliosByFolder(ByVal id As String) As List(Of Portfolio) Implements IPortfolioManager.GetPortfoliosByFolder
         Dim res As New List(Of Portfolio)
@@ -196,6 +195,8 @@ Public Class PortfolioManager
                         Case "custom-bond"
                             srcId = item.Attributes("id").Value
                             source = CustomBondSrc.LoadById(srcId)
+                        Case "ric"
+                            source = New RegularBondSrc(item.Attributes("id").Value, item.Attributes("color").Value, item.Attributes("name").Value, item.Attributes("rics").Value)
                         Case Else
                             srcId = -1
                             Logger.Warn("Unsupported item {0}", what)

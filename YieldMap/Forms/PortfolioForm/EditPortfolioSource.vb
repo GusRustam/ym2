@@ -3,14 +3,7 @@ Imports Uitls
 
 Namespace Forms.PortfolioForm
     Public Class EditPortfolioSource
-        Private ReadOnly _thePortfolio As SourceBase
         Private _color As String
-
-        Public ReadOnly Property Portfolio As SourceBase
-            Get
-                Return _thePortfolio
-            End Get
-        End Property
 
         Public Property CustomName() As String
             Get
@@ -50,7 +43,7 @@ Namespace Forms.PortfolioForm
         End Property
 
         Public Structure ItemDescription
-            Public Src As Source
+            Public Src As SourceBase
             Public CustomColor As String
             Public CustomName As String
             Public Condition As String
@@ -64,18 +57,30 @@ Namespace Forms.PortfolioForm
                 res.CustomName = CustomName
                 res.Condition = Condition
                 res.Include = IncludeCB.Checked
-                res.Src = If(MainTabControl.SelectedTab.Name = ChainOrListTP.Name, ChainsListsLB.SelectedItem, Nothing)
+                'res.Src = If(MainTabControl.SelectedTab.Name = ChainOrListTP.Name, ChainsListsLB.SelectedItem, Nothing)
+
+                If MainTabControl.SelectedTab.Name = ChainOrListTP.Name Then
+                    res.Src = ChainsListsLB.SelectedItem
+                Else
+                    If IndBondsRB.Checked Then
+                        res.Src = New RegularBondSrc(res.CustomColor, res.CustomName, _rics)
+                    Else
+                        res.Src = BondsDGV.SelectedRows(0).DataBoundItem
+                    End If
+                End If
+
                 Return res
             End Get
         End Property
 
         Sub New(ByVal p As SourceBase)
             InitializeComponent()
+            ' Data.Src = p
             _thePortfolio = p
         End Sub
 
         Private Sub RandomColorButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles RandomColorB.Click
-            CustomColorCB.SelectedIndex = New Random().NextDouble() * CustomColorCB.Items.Count
+            CustomColorCB.SelectedIndex = New Random().NextDouble() * (CustomColorCB.Items.Count - 1)
         End Sub
 
         Private Sub ColorComboBox_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs) Handles CustomColorCB.SelectedIndexChanged
@@ -86,20 +91,38 @@ Namespace Forms.PortfolioForm
             End If
         End Sub
 
+        Private Class NamedItem
+            Private ReadOnly _ric As String
+
+            Public Sub New(ByVal ric As String)
+                _ric = ric
+            End Sub
+
+            Public ReadOnly Property RIC() As String
+                Get
+                    Return _ric
+                End Get
+            End Property
+
+            Public Overrides Function ToString() As String
+                Return RIC
+            End Function
+        End Class
+
         Private Sub AddEditPortfolioSource_Load(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Shown
             For Each clr In Utils.GetColorList()
                 CustomColorCB.Items.Add(clr)
             Next
             If _color <> "" Then CustomColorCB.SelectedItem = _color
 
-            If TypeOf Portfolio Is ChainSrc OrElse TypeOf Portfolio Is UserListSrc Then
+            If TypeOf _thePortfolio Is ChainSrc OrElse TypeOf _thePortfolio Is UserListSrc Then
                 MainTabControl.SelectedTab = ChainOrListTP
 
                 IndividualAndCustomBondsTP.Visible = False
                 IndividualAndCustomBondsTP.Enabled = False
 
                 ChainOrListTP.Visible = True
-                ShowChainsRB.Checked = TypeOf Portfolio Is ChainSrc
+                ShowChainsRB.Checked = TypeOf _thePortfolio Is ChainSrc
                 ShowListsRB.Checked = Not ShowChainsRB.Checked
                 ShowChainsRB.Enabled = ShowChainsRB.Checked
                 ShowListsRB.Enabled = Not ShowChainsRB.Checked
@@ -109,10 +132,10 @@ Namespace Forms.PortfolioForm
                      PortfolioManager.Instance.ChainsView,
                      PortfolioManager.Instance.UserListsView)
 
-                Dim itms = (From elem In ChainsListsLB.Items Let id = CType(elem, Source).ID Where id = Portfolio.ID Select elem).ToList()
+                Dim itms = (From elem In ChainsListsLB.Items Let id = CType(elem, Source).ID Where id = _thePortfolio.ID Select elem).ToList()
                 If itms.Any() Then ChainsListsLB.SelectedItem = itms.First()
 
-            ElseIf TypeOf Portfolio Is CustomBondSrc OrElse TypeOf Portfolio Is RegularBondSrc Then
+            ElseIf TypeOf _thePortfolio Is CustomBondSrc OrElse TypeOf _thePortfolio Is RegularBondSrc Then
                 MainTabControl.SelectedTab = IndividualAndCustomBondsTP
 
                 IndividualAndCustomBondsTP.Visible = True
@@ -121,16 +144,23 @@ Namespace Forms.PortfolioForm
                 ChainOrListTP.Visible = False
                 ChainOrListTP.Enabled = False
 
-                IndBondsRB.Checked = TypeOf Portfolio Is RegularBondSrc
+                IndBondsRB.Checked = TypeOf _thePortfolio Is RegularBondSrc
                 IndBondsRB.Enabled = IndBondsRB.Checked
+                AddBondsButton.Visible = IndBondsRB.Checked
+                RemoveBondsButton.Visible = IndBondsRB.Checked
+
                 CustomBondsRB.Checked = Not IndBondsRB.Checked
                 CustomBondsRB.Enabled = Not IndBondsRB.Checked
-                BondsDGV.DataSource = If(CustomBondsRB.Checked,
-                                         PortfolioManager.Instance.CustomBondsView(),
-                                         Nothing)
-
+                If TypeOf _thePortfolio Is RegularBondSrc Then
+                    Dim defaultRics = CType(_thePortfolio, RegularBondSrc).GetDefaultRics()
+                    _rics = String.Join(",", defaultRics)
+                    BondsDGV.DataSource = (From elem In defaultRics Select New NamedItem(elem)).ToList()
+                Else
+                    BondsDGV.DataSource = PortfolioManager.Instance.CustomBondsView()
+                End If
+                
                 ' ReSharper disable ConditionalTernaryEqualBranch
-                BondsDGV.DataSource = If(IndBondsRB.Checked, Nothing, Nothing)
+                'BondsDGV.DataSource = If(IndBondsRB.Checked, Nothing, Nothing)
                 ' ReSharper restore ConditionalTernaryEqualBranch
             End If
         End Sub
@@ -138,9 +168,21 @@ Namespace Forms.PortfolioForm
         Private Sub OkButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles OkButton.Click
             If MainTabControl.SelectedTab.Name = ChainOrListTP.Name AndAlso ChainsListsLB.SelectedIndex < 0 Then
                 MessageBox.Show("Please select chain or list to show", "Cannot perform an operation", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            ElseIf MainTabControl.SelectedTab.Name = IndividualAndCustomBondsTP.Name AndAlso BondsDGV.SelectedRows.Count <= 0 Then
-                MessageBox.Show("Please select some bonds or custom bonds", "Cannot perform an operation", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                _dontClose = True
+            ElseIf MainTabControl.SelectedTab.Name = IndividualAndCustomBondsTP.Name Then
+                If TypeOf Data.Src Is RegularBondSrc Then
+                    If Data.CustomName = "" Then
+                        MessageBox.Show("Please enter custom name", "Cannot perform an operation", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        _dontClose = True
+                    End If
+                Else
+                    If BondsDGV.SelectedRows.Count <= 0 Then
+                        MessageBox.Show("Please select some bonds or custom bonds", "Cannot perform an operation", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        _dontClose = True
+                    End If
+                End If
             Else
+                _dontClose = False
                 DialogResult = DialogResult.OK
                 Close()
             End If
@@ -172,5 +214,59 @@ Namespace Forms.PortfolioForm
             frm.ConditionTB.Text = Condition
             If frm.ShowDialog() = DialogResult.OK Then ConditionTB.Text = frm.ConditionTB.Text
         End Sub
+
+        Private _rics As String = ""
+        Private ReadOnly _thePortfolio As SourceBase
+        Private _dontClose As Boolean
+
+        Private Sub AddBondsButton_Click(sender As Object, e As EventArgs) Handles AddBondsButton.Click
+            Dim a As New BondSelectorForm
+            If a.ShowDialog() = DialogResult.OK Then
+                Dim incomingRics As New HashSet(Of String)(a.SelectedRICs)
+                Dim currentRics = (From ric In _rics.Split(",") Where Trim(ric) <> "").ToList()
+                For Each ric In currentRics
+                    incomingRics.Add(ric)
+                Next
+                _rics = String.Join(",", incomingRics) 'todo rics are never used 
+            End If
+
+            RefreshBondCustomBondList()
+        End Sub
+
+        Private Sub RefreshBondCustomBondList()
+            If CustomBondsRB.Checked Then
+                BondsDGV.DataSource = PortfolioManager.Instance.CustomBondsView
+            Else
+                If TypeOf Data.Src Is RegularBondSrc Then
+                    BondsDGV.DataSource = (From elem In CType(Data.Src, RegularBondSrc).GetDefaultRics() Select New NamedItem(elem)).ToList()
+                Else
+                    BondsDGV.DataSource = Nothing
+                End If
+            End If
+            BondsDGV.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells
+        End Sub
+
+        Private Sub RemoveBondsButton_Click(sender As Object, e As EventArgs) Handles RemoveBondsButton.Click
+            If BondsDGV.SelectedRows.Count <= 0 Then Return
+            Dim currentRics = New HashSet(Of String)(From ric In _rics.Split(",") Select Trim(ric))
+            For Each row As DataGridViewRow In BondsDGV.SelectedRows
+                currentRics.Remove(row.DataBoundItem.ToString())
+            Next
+            _rics = String.Join(",", currentRics)
+            RefreshBondCustomBondList()
+        End Sub
+
+        Private Sub CancelButton_Click(sender As System.Object, e As System.EventArgs) Handles CancelButton.Click
+            _dontClose = False
+        End Sub
+
+        Private Sub AddPortfolioSource_FormClosing(sender As System.Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+            If _dontClose Then
+                e.Cancel = True
+                _dontClose = False
+            End If
+        End Sub
     End Class
+
+
 End Namespace

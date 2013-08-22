@@ -6,6 +6,7 @@ Imports Uitls
 Imports System.Xml
 
 Public MustInherit Class SourceBase
+    Protected Shared ReadOnly Logger As Logger = GetLogger(GetType(SourceBase))
     Private ReadOnly _id As String
     Private _color As String
     Private _name As String
@@ -56,7 +57,35 @@ Public MustInherit Class SourceBase
     ''' <remarks></remarks>
     Public MustOverride Function GetDefaultRics() As List(Of String)
     Public MustOverride Function GetXmlTypeName() As String
+    Public MustOverride Function GetXmlPath() As String
     Protected MustOverride Function GenerateId() As String
+
+    ''' <summary>
+    ''' Tries to delete current source
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub Kill()
+        Dim xml = PortfolioManager.ClassInstance.GetConfigDocument()
+        Dim node = xml.SelectSingleNode(String.Format("/bonds/{0}[@id='{1}']", GetXmlPath(), ID))
+        If node IsNot Nothing Then
+            Try
+                xml.RemoveChild(node)
+            Catch ex As Exception
+                Logger.Warn("Failed to delete source {0} id {1}", GetXmlTypeName(), ID)
+                Logger.Warn("Exception = {0}", ex.ToString())
+            End Try
+            PortfolioManager.ClassInstance.SaveBonds()
+        End If
+
+        For Each port In PortfolioManager.ClassInstance.GetAllPortfolios()
+            Try
+                Dim prt = New PortfolioWrapper(port.Id)
+                prt.TryDeleteSource(Me)
+            Catch ex As Exception
+                Logger.Warn("Failed to delete source from portfolio with id {0}", port.Id)
+            End Try
+        Next
+    End Sub
 End Class
 
 Public MustInherit Class Source
@@ -157,11 +186,12 @@ Public MustInherit Class Source
             Where descr IsNot Nothing
             Select descr).ToList()
     End Function
+
 End Class
 
 Public Class ChainSrc
     Inherits Source
-    Private _chainRic As String
+    Private ReadOnly _chainRic As String
     Private ReadOnly _bondsManager As IBondsLoader = BondsLoader.Instance
 
     Public Overrides Function ToString() As String
@@ -180,13 +210,13 @@ Public Class ChainSrc
     End Sub
 
     <DisplayName("Chain RIC")>
-    Public Property ChainRic As String
+    Public ReadOnly Property ChainRic As String
         Get
             Return _chainRic
         End Get
-        Set(ByVal value As String)
-            _chainRic = value
-        End Set
+        'Set(ByVal value As String)
+        '    _chainRic = value
+        'End Set
     End Property
 
     Public Overrides Function GetDefaultRics() As List(Of String)
@@ -195,6 +225,10 @@ Public Class ChainSrc
 
     Public Overrides Function GetXmlTypeName() As String
         Return "chain"
+    End Function
+
+    Public Overrides Function GetXmlPath() As String
+        Return "chains/chain"
     End Function
 
     Protected Overrides Function GenerateId() As String
@@ -246,10 +280,57 @@ Public Class ChainSrc
     End Operator
 End Class
 
+''' <summary>
+''' That's a new class intended to fight old and stupid way of how I treat a portfolio
+''' It is more tightly linked to XML 
+''' The main use case is just call New(id) and have fun
+''' The main challenge is that one person can call New(100)
+''' And another person can call New(100)
+''' And the first does smth and saves it (f.e. kill the portfolio, or deletes some source)
+''' And the second doesn't know anything and thus fucks up (i.e. he can behave as though the portfolio still exists)
+''' Cures:
+'''  1) Event-based Portfolio Manager
+'''  2) Careful treatment of all Portfolio operations (any time be ready to find out you are dead =/)
+''' </summary>
+''' <remarks></remarks>
+Public Class PortfolioWrapper
+    Private Shared ReadOnly PMan As PortfolioManager = PortfolioManager.ClassInstance
+    Private ReadOnly _id As String
+
+    Public Sub New(ByVal id As String, Optional ByVal createIfNotExists As Boolean = False)
+        Dim xml = PMan.GetConfigDocument()
+        _id = id
+        Dim node = xml.SelectSingleNode(String.Format("/bonds/portfolios//portfolio[@id='{0}']/portfolio", id))
+        If node Is Nothing Then
+            If createIfNotExists Then
+                ' todo create TEMPORARY portfolio
+                ' todo introduce concept of TEMPORARY elements which are to be hidden and killed on any load
+                ' todo store bonds.xml in zipped format
+                ' todo backward compatibility
+                Throw New NotImplementedException()
+            Else
+                Throw New InvalidOperationException(String.Format("Portfolio with ID {0} not found", id))
+            End If
+        End If
+    End Sub
+
+    Public Function TryDeleteSource(ByVal src As SourceBase) As Boolean
+        Dim xml = PMan.GetConfigDocument()
+        Dim node = xml.SelectSingleNode(String.Format("/bonds/portfolios//portfolio[@id='{0}']/portfolio", _id))
+        If node Is Nothing Then Return False
+        Dim srcNode = node.SelectSingleNode(String.Format("include[@what='{0}' and @id='{1}'] | exclude[@what='{0}' and @id='{1}']", src.GetXmlTypeName(), src.ID))
+
+        If srcNode IsNot Nothing Then
+            node.RemoveChild(srcNode)
+            PMan.SaveBonds()
+        End If
+
+        Return False
+    End Function
+End Class
+
 Public Class UserListSrc
     Inherits Source
-
-    Private Shared ReadOnly Logger As Logger = GetLogger(GetType(UserListSrc))
 
     Public Sub New(ByVal color As String, ByVal fieldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
         MyBase.New(color, fieldSetId, enabled, curve, name)
@@ -287,6 +368,7 @@ Public Class UserListSrc
                 If availableRics.Contains(newRic) Then
                     resultingRics.Add(newRic)
                 Else
+                    ' it could well be ok (f.e. in case bond has matured and cease to exist)
                     Logger.Warn("Failed to find both old {0} and updated ric {1}", foundRic, newRic)
                 End If
             End If
@@ -296,6 +378,10 @@ Public Class UserListSrc
 
     Public Overrides Function GetXmlTypeName() As String
         Return "list"
+    End Function
+
+    Public Overrides Function GetXmlPath() As String
+        Return "lists/list"
     End Function
 
     Protected Overrides Function GenerateId() As String
@@ -347,21 +433,89 @@ End Class
 
 Public Class RegularBondSrc
     Inherits SourceBase
-    ' todo equality members
-    Public Sub New(ByVal id As String, ByVal color As String, ByVal name As String)
+
+    Private ReadOnly _rics As List(Of String)
+
+    Public ReadOnly Property Rics() As String
+        Get
+            Return If(_rics Is Nothing, "", String.Join(",", _rics))
+        End Get
+    End Property
+
+    Public Overrides Function ToString() As String
+        Return "Regular bond"
+    End Function
+
+    Public Overrides Function Equals(ByVal obj As Object) As Boolean
+        If obj Is Nothing Then Return False
+        If Not TypeOf obj Is RegularBondSrc Then Return False
+        Dim hisRics = CType(obj, RegularBondSrc)._rics
+        If hisRics.Count <> _rics.Count Then Return False
+        Dim i As Long
+        For i = 0 To hisRics.Count
+            If hisRics(i) <> _rics(i) Then Return False
+        Next
+        Return True
+    End Function
+
+    Public Shared Operator =(ByVal a As RegularBondSrc, ByVal b As RegularBondSrc) As Boolean
+        If a Is Nothing Then Return False
+        Return a.Equals(b)
+    End Operator
+
+    Public Shared Operator <>(ByVal a As RegularBondSrc, ByVal b As RegularBondSrc) As Boolean
+        If a Is Nothing Then Return False
+        Return a.Equals(b)
+    End Operator
+
+    Public Overrides Function GetHashCode() As Integer
+        Return String.Join(",", _rics).GetHashCode()
+    End Function
+
+    Public Sub New(ByVal id As String, ByVal color As String, ByVal name As String, ByVal rics As String)
         MyBase.New(id, color, name)
+        _rics = (From ric In rics.Split(",") Select Trim(ric)).ToList()
+    End Sub
+
+    Public Sub New(ByVal color As String, ByVal name As String, ByVal rics As String)
+        MyBase.New(Guid.NewGuid().ToString(), color, name)
+        _rics = (From ric In rics.Split(",") Select Trim(ric)).ToList()
     End Sub
 
     Public Overrides Function GetDefaultRics() As List(Of String)
-        Throw New NotImplementedException()
+        Dim availableRics = New HashSet(Of String)(From row As BondsDataSet.BondRow In BondsLoader.Instance.GetBondsTable().Rows Select row.ric)
+        Dim res As New List(Of String)
+        For Each ric In _rics
+            If availableRics.Contains(ric) Then
+                res.Add(ric)
+            Else
+                Dim newRic As String
+                If _rics(0) = "/" Then
+                    newRic = ric.Substring(1)
+                Else
+                    newRic = "/" + ric
+                End If
+                If availableRics.Contains(newRic) Then
+                    res.Add(newRic)
+                Else
+                    ' it could well be ok (f.e. in case bond has matured and cease to exist)
+                    Logger.Warn("Failed to find both old {0} and updated ric {1}", ric, newRic)
+                End If
+            End If
+        Next
+        Return res
     End Function
 
     Public Overrides Function GetXmlTypeName() As String
-        Throw New NotImplementedException()
+        Return "ric"
+    End Function
+
+    Public Overrides Function GetXmlPath() As String
+        Return ""
     End Function
 
     Protected Overrides Function GenerateId() As String
-        Throw New NotImplementedException()
+        Return ""
     End Function
 End Class
 
@@ -423,6 +577,10 @@ Public Class CustomBondSrc
 
     Public Overrides Function GetXmlTypeName() As String
         Return "custom-bond"
+    End Function
+
+    Public Overrides Function GetXmlPath() As String
+        Return "custom-bonds/bond"
     End Function
 
     Protected Overrides Function GenerateId() As String
@@ -542,6 +700,10 @@ Public Class ChainCurveSrc
 
     Public Overrides Function GetXmlTypeName() As String
         Return "chain-curves"
+    End Function
+
+    Public Overrides Function GetXmlPath() As String
+        Return "chain-curves/curve"
     End Function
 
     Protected Overrides Function GenerateId() As String

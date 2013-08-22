@@ -168,7 +168,8 @@ Public Class PortfolioStructure
     Public Const List As Byte = 1
     Public Const Chain As Byte = 2
     Public Const CustomBond As Byte = 4
-    Public Const All As Byte = List Or Chain Or CustomBond
+    Public Const RegularBond As Byte = 8
+    Public Const All As Byte = List Or Chain Or CustomBond Or RegularBond
 
     Private ReadOnly _id As String
     Private ReadOnly _name As String
@@ -199,6 +200,9 @@ Public Class PortfolioStructure
             End If
             If what And CustomBond Then
                 data.AddRange(From src In _sources Where TypeOf src.Source Is CustomBondSrc)
+            End If
+            If what And RegularBond Then
+                data.AddRange(From src In _sources Where TypeOf src.Source Is RegularBondSrc)
             End If
             Return New ReadOnlyCollection(Of PortfolioSource)(data)
         End Get
@@ -329,8 +333,6 @@ Public Class PortfolioStructure
             lst.RemoveAll(Function(item) _excludes.Contains(item))
             _rics.Add(src, lst)
         Next
-        ' todo now apply static filtering
-        ' TODO make a difference between dynamic as static filtering!!!
     End Sub
 End Class
 
@@ -364,17 +366,23 @@ Public Class Portfolio
         Dim xml = PortMan.GetConfigDocument()
         Dim node = xml.SelectSingleNode(String.Format("/bonds/portfolios//portfolio[@id='{0}']", Id))
         If node Is Nothing Then Throw New PortfolioException(String.Format("Can not find portfolio with id {0}", Id))
+
         Dim newSrc = xml.CreateNode(XmlNodeType.Element, If(include, "include", "exclude"), "")
+
+        Dim regularBondSrc = TryCast(source, RegularBondSrc)
+        If regularBondSrc IsNot Nothing Then xml.AppendAttr(newSrc, "rics", regularBondSrc.Rics)
+
         xml.AppendAttr(newSrc, "what", source.GetXmlTypeName())
         xml.AppendAttr(newSrc, "id", source.ID)
         If customName <> "" Then xml.AppendAttr(newSrc, "name", customName)
         If customColor <> "" Then xml.AppendAttr(newSrc, "color", customColor)
         If condition <> "" Then xml.AppendAttr(newSrc, "condition", condition)
+
         node.AppendChild(newSrc)
         PortMan.SaveBonds()
     End Sub
 
-    Public Sub UpdateSource(ByVal who As PortfolioSource, ByVal source As Source, ByVal customName As String, ByVal customColor As String, ByVal condition As String, ByVal include As Boolean)
+    Public Sub UpdateSource(ByVal who As PortfolioSource, ByVal source As SourceBase, ByVal customName As String, ByVal customColor As String, ByVal condition As String, ByVal include As Boolean)
         DeleteSource(who)
         AddSource(source, customName, customColor, condition, include)
     End Sub

@@ -4,6 +4,9 @@ Imports Uitls
 
 Namespace Forms.PortfolioForm
     Public Class AddPortfolioSource
+        Private _rics As String = ""
+        Private _dontClose As Boolean
+
         Public ReadOnly Property CustomName() As String
             Get
                 Return CustomNameTB.Text
@@ -45,7 +48,16 @@ Namespace Forms.PortfolioForm
                 res.CustomName = CustomName
                 res.Condition = Condition
                 res.Include = (MainTabControl.SelectedTab.Name <> ChainOrListTP.Name AndAlso CustomBondsRB.Checked) OrElse IncludeCB.Checked
-                res.Src = If(MainTabControl.SelectedTab.Name = ChainOrListTP.Name, ChainsListsLB.SelectedItem, BondsDGV.SelectedRows(0).DataBoundItem)
+                If MainTabControl.SelectedTab.Name = ChainOrListTP.Name Then
+                    res.Src = ChainsListsLB.SelectedItem
+                Else
+                    If IndBondsRB.Checked Then
+                        res.Src = New RegularBondSrc(res.CustomColor, res.CustomName, _rics)
+                    Else
+                        res.Src = BondsDGV.SelectedRows(0).DataBoundItem
+                    End If
+                End If
+
                 Return res
             End Get
         End Property
@@ -59,6 +71,7 @@ Namespace Forms.PortfolioForm
                 CustomColorCB.Items.Add(clr)
             Next
             RefreshChainListList()
+            RefreshBondCustomBondList()
             BondsDGV.DataSource = If(IndBondsRB.Checked, Nothing, PortfolioManager.Instance.CustomBondsView())
         End Sub
 
@@ -67,7 +80,7 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub RandomColorButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles RandomColorB.Click
-            CustomColorCB.SelectedIndex = New Random().NextDouble() * CustomColorCB.Items.Count
+            CustomColorCB.SelectedIndex = New Random().NextDouble() * (CustomColorCB.Items.Count - 1)
         End Sub
 
         Private Sub ChainsListsLB_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs) Handles ChainsListsLB.SelectedIndexChanged
@@ -95,15 +108,29 @@ Namespace Forms.PortfolioForm
             Else
                 ConditionTB.Enabled = False
                 IncludeCB.Enabled = False
+
+                RemoveBondsButton.Enabled = IndBondsRB.Checked AndAlso BondsDGV.SelectedRows.Count > 0
             End If
         End Sub
 
         Private Sub OkButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles OkButton.Click
             If MainTabControl.SelectedTab.Name = ChainOrListTP.Name AndAlso ChainsListsLB.SelectedIndex < 0 Then
                 MessageBox.Show("Please select chain or list to show", "Cannot perform an operation", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            ElseIf MainTabControl.SelectedTab.Name = IndividualAndCustomBondsTP.Name AndAlso BondsDGV.SelectedRows.Count <= 0 Then
-                MessageBox.Show("Please select some bonds or custom bonds", "Cannot perform an operation", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                _dontClose = True
+            ElseIf MainTabControl.SelectedTab.Name = IndividualAndCustomBondsTP.Name Then
+                If TypeOf Data.Src Is RegularBondSrc Then
+                    If Data.CustomName = "" Then
+                        MessageBox.Show("Please enter custom name", "Cannot perform an operation", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        _dontClose = True
+                    End If
+                Else
+                    If BondsDGV.SelectedRows.Count <= 0 Then
+                        MessageBox.Show("Please select some bonds or custom bonds", "Cannot perform an operation", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        _dontClose = True
+                    End If
+                End If
             Else
+                _dontClose = False
                 DialogResult = DialogResult.OK
                 Close()
             End If
@@ -134,6 +161,79 @@ Namespace Forms.PortfolioForm
         Private Sub ConditionTB_Enter(ByVal sender As Object, ByVal e As EventArgs) Handles ConditionTB.Enter, ConditionTB.MouseClick
             Dim frm As New ParserErrorForm
             If frm.ShowDialog() = DialogResult.OK Then ConditionTB.Text = frm.ConditionTB.Text
+        End Sub
+
+        Private Sub CustomBondsRB_CheckedChanged(sender As Object, e As EventArgs) Handles CustomBondsRB.CheckedChanged
+            AddBondsButton.Visible = IndBondsRB.Checked
+            RemoveBondsButton.Visible = IndBondsRB.Checked
+            RefreshBondCustomBondList()
+            RefreshSupplementaryFields()
+        End Sub
+
+        Private Class NamedItem
+            Private ReadOnly _ric As String
+
+            Public Sub New(ByVal ric As String)
+                _ric = ric
+            End Sub
+
+            Public ReadOnly Property RIC() As String
+                Get
+                    Return _ric
+                End Get
+            End Property
+
+            Public Overrides Function ToString() As String
+                Return RIC
+            End Function
+        End Class
+
+        Private Sub RefreshBondCustomBondList()
+            If CustomBondsRB.Checked Then
+                BondsDGV.DataSource = PortfolioManager.Instance.CustomBondsView
+            Else
+                If TypeOf Data.Src Is RegularBondSrc Then
+                    BondsDGV.DataSource = (From elem In CType(Data.Src, RegularBondSrc).GetDefaultRics() Select New NamedItem(elem)).ToList()
+                    'BondsDGV.DataMember = "RIC"
+                Else
+                    BondsDGV.DataSource = Nothing
+                End If
+            End If
+            BondsDGV.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells
+        End Sub
+
+        Private Sub AddBondsButton_Click(sender As Object, e As EventArgs) Handles AddBondsButton.Click
+            Dim a As New BondSelectorForm
+            If a.ShowDialog() = DialogResult.OK Then
+                Dim incomingRics As New HashSet(Of String)(a.SelectedRICs)
+                Dim currentRics = (From ric In _rics.Split(",") Where Trim(ric) <> "").ToList()
+                For Each ric In currentRics
+                    incomingRics.Add(ric)
+                Next
+                _rics = String.Join(",", incomingRics)
+            End If
+            RefreshBondCustomBondList()
+        End Sub
+
+        Private Sub RemoveBondsButton_Click(sender As Object, e As EventArgs) Handles RemoveBondsButton.Click
+            If BondsDGV.SelectedRows.Count <= 0 Then Return
+            Dim currentRics = New HashSet(Of String)(From ric In _rics.Split(",") Select Trim(ric))
+            For Each row As DataGridViewRow In BondsDGV.SelectedRows
+                currentRics.Remove(row.DataBoundItem.ToString())
+            Next
+            _rics = String.Join(",", currentRics)
+            RefreshBondCustomBondList()
+        End Sub
+
+        Private Sub CancelButton_Click(sender As System.Object, e As System.EventArgs) Handles CancelButton.Click
+            _dontClose = False
+        End Sub
+
+        Private Sub AddPortfolioSource_FormClosing(sender As System.Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+            If _dontClose Then
+                e.Cancel = True
+                _dontClose = False
+            End If
         End Sub
     End Class
 End Namespace

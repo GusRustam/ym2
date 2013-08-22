@@ -178,6 +178,7 @@
             Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripSeparator()
             Me.CloseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Me.ErrProv = New System.Windows.Forms.ErrorProvider(Me.components)
+            Me.RegularBondsCB = New System.Windows.Forms.CheckBox()
             Label1 = New System.Windows.Forms.Label()
             Label16 = New System.Windows.Forms.Label()
             Label12 = New System.Windows.Forms.Label()
@@ -926,6 +927,7 @@
             '
             Me.FlowLayoutPanel9.Controls.Add(Me.ChainsCB)
             Me.FlowLayoutPanel9.Controls.Add(Me.ListsCB)
+            Me.FlowLayoutPanel9.Controls.Add(Me.RegularBondsCB)
             Me.FlowLayoutPanel9.Controls.Add(Me.CustomBondsCB)
             Me.FlowLayoutPanel9.Dock = System.Windows.Forms.DockStyle.Fill
             Me.FlowLayoutPanel9.Location = New System.Drawing.Point(3, 3)
@@ -962,7 +964,7 @@
             Me.CustomBondsCB.AutoSize = True
             Me.CustomBondsCB.Checked = True
             Me.CustomBondsCB.CheckState = System.Windows.Forms.CheckState.Checked
-            Me.CustomBondsCB.Location = New System.Drawing.Point(120, 3)
+            Me.CustomBondsCB.Location = New System.Drawing.Point(221, 3)
             Me.CustomBondsCB.Name = "CustomBondsCB"
             Me.CustomBondsCB.Size = New System.Drawing.Size(93, 17)
             Me.CustomBondsCB.TabIndex = 1
@@ -1857,6 +1859,18 @@
             '
             Me.ErrProv.ContainerControl = Me
             '
+            'RegularBondsCB
+            '
+            Me.RegularBondsCB.AutoSize = True
+            Me.RegularBondsCB.Checked = True
+            Me.RegularBondsCB.CheckState = System.Windows.Forms.CheckState.Checked
+            Me.RegularBondsCB.Location = New System.Drawing.Point(120, 3)
+            Me.RegularBondsCB.Name = "RegularBondsCB"
+            Me.RegularBondsCB.Size = New System.Drawing.Size(95, 17)
+            Me.RegularBondsCB.TabIndex = 1
+            Me.RegularBondsCB.Text = "Regular bonds"
+            Me.RegularBondsCB.UseVisualStyleBackColor = True
+            '
             'PortfolioForm
             '
             Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -2052,5 +2066,6 @@
         Friend WithEvents SaveChainCurveChangesButton As System.Windows.Forms.Button
         Friend WithEvents ChainCurvePatternTB As System.Windows.Forms.TextBox
         Friend WithEvents AddItemTagButton As System.Windows.Forms.Button
+        Friend WithEvents RegularBondsCB As System.Windows.Forms.CheckBox
     End Class
 End Namespace

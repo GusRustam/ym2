@@ -35,6 +35,8 @@
             Me.TableLayoutPanel4 = New System.Windows.Forms.TableLayoutPanel()
             Me.FlowLayoutPanel4 = New System.Windows.Forms.FlowLayoutPanel()
             Me.IndBondsRB = New System.Windows.Forms.RadioButton()
+            Me.AddBondsButton = New System.Windows.Forms.Button()
+            Me.RemoveBondsButton = New System.Windows.Forms.Button()
             Me.CustomBondsRB = New System.Windows.Forms.RadioButton()
             Me.BondsDGV = New System.Windows.Forms.DataGridView()
             Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
@@ -192,6 +194,8 @@
             'FlowLayoutPanel4
             '
             Me.FlowLayoutPanel4.Controls.Add(Me.IndBondsRB)
+            Me.FlowLayoutPanel4.Controls.Add(Me.AddBondsButton)
+            Me.FlowLayoutPanel4.Controls.Add(Me.RemoveBondsButton)
             Me.FlowLayoutPanel4.Controls.Add(Me.CustomBondsRB)
             Me.FlowLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill
             Me.FlowLayoutPanel4.Location = New System.Drawing.Point(3, 3)
@@ -211,10 +215,30 @@
             Me.IndBondsRB.Text = "Regular"
             Me.IndBondsRB.UseVisualStyleBackColor = True
             '
+            'AddBondsButton
+            '
+            Me.AddBondsButton.Location = New System.Drawing.Point(71, 3)
+            Me.AddBondsButton.Name = "AddBondsButton"
+            Me.AddBondsButton.Size = New System.Drawing.Size(53, 21)
+            Me.AddBondsButton.TabIndex = 2
+            Me.AddBondsButton.Text = "Add..."
+            Me.AddBondsButton.UseVisualStyleBackColor = True
+            Me.AddBondsButton.Visible = False
+            '
+            'RemoveBondsButton
+            '
+            Me.RemoveBondsButton.Location = New System.Drawing.Point(130, 3)
+            Me.RemoveBondsButton.Name = "RemoveBondsButton"
+            Me.RemoveBondsButton.Size = New System.Drawing.Size(128, 21)
+            Me.RemoveBondsButton.TabIndex = 2
+            Me.RemoveBondsButton.Text = "Remove selected"
+            Me.RemoveBondsButton.UseVisualStyleBackColor = True
+            Me.RemoveBondsButton.Visible = False
+            '
             'CustomBondsRB
             '
             Me.CustomBondsRB.AutoSize = True
-            Me.CustomBondsRB.Location = New System.Drawing.Point(71, 3)
+            Me.CustomBondsRB.Location = New System.Drawing.Point(264, 3)
             Me.CustomBondsRB.Name = "CustomBondsRB"
             Me.CustomBondsRB.Size = New System.Drawing.Size(60, 17)
             Me.CustomBondsRB.TabIndex = 1
@@ -463,5 +487,7 @@
         Friend WithEvents ClearCustomColorB As System.Windows.Forms.Button
         Friend WithEvents Label2 As System.Windows.Forms.Label
         Friend WithEvents IncludeCB As System.Windows.Forms.CheckBox
+        Friend WithEvents AddBondsButton As System.Windows.Forms.Button
+        Friend WithEvents RemoveBondsButton As System.Windows.Forms.Button
     End Class
 End Namespace

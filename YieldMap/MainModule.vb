@@ -2,6 +2,7 @@
 Imports System.Drawing.Imaging
 Imports System.IO
 Imports System.Reflection
+Imports System.ComponentModel
 Imports DbManager
 Imports Logging
 Imports YieldMap.Forms.PortfolioForm
@@ -17,12 +18,96 @@ Module MainModule
     Private _mainForm As MainForm
     Private ReadOnly Logger As Logger = GetLogger(GetType(MainModule))
 
+    Public Enum UserMessageLevel
+        Usual
+        Warning
+        Failure
+    End Enum
+
+    Private _userMessageCounter As Long = 0
+
+    Public Class UserMessageItem
+        Private ReadOnly _id As Long
+        Private ReadOnly _level As UserMessageLevel
+        Private ReadOnly _time As DateTime
+        Private ReadOnly _source As String
+        Private ReadOnly _message As String
+        Private ReadOnly _details As String
+
+        Public Sub New(ByVal level As UserMessageLevel, ByVal source As String, ByVal message As String, Optional ByVal details As String = "")
+            _id = _userMessageCounter
+            _details = details
+            _level = level
+            _message = message
+            _source = source
+            _time = DateTime.Now
+
+            _userMessageCounter += 1
+        End Sub
+
+        <Browsable(False)>
+        Public ReadOnly Property ID() As Long
+            Get
+                Return _id
+            End Get
+        End Property
+
+        Public ReadOnly Property Level() As UserMessageLevel
+            Get
+                Return _level
+            End Get
+        End Property
+
+        Public ReadOnly Property Time() As Date
+            Get
+                Return _time
+            End Get
+        End Property
+
+        Public ReadOnly Property Source() As String
+            Get
+                Return _source
+            End Get
+        End Property
+
+        Public ReadOnly Property Message() As String
+            Get
+                Return _message
+            End Get
+        End Property
+
+        Public ReadOnly Property Details() As String
+            Get
+                Return _details
+            End Get
+        End Property
+    End Class
+
     Public Class MainController
         Private ReadOnly _charts As New List(Of GraphForm)
         Private _portManForm As PortfolioForm
         Private _settingsForm As SettingsForm
         Private Shared _instance As MainController
         Private Shared ReadOnly ShutdownController As ShutdownController = ShutdownController.Instance
+
+        Public Shared Event UserLogUpdated As Action(Of Guid)
+        Public Shared ReadOnly GlobalMessage As Guid = Guid.NewGuid()
+        Private Shared ReadOnly UserMessageLog As New Dictionary(Of Guid, List(Of UserMessageItem))
+
+        Public Shared Sub LogMessage(ByVal source As Guid, ByVal msg As UserMessageItem)
+            If Not UserMessageLog.ContainsKey(source) Then UserMessageLog.Add(source, New List(Of UserMessageItem))
+            UserMessageLog(source).Add(msg)
+            RaiseEvent UserLogUpdated(source)
+        End Sub
+
+        Public Shared Sub ClearUserLog(Optional ByVal source As Guid? = Nothing)
+            If Not source.HasValue Then
+                UserMessageLog.Clear()
+            Else
+                If Not UserMessageLog.ContainsKey(source.Value) Then Return
+                UserMessageLog.Remove(source.Value)
+            End If
+        End Sub
 
         Public Shared ReadOnly Property Instance() As MainController
             Get

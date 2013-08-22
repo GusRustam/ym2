@@ -17,14 +17,17 @@ Namespace Forms.PortfolioForm
                 Dim chainRic = ChainRicTextBox.Text
 
                 If _src IsNot Nothing Then
-                    With _src
-                        .Color = color
-                        .FieldSetId = fieldSetId
-                        .Curve = curve
-                        .Enabled = enbld
-                        .Name = nme
-                        If ChainRadioButton.Checked Then CType(_src, ChainSrc).ChainRic = chainRic
-                    End With
+                    Dim temp = New ChainSrc(color, fieldSetId, enbld, curve, Name, chainRic)
+                    _src.Kill()
+                    _src = temp
+                    'With _src
+                    '    .Color = color
+                    '    .FieldSetId = fieldSetId
+                    '    .Curve = curve
+                    '    .Enabled = enbld
+                    '    .Name = nme
+                    '    If ChainRadioButton.Checked Then CType(_src, ChainSrc).ChainRic = chainRic
+                    'End With
                     Return _src
                 Else
                     If ListRadioButton.Checked Then
@@ -121,7 +124,7 @@ Namespace Forms.PortfolioForm
         End Function
 
         Private Sub RandomColorButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles RandomColorButton.Click
-            ColorComboBox.SelectedIndex = New Random().NextDouble() * ColorComboBox.Items.Count
+            ColorComboBox.SelectedIndex = New Random().NextDouble() * (ColorComboBox.Items.Count - 1)
         End Sub
 
         Private Sub ColorComboBox_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs) Handles ColorComboBox.SelectedIndexChanged

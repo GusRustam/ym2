@@ -189,7 +189,7 @@ Namespace Forms.PortfolioForm
 #End Region
 
 #Region "Portfolio TAB"
-        Private Sub PortSourcesCheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles ChainsCB.CheckedChanged, ListsCB.CheckedChanged, CustomBondsCB.CheckedChanged
+        Private Sub PortSourcesCheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles ChainsCB.CheckedChanged, ListsCB.CheckedChanged, CustomBondsCB.CheckedChanged, RegularBondsCB.CheckedChanged
             RefreshPortfolioData()
         End Sub
 
@@ -211,11 +211,12 @@ Namespace Forms.PortfolioForm
                 PortfolioChainsListsGrid.DataSource = descr.Sources(
                     If(ChainsCB.Checked, PortfolioStructure.Chain, 0) Or
                     If(ListsCB.Checked, PortfolioStructure.List, 0) Or
-                    If(CustomBondsCB.Checked, PortfolioStructure.CustomBond, 0)
+                    If(CustomBondsCB.Checked, PortfolioStructure.CustomBond, 0) Or
+                    If(RegularBondsCB.Checked, PortfolioStructure.RegularBond, 0)
                 )
 
-                PortfolioItemsGrid.DataSource = descr.Rics(AllRB.Checked)
-            End If
+                    PortfolioItemsGrid.DataSource = descr.Rics(AllRB.Checked)
+                End If
         End Sub
 
         Private Sub RefreshPortfolioTree(Optional ByVal selId As Long = -1)
@@ -784,7 +785,7 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub RandomColorButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles RandomColorButton.Click
-            CustomBondColorCB.SelectedIndex = New Random().NextDouble() * CustomBondColorCB.Items.Count
+            CustomBondColorCB.SelectedIndex = New Random().NextDouble() * (CustomBondColorCB.Items.Count - 1)
             If _currentBond Is Nothing Then Return
             _currentBond.Color = CustomBondColorCB.SelectedItem
             CustomBondChanged = True
@@ -1250,7 +1251,7 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub ChainCurveRandomColorButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles RandomColorChainCurveButton.Click
-            ChainCurveColorCB.SelectedIndex = New Random().NextDouble() * ChainCurveColorCB.Items.Count
+            ChainCurveColorCB.SelectedIndex = New Random().NextDouble() * (ChainCurveColorCB.Items.Count - 1)
             ChainCurveColorPB.BackColor = Color.FromName(ChainCurveColorCB.SelectedItem)
         End Sub
 

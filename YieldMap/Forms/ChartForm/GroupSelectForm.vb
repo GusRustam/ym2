@@ -113,7 +113,7 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub RandomColorButton_Click(sender As Object, e As EventArgs) Handles RandomColorButton.Click
-            ColorsComboBox.SelectedIndex = New Random().NextDouble() * ColorsComboBox.Items.Count
+            ColorsComboBox.SelectedIndex = New Random().NextDouble() * (ColorsComboBox.Items.Count - 1)
         End Sub
     End Class
 End Namespace
