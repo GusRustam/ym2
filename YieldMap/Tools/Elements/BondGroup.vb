@@ -6,7 +6,7 @@ Namespace Tools.Elements
         Inherits Group
 
         Public Sub New(ByVal ans As Ansamble, ByVal port As PortfolioSource, ByVal portfolioStructure As PortfolioStructure)
-            MyBase.new(ans,  CType(port.Source, Source).Fields)
+            MyBase.new(ans, CType(port.Source, Source).Fields)
             Dim source = CType(port.Source, Source)
 
             Nm = If(port.Name <> "", port.Name, source.Name)

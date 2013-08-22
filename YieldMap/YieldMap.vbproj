@@ -190,10 +190,10 @@
     <Compile Include="Forms\PortfolioForm\AddPortfolioForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\PortfolioForm\BondSelectorForm.Designer.vb">
+    <Compile Include="Forms\BondSelectorForm.Designer.vb">
       <DependentUpon>BondSelectorForm.vb</DependentUpon>
     </Compile>
-    <Compile Include="Forms\PortfolioForm\BondSelectorForm.vb">
+    <Compile Include="Forms\BondSelectorForm.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\PortfolioForm\EditPortfolioSource.Designer.vb">
@@ -309,7 +309,7 @@
     <EmbeddedResource Include="Forms\PortfolioForm\AddPortfolioForm.resx">
       <DependentUpon>AddPortfolioForm.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\PortfolioForm\BondSelectorForm.resx">
+    <EmbeddedResource Include="Forms\BondSelectorForm.resx">
       <DependentUpon>BondSelectorForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\PortfolioForm\EditPortfolioSource.resx">
@@ -506,7 +506,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_BuildVersioningStyle="None.MonthStamp.Increment.TimeStamp" />
+      <UserProperties BuildVersion_BuildVersioningStyle="None.MonthStamp.Increment.TimeStamp" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

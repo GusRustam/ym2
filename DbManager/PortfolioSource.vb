@@ -370,7 +370,10 @@ Public Class Portfolio
         Dim newSrc = xml.CreateNode(XmlNodeType.Element, If(include, "include", "exclude"), "")
 
         Dim regularBondSrc = TryCast(source, RegularBondSrc)
-        If regularBondSrc IsNot Nothing Then xml.AppendAttr(newSrc, "rics", regularBondSrc.Rics)
+        If regularBondSrc IsNot Nothing Then
+            xml.AppendAttr(newSrc, "rics", regularBondSrc.Rics)
+            xml.AppendAttr(newSrc, "field-layout", regularBondSrc.FieldSetId)
+        End If
 
         xml.AppendAttr(newSrc, "what", source.GetXmlTypeName())
         xml.AppendAttr(newSrc, "id", source.ID)

@@ -432,7 +432,7 @@ Public Class UserListSrc
 End Class
 
 Public Class RegularBondSrc
-    Inherits SourceBase
+    Inherits Source
 
     Private ReadOnly _rics As List(Of String)
 
@@ -472,15 +472,16 @@ Public Class RegularBondSrc
         Return String.Join(",", _rics).GetHashCode()
     End Function
 
-    Public Sub New(ByVal id As String, ByVal color As String, ByVal name As String, ByVal rics As String)
-        MyBase.New(id, color, name)
+    Public Sub New(ByVal id As String, ByVal color As String, ByVal name As String, fsid As String, ByVal rics As String)
+        MyBase.New(id, color, New FieldSet(fsid), True, False, name)
         _rics = (From ric In rics.Split(",") Select Trim(ric)).ToList()
     End Sub
 
     Public Sub New(ByVal color As String, ByVal name As String, ByVal rics As String)
-        MyBase.New(Guid.NewGuid().ToString(), color, name)
+        MyBase.New(Guid.NewGuid().ToString(), color, New FieldSet("MICEX"), True, False, name) ' todo very bad
         _rics = (From ric In rics.Split(",") Select Trim(ric)).ToList()
     End Sub
+
 
     Public Overrides Function GetDefaultRics() As List(Of String)
         Dim availableRics = New HashSet(Of String)(From row As BondsDataSet.BondRow In BondsLoader.Instance.GetBondsTable().Rows Select row.ric)

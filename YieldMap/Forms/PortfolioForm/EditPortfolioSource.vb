@@ -57,13 +57,16 @@ Namespace Forms.PortfolioForm
                 res.CustomName = CustomName
                 res.Condition = Condition
                 res.Include = IncludeCB.Checked
-                'res.Src = If(MainTabControl.SelectedTab.Name = ChainOrListTP.Name, ChainsListsLB.SelectedItem, Nothing)
 
                 If MainTabControl.SelectedTab.Name = ChainOrListTP.Name Then
                     res.Src = ChainsListsLB.SelectedItem
                 Else
                     If IndBondsRB.Checked Then
-                        res.Src = New RegularBondSrc(res.CustomColor, res.CustomName, _rics)
+                        If FieldsLayoutCB.SelectedIndex >= 0 Then
+                            res.Src = New RegularBondSrc(res.CustomColor, res.CustomName, _rics) With {.FieldSetId = FieldsLayoutCB.SelectedValue}
+                        Else
+                            res.Src = New RegularBondSrc(res.CustomColor, res.CustomName, _rics)
+                        End If
                     Else
                         res.Src = BondsDGV.SelectedRows(0).DataBoundItem
                     End If
@@ -152,9 +155,15 @@ Namespace Forms.PortfolioForm
                 CustomBondsRB.Checked = Not IndBondsRB.Checked
                 CustomBondsRB.Enabled = Not IndBondsRB.Checked
                 If TypeOf _thePortfolio Is RegularBondSrc Then
-                    Dim defaultRics = CType(_thePortfolio, RegularBondSrc).GetDefaultRics()
+                    Dim regularBondSrc = CType(_thePortfolio, RegularBondSrc)
+                    Dim defaultRics = regularBondSrc.GetDefaultRics()
                     _rics = String.Join(",", defaultRics)
                     BondsDGV.DataSource = (From elem In defaultRics Select New NamedItem(elem)).ToList()
+                    FieldsLayoutCB.Enabled = True
+                    FieldsLayoutCB.DataSource = PortfolioManager.Instance.GetFieldLayouts()
+                    FieldsLayoutCB.DisplayMember = "Name"
+                    FieldsLayoutCB.ValueMember = "ID"
+                    FieldsLayoutCB.SelectedValue = regularBondSrc.FieldSetId
                 Else
                     BondsDGV.DataSource = PortfolioManager.Instance.CustomBondsView()
                 End If
@@ -173,6 +182,10 @@ Namespace Forms.PortfolioForm
                 If TypeOf Data.Src Is RegularBondSrc Then
                     If Data.CustomName = "" Then
                         MessageBox.Show("Please enter custom name", "Cannot perform an operation", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        _dontClose = True
+                    End If
+                    If FieldsLayoutCB.SelectedIndex < 0 Then
+                        MessageBox.Show("Please select fields layout", "Cannot perform an operation", MessageBoxButtons.OK, MessageBoxIcon.Information)
                         _dontClose = True
                     End If
                 Else
@@ -210,6 +223,7 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub ConditionTB_Enter(ByVal sender As Object, ByVal e As EventArgs) Handles ConditionTB.Enter, ConditionTB.Click
+            If MainTabControl.SelectedTab.Name <> ChainOrListTP.Name Then Return
             Dim frm As New ParserErrorForm
             frm.ConditionTB.Text = Condition
             If frm.ShowDialog() = DialogResult.OK Then ConditionTB.Text = frm.ConditionTB.Text
@@ -236,9 +250,14 @@ Namespace Forms.PortfolioForm
         Private Sub RefreshBondCustomBondList()
             If CustomBondsRB.Checked Then
                 BondsDGV.DataSource = PortfolioManager.Instance.CustomBondsView
-            Else
+                FieldsLayoutCB.Enabled = False
+                FieldsLayoutCB.DataSource = Nothing
                 If TypeOf Data.Src Is RegularBondSrc Then
                     BondsDGV.DataSource = (From elem In CType(Data.Src, RegularBondSrc).GetDefaultRics() Select New NamedItem(elem)).ToList()
+                    FieldsLayoutCB.Enabled = True
+                    FieldsLayoutCB.DataSource = PortfolioManager.Instance.GetFieldLayouts()
+                    FieldsLayoutCB.DisplayMember = "Name"
+                    FieldsLayoutCB.ValueMember = "ID"
                 Else
                     BondsDGV.DataSource = Nothing
                 End If
@@ -256,11 +275,11 @@ Namespace Forms.PortfolioForm
             RefreshBondCustomBondList()
         End Sub
 
-        Private Sub CancelButton_Click(sender As System.Object, e As System.EventArgs) Handles CancelButton.Click
+        Private Sub CancelButton_Click(sender As Object, e As EventArgs) Handles CancelButton.Click
             _dontClose = False
         End Sub
 
-        Private Sub AddPortfolioSource_FormClosing(sender As System.Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        Private Sub AddPortfolioSource_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
             If _dontClose Then
                 e.Cancel = True
                 _dontClose = False

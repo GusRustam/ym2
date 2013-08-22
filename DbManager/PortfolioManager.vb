@@ -196,7 +196,12 @@ Public Class PortfolioManager
                             srcId = item.Attributes("id").Value
                             source = CustomBondSrc.LoadById(srcId)
                         Case "ric"
-                            source = New RegularBondSrc(item.Attributes("id").Value, item.Attributes("color").Value, item.Attributes("name").Value, item.Attributes("rics").Value)
+                            source = New RegularBondSrc(item.Attributes("id").Value,
+                                                        item.Attributes("color").Value,
+                                                        item.Attributes("name").Value,
+                                                        item.Attributes("field-layout").Value,
+                                                        item.Attributes("rics").Value)
+
                         Case Else
                             srcId = -1
                             Logger.Warn("Unsupported item {0}", what)

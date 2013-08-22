@@ -109,6 +109,7 @@
             Me.FlowLayoutPanel9 = New System.Windows.Forms.FlowLayoutPanel()
             Me.ChainsCB = New System.Windows.Forms.CheckBox()
             Me.ListsCB = New System.Windows.Forms.CheckBox()
+            Me.RegularBondsCB = New System.Windows.Forms.CheckBox()
             Me.CustomBondsCB = New System.Windows.Forms.CheckBox()
             Me.TabPage3 = New System.Windows.Forms.TabPage()
             Me.TableLayoutPanel7 = New System.Windows.Forms.TableLayoutPanel()
@@ -178,7 +179,6 @@
             Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripSeparator()
             Me.CloseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Me.ErrProv = New System.Windows.Forms.ErrorProvider(Me.components)
-            Me.RegularBondsCB = New System.Windows.Forms.CheckBox()
             Label1 = New System.Windows.Forms.Label()
             Label16 = New System.Windows.Forms.Label()
             Label12 = New System.Windows.Forms.Label()
@@ -958,6 +958,18 @@
             Me.ListsCB.TabIndex = 1
             Me.ListsCB.Text = "Lists"
             Me.ListsCB.UseVisualStyleBackColor = True
+            '
+            'RegularBondsCB
+            '
+            Me.RegularBondsCB.AutoSize = True
+            Me.RegularBondsCB.Checked = True
+            Me.RegularBondsCB.CheckState = System.Windows.Forms.CheckState.Checked
+            Me.RegularBondsCB.Location = New System.Drawing.Point(120, 3)
+            Me.RegularBondsCB.Name = "RegularBondsCB"
+            Me.RegularBondsCB.Size = New System.Drawing.Size(95, 17)
+            Me.RegularBondsCB.TabIndex = 1
+            Me.RegularBondsCB.Text = "Regular bonds"
+            Me.RegularBondsCB.UseVisualStyleBackColor = True
             '
             'CustomBondsCB
             '
@@ -1858,18 +1870,6 @@
             'ErrProv
             '
             Me.ErrProv.ContainerControl = Me
-            '
-            'RegularBondsCB
-            '
-            Me.RegularBondsCB.AutoSize = True
-            Me.RegularBondsCB.Checked = True
-            Me.RegularBondsCB.CheckState = System.Windows.Forms.CheckState.Checked
-            Me.RegularBondsCB.Location = New System.Drawing.Point(120, 3)
-            Me.RegularBondsCB.Name = "RegularBondsCB"
-            Me.RegularBondsCB.Size = New System.Drawing.Size(95, 17)
-            Me.RegularBondsCB.TabIndex = 1
-            Me.RegularBondsCB.Text = "Regular bonds"
-            Me.RegularBondsCB.UseVisualStyleBackColor = True
             '
             'PortfolioForm
             '

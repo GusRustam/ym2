@@ -115,7 +115,7 @@ Namespace Forms.ChartForm
 
                 Dim portfolioStructure = PortfolioManager.Instance.GetPortfolioStructure(currentPortId)
                 For Each grp As BondGroup In From port In portfolioStructure.Sources
-                                           Where TypeOf port.Source Is ChainSrc Or TypeOf port.Source Is UserListSrc
+                                           Where TypeOf port.Source Is ChainSrc Or TypeOf port.Source Is UserListSrc Or TypeOf port.Source Is RegularBondSrc
                                            Select New BondGroup(_ansamble, port, portfolioStructure)
                     Dim tmp = grp
                     AddHandler tmp.Updated, Sub(items) OnGroupUpdated(tmp, items)
