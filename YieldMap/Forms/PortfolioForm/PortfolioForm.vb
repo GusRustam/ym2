@@ -466,17 +466,21 @@ Namespace Forms.PortfolioForm
                 MessageBox.Show("Please select an item to delete", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Exit Sub
             End If
-
-            Dim item = CType(PortfolioChainsListsGrid.SelectedRows(0).DataBoundItem, PortfolioSource)
-            If item Is Nothing Then Exit Sub
-            Try
-                CurrentItem.DeleteSource(item)
-                RefreshPortfolioData()
-            Catch ex As Exception
-                Logger.ErrorException("Failed to delete selected source", ex)
-                Logger.Error("Exception = {0}", ex.ToString())
-                MessageBox.Show("Failed to delete selected source", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            End Try
+            Dim srcToDelete = (From item As DataGridViewRow In PortfolioChainsListsGrid.SelectedRows
+                               Where item.DataBoundItem IsNot Nothing
+                               Let elem = TryCast(item.DataBoundItem, PortfolioSource)
+                               Where elem IsNot Nothing
+                               Select elem).ToList()
+            For Each item In srcToDelete
+                Try
+                    CurrentItem.DeleteSource(item)
+                    RefreshPortfolioData()
+                Catch ex As Exception
+                    Logger.ErrorException("Failed to delete selected source", ex)
+                    Logger.Error("Exception = {0}", ex.ToString())
+                    MessageBox.Show("Failed to delete selected source", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                End Try
+            Next
         End Sub
 
         Private Sub EditChainListButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles EditChainListButton.Click

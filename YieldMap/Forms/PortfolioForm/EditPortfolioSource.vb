@@ -241,7 +241,7 @@ Namespace Forms.PortfolioForm
                 For Each ric In currentRics
                     incomingRics.Add(ric)
                 Next
-                _rics = String.Join(",", incomingRics) 'todo rics are never used 
+                _rics = String.Join(",", incomingRics)
             End If
 
             RefreshBondCustomBondList()

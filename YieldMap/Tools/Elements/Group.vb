@@ -54,8 +54,7 @@ Namespace Tools.Elements
             End Get
         End Property
 
-        Public PortfolioID As Long
-
+        Public PortfolioID As String
 
         Private ReadOnly _ansamble As Ansamble
         Public ReadOnly Property Ansamble() As Ansamble
