@@ -85,6 +85,11 @@
       <ric>RU25068RMFS=MM</ric>
     </list>
   </lists>
+  <!-- Dynamic lists -->
+  <queries>
+    <query id="87d74dae-7258-46b7-aad4-1a8fa205e997" field-set-id="MICEX" chain-id="93560" name="Corp BBB Putable" color="DarkOliveGreen" condition="$LastRating.Rating &gt;= [BBB-] And $LastRating.Rating &lt;= [BBB+] And $Putable = True" />
+    <query id="ee647a27-f774-4623-8656-9fb283e43394" field-set-id="MICEX" chain-id="93560" name="Corp BB Putable" color="DarkOrchid" condition="$LastRating.Rating &gt;= [BB-] And $LastRating.Rating &lt;= [BB+] And $Putable = True" />
+  </queries>
   <!-- Portfolios -->
   <portfolios>
     <folder id="0" name="Main">
@@ -95,8 +100,8 @@
           <include what="chain" id="3" name="Muni BBB" color="CornflowerBlue" condition="$LastRating.Rating &gt;= [BBB-] and $LastRating.Rating &lt;= [BBB+] " />
         </portfolio>
         <portfolio id="97046" name="Corporates by rating">
-          <include what="chain" id="93560" name="Corp BBB" color="DarkOliveGreen" condition="$LastRating.Rating &gt;= [BBB-] And $LastRating.Rating &lt;= [BBB+] And $Putable = True" />
-          <include what="chain" id="5" name="Corp BB" color="CornflowerBlue" condition="$LastRating.Rating &gt;= [BB-] and $LastRating.Rating &lt;= [BB+] ANd $Putable = True" />
+          <include what="query" id="87d74dae-7258-46b7-aad4-1a8fa205e997" name="Corp BBB" color="DarkOliveGreen" condition="$Coupon &gt; 9" />
+          <include what="query" id="ee647a27-f774-4623-8656-9fb283e43394" name="Corp BB" color="CornflowerBlue" condition="$Coupon &gt; 9" />
         </portfolio>
       </folder>
       <folder id="2" name="Stuff">
@@ -109,8 +114,6 @@
           <include what="chain" id="1" name="All OFZs" />
           <exclude what="list" id="1" />
           <include what="custom-bond" id="1" />
-          <!-- todo -->
-          <exclude what="ric" name="XXXXX" />
         </portfolio>
         <portfolio id="76699" name="EUR">
           <include what="chain" id="5" name="Russia Eur" color="ForestGreen" />
@@ -127,6 +130,6 @@
     <curve id="2" ric="0#USBMK=" color="Green" name="US Benchmark" pattern="US(?&lt;term&gt;.+?)T=RR" skip="" field-set="US chain curves" />
     <curve id="66400" name="Reuters OFZ curve" color="BlueViolet" ric="0#RUXZ=MM" pattern="RUGOV(?&lt;term&gt;.+?)Z=MM" field-set="US chain curves" />
     <curve id="26534" name="Ruble Depo" color="Olive" ric="0#RUBID=" pattern="RUB(?&lt;term&gt;.+?)ID=" field-set="Russian depo curves" />
-    <curve id="88771" name="Ruble Government CDS" color="Red" ric="0#RUGVUSACRBMK=" pattern="RUGV(?&lt;term&gt;.+?)USAC=R" field-set="Eurobonds" type="Spread"/>
+    <curve id="88771" name="Ruble Government CDS" color="Red" ric="0#RUGVUSACRBMK=" pattern="RUGV(?&lt;term&gt;.+?)USAC=R" field-set="Eurobonds" type="Spread" />
   </chain-curves>
 </bonds>

@@ -431,6 +431,107 @@ Public Class UserListSrc
     End Sub
 End Class
 
+Public Class UserQuerySrc
+    Inherits UserListSrc
+
+    Private _condition As String
+    Private _mySource As ChainSrc
+
+    Public Property Condition() As String
+        Get
+            Return _condition
+        End Get
+        Friend Set(ByVal value As String)
+            _condition = value
+        End Set
+    End Property
+
+    Public Property MySource() As ChainSrc
+        Get
+            Return _mySource
+        End Get
+        Friend Set(ByVal value As ChainSrc)
+            _mySource = value
+        End Set
+    End Property
+
+    Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As FieldSet, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
+        MyBase.New(id, color, fields, enabled, curve, name)
+    End Sub
+
+    Public Sub New(ByVal color As String, ByVal fieldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
+        MyBase.New(color, fieldSetId, enabled, curve, name)
+    End Sub
+
+    Public Overrides Function GetDefaultRics() As List(Of String)
+        Dim res As New List(Of String)
+        Dim interpreter = New FilterInterpreter(Of BondMetadata)
+        Dim filter As Boolean = False
+
+        If _condition = "" Then Return res
+        Dim parser As New FilterParser
+        Try
+            Dim grammar As LinkedList(Of FilterParser.IGrammarElement)
+            grammar = parser.SetFilter(_condition)
+            interpreter.SetGrammar(grammar)
+            filter = True
+        Catch ex As Exception
+            Logger.ErrorException(String.Format("Failed to parse condition {0}", _condition), ex)
+            Logger.Error("Exception = {0}", ex.ToString())
+        End Try
+
+        For Each ric In _mySource.GetDefaultRics()
+            Dim descr = BondsData.Instance.GetBondInfo(ric)
+            If descr IsNot Nothing Then
+                If filter Then
+                    Try
+                        If Not interpreter.Allows(descr) Then Continue For
+                    Catch ex As Exception
+                        Logger.ErrorException(String.Format("Failed to apply filter to bond {0}", ric), ex)
+                        Logger.Error("Exception = {0}", ex.ToString())
+                    End Try
+                End If
+                res.Add(ric)
+            Else
+                Logger.Warn("No bond {0}", ric)
+            End If
+        Next
+        Return res
+    End Function
+
+    Public Overrides Function GetXmlTypeName() As String
+        Return "query"
+    End Function
+
+    Public Overrides Function GetXmlPath() As String
+        Return "queries/query"
+    End Function
+
+    Protected Overrides Function GenerateId() As String
+        Return MyBase.GenerateId()
+    End Function
+
+    Public Shared Function Load(ByVal listId As String) As UserQuerySrc
+        Dim node = PortfolioManager.ClassInstance.GetConfigDocument().SelectSingleNode(String.Format("/bonds/queries/query[@id='{0}']", listId))
+        If node Is Nothing Then Throw New NoSourceException(String.Format("Failed to find list with id {0}", listId))
+        Try
+            Dim color = node.GetAttrStrict("color")
+            Dim name = node.GetAttrStrict("name")
+            Dim enabled = node.GetAttr("enabled", "True")
+            Dim cond = node.GetAttr("condition")
+            Dim srcId = node.GetAttr("chain-id")
+            Dim curve = node.GetAttr("curve", "False")
+            Dim fields = New FieldSet(node.GetAttrStrict("field-set-id"))
+            Return New UserQuerySrc(listId, color, fields, enabled, curve, name) With {
+                .Condition = cond,
+                .MySource = ChainSrc.Load(srcId)
+            }
+        Catch ex As Exception
+            Throw New NoSourceException(String.Format("Failed to find list with id {0}", listId), ex)
+        End Try
+    End Function
+End Class
+
 Public Class RegularBondSrc
     Inherits Source
 

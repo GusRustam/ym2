@@ -336,7 +336,6 @@ Public Class PortfolioStructure
     End Sub
 End Class
 
-
 Public Class Portfolio
     Public IsFolder As Boolean
     Public Name As String
