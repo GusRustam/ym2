@@ -479,7 +479,7 @@ Public Class PortfolioManager
         ElseIf TypeOf src Is UserQuerySrc Then
             Dim query = CType(src, UserQuerySrc)
             Dim parent = _bonds.SelectSingleNode("/bonds/queries")
-            Dim newListNode = _bonds.CreateNode(XmlNodeType.Element, "quote", "")
+            Dim newListNode = _bonds.CreateNode(XmlNodeType.Element, "query", "")
             _bonds.AppendAttr(newListNode, "id", query.ID)
             _bonds.AppendAttr(newListNode, "field-set-id", query.Fields.ID)
             _bonds.AppendAttr(newListNode, "name", query.Name)

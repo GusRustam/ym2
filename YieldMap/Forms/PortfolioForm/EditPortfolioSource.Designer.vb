@@ -173,7 +173,7 @@
             Me.IndividualAndCustomBondsTP.Location = New System.Drawing.Point(4, 22)
             Me.IndividualAndCustomBondsTP.Name = "IndividualAndCustomBondsTP"
             Me.IndividualAndCustomBondsTP.Padding = New System.Windows.Forms.Padding(3)
-            Me.IndividualAndCustomBondsTP.Size = New System.Drawing.Size(478, 283)
+            Me.IndividualAndCustomBondsTP.Size = New System.Drawing.Size(478, 253)
             Me.IndividualAndCustomBondsTP.TabIndex = 1
             Me.IndividualAndCustomBondsTP.Text = "Bonds"
             Me.IndividualAndCustomBondsTP.UseVisualStyleBackColor = True
@@ -190,7 +190,7 @@
             Me.TableLayoutPanel4.RowCount = 2
             Me.TableLayoutPanel4.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
             Me.TableLayoutPanel4.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-            Me.TableLayoutPanel4.Size = New System.Drawing.Size(472, 277)
+            Me.TableLayoutPanel4.Size = New System.Drawing.Size(472, 247)
             Me.TableLayoutPanel4.TabIndex = 1
             '
             'FlowLayoutPanel4
@@ -257,7 +257,7 @@
             Me.BondsDGV.Location = New System.Drawing.Point(3, 33)
             Me.BondsDGV.Name = "BondsDGV"
             Me.BondsDGV.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-            Me.BondsDGV.Size = New System.Drawing.Size(466, 241)
+            Me.BondsDGV.Size = New System.Drawing.Size(466, 211)
             Me.BondsDGV.TabIndex = 1
             '
             'FlowLayoutPanel1

@@ -7,7 +7,7 @@ Namespace Forms.PortfolioForm
 
         Public Property Src() As Source
             Get
-                If Not DoValidate(ChainRadioButton.Checked) Then Return Nothing
+                If Not DoValidate() Then Return Nothing
 
                 Dim color = ColorComboBox.Items(ColorComboBox.SelectedIndex)
                 Dim fieldSetId = CType(FieldLayoutComboBox.SelectedItem, IdName(Of String)).Id
@@ -15,27 +15,21 @@ Namespace Forms.PortfolioForm
                 Dim enbld = EnabledCheckBox.Checked
                 Dim nme = NameTextBox.Text
                 Dim chainRic = ChainRicTextBox.Text
+                Dim cond = ConditionTextBox.Text
 
                 If _src IsNot Nothing Then
-                    Dim temp = New ChainSrc(color, fieldSetId, enbld, curve, Name, chainRic)
                     _src.Kill()
-                    _src = temp
-                    'With _src
-                    '    .Color = color
-                    '    .FieldSetId = fieldSetId
-                    '    .Curve = curve
-                    '    .Enabled = enbld
-                    '    .Name = nme
-                    '    If ChainRadioButton.Checked Then CType(_src, ChainSrc).ChainRic = chainRic
-                    'End With
-                    Return _src
-                Else
-                    If ListRadioButton.Checked Then
-                        Return New UserListSrc(color, fieldSetId, enbld, curve, nme)
-                    Else
-                        Return New ChainSrc(color, fieldSetId, enbld, curve, nme, chainRic)
-                    End If
                 End If
+
+                If ListRadioButton.Checked Then
+                    _src = New UserListSrc(color, fieldSetId, enbld, curve, nme)
+                ElseIf ChainRadioButton.Checked Then
+                    _src = New ChainSrc(color, fieldSetId, enbld, curve, nme, chainRic)
+                ElseIf QueryRadioButton.Checked Then
+                    Dim selectedItem As ChainSrc = CType(ChainRicTextBox.SelectedItem, ChainSrc)
+                    _src = New UserQuerySrc(color, fieldSetId, enbld, curve, nme, cond, selectedItem)
+                End If
+                Return _src
             End Get
             Set(ByVal value As Source)
                 _src = value
@@ -48,22 +42,55 @@ Namespace Forms.PortfolioForm
 
                 EnabledCheckBox.Checked = _src.Enabled
                 CurveCheckBox.Checked = _src.Curve
-                Dim source = TryCast(_src, ChainSrc)
-                If source Is Nothing Then
-                    Text = "Edit list"
-                    ListRadioButton.Checked = True
-                Else
+
+                If TypeOf _src Is ChainSrc Then
+                    Dim source = TryCast(_src, ChainSrc)
                     Text = "Edit chain"
                     ChainRadioButton.Checked = True
+
+                    ChainRicTextBox.DropDownStyle = ComboBoxStyle.Simple
+                    ChainRicTextBox.DataSource = Nothing
                     ChainRicTextBox.Text = source.ChainRic
+
+                    EditConditionButton.Enabled = False
+                    RemoveHandler ChainRicTextBox.SelectedValueChanged, Sub() AnotherFieldLayout(ChainRicTextBox.SelectedValue)
+                    FieldLayoutComboBox.Enabled = True
+
+                ElseIf TypeOf _src Is UserQuerySrc Then
+                    Dim source = TryCast(_src, UserQuerySrc)
+                    Text = "Edit query"
+                    QueryRadioButton.Checked = True
+                    ConditionTextBox.Text = source.Condition
+                    EditConditionButton.Enabled = True
+
+                    ChainRicTextBox.Enabled = True
+                    ChainRicTextBox.DropDownStyle = ComboBoxStyle.DropDown
+                    ChainRicTextBox.DataSource = PortfolioManager.Instance.ChainsView
+                    'ChainRicTextBox.ValueMember = "ID"
+                    'ChainRicTextBox.DisplayMember = "ChainRic"
+                    AddHandler ChainRicTextBox.SelectedValueChanged, Sub() AnotherFieldLayout(ChainRicTextBox.SelectedValue)
+                    FieldLayoutComboBox.Enabled = False
+
+                Else
+                    Text = "Edit list"
+                    ListRadioButton.Checked = True
+                    ChainRicTextBox.Enabled = False
+                    EditConditionButton.Enabled = False
+                    ChainRicTextBox.DropDownStyle = ComboBoxStyle.Simple
+                    ChainRicTextBox.DataSource = Nothing
+                    RemoveHandler ChainRicTextBox.SelectedValueChanged, Sub() AnotherFieldLayout(ChainRicTextBox.SelectedValue)
+                    FieldLayoutComboBox.Enabled = True
+
                 End If
 
                 ListRadioButton.Enabled = False
                 ChainRadioButton.Enabled = False
+                QueryRadioButton.Enabled = False
+
             End Set
         End Property
 
-        Private Function DoValidate(Optional ByVal checkChainRic As Boolean = False) As Boolean
+        Private Function DoValidate() As Boolean
             If ColorComboBox.SelectedIndex < 0 Then
                 MessageBox.Show("Please select color", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Return False
@@ -72,11 +99,11 @@ Namespace Forms.PortfolioForm
                 MessageBox.Show("Please field layout", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Return False
             End If
-            If Name = "" Then
+            If NameTextBox.Text = "" Then
                 MessageBox.Show("Please enter name", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Return False
             End If
-            If checkChainRic AndAlso ChainRicTextBox.Text = "" Then
+            If ChainRadioButton.Checked AndAlso ChainRicTextBox.Text = "" Then
                 MessageBox.Show("Please enter chain ric", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Return False
             End If
@@ -115,8 +142,48 @@ Namespace Forms.PortfolioForm
             End If
         End Sub
 
-        Private Sub ChainRadioButton_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles ChainRadioButton.CheckedChanged
-            ChainRicTextBox.Enabled = ChainRadioButton.Checked
+        Private Sub ChainRadioButton_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles ChainRadioButton.Click, ListRadioButton.Click, QueryRadioButton.Click
+            If ChainRadioButton.Checked Then
+                ChainRicTextBox.Enabled = True
+                ChainRicTextBox.DropDownStyle = ComboBoxStyle.Simple
+                ChainRicTextBox.DataSource = Nothing
+                EditConditionButton.Enabled = False
+
+                RemoveHandler ChainRicTextBox.SelectedValueChanged, Sub() AnotherFieldLayout(ChainRicTextBox.SelectedValue)
+                FieldLayoutComboBox.Enabled = True
+
+            ElseIf ListRadioButton.Checked Then
+                ChainRicTextBox.Enabled = False
+                ChainRicTextBox.DropDownStyle = ComboBoxStyle.Simple
+                ChainRicTextBox.DataSource = Nothing
+                EditConditionButton.Enabled = False
+
+                RemoveHandler ChainRicTextBox.SelectedValueChanged, Sub() AnotherFieldLayout(ChainRicTextBox.SelectedValue)
+                FieldLayoutComboBox.Enabled = True
+
+            ElseIf QueryRadioButton.Checked Then
+                ChainRicTextBox.Enabled = True
+                ChainRicTextBox.DataSource = Nothing
+                ChainRicTextBox.DropDownStyle = ComboBoxStyle.DropDownList
+                ChainRicTextBox.DataSource = PortfolioManager.Instance.ChainsView
+                EditConditionButton.Enabled = True
+
+                AddHandler ChainRicTextBox.SelectedValueChanged, Sub() AnotherFieldLayout(ChainRicTextBox.SelectedValue)
+                FieldLayoutComboBox.Enabled = False
+
+            End If
+        End Sub
+
+        Private Sub AnotherFieldLayout(ByVal selectedValue As Object)
+            If selectedValue Is Nothing Then Return
+            Dim x As ChainSrc = TryCast(selectedValue, ChainSrc)
+            If x Is Nothing Then Return
+            For Each item In FieldLayoutComboBox.Items
+                If CType(item, IdName(Of String)).Id = x.FieldSetId Then
+                    FieldLayoutComboBox.SelectedItem = item
+                    Exit For
+                End If
+            Next
         End Sub
 
         Public Function SaveSource() As Source
@@ -137,6 +204,12 @@ Namespace Forms.PortfolioForm
 
         Private Sub AddEditChainList_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
             If DialogResult = DialogResult.OK Then e.Cancel = Not DoValidate()
+        End Sub
+
+        Private Sub EditConditionButton_Click(sender As Object, e As EventArgs) Handles EditConditionButton.Click
+            Dim frm As New ParserErrorForm
+            frm.ConditionTB.Text = ConditionTextBox.Text
+            If frm.ShowDialog() = DialogResult.OK Then ConditionTextBox.Text = frm.ConditionTB.Text
         End Sub
     End Class
 End Namespace

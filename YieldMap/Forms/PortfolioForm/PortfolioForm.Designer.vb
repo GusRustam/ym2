@@ -1197,6 +1197,7 @@
             Me.ChainsListsGrid.DefaultCellStyle = DataGridViewCellStyle8
             Me.ChainsListsGrid.Dock = System.Windows.Forms.DockStyle.Fill
             Me.ChainsListsGrid.Location = New System.Drawing.Point(3, 28)
+            Me.ChainsListsGrid.MultiSelect = False
             Me.ChainsListsGrid.Name = "ChainsListsGrid"
             DataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
             DataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control

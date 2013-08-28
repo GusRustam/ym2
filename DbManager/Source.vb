@@ -69,7 +69,7 @@ Public MustInherit Class SourceBase
         Dim node = xml.SelectSingleNode(String.Format("/bonds/{0}[@id='{1}']", GetXmlPath(), ID))
         If node IsNot Nothing Then
             Try
-                xml.RemoveChild(node)
+                node.ParentNode.RemoveChild(node)
             Catch ex As Exception
                 Logger.Warn("Failed to delete source {0} id {1}", GetXmlTypeName(), ID)
                 Logger.Warn("Exception = {0}", ex.ToString())
@@ -332,9 +332,9 @@ End Class
 Public Class UserListSrc
     Inherits Source
 
-    Public Sub New(ByVal color As String, ByVal fieldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
+    Public Sub New(ByVal color As String, ByVal fieldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String, Optional ByVal addSrc As Boolean = True)
         MyBase.New(color, fieldSetId, enabled, curve, name)
-        PortMan.AddSource(Me)
+        If addSrc Then PortMan.AddSource(Me)
     End Sub
 
     Public Overrides Function ToString() As String
@@ -454,6 +454,13 @@ Public Class UserQuerySrc
             _mySource = value
         End Set
     End Property
+
+    Public Sub New(ByVal color As String, ByVal fieldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String, ByVal cond As String, ByVal src As ChainSrc)
+        MyBase.New(color, fieldSetId, enabled, curve, name, False)
+        _mySource = src
+        _condition = cond
+        PortMan.AddSource(Me)
+    End Sub
 
     Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As FieldSet, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
         MyBase.New(id, color, fields, enabled, curve, name)

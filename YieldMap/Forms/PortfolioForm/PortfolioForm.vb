@@ -555,14 +555,27 @@ Namespace Forms.PortfolioForm
 
         Private Sub RefreshChainsLists(Optional ByVal selectedSource As Source = Nothing)
             ChainsListsGrid.DataSource = If(ChainsButton.Checked, PortfolioManager.ChainsView, PortfolioManager.UserListsView)
-            AddItemsButton.Enabled = Not ChainsButton.Checked
-            DeleteItemsButton.Enabled = Not ChainsButton.Checked
             For Each col As DataGridViewColumn In ChainsListsGrid.Columns
                 col.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             Next
-            If selectedSource IsNot Nothing Then
-                ' todo select it
-            End If
+
+            If selectedSource Is Nothing Then Return
+
+            ChainsListsGrid.ClearSelection()
+            For Each row As DataGridViewRow In (From rw As DataGridViewRow In ChainsListsGrid.Rows
+                                               Where rw.DataBoundItem IsNot Nothing AndAlso rw.DataBoundItem.Equals(selectedSource))
+                row.Selected = True
+                Exit For
+            Next
+        End Sub
+
+
+        Private Sub ChainsListsGrid_SelectionChanged(sender As Object, e As EventArgs) Handles ChainsListsGrid.SelectionChanged
+            If ChainsListsGrid.SelectedRows.Count <= 0 Then Return
+            Dim item = ChainsListsGrid.SelectedRows(0).DataBoundItem
+            If item Is Nothing Then Return
+            AddItemsButton.Enabled = TypeOf item Is UserListSrc And Not TypeOf item Is UserQuerySrc
+            DeleteItemsButton.Enabled = AddItemsButton.Enabled
         End Sub
 
         Private Sub AddCLButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AddCLButton.Click, AddCLTSMI.Click
@@ -579,7 +592,7 @@ Namespace Forms.PortfolioForm
             Dim frm As New AddEditChainList
             frm.Src = selectedItem
             If frm.ShowDialog() = DialogResult.OK Then
-                PortfolioManager.UpdateSource(frm.Src)
+                selectedItem.Kill()
                 RefreshChainsLists(frm.Src)
             End If
         End Sub
@@ -663,7 +676,9 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub RefreshChainListItemGrid(ByVal src As Source)
+            Cursor = Cursors.WaitCursor
             ChainListItemsGrid.DataSource = src.GetDefaultRicsView()
+            Cursor = Cursors.Default
             For Each col As DataGridViewColumn In ChainListItemsGrid.Columns
                 col.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             Next
@@ -1284,7 +1299,7 @@ Namespace Forms.PortfolioForm
             NewCc
             EditCc
         End Enum
-        Private _ccMode As ChainCurveMode = ChainCurveMode.NewCC
+        Private _ccMode As ChainCurveMode = ChainCurveMode.NewCc
         Private _currentChainCurveId As String
 
         Private Class ChainCurveDescr
@@ -1366,7 +1381,7 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub SaveChainCurveChangesButton_Click(sender As Object, e As EventArgs) Handles SaveChainCurveChangesButton.Click
-            If ValidToSave Then
+            If ValidToSave() Then
                 If _ccMode = ChainCurveMode.EditCc Then
                     Dim chainCurveSrc = GetCurrentSource()
                     PortfolioManager.UpdateSource(chainCurveSrc)
