@@ -17,17 +17,17 @@ Namespace Forms.PortfolioForm
                 Dim chainRic = ChainRicTextBox.Text
                 Dim cond = ConditionTextBox.Text
 
-                If _src IsNot Nothing Then
-                    _src.Kill()
-                End If
-
                 If ListRadioButton.Checked Then
-                    _src = New UserListSrc(color, fieldSetId, enbld, curve, nme)
+
+                    Dim userListSrc = New UserListSrc(color, fieldSetId, enbld, curve, nme, _src Is Nothing)
+                    If _src IsNot Nothing Then _src.Update(userListSrc)
                 ElseIf ChainRadioButton.Checked Then
-                    _src = New ChainSrc(color, fieldSetId, enbld, curve, nme, chainRic)
+                    Dim chainSrc = New ChainSrc(color, fieldSetId, enbld, curve, nme, chainRic, _src Is Nothing)
+                    If _src IsNot Nothing Then _src.Update(chainSrc)
                 ElseIf QueryRadioButton.Checked Then
                     Dim selectedItem As ChainSrc = CType(ChainRicTextBox.SelectedItem, ChainSrc)
-                    _src = New UserQuerySrc(color, fieldSetId, enbld, curve, nme, cond, selectedItem)
+                    Dim userQuerySrc = New UserQuerySrc(color, fieldSetId, enbld, curve, nme, cond, selectedItem, _src Is Nothing)
+                    If _src IsNot Nothing Then _src.Update(userQuerySrc)
                 End If
                 Return _src
             End Get
@@ -66,6 +66,13 @@ Namespace Forms.PortfolioForm
                     ChainRicTextBox.Enabled = True
                     ChainRicTextBox.DropDownStyle = ComboBoxStyle.DropDown
                     ChainRicTextBox.DataSource = PortfolioManager.Instance.ChainsView
+
+                    For Each item In (From elem In ChainRicTextBox.Items
+                                      Let x = TryCast(elem, ChainSrc)
+                                      Where x IsNot Nothing AndAlso x.ID = source.MySource.ID
+                                      Select x)
+                        ChainRicTextBox.SelectedItem = item
+                    Next
                     'ChainRicTextBox.ValueMember = "ID"
                     'ChainRicTextBox.DisplayMember = "ChainRic"
                     AddHandler ChainRicTextBox.SelectedValueChanged, Sub() AnotherFieldLayout(ChainRicTextBox.SelectedValue)

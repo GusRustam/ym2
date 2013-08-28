@@ -551,7 +551,7 @@ Public Class PortfolioManager
             SaveBonds()
         ElseIf TypeOf src Is UserQuerySrc Then
             Dim query = CType(src, UserQuerySrc)
-            Dim queryNode = _bonds.SelectSingleNode(String.Format("/bonds/query/queries[@id='{0}']", src.ID))
+            Dim queryNode = _bonds.SelectSingleNode(String.Format("/bonds/queries/query[@id='{0}']", src.ID))
             If queryNode Is Nothing Then
                 Logger.Error("No list with id {0} found", src.ID)
                 Return
@@ -620,12 +620,17 @@ Public Class PortfolioManager
             Dim chain = CType(src, ChainSrc)
             Dim nodes = _bonds.SelectNodes(String.Format("/bonds/portfolios//portfolio[include[@what='chain' and @id='{0}']]", chain.ID))
             Return (From node As XmlNode In nodes
-                    Select New IdName(Of String)(node.Attributes("id").Value, node.Attributes("name").Value)).ToList()
+                    Select New IdName(Of String)(node.Attributes("id").Value, node.Attributes("name").Value)).Distinct().ToList()
+        ElseIf TypeOf src Is UserQuerySrc Then
+            Dim list = CType(src, UserListSrc)
+            Dim nodes = _bonds.SelectNodes(String.Format("/bonds/portfolios//portfolio[include[@what='query' and @id='{0}']]", list.ID))
+            Return (From node As XmlNode In nodes
+                    Select New IdName(Of String)(node.Attributes("id").Value, node.Attributes("name").Value)).Distinct().ToList()
         ElseIf TypeOf src Is UserListSrc Then
             Dim list = CType(src, UserListSrc)
             Dim nodes = _bonds.SelectNodes(String.Format("/bonds/portfolios//portfolio[include[@what='list' and @id='{0}']]", list.ID))
             Return (From node As XmlNode In nodes
-                    Select New IdName(Of String)(node.Attributes("id").Value, node.Attributes("name").Value)).ToList()
+                    Select New IdName(Of String)(node.Attributes("id").Value, node.Attributes("name").Value)).Distinct().ToList()
         Else
             Return New List(Of IdName(Of String))
         End If

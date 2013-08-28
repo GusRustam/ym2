@@ -12,6 +12,11 @@ Public MustInherit Class SourceBase
     Private _name As String
     Protected Friend ReadOnly PortMan As PortfolioManager = PortfolioManager.ClassInstance
 
+    Public Overridable Sub Update(ByVal src As SourceBase)
+        _color = src.Color
+        _name = src.Name
+    End Sub
+
     Friend Sub New(ByVal id As String, ByVal color As String, ByVal name As String)
         _id = id
         _color = color
@@ -64,7 +69,7 @@ Public MustInherit Class SourceBase
     ''' Tries to delete current source
     ''' </summary>
     ''' <remarks></remarks>
-    Public Sub Kill()
+    Public Sub Kill() 'As List(Of String)
         Dim xml = PortfolioManager.ClassInstance.GetConfigDocument()
         Dim node = xml.SelectSingleNode(String.Format("/bonds/{0}[@id='{1}']", GetXmlPath(), ID))
         If node IsNot Nothing Then
@@ -76,15 +81,19 @@ Public MustInherit Class SourceBase
             End Try
             PortfolioManager.ClassInstance.SaveBonds()
         End If
+        'Dim res As New List(Of String)
+        'For Each port In PortfolioManager.ClassInstance.GetPortfoliosBySource(Me)
+        '    Try
+        '        Dim prt = New PortfolioWrapper(port.Id)
+        '        If prt.TryDeleteSource(Me) Then res.Add(port.Id)
+        '    Catch ex As Exception
+        '        Logger.Warn("Failed to delete source from portfolio with id {0}", port.Id)
+        '        Logger.Warn("Exception = {0}", ex.ToString())
+        '    End Try
+        'Next
 
-        For Each port In PortfolioManager.ClassInstance.GetAllPortfolios()
-            Try
-                Dim prt = New PortfolioWrapper(port.Id)
-                prt.TryDeleteSource(Me)
-            Catch ex As Exception
-                Logger.Warn("Failed to delete source from portfolio with id {0}", port.Id)
-            End Try
-        Next
+        'If res.Any Then PortfolioManager.ClassInstance.SaveBonds()
+        'Return res
     End Sub
 End Class
 
@@ -187,11 +196,19 @@ Public MustInherit Class Source
             Select descr).ToList()
     End Function
 
+    Public Overrides Sub Update(ByVal src As SourceBase)
+        MyBase.Update(src)
+        Dim srcc = CType(src, Source)
+        _curve = srcc.Curve
+        _enabled = srcc.Enabled
+        _fieldSetId = srcc.FieldSetId
+        _fields = srcc.Fields
+    End Sub
 End Class
 
 Public Class ChainSrc
     Inherits Source
-    Private ReadOnly _chainRic As String
+    Private _chainRic As String
     Private ReadOnly _bondsManager As IBondsLoader = BondsLoader.Instance
 
     Public Overrides Function ToString() As String
@@ -203,20 +220,20 @@ Public Class ChainSrc
         _chainRic = chainRic
     End Sub
 
-    Public Sub New(ByVal color As String, ByVal fieldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String, ByVal chainRic As String)
+    Public Sub New(ByVal color As String, ByVal fieldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String, ByVal chainRic As String, Optional ByVal addSrc As Boolean = True)
         MyBase.New(color, fieldSetId, enabled, curve, name)
         _chainRic = chainRic
-        PortMan.AddSource(Me)
+        If addSrc Then PortMan.AddSource(Me)
     End Sub
 
     <DisplayName("Chain RIC")>
-    Public ReadOnly Property ChainRic As String
+    Public Property ChainRic As String
         Get
             Return _chainRic
         End Get
-        'Set(ByVal value As String)
-        '    _chainRic = value
-        'End Set
+        Private Set(ByVal value As String)
+            _chainRic = value
+        End Set
     End Property
 
     Public Overrides Function GetDefaultRics() As List(Of String)
@@ -271,6 +288,13 @@ Public Class ChainSrc
         Return hashCode
     End Function
 
+    Public Overrides Sub Update(ByVal src As SourceBase)
+        MyBase.Update(src)
+        If Not TypeOf src Is ChainSrc Then Throw New PortfolioException("Invalid source type")
+        Dim ch = CType(src, ChainSrc)
+        _chainRic = ch.ChainRic
+    End Sub
+
     Public Shared Shadows Operator =(ByVal left As ChainSrc, ByVal right As ChainSrc) As Boolean
         Return Equals(left, right)
     End Operator
@@ -300,7 +324,7 @@ Public Class PortfolioWrapper
     Public Sub New(ByVal id As String, Optional ByVal createIfNotExists As Boolean = False)
         Dim xml = PMan.GetConfigDocument()
         _id = id
-        Dim node = xml.SelectSingleNode(String.Format("/bonds/portfolios//portfolio[@id='{0}']/portfolio", id))
+        Dim node = xml.SelectSingleNode(String.Format("/bonds/portfolios//portfolio[@id='{0}']", id))
         If node Is Nothing Then
             If createIfNotExists Then
                 ' todo create TEMPORARY portfolio
@@ -437,6 +461,14 @@ Public Class UserQuerySrc
     Private _condition As String
     Private _mySource As ChainSrc
 
+    Public Overrides Sub Update(ByVal src As SourceBase)
+        MyBase.Update(src)
+        If Not TypeOf src Is UserQuerySrc Then Throw New PortfolioException("Invalid source type")
+        Dim ch = CType(src, UserQuerySrc)
+        _condition = ch.Condition
+        _mySource = ch.MySource
+    End Sub
+
     Public Property Condition() As String
         Get
             Return _condition
@@ -455,11 +487,11 @@ Public Class UserQuerySrc
         End Set
     End Property
 
-    Public Sub New(ByVal color As String, ByVal fieldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String, ByVal cond As String, ByVal src As ChainSrc)
+    Public Sub New(ByVal color As String, ByVal fieldSetId As String, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String, ByVal cond As String, ByVal src As ChainSrc, Optional ByVal addSrc As Boolean = True)
         MyBase.New(color, fieldSetId, enabled, curve, name, False)
         _mySource = src
         _condition = cond
-        PortMan.AddSource(Me)
+        If addsrc Then PortMan.AddSource(Me)
     End Sub
 
     Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As FieldSet, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)

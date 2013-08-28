@@ -592,8 +592,9 @@ Namespace Forms.PortfolioForm
             Dim frm As New AddEditChainList
             frm.Src = selectedItem
             If frm.ShowDialog() = DialogResult.OK Then
-                selectedItem.Kill()
-                RefreshChainsLists(frm.Src)
+                Dim tmp = frm.Src
+                PortfolioManager.UpdateSource(tmp)
+                RefreshChainsLists(tmp)
             End If
         End Sub
 
