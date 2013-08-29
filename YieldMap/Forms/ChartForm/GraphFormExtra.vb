@@ -641,7 +641,11 @@ Namespace Forms.ChartForm
 
                     Dim legendName = curve.Name
                     If curve.GroupDate <> Today Then legendName = String.Format("{0} ({1:dd/MM/yyy})", legendName, curve.GroupDate)
-                    TheChart.Legends(0).CustomItems.Add(New LegendItem(legendName, clr, "") With {.Tag = curve.Identity})
+                    TheChart.Legends(0).CustomItems.Add(New LegendItem(legendName, clr, "") With {
+                                                        .Tag = curve.Identity,
+                                                        .ImageStyle = LegendImageStyle.Line,
+                                                        .BorderWidth = 2
+                                                    })
 
                     If itsBond Then
                         ' another option would be to show mark only if only one point exists

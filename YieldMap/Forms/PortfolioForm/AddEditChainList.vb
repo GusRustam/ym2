@@ -18,7 +18,6 @@ Namespace Forms.PortfolioForm
                 Dim cond = ConditionTextBox.Text
 
                 If ListRadioButton.Checked Then
-
                     Dim userListSrc = New UserListSrc(color, fieldSetId, enbld, curve, nme, _src Is Nothing)
                     If _src IsNot Nothing Then _src.Update(userListSrc)
                 ElseIf ChainRadioButton.Checked Then

@@ -483,6 +483,10 @@ Namespace Bonds
                         Dim rw = table.NewRow()
                         For Each colName In slot.Keys
                             Dim elem = slot(colName)
+                            If elem Is Nothing Then Continue For
+                            If elem.ToString().StartsWith("Unable to collect data") Then
+                                Throw New InvalidOperationException()
+                            End If
                             If query.IsBool(colName) Then
                                 rw(colName) = (elem = "Y")
                             ElseIf query.IsDate(colName) Then
@@ -498,6 +502,7 @@ Namespace Bonds
                 Catch ex As Exception
                     Logger.ErrorException("Failed to import data to table" + table.TableName, ex)
                     Logger.Error("Exception = {0}", ex.ToString())
+                    Throw New InvalidOperationException()
                 End Try
             End If
 
@@ -510,8 +515,13 @@ Namespace Bonds
             LoadGeneral(BondsTable, QueryBondDescr, "Loading bonds descriptions",
                          Sub(data As LinkedList(Of Dictionary(Of String, Object)))
                              If data IsNot Nothing Then
-                                 ImportData(data, BondsTable, QueryBondDescr)
-                                 LoadStep1(New HashSet(Of String)(requiredRics))
+                                 Try
+                                     ImportData(data, BondsTable, QueryBondDescr)
+                                     LoadStep1(New HashSet(Of String)(requiredRics))
+                                 Catch ex As Exception
+                                     RaiseEvent Progress(New ProgressEvent(MessageKind.Fail, "Failed to import chain metadata"))
+
+                                 End Try
                              Else
                                  RaiseEvent Progress(New ProgressEvent(MessageKind.Fail, "No bond descriptions available"))
                              End If
