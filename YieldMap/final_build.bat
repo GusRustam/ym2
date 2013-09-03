@@ -28,7 +28,7 @@ mkdir "Yield Map"
 
 echo Copying files
 copy *.* "Yield Map"
-del "Yield Map"\%0
+del "Yield Map"\%~nx0
 
 echo Moving files into lib folder
 mkdir "Yield Map"\lib

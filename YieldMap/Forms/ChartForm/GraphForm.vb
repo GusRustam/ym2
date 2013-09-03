@@ -812,8 +812,8 @@ Namespace Forms.ChartForm
             Dim portfolioManager = DbManager.PortfolioManager.Instance
 
             BondCurvesNewTSMI.DropDownItems.Clear()
-            DoAddNew(From chain In portfolioManager.ChainsView Where chain.Curve)
-            DoAddNew(From list In portfolioManager.UserListsView Where list.Curve)
+            DoAddNew(From chain In portfolioManager.ChainsView Where chain.Curve And chain.Enabled)
+            DoAddNew(From list In portfolioManager.UserListsView Where list.Curve And list.Enabled)
 
             ChainCurvesToolStripMenuItem.DropDownItems.Clear()
             For Each curve In portfolioManager.CurveChainsView
@@ -1089,22 +1089,30 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub IssuerSeriesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles IssuerSeriesToolStripMenuItem.Click
-            Dim grp = TryCast(BondCurveCMS.Tag, Group)
+            Dim elem = _ansamble(BondCurveCMS.Tag)
+            If elem Is Nothing Then Return
+            Dim grp = TryCast(elem, Group)
             If grp IsNot Nothing Then grp.SetLabelMode(LabelMode.IssuerAndSeries)
         End Sub
 
         Private Sub IssuerCouponMaturityToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles IssuerCouponMaturityToolStripMenuItem.Click
-            Dim grp = TryCast(BondCurveCMS.Tag, Group)
+            Dim elem = _ansamble(BondCurveCMS.Tag)
+            If elem Is Nothing Then Return
+            Dim grp = TryCast(elem, Group)
             If grp IsNot Nothing Then grp.SetLabelMode(LabelMode.IssuerCpnMat)
         End Sub
 
         Private Sub DescriptionToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DescriptionToolStripMenuItem.Click
-            Dim grp = TryCast(BondCurveCMS.Tag, Group)
+            Dim elem = _ansamble(BondCurveCMS.Tag)
+            If elem Is Nothing Then Return
+            Dim grp = TryCast(elem, Group)
             If grp IsNot Nothing Then grp.SetLabelMode(LabelMode.Description)
         End Sub
 
         Private Sub SeriesOnlyToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SeriesOnlyToolStripMenuItem.Click
-            Dim grp = TryCast(BondCurveCMS.Tag, Group)
+            Dim elem = _ansamble(BondCurveCMS.Tag)
+            If elem Is Nothing Then Return
+            Dim grp = TryCast(elem, Group)
             If grp IsNot Nothing Then grp.SetLabelMode(LabelMode.SeriesOnly)
         End Sub
 

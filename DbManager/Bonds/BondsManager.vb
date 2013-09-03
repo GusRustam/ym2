@@ -485,7 +485,9 @@ Namespace Bonds
                             Dim elem = slot(colName)
                             If elem Is Nothing Then Continue For
                             If elem.ToString().StartsWith("Unable to collect data") Then
-                                Throw New InvalidOperationException()
+                                Logger.Warn("Unable to import data on {0}", colName)
+                                Continue For
+                                ' Throw New InvalidOperationException()
                             End If
                             If query.IsBool(colName) Then
                                 rw(colName) = (elem = "Y")
@@ -520,7 +522,6 @@ Namespace Bonds
                                      LoadStep1(New HashSet(Of String)(requiredRics))
                                  Catch ex As Exception
                                      RaiseEvent Progress(New ProgressEvent(MessageKind.Fail, "Failed to import chain metadata"))
-
                                  End Try
                              Else
                                  RaiseEvent Progress(New ProgressEvent(MessageKind.Fail, "No bond descriptions available"))

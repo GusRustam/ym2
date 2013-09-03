@@ -54,6 +54,7 @@ Namespace Forms.PortfolioForm
                     EditConditionButton.Enabled = False
                     RemoveHandler ChainRicTextBox.SelectedValueChanged, Sub() AnotherFieldLayout(ChainRicTextBox.SelectedValue)
                     FieldLayoutComboBox.Enabled = True
+                    EditConditionButton.Enabled = False
 
                 ElseIf TypeOf _src Is UserQuerySrc Then
                     Dim source = TryCast(_src, UserQuerySrc)
@@ -76,6 +77,7 @@ Namespace Forms.PortfolioForm
                     'ChainRicTextBox.DisplayMember = "ChainRic"
                     AddHandler ChainRicTextBox.SelectedValueChanged, Sub() AnotherFieldLayout(ChainRicTextBox.SelectedValue)
                     FieldLayoutComboBox.Enabled = False
+                    EditConditionButton.Enabled = True
 
                 Else
                     Text = "Edit list"
@@ -86,8 +88,13 @@ Namespace Forms.PortfolioForm
                     ChainRicTextBox.DataSource = Nothing
                     RemoveHandler ChainRicTextBox.SelectedValueChanged, Sub() AnotherFieldLayout(ChainRicTextBox.SelectedValue)
                     FieldLayoutComboBox.Enabled = True
+                    EditConditionButton.Enabled = False
+
+
+
 
                 End If
+
 
                 ListRadioButton.Enabled = False
                 ChainRadioButton.Enabled = False
@@ -129,10 +136,18 @@ Namespace Forms.PortfolioForm
             For Each clr In Utils.GetColorList()
                 ColorComboBox.Items.Add(clr)
             Next
-            If _src IsNot Nothing Then ColorComboBox.SelectedItem = _src.Color
             FieldLayoutComboBox.DataSource = PortfolioManager.Instance().GetFieldLayouts()
-
+            If _src IsNot Nothing Then
+                ColorComboBox.SelectedItem = _src.Color
+                For Each item In (From elem In FieldLayoutComboBox.Items
+                      Let x = TryCast(elem, IdName(Of String))
+                      Where x IsNot Nothing AndAlso x.Id = _src.FieldSetId
+                      Select x)
+                    FieldLayoutComboBox.SelectedItem = item
+                Next
+            End If
             Text = "Create new chain or list"
+            'EditConditionButton.Enabled = False
         End Sub
 
         Private Sub ColorsComboBoxDrawItem(ByVal sender As Object, ByVal e As DrawItemEventArgs) Handles ColorComboBox.DrawItem
@@ -157,6 +172,7 @@ Namespace Forms.PortfolioForm
 
                 RemoveHandler ChainRicTextBox.SelectedValueChanged, Sub() AnotherFieldLayout(ChainRicTextBox.SelectedValue)
                 FieldLayoutComboBox.Enabled = True
+                EditConditionButton.Enabled = False
 
             ElseIf ListRadioButton.Checked Then
                 ChainRicTextBox.Enabled = False
@@ -166,6 +182,7 @@ Namespace Forms.PortfolioForm
 
                 RemoveHandler ChainRicTextBox.SelectedValueChanged, Sub() AnotherFieldLayout(ChainRicTextBox.SelectedValue)
                 FieldLayoutComboBox.Enabled = True
+                EditConditionButton.Enabled = False
 
             ElseIf QueryRadioButton.Checked Then
                 ChainRicTextBox.Enabled = True
@@ -176,6 +193,7 @@ Namespace Forms.PortfolioForm
 
                 AddHandler ChainRicTextBox.SelectedValueChanged, Sub() AnotherFieldLayout(ChainRicTextBox.SelectedValue)
                 FieldLayoutComboBox.Enabled = False
+                EditConditionButton.Enabled = True
 
             End If
         End Sub

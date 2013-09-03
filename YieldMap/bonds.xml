@@ -52,73 +52,70 @@
   </field-sets>
   <!-- Chains -->
   <chains>
-    <chain id="1" ric="0#RUTSY=MM" field-set-id="MICEX" name="OFZ" color="Red" />
-    <chain id="2" ric="0#RUMOSB=MM" field-set-id="MICEX" name="Moscow" color="Green" curve="True" />
-    <chain id="3" ric="0#RUSOVB=MM" field-set-id="MICEX" name="Regional" color="Blue" />
-    <chain id="5" ric="0#RFGOVBONDS=" field-set-id="MICEX" name="Russian eurobonds" color="IndianRed" curve="True" enabled="True" />
-    <chain id="93560" ric="0#RUCORP=MM" field-set-id="MICEX" name="Russian MICEX corporates" color="MediumSeaGreen" curve="False" enabled="True" />
+    <chain id="1" ric="0#RUTSY=MM" field-set-id="MICEX" name="Russia Domestic BMK" color="Red" curve="False" enabled="True" />
+    <chain id="2" ric="0#RUMOSB=MM" field-set-id="MICEX" name="City of Moscow" color="Green" curve="True" enabled="True" />
+    <chain id="3" ric="0#RUSOVB=MM" field-set-id="MICEX" name="Russian Regionals" color="Blue" curve="False" enabled="True" />
+    <chain id="5" ric="0#RFGOVBONDS=" field-set-id="Eurobonds" name="Russia BMK" color="IndianRed" curve="True" enabled="True" />
+    <chain id="93560" ric="0#RUCORP=MM" field-set-id="MICEX" name="Russian Corporates" color="MediumSeaGreen" curve="False" enabled="True" />
+    <chain id="22208" ric="0#USBMK=" field-set-id="Eurobonds" name="US BMK" color="OrangeRed" curve="True" enabled="True" />
+    <chain id="98846" ric="0#GBBMK=" field-set-id="Eurobonds" name="UK BMK" color="Purple" curve="True" enabled="True" />
+    <chain id="54948" ric="0#EUBMK=" field-set-id="Eurobonds" name="Euro BMK" color="Firebrick" curve="True" enabled="True" />
+    <chain id="61053" ric="0#CNBMK=" field-set-id="Eurobonds" name="China BMK" color="RoyalBlue" curve="True" enabled="True" />
+    <chain id="16318" ric="0#JPBMK=" field-set-id="Eurobonds" name="Japan BMK" color="Tomato" curve="True" enabled="True" />
+    <chain id="71273" ric="0#BRTSY=" field-set-id="Eurobonds" name="Brazil BMK" color="DarkOrchid" curve="True" enabled="True" />
+    <chain id="6714" ric="0#MXGLBBMK=" field-set-id="Eurobonds" name="Mexico BMK" color="MediumTurquoise" curve="True" enabled="True" />
+    <chain id="73214" ric="0#UAEUROSAZ=" field-set-id="Eurobonds" name="CIS UKR All Eurobonds" color="MediumBlue" curve="False" enabled="True" />
+    <chain id="66919" ric="0#BYEUROSAZ=" field-set-id="Eurobonds" name="CIS BY All Eurobonds" color="MediumPurple" curve="False" enabled="True" />
+    <chain id="26079" ric="0#KZEUROSAZ=" field-set-id="Eurobonds" name="CIS KZ All Eurobonds" color="DarkOrange" curve="False" enabled="True" />
+    <chain id="338" ric="0#GEEUROSAZ=" field-set-id="MICEX" name="CIS GE All Eurobonds" color="DarkSlateGray" curve="False" enabled="True" />
+    <chain id="18867" ric="0#AZEUROSAZ=" field-set-id="Eurobonds" name="CIS AZ All Eurobonds" color="Goldenrod" curve="False" enabled="True" />
+    <chain id="2070" ric="0#CHTSY=" field-set-id="Eurobonds" name="Swiss BMK" color="GreenYellow" curve="True" enabled="True" />
+    <chain id="40166" ric="0#ECBRUSSC=" field-set-id="Eurobonds" name="Russia Lomard List" color="DeepPink" curve="False" enabled="True" />
+    <chain id="68039" ric="0#RUAER=MM" field-set-id="MICEX" name="Russia Aerospace &amp; Military" color="Orchid" curve="False" enabled="True" />
+    <chain id="17214" ric="0#RUAUT=MM" field-set-id="MICEX" name="Russia Airlines &amp; Transport" color="Crimson" curve="False" enabled="True" />
+    <chain id="51020" ric="0#RUAUT=MM" field-set-id="MICEX" name="Russia Automobiles" color="DeepSkyBlue" curve="False" enabled="True" />
+    <chain id="71511" ric="0#RUBNK=MM" field-set-id="MICEX" name="Russia Banking" color="MediumAquamarine" curve="False" enabled="True" />
+    <chain id="31424" ric="0#RUBLD=MM" field-set-id="MICEX" name="Russia Building" color="MediumVioletRed" curve="False" enabled="True" />
+    <chain id="15953" ric="0#RUCHE=MM" field-set-id="MICEX" name="Russia Chemicals" color="DarkKhaki" curve="False" enabled="True" />
+    <chain id="11882" ric="0#RUELG=MM" field-set-id="MICEX" name="Russia Electricity and Energy" color="CornflowerBlue" curve="False" enabled="True" />
+    <chain id="18792" ric="0#RUENR=MM" field-set-id="MICEX" name="Russia Oil and Gas" color="Chocolate" curve="False" enabled="True" />
+    <chain id="26695" ric="0#TREUROSAZ=" field-set-id="Eurobonds" name="Turkey Corporate Eurobonds" color="Lime" curve="False" enabled="True" />
+    <chain id="51842" ric="0#TRBMK=" field-set-id="Eurobonds" name="Turkey BMK" color="Chartreuse" curve="True" enabled="True" />
+    <chain id="67919" ric="0#ZATSY=" field-set-id="Eurobonds" name="South Africa GOVT" color="SaddleBrown" curve="True" enabled="True" />
+    <chain id="409" ric="0#RUEUROS=" field-set-id="Eurobonds" name="Russian Eurobonds" color="LimeGreen" curve="False" enabled="True" />
   </chains>
   <!-- Lists -->
   <lists>
-    <list id="89317" field-set-id="MICEX" name="OFZ" color="DarkKhaki" curve="True" enabled="True">
-      <ric>RU26212RMFS=MM</ric>
-      <ric>RU26211RMFS=MM</ric>
-      <ric>RU26210RMFS=MM</ric>
-      <ric>RU26209RMFS=MM</ric>
-      <ric>RU26208RMFS=MM</ric>
-      <ric>RU26207RMFS=MM</ric>
-      <ric>RU26206RMFS=MM</ric>
-      <ric>RU26205RMFS=MM</ric>
-      <ric>RU26204RMFS=MM</ric>
-      <ric>RU26203RMFS=MM</ric>
-      <ric>RU26202RMFS=MM</ric>
-      <ric>RU26201RMFS=MM</ric>
-      <ric>RU26200RMFS=MM</ric>
-      <ric>RU25082RMFS=MM</ric>
-      <ric>RU25081RMFS=MM</ric>
-      <ric>RU25080RMFS=MM</ric>
-      <ric>RU25079RMFS=MM</ric>
-      <ric>RU25077RMFS=MM</ric>
-      <ric>RU25076RMFS=MM</ric>
-      <ric>RU25075RMFS=MM</ric>
-      <ric>RU25071RMFS=MM</ric>
-      <ric>RU25068RMFS=MM</ric>
-    </list>
   </lists>
   <!-- Dynamic lists -->
   <queries>
-    <query id="87d74dae-7258-46b7-aad4-1a8fa205e997" field-set-id="MICEX" chain-id="93560" name="Corp BBB Putable" color="DarkOliveGreen" condition="$LastRating.Rating &gt;= [BBB-] And $LastRating.Rating &lt;= [BBB+] And $Putable = True" />
-    <query id="ee647a27-f774-4623-8656-9fb283e43394" field-set-id="MICEX" chain-id="93560" name="Corp BB Putable" color="DarkOrchid" condition="$LastRating.Rating &gt;= [BB-] And $LastRating.Rating &lt;= [BB+] And $Putable = True" />
+    <query id="37593" field-set-id="Eurobonds" name="Turkey GOVT" color="Olive" curve="True" enabled="True" chain-id="26695" condition="$ShortName LIKE &quot;^Turkey&quot;" />
+    <query id="9546" field-set-id="MICEX" name="Russia Bank VEB RU" color="DarkSeaGreen" curve="True" enabled="True" chain-id="71511" condition="$ShortName LIKE &quot;^Vneshekonom&quot;" />
+    <query id="47777" field-set-id="MICEX" name="Russia Bank VTB RU" color="DarkGreen" curve="True" enabled="True" chain-id="71511" condition="$IssuerName = &quot;BANK VTB OAO&quot;" />
+    <query id="14285" field-set-id="Eurobonds" name="Russia Bank VEB USD" color="LawnGreen" curve="True" enabled="True" chain-id="409" condition="$Currency = &quot;USD&quot; AND $IssuerName = &quot;VEB FINANCE PLC&quot;" />
+    <query id="443" field-set-id="Eurobonds" name="Russia Bank VTB USD" color="SpringGreen" curve="True" enabled="True" chain-id="409" condition="$Currency = &quot;USD&quot; AND $IssuerName = &quot;VTB CAPITAL SA&quot;" />
+    <query id="80636" field-set-id="Eurobonds" name="Russia Sberbank USD" color="OliveDrab" curve="True" enabled="True" chain-id="409" condition="$IssuerName = &quot;SB CAPITAL SA&quot; AND $Currency = &quot;USD&quot;" />
+    <query id="24875" field-set-id="Eurobonds" name="Russia Bank RSHB USD" color="GreenYellow" curve="True" enabled="True" chain-id="409" condition="$IssuerName LIKE &quot;^RSHB&quot; AND $Currency = &quot;USD&quot;" />
+    <query id="91530" field-set-id="Eurobonds" name="Russia Bank Alfa USD" color="MediumTurquoise" curve="True" enabled="True" chain-id="409" condition="$IssuerName LIKE &quot;^ALFA&quot; AND $Currency = &quot;USD&quot;" />
+    <query id="4027" field-set-id="Eurobonds" name="Russia O&amp;G Lukoil USD" color="Goldenrod" curve="True" enabled="True" chain-id="409" condition="$IssuerName LIKE &quot;LUKOIL&quot; AND $Currency = &quot;USD&quot;" />
+    <query id="8945" field-set-id="Eurobonds" name="Russia O&amp;G TNK-BP USD" color="Chocolate" curve="True" enabled="True" chain-id="409" condition="$Currency = &quot;USD&quot; AND $IssuerName LIKE &quot;^TNK&quot;" />
+    <query id="97636" field-set-id="Eurobonds" name="Russia O&amp;G Gazprom USD" color="DarkGoldenrod" curve="True" enabled="True" chain-id="409" condition="$Currency = &quot;USD&quot; AND $IssuerName LIKE &quot;GAZ&quot;" />
+    <query id="67851" field-set-id="Eurobonds" name="Russia O&amp;G Gazprom EUR" color="Maroon" curve="True" enabled="True" chain-id="409" condition="$IssuerName LIKE &quot;GAZ&quot; AND $Currency = &quot;EUR&quot;" />
+    <query id="58175" field-set-id="Eurobonds" name="Russia Telecom Vimpelcom" color="IndianRed" curve="True" enabled="True" chain-id="409" condition="$Currency = &quot;USD&quot; and $IssuerName LIKE &quot;VIMP&quot;" />
+    <query id="25150" field-set-id="MICEX" name="OFZ Curve" color="Firebrick" curve="True" enabled="True" chain-id="1" condition="$Ric LIKE &quot;2(5|6)&quot;" />
   </queries>
   <!-- Portfolios -->
   <portfolios>
-    <folder id="0" name="Main">
-      <folder id="1" name="By rating">
-        <portfolio id="82762" name="Regionals by rating">
-          <include what="chain" id="3" name="Muni B" color="DarkOrchid" condition="$LastRating.Rating &gt;= [B-] and $LastRating.Rating &lt;= [B+] " />
-          <include what="chain" id="3" name="Muni BB" color="Blue" condition="$LastRating.Rating &gt;= [BB-] and $LastRating.Rating &lt;= [BB+] " />
-          <include what="chain" id="3" name="Muni BBB" color="CornflowerBlue" condition="$LastRating.Rating &gt;= [BBB-] and $LastRating.Rating &lt;= [BBB+] " />
-        </portfolio>
-        <portfolio id="97046" name="Corporates by rating">
-          <include what="query" id="87d74dae-7258-46b7-aad4-1a8fa205e997" name="Corp BBB" color="DarkOliveGreen" condition="$Coupon &gt; 9" />
-          <include what="query" id="ee647a27-f774-4623-8656-9fb283e43394" name="Corp BB" color="CornflowerBlue" condition="$Coupon &gt; 9" />
-        </portfolio>
-      </folder>
-      <folder id="2" name="Stuff">
-        <portfolio id="3" name="Mos">
-          <include what="chain" id="2" name="Moskau" color="Blue" />
-          <include what="custom-bond" id="1" name="Bond 1" color="MidnightBlue" />
-          <include what="custom-bond" id="39240" name="Bond 2" color="DarkSlateGray" />
-        </portfolio>
-        <portfolio id="4" name="Main">
-          <include what="chain" id="1" name="All OFZs" />
-          <exclude what="list" id="1" />
-          <include what="custom-bond" id="1" />
-        </portfolio>
-        <portfolio id="76699" name="EUR">
-          <include what="chain" id="5" name="Russia Eur" color="ForestGreen" />
-        </portfolio>
-      </folder>
+    <folder id="35296" name="Global">
+      <portfolio id="23484" name="Lombard by rating">
+        <include what="chain" id="40166" name="Lombard BBB+" color="Orchid" condition="$LastRating.Rating = [BBB+] AND $Currency = &quot;RUB&quot;" />
+        <include what="chain" id="40166" name="Lombard BBB" color="MediumOrchid" condition="$LastRating.Rating = [BBB] AND $Currency = &quot;RUB&quot;" />
+        <include what="chain" id="40166" name="Lombard BBB-" color="DeepPink" condition="$LastRating.Rating = [BBB-] AND $Currency = &quot;RUB&quot;" />
+      </portfolio>
+      <portfolio id="71714" name="Micex New Ratings">
+        <include what="chain" id="93560" name="BBB" color="DarkSeaGreen" condition="$LastRating.Rating &gt;= [BBB-] and $LastRating.Rating &lt;= [BBB+] and $LastRating.RatingDate &gt;= #03/08/2013# " />
+        <include what="chain" id="93560" name="BB" color="LimeGreen" condition="$LastRating.Rating &gt;= [BB-] and $LastRating.Rating &lt;= [BB+] and $LastRating.RatingDate &gt;= #03/08/2013# " />
+      </portfolio>
     </folder>
   </portfolios>
   <custom-bonds>
@@ -130,6 +127,5 @@
     <curve id="2" ric="0#USBMK=" color="Green" name="US Benchmark" pattern="US(?&lt;term&gt;.+?)T=RR" skip="" field-set="US chain curves" />
     <curve id="66400" name="Reuters OFZ curve" color="BlueViolet" ric="0#RUXZ=MM" pattern="RUGOV(?&lt;term&gt;.+?)Z=MM" field-set="US chain curves" />
     <curve id="26534" name="Ruble Depo" color="Olive" ric="0#RUBID=" pattern="RUB(?&lt;term&gt;.+?)ID=" field-set="Russian depo curves" />
-    <curve id="88771" name="Ruble Government CDS" color="Red" ric="0#RUGVUSACRBMK=" pattern="RUGV(?&lt;term&gt;.+?)USAC=R" field-set="Eurobonds" type="Spread" />
   </chain-curves>
 </bonds>

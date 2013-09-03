@@ -27,7 +27,7 @@ Namespace Forms.PortfolioForm
             End Sub
 
             Public Sub LogMessage(ByVal msg As String)
-                _frm.ListBox.Items.Add(msg)
+                _frm.LogMessage(msg)
             End Sub
         End Class
 
@@ -39,11 +39,9 @@ Namespace Forms.PortfolioForm
                 .Size = New Point(280, 180)
             }
 
-            Public ReadOnly Property ListBox() As ListBox
-                Get
-                    Return _listBox
-                End Get
-            End Property
+            Public Sub LogMessage(ByVal msg As String)
+                GuiAsync(Sub() _listBox.Items.Add(msg))
+            End Sub
 
             Private WithEvents _close As New Button With {
                 .Location = New Point(20, 210),
@@ -199,13 +197,13 @@ Namespace Forms.PortfolioForm
 
         Private Sub RefreshPortfolioData()
             If CurrentItem Is Nothing Then Return
-
             If CurrentItem.IsFolder Then
                 PortfolioChainsListsGrid.Columns.Clear()
                 PortfolioChainsListsGrid.Rows.Clear()
                 PortfolioItemsGrid.Columns.Clear()
                 PortfolioItemsGrid.Rows.Clear()
             Else
+                Cursor = Cursors.WaitCursor
                 Dim descr = PortfolioManager.GetPortfolioStructure(CurrentItem.Id)
 
                 PortfolioChainsListsGrid.DataSource = descr.Sources(
@@ -215,8 +213,9 @@ Namespace Forms.PortfolioForm
                     If(RegularBondsCB.Checked, PortfolioStructure.RegularBond, 0)
                 )
 
-                    PortfolioItemsGrid.DataSource = descr.Rics(AllRB.Checked)
-                End If
+                PortfolioItemsGrid.DataSource = descr.Rics(AllRB.Checked)
+                Cursor = Cursors.Default
+            End If
         End Sub
 
         Private Sub RefreshPortfolioTree(Optional ByVal selId As Long = -1)
