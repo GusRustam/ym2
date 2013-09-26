@@ -380,7 +380,7 @@ Public Class UserListSrc
         Dim availableRics = New HashSet(Of String)(From row As BondsDataSet.BondRow In BondsLoader.Instance.GetBondsTable().Rows Select row.ric)
         Dim foundRics = ExtractRics(node)
         Dim resultingRics As New List(Of String)
-        For Each foundRic In foundRics
+        For Each foundRic In From rc In foundRics Select rc.Trim()
             If availableRics.Contains(foundRic) Then
                 resultingRics.Add(foundRic)
             Else
@@ -393,8 +393,8 @@ Public Class UserListSrc
                 If availableRics.Contains(newRic) Then
                     resultingRics.Add(newRic)
                 Else
-                    ' it could well be ok (f.e. in case bond has matured and cease to exist)
-                    Logger.Warn("Failed to find both old {0} and updated ric {1}", foundRic, newRic)
+                    ' it could well be ok (f.e. in case bond has matured and ceased to exist)
+                    Logger.Warn("Failed to find both old [{0}] and updated ric [{1}]", foundRic, newRic)
                 End If
             End If
         Next
@@ -623,7 +623,6 @@ Public Class RegularBondSrc
         _rics = (From ric In rics.Split(",") Select Trim(ric)).ToList()
     End Sub
 
-
     Public Overrides Function GetDefaultRics() As List(Of String)
         Dim availableRics = New HashSet(Of String)(From row As BondsDataSet.BondRow In BondsLoader.Instance.GetBondsTable().Rows Select row.ric)
         Dim res As New List(Of String)
@@ -632,7 +631,7 @@ Public Class RegularBondSrc
                 res.Add(ric)
             Else
                 Dim newRic As String
-                If _rics(0) = "/" Then
+                If ric(0) = "/" Then
                     newRic = ric.Substring(1)
                 Else
                     newRic = "/" + ric
@@ -641,7 +640,7 @@ Public Class RegularBondSrc
                     res.Add(newRic)
                 Else
                     ' it could well be ok (f.e. in case bond has matured and cease to exist)
-                    Logger.Warn("Failed to find both old {0} and updated ric {1}", ric, newRic)
+                    Logger.Warn("Failed to find both old [{0}] and updated ric [{1}]", ric, newRic)
                 End If
             End If
         Next
