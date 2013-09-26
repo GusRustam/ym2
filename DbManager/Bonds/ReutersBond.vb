@@ -33,7 +33,7 @@ Namespace Bonds
             End Get
         End Property
 
-        Public MustOverride Function IntoString(ByVal bond As ReutersBondStructure, ByVal fieldName As String) As String
+        Public MustOverride Function IntoString(ByVal bond As ReutersBondStructure, ByVal fieldName As String, ByVal local As Boolean) As String
     End Class
 
     Friend NotInheritable Class ReutersEmptyAttribute
@@ -48,7 +48,7 @@ Namespace Bonds
             tp.GetField(fieldName, BindingFlags.NonPublic Or BindingFlags.Instance).SetValue(bond, True)
         End Sub
 
-        Public Overrides Function IntoString(ByVal bond As ReutersBondStructure, ByVal fieldName As String) As String
+        Public Overrides Function IntoString(ByVal bond As ReutersBondStructure, ByVal fieldName As String, ByVal local As Boolean) As String
             Return Name
         End Function
     End Class
@@ -74,10 +74,16 @@ Namespace Bonds
             End Try
         End Sub
 
-        Public Overrides Function IntoString(ByVal bond As ReutersBondStructure, ByVal fieldName As String) As String
+        Public Overrides Function IntoString(ByVal bond As ReutersBondStructure, ByVal fieldName As String, ByVal local As Boolean) As String
             Dim tp = GetType(ReutersBondStructure)
             Dim field = tp.GetField(fieldName, BindingFlags.NonPublic Or BindingFlags.Instance)
-            Return Name + ":" + field.GetValue(bond).ToString()
+            Dim value = field.GetValue(bond).ToString()
+            Dim numVal As Double
+            If Double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, numVal) Then
+                Return Name + ":" + String.Format(If(local, CultureInfo.CurrentCulture, CultureInfo.InvariantCulture), "{0:F2}", numVal)
+            Else
+                Return Name + ":" + String.Format("{0}", value)
+            End If
         End Function
     End Class
 
@@ -113,7 +119,7 @@ Namespace Bonds
             field.SetValue(bond, fieldCurrentValue)
         End Sub
 
-        Public Overrides Function IntoString(ByVal bond As ReutersBondStructure, ByVal fieldName As String) As String
+        Public Overrides Function IntoString(ByVal bond As ReutersBondStructure, ByVal fieldName As String, ByVal local As Boolean) As String
             Dim tp = GetType(ReutersBondStructure)
             Dim field = tp.GetField(fieldName, BindingFlags.NonPublic Or BindingFlags.Instance)
             Dim val As List(Of Tuple(Of Date, Single)) = CType(field.GetValue(bond), List(Of Tuple(Of Date, Single)))
@@ -165,16 +171,22 @@ Namespace Bonds
             field.SetValue(bond, fieldCurrentValue)
         End Sub
 
-        Public Overrides Function IntoString(ByVal bond As ReutersBondStructure, ByVal fieldName As String) As String
+        Public Overrides Function IntoString(ByVal bond As ReutersBondStructure, ByVal fieldName As String, ByVal local As Boolean) As String
             Dim tp = GetType(ReutersBondStructure)
             Dim field = tp.GetField(fieldName, BindingFlags.NonPublic Or BindingFlags.Instance)
             Dim val As List(Of Tuple(Of Date, Date, Single)) = CType(field.GetValue(bond), List(Of Tuple(Of Date, Date, Single)))
             Dim res As String = val.Aggregate("",
                 Function(current, item)
                     If item.Item1 = item.Item2 Then
-                        Return String.Format("{0}{1}:{2}:{3:F2} ", current, Name, ReutersDate.DateToReuters(item.Item1), item.Item3)
+                        Return String.Format(
+                            If(local, CultureInfo.CurrentCulture, CultureInfo.InvariantCulture),
+                            "{0}{1}:{2}:{3:F2} ", current, Name, ReutersDate.DateToReuters(item.Item1),
+                            item.Item3)
                     Else
-                        Return String.Format("{0}{1}:{2}:{3}:{4:F2} ", current, Name, ReutersDate.DateToReuters(item.Item1), ReutersDate.DateToReuters(item.Item2), item.Item3)
+                        Return String.Format(
+                            If(local, CultureInfo.CurrentCulture, CultureInfo.InvariantCulture),
+                            "{0}{1}:{2}:{3}:{4:F2} ", current, Name, ReutersDate.DateToReuters(item.Item1),
+                            ReutersDate.DateToReuters(item.Item2), item.Item3)
                     End If
                 End Function
             )
@@ -445,9 +457,19 @@ Namespace Bonds
             Return res
         End Function
 
+        Public ReadOnly Property AdfinStructure() As String
+            Get
+                Return AsString(True)
+            End Get
+        End Property
+
         Public Overrides Function ToString() As String
+            Return AsString(False)
+        End Function
+
+        Private Function AsString(ByVal local As Boolean) As String
             Return Attributes.Keys.Where(AddressOf FieldNotNothing).
-                Aggregate("", Function(current, name) current + Attributes(name).IntoString(Me, Fields(name)) + " ")
+                Aggregate("", Function(current, name) current + Attributes(name).IntoString(Me, Fields(name), local) + " ")
         End Function
 
         Private Function FieldNotNothing(ByVal key As String) As Boolean
@@ -463,7 +485,7 @@ Namespace Bonds
         End Function
 
         Public Function GetCashFlows(ByVal matDate As String, ByVal couponRate As Double) As List(Of CashFlowDescription)
-            Dim cashFlows As Array = _bondModule.BdCashflows(Today, matDate, couponRate, ToString(), "IAC RET:A100")
+            Dim cashFlows As Array = _bondModule.BdCashflows(Today, matDate, couponRate, AdfinStructure, "IAC RET:A100")
             Dim res As New List(Of CashFlowDescription)
             Dim i As Integer
             For i = cashFlows.GetLowerBound(0) To cashFlows.GetUpperBound(0)

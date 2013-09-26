@@ -52,75 +52,287 @@
   </field-sets>
   <!-- Chains -->
   <chains>
-    <chain id="1" ric="0#RUTSY=MM" field-set-id="MICEX" name="Russia Domestic BMK" color="Red" curve="False" enabled="True" />
-    <chain id="2" ric="0#RUMOSB=MM" field-set-id="MICEX" name="City of Moscow" color="Green" curve="True" enabled="True" />
-    <chain id="3" ric="0#RUSOVB=MM" field-set-id="MICEX" name="Russian Regionals" color="Blue" curve="False" enabled="True" />
-    <chain id="5" ric="0#RFGOVBONDS=" field-set-id="Eurobonds" name="Russia BMK" color="IndianRed" curve="True" enabled="True" />
-    <chain id="93560" ric="0#RUCORP=MM" field-set-id="MICEX" name="Russian Corporates" color="MediumSeaGreen" curve="False" enabled="True" />
-    <chain id="22208" ric="0#USBMK=" field-set-id="Eurobonds" name="US BMK" color="OrangeRed" curve="True" enabled="True" />
-    <chain id="98846" ric="0#GBBMK=" field-set-id="Eurobonds" name="UK BMK" color="Purple" curve="True" enabled="True" />
-    <chain id="54948" ric="0#EUBMK=" field-set-id="Eurobonds" name="Euro BMK" color="Firebrick" curve="True" enabled="True" />
-    <chain id="61053" ric="0#CNBMK=" field-set-id="Eurobonds" name="China BMK" color="RoyalBlue" curve="True" enabled="True" />
-    <chain id="16318" ric="0#JPBMK=" field-set-id="Eurobonds" name="Japan BMK" color="Tomato" curve="True" enabled="True" />
-    <chain id="71273" ric="0#BRTSY=" field-set-id="Eurobonds" name="Brazil BMK" color="DarkOrchid" curve="True" enabled="True" />
-    <chain id="6714" ric="0#MXGLBBMK=" field-set-id="Eurobonds" name="Mexico BMK" color="MediumTurquoise" curve="True" enabled="True" />
-    <chain id="73214" ric="0#UAEUROSAZ=" field-set-id="Eurobonds" name="CIS UKR All Eurobonds" color="MediumBlue" curve="False" enabled="True" />
-    <chain id="66919" ric="0#BYEUROSAZ=" field-set-id="Eurobonds" name="CIS BY All Eurobonds" color="MediumPurple" curve="False" enabled="True" />
-    <chain id="26079" ric="0#KZEUROSAZ=" field-set-id="Eurobonds" name="CIS KZ All Eurobonds" color="DarkOrange" curve="False" enabled="True" />
-    <chain id="338" ric="0#GEEUROSAZ=" field-set-id="MICEX" name="CIS GE All Eurobonds" color="DarkSlateGray" curve="False" enabled="True" />
-    <chain id="18867" ric="0#AZEUROSAZ=" field-set-id="Eurobonds" name="CIS AZ All Eurobonds" color="Goldenrod" curve="False" enabled="True" />
-    <chain id="2070" ric="0#CHTSY=" field-set-id="Eurobonds" name="Swiss BMK" color="GreenYellow" curve="True" enabled="True" />
-    <chain id="40166" ric="0#ECBRUSSC=" field-set-id="Eurobonds" name="Russia Lomard List" color="DeepPink" curve="False" enabled="True" />
-    <chain id="68039" ric="0#RUAER=MM" field-set-id="MICEX" name="Russia Aerospace &amp; Military" color="Orchid" curve="False" enabled="True" />
-    <chain id="17214" ric="0#RUAUT=MM" field-set-id="MICEX" name="Russia Airlines &amp; Transport" color="Crimson" curve="False" enabled="True" />
-    <chain id="51020" ric="0#RUAUT=MM" field-set-id="MICEX" name="Russia Automobiles" color="DeepSkyBlue" curve="False" enabled="True" />
-    <chain id="71511" ric="0#RUBNK=MM" field-set-id="MICEX" name="Russia Banking" color="MediumAquamarine" curve="False" enabled="True" />
-    <chain id="31424" ric="0#RUBLD=MM" field-set-id="MICEX" name="Russia Building" color="MediumVioletRed" curve="False" enabled="True" />
-    <chain id="15953" ric="0#RUCHE=MM" field-set-id="MICEX" name="Russia Chemicals" color="DarkKhaki" curve="False" enabled="True" />
-    <chain id="11882" ric="0#RUELG=MM" field-set-id="MICEX" name="Russia Electricity and Energy" color="CornflowerBlue" curve="False" enabled="True" />
-    <chain id="18792" ric="0#RUENR=MM" field-set-id="MICEX" name="Russia Oil and Gas" color="Chocolate" curve="False" enabled="True" />
-    <chain id="26695" ric="0#TREUROSAZ=" field-set-id="Eurobonds" name="Turkey Corporate Eurobonds" color="Lime" curve="False" enabled="True" />
-    <chain id="51842" ric="0#TRBMK=" field-set-id="Eurobonds" name="Turkey BMK" color="Chartreuse" curve="True" enabled="True" />
-    <chain id="67919" ric="0#ZATSY=" field-set-id="Eurobonds" name="South Africa GOVT" color="SaddleBrown" curve="True" enabled="True" />
-    <chain id="409" ric="0#RUEUROS=" field-set-id="Eurobonds" name="Russian Eurobonds" color="LimeGreen" curve="False" enabled="True" />
+    <chain id="1" ric="0#RUTSY=MM" field-set-id="MICEX" name="CIS Russia Domestic Sovereigns (RUB)" color="Red" curve="False" enabled="True" />
+    <chain id="2" ric="0#RUMOSB=MM" field-set-id="MICEX" name="CIS Russia City of Moscow (RUB)" color="Green" curve="True" enabled="True" />
+    <chain id="3" ric="0#RUSOVB=MM" field-set-id="MICEX" name="CIS Russia Munis (RUB)" color="Blue" curve="False" enabled="True" />
+    <chain id="5" ric="0#RFGOVBONDS=" field-set-id="Eurobonds" name="CIS Russia Sovereign Eurobonds" color="IndianRed" curve="False" enabled="True" />
+    <chain id="93560" ric="0#RUCORP=MM" field-set-id="MICEX" name="CIS Russia Domestic Corporates (RUB)" color="MediumSeaGreen" curve="False" enabled="True" />
+    <chain id="98846" ric="0#GBBMK=" field-set-id="Eurobonds" name="EMEA UK Sovereign BMK (GBP)" color="Purple" curve="True" enabled="True" />
+    <chain id="54948" ric="0#EUBMK=" field-set-id="Eurobonds" name="EU Sovereign MK (EUR)" color="Firebrick" curve="True" enabled="True" />
+    <chain id="61053" ric="0#CNBMK=" field-set-id="Eurobonds" name="China Sovereign BMK (CNY)" color="RoyalBlue" curve="True" enabled="True" />
+    <chain id="16318" ric="0#JPBMK=" field-set-id="Eurobonds" name="G7 Japan Sovereign BMK (JPY)" color="Tomato" curve="True" enabled="True" />
+    <chain id="71273" ric="0#BRGLBBMK=" field-set-id="Eurobonds" name="LATAM Brazil Global BMK (USD)" color="DarkBlue" curve="True" enabled="True" />
+    <chain id="78912" ric="0#PAGLBBMK=" field-set-id="Eurobonds" name="LATAM Panama Global BMK (USD)" color="DarkBlue" curve="True" enabled="True" />
+    <chain id="55527" ric="0#PAEUROSAZ=" field-set-id="Eurobonds" name="LATAM Panama Eurobonds" color="DarkGreen" curve="False" enabled="True" />
+    <chain id="27018" ric="0#COGLBBMK=" field-set-id="Eurobonds" name="LATAM Colombia Global BMK (USD)" color="RoyalBlue" curve="True" enabled="True" />
+    <chain id="69696" ric="0#COEUROSAZ=" field-set-id="Eurobonds" name="LATAM Colombia Eurobonds" color="RoyalBlue" curve="False" enabled="True" />
+    <chain id="6714" ric="0#MXGLBBMK=" field-set-id="Eurobonds" name="LATAM Mexico Global BMK (USD)" color="MediumTurquoise" curve="True" enabled="True" />
+    <chain id="41112" ric="0#MXEUROSAZ=" field-set-id="Eurobonds" name="LATAM Mexico Eurobonds" color="MediumTurquoise" curve="False" enabled="True" />
+    <chain id="73214" ric="0#UAEUROSAZ=" field-set-id="Eurobonds" name="CIS Ukraine Eurobonds" color="MediumBlue" curve="False" enabled="True" />
+    <chain id="66919" ric="0#BYEUROSAZ=" field-set-id="Eurobonds" name="CIS Belarus Eurobonds" color="MediumPurple" curve="False" enabled="True" />
+    <chain id="26079" ric="0#KZEUROSAZ=" field-set-id="Eurobonds" name="CIS Kazakhstan Eurobonds" color="DarkOrange" curve="False" enabled="True" />
+    <chain id="18867" ric="0#AZEUROSAZ=" field-set-id="Eurobonds" name="CIS Azerbaijan Eurobonds" color="Goldenrod" curve="False" enabled="True" />
+    <chain id="2070" ric="0#CHTSY=" field-set-id="Eurobonds" name="EMEA Switzerland Domestic Sovereigns (CHF)" color="GreenYellow" curve="True" enabled="True" />
+    <chain id="68039" ric="0#RUAER=MM" field-set-id="MICEX" name="CIS Russia Aerospace &amp; Military (RUB)" color="Orchid" curve="False" enabled="True" />
+    <chain id="17214" ric="0#RUAUT=MM" field-set-id="MICEX" name="CIS Russia Airlines &amp; Transport (RUB)" color="Crimson" curve="False" enabled="True" />
+    <chain id="51020" ric="0#RUAUT=MM" field-set-id="MICEX" name="CIS Russia Automobiles (RUB)" color="DeepSkyBlue" curve="False" enabled="True" />
+    <chain id="71511" ric="0#RUBNK=MM" field-set-id="MICEX" name="CIS Russia Banking (RUB)" color="MediumAquamarine" curve="False" enabled="True" />
+    <chain id="31424" ric="0#RUBLD=MM" field-set-id="MICEX" name="CIS Russia Building (RUB)" color="MediumVioletRed" curve="False" enabled="True" />
+    <chain id="15953" ric="0#RUCHE=MM" field-set-id="MICEX" name="CIS Russia Chemicals (RUB)" color="DarkKhaki" curve="False" enabled="True" />
+    <chain id="11882" ric="0#RUELG=MM" field-set-id="MICEX" name="CIS Russia Electricity and Energy (RUB)" color="CornflowerBlue" curve="False" enabled="True" />
+    <chain id="18792" ric="0#RUENR=MM" field-set-id="MICEX" name="CIS Russia Oil and Gas (RUB)" color="Chocolate" curve="False" enabled="True" />
+    <chain id="26695" ric="0#TREUROSAZ=" field-set-id="Eurobonds" name="EMEA Turkey Corporate Eurobonds" color="Lime" curve="False" enabled="True" />
+    <chain id="51842" ric="0#TRBMK=" field-set-id="Eurobonds" name="EMEA Turkey Sovereign BMK (TRY)" color="Chartreuse" curve="True" enabled="True" />
+    <chain id="67919" ric="0#ZATSY=" field-set-id="Eurobonds" name="EMEA South Africa Domestic Sovereigns (ZAR)" color="SaddleBrown" curve="True" enabled="True" />
+    <chain id="409" ric="0#RUEUROS=" field-set-id="Eurobonds" name="CIS Russian Eurobonds" color="LimeGreen" curve="False" enabled="True" />
+    <chain id="83533" ric="0#USBMK=" field-set-id="Eurobonds" name="US Treasuries (on-the-run benchmarks)" color="DimGray" curve="True" enabled="True" />
+    <chain id="57679" ric="0#USBMK=TWEB" field-set-id="Eurobonds" name="US Treasuries (Tradeweb)" color="Blue" curve="True" enabled="True" />
+    <chain id="38908" ric="0#US1YT=PX" field-set-id="Eurobonds" name="US 1Y STRIP (GovPX)" color="DarkGreen" curve="True" enabled="True" />
+    <chain id="25020" ric="0#US2YSTRIP=PX" field-set-id="Eurobonds" name="US 2Y STRIP (GovPX)" color="SeaGreen" curve="True" enabled="True" />
+    <chain id="3090" ric="0#US3YSTRIP=PX" field-set-id="Eurobonds" name="US 3Y STRIP (GovPX)" color="MediumSpringGreen" curve="True" enabled="True" />
+    <chain id="14343" ric="0#US5YSTRIP=PX" field-set-id="Eurobonds" name="US 5Y STRIP (GovPX)" color="Turquoise" curve="True" enabled="True" />
+    <chain id="23710" ric="0#US7YSTRIP=PX" field-set-id="Eurobonds" name="US 7Y STRIP (GovPX)" color="CadetBlue" curve="True" enabled="True" />
+    <chain id="10102" ric="0#US10YSTRIP=PX" field-set-id="Eurobonds" name="US 10Y STRIP (GovPX)" color="DeepSkyBlue" curve="True" enabled="True" />
+    <chain id="15312" ric="0#US30YSTRIP=PX" field-set-id="Eurobonds" name="US 30Y STRIP (GovPX)" color="DodgerBlue" curve="True" enabled="True" />
+    <chain id="97215" ric="0#EURO=DRGN" field-set-id="Eurobonds" name="CIS Ukraine Eurobonds (Dragon Capital)" color="Blue" curve="False" enabled="True" />
+    <chain id="26783" ric="0#EUKZBYAZ=SBER" field-set-id="Eurobonds" name="CIS Kazakstan Belarus Azerbaijan Eurobonds (Sberbank CIB)" color="Coral" curve="False" enabled="True" />
+    <chain id="76697" ric="0#GEEUROSAZ=" field-set-id="Eurobonds" name="CIS Georgia Eurobonds" color="DarkRed" curve="False" enabled="True" />
+    <chain id="92231" ric="0#AM097464227=" field-set-id="Eurobonds" name="CIS Armenia 20 Eurobond (USD)" color="DarkMagenta" curve="False" enabled="True" />
   </chains>
   <!-- Lists -->
   <lists>
+    <list id="4102" field-set-id="Eurobonds" name="CIS Kazakhstan Kazmunai Gaz Eurobonds (USD)" color="DarkSeaGreen" curve="True" enabled="True">
+      <ric>XS0373641009=SBER</ric>
+      <ric>XS0441261921=SBER</ric>
+      <ric>XS0556885753=SBER</ric>
+      <ric>XS0506527851=SBER</ric>
+      <ric>KZ092501515=</ric>
+    </list>
+    <list id="7189" field-set-id="Eurobonds" name="CIS Kazakhstan Eurobond Issuers (USD)" color="DodgerBlue" curve="False" enabled="True">
+      <ric>KZ023448823=</ric>
+      <ric>KZ019024032=</ric>
+      <ric>KZS083157143=</ric>
+      <ric>KZ056823565=</ric>
+      <ric>KZ057057734=</ric>
+      <ric>KZ057054131=</ric>
+      <ric>KZ024816010=</ric>
+      <ric>KZ086058243=</ric>
+      <ric>KZ056823581=</ric>
+      <ric>KZ035815651=</ric>
+      <ric>KZ058379697=</ric>
+      <ric>KZ093460901=</ric>
+      <ric>KZ029893128=</ric>
+      <ric>KZ027670792=</ric>
+      <ric>KZ062551615=</ric>
+      <ric>XS0253694755=SBER</ric>
+      <ric>XS0799658637=SBER</ric>
+      <ric>XS0546214007=SBER</ric>
+    </list>
+    <list id="2334" field-set-id="Eurobonds" name="CIS Russia Sovereign Eurobonds (USD)" color="Crimson" curve="True" enabled="True">
+      <ric>RU097172196=</ric>
+      <ric>RU076747385=</ric>
+      <ric>RU097172145=</ric>
+      <ric>RU076747245=</ric>
+      <ric>RU050495434=</ric>
+      <ric>RU097172137=</ric>
+      <ric>RU076746982=</ric>
+      <ric>RU050495418=</ric>
+    </list>
+    <list id="55792" field-set-id="Eurobonds" name="CIS Russia Vimpelcom (USD)" color="Crimson" curve="True" enabled="True">
+      <ric>RU064317644=</ric>
+      <ric>RU088940105=</ric>
+      <ric>RU088940172=</ric>
+      <ric>RU064318322=</ric>
+      <ric>RU025386183=</ric>
+      <ric>RU058703095=</ric>
+      <ric>RU036104180=</ric>
+      <ric>RU058703109=</ric>
+    </list>
+    <list id="11500" field-set-id="Eurobonds" name="CIS Ukraine Sovereign Eurobonds (USD)" color="Orange" curve="True" enabled="True">
+      <ric>UA091760584=</ric>
+      <ric>UA085835823=</ric>
+      <ric>UA059439081=</ric>
+      <ric>UA054378319=</ric>
+      <ric>UA080875819=</ric>
+      <ric>UA033077661=</ric>
+      <ric>UA027605311=</ric>
+      <ric>UA063855294=</ric>
+      <ric>UA054378343=</ric>
+      <ric>UA080477821=</ric>
+    </list>
+    <list id="58136" field-set-id="MICEX" name="CIS Russia Domestic Sovereign OFZ BMK (RUB)" color="CornflowerBlue" curve="True" enabled="True">
+      <ric>/RU26212RMFS=MM</ric>
+      <ric>/RU26207RMFS=MM</ric>
+      <ric>/RU26211RMFS=MM</ric>
+      <ric>/RU26205RMFS=MM</ric>
+      <ric>/RU26210RMFS=MM</ric>
+      <ric>/RU26208RMFS=MM</ric>
+      <ric>/RU26206RMFS=MM</ric>
+      <ric>/RU26203RMFS=MM</ric>
+      <ric>/RU25077RMFS=MM</ric>
+      <ric>/RU25075RMFS=MM</ric>
+      <ric>/RU25079RMFS=MM</ric>
+      <ric>/RU26202RMFS=MM</ric>
+      <ric>/RU25068RMFS=MM</ric>
+      <ric>/RU25076RMFS=MM</ric>
+    </list>
+    <list id="38322" field-set-id="Eurobonds" name="LATAM Panama Sovereign Eurobonds (USD)" color="DarkCyan" curve="True" enabled="True">
+      <ric>PA008023972=</ric>
+      <ric>PA009626611=</ric>
+      <ric>PA018498723=</ric>
+      <ric>PA015897309=</ric>
+      <ric>PA020635525=</ric>
+      <ric>PA046890663=</ric>
+      <ric>PA011426743=</ric>
+    </list>
+    <list id="87126" field-set-id="Eurobonds" name="LATAM Colombia Sovereign Eurobonds (USD)" color="Coral" curve="True" enabled="True">
+      <ric>CO016187933=</ric>
+      <ric>CO010836387=</ric>
+      <ric>CO018437384=</ric>
+      <ric>CO026291593=</ric>
+      <ric>CO020148454=</ric>
+      <ric>CO007027192=</ric>
+      <ric>CO026779405=</ric>
+      <ric>CO007401060=</ric>
+      <ric>CO010878659=</ric>
+    </list>
+    <list id="66094" field-set-id="Eurobonds" name="LATAM Mexico Sovereign Eurobonds (USD)" color="DarkSeaGreen" curve="True" enabled="True">
+      <ric>MX016432105=</ric>
+      <ric>MX017836145=</ric>
+      <ric>MX015531886=</ric>
+      <ric>MX006573584=</ric>
+      <ric>MX047970580=</ric>
+      <ric>MX006982026=</ric>
+      <ric>MX012690282=</ric>
+      <ric>MX013412855=</ric>
+      <ric>MX016699314=</ric>
+      <ric>MX020218118=</ric>
+    </list>
+    <list id="98366" field-set-id="Eurobonds" name="CIS Armenia 20 Eurobond (USD)" color="DarkOrchid" curve="False" enabled="True">
+      <ric>AM097464227=</ric>
+    </list>
   </lists>
   <!-- Dynamic lists -->
   <queries>
-    <query id="37593" field-set-id="Eurobonds" name="Turkey GOVT" color="Olive" curve="True" enabled="True" chain-id="26695" condition="$ShortName LIKE &quot;^Turkey&quot;" />
-    <query id="9546" field-set-id="MICEX" name="Russia Bank VEB RU" color="DarkSeaGreen" curve="True" enabled="True" chain-id="71511" condition="$ShortName LIKE &quot;^Vneshekonom&quot;" />
-    <query id="47777" field-set-id="MICEX" name="Russia Bank VTB RU" color="DarkGreen" curve="True" enabled="True" chain-id="71511" condition="$IssuerName = &quot;BANK VTB OAO&quot;" />
-    <query id="14285" field-set-id="Eurobonds" name="Russia Bank VEB USD" color="LawnGreen" curve="True" enabled="True" chain-id="409" condition="$Currency = &quot;USD&quot; AND $IssuerName = &quot;VEB FINANCE PLC&quot;" />
-    <query id="443" field-set-id="Eurobonds" name="Russia Bank VTB USD" color="SpringGreen" curve="True" enabled="True" chain-id="409" condition="$Currency = &quot;USD&quot; AND $IssuerName = &quot;VTB CAPITAL SA&quot;" />
-    <query id="80636" field-set-id="Eurobonds" name="Russia Sberbank USD" color="OliveDrab" curve="True" enabled="True" chain-id="409" condition="$IssuerName = &quot;SB CAPITAL SA&quot; AND $Currency = &quot;USD&quot;" />
-    <query id="24875" field-set-id="Eurobonds" name="Russia Bank RSHB USD" color="GreenYellow" curve="True" enabled="True" chain-id="409" condition="$IssuerName LIKE &quot;^RSHB&quot; AND $Currency = &quot;USD&quot;" />
-    <query id="91530" field-set-id="Eurobonds" name="Russia Bank Alfa USD" color="MediumTurquoise" curve="True" enabled="True" chain-id="409" condition="$IssuerName LIKE &quot;^ALFA&quot; AND $Currency = &quot;USD&quot;" />
-    <query id="4027" field-set-id="Eurobonds" name="Russia O&amp;G Lukoil USD" color="Goldenrod" curve="True" enabled="True" chain-id="409" condition="$IssuerName LIKE &quot;LUKOIL&quot; AND $Currency = &quot;USD&quot;" />
-    <query id="8945" field-set-id="Eurobonds" name="Russia O&amp;G TNK-BP USD" color="Chocolate" curve="True" enabled="True" chain-id="409" condition="$Currency = &quot;USD&quot; AND $IssuerName LIKE &quot;^TNK&quot;" />
-    <query id="97636" field-set-id="Eurobonds" name="Russia O&amp;G Gazprom USD" color="DarkGoldenrod" curve="True" enabled="True" chain-id="409" condition="$Currency = &quot;USD&quot; AND $IssuerName LIKE &quot;GAZ&quot;" />
-    <query id="67851" field-set-id="Eurobonds" name="Russia O&amp;G Gazprom EUR" color="Maroon" curve="True" enabled="True" chain-id="409" condition="$IssuerName LIKE &quot;GAZ&quot; AND $Currency = &quot;EUR&quot;" />
-    <query id="58175" field-set-id="Eurobonds" name="Russia Telecom Vimpelcom" color="IndianRed" curve="True" enabled="True" chain-id="409" condition="$Currency = &quot;USD&quot; and $IssuerName LIKE &quot;VIMP&quot;" />
-    <query id="25150" field-set-id="MICEX" name="OFZ Curve" color="Firebrick" curve="True" enabled="True" chain-id="1" condition="$Ric LIKE &quot;2(5|6)&quot;" />
+    <query id="37593" field-set-id="Eurobonds" name="EMEA Turkey Sovereign Eurobonds (USD)" color="Olive" curve="True" enabled="True" chain-id="26695" condition="$ShortName LIKE &quot;^Turkey&quot; and $Currency = &quot;USD&quot;" />
+    <query id="9546" field-set-id="MICEX" name="CIS Russia VEB (RUB)" color="DarkSeaGreen" curve="True" enabled="True" chain-id="71511" condition="$ShortName LIKE &quot;^Vneshekonom&quot; AND $Currency = &quot;RUB&quot;" />
+    <query id="47777" field-set-id="MICEX" name="CIS Russia VTB (RUB)" color="DarkGreen" curve="True" enabled="True" chain-id="71511" condition="$IssuerName Like &quot;VTB&quot; AND $Currency = &quot;RUB&quot;" />
+    <query id="14285" field-set-id="Eurobonds" name="CIS Russia VEB Eurobonds (USD)" color="LawnGreen" curve="True" enabled="True" chain-id="409" condition="$Currency = &quot;USD&quot; AND $IssuerName = &quot;VEB FINANCE PLC&quot;" />
+    <query id="443" field-set-id="Eurobonds" name="CIS Russia VTB Eurobonds (USD)" color="SpringGreen" curve="True" enabled="True" chain-id="409" condition="$Currency = &quot;USD&quot; AND $IssuerName = &quot;VTB CAPITAL SA&quot;" />
+    <query id="80636" field-set-id="Eurobonds" name="CIS Russia Sberbank Eurobonds (USD)" color="OliveDrab" curve="True" enabled="True" chain-id="409" condition="$IssuerName = &quot;SB CAPITAL SA&quot; AND $Currency = &quot;USD&quot;" />
+    <query id="24875" field-set-id="Eurobonds" name="CIS Russia RSHB Eurobonds (USD)" color="MediumTurquoise" curve="True" enabled="True" chain-id="409" condition="$IssuerName LIKE &quot;^RSHB&quot; AND $Currency = &quot;USD&quot;" />
+    <query id="91530" field-set-id="Eurobonds" name="CIS Russia Alfa Bank Eurobonds (USD)" color="MediumTurquoise" curve="True" enabled="True" chain-id="409" condition="$IssuerName LIKE &quot;^ALFA&quot; AND $Currency = &quot;USD&quot;" />
+    <query id="4027" field-set-id="Eurobonds" name="CIS Russia Lukoil Eurobonds (USD)" color="Goldenrod" curve="True" enabled="True" chain-id="409" condition="$IssuerName LIKE &quot;LUKOIL&quot; AND $Currency = &quot;USD&quot;" />
+    <query id="8945" field-set-id="Eurobonds" name="CIS Russia Rosneft Eurobonds (USD)" color="Chocolate" curve="True" enabled="True" chain-id="409" condition="$Currency = &quot;USD&quot; AND $IssuerName LIKE &quot;^ROSN&quot;" />
+    <query id="97636" field-set-id="Eurobonds" name="CIS Russia Gazprom Eurobonds (USD)" color="MediumPurple" curve="True" enabled="True" chain-id="409" condition="$Currency = &quot;USD&quot; AND $IssuerName LIKE &quot;GAZ&quot;" />
+    <query id="67851" field-set-id="Eurobonds" name="CIS Russia Gazprom Eurobonds (EUR)" color="Maroon" curve="True" enabled="True" chain-id="409" condition="$IssuerName LIKE &quot;GAZ&quot; AND $Currency = &quot;EUR&quot;" />
   </queries>
   <!-- Portfolios -->
   <portfolios>
-    <folder id="35296" name="Global">
-      <portfolio id="23484" name="Lombard by rating">
-        <include what="chain" id="40166" name="Lombard BBB+" color="Orchid" condition="$LastRating.Rating = [BBB+] AND $Currency = &quot;RUB&quot;" />
-        <include what="chain" id="40166" name="Lombard BBB" color="MediumOrchid" condition="$LastRating.Rating = [BBB] AND $Currency = &quot;RUB&quot;" />
-        <include what="chain" id="40166" name="Lombard BBB-" color="DeepPink" condition="$LastRating.Rating = [BBB-] AND $Currency = &quot;RUB&quot;" />
+    <folder id="60175" name="Rouble Bonds">
+      <portfolio id="57647" name="Sovereigns (OFZ)">
+        <include what="chain" id="1" name="RU SOV OFZ (RUB)" color="DodgerBlue" />
       </portfolio>
-      <portfolio id="71714" name="Micex New Ratings">
-        <include what="chain" id="93560" name="BBB" color="DarkSeaGreen" condition="$LastRating.Rating &gt;= [BBB-] and $LastRating.Rating &lt;= [BBB+] and $LastRating.RatingDate &gt;= #03/08/2013# " />
-        <include what="chain" id="93560" name="BB" color="LimeGreen" condition="$LastRating.Rating &gt;= [BB-] and $LastRating.Rating &lt;= [BB+] and $LastRating.RatingDate &gt;= #03/08/2013# " />
+      <portfolio id="30075" name="Public finance (munis)">
+        <include rics="/RU000A0JTDR3=MM,/RU000A0JSRL8=MM,/RU000A0JU286=MM,/RU000A0JSFK5=MM,/RU000A0JTYB3=MM,/RU000A0JRJX2=MM,/RU000A0JSQR7=MM,/RU000A0JRHN7=MM,/RU000A0JQX51=MM,/RU000A0JRYA9=MM,/RU000A0JU1V8=MM,/RU000A0JR688=MM,/RU000A0JS0N1=MM,/RU000A0DF2U3=MM,/RU000A0GKKB7=MM,/RU000A0JR3B1=MM,/RU000A0JRWS5=MM,/RU000A0JR225=MM,/RU000A0JTBA3=MM,/RU000A0JRVV1=MM,/RU000A0JRYP7=MM,/RU000A0JT8G7=MM,/RU000A0JS8T1=MM,/RU000A0JTVZ8=MM,/RU000A0JT361=MM,/RU000A0JP6R2=MM,/RU000A0DASA0=MM,/RU000A0E6TK0=MM,/RU000A0JNYP6=MM,/RU000A0JPZ50=MM,/RU000A0JQ5L6=MM,/RU000A0JQ5H4=MM,/RU000A0JQHJ7=MM,/RU000A0JTXW1=MM,/RU000A0JU3B6=MM,/RU000A0JR2H0=MM,/RU000A0JRWA3=MM,/RU000A0JSVD7=MM,/RU000A0JSY25=MM,/RU000A0JU1T2=MM,/RU000A0JTGE4=MM,/RU000A0JTZK1=MM,/RU000A0JR5G5=MM,/RU000A0JTGF1=MM,/RU000A0JPU55=MM,/RU000A0JRJF9=MM,/RU000A0JS9J0=MM,/RU000A0JU2H5=MM,/RU000A0JR4V7=MM,/RU000A0JTDL6=MM,/RU000A0JTFZ1=MM,/RU000A0JS009=MM,/RU000A0JTDZ6=MM,/RU000A0JTGD6=MM,/RU000A0JQ193=MM,/RU000A0JQX85=MM,/RU000A0JTDV5=MM,/RU000A0JT1G2=MM,/RU000A0JQN04=MM,/RU000A0JR639=MM,/RU000A0JTGN5=MM,/RU000A0JTF76=MM,/RU000A0JR6T6=MM,/RU000A0JS7P1=MM,/RU000A0JRGR0=MM,/RU000A0JQWF4=MM,/RU000A0JTXF6=MM,/RU000A0JSVC9=MM,/RU000A0JTF68=MM,/RU000A0JTG34=MM,/RU000A0JRHB2=MM,/RU000A0JS850=MM,/RU000A0JTVM6=MM,/RU000A0JP6V4=MM,/RU000A0JREC7=MM,/RU000A0JSU45=MM,/RU000A0JU0W8=MM" field-layout="MICEX" what="ric" id="1f255825-0581-4703-8s93-sg2244h85f69" name="RU Munis (RUB)" color="MediumSlateBlue" />
+      </portfolio>
+      <portfolio id="80049" name="High Yield">
+        <include rics="/RU000A0JR233=MM,/RU000A0JR2T5=MM,/RU000A0JU0B2=MM,/RU000A0JT486=MM,/RU000A0JT5M1=MM,/RU000A0JR3D7=MM,/RU000A0JQG94=MM,/RU000A0JT825=MM,/RU000A0JR3W7=MM,/RU000A0JR472=MM,/RU000A0JS7D7=MM,/RU000A0JR5A8=MM,/RU000A0JR522=MM,/RU000A0JRY75=MM,/RU000A0JR571=MM,/RU000A0JR6F5=MM,/RU000A0JR6G3=MM,/RU000A0JS9F8=MM,/RU000A0JTGK1=MM,/RU000A0JRKP6=MM,/RU000A0JTKN7=MM,/RU000A0JTLE4=MM,/RU000A0JS3R6=MM,/RU000A0JTMR4=MM,/RU000A0JS3X4=MM,/RU000A0JR8R6=MM,/RU000A0JTNX0=MM,/RU000A0JR9L7=MM,/RU000A0JTQ16=MM,/RU000A0JR9J1=MM,/RU000A0JTQJ2=MM,/RU000A0JR9F9=MM,/RU000A0JR9Z7=MM,/RU000A0JRTB7=MM,/RU000A0JRDB1=MM,/RU000A0JRDC9=MM,/RU000A0JS6D9=MM,/RU000A0JT5L3=MM,/RU000A0JRF94=MM,/RU000A0JTVE3=MM,/RU000A0JS6K4=MM,/RU000A0JS7B1=MM,/RU000A0JS7C9=MM,/RU000A0JTW00=MM,/RU000A0JS7E5=MM,/RU000A0JRFS0=MM,/RU000A0JRJR4=MM,/RU000A0JTYS7=MM,/RU000A0JTZ49=MM,/RU000A0JRK63=MM,/RU000A0JTZH7=MM,/RU000A0JTYW9=MM,/RU000A0JS9W3=MM,/RU000A0JTZR6=MM,/RU000A0JTZG9=MM,/RU000A0JRNR6=MM,/RU000A0JU245=MM,/RU000A0JTN43=MM,/RU000A0JU3U6=MM,/RU000A0JU526=MM,/RU000A0JU5G0=MM,/RU000A0JT1E7=MM,/RU000A0JTW42=MM,/RU000A0JT9S0=MM,/RU000A0JTXT7=MM,/RU000A0JTGU0=MM,/RU000A0JU146=MM,/RU000A0JS3V8=MM,/RU000A0JTPS5=MM,/RU000A0JS4W4=MM,/RU000A0JU575=MM,/RU000A0JS728=MM,/RU000A0GKGF6=MM,/RU000A0JR5B6=MM,/RU000A0JQY92=MM,/RU000A0JU1P0=MM,/RU000A0JSQK2=MM,/RU000A0JSS64=MM,/RU000A0JTKY4=MM,/RU000A0JU5A3=MM,/RU000A0JTFX6=MM" field-layout="MICEX" what="ric" id="1c256665-0582-4702-8d93-kl7130d31g80" name="RU High Yield (RUB)" color="DarkSeaGreen" />
+      </portfolio>
+      <portfolio id="3345" name="Banks &amp; financials">
+        <include rics="/RU000A0JPZ84=MM,/RU000A0JR2T5=MM,/RU000A0JT3Q7=MM,/RU000A0JQU70=MM,/RU000A0JU0B2=MM,/RU000A0JS6B3=MM,/RU000A0JT486=MM,/RU000A0JPZZ7=MM,/RU000A0JT5M1=MM,/RU000A0JT692=MM,/RU000A0JR3D7=MM,/RU000A0GHL00=MM,/RU000A0JR3G0=MM,/RU000A0JT825=MM,/RU000A0JRFJ9=MM,/RU000A0JR3W7=MM,/RU000A0JT9Y8=MM,/RU000A0JREL8=MM,/RU000A0JS7N6=MM,/RU000A0JRVN8=MM,/RU000A0JR472=MM,/RU000A0JRVZ2=MM,/RU000A0JRW36=MM,/RU000A0JR4M6=MM,/RU000A0JR5A8=MM,/RU000A0JR522=MM,/RU000A0JR563=MM,/RU000A0JRY75=MM,/RU000A0JQ1K7=MM,/RU000A0JTDW3=MM,/RU000A0JR5S0=MM,/RU000A0JR571=MM,/RU000A0JR5Q4=MM,/RU000A0JR5P6=MM,/RU000A0JRK97=MM,/RU000A0JS0W2=MM,/RU000A0JS9F8=MM,/RU000A0JRKP6=MM,/RU000A0JR5T8=MM,/RU000A0JQY50=MM,/RU000A0JU153=MM,/RU000A0JR050=MM,/RU000A0JTKS6=MM,/RU000A0JS322=MM,/RU000A0JR7S6=MM,/RU000A0JR845=MM,/RU000A0JS397=MM,/RU000A0JTLE4=MM,/RU000A0JR894=MM,/RU000A0JRVA5=MM,/RU000A0JRLL3=MM,/RU000A0JP2G4=MM,/RU000A0JS3P0=MM,/RU000A0JTMR4=MM,/RU000A0JS3X4=MM,/RU000A0JR8R6=MM,/RU000A0JTMY0=MM,/RU000A0JR0Q5=MM,/RU000A0JR8T2=MM,/RU000A0JSTQ3=MM,/RU000A0JR9A0=MM,/RU000A0JR9L7=MM,/RU000A0JSW35=MM,/RU000A0JTQ16=MM,/RU000A0JSW84=MM,/RU000A0JR9J1=MM,/RU000A0JRV86=MM,/RU000A0JQ4D6=MM,/RU000A0JTQJ2=MM,/RU000A0JR9F9=MM,/RU000A0JPWF6=MM,/RU000A0JS1M1=MM,/RU000A0JS1P4=MM,/RU000A0JRTB7=MM,/RU000A0JS5N0=MM,/RU000A0JRCU3=MM,/RU000A0JS5R1=MM,/RU000A0JS6D9=MM,/RU000A0JRCD9=MM,/RU000A0JQZ67=MM,/RU000A0JTU44=MM" field-layout="MICEX" what="ric" id="e0b6e3e4-24b5-407a-89bc-73adda8a5bf5" name="RU Banks &amp; Financials (RUB)" color="LightSeaGreen" />
+      </portfolio>
+      <portfolio id="47318" name="Telecoms">
+        <include rics="/RU000A0JQ9U9=MM,/RU000A0JQL30=MM,/RU000A0JRBU5=MM,/RU000A0JT4G6=MM,/RU000A0JTR98=MM,/RU000A0JTRA9=MM,/RU000A0JQ0E2=MM,/RU000A0JPTJ4=MM,/RU000A0JQ5E1=MM,/RU000A0JQ8Q9=MM,/RU000A0JR4H6=MM,/RU000A0JR4J2=MM,/RU000A0JTTA5=MM,/RU000A0JTKD8=MM,/RU000A0JTYT5=MM,/RU000A0JTAQ1=MM,/RU000A0JTKC0=MM,/RU000A0JTR15=MM,/RU000A0JRKC4=MM,/RU000A0JRKD2=MM,/RU000A0JRKM3=MM,/RU000A0JS3M7=MM,/RU000A0JS3L9=MM,/RU000A0JRVU3=MM,/RU000A0JS5E9=MM,/RU000A0JS5M2=MM,/RU000A0JQ7N8=MM,/RU000A0JS5F6=MM,/RU000A0JR357=MM,/RU000A0JR381=MM" field-layout="MICEX" what="ric" id="1c251837-69cf-470c-8f93-c9b130d31a85" name="RU Telecoms (RUB)" color="DarkSeaGreen" />
+      </portfolio>
+      <portfolio id="68192" name="Utilities &amp; transportation">
+        <include rics="/RU000A0JTTC1=MM,/RU000A0JT9S0=MM,/XS0863439161=MM,/RU000A0JR217=MM,/RU000A0JR3L0=MM,/RU000A0JS7H8=MM,/RU000A0JRL96=MM,/RU000A0JRUS9=MM,/RU000A0JRZK5=MM,/RU000A0JRMX6=MM,/RU000A0JT7T2=MM,/RU000A0JSQ58=MM,/RU000A0JTKA4=MM,/RU000A0JT2K2=MM,/RU000A0JR1Y7=MM,/RU000A0JR1Z4=MM,/RU000A0JR209=MM,/RU000A0JR3M8=MM,/RU000A0JT7U0=MM,/RU000A0JTKB2=MM,/RU000A0JTKM9=MM,/XS0553072611=MM,/RU000A0JRED5=MM,/RU000A0JS785=MM,/RU000A0JTVA1=MM,/RU000A0JT0U5=MM,/RU000A0JT9D2=MM,/RU000A0JTMD4=MM,/RU000A0JT601=MM,/RU000A0JTG26=MM,/RU000A0JTKL1=MM,/RU000A0JS7L0=MM,/RU000A0JS4S2=MM,/RU000A0JS4T0=MM,/RU000A0JRKW2=MM,/RU000A0JR498=MM,/RU000A0JRFN1=MM,/RU000A0JRFP6=MM,/RU000A0JTMG7=MM,/RU000A0JRD47=MM,/RU000A0JT8N3=MM,/RU000A0JT8R4=MM,/RU000A0JT8T0=MM,/RU000A0JQ177=MM,/RU000A0JQ5Q5=MM,/RU000A0JQ4U0=MM,/RU000A0JQ6S9=MM,/RU000A0JQ656=MM,/RU000A0JQ7W9=MM,/RU000A0JQRD9=MM,/RU000A0JTU85=MM,/RU000A0JSGV0=MM,/RU000A0JP435=MM,/RU000A0JR2S7=MM,/RU000A0JQG94=MM,/RU000A0JQWJ6=MM,/RU000A0JTKJ5=MM,/RU000A0JRDC9=MM,/RU000A0JR5V4=MM,/RU000A0JRJB8=MM,/RU000A0JRJL7=MM,/RU000A0JS4J1=MM,/RU000A0JS4K9=MM,/RU000A0JS4L7=MM" field-layout="MICEX" what="ric" id="1c251837-69cf-470c-8f93-c9b130d31a86" name="RU Utilities &amp; transportation (RUB)" color="DarkSeaGreen" />
+      </portfolio>
+      <portfolio id="47873" name="Retail &amp; consumer goods">
+        <include rics="/RU000A0JR4C7=MM,/RU000A0GKGF6=MM,/RU000A0JR2D9=MM,/RU000A0JTQB9=MM,/RU000A0JTP09=MM,/RU000A0JR9N3=MM,/RU000A0JRFQ4=MM,/RU000A0JT171=MM,/RU000A0JTKN7=MM,/RU000A0JRNR6=MM,/RU000A0JTFU2=MM,/RU000A0JRFS0=MM,/RU000A0JS9W3=MM,/RU000A0JPBN4=MM,/RU000A0JQ664=MM,/RU000A0JT387=MM" field-layout="MICEX" what="ric" id="1c255555-69cf-4702-8d93-c9b130d31g80" name="RU Retail &amp; consumer goods (RUB)" color="DarkSeaGreen" />
+      </portfolio>
+      <portfolio id="24851" name="Metals &amp; mining">
+        <include rics="/RU000A0JQVK6=MM,/RU000A0JQX10=MM,/RU000A0JTA48=MM,/RU000A0JTA55=MM,/RU000A0JQXQ9=MM,/RU000A0JR4Z8=MM,/RU000A0JQTD5=MM,/RU000A0JR3P1=MM,/RU000A0JQTQ7=MM,/RU000A0JR3Q9=MM,/RU000A0JRJW4=MM,/RU000A0JRJM5=MM,/RU000A0JRJ09=MM,/RU000A0JS3R6=MM,/RU000A0JS5B5=MM,/RU000A0JTLJ3=MM,/RU000A0JTLL9=MM,/RU000A0JS5A7=MM,/RU000A0JS5L4=MM,/RU000A0JTDP7=MM,/RU000A0JTY65=MM,/RU000A0JR9M5=MM,/RU000A0JRM87=MM,/RU000A0JRMZ1=MM,/RU000A0JSZU2=MM,/RU000A0JTED1=MM,/RU000A0JSY74=MM,/RU000A0JRW10=MM,/RU000A0JTPV9=MM,/RU000A0JTPX5=MM,/RU000A0JTPY3=MM,/RU000A0JR6F5=MM,/RU000A0JRJR4=MM,/RU000A0JQFU8=MM,/RU000A0JQFZ7=MM,/RU000A0JQXR7=MM,/RU000A0JU336=MM,/RU000A0JR3J4=MM" field-layout="MICEX" what="ric" id="1c256655-69cf-1702-8y93-b9c141d31b83" name="RU Metals &amp; mining (RUB)" color="DarkSeaGreen" />
+      </portfolio>
+    </folder>
+    <folder id="30205" name="Eurobonds">
+      <portfolio id="68807" name="Kazakhstan, Georgia, Azerbaijan, Armenia">
+        <include what="list" id="4102" />
+        <include what="list" id="7189" />
+        <include what="chain" id="76697" name="GE Issuers" />
+        <include what="chain" id="18867" color="Coral" />
+        <include what="list" id="98366" />
+        <include what="custom-bond" id="26531" name="Armenia 20" color="BlueViolet" />
+      </portfolio>
+      <portfolio id="33783" name="Quasi sovereign">
+        <include what="query" id="97636" name="GAZP USD" color="MediumSlateBlue" />
+        <include what="query" id="14285" name="VEB USD" color="CornflowerBlue" />
+        <include what="query" id="80636" name="SBER USD" color="DarkGreen" />
+        <include what="query" id="24875" name="RSHB USD" color="CornflowerBlue" />
+        <include rics="RU086198118=,RU086198037=" field-layout="Eurobonds" what="ric" id="51da8970-ef0e-40e7-8c54-cfac64ac167e" name="ROSN USD" color="DarkOrange" />
+        <include what="list" id="2334" name="RUSSIA USD" />
+        <include rics="RU049924518=,RU076422001=" field-layout="Eurobonds" what="ric" id="46ba2def-3c1b-4c07-9a0e-563a3cd113a8" name="RURAIL USD" color="CornflowerBlue" />
+        <include what="query" id="443" name="VTB USD" color="Blue" />
+        <include rics="RU055549320=,RU020582847=" field-layout="Eurobonds" what="ric" id="afc315dd-e905-474c-a605-5d862ae866c8" name="ALROSA USD" color="CornflowerBlue" />
+        <include rics="RU083019271=,RU055267987=" field-layout="Eurobonds" what="ric" id="171989ab-1553-4354-b75d-daf3ff896e24" name="Various USD" color="CornflowerBlue" />
+      </portfolio>
+      <portfolio id="9151" name="Sovereign and BBB corporates">
+        <include what="chain" id="409" name="RU BBB Euros" color="CadetBlue" condition="$LastIssuerRating.Rating &gt;= [BBB-] and $LastIssuerRating.Rating &lt;= [BBB+] and $Currency = &quot;USD&quot;" />
+        <include what="chain" id="5" name="RU SOV USD" color="Red" condition="$Currency = &quot;USD&quot;" />
+      </portfolio>
+      <portfolio id="91128" name="Sub-Investment grade corporates">
+        <include what="list" id="55792" />
+        <include rics="RU092347281=,RU078393432=,RU080863284=,RU051372387=,RU092133150=,RU091829738=,RU064033476=,RU092213471=,RU080863861=,RU035938133=,RU061890521=,RU065291355=,RU023498715=,RU055549320=,RU078324287=,RU065096218=,RU064840258=,RU049357923=,RU092504310=,RU091159970=,RU058521159=,RU087885577=,RU055267987=,RU085039326=,RU088824512=" field-layout="Eurobonds" what="ric" id="70db6b87-27a0-4eeb-bb79-db15a586341d" name="Investment grade banks USD" color="DarkOrange" />
+      </portfolio>
+      <portfolio id="47366" name="Sub-investment grade banks">
+        <include rics="RU031136997=,RU061984534=,RU080863691=,RU083019123=,RU095332331=,RU080264895=,RU027572855=,RU023809150=,RU061678450=,RU093834178=,RU086979292=,RU085167243=,RU077598421=,RU052465885=,RU046985605=,RU077612106=,RU092311023=,RU050383962=,RU024693716=,RU029918325=,RU023633604=,RU084665266=,RU060638241=,RU085476335=,RU092407845=,RU087910555=,RU065508508=,RU031257298=,RU084816345=,RU054436297=,RU028869053=,RU083241250=,RU062069520=,RU085533428=" field-layout="Eurobonds" what="ric" id="753be4d1-5804-4fe8-ba90-1ed489a6fa39" name="RU BANKS SUD (Sub-inv grade)" color="CornflowerBlue" />
+      </portfolio>
+      <portfolio id="99426" name="Ukraine and Belarus">
+        <include what="list" id="11500" />
+        <include rics="UA090850245=,UA089689031=,UA054374453=,UA028701578=,UA024293939=,UA059429469=,UA090643487=,UA093413431=,UA045920712=,UA055914087=,UA091690225=,UA050290832=,UA091050617=,UA059154923=,UA051137906=,UA064475002=,UA061432558=,UA078395028=,UA050564746=,UA086247623=,UA061985646=,UA055632782=,UA023362023=,UA024373312=,UA030324161=,UA050373746=,UA087773728=,UA055308870=,BY055329621=,BY052939470=,BY058361623=" field-layout="Eurobonds" what="ric" id="e4c77da0-3307-4857-8d49-c45aa47bd976" name="UA &amp; BY EUROS USD" color="Gray" />
+      </portfolio>
+      <portfolio id="52632" name="Latin America">
+        <include what="chain" id="71273" />
+        <include what="list" id="38322" />
+        <include what="chain" id="27018" />
+        <include what="list" id="87126" />
+        <include what="chain" id="6714" />
+        <include what="list" id="66094" />
+        <include what="list" id="2334" />
+        <include what="chain" id="78912" name="Panama Global BMK" color="DarkGreen" />
+      </portfolio>
+      <portfolio id="91473" name="Investment grade banks">
+        <include what="query" id="80636" name="SBER USD" color="ForestGreen" />
+        <include what="query" id="24875" name="RSHB USD" color="CadetBlue" />
+        <include what="query" id="91530" name="ALFA USD" color="Firebrick" />
+        <include what="query" id="443" name="VTB USD" color="DodgerBlue" />
+        <include what="query" id="14285" name="VEB USD" color="DarkBlue" />
+        <include rics="RU045489736=,KZS083157143=" field-layout="Eurobonds" what="ric" id="4f3067a9-d635-4f06-8ffc-1b1325f81623" name="EBR USD" color="CornflowerBlue" />
+        <include rics="RU042651770=,RU078329122=,RU053127096=,RU023057794=,RU077921346=,RU084813770=" field-layout="Eurobonds" what="ric" id="06bec29e-0a08-47c2-92e5-10d61ca9881b" name="GPB USD" color="DarkCyan" />
+      </portfolio>
+    </folder>
+    <folder id="4971" name="World">
+      <portfolio id="78673" name="US Strips (GovPX)">
+        <include what="chain" id="38908" />
+        <include what="chain" id="25020" />
+        <include what="chain" id="3090" />
+        <include what="chain" id="14343" />
+        <include what="chain" id="23710" />
+        <include what="chain" id="10102" />
+        <include what="chain" id="15312" />
       </portfolio>
     </folder>
   </portfolios>
   <custom-bonds>
-    <bond id="1" name="Base case 3Y 12% bond" code="NewIssueBase" rateStructure="" bondStructure="ACC:A5 IC:L1 CLDR:RUS_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY FRQ:28D PX:CLEAN REFDATE:MATURITY ISSUE:01JAN2013 RATE:0.10 AMORT:23JUL2013:0.20 AMORT:01JAN2014:0.80   STEP:01SEP2013:0.14 " maturity="23APR2014" coupon="0.1" color="Red" />
+    <bond id="1" name="Base case 3Y 12% bond" code="NewIssueBase" rateStructure="" bondStructure="ACC:A5 IC:L1 CLDR:RUS_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY FRQ:2.00 PX:CLEAN REFDATE:MATURITY RATE:0.06 AMORT:23JUL2013:0.20 AMORT:01JAN2014:0.80   STEP:01SEP2013:0.14 " maturity="30SEP2020" coupon="0.06" color="Red" />
     <bond id="39240" name="ss" color="Gray" code="22" maturity="23APR2014" coupon="0" bondStructure="ACC:A5 IC:L1 CLDR:RUS_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY PX:CLEAN REFDATE:MATURITY RATE:0.13     " />
+    <bond id="40958" name="Russia '23" color="Gray" code="Russia 23" maturity="16SEP2023" coupon="0.0488" bondStructure="ACC:A5 IC:L1 CLDR:EMU_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY FRQ:182D PX:CLEAN REFDATE:MATURITY RATE:0.0488     " />
+    <bond id="36302" name="Russia '19" color="Gray" code="Russia 19" maturity="16SEP2019" coupon="0.035" bondStructure="ACC:A5 IC:L1 CLDR:EMU_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY FRQ:182D PX:CLEAN REFDATE:MATURITY RATE:0.035     " />
+    <bond id="95081" name="Gazprom 7Y GBP" color="Gray" code="GAZP 7Y GBP" maturity="20SEP2020" coupon="0.06" bondStructure="ACC:A5 IC:L1 CLDR:UKG_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY FRQ:2.00 PX:CLEAN REFDATE:MATURITY RATE:0.06     " />
+    <bond id="5848" name="XS0974126186" color="Gray" code="XS0974126186" maturity="25SEP2020" coupon="0.05338" bondStructure="ACC:A5 IC:L1 CLDR:EMU_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY FRQ:182D PX:CLEAN REFDATE:MATURITY RATE:0.05338     " />
+    <bond id="29521" name="OMSK 3Y" color="Gray" code="OMSK 3Y" maturity="19SEP2014" coupon="0.10" bondStructure="ACC:A5 IC:L1 CLDR:RUS_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY PX:CLEAN REFDATE:MATURITY     " />
+    <bond id="10341" name="EABR 20" color="Gray" code="EABR 20" maturity="26SEP2020" coupon="0.05" bondStructure="ACC:A5 IC:L1 CLDR:EMU_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY FRQ:182D PX:CLEAN REFDATE:MATURITY RATE:0.05     " />
+    <bond id="26531" name="Armenia 20" color="Gray" code="Armenia 20" maturity="30SEP2020" coupon="0.06" bondStructure="ACC:A5 IC:L1 CLDR:EMU_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY FRQ:182D PX:CLEAN REFDATE:MATURITY RATE:0.06     " />
   </custom-bonds>
   <chain-curves>
     <curve id="1" ric="0#RUBCCSZ=R" color="Tomato" name="Rouble CCS" pattern="RUBCCS(?&lt;term&gt;.+?)Z=R" skip="" field-set="Russian chain curves" />

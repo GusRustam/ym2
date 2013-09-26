@@ -35,16 +35,6 @@
             Dim Label10 As System.Windows.Forms.Label
             Dim Label11 As System.Windows.Forms.Label
             Dim Label4 As System.Windows.Forms.Label
-            Dim ChainCurvesTP As System.Windows.Forms.TabPage
-            Dim TableLayoutPanel11 As System.Windows.Forms.TableLayoutPanel
-            Dim Label17 As System.Windows.Forms.Label
-            Dim Label18 As System.Windows.Forms.Label
-            Dim Label19 As System.Windows.Forms.Label
-            Dim Label20 As System.Windows.Forms.Label
-            Dim Label21 As System.Windows.Forms.Label
-            Dim Label22 As System.Windows.Forms.Label
-            Dim FlowLayoutPanel6 As System.Windows.Forms.FlowLayoutPanel
-            Dim TableLayoutPanel12 As System.Windows.Forms.TableLayoutPanel
             Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
             Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
             Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
@@ -63,22 +53,6 @@
             Dim DataGridViewCellStyle16 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
             Dim DataGridViewCellStyle17 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
             Dim DataGridViewCellStyle18 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-            Me.TableLayoutPanel5 = New System.Windows.Forms.TableLayoutPanel()
-            Me.ChainCurvesDGV = New System.Windows.Forms.DataGridView()
-            Me.ChainCurveSkipTB = New System.Windows.Forms.TextBox()
-            Me.ChainCurveNameTB = New System.Windows.Forms.TextBox()
-            Me.ChainCurveRicTB = New System.Windows.Forms.TextBox()
-            Me.FlowLayoutPanel5 = New System.Windows.Forms.FlowLayoutPanel()
-            Me.ChainCurveColorCB = New System.Windows.Forms.ComboBox()
-            Me.ChainCurveColorPB = New System.Windows.Forms.PictureBox()
-            Me.RandomColorChainCurveButton = New System.Windows.Forms.Button()
-            Me.ChainCurveFieldSetCB = New System.Windows.Forms.ComboBox()
-            Me.SaveChainCurveChangesButton = New System.Windows.Forms.Button()
-            Me.ChainCurvePatternTB = New System.Windows.Forms.TextBox()
-            Me.AddItemTagButton = New System.Windows.Forms.Button()
-            Me.DeleteChainCurveButton = New System.Windows.Forms.Button()
-            Me.EditChainCurveButton = New System.Windows.Forms.Button()
-            Me.AddNewChainCurveButton = New System.Windows.Forms.Button()
             Me.PortTreeCM = New System.Windows.Forms.ContextMenuStrip(Me.components)
             Me.AddToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
@@ -190,24 +164,6 @@
             Label10 = New System.Windows.Forms.Label()
             Label11 = New System.Windows.Forms.Label()
             Label4 = New System.Windows.Forms.Label()
-            ChainCurvesTP = New System.Windows.Forms.TabPage()
-            TableLayoutPanel11 = New System.Windows.Forms.TableLayoutPanel()
-            Label17 = New System.Windows.Forms.Label()
-            Label18 = New System.Windows.Forms.Label()
-            Label19 = New System.Windows.Forms.Label()
-            Label20 = New System.Windows.Forms.Label()
-            Label21 = New System.Windows.Forms.Label()
-            Label22 = New System.Windows.Forms.Label()
-            FlowLayoutPanel6 = New System.Windows.Forms.FlowLayoutPanel()
-            TableLayoutPanel12 = New System.Windows.Forms.TableLayoutPanel()
-            ChainCurvesTP.SuspendLayout()
-            Me.TableLayoutPanel5.SuspendLayout()
-            CType(Me.ChainCurvesDGV, System.ComponentModel.ISupportInitialize).BeginInit()
-            TableLayoutPanel11.SuspendLayout()
-            Me.FlowLayoutPanel5.SuspendLayout()
-            CType(Me.ChainCurveColorPB, System.ComponentModel.ISupportInitialize).BeginInit()
-            FlowLayoutPanel6.SuspendLayout()
-            TableLayoutPanel12.SuspendLayout()
             Me.PortTreeCM.SuspendLayout()
             Me.ChainsListsCMS.SuspendLayout()
             Me.CustomBondListCMS.SuspendLayout()
@@ -360,385 +316,87 @@
             Label4.TabIndex = 27
             Label4.Text = "Structure "
             '
-            'ChainCurvesTP
-            '
-            ChainCurvesTP.Controls.Add(Me.TableLayoutPanel5)
-            ChainCurvesTP.Location = New System.Drawing.Point(4, 22)
-            ChainCurvesTP.Name = "ChainCurvesTP"
-            ChainCurvesTP.Padding = New System.Windows.Forms.Padding(3)
-            ChainCurvesTP.Size = New System.Drawing.Size(888, 598)
-            ChainCurvesTP.TabIndex = 7
-            ChainCurvesTP.Text = "Chain curves"
-            ChainCurvesTP.UseVisualStyleBackColor = True
-            '
-            'TableLayoutPanel5
-            '
-            Me.TableLayoutPanel5.ColumnCount = 1
-            Me.TableLayoutPanel5.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-            Me.TableLayoutPanel5.Controls.Add(Me.ChainCurvesDGV, 0, 0)
-            Me.TableLayoutPanel5.Controls.Add(TableLayoutPanel11, 0, 2)
-            Me.TableLayoutPanel5.Controls.Add(TableLayoutPanel12, 0, 1)
-            Me.TableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.TableLayoutPanel5.Location = New System.Drawing.Point(3, 3)
-            Me.TableLayoutPanel5.Name = "TableLayoutPanel5"
-            Me.TableLayoutPanel5.RowCount = 3
-            Me.TableLayoutPanel5.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 30.0!))
-            Me.TableLayoutPanel5.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
-            Me.TableLayoutPanel5.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 70.0!))
-            Me.TableLayoutPanel5.Size = New System.Drawing.Size(882, 592)
-            Me.TableLayoutPanel5.TabIndex = 0
-            '
-            'ChainCurvesDGV
-            '
-            Me.ChainCurvesDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-            Me.ChainCurvesDGV.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.ChainCurvesDGV.Location = New System.Drawing.Point(3, 3)
-            Me.ChainCurvesDGV.MultiSelect = False
-            Me.ChainCurvesDGV.Name = "ChainCurvesDGV"
-            Me.ChainCurvesDGV.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-            Me.ChainCurvesDGV.Size = New System.Drawing.Size(876, 162)
-            Me.ChainCurvesDGV.TabIndex = 0
-            '
-            'TableLayoutPanel11
-            '
-            TableLayoutPanel11.ColumnCount = 4
-            TableLayoutPanel11.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 37.5!))
-            TableLayoutPanel11.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
-            TableLayoutPanel11.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 62.5!))
-            TableLayoutPanel11.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 22.0!))
-            TableLayoutPanel11.Controls.Add(Me.ChainCurveSkipTB, 2, 5)
-            TableLayoutPanel11.Controls.Add(Me.ChainCurveNameTB, 2, 1)
-            TableLayoutPanel11.Controls.Add(Label17, 0, 0)
-            TableLayoutPanel11.Controls.Add(Label18, 0, 1)
-            TableLayoutPanel11.Controls.Add(Label19, 0, 2)
-            TableLayoutPanel11.Controls.Add(Label20, 0, 3)
-            TableLayoutPanel11.Controls.Add(Label21, 0, 5)
-            TableLayoutPanel11.Controls.Add(Label22, 0, 4)
-            TableLayoutPanel11.Controls.Add(Me.ChainCurveRicTB, 2, 0)
-            TableLayoutPanel11.Controls.Add(Me.FlowLayoutPanel5, 2, 2)
-            TableLayoutPanel11.Controls.Add(Me.ChainCurveFieldSetCB, 2, 4)
-            TableLayoutPanel11.Controls.Add(Me.SaveChainCurveChangesButton, 0, 6)
-            TableLayoutPanel11.Controls.Add(FlowLayoutPanel6, 2, 3)
-            TableLayoutPanel11.Dock = System.Windows.Forms.DockStyle.Fill
-            TableLayoutPanel11.Location = New System.Drawing.Point(0, 198)
-            TableLayoutPanel11.Margin = New System.Windows.Forms.Padding(0)
-            TableLayoutPanel11.Name = "TableLayoutPanel11"
-            TableLayoutPanel11.RowCount = 8
-            TableLayoutPanel11.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25.0!))
-            TableLayoutPanel11.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25.0!))
-            TableLayoutPanel11.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
-            TableLayoutPanel11.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
-            TableLayoutPanel11.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25.0!))
-            TableLayoutPanel11.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25.0!))
-            TableLayoutPanel11.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
-            TableLayoutPanel11.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-            TableLayoutPanel11.Size = New System.Drawing.Size(882, 394)
-            TableLayoutPanel11.TabIndex = 1
-            '
-            'ChainCurveSkipTB
-            '
-            Me.ChainCurveSkipTB.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.ChainCurveSkipTB.Location = New System.Drawing.Point(338, 138)
-            Me.ChainCurveSkipTB.Name = "ChainCurveSkipTB"
-            Me.ChainCurveSkipTB.Size = New System.Drawing.Size(519, 20)
-            Me.ChainCurveSkipTB.TabIndex = 10
-            Me.ChainCurveSkipTB.Visible = False
-            '
-            'ChainCurveNameTB
-            '
-            Me.ChainCurveNameTB.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.ChainCurveNameTB.Location = New System.Drawing.Point(338, 28)
-            Me.ChainCurveNameTB.Name = "ChainCurveNameTB"
-            Me.ChainCurveNameTB.Size = New System.Drawing.Size(519, 20)
-            Me.ChainCurveNameTB.TabIndex = 7
-            '
-            'Label17
-            '
-            Label17.AutoSize = True
-            Label17.Location = New System.Drawing.Point(3, 3)
-            Label17.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
-            Label17.Name = "Label17"
-            Label17.Size = New System.Drawing.Size(55, 13)
-            Label17.TabIndex = 0
-            Label17.Text = "Chain RIC"
-            '
-            'Label18
-            '
-            Label18.AutoSize = True
-            Label18.Location = New System.Drawing.Point(3, 28)
-            Label18.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
-            Label18.Name = "Label18"
-            Label18.Size = New System.Drawing.Size(64, 13)
-            Label18.TabIndex = 1
-            Label18.Text = "Curve name"
-            '
-            'Label19
-            '
-            Label19.AutoSize = True
-            Label19.Location = New System.Drawing.Point(3, 53)
-            Label19.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
-            Label19.Name = "Label19"
-            Label19.Size = New System.Drawing.Size(31, 13)
-            Label19.TabIndex = 2
-            Label19.Text = "Color"
-            '
-            'Label20
-            '
-            Label20.AutoSize = True
-            Label20.Location = New System.Drawing.Point(3, 83)
-            Label20.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
-            Label20.Name = "Label20"
-            Label20.Size = New System.Drawing.Size(41, 13)
-            Label20.TabIndex = 3
-            Label20.Text = "Pattern"
-            '
-            'Label21
-            '
-            Label21.AutoSize = True
-            Label21.Location = New System.Drawing.Point(3, 138)
-            Label21.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
-            Label21.Name = "Label21"
-            Label21.Size = New System.Drawing.Size(28, 13)
-            Label21.TabIndex = 4
-            Label21.Text = "Skip"
-            Label21.Visible = False
-            '
-            'Label22
-            '
-            Label22.AutoSize = True
-            Label22.Location = New System.Drawing.Point(3, 113)
-            Label22.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
-            Label22.Name = "Label22"
-            Label22.Size = New System.Drawing.Size(34, 13)
-            Label22.TabIndex = 5
-            Label22.Text = "Fields"
-            '
-            'ChainCurveRicTB
-            '
-            Me.ChainCurveRicTB.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.ChainCurveRicTB.Location = New System.Drawing.Point(338, 3)
-            Me.ChainCurveRicTB.Name = "ChainCurveRicTB"
-            Me.ChainCurveRicTB.Size = New System.Drawing.Size(519, 20)
-            Me.ChainCurveRicTB.TabIndex = 6
-            '
-            'FlowLayoutPanel5
-            '
-            Me.FlowLayoutPanel5.Controls.Add(Me.ChainCurveColorCB)
-            Me.FlowLayoutPanel5.Controls.Add(Me.ChainCurveColorPB)
-            Me.FlowLayoutPanel5.Controls.Add(Me.RandomColorChainCurveButton)
-            Me.FlowLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.FlowLayoutPanel5.Location = New System.Drawing.Point(335, 50)
-            Me.FlowLayoutPanel5.Margin = New System.Windows.Forms.Padding(0)
-            Me.FlowLayoutPanel5.Name = "FlowLayoutPanel5"
-            Me.FlowLayoutPanel5.Size = New System.Drawing.Size(525, 30)
-            Me.FlowLayoutPanel5.TabIndex = 8
-            Me.FlowLayoutPanel5.WrapContents = False
-            '
-            'ChainCurveColorCB
-            '
-            Me.ChainCurveColorCB.Dock = System.Windows.Forms.DockStyle.Left
-            Me.ChainCurveColorCB.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable
-            Me.ChainCurveColorCB.FormattingEnabled = True
-            Me.ChainCurveColorCB.Location = New System.Drawing.Point(3, 3)
-            Me.ChainCurveColorCB.Name = "ChainCurveColorCB"
-            Me.ChainCurveColorCB.Size = New System.Drawing.Size(156, 21)
-            Me.ChainCurveColorCB.TabIndex = 0
-            '
-            'ChainCurveColorPB
-            '
-            Me.ChainCurveColorPB.Dock = System.Windows.Forms.DockStyle.Left
-            Me.ChainCurveColorPB.Location = New System.Drawing.Point(165, 3)
-            Me.ChainCurveColorPB.Name = "ChainCurveColorPB"
-            Me.ChainCurveColorPB.Size = New System.Drawing.Size(25, 21)
-            Me.ChainCurveColorPB.TabIndex = 1
-            Me.ChainCurveColorPB.TabStop = False
-            '
-            'RandomColorChainCurveButton
-            '
-            Me.RandomColorChainCurveButton.Location = New System.Drawing.Point(196, 3)
-            Me.RandomColorChainCurveButton.Name = "RandomColorChainCurveButton"
-            Me.RandomColorChainCurveButton.Size = New System.Drawing.Size(68, 21)
-            Me.RandomColorChainCurveButton.TabIndex = 2
-            Me.RandomColorChainCurveButton.Text = "Rand"
-            Me.RandomColorChainCurveButton.UseVisualStyleBackColor = True
-            '
-            'ChainCurveFieldSetCB
-            '
-            Me.ChainCurveFieldSetCB.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.ChainCurveFieldSetCB.FormattingEnabled = True
-            Me.ChainCurveFieldSetCB.Location = New System.Drawing.Point(338, 113)
-            Me.ChainCurveFieldSetCB.Name = "ChainCurveFieldSetCB"
-            Me.ChainCurveFieldSetCB.Size = New System.Drawing.Size(519, 21)
-            Me.ChainCurveFieldSetCB.TabIndex = 11
-            '
-            'SaveChainCurveChangesButton
-            '
-            Me.SaveChainCurveChangesButton.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.SaveChainCurveChangesButton.Location = New System.Drawing.Point(3, 163)
-            Me.SaveChainCurveChangesButton.Name = "SaveChainCurveChangesButton"
-            Me.SaveChainCurveChangesButton.Size = New System.Drawing.Size(309, 24)
-            Me.SaveChainCurveChangesButton.TabIndex = 15
-            Me.SaveChainCurveChangesButton.Text = "Save changes"
-            Me.SaveChainCurveChangesButton.UseVisualStyleBackColor = True
-            '
-            'FlowLayoutPanel6
-            '
-            FlowLayoutPanel6.Controls.Add(Me.ChainCurvePatternTB)
-            FlowLayoutPanel6.Controls.Add(Me.AddItemTagButton)
-            FlowLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill
-            FlowLayoutPanel6.Location = New System.Drawing.Point(335, 80)
-            FlowLayoutPanel6.Margin = New System.Windows.Forms.Padding(0)
-            FlowLayoutPanel6.Name = "FlowLayoutPanel6"
-            FlowLayoutPanel6.Size = New System.Drawing.Size(525, 30)
-            FlowLayoutPanel6.TabIndex = 16
-            '
-            'ChainCurvePatternTB
-            '
-            Me.ChainCurvePatternTB.Location = New System.Drawing.Point(3, 3)
-            Me.ChainCurvePatternTB.Name = "ChainCurvePatternTB"
-            Me.ChainCurvePatternTB.Size = New System.Drawing.Size(419, 20)
-            Me.ChainCurvePatternTB.TabIndex = 10
-            '
-            'AddItemTagButton
-            '
-            Me.AddItemTagButton.Location = New System.Drawing.Point(428, 3)
-            Me.AddItemTagButton.MaximumSize = New System.Drawing.Size(75, 24)
-            Me.AddItemTagButton.MinimumSize = New System.Drawing.Size(75, 24)
-            Me.AddItemTagButton.Name = "AddItemTagButton"
-            Me.AddItemTagButton.Size = New System.Drawing.Size(75, 24)
-            Me.AddItemTagButton.TabIndex = 11
-            Me.AddItemTagButton.Text = "Add term tag"
-            Me.AddItemTagButton.UseVisualStyleBackColor = True
-            '
-            'TableLayoutPanel12
-            '
-            TableLayoutPanel12.ColumnCount = 3
-            TableLayoutPanel12.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
-            TableLayoutPanel12.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
-            TableLayoutPanel12.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333!))
-            TableLayoutPanel12.Controls.Add(Me.DeleteChainCurveButton, 0, 0)
-            TableLayoutPanel12.Controls.Add(Me.EditChainCurveButton, 0, 0)
-            TableLayoutPanel12.Controls.Add(Me.AddNewChainCurveButton, 0, 0)
-            TableLayoutPanel12.Dock = System.Windows.Forms.DockStyle.Fill
-            TableLayoutPanel12.Location = New System.Drawing.Point(0, 168)
-            TableLayoutPanel12.Margin = New System.Windows.Forms.Padding(0)
-            TableLayoutPanel12.Name = "TableLayoutPanel12"
-            TableLayoutPanel12.RowCount = 1
-            TableLayoutPanel12.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-            TableLayoutPanel12.Size = New System.Drawing.Size(882, 30)
-            TableLayoutPanel12.TabIndex = 2
-            '
-            'DeleteChainCurveButton
-            '
-            Me.DeleteChainCurveButton.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.DeleteChainCurveButton.Location = New System.Drawing.Point(591, 3)
-            Me.DeleteChainCurveButton.Name = "DeleteChainCurveButton"
-            Me.DeleteChainCurveButton.Size = New System.Drawing.Size(288, 24)
-            Me.DeleteChainCurveButton.TabIndex = 15
-            Me.DeleteChainCurveButton.Text = "Delete"
-            Me.DeleteChainCurveButton.UseVisualStyleBackColor = True
-            '
-            'EditChainCurveButton
-            '
-            Me.EditChainCurveButton.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.EditChainCurveButton.Location = New System.Drawing.Point(297, 3)
-            Me.EditChainCurveButton.Name = "EditChainCurveButton"
-            Me.EditChainCurveButton.Size = New System.Drawing.Size(288, 24)
-            Me.EditChainCurveButton.TabIndex = 14
-            Me.EditChainCurveButton.Text = "Edit"
-            Me.EditChainCurveButton.UseVisualStyleBackColor = True
-            '
-            'AddNewChainCurveButton
-            '
-            Me.AddNewChainCurveButton.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.AddNewChainCurveButton.Location = New System.Drawing.Point(3, 3)
-            Me.AddNewChainCurveButton.Name = "AddNewChainCurveButton"
-            Me.AddNewChainCurveButton.Size = New System.Drawing.Size(288, 24)
-            Me.AddNewChainCurveButton.TabIndex = 13
-            Me.AddNewChainCurveButton.Text = "Add new"
-            Me.AddNewChainCurveButton.UseVisualStyleBackColor = True
-            '
             'PortTreeCM
             '
             Me.PortTreeCM.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddToolStripMenuItem, Me.ToolStripSeparator1, Me.RenameToolStripMenuItem, Me.DeleteToolStripMenuItem})
             Me.PortTreeCM.Name = "PortTreeCM"
-            Me.PortTreeCM.Size = New System.Drawing.Size(114, 76)
+            Me.PortTreeCM.Size = New System.Drawing.Size(118, 76)
             '
             'AddToolStripMenuItem
             '
             Me.AddToolStripMenuItem.Name = "AddToolStripMenuItem"
-            Me.AddToolStripMenuItem.Size = New System.Drawing.Size(113, 22)
+            Me.AddToolStripMenuItem.Size = New System.Drawing.Size(117, 22)
             Me.AddToolStripMenuItem.Text = "Add..."
             '
             'ToolStripSeparator1
             '
             Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-            Me.ToolStripSeparator1.Size = New System.Drawing.Size(110, 6)
+            Me.ToolStripSeparator1.Size = New System.Drawing.Size(114, 6)
             '
             'RenameToolStripMenuItem
             '
             Me.RenameToolStripMenuItem.Name = "RenameToolStripMenuItem"
-            Me.RenameToolStripMenuItem.Size = New System.Drawing.Size(113, 22)
+            Me.RenameToolStripMenuItem.Size = New System.Drawing.Size(117, 22)
             Me.RenameToolStripMenuItem.Text = "Rename"
             '
             'DeleteToolStripMenuItem
             '
             Me.DeleteToolStripMenuItem.Name = "DeleteToolStripMenuItem"
-            Me.DeleteToolStripMenuItem.Size = New System.Drawing.Size(113, 22)
+            Me.DeleteToolStripMenuItem.Size = New System.Drawing.Size(117, 22)
             Me.DeleteToolStripMenuItem.Text = "Delete"
             '
             'ChainsListsCMS
             '
             Me.ChainsListsCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddCLTSMI, Me.EditCLTSMI, Me.DeleteCLTSMI, Me.ReloadCLTSMI})
             Me.ChainsListsCMS.Name = "ChainsListsCMS"
-            Me.ChainsListsCMS.Size = New System.Drawing.Size(136, 92)
+            Me.ChainsListsCMS.Size = New System.Drawing.Size(143, 92)
             '
             'AddCLTSMI
             '
             Me.AddCLTSMI.Name = "AddCLTSMI"
-            Me.AddCLTSMI.Size = New System.Drawing.Size(135, 22)
+            Me.AddCLTSMI.Size = New System.Drawing.Size(142, 22)
             Me.AddCLTSMI.Text = "Add..."
             '
             'EditCLTSMI
             '
             Me.EditCLTSMI.Name = "EditCLTSMI"
-            Me.EditCLTSMI.Size = New System.Drawing.Size(135, 22)
+            Me.EditCLTSMI.Size = New System.Drawing.Size(142, 22)
             Me.EditCLTSMI.Text = "Edit..."
             '
             'DeleteCLTSMI
             '
             Me.DeleteCLTSMI.Name = "DeleteCLTSMI"
-            Me.DeleteCLTSMI.Size = New System.Drawing.Size(135, 22)
+            Me.DeleteCLTSMI.Size = New System.Drawing.Size(142, 22)
             Me.DeleteCLTSMI.Text = "Delete..."
             '
             'ReloadCLTSMI
             '
             Me.ReloadCLTSMI.Name = "ReloadCLTSMI"
-            Me.ReloadCLTSMI.Size = New System.Drawing.Size(135, 22)
+            Me.ReloadCLTSMI.Size = New System.Drawing.Size(142, 22)
             Me.ReloadCLTSMI.Text = "Reload items"
             '
             'CustomBondListCMS
             '
             Me.CustomBondListCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddNewCustomBondTSMI, Me.DeleteCustomBondTSMI, Me.RenameCustomBondTSMI})
             Me.CustomBondListCMS.Name = "CustomBondListCMS"
-            Me.CustomBondListCMS.Size = New System.Drawing.Size(129, 70)
+            Me.CustomBondListCMS.Size = New System.Drawing.Size(131, 70)
             '
             'AddNewCustomBondTSMI
             '
             Me.AddNewCustomBondTSMI.Name = "AddNewCustomBondTSMI"
-            Me.AddNewCustomBondTSMI.Size = New System.Drawing.Size(128, 22)
+            Me.AddNewCustomBondTSMI.Size = New System.Drawing.Size(130, 22)
             Me.AddNewCustomBondTSMI.Text = "Add new..."
             '
             'DeleteCustomBondTSMI
             '
             Me.DeleteCustomBondTSMI.Name = "DeleteCustomBondTSMI"
-            Me.DeleteCustomBondTSMI.Size = New System.Drawing.Size(128, 22)
+            Me.DeleteCustomBondTSMI.Size = New System.Drawing.Size(130, 22)
             Me.DeleteCustomBondTSMI.Text = "Delete"
             '
             'RenameCustomBondTSMI
             '
             Me.RenameCustomBondTSMI.Name = "RenameCustomBondTSMI"
-            Me.RenameCustomBondTSMI.Size = New System.Drawing.Size(128, 22)
+            Me.RenameCustomBondTSMI.Size = New System.Drawing.Size(130, 22)
             Me.RenameCustomBondTSMI.Text = "Rename..."
             '
             'TableLayoutPanel10
@@ -761,7 +419,6 @@
             Me.MainTabControl.Controls.Add(Me.PortfoliosPage)
             Me.MainTabControl.Controls.Add(Me.ChainsPage)
             Me.MainTabControl.Controls.Add(Me.CustomBondsPage)
-            Me.MainTabControl.Controls.Add(ChainCurvesTP)
             Me.MainTabControl.Controls.Add(Me.FieldsPage)
             Me.MainTabControl.Controls.Add(Me.DataPage)
             Me.MainTabControl.Dock = System.Windows.Forms.DockStyle.Fill
@@ -1842,30 +1499,30 @@
             '
             Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.OpenToolStripMenuItem, Me.ImportToolStripMenuItem, Me.ToolStripMenuItem1, Me.CloseToolStripMenuItem})
             Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
-            Me.FileToolStripMenuItem.Size = New System.Drawing.Size(35, 20)
+            Me.FileToolStripMenuItem.Size = New System.Drawing.Size(37, 20)
             Me.FileToolStripMenuItem.Text = "File"
             '
             'OpenToolStripMenuItem
             '
             Me.OpenToolStripMenuItem.Name = "OpenToolStripMenuItem"
-            Me.OpenToolStripMenuItem.Size = New System.Drawing.Size(118, 22)
+            Me.OpenToolStripMenuItem.Size = New System.Drawing.Size(119, 22)
             Me.OpenToolStripMenuItem.Text = "Open..."
             '
             'ImportToolStripMenuItem
             '
             Me.ImportToolStripMenuItem.Name = "ImportToolStripMenuItem"
-            Me.ImportToolStripMenuItem.Size = New System.Drawing.Size(118, 22)
+            Me.ImportToolStripMenuItem.Size = New System.Drawing.Size(119, 22)
             Me.ImportToolStripMenuItem.Text = "Import..."
             '
             'ToolStripMenuItem1
             '
             Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(115, 6)
+            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(116, 6)
             '
             'CloseToolStripMenuItem
             '
             Me.CloseToolStripMenuItem.Name = "CloseToolStripMenuItem"
-            Me.CloseToolStripMenuItem.Size = New System.Drawing.Size(118, 22)
+            Me.CloseToolStripMenuItem.Size = New System.Drawing.Size(119, 22)
             Me.CloseToolStripMenuItem.Text = "Close"
             '
             'ErrProv
@@ -1881,16 +1538,6 @@
             Me.MainMenuStrip = Me.MenuStrip1
             Me.Name = "PortfolioForm"
             Me.Text = "Portfolio manager"
-            ChainCurvesTP.ResumeLayout(False)
-            Me.TableLayoutPanel5.ResumeLayout(False)
-            CType(Me.ChainCurvesDGV, System.ComponentModel.ISupportInitialize).EndInit()
-            TableLayoutPanel11.ResumeLayout(False)
-            TableLayoutPanel11.PerformLayout()
-            Me.FlowLayoutPanel5.ResumeLayout(False)
-            CType(Me.ChainCurveColorPB, System.ComponentModel.ISupportInitialize).EndInit()
-            FlowLayoutPanel6.ResumeLayout(False)
-            FlowLayoutPanel6.PerformLayout()
-            TableLayoutPanel12.ResumeLayout(False)
             Me.PortTreeCM.ResumeLayout(False)
             Me.ChainsListsCMS.ResumeLayout(False)
             Me.CustomBondListCMS.ResumeLayout(False)
@@ -2050,23 +1697,7 @@
         Friend WithEvents ImportToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents ToolStripMenuItem1 As System.Windows.Forms.ToolStripSeparator
         Friend WithEvents CloseToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-        Friend WithEvents TableLayoutPanel5 As System.Windows.Forms.TableLayoutPanel
-        Friend WithEvents ChainCurvesDGV As System.Windows.Forms.DataGridView
-        Friend WithEvents ChainCurveSkipTB As System.Windows.Forms.TextBox
-        Friend WithEvents ChainCurveNameTB As System.Windows.Forms.TextBox
-        Friend WithEvents ChainCurveRicTB As System.Windows.Forms.TextBox
-        Friend WithEvents ChainCurveColorCB As System.Windows.Forms.ComboBox
-        Friend WithEvents ChainCurveColorPB As System.Windows.Forms.PictureBox
-        Friend WithEvents RandomColorChainCurveButton As System.Windows.Forms.Button
-        Friend WithEvents ChainCurveFieldSetCB As System.Windows.Forms.ComboBox
-        Friend WithEvents DeleteChainCurveButton As System.Windows.Forms.Button
-        Friend WithEvents EditChainCurveButton As System.Windows.Forms.Button
-        Friend WithEvents AddNewChainCurveButton As System.Windows.Forms.Button
         Friend WithEvents ErrProv As System.Windows.Forms.ErrorProvider
-        Friend WithEvents FlowLayoutPanel5 As System.Windows.Forms.FlowLayoutPanel
-        Friend WithEvents SaveChainCurveChangesButton As System.Windows.Forms.Button
-        Friend WithEvents ChainCurvePatternTB As System.Windows.Forms.TextBox
-        Friend WithEvents AddItemTagButton As System.Windows.Forms.Button
         Friend WithEvents RegularBondsCB As System.Windows.Forms.CheckBox
     End Class
 End Namespace

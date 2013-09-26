@@ -72,6 +72,7 @@ Namespace Bonds
         Private ReadOnly _lastRating As RatingDescr
 
         Private ReadOnly _seniorityType As String
+        Private ReadOnly _instrumentType As String
 
         Private ReadOnly _label1 As String
         Private ReadOnly _label2 As String
@@ -103,7 +104,8 @@ Namespace Bonds
         End Sub
 
         Sub New(ByVal ric As String, ByVal shortName As String, ByVal label As String, ByVal maturity As Date?, ByVal coupon As Double, ByVal paymentStructure As String, ByVal rateStructure As String, ByVal issueDate As Date, ByVal label1 As String, ByVal label2 As String, ByVal label3 As String, ByVal label4 As String,
-                ByVal issuerName As String, ByVal borrowerName As String, ByVal currency As String, ByVal putable As Boolean, ByVal callable As Boolean, ByVal floater As Boolean, ByVal lastIssueRating As RatingDescr, ByVal lastIssuerRating As RatingDescr, ByVal lastRating As RatingDescr, ByVal seniorityType As String, ByVal industry As String, ByVal subIndustry As String)
+                ByVal issuerName As String, ByVal borrowerName As String, ByVal currency As String, ByVal putable As Boolean, ByVal callable As Boolean, ByVal floater As Boolean, ByVal lastIssueRating As RatingDescr, ByVal lastIssuerRating As RatingDescr, ByVal lastRating As RatingDescr, ByVal seniorityType As String,
+                ByVal industry As String, ByVal subIndustry As String, instrumentType As String)
             _ric = ric
             _shortName = shortName
             _label = label
@@ -129,6 +131,7 @@ Namespace Bonds
             _seniorityType = seniorityType
             _industry = industry
             _subIndustry = subIndustry
+            _instrumentType = instrumentType
         End Sub
 
         <Hideable()>
@@ -343,10 +346,19 @@ Namespace Bonds
             End Get
         End Property
 
+        <Hideable()>
+        <DisplayName("Type of instrument")>
+        <Filterable()>
+        <Sortable()>
+        Public ReadOnly Property InstrumentType As String
+            Get
+                Return _instrumentType
+            End Get
+        End Property
+
         Public Function GetCouponByDate(ByVal dt As Date) As Double
             Return BondsData.Instance.GetBondPayments(_ric).GetCoupon(dt)
         End Function
-
 
         Public Shared Function GetHideableFields() As List(Of String)
             Return (From field In GetType(BondMetadata).GetProperties(BindingFlags.Instance Or BindingFlags.Public)

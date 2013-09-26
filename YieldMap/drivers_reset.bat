@@ -5,7 +5,7 @@ if exist "%USERPROFILE%\Local Settings\Application Data\%FLD%" (
 	set THPATH=%USERPROFILE%\Local Settings\Application Data\%FLD%
 	
 ) else if exist "%LOCALAPPDATA%\%FLD%" (
-	set THPATH=%CommonProgramFiles%\%FLD%
+	set THPATH=%LOCALAPPDATA%\%FLD%
 
 ) else if exist "%CommonProgramFiles%\%FLD%" (
 	set THPATH=%CommonProgramFiles%\%FLD%

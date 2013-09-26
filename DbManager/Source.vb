@@ -1,5 +1,6 @@
 ﻿Imports System.ComponentModel
 Imports DbManager.Bonds
+Imports System.Globalization
 Imports Logging
 Imports NLog
 Imports Uitls
@@ -491,7 +492,7 @@ Public Class UserQuerySrc
         MyBase.New(color, fieldSetId, enabled, curve, name, False)
         _mySource = src
         _condition = cond
-        If addsrc Then PortMan.AddSource(Me)
+        If addSrc Then PortMan.AddSource(Me)
     End Sub
 
     Public Sub New(ByVal id As String, ByVal color As String, ByVal fields As FieldSet, ByVal enabled As Boolean, ByVal curve As Boolean, ByVal name As String)
@@ -744,9 +745,9 @@ Public Class CustomBondSrc
             Dim name = node.GetAttrStrict("name")
             Dim struct = node.GetAttrStrict("bondStructure")
             Dim maturity = node.GetAttrStrict("maturity")
-            Dim coupon = node.GetAttrStrict("coupon")
+            Dim cpn As Double = Double.Parse(node.GetAttrStrict("coupon"), CultureInfo.InvariantCulture)
             Dim bndId = node.GetAttrStrict("id")
-            Return New CustomBondSrc(bndId, color, name, cd, struct, maturity, coupon)
+            Return New CustomBondSrc(bndId, color, name, cd, struct, maturity, cpn)
         Catch ex As Exception
             Throw New NoSourceException(String.Format("Failed to find custom bond with code {0}", cd), ex)
         End Try
@@ -761,8 +762,9 @@ Public Class CustomBondSrc
             Dim code = node.GetAttrStrict("code")
             Dim struct = node.GetAttrStrict("bondStructure")
             Dim maturity = node.GetAttrStrict("maturity")
-            Dim coupon = node.GetAttrStrict("coupon")
-            Return New CustomBondSrc(bndId, color, name, code, struct, maturity, coupon)
+            Dim cpn As Double = Double.Parse(node.GetAttrStrict("coupon"), CultureInfo.InvariantCulture)
+
+            Return New CustomBondSrc(bndId, color, name, code, struct, maturity, cpn)
         Catch ex As Exception
             Throw New NoSourceException(String.Format("Failed to find custom bond with id {0}", bndId), ex)
         End Try
@@ -775,7 +777,7 @@ Public Class CustomBondSrc
         Catch ex As Exception
             newDt = Today
         End Try
-        Return New BondMetadata(_code, _maturity, _currentCouponRate, _struct.ToString(), "RM:YTM", "Custom", _code, newDt)
+        Return New BondMetadata(_code, _maturity, _currentCouponRate * 100, _struct.AdfinStructure, "RM:YTM", "Custom", _code, newDt)
     End Function
 End Class
 

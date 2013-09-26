@@ -192,7 +192,8 @@ Namespace Tools.Elements
                                                                               "RM:" & rateStructure, "", "RES:BDPRICE")
                             params(i, 4) = priceObject.GetValue(1)
                         Else
-                            params(i, 4) = main.Price / 100.0
+
+                            params(i, 4) = If(meta.InstrumentType = "Bill" And main.Price < 1, 100 - main.Price, main.Price) / 100.0
                         End If
 
                         params(i, 5) = meta.PaymentStructure

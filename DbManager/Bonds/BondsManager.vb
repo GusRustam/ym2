@@ -96,6 +96,7 @@ Namespace Bonds
             Dim rateStructure = If(Not IsDBNull(descr("rateStructure")), descr.rateStructure, "")
             Dim ric = If(Not IsDBNull(descr("ric")), descr.ric, "")
             Dim paymentStructure = If(Not IsDBNull(descr("bondStructure")), descr.bondStructure, "")
+            Dim intstrumentType = If(Not IsDBNull(descr("instrumentType")), descr.instrumentType, "")
             Dim shortName = If(Not IsDBNull(descr("shortName")), descr.shortName, "")
             Dim description = If(Not IsDBNull(descr("description")), descr.description, "")
             Dim issuerName = If(Not IsDBNull(descr("issuerName")), descr.issuerName, "")
@@ -142,7 +143,7 @@ Namespace Bonds
             Return New BondMetadata(ric, sN, sN, maturityDate, coupon, paymentStructure, rateStructure, issueDate, sN,
                                        label2, description, series, issuerName, borrowerName, currency,
                                        isPutable, isCallable, isFloater, lastIssueRating, lastIssuerRating, lastRating,
-                                       seniorityType, industry, subIndustry)
+                                       seniorityType, industry, subIndustry, intstrumentType)
         End Function
 
         'Private Shared Function SkipSlash(ByVal aRic As String) As String
@@ -153,6 +154,7 @@ Namespace Bonds
 
         Public Function GetBondPayments(ByVal aRic As String) As BondPayments Implements IBondsData.GetBondPayments
             'aRic = SkipSlash(aRic)
+            If Not _subRicToRic.ContainsKey(aRic) Then Return Nothing
             Dim descr = (From row In _ldr.GetBondsTable() Where row.ric = _subRicToRic(aRic) Select row).First()
             Dim rows = (From row In _ldr.GetCouponsTable()
                         Where row.ric = _subRicToRic(aRic)
@@ -264,9 +266,10 @@ Namespace Bonds
             New Dex2Field("EJV.C.IssuerCountry", BondsTable.issuerCountryColumn.ColumnName),
             New Dex2Field("RI.ID.ISIN", BondsTable.isinColumn.ColumnName),
             New Dex2Field("EJV.C.ParentTicker", BondsTable.parentTickerColumn.ColumnName),
-            New Dex2Field("EJV.C.SeniorityTypeDescription ", BondsTable.seniorityTypeColumn.ColumnName),
-            New Dex2Field("EJV.C.SPIndustryDescription ", BondsTable.industryColumn.ColumnName),
-            New Dex2Field("EJV.C.SPIndustrySubDescription ", BondsTable.subIndustryColumn.ColumnName)
+            New Dex2Field("EJV.C.SeniorityTypeDescription", BondsTable.seniorityTypeColumn.ColumnName),
+            New Dex2Field("EJV.C.SPIndustryDescription", BondsTable.industryColumn.ColumnName),
+            New Dex2Field("EJV.C.SPIndustrySubDescription", BondsTable.subIndustryColumn.ColumnName),
+            New Dex2Field("EJV.C.InstrumentTypeDescription", BondsTable.instrumentTypeColumn.ColumnName)
         }.ToList(), "RH:In")
 
         Private Shared ReadOnly QueryIssueRating As New Dex2Query({
@@ -479,16 +482,19 @@ Namespace Bonds
             Else
                 Logger.Info("Importing {0} data rows into table {1}", data.Count, table.TableName)
                 Try
+                    Dim invalidRow As Boolean
                     For Each slot In data
                         Dim rw = table.NewRow()
+                        invalidRow = False
                         For Each colName In slot.Keys
                             Dim elem = slot(colName)
                             If elem Is Nothing Then Continue For
                             If elem.ToString().StartsWith("Unable to collect data") Then
                                 Logger.Warn("Unable to import data on {0}", colName)
-                                Continue For
-                                ' Throw New InvalidOperationException()
+                                invalidRow = True
+                                Exit For
                             End If
+
                             If query.IsBool(colName) Then
                                 rw(colName) = (elem = "Y")
                             ElseIf query.IsDate(colName) Then
@@ -496,10 +502,10 @@ Namespace Bonds
                             ElseIf query.IsNum(colName) Then
                                 If IsNumeric(elem) Then rw(colName) = Double.Parse(elem)
                             Else
-                                rw(colName) = elem '.ToString()
+                                rw(colName) = elem
                             End If
                         Next
-                        table.Rows.Add(rw)
+                        If Not invalidRow Then table.Rows.Add(rw)
                     Next
                 Catch ex As Exception
                     Logger.ErrorException("Failed to import data to table" + table.TableName, ex)

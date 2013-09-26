@@ -273,9 +273,13 @@ Namespace Tools.Elements
         End Sub
 
         Private Sub CalculateYields(ByVal prc As Double)
-            Price = prc
             Dim dscr = ParentBond.MetaData
-            Logger.Trace("CalculateYields({0}, {1}, {2})", Price, dscr.Ric, ParentBond.YieldMode)
+            Logger.Trace("CalculateYields({0}, {1}, {2})", prc, dscr.Ric, ParentBond.YieldMode)
+
+            Price = prc
+            If dscr.InstrumentType = "Bill" And prc < 1 Then
+                prc = 100 - prc
+            End If
 
             Dim coupon = ParentBond.Coupon(YieldAtDate)
             Dim settleDate = _bondModule.BdSettle(YieldAtDate, dscr.PaymentStructure)
@@ -283,7 +287,7 @@ Namespace Tools.Elements
 
             Dim yieldCalcMode = ParentBond.YieldMode
             Dim rateStructure = If(Not yieldCalcMode.Belongs("Default", ""), Regex.Replace(dscr.RateStructure, "YT[A-Z]", yieldCalcMode), dscr.RateStructure)
-            Dim bondYield As Array = _bondModule.AdBondYield(settleDate, Price / 100, dscr.Maturity, coupon, dscr.PaymentStructure, rateStructure, "")
+            Dim bondYield As Array = _bondModule.AdBondYield(settleDate, prc / 100, dscr.Maturity, coupon, dscr.PaymentStructure, rateStructure, "")
 
             'Dim bondYield As Array = _bondModule.AdBondYield(settleDate, Price / 100, dscr.Maturity, coupon, dscr.PaymentStructure, Regex.Replace(rateStructure, "YT[A-Z]", SettingsManager.Instance.YieldCalcMode), "")
             _yields = New YieldContainer(bondYield, ParentBond.UserDefinedSpread(Ordinate.Yield))

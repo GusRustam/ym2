@@ -679,6 +679,17 @@ Namespace Forms.ChartForm
             _ansamble.SwapCurves.Add(usdIRS)
         End Sub
 
+        Private Sub EurIRS_TSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles EurIRSToolStripMenuItem.Click
+            Logger.Debug("EurIRSToolStripMenuItem()")
+            Dim eurIrs = New EurIRS(_ansamble)
+            AddHandler eurIrs.Cleared, Sub() ClearSeries(eurIrs.Identity)
+            AddHandler eurIrs.Updated, Sub(data As List(Of PointOfCurve)) OnSwapCurvePaint(data, eurIrs)
+            AddHandler eurIrs.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnSwapCurvePaint(data, eurIrs)
+
+            eurIrs.Subscribe()
+            _ansamble.SwapCurves.Add(eurIrs)
+        End Sub
+
         Private Sub NDFTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles NDFTSMI.Click
             Logger.Debug("NDFTSMI_Click()")
             Dim rubNDF = New RubNDF(_ansamble)
@@ -690,6 +701,16 @@ Namespace Forms.ChartForm
             _ansamble.SwapCurves.Add(rubNDF)
         End Sub
 
+        Private Sub UahNDFTSMIClick(ByVal sender As Object, ByVal e As EventArgs) Handles UahNDFToolStripMenuItem.Click
+            Logger.Debug("NDFTSMI_Click()")
+            Dim uahNDF = New UahNDF(_ansamble)
+            AddHandler uahNDF.Cleared, Sub() ClearSeries(uahNDF.Identity)
+            AddHandler uahNDF.Updated, Sub(data As List(Of PointOfCurve)) OnSwapCurvePaint(data, uahNDF)
+            AddHandler uahNDF.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) If _ansamble.YSource = ord Then OnSwapCurvePaint(data, uahNDF)
+
+            uahNDF.Subscribe()
+            _ansamble.SwapCurves.Add(uahNDF)
+        End Sub
         Private Sub ShowLegendTSBClicked(ByVal sender As Object, ByVal e As EventArgs) Handles ShowLegendTSB.Click
             TheChart.Legends(0).Enabled = ShowLegendTSB.Checked
         End Sub
@@ -815,11 +836,11 @@ Namespace Forms.ChartForm
             DoAddNew(From chain In portfolioManager.ChainsView Where chain.Curve And chain.Enabled)
             DoAddNew(From list In portfolioManager.UserListsView Where list.Curve And list.Enabled)
 
-            ChainCurvesToolStripMenuItem.DropDownItems.Clear()
-            For Each curve In portfolioManager.CurveChainsView
-                Dim tmp = curve
-                ChainCurvesToolStripMenuItem.DropDownItems.Add(tmp.Name, Nothing, Sub() AddChainCurve(tmp.ID))
-            Next
+            'ChainCurvesToolStripMenuItem.DropDownItems.Clear()
+            'For Each curve In portfolioManager.CurveChainsView
+            '    Dim tmp = curve
+            '    ChainCurvesToolStripMenuItem.DropDownItems.Add(tmp.Name, Nothing, Sub() AddChainCurve(tmp.ID))
+            'Next
         End Sub
 
         Private Sub AddChainCurve(ByVal id As Long)

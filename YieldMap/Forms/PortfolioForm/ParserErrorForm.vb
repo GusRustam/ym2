@@ -56,7 +56,7 @@ Namespace Forms.PortfolioForm
                     x.Allows(New BondMetadata("X", "X", "X", Date.Today, 10, "X", "X", Date.Today, "X", "X", "X", "X", "X",
                              "X", "X", True, True, True, New RatingDescr(Rating.Other, Nothing, Nothing),
                              New RatingDescr(Rating.Other, Nothing, Nothing),
-                             New RatingDescr(Rating.Other, Nothing, Nothing), "x", "x", "x"))
+                             New RatingDescr(Rating.Other, Nothing, Nothing), "x", "x", "x", "x"))
                 Catch ex As InterpreterException
                     MessagesTB.ForeColor = Color.DarkRed
                     MessagesTB.Text = "Failed to interpret " + Environment.NewLine + ex.Message

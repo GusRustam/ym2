@@ -179,7 +179,8 @@ Namespace Tools.Elements
             If dscr.Price > 0 Then
                 Try
                     Dim settleDate = BondModule.BdSettle(DateTime.Today, data.PaymentStructure)
-                    Dim res As Array = SwapModule.AdAssetSwapBdSpread(settleDate, data.Maturity, rateArray, dscr.Price / 100.0,
+                    Dim price = If(data.InstrumentType = "Bill" And dscr.Price < 1.0, 100 - dscr.Price, dscr.Price)
+                    Dim res As Array = SwapModule.AdAssetSwapBdSpread(settleDate, data.Maturity, rateArray, price / 100.0,
                                                                       data.Coupon / 100.0, floatingRate, data.PaymentStructure,
                                                                       floatLegStructure, "ZCTYPE:RATE IM:LIX RM:YC", "")
                     Return res.GetValue(1, 1) + dscr.ParentBond.UserDefinedSpread(AswSpread)
@@ -268,7 +269,8 @@ Namespace Tools.Elements
             If dscr.Price > 0 Then
                 Try
                     Dim settleDate = BondModule.BdSettle(DateTime.Today, data.PaymentStructure)
-                    Return BondModule.AdBondSpread(settleDate, rateArray, dscr.Price / 100.0,
+                    Dim prc = If(data.InstrumentType = "Bill" And dscr.Price < 1, 100 - dscr.Price, dscr.Price)
+                    Return BondModule.AdBondSpread(settleDate, rateArray, prc / 100.0,
                                                    data.Maturity, data.Coupon / 100.0,
                                                    data.PaymentStructure, "ZCTYPE:RATE IM:LIX RM:YC", "", "")
                 Catch ex As Exception

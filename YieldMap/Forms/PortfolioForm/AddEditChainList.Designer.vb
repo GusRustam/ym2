@@ -44,11 +44,11 @@
             Me.FlowLayoutPanel2 = New System.Windows.Forms.FlowLayoutPanel()
             Me.ChainRadioButton = New System.Windows.Forms.RadioButton()
             Me.ListRadioButton = New System.Windows.Forms.RadioButton()
+            Me.QueryRadioButton = New System.Windows.Forms.RadioButton()
             Me.Label8 = New System.Windows.Forms.Label()
             Me.FlowLayoutPanel3 = New System.Windows.Forms.FlowLayoutPanel()
             Me.ConditionTextBox = New System.Windows.Forms.TextBox()
             Me.EditConditionButton = New System.Windows.Forms.Button()
-            Me.QueryRadioButton = New System.Windows.Forms.RadioButton()
             Me.ChainRicTextBox = New System.Windows.Forms.ComboBox()
             Me.TableLayoutPanel1.SuspendLayout()
             Me.FlowLayoutPanel1.SuspendLayout()
@@ -297,6 +297,17 @@
             Me.ListRadioButton.Text = "List"
             Me.ListRadioButton.UseVisualStyleBackColor = True
             '
+            'QueryRadioButton
+            '
+            Me.QueryRadioButton.AutoSize = True
+            Me.QueryRadioButton.Location = New System.Drawing.Point(108, 3)
+            Me.QueryRadioButton.Name = "QueryRadioButton"
+            Me.QueryRadioButton.Size = New System.Drawing.Size(53, 17)
+            Me.QueryRadioButton.TabIndex = 2
+            Me.QueryRadioButton.TabStop = True
+            Me.QueryRadioButton.Text = "Query"
+            Me.QueryRadioButton.UseVisualStyleBackColor = True
+            '
             'Label8
             '
             Me.Label8.AutoSize = True
@@ -334,17 +345,6 @@
             Me.EditConditionButton.TabIndex = 1
             Me.EditConditionButton.Text = "Edit..."
             Me.EditConditionButton.UseVisualStyleBackColor = True
-            '
-            'QueryRadioButton
-            '
-            Me.QueryRadioButton.AutoSize = True
-            Me.QueryRadioButton.Location = New System.Drawing.Point(108, 3)
-            Me.QueryRadioButton.Name = "QueryRadioButton"
-            Me.QueryRadioButton.Size = New System.Drawing.Size(53, 17)
-            Me.QueryRadioButton.TabIndex = 2
-            Me.QueryRadioButton.TabStop = True
-            Me.QueryRadioButton.Text = "Query"
-            Me.QueryRadioButton.UseVisualStyleBackColor = True
             '
             'ChainRicTextBox
             '

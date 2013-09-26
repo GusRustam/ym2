@@ -32,8 +32,8 @@
             Dim Label4 As System.Windows.Forms.Label
             Dim Label5 As System.Windows.Forms.Label
             Dim Label7 As System.Windows.Forms.Label
-            Dim ChartArea2 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-            Dim Legend2 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+            Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+            Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
             Me.TheStatusStrip = New System.Windows.Forms.StatusStrip()
             Me.StatusMessage = New System.Windows.Forms.ToolStripStatusLabel()
             Me.TheToolStrip = New System.Windows.Forms.ToolStrip()
@@ -48,6 +48,7 @@
             Me.RubCCSTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.NDFTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.UsdIRSTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.EurIRSToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Me.ChainCurvesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
             Me.ShowLegendTSB = New System.Windows.Forms.ToolStripButton()
@@ -184,6 +185,9 @@
             Me.BootstrappingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Me.BondCurveImportantTSS = New System.Windows.Forms.ToolStripSeparator()
             Me.SelectDateToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.UahNDFToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.ToolStripMenuItem2 = New System.Windows.Forms.ToolStripSeparator()
+            Me.ToolStripMenuItem3 = New System.Windows.Forms.ToolStripSeparator()
             Label8 = New System.Windows.Forms.Label()
             Label3 = New System.Windows.Forms.Label()
             Label6 = New System.Windows.Forms.Label()
@@ -350,7 +354,7 @@
             Me.PortfolioTSSB.Image = Global.YieldMap.My.Resources.Resources.folder
             Me.PortfolioTSSB.ImageTransparentColor = System.Drawing.Color.Magenta
             Me.PortfolioTSSB.Name = "PortfolioTSSB"
-            Me.PortfolioTSSB.Size = New System.Drawing.Size(79, 22)
+            Me.PortfolioTSSB.Size = New System.Drawing.Size(85, 22)
             Me.PortfolioTSSB.Text = "Portfolio"
             '
             'CurvesTSMI
@@ -359,51 +363,58 @@
             Me.CurvesTSMI.Image = Global.YieldMap.My.Resources.Resources.graph_edge_curved
             Me.CurvesTSMI.ImageTransparentColor = System.Drawing.Color.Magenta
             Me.CurvesTSMI.Name = "CurvesTSMI"
-            Me.CurvesTSMI.Size = New System.Drawing.Size(73, 22)
+            Me.CurvesTSMI.Size = New System.Drawing.Size(75, 22)
             Me.CurvesTSMI.Text = "Curves"
             '
             'BondCurvesNewTSMI
             '
             Me.BondCurvesNewTSMI.Name = "BondCurvesNewTSMI"
-            Me.BondCurvesNewTSMI.Size = New System.Drawing.Size(169, 22)
+            Me.BondCurvesNewTSMI.Size = New System.Drawing.Size(180, 22)
             Me.BondCurvesNewTSMI.Text = "Bond curves"
             '
             'ToolStripMenuItem1
             '
-            Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RubIRSTSMI, Me.RubCCSTSMI, Me.NDFTSMI, Me.UsdIRSTSMI})
+            Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RubIRSTSMI, Me.RubCCSTSMI, Me.NDFTSMI, Me.ToolStripMenuItem2, Me.UahNDFToolStripMenuItem, Me.ToolStripMenuItem3, Me.UsdIRSTSMI, Me.EurIRSToolStripMenuItem})
             Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
-            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(169, 22)
+            Me.ToolStripMenuItem1.Size = New System.Drawing.Size(180, 22)
             Me.ToolStripMenuItem1.Text = "Built-in swap curves"
             '
             'RubIRSTSMI
             '
             Me.RubIRSTSMI.Name = "RubIRSTSMI"
-            Me.RubIRSTSMI.Size = New System.Drawing.Size(116, 22)
+            Me.RubIRSTSMI.Size = New System.Drawing.Size(152, 22)
             Me.RubIRSTSMI.Text = "Rub IRS"
             '
             'RubCCSTSMI
             '
             Me.RubCCSTSMI.Name = "RubCCSTSMI"
-            Me.RubCCSTSMI.Size = New System.Drawing.Size(116, 22)
+            Me.RubCCSTSMI.Size = New System.Drawing.Size(152, 22)
             Me.RubCCSTSMI.Text = "Rub CCS"
             '
             'NDFTSMI
             '
             Me.NDFTSMI.Name = "NDFTSMI"
-            Me.NDFTSMI.Size = New System.Drawing.Size(116, 22)
-            Me.NDFTSMI.Text = "NDF"
+            Me.NDFTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.NDFTSMI.Text = "Rub NDF"
             '
             'UsdIRSTSMI
             '
             Me.UsdIRSTSMI.Name = "UsdIRSTSMI"
-            Me.UsdIRSTSMI.Size = New System.Drawing.Size(116, 22)
+            Me.UsdIRSTSMI.Size = New System.Drawing.Size(152, 22)
             Me.UsdIRSTSMI.Text = "Usd IRS"
+            '
+            'EurIRSToolStripMenuItem
+            '
+            Me.EurIRSToolStripMenuItem.Name = "EurIRSToolStripMenuItem"
+            Me.EurIRSToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.EurIRSToolStripMenuItem.Text = "Eur IRS"
             '
             'ChainCurvesToolStripMenuItem
             '
             Me.ChainCurvesToolStripMenuItem.Name = "ChainCurvesToolStripMenuItem"
-            Me.ChainCurvesToolStripMenuItem.Size = New System.Drawing.Size(169, 22)
+            Me.ChainCurvesToolStripMenuItem.Size = New System.Drawing.Size(180, 22)
             Me.ChainCurvesToolStripMenuItem.Text = "Chain curves"
+            Me.ChainCurvesToolStripMenuItem.Visible = False
             '
             'ToolStripSeparator2
             '
@@ -484,25 +495,25 @@
             'IssuerNameSeriesTSMI
             '
             Me.IssuerNameSeriesTSMI.Name = "IssuerNameSeriesTSMI"
-            Me.IssuerNameSeriesTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.IssuerNameSeriesTSMI.Size = New System.Drawing.Size(200, 22)
             Me.IssuerNameSeriesTSMI.Text = "Issuer Series"
             '
             'ShortNameTSMI
             '
             Me.ShortNameTSMI.Name = "ShortNameTSMI"
-            Me.ShortNameTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.ShortNameTSMI.Size = New System.Drawing.Size(200, 22)
             Me.ShortNameTSMI.Text = "Issuer Coupon-Maturity"
             '
             'DescriptionTSMI
             '
             Me.DescriptionTSMI.Name = "DescriptionTSMI"
-            Me.DescriptionTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.DescriptionTSMI.Size = New System.Drawing.Size(200, 22)
             Me.DescriptionTSMI.Text = "Description"
             '
             'SeriesOnlyTSMI
             '
             Me.SeriesOnlyTSMI.Name = "SeriesOnlyTSMI"
-            Me.SeriesOnlyTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.SeriesOnlyTSMI.Size = New System.Drawing.Size(200, 22)
             Me.SeriesOnlyTSMI.Text = "Series Only"
             '
             'BondCurveTSMI
@@ -516,7 +527,7 @@
             '
             Me.XxxToolStripMenuItem.Enabled = False
             Me.XxxToolStripMenuItem.Name = "XxxToolStripMenuItem"
-            Me.XxxToolStripMenuItem.Size = New System.Drawing.Size(181, 22)
+            Me.XxxToolStripMenuItem.Size = New System.Drawing.Size(191, 22)
             Me.XxxToolStripMenuItem.Text = "Curve menu loading..."
             '
             'YieldCalcModeSep
@@ -535,43 +546,43 @@
             'DefaultToolStripMenuItem
             '
             Me.DefaultToolStripMenuItem.Name = "DefaultToolStripMenuItem"
-            Me.DefaultToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.DefaultToolStripMenuItem.Size = New System.Drawing.Size(109, 22)
             Me.DefaultToolStripMenuItem.Text = "Default"
             '
             'YTMToolStripMenuItem
             '
             Me.YTMToolStripMenuItem.Name = "YTMToolStripMenuItem"
-            Me.YTMToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.YTMToolStripMenuItem.Size = New System.Drawing.Size(109, 22)
             Me.YTMToolStripMenuItem.Text = "YTM"
             '
             'YTPToolStripMenuItem
             '
             Me.YTPToolStripMenuItem.Name = "YTPToolStripMenuItem"
-            Me.YTPToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.YTPToolStripMenuItem.Size = New System.Drawing.Size(109, 22)
             Me.YTPToolStripMenuItem.Text = "YTP"
             '
             'YTCToolStripMenuItem
             '
             Me.YTCToolStripMenuItem.Name = "YTCToolStripMenuItem"
-            Me.YTCToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.YTCToolStripMenuItem.Size = New System.Drawing.Size(109, 22)
             Me.YTCToolStripMenuItem.Text = "YTC"
             '
             'YTBToolStripMenuItem
             '
             Me.YTBToolStripMenuItem.Name = "YTBToolStripMenuItem"
-            Me.YTBToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.YTBToolStripMenuItem.Size = New System.Drawing.Size(109, 22)
             Me.YTBToolStripMenuItem.Text = "YTB"
             '
             'YTAToolStripMenuItem
             '
             Me.YTAToolStripMenuItem.Name = "YTAToolStripMenuItem"
-            Me.YTAToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.YTAToolStripMenuItem.Size = New System.Drawing.Size(109, 22)
             Me.YTAToolStripMenuItem.Text = "YTA"
             '
             'YTWToolStripMenuItem
             '
             Me.YTWToolStripMenuItem.Name = "YTWToolStripMenuItem"
-            Me.YTWToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.YTWToolStripMenuItem.Size = New System.Drawing.Size(109, 22)
             Me.YTWToolStripMenuItem.Text = "YTW"
             '
             'DescriptionSep
@@ -913,14 +924,14 @@
             '
             Me.TheChart.BackImageAlignment = System.Windows.Forms.DataVisualization.Charting.ChartImageAlignmentStyle.Center
             Me.TheChart.BackImageWrapMode = System.Windows.Forms.DataVisualization.Charting.ChartImageWrapMode.Unscaled
-            ChartArea2.BackImageAlignment = System.Windows.Forms.DataVisualization.Charting.ChartImageAlignmentStyle.Center
-            ChartArea2.BackImageWrapMode = System.Windows.Forms.DataVisualization.Charting.ChartImageWrapMode.Unscaled
-            ChartArea2.Name = "ChartArea1"
-            Me.TheChart.ChartAreas.Add(ChartArea2)
+            ChartArea1.BackImageAlignment = System.Windows.Forms.DataVisualization.Charting.ChartImageAlignmentStyle.Center
+            ChartArea1.BackImageWrapMode = System.Windows.Forms.DataVisualization.Charting.ChartImageWrapMode.Unscaled
+            ChartArea1.Name = "ChartArea1"
+            Me.TheChart.ChartAreas.Add(ChartArea1)
             Me.TheChart.Dock = System.Windows.Forms.DockStyle.Fill
-            Legend2.Enabled = False
-            Legend2.Name = "Legend1"
-            Me.TheChart.Legends.Add(Legend2)
+            Legend1.Enabled = False
+            Legend1.Name = "Legend1"
+            Me.TheChart.Legends.Add(Legend1)
             Me.TheChart.Location = New System.Drawing.Point(0, 0)
             Me.TheChart.Name = "TheChart"
             Me.TheChart.Size = New System.Drawing.Size(778, 417)
@@ -940,188 +951,188 @@
             '
             Me.ChartCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToClipboardTSMI, Me.ClipboardSeparator, Me.SelectFromAListTSMI, Me.ToolStripSeparator14, Me.SelectChartDateTSMI})
             Me.ChartCMS.Name = "ChartCMS"
-            Me.ChartCMS.Size = New System.Drawing.Size(159, 82)
+            Me.ChartCMS.Size = New System.Drawing.Size(170, 82)
             '
             'CopyToClipboardTSMI
             '
             Me.CopyToClipboardTSMI.Name = "CopyToClipboardTSMI"
-            Me.CopyToClipboardTSMI.Size = New System.Drawing.Size(158, 22)
+            Me.CopyToClipboardTSMI.Size = New System.Drawing.Size(169, 22)
             Me.CopyToClipboardTSMI.Text = "Copy to clipboard"
             '
             'ClipboardSeparator
             '
             Me.ClipboardSeparator.Name = "ClipboardSeparator"
-            Me.ClipboardSeparator.Size = New System.Drawing.Size(155, 6)
+            Me.ClipboardSeparator.Size = New System.Drawing.Size(166, 6)
             '
             'SelectFromAListTSMI
             '
             Me.SelectFromAListTSMI.Name = "SelectFromAListTSMI"
-            Me.SelectFromAListTSMI.Size = New System.Drawing.Size(158, 22)
+            Me.SelectFromAListTSMI.Size = New System.Drawing.Size(169, 22)
             Me.SelectFromAListTSMI.Text = "Add bond..."
             '
             'ToolStripSeparator14
             '
             Me.ToolStripSeparator14.Name = "ToolStripSeparator14"
-            Me.ToolStripSeparator14.Size = New System.Drawing.Size(155, 6)
+            Me.ToolStripSeparator14.Size = New System.Drawing.Size(166, 6)
             '
             'SelectChartDateTSMI
             '
             Me.SelectChartDateTSMI.Name = "SelectChartDateTSMI"
-            Me.SelectChartDateTSMI.Size = New System.Drawing.Size(158, 22)
+            Me.SelectChartDateTSMI.Size = New System.Drawing.Size(169, 22)
             Me.SelectChartDateTSMI.Text = "Select date..."
             '
             'HistoryCMS
             '
             Me.HistoryCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RemoveHistoryTSMI})
             Me.HistoryCMS.Name = "HistoryCMS"
-            Me.HistoryCMS.Size = New System.Drawing.Size(150, 26)
+            Me.HistoryCMS.Size = New System.Drawing.Size(157, 26)
             '
             'RemoveHistoryTSMI
             '
             Me.RemoveHistoryTSMI.Name = "RemoveHistoryTSMI"
-            Me.RemoveHistoryTSMI.Size = New System.Drawing.Size(149, 22)
+            Me.RemoveHistoryTSMI.Size = New System.Drawing.Size(156, 22)
             Me.RemoveHistoryTSMI.Text = "Remove history"
             '
             'MoneyCurveCMS
             '
             Me.MoneyCurveCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MMNameTSMI, Me.ShowCurveItemsTSMI, Me.DeleteMMCurveTSMI, Me.ToolStripSeparator10, Me.BrokerTSMI, Me.QuoteTSMI, Me.FitTSMI, Me.BootstrapTSMI, Me.ToolStripSeparator11, Me.SelDateTSMI})
             Me.MoneyCurveCMS.Name = "MoneyCurveCMS"
-            Me.MoneyCurveCMS.Size = New System.Drawing.Size(141, 192)
+            Me.MoneyCurveCMS.Size = New System.Drawing.Size(145, 192)
             '
             'MMNameTSMI
             '
             Me.MMNameTSMI.Enabled = False
             Me.MMNameTSMI.Name = "MMNameTSMI"
-            Me.MMNameTSMI.Size = New System.Drawing.Size(140, 22)
+            Me.MMNameTSMI.Size = New System.Drawing.Size(144, 22)
             Me.MMNameTSMI.Text = "Name"
             '
             'ShowCurveItemsTSMI
             '
             Me.ShowCurveItemsTSMI.Name = "ShowCurveItemsTSMI"
-            Me.ShowCurveItemsTSMI.Size = New System.Drawing.Size(140, 22)
+            Me.ShowCurveItemsTSMI.Size = New System.Drawing.Size(144, 22)
             Me.ShowCurveItemsTSMI.Text = "Show items..."
             '
             'DeleteMMCurveTSMI
             '
             Me.DeleteMMCurveTSMI.Name = "DeleteMMCurveTSMI"
-            Me.DeleteMMCurveTSMI.Size = New System.Drawing.Size(140, 22)
+            Me.DeleteMMCurveTSMI.Size = New System.Drawing.Size(144, 22)
             Me.DeleteMMCurveTSMI.Text = "Delete curve"
             '
             'ToolStripSeparator10
             '
             Me.ToolStripSeparator10.Name = "ToolStripSeparator10"
-            Me.ToolStripSeparator10.Size = New System.Drawing.Size(137, 6)
+            Me.ToolStripSeparator10.Size = New System.Drawing.Size(141, 6)
             '
             'BrokerTSMI
             '
             Me.BrokerTSMI.Name = "BrokerTSMI"
-            Me.BrokerTSMI.Size = New System.Drawing.Size(140, 22)
+            Me.BrokerTSMI.Size = New System.Drawing.Size(144, 22)
             Me.BrokerTSMI.Text = "Broker"
             '
             'QuoteTSMI
             '
             Me.QuoteTSMI.Name = "QuoteTSMI"
-            Me.QuoteTSMI.Size = New System.Drawing.Size(140, 22)
+            Me.QuoteTSMI.Size = New System.Drawing.Size(144, 22)
             Me.QuoteTSMI.Text = "Quote"
             '
             'FitTSMI
             '
             Me.FitTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LinearRegressionTSMI, Me.LogarithmicRegressionTSMI, Me.InverseRegressionTSMI, Me.PowerRegressionTSMI, Me.Poly6RegressionTSMI, Me.NelsonSiegelSvenssonTSMI, Me.ToolStripSeparator8, Me.LinearInterpolationTSMI, Me.CubicSplineTSMI, Me.ToolStripSeparator9, Me.VasicekCurveTSMI, Me.CIRCurveTSMI})
             Me.FitTSMI.Name = "FitTSMI"
-            Me.FitTSMI.Size = New System.Drawing.Size(140, 22)
+            Me.FitTSMI.Size = New System.Drawing.Size(144, 22)
             Me.FitTSMI.Text = "Interpolation"
             Me.FitTSMI.Visible = False
             '
             'LinearRegressionTSMI
             '
             Me.LinearRegressionTSMI.Name = "LinearRegressionTSMI"
-            Me.LinearRegressionTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.LinearRegressionTSMI.Size = New System.Drawing.Size(201, 22)
             Me.LinearRegressionTSMI.Tag = "Lin"
             Me.LinearRegressionTSMI.Text = "Linear Regression"
             '
             'LogarithmicRegressionTSMI
             '
             Me.LogarithmicRegressionTSMI.Name = "LogarithmicRegressionTSMI"
-            Me.LogarithmicRegressionTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.LogarithmicRegressionTSMI.Size = New System.Drawing.Size(201, 22)
             Me.LogarithmicRegressionTSMI.Tag = "Log"
             Me.LogarithmicRegressionTSMI.Text = "Logarithmic Regression"
             '
             'InverseRegressionTSMI
             '
             Me.InverseRegressionTSMI.Name = "InverseRegressionTSMI"
-            Me.InverseRegressionTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.InverseRegressionTSMI.Size = New System.Drawing.Size(201, 22)
             Me.InverseRegressionTSMI.Tag = "Inv"
             Me.InverseRegressionTSMI.Text = "Inverse Regression"
             '
             'PowerRegressionTSMI
             '
             Me.PowerRegressionTSMI.Name = "PowerRegressionTSMI"
-            Me.PowerRegressionTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.PowerRegressionTSMI.Size = New System.Drawing.Size(201, 22)
             Me.PowerRegressionTSMI.Tag = "Pow"
             Me.PowerRegressionTSMI.Text = "Power Regression"
             '
             'Poly6RegressionTSMI
             '
             Me.Poly6RegressionTSMI.Name = "Poly6RegressionTSMI"
-            Me.Poly6RegressionTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.Poly6RegressionTSMI.Size = New System.Drawing.Size(201, 22)
             Me.Poly6RegressionTSMI.Text = "Poly6 Regression"
             '
             'NelsonSiegelSvenssonTSMI
             '
             Me.NelsonSiegelSvenssonTSMI.Name = "NelsonSiegelSvenssonTSMI"
-            Me.NelsonSiegelSvenssonTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.NelsonSiegelSvenssonTSMI.Size = New System.Drawing.Size(201, 22)
             Me.NelsonSiegelSvenssonTSMI.Text = "Nelson-Siegel-Svensson"
             '
             'ToolStripSeparator8
             '
             Me.ToolStripSeparator8.Name = "ToolStripSeparator8"
-            Me.ToolStripSeparator8.Size = New System.Drawing.Size(185, 6)
+            Me.ToolStripSeparator8.Size = New System.Drawing.Size(198, 6)
             '
             'LinearInterpolationTSMI
             '
             Me.LinearInterpolationTSMI.Name = "LinearInterpolationTSMI"
-            Me.LinearInterpolationTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.LinearInterpolationTSMI.Size = New System.Drawing.Size(201, 22)
             Me.LinearInterpolationTSMI.Text = "Linear Interpolation"
             '
             'CubicSplineTSMI
             '
             Me.CubicSplineTSMI.Name = "CubicSplineTSMI"
-            Me.CubicSplineTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.CubicSplineTSMI.Size = New System.Drawing.Size(201, 22)
             Me.CubicSplineTSMI.Text = "Cubic Spline"
             '
             'ToolStripSeparator9
             '
             Me.ToolStripSeparator9.Name = "ToolStripSeparator9"
-            Me.ToolStripSeparator9.Size = New System.Drawing.Size(185, 6)
+            Me.ToolStripSeparator9.Size = New System.Drawing.Size(198, 6)
             '
             'VasicekCurveTSMI
             '
             Me.VasicekCurveTSMI.Name = "VasicekCurveTSMI"
-            Me.VasicekCurveTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.VasicekCurveTSMI.Size = New System.Drawing.Size(201, 22)
             Me.VasicekCurveTSMI.Text = "Vasicek Curve"
             '
             'CIRCurveTSMI
             '
             Me.CIRCurveTSMI.Name = "CIRCurveTSMI"
-            Me.CIRCurveTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.CIRCurveTSMI.Size = New System.Drawing.Size(201, 22)
             Me.CIRCurveTSMI.Text = "CIR Curve"
             '
             'BootstrapTSMI
             '
             Me.BootstrapTSMI.CheckOnClick = True
             Me.BootstrapTSMI.Name = "BootstrapTSMI"
-            Me.BootstrapTSMI.Size = New System.Drawing.Size(140, 22)
+            Me.BootstrapTSMI.Size = New System.Drawing.Size(144, 22)
             Me.BootstrapTSMI.Text = "Bootstrap"
             '
             'ToolStripSeparator11
             '
             Me.ToolStripSeparator11.Name = "ToolStripSeparator11"
-            Me.ToolStripSeparator11.Size = New System.Drawing.Size(137, 6)
+            Me.ToolStripSeparator11.Size = New System.Drawing.Size(141, 6)
             '
             'SelDateTSMI
             '
             Me.SelDateTSMI.Name = "SelDateTSMI"
-            Me.SelDateTSMI.Size = New System.Drawing.Size(140, 22)
+            Me.SelDateTSMI.Size = New System.Drawing.Size(144, 22)
             Me.SelDateTSMI.Text = "Select date..."
             '
             'SpreadCMS
@@ -1133,30 +1144,30 @@
             '
             Me.DurConvCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ModifiedTSMI, Me.MacaleyTSMI})
             Me.DurConvCMS.Name = "DurConvCMS"
-            Me.DurConvCMS.Size = New System.Drawing.Size(116, 48)
+            Me.DurConvCMS.Size = New System.Drawing.Size(121, 48)
             '
             'ModifiedTSMI
             '
             Me.ModifiedTSMI.Name = "ModifiedTSMI"
-            Me.ModifiedTSMI.Size = New System.Drawing.Size(115, 22)
+            Me.ModifiedTSMI.Size = New System.Drawing.Size(120, 22)
             Me.ModifiedTSMI.Text = "Duration"
             '
             'MacaleyTSMI
             '
             Me.MacaleyTSMI.Name = "MacaleyTSMI"
-            Me.MacaleyTSMI.Size = New System.Drawing.Size(115, 22)
+            Me.MacaleyTSMI.Size = New System.Drawing.Size(120, 22)
             Me.MacaleyTSMI.Text = "Maturity"
             '
             'BidAskCMS
             '
             Me.BidAskCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RemoveBidAskTSMI})
             Me.BidAskCMS.Name = "BidAskCMS"
-            Me.BidAskCMS.Size = New System.Drawing.Size(151, 26)
+            Me.BidAskCMS.Size = New System.Drawing.Size(160, 26)
             '
             'RemoveBidAskTSMI
             '
             Me.RemoveBidAskTSMI.Name = "RemoveBidAskTSMI"
-            Me.RemoveBidAskTSMI.Size = New System.Drawing.Size(150, 22)
+            Me.RemoveBidAskTSMI.Size = New System.Drawing.Size(159, 22)
             Me.RemoveBidAskTSMI.Text = "Remove bid-ask"
             '
             'YAxisCMS
@@ -1168,7 +1179,7 @@
             '
             Me.BondSetCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LabelToolStripMenuItem, Me.BondSetYCMTSMI, Me.ToolStripSeparator12, Me.SelectDateTSMI, Me.ToolStripSeparator13, Me.RemoveFromChartTSMI})
             Me.BondSetCMS.Name = "BondSetCMS"
-            Me.BondSetCMS.Size = New System.Drawing.Size(179, 126)
+            Me.BondSetCMS.Size = New System.Drawing.Size(179, 104)
             '
             'LabelToolStripMenuItem
             '
@@ -1180,25 +1191,25 @@
             'SeriesIssuerNameAndSeriesTSMI
             '
             Me.SeriesIssuerNameAndSeriesTSMI.Name = "SeriesIssuerNameAndSeriesTSMI"
-            Me.SeriesIssuerNameAndSeriesTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.SeriesIssuerNameAndSeriesTSMI.Size = New System.Drawing.Size(200, 22)
             Me.SeriesIssuerNameAndSeriesTSMI.Text = "Issuer Series"
             '
             'IssuerCouponMaturityTSMI
             '
             Me.IssuerCouponMaturityTSMI.Name = "IssuerCouponMaturityTSMI"
-            Me.IssuerCouponMaturityTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.IssuerCouponMaturityTSMI.Size = New System.Drawing.Size(200, 22)
             Me.IssuerCouponMaturityTSMI.Text = "Issuer Coupon-Maturity"
             '
             'SeriesDescriptionTSMI
             '
             Me.SeriesDescriptionTSMI.Name = "SeriesDescriptionTSMI"
-            Me.SeriesDescriptionTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.SeriesDescriptionTSMI.Size = New System.Drawing.Size(200, 22)
             Me.SeriesDescriptionTSMI.Text = "Description"
             '
             'SeriesSeriesOnlyTSMI
             '
             Me.SeriesSeriesOnlyTSMI.Name = "SeriesSeriesOnlyTSMI"
-            Me.SeriesSeriesOnlyTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.SeriesSeriesOnlyTSMI.Size = New System.Drawing.Size(200, 22)
             Me.SeriesSeriesOnlyTSMI.Text = "Series Only"
             '
             'BondSetYCMTSMI
@@ -1212,43 +1223,43 @@
             'DefaultTSMI
             '
             Me.DefaultTSMI.Name = "DefaultTSMI"
-            Me.DefaultTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.DefaultTSMI.Size = New System.Drawing.Size(109, 22)
             Me.DefaultTSMI.Text = "Default"
             '
             'YtmTSMI
             '
             Me.YtmTSMI.Name = "YtmTSMI"
-            Me.YtmTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.YtmTSMI.Size = New System.Drawing.Size(109, 22)
             Me.YtmTSMI.Text = "YTM"
             '
             'YtpTSMI
             '
             Me.YtpTSMI.Name = "YtpTSMI"
-            Me.YtpTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.YtpTSMI.Size = New System.Drawing.Size(109, 22)
             Me.YtpTSMI.Text = "YTP"
             '
             'YtcTSMI
             '
             Me.YtcTSMI.Name = "YtcTSMI"
-            Me.YtcTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.YtcTSMI.Size = New System.Drawing.Size(109, 22)
             Me.YtcTSMI.Text = "YTC"
             '
             'YtbTSMI
             '
             Me.YtbTSMI.Name = "YtbTSMI"
-            Me.YtbTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.YtbTSMI.Size = New System.Drawing.Size(109, 22)
             Me.YtbTSMI.Text = "YTB"
             '
             'YtaTSMI
             '
             Me.YtaTSMI.Name = "YtaTSMI"
-            Me.YtaTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.YtaTSMI.Size = New System.Drawing.Size(109, 22)
             Me.YtaTSMI.Text = "YTA"
             '
             'YtwTSMI
             '
             Me.YtwTSMI.Name = "YtwTSMI"
-            Me.YtwTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.YtwTSMI.Size = New System.Drawing.Size(109, 22)
             Me.YtwTSMI.Text = "YTW"
             '
             'ToolStripSeparator12
@@ -1277,147 +1288,163 @@
             '
             Me.BondCurveCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ShowBondCurveItemsTSMI, Me.DeleteBondCurveTSMI, Me.BondCurveImportantTSS0, Me.LabelingModeToolStripMenuItem, Me.InterpolationTSMI, Me.BootstrappingToolStripMenuItem, Me.BondCurveImportantTSS, Me.SelectDateToolStripMenuItem})
             Me.BondCurveCMS.Name = "BondCurveCMS"
-            Me.BondCurveCMS.Size = New System.Drawing.Size(142, 148)
+            Me.BondCurveCMS.Size = New System.Drawing.Size(150, 148)
             '
             'ShowBondCurveItemsTSMI
             '
             Me.ShowBondCurveItemsTSMI.Name = "ShowBondCurveItemsTSMI"
-            Me.ShowBondCurveItemsTSMI.Size = New System.Drawing.Size(141, 22)
+            Me.ShowBondCurveItemsTSMI.Size = New System.Drawing.Size(149, 22)
             Me.ShowBondCurveItemsTSMI.Text = "Show items..."
             '
             'DeleteBondCurveTSMI
             '
             Me.DeleteBondCurveTSMI.Name = "DeleteBondCurveTSMI"
-            Me.DeleteBondCurveTSMI.Size = New System.Drawing.Size(141, 22)
+            Me.DeleteBondCurveTSMI.Size = New System.Drawing.Size(149, 22)
             Me.DeleteBondCurveTSMI.Text = "Delete curve"
             '
             'BondCurveImportantTSS0
             '
             Me.BondCurveImportantTSS0.Name = "BondCurveImportantTSS0"
-            Me.BondCurveImportantTSS0.Size = New System.Drawing.Size(138, 6)
+            Me.BondCurveImportantTSS0.Size = New System.Drawing.Size(146, 6)
             '
             'LabelingModeToolStripMenuItem
             '
             Me.LabelingModeToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.IssuerSeriesToolStripMenuItem, Me.IssuerCouponMaturityToolStripMenuItem, Me.DescriptionToolStripMenuItem, Me.SeriesOnlyToolStripMenuItem})
             Me.LabelingModeToolStripMenuItem.Name = "LabelingModeToolStripMenuItem"
-            Me.LabelingModeToolStripMenuItem.Size = New System.Drawing.Size(141, 22)
+            Me.LabelingModeToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
             Me.LabelingModeToolStripMenuItem.Text = "Labels"
             '
             'IssuerSeriesToolStripMenuItem
             '
             Me.IssuerSeriesToolStripMenuItem.Name = "IssuerSeriesToolStripMenuItem"
-            Me.IssuerSeriesToolStripMenuItem.Size = New System.Drawing.Size(188, 22)
+            Me.IssuerSeriesToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
             Me.IssuerSeriesToolStripMenuItem.Text = "Issuer Series"
             '
             'IssuerCouponMaturityToolStripMenuItem
             '
             Me.IssuerCouponMaturityToolStripMenuItem.Name = "IssuerCouponMaturityToolStripMenuItem"
-            Me.IssuerCouponMaturityToolStripMenuItem.Size = New System.Drawing.Size(188, 22)
+            Me.IssuerCouponMaturityToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
             Me.IssuerCouponMaturityToolStripMenuItem.Text = "Issuer Coupon-Maturity"
             '
             'DescriptionToolStripMenuItem
             '
             Me.DescriptionToolStripMenuItem.Name = "DescriptionToolStripMenuItem"
-            Me.DescriptionToolStripMenuItem.Size = New System.Drawing.Size(188, 22)
+            Me.DescriptionToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
             Me.DescriptionToolStripMenuItem.Text = "Description"
             '
             'SeriesOnlyToolStripMenuItem
             '
             Me.SeriesOnlyToolStripMenuItem.Name = "SeriesOnlyToolStripMenuItem"
-            Me.SeriesOnlyToolStripMenuItem.Size = New System.Drawing.Size(188, 22)
+            Me.SeriesOnlyToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
             Me.SeriesOnlyToolStripMenuItem.Text = "Series Only"
             '
             'InterpolationTSMI
             '
             Me.InterpolationTSMI.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.LinRegTSMI, Me.LogRegTSMI, Me.PowRegTSMI, Me.PolyRegTSMI, Me.InvRegTSMI, Me.NSSRegTSMI, Me.CubSplineTSMI, Me.ToolStripMenuItem5, Me.VasicekTSMI, Me.CIRRTSMI})
             Me.InterpolationTSMI.Name = "InterpolationTSMI"
-            Me.InterpolationTSMI.Size = New System.Drawing.Size(141, 22)
+            Me.InterpolationTSMI.Size = New System.Drawing.Size(149, 22)
             Me.InterpolationTSMI.Text = "Interpolation"
             '
             'LinRegTSMI
             '
             Me.LinRegTSMI.Name = "LinRegTSMI"
-            Me.LinRegTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.LinRegTSMI.Size = New System.Drawing.Size(201, 22)
             Me.LinRegTSMI.Tag = "Lin"
             Me.LinRegTSMI.Text = "Linear regression"
             '
             'LogRegTSMI
             '
             Me.LogRegTSMI.Name = "LogRegTSMI"
-            Me.LogRegTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.LogRegTSMI.Size = New System.Drawing.Size(201, 22)
             Me.LogRegTSMI.Tag = "Log"
             Me.LogRegTSMI.Text = "Logarithmic regression"
             '
             'PowRegTSMI
             '
             Me.PowRegTSMI.Name = "PowRegTSMI"
-            Me.PowRegTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.PowRegTSMI.Size = New System.Drawing.Size(201, 22)
             Me.PowRegTSMI.Tag = "Pow"
             Me.PowRegTSMI.Text = "Power regression"
             '
             'PolyRegTSMI
             '
             Me.PolyRegTSMI.Name = "PolyRegTSMI"
-            Me.PolyRegTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.PolyRegTSMI.Size = New System.Drawing.Size(201, 22)
             Me.PolyRegTSMI.Tag = "Poly6"
             Me.PolyRegTSMI.Text = "Polynomial regression"
             '
             'InvRegTSMI
             '
             Me.InvRegTSMI.Name = "InvRegTSMI"
-            Me.InvRegTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.InvRegTSMI.Size = New System.Drawing.Size(201, 22)
             Me.InvRegTSMI.Tag = "Inv"
             Me.InvRegTSMI.Text = "Inverse regression"
             '
             'NSSRegTSMI
             '
             Me.NSSRegTSMI.Name = "NSSRegTSMI"
-            Me.NSSRegTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.NSSRegTSMI.Size = New System.Drawing.Size(201, 22)
             Me.NSSRegTSMI.Tag = "NSS"
             Me.NSSRegTSMI.Text = "Nelson-Siegel-Svensson"
             '
             'CubSplineTSMI
             '
             Me.CubSplineTSMI.Name = "CubSplineTSMI"
-            Me.CubSplineTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.CubSplineTSMI.Size = New System.Drawing.Size(201, 22)
             Me.CubSplineTSMI.Tag = "CubicSpline"
             Me.CubSplineTSMI.Text = "Cubic spline"
             '
             'ToolStripMenuItem5
             '
             Me.ToolStripMenuItem5.Name = "ToolStripMenuItem5"
-            Me.ToolStripMenuItem5.Size = New System.Drawing.Size(185, 6)
+            Me.ToolStripMenuItem5.Size = New System.Drawing.Size(198, 6)
             '
             'VasicekTSMI
             '
             Me.VasicekTSMI.Name = "VasicekTSMI"
-            Me.VasicekTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.VasicekTSMI.Size = New System.Drawing.Size(201, 22)
             Me.VasicekTSMI.Tag = "Vasicek"
             Me.VasicekTSMI.Text = "Vasicek curve"
             '
             'CIRRTSMI
             '
             Me.CIRRTSMI.Name = "CIRRTSMI"
-            Me.CIRRTSMI.Size = New System.Drawing.Size(188, 22)
+            Me.CIRRTSMI.Size = New System.Drawing.Size(201, 22)
             Me.CIRRTSMI.Tag = "CIR"
             Me.CIRRTSMI.Text = "CIR curve"
             '
             'BootstrappingToolStripMenuItem
             '
             Me.BootstrappingToolStripMenuItem.Name = "BootstrappingToolStripMenuItem"
-            Me.BootstrappingToolStripMenuItem.Size = New System.Drawing.Size(141, 22)
+            Me.BootstrappingToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
             Me.BootstrappingToolStripMenuItem.Text = "Bootstrapping"
             '
             'BondCurveImportantTSS
             '
             Me.BondCurveImportantTSS.Name = "BondCurveImportantTSS"
-            Me.BondCurveImportantTSS.Size = New System.Drawing.Size(138, 6)
+            Me.BondCurveImportantTSS.Size = New System.Drawing.Size(146, 6)
             '
             'SelectDateToolStripMenuItem
             '
             Me.SelectDateToolStripMenuItem.Name = "SelectDateToolStripMenuItem"
-            Me.SelectDateToolStripMenuItem.Size = New System.Drawing.Size(141, 22)
+            Me.SelectDateToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
             Me.SelectDateToolStripMenuItem.Text = "Select date..."
+            '
+            'UahNDFToolStripMenuItem
+            '
+            Me.UahNDFToolStripMenuItem.Name = "UahNDFToolStripMenuItem"
+            Me.UahNDFToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.UahNDFToolStripMenuItem.Text = "Uah NDF"
+            '
+            'ToolStripMenuItem2
+            '
+            Me.ToolStripMenuItem2.Name = "ToolStripMenuItem2"
+            Me.ToolStripMenuItem2.Size = New System.Drawing.Size(149, 6)
+            '
+            'ToolStripMenuItem3
+            '
+            Me.ToolStripMenuItem3.Name = "ToolStripMenuItem3"
+            Me.ToolStripMenuItem3.Size = New System.Drawing.Size(149, 6)
             '
             'GraphForm
             '
@@ -1604,5 +1631,9 @@
         Friend WithEvents ToolStripSeparator14 As System.Windows.Forms.ToolStripSeparator
         Friend WithEvents SelectChartDateTSMI As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents ChainCurvesToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents EurIRSToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents ToolStripMenuItem2 As System.Windows.Forms.ToolStripSeparator
+        Friend WithEvents UahNDFToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents ToolStripMenuItem3 As System.Windows.Forms.ToolStripSeparator
     End Class
 End Namespace

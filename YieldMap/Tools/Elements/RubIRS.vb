@@ -516,7 +516,7 @@ Namespace Tools.Elements
         End Property
     End Class
 
-    Public NotInheritable Class RubNDF
+    Public Class RubNDF
         Inherits RubIRS
 
 
@@ -563,7 +563,7 @@ Namespace Tools.Elements
         End Function
     End Class
 
-    Public NotInheritable Class UsdIRS
+    Public Class UsdIRS
         Inherits RubIRS
 
         Public Sub New(ByVal ansamble As Ansamble)
@@ -597,7 +597,7 @@ Namespace Tools.Elements
             Dim match = Regex.Match(ric, String.Format("{0}(?<term>[0-9]+?Y)=.*", InstrumentName))
             Dim term = match.Groups("term").Value
             Dim dt As Date = GroupDate
-            Dim aDate As Array = DateModule.DfAddPeriod("RUS", dt, term, "")
+            Dim aDate As Array = DateModule.DfAddPeriod("USA", dt, term, "")
             Return DateModule.DfCountYears(dt, Utils.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
         End Function
 
@@ -614,5 +614,90 @@ Namespace Tools.Elements
                 Return "CLDR:USA  ARND:NO CCM:MMA0 CFADJ:YES CRND:NO DMC:MODIFIED EMC:SAMEDAY IC:S1 PDELAY:0  REFDATE:MATURITY RP:1 XD:NO FRQ:Q"
             End Get
         End Property
+    End Class
+
+    Public NotInheritable Class EurIRS
+        Inherits UsdIRS
+
+        Public Sub New(ByVal ansamble As Ansamble)
+            MyBase.New(ansamble)
+        End Sub
+        Protected Overrides Property InstrumentName() As String = "EURAB3E"
+        Protected Overrides Property AllowedTenors() As String() = {"1Y", "18M", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y", "40Y", "50Y"}
+        Protected Overrides Property Brokers() As String() = {""}
+        Protected Overrides Property BaseInstrument As String = "EUR3MFSR="
+
+
+        Protected Overrides Function GetDuration(ByVal ric As String) As Double
+            Dim match = Regex.Match(ric, String.Format("{0}(?<term>[0-9]+[MY]?)=.*", InstrumentName))
+            Dim term = match.Groups("term").Value
+            Dim dt As Date = GroupDate
+            Dim aDate As Array = DateModule.DfAddPeriod("USA", dt, term, "")
+            Return DateModule.DfCountYears(dt, Utils.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
+        End Function
+
+        Protected Overrides Function GetRICs(ByVal broker As String) As List(Of String)
+            Return AllowedTenors.Select(Function(item) String.Format("{0}{1}={2}", InstrumentName, item, broker)).ToList()
+        End Function
+
+        Public Overrides ReadOnly Property OuterColor() As Color
+            Get
+                Return Color.Teal
+            End Get
+        End Property
+
+        Public Overrides ReadOnly Property InnerColor() As Color
+            Get
+                Return Color.DarkBlue
+            End Get
+        End Property
+
+        Protected Overrides ReadOnly Property Struct() As String
+            Get
+                Return "LBOTH CLDR:EMU ARND:NO CFADJ:YES CRND:NO DMC:MODIFIED EMC:SAMEDAY IC:S1 PDELAY:0 REFDATE:MATURITY RP:1 XD:NO LPAID LTYPE:FIXED CCM:BB00 FRQ:Y LRECEIVED LTYPE:FLOAT CCM:MMA0 FRQ:Q"
+            End Get
+        End Property
+
+        Public Overrides ReadOnly Property FloatLegStructure() As String
+            Get
+                Return "CLDR:EMU ARND:NO CCM:MMA0 CFADJ:YES CRND:NO DMC:MODIFIED EMC:SAMEDAY IC:S1 PDELAY:0  REFDATE:MATURITY RP:1 XD:NO FRQ:Q"
+            End Get
+        End Property
+    End Class
+
+    Public Class UahNDF
+        Inherits RubNDF
+
+        Public Sub New(ByVal ansamble As Ansamble)
+            MyBase.New(ansamble)
+        End Sub
+        Protected Overrides Property InstrumentName() As String = "UAH"
+        Protected Overrides Property AllowedTenors() As String() = {"1W", "2W", "1M", "2M", "3M", "6M", "9M", "1Y"}
+        Protected Overrides Property Brokers() As String() = {""}
+        Protected Overrides Property BaseInstrument As String = ""
+
+        Public Overrides ReadOnly Property OuterColor() As Color
+            Get
+                Return Color.MediumVioletRed
+            End Get
+        End Property
+
+        Public Overrides ReadOnly Property InnerColor() As Color
+            Get
+                Return Color.DodgerBlue
+            End Get
+        End Property
+
+        Protected Overrides Function GetDuration(ByVal ric As String) As Double
+            Dim match = Regex.Match(ric, String.Format("{0}(?<term>[0-9]+?[DWMY])NDFOR=.*", InstrumentName))
+            Dim term = match.Groups("term").Value
+            Dim dt As Date = GroupDate()
+            Dim aDate As Array = DateModule.DfAddPeriod("RUS", dt, term, "")
+            Return DateModule.DfCountYears(dt, Utils.FromExcelSerialDate(aDate.GetValue(1, 1)), "")
+        End Function
+
+        Protected Overrides Function GetRICs(ByVal broker As String) As List(Of String)
+            Return AllowedTenors.Select(Function(item) String.Format("{0}{1}NDFOR={2}", InstrumentName, item, broker)).ToList()
+        End Function
     End Class
 End Namespace
