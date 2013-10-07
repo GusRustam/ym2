@@ -80,7 +80,7 @@ Namespace Bonds
             Dim value = field.GetValue(bond).ToString()
             Dim numVal As Double
             If Double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, numVal) Then
-                Return Name + ":" + String.Format(If(local, CultureInfo.CurrentCulture, CultureInfo.InvariantCulture), "{0:F2}", numVal)
+                Return Name + ":" + String.Format(If(local, CultureInfo.CurrentCulture, CultureInfo.InvariantCulture), "{0:0.####}", numVal)
             Else
                 Return Name + ":" + String.Format("{0}", value)
             End If
@@ -124,7 +124,8 @@ Namespace Bonds
             Dim field = tp.GetField(fieldName, BindingFlags.NonPublic Or BindingFlags.Instance)
             Dim val As List(Of Tuple(Of Date, Single)) = CType(field.GetValue(bond), List(Of Tuple(Of Date, Single)))
             Dim res As String = val.Aggregate("",
-                Function(current, item) String.Format("{0}{1}:{2}:{3:F2} ", current, Name, ReutersDate.DateToReuters(item.Item1), item.Item2)
+                Function(current, item) String.Format(If(local, CultureInfo.CurrentCulture, CultureInfo.InvariantCulture), "{0}{1}:{2}:{3:0.####} ",
+                                                      current, Name, ReutersDate.DateToReuters(item.Item1), item.Item2)
             )
             Return res.TrimEnd
         End Function
@@ -180,12 +181,12 @@ Namespace Bonds
                     If item.Item1 = item.Item2 Then
                         Return String.Format(
                             If(local, CultureInfo.CurrentCulture, CultureInfo.InvariantCulture),
-                            "{0}{1}:{2}:{3:F2} ", current, Name, ReutersDate.DateToReuters(item.Item1),
+                            "{0}{1}:{2}:{3:0.####} ", current, Name, ReutersDate.DateToReuters(item.Item1),
                             item.Item3)
                     Else
                         Return String.Format(
                             If(local, CultureInfo.CurrentCulture, CultureInfo.InvariantCulture),
-                            "{0}{1}:{2}:{3}:{4:F2} ", current, Name, ReutersDate.DateToReuters(item.Item1),
+                            "{0}{1}:{2}:{3}:{4:0.####} ", current, Name, ReutersDate.DateToReuters(item.Item1),
                             ReutersDate.DateToReuters(item.Item2), item.Item3)
                     End If
                 End Function

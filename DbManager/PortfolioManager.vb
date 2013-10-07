@@ -48,6 +48,7 @@ Public Interface IPortfolioManager
     Sub SelectConfigFile(ByVal fileName As String)
     Function ConfigFile() As String
     Sub SelectDefaultConfigFile()
+    Function GetQueriesByChain(ByVal source As ChainSrc) As List(Of IdName(Of String))
 End Interface
 
 Friend Interface IPortfolioManagerLocal
@@ -690,6 +691,12 @@ Public Class PortfolioManager
     Public Sub SelectDefaultConfigFile() Implements IPortfolioManager.SelectDefaultConfigFile
         ConfigFile = DefaultConfigFile
     End Sub
+
+    Public Function GetQueriesByChain(ByVal source As ChainSrc) As List(Of IdName(Of String)) Implements IPortfolioManager.GetQueriesByChain
+        Dim nodes = _bonds.SelectNodes(String.Format("/bonds/queries/query[@chain-id='{0}']", source.ID))
+        Return (From node As XmlNode In nodes
+                Select New IdName(Of String)(node.Attributes("id").Value, node.Attributes("name").Value)).Distinct().ToList()
+    End Function
 
     Public ReadOnly Property CustomBondsView() As List(Of CustomBondSrc) Implements IPortfolioManager.CustomBondsView
         Get

@@ -1,4 +1,5 @@
 ﻿Imports System.IO
+Imports System.Globalization
 Imports NLog
 Imports System.Xml
 Imports Uitls
@@ -25,7 +26,7 @@ Public Class SettingsManager
     Private _minYield As Double? = Nothing
     Public Property MinYield() As Double?
         Set(ByVal value As Double?)
-            SaveValue("/settings/viewport/yield/@min", If(value.HasValue, value.Value.ToString("F2"), ""))
+            SaveValue("/settings/viewport/yield/@min", If(value.HasValue, value.Value.ToString("F2", CultureInfo.InvariantCulture), ""))
             _minYield = value
             RaiseEvent ViewPortChanged()
         End Set
@@ -37,7 +38,7 @@ Public Class SettingsManager
     Private _maxYield As Double? = Nothing
     Public Property MaxYield() As Double?
         Set(ByVal value As Double?)
-            SaveValue("/settings/viewport/yield/@max", If(value.HasValue, value.Value.ToString("F2"), ""))
+            SaveValue("/settings/viewport/yield/@max", If(value.HasValue, value.Value.ToString("F2", CultureInfo.InvariantCulture), ""))
             _maxYield = value
             RaiseEvent ViewPortChanged()
         End Set
@@ -49,7 +50,7 @@ Public Class SettingsManager
     Private _minDur As Double? = Nothing
     Public Property MinDur() As Double?
         Set(ByVal value As Double?)
-            SaveValue("/settings/viewport/duration/@min", If(value.HasValue, value.Value.ToString("F2"), ""))
+            SaveValue("/settings/viewport/duration/@min", If(value.HasValue, value.Value.ToString("F2", CultureInfo.InvariantCulture), ""))
             _minDur = value
             RaiseEvent ViewPortChanged()
         End Set
@@ -61,7 +62,7 @@ Public Class SettingsManager
     Private _maxDur As Double? = Nothing
     Public Property MaxDur() As Double?
         Set(ByVal value As Double?)
-            SaveValue("/settings/viewport/duration/@max", If(value.HasValue, value.Value.ToString("F2"), ""))
+            SaveValue("/settings/viewport/duration/@max", If(value.HasValue, value.Value.ToString("F2", CultureInfo.InvariantCulture), ""))
             _maxDur = value
             RaiseEvent ViewPortChanged()
         End Set
@@ -73,7 +74,7 @@ Public Class SettingsManager
     Private _minSpread As Double? = Nothing
     Public Property MinSpread() As Double?
         Set(ByVal value As Double?)
-            SaveValue("/settings/viewport/spread/@min", If(value.HasValue, value.Value.ToString("F2"), ""))
+            SaveValue("/settings/viewport/spread/@min", If(value.HasValue, value.Value.ToString("F2", CultureInfo.InvariantCulture), ""))
             _minSpread = value
             RaiseEvent ViewPortChanged()
         End Set
@@ -85,7 +86,7 @@ Public Class SettingsManager
     Private _maxSpread As Double? = Nothing
     Public Property MaxSpread() As Double?
         Set(ByVal value As Double?)
-            SaveValue("/settings/viewport/spread/@max", If(value.HasValue, value.Value.ToString("F2"), ""))
+            SaveValue("/settings/viewport/spread/@max", If(value.HasValue, value.Value.ToString("F2", CultureInfo.InvariantCulture), ""))
             _maxSpread = value
             RaiseEvent ViewPortChanged()
         End Set
@@ -383,7 +384,7 @@ Public Class SettingsManager
     Private Shared Sub GetDoubleValue(ByVal address As String, ByRef var As Double?)
         Dim val = Settings.SelectSingleNode(address)
         If val IsNot Nothing AndAlso val.Value <> "" Then
-            var = Double.Parse(val.Value)
+            var = Double.Parse(val.Value, CultureInfo.InvariantCulture)
         Else
             var = Nothing
         End If

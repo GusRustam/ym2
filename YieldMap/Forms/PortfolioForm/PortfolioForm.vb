@@ -604,6 +604,16 @@ Namespace Forms.PortfolioForm
                 Return
             End If
             Dim selectedItem = CType(ChainsListsGrid.SelectedRows.Item(0).DataBoundItem, Source)
+
+            If TypeOf selectedItem Is ChainSrc Then
+                Dim queries = PortfolioManager.GetQueriesByChain(selectedItem)
+                If queries.Any Then
+                    Dim aList = String.Join(Environment.NewLine, (From q In queries Select q.Value))
+                    MessageBox.Show("There are the following queries using this chain. Please delete them first." + Environment.NewLine + aList, "Action required", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                    Return
+                End If
+            End If
+
             Dim list = PortfolioManager.GetPortfoliosBySource(selectedItem)
             If Not list.Any OrElse (
                    MessageBox.Show(
@@ -617,6 +627,7 @@ Namespace Forms.PortfolioForm
         End Sub
 
         Private Sub ChainsListsGrid_CellMouseClick(ByVal sender As Object, ByVal e As DataGridViewCellMouseEventArgs) Handles ChainsListsGrid.CellMouseClick
+            If e.RowIndex < 0 Then Return
             Dim elem = ChainsListsGrid.Rows(e.RowIndex).DataBoundItem
             Dim chain As Source = TryCast(elem, Source)
             If chain Is Nothing Then Return
@@ -847,7 +858,7 @@ Namespace Forms.PortfolioForm
             MaturityDTP.Value = If(_currentBond.Maturity.HasValue, _currentBond.Maturity, Date.Today)
             FrequencyCB.SelectedItem = bondStructure.Frequency
 
-            FixedRateTB.Text = String.Format(CultureInfo.InvariantCulture, "{0:F2}", bondStructure.GetFixedRate())
+            FixedRateTB.Text = String.Format(CultureInfo.InvariantCulture, "{0:F4}", bondStructure.GetFixedRate())
             CouponScheduleDGV.DataSource = bondStructure.GetCouponsList()
 
             PerpetualCB.Checked = bondStructure.IsPerpetual
@@ -1053,11 +1064,13 @@ Namespace Forms.PortfolioForm
                     frm.AcceptButton = btnOk
 
                     If frm.ShowDialog() = DialogResult.OK Then
-                        If Not IsNumeric(newRateTb.Text) Then
+                        Dim triedRes As Single
+
+                        If Not Single.TryParse(newRateTb.Text, NumberStyles.Any, CultureInfo.InvariantCulture, triedRes) Then
                             MessageBox.Show(String.Format("Coupon value {0} is not numeric", newRateTb.Text),
                                             "Please try once again", MessageBoxButtons.OK, MessageBoxIcon.Information)
                         Else
-                            _currentBond.Struct.StepCouponPattern.Add(tuple.Create(sinceDateDtp.Value, CSng(newRateTb.Text)))
+                            _currentBond.Struct.StepCouponPattern.Add(tuple.Create(sinceDateDtp.Value, triedRes))
                             CustomBondChanged = True
                             RefreshBondView()
                             RecalculateCashFlows()
@@ -1090,11 +1103,12 @@ Namespace Forms.PortfolioForm
                     frm.AcceptButton = btnOk
 
                     If frm.ShowDialog() = DialogResult.OK Then
-                        If Not IsNumeric(amountTb.Text) Then
+                        Dim triedRes As Single
+                        If Not Single.TryParse(amountTb.Text, NumberStyles.Any, CultureInfo.InvariantCulture, triedRes) Then
                             MessageBox.Show(String.Format("Redemption value {0} is not numeric", amountTb.Text),
                                             "Please try once again", MessageBoxButtons.OK, MessageBoxIcon.Information)
                         Else
-                            _currentBond.Struct.AmortPattern.Add(tuple.Create(dateDtp.Value, CSng(amountTb.Text)))
+                            _currentBond.Struct.AmortPattern.Add(tuple.Create(dateDtp.Value, triedRes))
                             CustomBondChanged = True
                             RefreshBondView()
                             RecalculateCashFlows()
@@ -1150,14 +1164,16 @@ Namespace Forms.PortfolioForm
                     frm.AcceptButton = btnOk
 
                     If frm.ShowDialog() = DialogResult.OK Then
-                        If Not IsNumeric(priceTb.Text) Then
+                        Dim triedRes As Single
+
+                        If Not Single.TryParse(priceTb.Text, NumberStyles.Any, CultureInfo.InvariantCulture, triedRes) Then
                             MessageBox.Show(String.Format("Strike price {0} is not numeric", priceTb.Text),
                                             "Please try once again", MessageBoxButtons.OK, MessageBoxIcon.Information)
                         Else
                             If optionTypeCb.SelectedItem.ToString() = "Call" Then
-                                _currentBond.Struct.CallPattern.Add(tuple.Create(startDateDtp.Value, endDateDtp.Value, CSng(priceTb.Text)))
+                                _currentBond.Struct.CallPattern.Add(tuple.Create(startDateDtp.Value, endDateDtp.Value, triedRes))
                             Else
-                                _currentBond.Struct.PutPattern.Add(tuple.Create(startDateDtp.Value, endDateDtp.Value, CSng(priceTb.Text)))
+                                _currentBond.Struct.PutPattern.Add(tuple.Create(startDateDtp.Value, endDateDtp.Value, triedRes))
                             End If
                             CustomBondChanged = True
                             RefreshBondView()

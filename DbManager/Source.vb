@@ -380,7 +380,11 @@ Public Class UserListSrc
         Dim availableRics = New HashSet(Of String)(From row As BondsDataSet.BondRow In BondsLoader.Instance.GetBondsTable().Rows Select row.ric)
         Dim foundRics = ExtractRics(node)
         Dim resultingRics As New List(Of String)
-        For Each foundRic In From rc In foundRics Select rc.Trim()
+        For Each foundRic In (From rc In foundRics
+                              Where rc IsNot Nothing
+                              Let trimmed = rc.Trim()
+                              Where Not String.IsNullOrEmpty(trimmed)
+                              Select trimmed)
             If availableRics.Contains(foundRic) Then
                 resultingRics.Add(foundRic)
             Else
@@ -626,7 +630,11 @@ Public Class RegularBondSrc
     Public Overrides Function GetDefaultRics() As List(Of String)
         Dim availableRics = New HashSet(Of String)(From row As BondsDataSet.BondRow In BondsLoader.Instance.GetBondsTable().Rows Select row.ric)
         Dim res As New List(Of String)
-        For Each ric In _rics
+        For Each ric In (From rc In _rics
+                         Where rc IsNot Nothing
+                         Let trimmed = rc.Trim()
+                         Where Not String.IsNullOrEmpty(trimmed)
+                         Select trimmed)
             If availableRics.Contains(ric) Then
                 res.Add(ric)
             Else

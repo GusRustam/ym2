@@ -219,7 +219,7 @@ Namespace Forms.ChartForm
                     If minMaxY IsNot Nothing Then
                         Dim pow = If(_ansamble.YSource = Yield, 3, 0)
                         Dim theMinY As Double
-                        If minMinYStrict Then
+                        If minMinYStrict AndAlso minMinY.HasValue Then
                             theMinY = minMinY
                         Else
                             theMinY = If(minMinY.HasValue, Math.Max(minMinY.Value, minMaxY.Item1), minMaxY.Item1)
@@ -227,10 +227,15 @@ Namespace Forms.ChartForm
                         theMinY = Math.Floor(theMinY * (10 ^ pow)) / (10 ^ pow)
 
                         Dim theMaxY As Double
-                        If maxMaxYStrict Then
+                        If maxMaxYStrict AndAlso maxMaxY.HasValue Then
                             theMaxY = maxMaxY
                         Else
-                            theMaxY = If(maxMaxY.HasValue, Math.Min(maxMaxY.Value, minMaxY.Item2), minMaxY.Item2)
+                            Dim someMinMaxY = CalcMinMax(Function(pnt) If(pnt.YValues.Any AndAlso pnt.YValues.First() < maxMaxY.Value, pnt.YValues.First(), Nothing))
+                            If someMinMaxY IsNot Nothing Then
+                                theMaxY = If(maxMaxY.HasValue, Math.Min(maxMaxY.Value, someMinMaxY.Item2), someMinMaxY.Item2)
+                            Else
+                                theMaxY = If(maxMaxY.HasValue, Math.Min(maxMaxY.Value, minMaxY.Item2), minMaxY.Item2)
+                            End If
                         End If
                         theMaxY = Math.Ceiling(theMaxY * (10 ^ pow)) / (10 ^ pow)
 
@@ -255,7 +260,7 @@ Namespace Forms.ChartForm
                     Dim minmaxX = CalcMinMax(Function(pnt) pnt.XValue)
                     If minmaxX IsNot Nothing Then
                         Dim theMinX As Double
-                        If minMinXStrict Then
+                        If minMinXStrict AndAlso minMinX.HasValue Then
                             theMinX = minMinX
                         Else
                             theMinX = If(minMinX.HasValue, Math.Max(minMinX.Value, minmaxX.Item1), minmaxX.Item1)
@@ -263,7 +268,7 @@ Namespace Forms.ChartForm
                         theMinX = Math.Floor(theMinX)
 
                         Dim theMaxX As Double
-                        If maxMaxXStrict Then
+                        If maxMaxXStrict AndAlso maxMaxX.HasValue Then
                             theMaxX = maxMaxX
                         Else
                             theMaxX = If(maxMaxX.HasValue AndAlso maxMaxX.Value > 0, Math.Min(maxMaxX.Value, minmaxX.Item2), minmaxX.Item2)
@@ -466,7 +471,7 @@ Namespace Forms.ChartForm
                 Return
             End If
 
-            Dim elem = _ansamble.Items.Bonds(Function(m) m.RIC = ric).First()
+            Dim elem = _ansamble.Items.Bonds(Function(m) m.Ric = ric).First()
             Dim bondDataPoint = elem.MetaData
             Dim points As New List(Of Tuple(Of BondPointDescription, BondMetadata))
             For Each dt In data.Keys
@@ -554,7 +559,7 @@ Namespace Forms.ChartForm
 
                     For Each pnt In dt
                         Dim point = New DataPoint(pnt.TheX, pnt.TheY) With {
-                                .Name = pnt.Bond.MetaData.RIC,
+                                .Name = pnt.Bond.MetaData.Ric,
                                 .Tag = pnt.Bond,
                                 .Color = Color.FromName(pnt.BackColor),
                                 .Label = pnt.Label

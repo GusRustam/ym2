@@ -20,7 +20,6 @@ Public Module LoggerManager
         End Set
     End Property
 
-
     Private ReadOnly Logger As Logger
     Private ReadOnly TxtTarget As FileTarget
     Private ReadOnly UdpTarget As ChainsawTarget
