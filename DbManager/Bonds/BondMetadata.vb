@@ -82,6 +82,11 @@ Namespace Bonds
         Private ReadOnly _industry As String
         Private ReadOnly _subIndustry As String
 
+        Private ReadOnly _issuerCountry As String
+        Private ReadOnly _borrowerCountry As String
+
+
+
         Sub New(ByVal ric As String, ByVal maturity As Date?, ByVal coupon As Double, ByVal paymentStructure As String, ByVal rateStructure As String,
                 ByVal issuerName As String, ByVal shortName As String, issueDate As Date)
             _ric = ric
@@ -92,6 +97,8 @@ Namespace Bonds
             _shortName = shortName
 
             _issueDate = issueDate
+            _issuerCountry = issuerCountry
+            _borrowerCountry = borrowerCountry
             _label1 = shortName
             _label2 = shortName
             _label3 = shortName
@@ -105,7 +112,8 @@ Namespace Bonds
 
         Sub New(ByVal ric As String, ByVal shortName As String, ByVal label As String, ByVal maturity As Date?, ByVal coupon As Double, ByVal paymentStructure As String, ByVal rateStructure As String, ByVal issueDate As Date, ByVal label1 As String, ByVal label2 As String, ByVal label3 As String, ByVal label4 As String,
                 ByVal issuerName As String, ByVal borrowerName As String, ByVal currency As String, ByVal putable As Boolean, ByVal callable As Boolean, ByVal floater As Boolean, ByVal lastIssueRating As RatingDescr, ByVal lastIssuerRating As RatingDescr, ByVal lastRating As RatingDescr, ByVal seniorityType As String,
-                ByVal industry As String, ByVal subIndustry As String, instrumentType As String)
+                ByVal industry As String, ByVal subIndustry As String, instrumentType As String, ByVal issuerCountry As String, ByVal borrowerCountry As String)
+
             _ric = ric
             _shortName = shortName
             _label = label
@@ -132,6 +140,8 @@ Namespace Bonds
             _industry = industry
             _subIndustry = subIndustry
             _instrumentType = instrumentType
+            _issuerCountry = issuerCountry
+            _borrowerCountry = borrowerCountry
         End Sub
 
         <Hideable()>
@@ -353,6 +363,27 @@ Namespace Bonds
         Public ReadOnly Property InstrumentType As String
             Get
                 Return _instrumentType
+            End Get
+        End Property
+
+
+        <Hideable()>
+        <DisplayName("Issuer Country")>
+        <Filterable()>
+        <Sortable()>
+        Public ReadOnly Property IssuerCountry() As String
+            Get
+                Return _issuerCountry
+            End Get
+        End Property
+
+        <Hideable()>
+        <DisplayName("Borrower Country")>
+        <Filterable()>
+        <Sortable()>
+        Public ReadOnly Property BorrowerCountry() As String
+            Get
+                Return _borrowerCountry
             End Get
         End Property
 

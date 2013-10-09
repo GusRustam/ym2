@@ -138,7 +138,7 @@ Public Class Dex2
             End If
         Catch ex As Exception
             Logger.ErrorException("Failed to import data", ex)
-            Logger.Error("Error is {0} and exception = {0}", [error].ToString(), ex.ToString())
+            Logger.Error(String.Format("Error is {0} and exception = {1}", [error].ToString(), ex.ToString()))
             RaiseEvent Failure(ex)
         End Try
 

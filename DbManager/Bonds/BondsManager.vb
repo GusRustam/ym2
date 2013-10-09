@@ -109,6 +109,8 @@ Namespace Bonds
             Dim seniorityType = If(Not IsDBNull(descr("seniorityType")), descr.seniorityType, "")
             Dim industry = If(Not IsDBNull(descr("industry")), descr.industry, "")
             Dim subIndustry = If(Not IsDBNull(descr("subIndustry")), descr.subIndustry, "")
+            Dim borrowerCountry = If(Not IsDBNull(descr("borrowerCountry")), descr.borrowerCountry, "")
+            Dim issuerCountry = If(Not IsDBNull(descr("issuerCountry")), descr.issuerCountry, "")
 
             Dim issueRatings = (From row In _ldr.GetIssueRatingsTable()
                                 Where row.ric = _subRicToRic(aRic) And Not IsDBNull(row("date")) AndAlso IsDate(row("date"))
@@ -143,7 +145,7 @@ Namespace Bonds
             Return New BondMetadata(ric, sN, sN, maturityDate, coupon, paymentStructure, rateStructure, issueDate, sN,
                                        label2, description, series, issuerName, borrowerName, currency,
                                        isPutable, isCallable, isFloater, lastIssueRating, lastIssuerRating, lastRating,
-                                       seniorityType, industry, subIndustry, intstrumentType)
+                                       seniorityType, industry, subIndustry, intstrumentType, issuerCountry, borrowerCountry)
         End Function
 
         'Private Shared Function SkipSlash(ByVal aRic As String) As String
@@ -377,7 +379,17 @@ Namespace Bonds
         Private Sub LoadStep4(ByVal rics As HashSet(Of String))
             Logger.Info("LoadFrns / {0}", _evt.CurrentCount)
             _evt.Signal()
-            Dim floaterRics = New HashSet(Of String)(From row In BondsTable Where rics.Contains(row.ric) And row.isFloater Select row.ric)
+
+            Dim cll As New List(Of String)
+            For Each row In BondsTable
+                If IsDBNull(row("isFloater")) Then
+                    Logger.Warn(String.Format("isFloater is DBNull in ric {0}", row.ric))
+                ElseIf rics.Contains(row.ric) AndAlso row.isFloater Then
+                    cll.Add(row.ric)
+                End If
+            Next
+
+            Dim floaterRics = New HashSet(Of String)(cll)
             LoadGeneral(FrnTable, QueryFrn, "Loading FRN structures",
                          Sub(data As LinkedList(Of Dictionary(Of String, Object)))
                              ImportData(data, FrnTable, QueryFrn)
@@ -481,16 +493,29 @@ Namespace Bonds
                 Logger.Info("Nothing to importing  into table {0}", table.TableName)
             Else
                 Logger.Info("Importing {0} data rows into table {1}", data.Count, table.TableName)
+                Dim lastRic As String
                 Try
                     Dim invalidRow As Boolean
                     For Each slot In data
                         Dim rw = table.NewRow()
+                        lastRic = slot("ric")
                         invalidRow = False
                         For Each colName In slot.Keys
                             Dim elem = slot(colName)
-                            If elem Is Nothing Then Continue For
+                            If elem Is Nothing Then
+                                'If query.IsBool(colName) Then
+                                '    rw(colName) = False
+                                'ElseIf query.IsNum(colName) Then
+                                '    If IsNumeric(elem) Then rw(colName) = 0
+                                'ElseIf query.IsDate(colName) Then
+                                '    Continue For
+                                'Else
+                                '    rw(colName) = ""
+                                'End If
+                                Continue For
+                            End If
                             If elem.ToString().StartsWith("Unable to collect data") Then
-                                Logger.Warn("Unable to import data on {0}", colName)
+                                Logger.Warn("Unable to import data on ric {0} column {1}", lastRic, colName)
                                 invalidRow = True
                                 Exit For
                             End If
@@ -508,7 +533,7 @@ Namespace Bonds
                         If Not invalidRow Then table.Rows.Add(rw)
                     Next
                 Catch ex As Exception
-                    Logger.ErrorException("Failed to import data to table" + table.TableName, ex)
+                    Logger.Error(String.Format("Failed to import data on ric {0} to table {1}", lastRic, table.TableName))
                     Logger.Error("Exception = {0}", ex.ToString())
                     Throw New InvalidOperationException()
                 End Try

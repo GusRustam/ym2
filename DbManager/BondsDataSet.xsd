@@ -12,7 +12,7 @@
   <xs:element name="BondsDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="BondsDataSet" msprop:Generator_UserDSName="BondsDataSet">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element name="Bond" msprop:Generator_TableClassName="BondDataTable" msprop:Generator_TableVarName="tableBond" msprop:Generator_RowChangedName="BondRowChanged" msprop:Generator_TablePropName="Bond" msprop:Generator_RowDeletingName="BondRowDeleting" msprop:Generator_RowChangingName="BondRowChanging" msprop:Generator_RowEvHandlerName="BondRowChangeEventHandler" msprop:Generator_RowDeletedName="BondRowDeleted" msprop:Generator_RowClassName="BondRow" msprop:Generator_UserTableName="Bond" msprop:Generator_RowEvArgName="BondRowChangeEvent">
+        <xs:element name="Bond" msprop:Generator_TableClassName="BondDataTable" msprop:Generator_TableVarName="tableBond" msprop:Generator_TablePropName="Bond" msprop:Generator_RowDeletingName="BondRowDeleting" msprop:Generator_RowChangingName="BondRowChanging" msprop:Generator_RowEvHandlerName="BondRowChangeEventHandler" msprop:Generator_RowDeletedName="BondRowDeleted" msprop:Generator_UserTableName="Bond" msprop:Generator_RowChangedName="BondRowChanged" msprop:Generator_RowEvArgName="BondRowChangeEvent" msprop:Generator_RowClassName="BondRow">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ric" msprop:Generator_ColumnVarNameInTable="columnric" msprop:Generator_ColumnPropNameInRow="ric" msprop:Generator_ColumnPropNameInTable="ricColumn" msprop:Generator_UserColumnName="ric" type="xs:string" minOccurs="0" />
@@ -47,7 +47,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="IssueRating" msprop:Generator_TableClassName="IssueRatingDataTable" msprop:Generator_TableVarName="tableIssueRating" msprop:Generator_RowChangedName="IssueRatingRowChanged" msprop:Generator_TablePropName="IssueRating" msprop:Generator_RowDeletingName="IssueRatingRowDeleting" msprop:Generator_RowChangingName="IssueRatingRowChanging" msprop:Generator_RowEvHandlerName="IssueRatingRowChangeEventHandler" msprop:Generator_RowDeletedName="IssueRatingRowDeleted" msprop:Generator_RowClassName="IssueRatingRow" msprop:Generator_UserTableName="IssueRating" msprop:Generator_RowEvArgName="IssueRatingRowChangeEvent">
+        <xs:element name="IssueRating" msprop:Generator_TableClassName="IssueRatingDataTable" msprop:Generator_TableVarName="tableIssueRating" msprop:Generator_TablePropName="IssueRating" msprop:Generator_RowDeletingName="IssueRatingRowDeleting" msprop:Generator_RowChangingName="IssueRatingRowChanging" msprop:Generator_RowEvHandlerName="IssueRatingRowChangeEventHandler" msprop:Generator_RowDeletedName="IssueRatingRowDeleted" msprop:Generator_UserTableName="IssueRating" msprop:Generator_RowChangedName="IssueRatingRowChanged" msprop:Generator_RowEvArgName="IssueRatingRowChangeEvent" msprop:Generator_RowClassName="IssueRatingRow">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ric" msprop:Generator_ColumnVarNameInTable="columnric" msprop:Generator_ColumnPropNameInRow="ric" msprop:Generator_ColumnPropNameInTable="ricColumn" msprop:Generator_UserColumnName="ric" type="xs:string" minOccurs="0" />
@@ -57,7 +57,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="Coupon" msprop:Generator_TableClassName="CouponDataTable" msprop:Generator_TableVarName="tableCoupon" msprop:Generator_RowChangedName="CouponRowChanged" msprop:Generator_TablePropName="Coupon" msprop:Generator_RowDeletingName="CouponRowDeleting" msprop:Generator_RowChangingName="CouponRowChanging" msprop:Generator_RowEvHandlerName="CouponRowChangeEventHandler" msprop:Generator_RowDeletedName="CouponRowDeleted" msprop:Generator_RowClassName="CouponRow" msprop:Generator_UserTableName="Coupon" msprop:Generator_RowEvArgName="CouponRowChangeEvent">
+        <xs:element name="Coupon" msprop:Generator_TableClassName="CouponDataTable" msprop:Generator_TableVarName="tableCoupon" msprop:Generator_TablePropName="Coupon" msprop:Generator_RowDeletingName="CouponRowDeleting" msprop:Generator_RowChangingName="CouponRowChanging" msprop:Generator_RowEvHandlerName="CouponRowChangeEventHandler" msprop:Generator_RowDeletedName="CouponRowDeleted" msprop:Generator_UserTableName="Coupon" msprop:Generator_RowChangedName="CouponRowChanged" msprop:Generator_RowEvArgName="CouponRowChangeEvent" msprop:Generator_RowClassName="CouponRow">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ric" msprop:Generator_ColumnVarNameInTable="columnric" msprop:Generator_ColumnPropNameInRow="ric" msprop:Generator_ColumnPropNameInTable="ricColumn" msprop:Generator_UserColumnName="ric" type="xs:string" minOccurs="0" />
@@ -66,7 +66,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="IssuerRating" msprop:Generator_TableClassName="IssuerRatingDataTable" msprop:Generator_TableVarName="tableIssuerRating" msprop:Generator_RowChangedName="IssuerRatingRowChanged" msprop:Generator_TablePropName="IssuerRating" msprop:Generator_RowDeletingName="IssuerRatingRowDeleting" msprop:Generator_RowChangingName="IssuerRatingRowChanging" msprop:Generator_RowEvHandlerName="IssuerRatingRowChangeEventHandler" msprop:Generator_RowDeletedName="IssuerRatingRowDeleted" msprop:Generator_RowClassName="IssuerRatingRow" msprop:Generator_UserTableName="IssuerRating" msprop:Generator_RowEvArgName="IssuerRatingRowChangeEvent">
+        <xs:element name="IssuerRating" msprop:Generator_TableClassName="IssuerRatingDataTable" msprop:Generator_TableVarName="tableIssuerRating" msprop:Generator_TablePropName="IssuerRating" msprop:Generator_RowDeletingName="IssuerRatingRowDeleting" msprop:Generator_RowChangingName="IssuerRatingRowChanging" msprop:Generator_RowEvHandlerName="IssuerRatingRowChangeEventHandler" msprop:Generator_RowDeletedName="IssuerRatingRowDeleted" msprop:Generator_UserTableName="IssuerRating" msprop:Generator_RowChangedName="IssuerRatingRowChanged" msprop:Generator_RowEvArgName="IssuerRatingRowChangeEvent" msprop:Generator_RowClassName="IssuerRatingRow">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ric" msprop:Generator_ColumnVarNameInTable="columnric" msprop:Generator_ColumnPropNameInRow="ric" msprop:Generator_ColumnPropNameInTable="ricColumn" msprop:Generator_UserColumnName="ric" type="xs:string" minOccurs="0" />
@@ -76,7 +76,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="RicChain" msprop:Generator_TableClassName="RicChainDataTable" msprop:Generator_TableVarName="tableRicChain" msprop:Generator_RowChangedName="RicChainRowChanged" msprop:Generator_TablePropName="RicChain" msprop:Generator_RowDeletingName="RicChainRowDeleting" msprop:Generator_RowChangingName="RicChainRowChanging" msprop:Generator_RowEvHandlerName="RicChainRowChangeEventHandler" msprop:Generator_RowDeletedName="RicChainRowDeleted" msprop:Generator_RowClassName="RicChainRow" msprop:Generator_UserTableName="RicChain" msprop:Generator_RowEvArgName="RicChainRowChangeEvent">
+        <xs:element name="RicChain" msprop:Generator_TableClassName="RicChainDataTable" msprop:Generator_TableVarName="tableRicChain" msprop:Generator_TablePropName="RicChain" msprop:Generator_RowDeletingName="RicChainRowDeleting" msprop:Generator_RowChangingName="RicChainRowChanging" msprop:Generator_RowEvHandlerName="RicChainRowChangeEventHandler" msprop:Generator_RowDeletedName="RicChainRowDeleted" msprop:Generator_UserTableName="RicChain" msprop:Generator_RowChangedName="RicChainRowChanged" msprop:Generator_RowEvArgName="RicChainRowChangeEvent" msprop:Generator_RowClassName="RicChainRow">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ric" msprop:Generator_ColumnVarNameInTable="columnric" msprop:Generator_ColumnPropNameInRow="ric" msprop:Generator_ColumnPropNameInTable="ricColumn" msprop:Generator_UserColumnName="ric" type="xs:string" minOccurs="0" />
@@ -84,7 +84,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="Frn" msprop:Generator_TableClassName="FrnDataTable" msprop:Generator_TableVarName="tableFrn" msprop:Generator_RowChangedName="FrnRowChanged" msprop:Generator_TablePropName="Frn" msprop:Generator_RowDeletingName="FrnRowDeleting" msprop:Generator_RowChangingName="FrnRowChanging" msprop:Generator_RowEvHandlerName="FrnRowChangeEventHandler" msprop:Generator_RowDeletedName="FrnRowDeleted" msprop:Generator_RowClassName="FrnRow" msprop:Generator_UserTableName="Frn" msprop:Generator_RowEvArgName="FrnRowChangeEvent">
+        <xs:element name="Frn" msprop:Generator_TableClassName="FrnDataTable" msprop:Generator_TableVarName="tableFrn" msprop:Generator_TablePropName="Frn" msprop:Generator_RowDeletingName="FrnRowDeleting" msprop:Generator_RowChangingName="FrnRowChanging" msprop:Generator_RowEvHandlerName="FrnRowChangeEventHandler" msprop:Generator_RowDeletedName="FrnRowDeleted" msprop:Generator_UserTableName="Frn" msprop:Generator_RowChangedName="FrnRowChanged" msprop:Generator_RowEvArgName="FrnRowChangeEvent" msprop:Generator_RowClassName="FrnRow">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ric" msprop:Generator_ColumnVarNameInTable="columnric" msprop:Generator_ColumnPropNameInRow="ric" msprop:Generator_ColumnPropNameInTable="ricColumn" msprop:Generator_UserColumnName="ric" type="xs:string" minOccurs="0" />
@@ -96,7 +96,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="Rics" msprop:Generator_TableClassName="RicsDataTable" msprop:Generator_TableVarName="tableRics" msprop:Generator_RowChangedName="RicsRowChanged" msprop:Generator_TablePropName="Rics" msprop:Generator_RowDeletingName="RicsRowDeleting" msprop:Generator_RowChangingName="RicsRowChanging" msprop:Generator_RowEvHandlerName="RicsRowChangeEventHandler" msprop:Generator_RowDeletedName="RicsRowDeleted" msprop:Generator_RowClassName="RicsRow" msprop:Generator_UserTableName="Rics" msprop:Generator_RowEvArgName="RicsRowChangeEvent">
+        <xs:element name="Rics" msprop:Generator_TableClassName="RicsDataTable" msprop:Generator_TableVarName="tableRics" msprop:Generator_TablePropName="Rics" msprop:Generator_RowDeletingName="RicsRowDeleting" msprop:Generator_RowChangingName="RicsRowChanging" msprop:Generator_RowEvHandlerName="RicsRowChangeEventHandler" msprop:Generator_RowDeletedName="RicsRowDeleted" msprop:Generator_UserTableName="Rics" msprop:Generator_RowChangedName="RicsRowChanged" msprop:Generator_RowEvArgName="RicsRowChangeEvent" msprop:Generator_RowClassName="RicsRow">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ric" msprop:Generator_ColumnVarNameInTable="columnric" msprop:Generator_ColumnPropNameInRow="ric" msprop:Generator_ColumnPropNameInTable="ricColumn" msprop:Generator_UserColumnName="ric" type="xs:string" minOccurs="0" />
@@ -127,14 +127,14 @@
       <xs:selector xpath=".//mstns:Coupon" />
       <xs:field xpath="mstns:ric" />
     </xs:keyref>
-    <xs:keyref name="FK_Bond_Rating" refer="Constraint1" msprop:rel_Generator_UserChildTable="IssueRating" msprop:rel_Generator_ChildPropName="GetIssueRatingRows" msprop:rel_Generator_UserRelationName="FK_Bond_Rating" msprop:rel_Generator_RelationVarName="relationFK_Bond_Rating" msprop:rel_Generator_UserParentTable="Bond" msprop:rel_Generator_ParentPropName="BondRow" msdata:AcceptRejectRule="Cascade">
+    <xs:keyref name="FK_Bond_Rating" refer="Constraint1" msprop:rel_Generator_UserChildTable="IssueRating" msprop:rel_Generator_ChildPropName="GetIssueRatingRows" msprop:rel_Generator_UserRelationName="FK_Bond_Rating" msprop:rel_Generator_ParentPropName="BondRow" msprop:rel_Generator_RelationVarName="relationFK_Bond_Rating" msprop:rel_Generator_UserParentTable="Bond" msdata:AcceptRejectRule="Cascade">
       <xs:selector xpath=".//mstns:IssueRating" />
       <xs:field xpath="mstns:ric" />
     </xs:keyref>
   </xs:element>
   <xs:annotation>
     <xs:appinfo>
-      <msdata:Relationship name="FK_RicChain_Bond" msdata:parent="RicChain" msdata:child="Bond" msdata:parentkey="ric" msdata:childkey="ric" msprop:Generator_UserChildTable="Bond" msprop:Generator_ChildPropName="GetBondRows" msprop:Generator_UserRelationName="FK_RicChain_Bond" msprop:Generator_RelationVarName="relationFK_RicChain_Bond" msprop:Generator_UserParentTable="RicChain" msprop:Generator_ParentPropName="RicChainRow" />
+      <msdata:Relationship name="FK_RicChain_Bond" msdata:parent="RicChain" msdata:child="Bond" msdata:parentkey="ric" msdata:childkey="ric" msprop:Generator_UserChildTable="Bond" msprop:Generator_ChildPropName="GetBondRows" msprop:Generator_UserRelationName="FK_RicChain_Bond" msprop:Generator_ParentPropName="RicChainRow" msprop:Generator_RelationVarName="relationFK_RicChain_Bond" msprop:Generator_UserParentTable="RicChain" />
     </xs:appinfo>
   </xs:annotation>
 </xs:schema>

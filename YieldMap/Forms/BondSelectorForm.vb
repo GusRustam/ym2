@@ -77,6 +77,10 @@ Namespace Forms
             AppendFilter(RICTextBox, "ric", strFilter)
             AppendFilter(SectorTextBox, "industry", strFilter)
             AppendFilter(CurrencyTextBox, "currency", strFilter)
+            AppendFilter(BorrowerTextBox, "borrowerName", strFilter)
+            AppendFilter(SubIndTextBox, "subIndustry", strFilter)
+            AppendFilter(IssCntTextBox, "issuerCountry", strFilter)
+            AppendFilter(BorCntTextBox, "borrowerCountry", strFilter)
 
             Try
                 _bonds.SetFilter(strFilter)
@@ -97,7 +101,8 @@ Namespace Forms
         End Sub
 
         Private Sub FilterTextChanged(ByVal sender As Object, ByVal e As EventArgs) _
-            Handles IssuerTextBox.TextChanged, RICTextBox.TextChanged, CurrencyTextBox.TextChanged, SectorTextBox.TextChanged
+            Handles IssuerTextBox.TextChanged, RICTextBox.TextChanged, CurrencyTextBox.TextChanged, SectorTextBox.TextChanged, _
+            BorrowerTextBox.TextChanged, SubIndTextBox.TextChanged, IssCntTextBox.TextChanged, BorCntTextBox.TextChanged
 
             RefreshGrid()
         End Sub
