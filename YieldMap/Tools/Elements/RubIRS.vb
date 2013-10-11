@@ -689,7 +689,7 @@ Namespace Tools.Elements
         End Property
 
         Protected Overrides Function GetDuration(ByVal ric As String) As Double
-            Dim match = Regex.Match(ric, String.Format("{0}(?<term>[0-9]+?[DWMY])NDFOR=.*", InstrumentName))
+            Dim match = Regex.Match(ric, String.Format("{0}(?<term>[0-9]+?[DWMY])ID=.*", InstrumentName))
             Dim term = match.Groups("term").Value
             Dim dt As Date = GroupDate()
             Dim aDate As Array = DateModule.DfAddPeriod("RUS", dt, term, "")
@@ -697,7 +697,7 @@ Namespace Tools.Elements
         End Function
 
         Protected Overrides Function GetRICs(ByVal broker As String) As List(Of String)
-            Return AllowedTenors.Select(Function(item) String.Format("{0}{1}NDFOR={2}", InstrumentName, item, broker)).ToList()
+            Return AllowedTenors.Select(Function(item) String.Format("{0}{1}ID={2}", InstrumentName, item, broker)).ToList()
         End Function
     End Class
 End Namespace

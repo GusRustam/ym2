@@ -32,8 +32,8 @@
             Dim Label4 As System.Windows.Forms.Label
             Dim Label5 As System.Windows.Forms.Label
             Dim Label7 As System.Windows.Forms.Label
-            Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-            Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+            Dim ChartArea11 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+            Dim Legend11 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
             Me.TheStatusStrip = New System.Windows.Forms.StatusStrip()
             Me.StatusMessage = New System.Windows.Forms.ToolStripStatusLabel()
             Me.TheToolStrip = New System.Windows.Forms.ToolStrip()
@@ -47,10 +47,18 @@
             Me.RubIRSTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.RubCCSTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.NDFTSMI = New System.Windows.Forms.ToolStripMenuItem()
+            Me.ToolStripMenuItem2 = New System.Windows.Forms.ToolStripSeparator()
+            Me.UahNDFToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.ToolStripMenuItem3 = New System.Windows.Forms.ToolStripSeparator()
             Me.UsdIRSTSMI = New System.Windows.Forms.ToolStripMenuItem()
             Me.EurIRSToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Me.ChainCurvesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
+            Me.ChartLabels = New System.Windows.Forms.ToolStripSplitButton()
+            Me.IssuerSeriesToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
+            Me.IssuerCouponMaturityToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
+            Me.DescriptionToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
+            Me.SeriesOnlyToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
             Me.ShowLegendTSB = New System.Windows.Forms.ToolStripButton()
             Me.ShowLabelsTSB = New System.Windows.Forms.ToolStripButton()
             Me.ToolStripSeparator6 = New System.Windows.Forms.ToolStripSeparator()
@@ -185,9 +193,6 @@
             Me.BootstrappingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Me.BondCurveImportantTSS = New System.Windows.Forms.ToolStripSeparator()
             Me.SelectDateToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-            Me.UahNDFToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-            Me.ToolStripMenuItem2 = New System.Windows.Forms.ToolStripSeparator()
-            Me.ToolStripMenuItem3 = New System.Windows.Forms.ToolStripSeparator()
             Label8 = New System.Windows.Forms.Label()
             Label3 = New System.Windows.Forms.Label()
             Label6 = New System.Windows.Forms.Label()
@@ -317,7 +322,7 @@
             '
             'TheToolStrip
             '
-            Me.TheToolStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ZoomAllButton, Me.ZoomCustomButton, Me.ToolStripSeparator3, Me.PortfolioTSSB, Me.CurvesTSMI, Me.ToolStripSeparator2, Me.ShowLegendTSB, Me.ShowLabelsTSB, Me.ToolStripSeparator6, Me.AsTableTSB, Me.PinUnpinTSB})
+            Me.TheToolStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ZoomAllButton, Me.ZoomCustomButton, Me.ToolStripSeparator3, Me.PortfolioTSSB, Me.CurvesTSMI, Me.ToolStripSeparator2, Me.ChartLabels, Me.ShowLegendTSB, Me.ShowLabelsTSB, Me.ToolStripSeparator6, Me.AsTableTSB, Me.PinUnpinTSB})
             Me.TheToolStrip.Location = New System.Drawing.Point(0, 0)
             Me.TheToolStrip.Name = "TheToolStrip"
             Me.TheToolStrip.Size = New System.Drawing.Size(784, 25)
@@ -382,31 +387,47 @@
             'RubIRSTSMI
             '
             Me.RubIRSTSMI.Name = "RubIRSTSMI"
-            Me.RubIRSTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.RubIRSTSMI.Size = New System.Drawing.Size(121, 22)
             Me.RubIRSTSMI.Text = "Rub IRS"
             '
             'RubCCSTSMI
             '
             Me.RubCCSTSMI.Name = "RubCCSTSMI"
-            Me.RubCCSTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.RubCCSTSMI.Size = New System.Drawing.Size(121, 22)
             Me.RubCCSTSMI.Text = "Rub CCS"
             '
             'NDFTSMI
             '
             Me.NDFTSMI.Name = "NDFTSMI"
-            Me.NDFTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.NDFTSMI.Size = New System.Drawing.Size(121, 22)
             Me.NDFTSMI.Text = "Rub NDF"
+            '
+            'ToolStripMenuItem2
+            '
+            Me.ToolStripMenuItem2.Name = "ToolStripMenuItem2"
+            Me.ToolStripMenuItem2.Size = New System.Drawing.Size(118, 6)
+            '
+            'UahNDFToolStripMenuItem
+            '
+            Me.UahNDFToolStripMenuItem.Name = "UahNDFToolStripMenuItem"
+            Me.UahNDFToolStripMenuItem.Size = New System.Drawing.Size(121, 22)
+            Me.UahNDFToolStripMenuItem.Text = "Uah NDF"
+            '
+            'ToolStripMenuItem3
+            '
+            Me.ToolStripMenuItem3.Name = "ToolStripMenuItem3"
+            Me.ToolStripMenuItem3.Size = New System.Drawing.Size(118, 6)
             '
             'UsdIRSTSMI
             '
             Me.UsdIRSTSMI.Name = "UsdIRSTSMI"
-            Me.UsdIRSTSMI.Size = New System.Drawing.Size(152, 22)
+            Me.UsdIRSTSMI.Size = New System.Drawing.Size(121, 22)
             Me.UsdIRSTSMI.Text = "Usd IRS"
             '
             'EurIRSToolStripMenuItem
             '
             Me.EurIRSToolStripMenuItem.Name = "EurIRSToolStripMenuItem"
-            Me.EurIRSToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.EurIRSToolStripMenuItem.Size = New System.Drawing.Size(121, 22)
             Me.EurIRSToolStripMenuItem.Text = "Eur IRS"
             '
             'ChainCurvesToolStripMenuItem
@@ -420,6 +441,43 @@
             '
             Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
             Me.ToolStripSeparator2.Size = New System.Drawing.Size(6, 25)
+            '
+            'ChartLabels
+            '
+            Me.ChartLabels.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.IssuerSeriesToolStripMenuItem1, Me.IssuerCouponMaturityToolStripMenuItem1, Me.DescriptionToolStripMenuItem1, Me.SeriesOnlyToolStripMenuItem1})
+            Me.ChartLabels.Image = Global.YieldMap.My.Resources.Resources.Labels
+            Me.ChartLabels.ImageTransparentColor = System.Drawing.Color.Magenta
+            Me.ChartLabels.Name = "ChartLabels"
+            Me.ChartLabels.Size = New System.Drawing.Size(72, 22)
+            Me.ChartLabels.Text = "Labels"
+            '
+            'IssuerSeriesToolStripMenuItem1
+            '
+            Me.IssuerSeriesToolStripMenuItem1.Name = "IssuerSeriesToolStripMenuItem1"
+            Me.IssuerSeriesToolStripMenuItem1.Size = New System.Drawing.Size(214, 22)
+            Me.IssuerSeriesToolStripMenuItem1.Tag = "IssuerAndSeries"
+            Me.IssuerSeriesToolStripMenuItem1.Text = "Issuer - Series"
+            '
+            'IssuerCouponMaturityToolStripMenuItem1
+            '
+            Me.IssuerCouponMaturityToolStripMenuItem1.Name = "IssuerCouponMaturityToolStripMenuItem1"
+            Me.IssuerCouponMaturityToolStripMenuItem1.Size = New System.Drawing.Size(214, 22)
+            Me.IssuerCouponMaturityToolStripMenuItem1.Tag = "IssuerCpnMat"
+            Me.IssuerCouponMaturityToolStripMenuItem1.Text = "Issuer - Coupon - Maturity"
+            '
+            'DescriptionToolStripMenuItem1
+            '
+            Me.DescriptionToolStripMenuItem1.Name = "DescriptionToolStripMenuItem1"
+            Me.DescriptionToolStripMenuItem1.Size = New System.Drawing.Size(214, 22)
+            Me.DescriptionToolStripMenuItem1.Tag = "Description"
+            Me.DescriptionToolStripMenuItem1.Text = "Description"
+            '
+            'SeriesOnlyToolStripMenuItem1
+            '
+            Me.SeriesOnlyToolStripMenuItem1.Name = "SeriesOnlyToolStripMenuItem1"
+            Me.SeriesOnlyToolStripMenuItem1.Size = New System.Drawing.Size(214, 22)
+            Me.SeriesOnlyToolStripMenuItem1.Tag = "SeriesOnly"
+            Me.SeriesOnlyToolStripMenuItem1.Text = "Series only"
             '
             'ShowLegendTSB
             '
@@ -440,6 +498,7 @@
             Me.ShowLabelsTSB.Name = "ShowLabelsTSB"
             Me.ShowLabelsTSB.Size = New System.Drawing.Size(23, 22)
             Me.ShowLabelsTSB.Text = "Show labels"
+            Me.ShowLabelsTSB.Visible = False
             '
             'ToolStripSeparator6
             '
@@ -924,14 +983,14 @@
             '
             Me.TheChart.BackImageAlignment = System.Windows.Forms.DataVisualization.Charting.ChartImageAlignmentStyle.Center
             Me.TheChart.BackImageWrapMode = System.Windows.Forms.DataVisualization.Charting.ChartImageWrapMode.Unscaled
-            ChartArea1.BackImageAlignment = System.Windows.Forms.DataVisualization.Charting.ChartImageAlignmentStyle.Center
-            ChartArea1.BackImageWrapMode = System.Windows.Forms.DataVisualization.Charting.ChartImageWrapMode.Unscaled
-            ChartArea1.Name = "ChartArea1"
-            Me.TheChart.ChartAreas.Add(ChartArea1)
+            ChartArea11.BackImageAlignment = System.Windows.Forms.DataVisualization.Charting.ChartImageAlignmentStyle.Center
+            ChartArea11.BackImageWrapMode = System.Windows.Forms.DataVisualization.Charting.ChartImageWrapMode.Unscaled
+            ChartArea11.Name = "ChartArea1"
+            Me.TheChart.ChartAreas.Add(ChartArea11)
             Me.TheChart.Dock = System.Windows.Forms.DockStyle.Fill
-            Legend1.Enabled = False
-            Legend1.Name = "Legend1"
-            Me.TheChart.Legends.Add(Legend1)
+            Legend11.Enabled = False
+            Legend11.Name = "Legend1"
+            Me.TheChart.Legends.Add(Legend11)
             Me.TheChart.Location = New System.Drawing.Point(0, 0)
             Me.TheChart.Name = "TheChart"
             Me.TheChart.Size = New System.Drawing.Size(778, 417)
@@ -1192,24 +1251,28 @@
             '
             Me.SeriesIssuerNameAndSeriesTSMI.Name = "SeriesIssuerNameAndSeriesTSMI"
             Me.SeriesIssuerNameAndSeriesTSMI.Size = New System.Drawing.Size(200, 22)
+            Me.SeriesIssuerNameAndSeriesTSMI.Tag = "IssuerAndSeries"
             Me.SeriesIssuerNameAndSeriesTSMI.Text = "Issuer Series"
             '
             'IssuerCouponMaturityTSMI
             '
             Me.IssuerCouponMaturityTSMI.Name = "IssuerCouponMaturityTSMI"
             Me.IssuerCouponMaturityTSMI.Size = New System.Drawing.Size(200, 22)
+            Me.IssuerCouponMaturityTSMI.Tag = "IssuerCpnMat"
             Me.IssuerCouponMaturityTSMI.Text = "Issuer Coupon-Maturity"
             '
             'SeriesDescriptionTSMI
             '
             Me.SeriesDescriptionTSMI.Name = "SeriesDescriptionTSMI"
             Me.SeriesDescriptionTSMI.Size = New System.Drawing.Size(200, 22)
+            Me.SeriesDescriptionTSMI.Tag = "Description"
             Me.SeriesDescriptionTSMI.Text = "Description"
             '
             'SeriesSeriesOnlyTSMI
             '
             Me.SeriesSeriesOnlyTSMI.Name = "SeriesSeriesOnlyTSMI"
             Me.SeriesSeriesOnlyTSMI.Size = New System.Drawing.Size(200, 22)
+            Me.SeriesSeriesOnlyTSMI.Tag = "SeriesOnly"
             Me.SeriesSeriesOnlyTSMI.Text = "Series Only"
             '
             'BondSetYCMTSMI
@@ -1288,7 +1351,7 @@
             '
             Me.BondCurveCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ShowBondCurveItemsTSMI, Me.DeleteBondCurveTSMI, Me.BondCurveImportantTSS0, Me.LabelingModeToolStripMenuItem, Me.InterpolationTSMI, Me.BootstrappingToolStripMenuItem, Me.BondCurveImportantTSS, Me.SelectDateToolStripMenuItem})
             Me.BondCurveCMS.Name = "BondCurveCMS"
-            Me.BondCurveCMS.Size = New System.Drawing.Size(150, 148)
+            Me.BondCurveCMS.Size = New System.Drawing.Size(153, 170)
             '
             'ShowBondCurveItemsTSMI
             '
@@ -1311,31 +1374,35 @@
             '
             Me.LabelingModeToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.IssuerSeriesToolStripMenuItem, Me.IssuerCouponMaturityToolStripMenuItem, Me.DescriptionToolStripMenuItem, Me.SeriesOnlyToolStripMenuItem})
             Me.LabelingModeToolStripMenuItem.Name = "LabelingModeToolStripMenuItem"
-            Me.LabelingModeToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
+            Me.LabelingModeToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
             Me.LabelingModeToolStripMenuItem.Text = "Labels"
             '
             'IssuerSeriesToolStripMenuItem
             '
             Me.IssuerSeriesToolStripMenuItem.Name = "IssuerSeriesToolStripMenuItem"
             Me.IssuerSeriesToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
+            Me.IssuerSeriesToolStripMenuItem.Tag = "IssuerAndSeries"
             Me.IssuerSeriesToolStripMenuItem.Text = "Issuer Series"
             '
             'IssuerCouponMaturityToolStripMenuItem
             '
             Me.IssuerCouponMaturityToolStripMenuItem.Name = "IssuerCouponMaturityToolStripMenuItem"
             Me.IssuerCouponMaturityToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
+            Me.IssuerCouponMaturityToolStripMenuItem.Tag = "IssuerCpnMat"
             Me.IssuerCouponMaturityToolStripMenuItem.Text = "Issuer Coupon-Maturity"
             '
             'DescriptionToolStripMenuItem
             '
             Me.DescriptionToolStripMenuItem.Name = "DescriptionToolStripMenuItem"
             Me.DescriptionToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
+            Me.DescriptionToolStripMenuItem.Tag = "Description"
             Me.DescriptionToolStripMenuItem.Text = "Description"
             '
             'SeriesOnlyToolStripMenuItem
             '
             Me.SeriesOnlyToolStripMenuItem.Name = "SeriesOnlyToolStripMenuItem"
             Me.SeriesOnlyToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
+            Me.SeriesOnlyToolStripMenuItem.Tag = "SeriesOnly"
             Me.SeriesOnlyToolStripMenuItem.Text = "Series Only"
             '
             'InterpolationTSMI
@@ -1429,22 +1496,6 @@
             Me.SelectDateToolStripMenuItem.Name = "SelectDateToolStripMenuItem"
             Me.SelectDateToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
             Me.SelectDateToolStripMenuItem.Text = "Select date..."
-            '
-            'UahNDFToolStripMenuItem
-            '
-            Me.UahNDFToolStripMenuItem.Name = "UahNDFToolStripMenuItem"
-            Me.UahNDFToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-            Me.UahNDFToolStripMenuItem.Text = "Uah NDF"
-            '
-            'ToolStripMenuItem2
-            '
-            Me.ToolStripMenuItem2.Name = "ToolStripMenuItem2"
-            Me.ToolStripMenuItem2.Size = New System.Drawing.Size(149, 6)
-            '
-            'ToolStripMenuItem3
-            '
-            Me.ToolStripMenuItem3.Name = "ToolStripMenuItem3"
-            Me.ToolStripMenuItem3.Size = New System.Drawing.Size(149, 6)
             '
             'GraphForm
             '
@@ -1635,5 +1686,10 @@
         Friend WithEvents ToolStripMenuItem2 As System.Windows.Forms.ToolStripSeparator
         Friend WithEvents UahNDFToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents ToolStripMenuItem3 As System.Windows.Forms.ToolStripSeparator
+        Friend WithEvents ChartLabels As System.Windows.Forms.ToolStripSplitButton
+        Friend WithEvents IssuerSeriesToolStripMenuItem1 As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents IssuerCouponMaturityToolStripMenuItem1 As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents DescriptionToolStripMenuItem1 As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents SeriesOnlyToolStripMenuItem1 As System.Windows.Forms.ToolStripMenuItem
     End Class
 End Namespace

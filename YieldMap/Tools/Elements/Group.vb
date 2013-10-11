@@ -352,25 +352,33 @@ Namespace Tools.Elements
             UnfreezeEvents()
         End Sub
 
-        Public WriteOnly Property LabelEnabled As Boolean
-            Set(ByVal value As Boolean)
+        Public Property LabelMode(Optional ByVal force As Boolean = False) As LabelMode?
+            Get
+                Dim modes = (From el In _elements Where el.LabelMode.HasValue Select el.LabelMode.Value).Distinct().ToList()
+                If Not modes.Any Then
+                    Return Nothing
+                ElseIf modes.Count = 1 Then
+                    Return modes.First()
+                Else ' sevural modes
+                    Dim halfCount = _elements.Count / 2
+                    Return (From md In modes
+                            Let corrItems = (From el In _elements Where el.LabelMode.HasValue AndAlso el.LabelMode = md)
+                            Let thisIsIt = corrItems.Count() <= halfCount
+                            Where thisIsIt
+                            Select md).FirstOrDefault()
+                End If
+            End Get
+            Set(value As LabelMode?)
                 FreezeEvents()
-                For Each elem In _elements
-                    elem.LabelEnabled = value
-                Next
+                If Not force Then
+                    Dim disable = (From el In _elements Where el.LabelMode.HasValue AndAlso el.LabelMode = value).Count() = _elements.Count()
+                    _elements.ForEach(Sub(el) el.LabelMode(True) = If(disable, Nothing, value))
+                Else
+                    _elements.ForEach(Sub(el) el.LabelMode(True) = value)
+                End If
                 UnfreezeEvents()
             End Set
         End Property
-
-        Public Sub SetLabelMode(ByVal mode As LabelMode)
-            FreezeEvents()
-            Dim enable = (From el In _elements Where el.LabelEnabled AndAlso el.LabelMode = mode).Count() <= _elements.Count() / 2
-            _elements.ForEach(Sub(el)
-                                  el.LabelMode = mode
-                                  el.LabelEnabled = enable
-                              End Sub)
-            UnfreezeEvents()
-        End Sub
 
         Public Function Bonds(Optional ByVal clause As Func(Of Bond, Boolean) = Nothing) As IEnumerable(Of Bond)
             If clause IsNot Nothing Then

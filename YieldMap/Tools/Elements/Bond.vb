@@ -135,30 +135,27 @@ Namespace Tools.Elements
             End Set
         End Property
 
-        Private _labelEnabled As Boolean = False
-        Public Property LabelEnabled() As Boolean
-            Get
-                Return _labelEnabled
-            End Get
-            Set(ByVal value As Boolean)
-                _labelEnabled = value
-                RaiseEvent Changed()
-            End Set
-        End Property
-
-        Private _labelMode As LabelMode = LabelMode.IssuerAndSeries
-
-        Public Property LabelMode As LabelMode
+        Private _labelMode As LabelMode? = Nothing
+        Public Property LabelMode(Optional ByVal force As Boolean = False) As LabelMode?
             Get
                 Return _labelMode
             End Get
-            Set(ByVal value As LabelMode)
-                If value <> _labelMode Then
-                    _labelMode = value
-                    LabelEnabled = True
+            Set(ByVal value As LabelMode?)
+                If Not force Then
+                    If Not value.HasValue And _labelMode.HasValue Then
+                        _labelMode = Nothing
+                    ElseIf value.HasValue And Not _labelMode.HasValue Then
+                        _labelMode = value
+                    ElseIf value <> _labelMode Then
+                        _labelMode = value
+                    Else
+                        _labelMode = Nothing
+                    End If
                 Else
-                    LabelEnabled = False
+                    _labelMode = value
                 End If
+
+                RaiseEvent Changed()
             End Set
         End Property
 
@@ -169,13 +166,13 @@ Namespace Tools.Elements
 
         Public ReadOnly Property Label() As String
             Get
-                If Not _labelEnabled Then Return ""
+                If Not LabelMode.HasValue Then Return ""
                 Dim lab As String = ""
-                Select Case LabelMode
-                    Case LabelMode.IssuerAndSeries : lab = MetaData.Label1
-                    Case LabelMode.IssuerCpnMat : lab = MetaData.Label2
-                    Case LabelMode.Description : lab = MetaData.Label3
-                    Case LabelMode.SeriesOnly : lab = MetaData.Label4
+                Select Case LabelMode.Value
+                    Case Elements.LabelMode.IssuerAndSeries : lab = MetaData.Label1
+                    Case Elements.LabelMode.IssuerCpnMat : lab = MetaData.Label2
+                    Case Elements.LabelMode.Description : lab = MetaData.Label3
+                    Case Elements.LabelMode.SeriesOnly : lab = MetaData.Label4
                 End Select
                 Label = lab
             End Get
@@ -231,10 +228,6 @@ Namespace Tools.Elements
                 _userSelectedQuote = Fields.Custom
                 RaiseEvent CustomPrice(Me, price)
             End If
-        End Sub
-
-        Public Sub ToggleLabel()
-            LabelEnabled = Not LabelEnabled
         End Sub
     End Class
 End NameSpace

@@ -239,10 +239,10 @@ Namespace Forms.ChartForm
 
                        End Sub
 
-            IssuerNameSeriesTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.IssuerAndSeries)
-            ShortNameTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.IssuerCpnMat)
-            DescriptionTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.Description)
-            SeriesOnlyTSMI.Checked = (bondDataPoint.LabelMode = LabelMode.SeriesOnly)
+            IssuerNameSeriesTSMI.Checked = (bondDataPoint.LabelMode.HasValue AndAlso bondDataPoint.LabelMode = LabelMode.IssuerAndSeries)
+            ShortNameTSMI.Checked = (bondDataPoint.LabelMode.HasValue AndAlso bondDataPoint.LabelMode = LabelMode.IssuerCpnMat)
+            DescriptionTSMI.Checked = (bondDataPoint.LabelMode.HasValue AndAlso bondDataPoint.LabelMode = LabelMode.Description)
+            SeriesOnlyTSMI.Checked = (bondDataPoint.LabelMode.HasValue AndAlso bondDataPoint.LabelMode = LabelMode.SeriesOnly)
 
             Dim found As Boolean = False
             For Each item In YieldCalculationModeToolStripMenuItem.DropDownItems
@@ -715,12 +715,12 @@ Namespace Forms.ChartForm
             TheChart.Legends(0).Enabled = ShowLegendTSB.Checked
         End Sub
 
-        Private Sub ShowLabelsTSBClick(ByVal sender As Object, ByVal e As EventArgs) Handles ShowLabelsTSB.Click
-            Logger.Trace("ShowLabelsTSBClick")
-            For Each grp As KeyValuePair(Of Long, Group) In _ansamble.Items
-                grp.Value.LabelEnabled = ShowLabelsTSB.Checked
-            Next
-        End Sub
+        'Private Sub ShowLabelsTSBClick(ByVal sender As Object, ByVal e As EventArgs) Handles ShowLabelsTSB.Click
+        '    Logger.Trace("ShowLabelsTSBClick")
+        '    For Each grp As KeyValuePair(Of Long, Group) In _ansamble.Items
+        '        grp.Value.LabelEnabled = ShowLabelsTSB.Checked
+        '    Next
+        'End Sub
 
         Private Sub PinUnpinTSBClick(ByVal sender As Object, ByVal e As EventArgs) Handles PinUnpinTSB.Click
             If ItemDescriptionPanel.Visible Then
@@ -1021,19 +1021,19 @@ Namespace Forms.ChartForm
         End Sub
 
         Private Sub SeriesIssuerNameAndSeriesTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SeriesIssuerNameAndSeriesTSMI.Click
-            _ansamble.Items(BondSetCMS.Tag).SetLabelMode(LabelMode.IssuerAndSeries)
+            _ansamble.Items(BondSetCMS.Tag).LabelMode = LabelMode.IssuerAndSeries
         End Sub
 
         Private Sub SeriesSeriesOnlyTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SeriesSeriesOnlyTSMI.Click
-            _ansamble.Items(BondSetCMS.Tag).SetLabelMode(LabelMode.SeriesOnly)
+            _ansamble.Items(BondSetCMS.Tag).LabelMode = LabelMode.SeriesOnly
         End Sub
 
         Private Sub SeriesDescriptionTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles SeriesDescriptionTSMI.Click
-            _ansamble.Items(BondSetCMS.Tag).SetLabelMode(LabelMode.Description)
+            _ansamble.Items(BondSetCMS.Tag).LabelMode = LabelMode.Description
         End Sub
 
         Private Sub IssuerCouponMaturityTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles IssuerCouponMaturityTSMI.Click
-            _ansamble.Items(BondSetCMS.Tag).SetLabelMode(LabelMode.IssuerCpnMat)
+            _ansamble.Items(BondSetCMS.Tag).LabelMode = LabelMode.IssuerCpnMat
         End Sub
 
         Private Sub BondCurveTSMI_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BondCurveTSMI.Click
@@ -1113,28 +1113,28 @@ Namespace Forms.ChartForm
             Dim elem = _ansamble(BondCurveCMS.Tag)
             If elem Is Nothing Then Return
             Dim grp = TryCast(elem, Group)
-            If grp IsNot Nothing Then grp.SetLabelMode(LabelMode.IssuerAndSeries)
+            If grp IsNot Nothing Then grp.LabelMode = LabelMode.IssuerAndSeries
         End Sub
 
         Private Sub IssuerCouponMaturityToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles IssuerCouponMaturityToolStripMenuItem.Click
             Dim elem = _ansamble(BondCurveCMS.Tag)
             If elem Is Nothing Then Return
             Dim grp = TryCast(elem, Group)
-            If grp IsNot Nothing Then grp.SetLabelMode(LabelMode.IssuerCpnMat)
+            If grp IsNot Nothing Then grp.LabelMode = LabelMode.IssuerCpnMat
         End Sub
 
         Private Sub DescriptionToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DescriptionToolStripMenuItem.Click
             Dim elem = _ansamble(BondCurveCMS.Tag)
             If elem Is Nothing Then Return
             Dim grp = TryCast(elem, Group)
-            If grp IsNot Nothing Then grp.SetLabelMode(LabelMode.Description)
+            If grp IsNot Nothing Then grp.LabelMode = LabelMode.Description
         End Sub
 
         Private Sub SeriesOnlyToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SeriesOnlyToolStripMenuItem.Click
             Dim elem = _ansamble(BondCurveCMS.Tag)
             If elem Is Nothing Then Return
             Dim grp = TryCast(elem, Group)
-            If grp IsNot Nothing Then grp.SetLabelMode(LabelMode.SeriesOnly)
+            If grp IsNot Nothing Then grp.LabelMode = LabelMode.SeriesOnly
         End Sub
 
         Private Sub BondCurveTSMI_DropDownOpening(sender As Object, e As EventArgs) Handles BondCurveTSMI.DropDownOpened
@@ -1210,6 +1210,104 @@ Namespace Forms.ChartForm
                                  Let elem = TryCast(el, ToolStripMenuItem)
                                  Where elem IsNot Nothing Select elem
                     item.Checked = False
+                Next
+            End If
+        End Sub
+
+        Private Sub IssuerSeriesToolStripMenuItem1_Click(sender As Object, e As EventArgs) _
+            Handles IssuerSeriesToolStripMenuItem1.Click, IssuerCouponMaturityToolStripMenuItem1.Click, _
+                    DescriptionToolStripMenuItem1.Click, SeriesOnlyToolStripMenuItem1.Click
+
+            Dim tsmi = TryCast(sender, ToolStripMenuItem)
+            If tsmi Is Nothing Then Return
+
+            Dim mode As LabelMode: 
+            If Not LabelMode.TryParse(tsmi.Tag, mode) Then Return
+
+            If tsmi.Checked Then
+                _ansamble.LabelMode = Nothing
+            Else
+                _ansamble.LabelMode = mode
+            End If
+        End Sub
+
+        Private Sub ChartLabels_DropDownOpening(sender As Object, e As EventArgs) Handles ChartLabels.DropDownOpening
+            Dim labelMode As LabelMode? = _ansamble.LabelMode
+            If Not labelMode.HasValue Then
+                For Each item In From el In ChartLabels.DropDownItems
+                                     Let tsmi = TryCast(el, ToolStripMenuItem)
+                                     Where tsmi IsNot Nothing
+                                     Select tsmi
+                    item.Checked = False
+                Next
+            Else
+                For Each item In ChartLabels.DropDownItems
+                    Dim tsmi = TryCast(item, ToolStripMenuItem)
+                    If tsmi Is Nothing Then Continue For
+
+                    Dim mark = tsmi.Tag
+                    If mark Is Nothing Then Continue For
+
+                    Dim mode As Tools.Elements.LabelMode
+                    If Not Tools.Elements.LabelMode.TryParse(mark, mode) Then Continue For
+
+                    item.Checked = mode = labelMode.Value
+                Next
+            End If
+        End Sub
+
+        Private Sub LabelToolStripMenuItem_DropDownOpening(sender As Object, e As EventArgs) Handles LabelToolStripMenuItem.DropDownOpening
+            Dim grp = TryCast(_ansamble(BondSetCMS.Tag), Group)
+            If grp Is Nothing Then Return
+
+            Dim labelMode As LabelMode? = grp.LabelMode
+            If Not labelMode.HasValue Then
+                For Each item In From el In LabelToolStripMenuItem.DropDownItems
+                                     Let tsmi = TryCast(el, ToolStripMenuItem)
+                                     Where tsmi IsNot Nothing
+                                     Select tsmi
+                    item.Checked = False
+                Next
+            Else
+                For Each item In LabelToolStripMenuItem.DropDownItems
+                    Dim tsmi = TryCast(item, ToolStripMenuItem)
+                    If tsmi Is Nothing Then Continue For
+
+                    Dim mark = tsmi.Tag
+                    If mark Is Nothing Then Continue For
+
+                    Dim mode As Tools.Elements.LabelMode
+                    If Not Tools.Elements.LabelMode.TryParse(mark, mode) Then Continue For
+
+                    item.Checked = mode = labelMode.Value
+                Next
+            End If
+        End Sub
+
+        Private Sub LabelingModeToolStripMenuItem_DropDownOpening(sender As Object, e As EventArgs) Handles LabelingModeToolStripMenuItem.DropDownOpening
+            Dim grp = TryCast(_ansamble(BondCurveCMS.Tag), Group)
+            If grp Is Nothing Then Return
+
+            Dim labelMode As LabelMode? = grp.LabelMode
+            If Not labelMode.HasValue Then
+                For Each item In From el In LabelToolStripMenuItem.DropDownItems
+                                     Let tsmi = TryCast(el, ToolStripMenuItem)
+                                     Where tsmi IsNot Nothing
+                                     Select tsmi
+                    item.Checked = False
+                Next
+            Else
+                For Each item In LabelToolStripMenuItem.DropDownItems
+                    Dim tsmi = TryCast(item, ToolStripMenuItem)
+                    If tsmi Is Nothing Then Continue For
+
+                    Dim mark = tsmi.Tag
+                    If mark Is Nothing Then Continue For
+
+                    Dim mode As Tools.Elements.LabelMode
+                    If Not Tools.Elements.LabelMode.TryParse(mark, mode) Then Continue For
+
+                    item.Checked = mode = labelMode.Value
                 Next
             End If
         End Sub

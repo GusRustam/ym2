@@ -79,6 +79,29 @@
             End Set
         End Property
 
+        Public Property LabelMode() As LabelMode?
+            Get
+                Dim groups = AllItems().OfType(Of Group)().ToList()
+                Dim modes = (From grp In groups Let md = grp.LabelMode Where md.HasValue Select md).Distinct().ToList()
+                If Not modes.Any Then
+                    Return Nothing
+                ElseIf modes.Count = 1 Then
+                    Return modes.First()
+                Else ' sevural modes
+                    Dim halfCount = groups.Count / 2
+                    Return (From md In modes
+                            Let corrItems = (From el In groups Where el.LabelMode.HasValue AndAlso el.LabelMode = md)
+                            Let thisIsIt = corrItems.Count() > halfCount
+                            Where thisIsIt
+                            Select md).FirstOrDefault()
+                End If
+            End Get
+            Set(value As LabelMode?)
+                For Each group As Group In AllItems().OfType(Of Group)()
+                    group.LabelMode(True) = value
+                Next
+            End Set
+        End Property
 
         Public Sub Replot()
             For Each item In AllItems()
