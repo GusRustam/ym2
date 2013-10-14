@@ -133,6 +133,12 @@
     <Compile Include="Forms\ChartForm\GroupSelectForm.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\CustomBondSelectorForm.Designer.vb">
+      <DependentUpon>CustomBondSelectorForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CustomBondSelectorForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Tools\Elements\BenchmarkContainer.vb" />
     <Compile Include="Tools\Elements\BondCurveSnapshotElement.vb" />
     <Compile Include="Tools\Elements\BondSnapshot.vb" />
@@ -286,6 +292,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ChartForm\GroupSelectForm.resx">
       <DependentUpon>GroupSelectForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CustomBondSelectorForm.resx">
+      <DependentUpon>CustomBondSelectorForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\MainForm\AboutForm.resx">
       <DependentUpon>AboutForm.vb</DependentUpon>
@@ -505,7 +514,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_BuildVersioningStyle="None.MonthStamp.Increment.TimeStamp" />
+      <UserProperties BuildVersion_BuildVersioningStyle="None.MonthStamp.Increment.TimeStamp" BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -15,6 +15,15 @@ Namespace Tools.Elements
             AddRics(portfolioStructure.Rics(port))
         End Sub
 
+        Public Sub New(ByVal ansamble As Ansamble, ByVal ric As String, ByVal clr As String)
+            MyBase.New(ansamble, New FieldSet("Custom bonds"))
+
+            Nm = ric
+            PortfolioID = Guid.NewGuid().ToString()
+            Color = clr
+            AddRics({ric})
+        End Sub
+
         Public Overrides Sub Subscribe()
             For Each item In Elements
                 item.SetCustomPrice(100)

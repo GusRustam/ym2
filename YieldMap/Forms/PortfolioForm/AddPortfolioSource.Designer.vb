@@ -35,6 +35,8 @@
             Me.TableLayoutPanel4 = New System.Windows.Forms.TableLayoutPanel()
             Me.FlowLayoutPanel4 = New System.Windows.Forms.FlowLayoutPanel()
             Me.IndBondsRB = New System.Windows.Forms.RadioButton()
+            Me.AddBondsButton = New System.Windows.Forms.Button()
+            Me.RemoveBondsButton = New System.Windows.Forms.Button()
             Me.CustomBondsRB = New System.Windows.Forms.RadioButton()
             Me.BondsDGV = New System.Windows.Forms.DataGridView()
             Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
@@ -52,8 +54,6 @@
             Me.SampleColorPB = New System.Windows.Forms.PictureBox()
             Me.RandomColorB = New System.Windows.Forms.Button()
             Me.IncludeCB = New System.Windows.Forms.CheckBox()
-            Me.AddBondsButton = New System.Windows.Forms.Button()
-            Me.RemoveBondsButton = New System.Windows.Forms.Button()
             Me.Label4 = New System.Windows.Forms.Label()
             Me.FieldsLayoutCB = New System.Windows.Forms.ComboBox()
             Me.TableLayoutPanel1.SuspendLayout()
@@ -105,7 +105,7 @@
             Me.ChainOrListTP.Location = New System.Drawing.Point(4, 22)
             Me.ChainOrListTP.Name = "ChainOrListTP"
             Me.ChainOrListTP.Padding = New System.Windows.Forms.Padding(3)
-            Me.ChainOrListTP.Size = New System.Drawing.Size(408, 269)
+            Me.ChainOrListTP.Size = New System.Drawing.Size(408, 294)
             Me.ChainOrListTP.TabIndex = 0
             Me.ChainOrListTP.Text = "Chain or List"
             Me.ChainOrListTP.UseVisualStyleBackColor = True
@@ -122,7 +122,7 @@
             Me.TableLayoutPanel2.RowCount = 2
             Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30.0!))
             Me.TableLayoutPanel2.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
-            Me.TableLayoutPanel2.Size = New System.Drawing.Size(402, 263)
+            Me.TableLayoutPanel2.Size = New System.Drawing.Size(402, 288)
             Me.TableLayoutPanel2.TabIndex = 0
             '
             'FlowLayoutPanel2
@@ -163,7 +163,7 @@
             Me.ChainsListsLB.FormattingEnabled = True
             Me.ChainsListsLB.Location = New System.Drawing.Point(3, 33)
             Me.ChainsListsLB.Name = "ChainsListsLB"
-            Me.ChainsListsLB.Size = New System.Drawing.Size(396, 227)
+            Me.ChainsListsLB.Size = New System.Drawing.Size(396, 252)
             Me.ChainsListsLB.TabIndex = 1
             '
             'IndividualAndCustomBondsTP
@@ -214,6 +214,26 @@
             Me.IndBondsRB.TabIndex = 0
             Me.IndBondsRB.Text = "Regular"
             Me.IndBondsRB.UseVisualStyleBackColor = True
+            '
+            'AddBondsButton
+            '
+            Me.AddBondsButton.Location = New System.Drawing.Point(71, 3)
+            Me.AddBondsButton.Name = "AddBondsButton"
+            Me.AddBondsButton.Size = New System.Drawing.Size(42, 23)
+            Me.AddBondsButton.TabIndex = 2
+            Me.AddBondsButton.Text = "Add..."
+            Me.AddBondsButton.UseVisualStyleBackColor = True
+            Me.AddBondsButton.Visible = False
+            '
+            'RemoveBondsButton
+            '
+            Me.RemoveBondsButton.Location = New System.Drawing.Point(119, 3)
+            Me.RemoveBondsButton.Name = "RemoveBondsButton"
+            Me.RemoveBondsButton.Size = New System.Drawing.Size(63, 23)
+            Me.RemoveBondsButton.TabIndex = 2
+            Me.RemoveBondsButton.Text = "Remove"
+            Me.RemoveBondsButton.UseVisualStyleBackColor = True
+            Me.RemoveBondsButton.Visible = False
             '
             'CustomBondsRB
             '
@@ -404,26 +424,6 @@
             Me.IncludeCB.TabIndex = 9
             Me.IncludeCB.Text = "Yes"
             Me.IncludeCB.UseVisualStyleBackColor = True
-            '
-            'AddBondsButton
-            '
-            Me.AddBondsButton.Location = New System.Drawing.Point(71, 3)
-            Me.AddBondsButton.Name = "AddBondsButton"
-            Me.AddBondsButton.Size = New System.Drawing.Size(42, 23)
-            Me.AddBondsButton.TabIndex = 2
-            Me.AddBondsButton.Text = "Add..."
-            Me.AddBondsButton.UseVisualStyleBackColor = True
-            Me.AddBondsButton.Visible = False
-            '
-            'RemoveBondsButton
-            '
-            Me.RemoveBondsButton.Location = New System.Drawing.Point(119, 3)
-            Me.RemoveBondsButton.Name = "RemoveBondsButton"
-            Me.RemoveBondsButton.Size = New System.Drawing.Size(63, 23)
-            Me.RemoveBondsButton.TabIndex = 2
-            Me.RemoveBondsButton.Text = "Remove"
-            Me.RemoveBondsButton.UseVisualStyleBackColor = True
-            Me.RemoveBondsButton.Visible = False
             '
             'Label4
             '

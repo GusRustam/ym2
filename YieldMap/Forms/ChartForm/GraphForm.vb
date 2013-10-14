@@ -1311,5 +1311,18 @@ Namespace Forms.ChartForm
                 Next
             End If
         End Sub
+
+        Private Sub AddCustomBondToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AddCustomBondToolStripMenuItem.Click
+            Dim bondSelector As New CustomBondSelectorForm
+            If bondSelector.ShowDialog() = DialogResult.OK AndAlso Not String.IsNullOrEmpty(bondSelector.SelectedRic) Then
+                Dim grp As New CustomBondGroup(_ansamble, bondSelector.SelectedRic, bondSelector.SelectedColor)
+                AddHandler grp.Updated, Sub(items) OnGroupUpdated(grp, items)
+                AddHandler grp.Cleared, Sub() ClearSeries(grp.Identity)
+                AddHandler grp.UpdatedSpread, Sub(data As List(Of PointOfCurve), ord As IOrdinate) _
+                                                  If _ansamble.YSource = ord Then OnGroupUpdated(grp, data)
+                _ansamble.Items.Add(grp)
+                grp.Subscribe()
+            End If
+        End Sub
     End Class
 End Namespace

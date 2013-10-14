@@ -32,8 +32,8 @@
             Dim Label4 As System.Windows.Forms.Label
             Dim Label5 As System.Windows.Forms.Label
             Dim Label7 As System.Windows.Forms.Label
-            Dim ChartArea11 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
-            Dim Legend11 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
+            Dim ChartArea1 As System.Windows.Forms.DataVisualization.Charting.ChartArea = New System.Windows.Forms.DataVisualization.Charting.ChartArea()
+            Dim Legend1 As System.Windows.Forms.DataVisualization.Charting.Legend = New System.Windows.Forms.DataVisualization.Charting.Legend()
             Me.TheStatusStrip = New System.Windows.Forms.StatusStrip()
             Me.StatusMessage = New System.Windows.Forms.ToolStripStatusLabel()
             Me.TheToolStrip = New System.Windows.Forms.ToolStrip()
@@ -193,6 +193,7 @@
             Me.BootstrappingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Me.BondCurveImportantTSS = New System.Windows.Forms.ToolStripSeparator()
             Me.SelectDateToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+            Me.AddCustomBondToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Label8 = New System.Windows.Forms.Label()
             Label3 = New System.Windows.Forms.Label()
             Label6 = New System.Windows.Forms.Label()
@@ -983,14 +984,14 @@
             '
             Me.TheChart.BackImageAlignment = System.Windows.Forms.DataVisualization.Charting.ChartImageAlignmentStyle.Center
             Me.TheChart.BackImageWrapMode = System.Windows.Forms.DataVisualization.Charting.ChartImageWrapMode.Unscaled
-            ChartArea11.BackImageAlignment = System.Windows.Forms.DataVisualization.Charting.ChartImageAlignmentStyle.Center
-            ChartArea11.BackImageWrapMode = System.Windows.Forms.DataVisualization.Charting.ChartImageWrapMode.Unscaled
-            ChartArea11.Name = "ChartArea1"
-            Me.TheChart.ChartAreas.Add(ChartArea11)
+            ChartArea1.BackImageAlignment = System.Windows.Forms.DataVisualization.Charting.ChartImageAlignmentStyle.Center
+            ChartArea1.BackImageWrapMode = System.Windows.Forms.DataVisualization.Charting.ChartImageWrapMode.Unscaled
+            ChartArea1.Name = "ChartArea1"
+            Me.TheChart.ChartAreas.Add(ChartArea1)
             Me.TheChart.Dock = System.Windows.Forms.DockStyle.Fill
-            Legend11.Enabled = False
-            Legend11.Name = "Legend1"
-            Me.TheChart.Legends.Add(Legend11)
+            Legend1.Enabled = False
+            Legend1.Name = "Legend1"
+            Me.TheChart.Legends.Add(Legend1)
             Me.TheChart.Location = New System.Drawing.Point(0, 0)
             Me.TheChart.Name = "TheChart"
             Me.TheChart.Size = New System.Drawing.Size(778, 417)
@@ -1008,36 +1009,36 @@
             '
             'ChartCMS
             '
-            Me.ChartCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToClipboardTSMI, Me.ClipboardSeparator, Me.SelectFromAListTSMI, Me.ToolStripSeparator14, Me.SelectChartDateTSMI})
+            Me.ChartCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CopyToClipboardTSMI, Me.ClipboardSeparator, Me.AddCustomBondToolStripMenuItem, Me.SelectFromAListTSMI, Me.ToolStripSeparator14, Me.SelectChartDateTSMI})
             Me.ChartCMS.Name = "ChartCMS"
-            Me.ChartCMS.Size = New System.Drawing.Size(170, 82)
+            Me.ChartCMS.Size = New System.Drawing.Size(180, 126)
             '
             'CopyToClipboardTSMI
             '
             Me.CopyToClipboardTSMI.Name = "CopyToClipboardTSMI"
-            Me.CopyToClipboardTSMI.Size = New System.Drawing.Size(169, 22)
+            Me.CopyToClipboardTSMI.Size = New System.Drawing.Size(179, 22)
             Me.CopyToClipboardTSMI.Text = "Copy to clipboard"
             '
             'ClipboardSeparator
             '
             Me.ClipboardSeparator.Name = "ClipboardSeparator"
-            Me.ClipboardSeparator.Size = New System.Drawing.Size(166, 6)
+            Me.ClipboardSeparator.Size = New System.Drawing.Size(176, 6)
             '
             'SelectFromAListTSMI
             '
             Me.SelectFromAListTSMI.Name = "SelectFromAListTSMI"
-            Me.SelectFromAListTSMI.Size = New System.Drawing.Size(169, 22)
+            Me.SelectFromAListTSMI.Size = New System.Drawing.Size(179, 22)
             Me.SelectFromAListTSMI.Text = "Add bond..."
             '
             'ToolStripSeparator14
             '
             Me.ToolStripSeparator14.Name = "ToolStripSeparator14"
-            Me.ToolStripSeparator14.Size = New System.Drawing.Size(166, 6)
+            Me.ToolStripSeparator14.Size = New System.Drawing.Size(176, 6)
             '
             'SelectChartDateTSMI
             '
             Me.SelectChartDateTSMI.Name = "SelectChartDateTSMI"
-            Me.SelectChartDateTSMI.Size = New System.Drawing.Size(169, 22)
+            Me.SelectChartDateTSMI.Size = New System.Drawing.Size(179, 22)
             Me.SelectChartDateTSMI.Text = "Select date..."
             '
             'HistoryCMS
@@ -1351,7 +1352,7 @@
             '
             Me.BondCurveCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ShowBondCurveItemsTSMI, Me.DeleteBondCurveTSMI, Me.BondCurveImportantTSS0, Me.LabelingModeToolStripMenuItem, Me.InterpolationTSMI, Me.BootstrappingToolStripMenuItem, Me.BondCurveImportantTSS, Me.SelectDateToolStripMenuItem})
             Me.BondCurveCMS.Name = "BondCurveCMS"
-            Me.BondCurveCMS.Size = New System.Drawing.Size(153, 170)
+            Me.BondCurveCMS.Size = New System.Drawing.Size(150, 148)
             '
             'ShowBondCurveItemsTSMI
             '
@@ -1374,7 +1375,7 @@
             '
             Me.LabelingModeToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.IssuerSeriesToolStripMenuItem, Me.IssuerCouponMaturityToolStripMenuItem, Me.DescriptionToolStripMenuItem, Me.SeriesOnlyToolStripMenuItem})
             Me.LabelingModeToolStripMenuItem.Name = "LabelingModeToolStripMenuItem"
-            Me.LabelingModeToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+            Me.LabelingModeToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
             Me.LabelingModeToolStripMenuItem.Text = "Labels"
             '
             'IssuerSeriesToolStripMenuItem
@@ -1496,6 +1497,12 @@
             Me.SelectDateToolStripMenuItem.Name = "SelectDateToolStripMenuItem"
             Me.SelectDateToolStripMenuItem.Size = New System.Drawing.Size(149, 22)
             Me.SelectDateToolStripMenuItem.Text = "Select date..."
+            '
+            'AddCustomBondToolStripMenuItem
+            '
+            Me.AddCustomBondToolStripMenuItem.Name = "AddCustomBondToolStripMenuItem"
+            Me.AddCustomBondToolStripMenuItem.Size = New System.Drawing.Size(179, 22)
+            Me.AddCustomBondToolStripMenuItem.Text = "Add custom bond..."
             '
             'GraphForm
             '
@@ -1691,5 +1698,6 @@
         Friend WithEvents IssuerCouponMaturityToolStripMenuItem1 As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents DescriptionToolStripMenuItem1 As System.Windows.Forms.ToolStripMenuItem
         Friend WithEvents SeriesOnlyToolStripMenuItem1 As System.Windows.Forms.ToolStripMenuItem
+        Friend WithEvents AddCustomBondToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     End Class
 End Namespace

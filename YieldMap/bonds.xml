@@ -138,7 +138,7 @@
       <ric>RU076746982=</ric>
       <ric>RU050495418=</ric>
     </list>
-    <list id="55792" field-set-id="Eurobonds" name="CIS Russia Vimpelcom (USD)" color="Crimson" curve="True" enabled="True">
+    <list id="55792" field-set-id="Eurobonds" name="CIS Russia Vimpelcom (USD)" color="Brown" curve="True" enabled="True">
       <ric>RU064317644=</ric>
       <ric>RU088940105=</ric>
       <ric>RU088940172=</ric>
@@ -215,13 +215,13 @@
   <!-- Dynamic lists -->
   <queries>
     <query id="37593" field-set-id="Eurobonds" name="EMEA Turkey Sovereign Eurobonds (USD)" color="Olive" curve="True" enabled="True" chain-id="26695" condition="$ShortName LIKE &quot;^Turkey&quot; and $Currency = &quot;USD&quot;" />
-    <query id="9546" field-set-id="MICEX" name="CIS Russia VEB (RUB)" color="DarkSeaGreen" curve="True" enabled="True" chain-id="71511" condition="$ShortName LIKE &quot;^Vneshekonom&quot; AND $Currency = &quot;RUB&quot;" />
-    <query id="47777" field-set-id="MICEX" name="CIS Russia VTB (RUB)" color="DarkGreen" curve="True" enabled="True" chain-id="71511" condition="$IssuerName Like &quot;VTB&quot; AND $Currency = &quot;RUB&quot;" />
-    <query id="14285" field-set-id="Eurobonds" name="CIS Russia VEB Eurobonds (USD)" color="LawnGreen" curve="True" enabled="True" chain-id="409" condition="$Currency = &quot;USD&quot; AND $IssuerName = &quot;VEB FINANCE PLC&quot;" />
-    <query id="443" field-set-id="Eurobonds" name="CIS Russia VTB Eurobonds (USD)" color="SpringGreen" curve="True" enabled="True" chain-id="409" condition="$Currency = &quot;USD&quot; AND $IssuerName = &quot;VTB CAPITAL SA&quot;" />
+    <query id="9546" field-set-id="MICEX" name="CIS Russia VEB (RUB)" color="DarkSlateBlue" curve="True" enabled="True" chain-id="71511" condition="$ShortName LIKE &quot;^Vneshekonom&quot; AND $Currency = &quot;RUB&quot;" />
+    <query id="47777" field-set-id="MICEX" name="CIS Russia VTB (RUB)" color="Blue" curve="True" enabled="True" chain-id="71511" condition="$IssuerName Like &quot;VTB&quot; AND $Currency = &quot;RUB&quot;" />
+    <query id="14285" field-set-id="Eurobonds" name="CIS Russia VEB Eurobonds (USD)" color="SeaGreen" curve="True" enabled="True" chain-id="409" condition="$Currency = &quot;USD&quot; AND $IssuerName = &quot;VEB FINANCE PLC&quot;" />
+    <query id="443" field-set-id="Eurobonds" name="CIS Russia VTB Eurobonds (USD)" color="MediumBlue" curve="True" enabled="True" chain-id="409" condition="$Currency = &quot;USD&quot; AND $IssuerName = &quot;VTB CAPITAL SA&quot;" />
     <query id="80636" field-set-id="Eurobonds" name="CIS Russia Sberbank Eurobonds (USD)" color="OliveDrab" curve="True" enabled="True" chain-id="409" condition="$IssuerName = &quot;SB CAPITAL SA&quot; AND $Currency = &quot;USD&quot;" />
-    <query id="24875" field-set-id="Eurobonds" name="CIS Russia RSHB Eurobonds (USD)" color="MediumTurquoise" curve="True" enabled="True" chain-id="409" condition="$IssuerName LIKE &quot;^RSHB&quot; AND $Currency = &quot;USD&quot;" />
-    <query id="91530" field-set-id="Eurobonds" name="CIS Russia Alfa Bank Eurobonds (USD)" color="MediumTurquoise" curve="True" enabled="True" chain-id="409" condition="$IssuerName LIKE &quot;^ALFA&quot; AND $Currency = &quot;USD&quot;" />
+    <query id="24875" field-set-id="Eurobonds" name="CIS Russia RSHB Eurobonds (USD)" color="DarkGreen" curve="True" enabled="True" chain-id="409" condition="$IssuerName LIKE &quot;^RSHB&quot; AND $Currency = &quot;USD&quot;" />
+    <query id="91530" field-set-id="Eurobonds" name="CIS Russia Alfa Bank Eurobonds (USD)" color="RosyBrown" curve="True" enabled="True" chain-id="409" condition="$IssuerName LIKE &quot;^ALFA&quot; AND $Currency = &quot;USD&quot;" />
     <query id="4027" field-set-id="Eurobonds" name="CIS Russia Lukoil Eurobonds (USD)" color="Goldenrod" curve="True" enabled="True" chain-id="409" condition="$IssuerName LIKE &quot;LUKOIL&quot; AND $Currency = &quot;USD&quot;" />
     <query id="8945" field-set-id="Eurobonds" name="CIS Russia Rosneft Eurobonds (USD)" color="Chocolate" curve="True" enabled="True" chain-id="409" condition="$Currency = &quot;USD&quot; AND $IssuerName LIKE &quot;^ROSN&quot;" />
     <query id="97636" field-set-id="Eurobonds" name="CIS Russia Gazprom Eurobonds (USD)" color="MediumPurple" curve="True" enabled="True" chain-id="409" condition="$Currency = &quot;USD&quot; AND $IssuerName LIKE &quot;GAZ&quot;" />
@@ -262,7 +262,6 @@
         <include what="chain" id="76697" name="GE Issuers" />
         <include what="chain" id="18867" color="Coral" />
         <include what="list" id="98366" />
-        <include what="custom-bond" id="26531" name="Armenia 20" color="BlueViolet" />
       </portfolio>
       <portfolio id="33783" name="Quasi sovereign">
         <include what="query" id="97636" name="GAZP USD" color="MediumSlateBlue" />
@@ -324,7 +323,7 @@
     </folder>
   </portfolios>
   <custom-bonds>
-    <bond id="1" name="Base case 3Y 12% bond" code="NewIssueBase" rateStructure="" bondStructure="ACC:A5 IC:L1 CLDR:RUS_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY FRQ:2.00 PX:CLEAN REFDATE:MATURITY RATE:0.06 AMORT:23JUL2013:0.20 AMORT:01JAN2014:0.80   STEP:01SEP2013:0.14 " maturity="30SEP2020" coupon="0.06" color="Red" />
+    <bond id="1" name="Base case 3Y 12% bond" code="NewIssueBase" rateStructure="" bondStructure="ACC:A5 IC:L1 CLDR:RUS_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY FRQ:2 PX:CLEAN REFDATE:MATURITY RATE:0.06 AMORT:23JUL2013:0.2 AMORT:01JAN2014:0.8   STEP:01SEP2013:0.14 " maturity="30SEP2020" coupon="0.06" color="Red" />
     <bond id="39240" name="ss" color="Gray" code="22" maturity="23APR2014" coupon="0" bondStructure="ACC:A5 IC:L1 CLDR:RUS_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY PX:CLEAN REFDATE:MATURITY RATE:0.13     " />
     <bond id="40958" name="Russia '23" color="Gray" code="Russia 23" maturity="16SEP2023" coupon="0.0488" bondStructure="ACC:A5 IC:L1 CLDR:EMU_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY FRQ:182D PX:CLEAN REFDATE:MATURITY RATE:0.0488     " />
     <bond id="36302" name="Russia '19" color="Gray" code="Russia 19" maturity="16SEP2019" coupon="0.035" bondStructure="ACC:A5 IC:L1 CLDR:EMU_FI SETTLE:0WD CFADJ:NO DMC:FOLLOWING EMC:LASTDAY FRQ:182D PX:CLEAN REFDATE:MATURITY RATE:0.035     " />

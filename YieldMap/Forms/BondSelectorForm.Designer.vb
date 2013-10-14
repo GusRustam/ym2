@@ -43,13 +43,13 @@
             Me.Label1 = New System.Windows.Forms.Label()
             Me.RICTextBox = New System.Windows.Forms.TextBox()
             Me.Label2 = New System.Windows.Forms.Label()
-            Me.SelectColumnsCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
-            Me.SelectColumnsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Me.Label8 = New System.Windows.Forms.Label()
             Me.BorrowerTextBox = New System.Windows.Forms.TextBox()
             Me.SubIndTextBox = New System.Windows.Forms.TextBox()
             Me.IssCntTextBox = New System.Windows.Forms.TextBox()
             Me.BorCntTextBox = New System.Windows.Forms.TextBox()
+            Me.SelectColumnsCMS = New System.Windows.Forms.ContextMenuStrip(Me.components)
+            Me.SelectColumnsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
             Label3 = New System.Windows.Forms.Label()
             Label4 = New System.Windows.Forms.Label()
             Label5 = New System.Windows.Forms.Label()
@@ -75,12 +75,42 @@
             'Label4
             '
             Label4.AutoSize = True
-            Label4.Location = New System.Drawing.Point(207, 27)
+            Label4.Location = New System.Drawing.Point(207, 28)
             Label4.Margin = New System.Windows.Forms.Padding(3)
             Label4.Name = "Label4"
             Label4.Size = New System.Drawing.Size(44, 13)
             Label4.TabIndex = 15
             Label4.Text = "Industry"
+            '
+            'Label5
+            '
+            Label5.AutoSize = True
+            Label5.Location = New System.Drawing.Point(207, 53)
+            Label5.Margin = New System.Windows.Forms.Padding(3)
+            Label5.Name = "Label5"
+            Label5.Size = New System.Drawing.Size(63, 13)
+            Label5.TabIndex = 18
+            Label5.Text = "SubIndustry"
+            '
+            'Label6
+            '
+            Label6.AutoSize = True
+            Label6.Location = New System.Drawing.Point(411, 3)
+            Label6.Margin = New System.Windows.Forms.Padding(3)
+            Label6.Name = "Label6"
+            Label6.Size = New System.Drawing.Size(62, 13)
+            Label6.TabIndex = 18
+            Label6.Text = "Iss. Country"
+            '
+            'Label7
+            '
+            Label7.AutoSize = True
+            Label7.Location = New System.Drawing.Point(411, 28)
+            Label7.Margin = New System.Windows.Forms.Padding(3)
+            Label7.Name = "Label7"
+            Label7.Size = New System.Drawing.Size(65, 13)
+            Label7.TabIndex = 18
+            Label7.Text = "Bor. Country"
             '
             'TableLayoutPanel1
             '
@@ -207,7 +237,7 @@
             'SectorTextBox
             '
             Me.SectorTextBox.Dock = System.Windows.Forms.DockStyle.Top
-            Me.SectorTextBox.Location = New System.Drawing.Point(287, 27)
+            Me.SectorTextBox.Location = New System.Drawing.Point(287, 28)
             Me.SectorTextBox.Name = "SectorTextBox"
             Me.SectorTextBox.Size = New System.Drawing.Size(118, 20)
             Me.SectorTextBox.TabIndex = 17
@@ -226,7 +256,7 @@
             Me.SettingsButton.Location = New System.Drawing.Point(663, 0)
             Me.SettingsButton.Margin = New System.Windows.Forms.Padding(0)
             Me.SettingsButton.Name = "SettingsButton"
-            Me.SettingsButton.Size = New System.Drawing.Size(75, 24)
+            Me.SettingsButton.Size = New System.Drawing.Size(75, 25)
             Me.SettingsButton.TabIndex = 13
             Me.SettingsButton.Text = "Settings..."
             Me.SettingsButton.UseVisualStyleBackColor = True
@@ -252,7 +282,7 @@
             'RICTextBox
             '
             Me.RICTextBox.Dock = System.Windows.Forms.DockStyle.Top
-            Me.RICTextBox.Location = New System.Drawing.Point(83, 51)
+            Me.RICTextBox.Location = New System.Drawing.Point(83, 53)
             Me.RICTextBox.Name = "RICTextBox"
             Me.RICTextBox.Size = New System.Drawing.Size(118, 20)
             Me.RICTextBox.TabIndex = 10
@@ -260,59 +290,17 @@
             'Label2
             '
             Me.Label2.AutoSize = True
-            Me.Label2.Location = New System.Drawing.Point(3, 51)
+            Me.Label2.Location = New System.Drawing.Point(3, 53)
             Me.Label2.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
             Me.Label2.Name = "Label2"
             Me.Label2.Size = New System.Drawing.Size(25, 13)
             Me.Label2.TabIndex = 7
             Me.Label2.Text = "RIC"
             '
-            'SelectColumnsCMS
-            '
-            Me.SelectColumnsCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SelectColumnsToolStripMenuItem})
-            Me.SelectColumnsCMS.Name = "SelectColumnsCMS"
-            Me.SelectColumnsCMS.Size = New System.Drawing.Size(173, 26)
-            '
-            'SelectColumnsToolStripMenuItem
-            '
-            Me.SelectColumnsToolStripMenuItem.Name = "SelectColumnsToolStripMenuItem"
-            Me.SelectColumnsToolStripMenuItem.Size = New System.Drawing.Size(172, 22)
-            Me.SelectColumnsToolStripMenuItem.Text = "Choose columns..."
-            '
-            'Label5
-            '
-            Label5.AutoSize = True
-            Label5.Location = New System.Drawing.Point(207, 51)
-            Label5.Margin = New System.Windows.Forms.Padding(3)
-            Label5.Name = "Label5"
-            Label5.Size = New System.Drawing.Size(63, 13)
-            Label5.TabIndex = 18
-            Label5.Text = "SubIndustry"
-            '
-            'Label6
-            '
-            Label6.AutoSize = True
-            Label6.Location = New System.Drawing.Point(411, 3)
-            Label6.Margin = New System.Windows.Forms.Padding(3)
-            Label6.Name = "Label6"
-            Label6.Size = New System.Drawing.Size(62, 13)
-            Label6.TabIndex = 18
-            Label6.Text = "Iss. Country"
-            '
-            'Label7
-            '
-            Label7.AutoSize = True
-            Label7.Location = New System.Drawing.Point(411, 27)
-            Label7.Margin = New System.Windows.Forms.Padding(3)
-            Label7.Name = "Label7"
-            Label7.Size = New System.Drawing.Size(65, 13)
-            Label7.TabIndex = 18
-            Label7.Text = "Bor. Country"
-            '
             'Label8
             '
             Me.Label8.AutoSize = True
-            Me.Label8.Location = New System.Drawing.Point(3, 27)
+            Me.Label8.Location = New System.Drawing.Point(3, 28)
             Me.Label8.Margin = New System.Windows.Forms.Padding(3, 3, 3, 0)
             Me.Label8.Name = "Label8"
             Me.Label8.Size = New System.Drawing.Size(49, 13)
@@ -322,7 +310,7 @@
             'BorrowerTextBox
             '
             Me.BorrowerTextBox.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.BorrowerTextBox.Location = New System.Drawing.Point(83, 27)
+            Me.BorrowerTextBox.Location = New System.Drawing.Point(83, 28)
             Me.BorrowerTextBox.Name = "BorrowerTextBox"
             Me.BorrowerTextBox.Size = New System.Drawing.Size(118, 20)
             Me.BorrowerTextBox.TabIndex = 19
@@ -330,7 +318,7 @@
             'SubIndTextBox
             '
             Me.SubIndTextBox.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.SubIndTextBox.Location = New System.Drawing.Point(287, 51)
+            Me.SubIndTextBox.Location = New System.Drawing.Point(287, 53)
             Me.SubIndTextBox.Name = "SubIndTextBox"
             Me.SubIndTextBox.Size = New System.Drawing.Size(118, 20)
             Me.SubIndTextBox.TabIndex = 20
@@ -346,10 +334,22 @@
             'BorCntTextBox
             '
             Me.BorCntTextBox.Dock = System.Windows.Forms.DockStyle.Fill
-            Me.BorCntTextBox.Location = New System.Drawing.Point(491, 27)
+            Me.BorCntTextBox.Location = New System.Drawing.Point(491, 28)
             Me.BorCntTextBox.Name = "BorCntTextBox"
             Me.BorCntTextBox.Size = New System.Drawing.Size(118, 20)
             Me.BorCntTextBox.TabIndex = 22
+            '
+            'SelectColumnsCMS
+            '
+            Me.SelectColumnsCMS.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SelectColumnsToolStripMenuItem})
+            Me.SelectColumnsCMS.Name = "SelectColumnsCMS"
+            Me.SelectColumnsCMS.Size = New System.Drawing.Size(173, 26)
+            '
+            'SelectColumnsToolStripMenuItem
+            '
+            Me.SelectColumnsToolStripMenuItem.Name = "SelectColumnsToolStripMenuItem"
+            Me.SelectColumnsToolStripMenuItem.Size = New System.Drawing.Size(172, 22)
+            Me.SelectColumnsToolStripMenuItem.Text = "Choose columns..."
             '
             'BondSelectorForm
             '
