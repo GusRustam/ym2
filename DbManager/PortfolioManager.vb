@@ -592,7 +592,7 @@ Public Class PortfolioManager
             _bonds.UpdateAttr(bondNode, "color", bond.Color)
             _bonds.UpdateAttr(bondNode, "code", bond.Code)
             _bonds.UpdateAttr(bondNode, "maturity", If(bond.Maturity.HasValue, ReutersDate.DateToReuters(bond.Maturity), ""))
-            _bonds.UpdateAttr(bondNode, "coupon", String.Format(CultureInfo.InvariantCulture, "{0:F2}", bond.CurrentCouponRate))
+            _bonds.UpdateAttr(bondNode, "coupon", String.Format(CultureInfo.InvariantCulture, "{0:F4}", bond.CurrentCouponRate))
             _bonds.UpdateAttr(bondNode, "bondStructure", bond.Struct.ToString())
             SaveBonds()
         ElseIf TypeOf src Is ChainCurveSrc Then

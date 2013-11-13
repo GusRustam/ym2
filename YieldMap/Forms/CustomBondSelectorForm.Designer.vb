@@ -123,7 +123,7 @@
             Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 30.0!))
             Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10.0!))
             Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 60.0!))
-            Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60.0!))
+            Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 61.0!))
             Me.TableLayoutPanel2.Controls.Add(Me.ColorSelectComboBox, 2, 0)
             Me.TableLayoutPanel2.Controls.Add(Label2, 0, 0)
             Me.TableLayoutPanel2.Controls.Add(Me.SelectedColorPictureBox, 1, 0)
@@ -142,15 +142,15 @@
             Me.ColorSelectComboBox.Dock = System.Windows.Forms.DockStyle.Fill
             Me.ColorSelectComboBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable
             Me.ColorSelectComboBox.FormattingEnabled = True
-            Me.ColorSelectComboBox.Location = New System.Drawing.Point(156, 3)
+            Me.ColorSelectComboBox.Location = New System.Drawing.Point(155, 3)
             Me.ColorSelectComboBox.Name = "ColorSelectComboBox"
-            Me.ColorSelectComboBox.Size = New System.Drawing.Size(224, 21)
+            Me.ColorSelectComboBox.Size = New System.Drawing.Size(223, 21)
             Me.ColorSelectComboBox.TabIndex = 6
             '
             'SelectedColorPictureBox
             '
             Me.SelectedColorPictureBox.Dock = System.Windows.Forms.DockStyle.Right
-            Me.SelectedColorPictureBox.Location = New System.Drawing.Point(130, 3)
+            Me.SelectedColorPictureBox.Location = New System.Drawing.Point(129, 3)
             Me.SelectedColorPictureBox.Name = "SelectedColorPictureBox"
             Me.SelectedColorPictureBox.Size = New System.Drawing.Size(20, 19)
             Me.SelectedColorPictureBox.TabIndex = 8
@@ -158,7 +158,7 @@
             '
             'RandomButton
             '
-            Me.RandomButton.Location = New System.Drawing.Point(383, 0)
+            Me.RandomButton.Location = New System.Drawing.Point(381, 0)
             Me.RandomButton.Margin = New System.Windows.Forms.Padding(0)
             Me.RandomButton.Name = "RandomButton"
             Me.RandomButton.Size = New System.Drawing.Size(61, 23)

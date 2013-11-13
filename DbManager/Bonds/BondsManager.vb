@@ -530,7 +530,7 @@ Namespace Bonds
                                 rw(colName) = elem
                             End If
                         Next
-                        If Not invalidRow Then table.Rows.Add(rw)
+                        If Not invalidRow AndAlso lastRic IsNot Nothing Then table.Rows.Add(rw)
                     Next
                 Catch ex As Exception
                     Logger.Error(String.Format("Failed to import data on ric {0} to table {1}", lastRic, table.TableName))
@@ -552,6 +552,7 @@ Namespace Bonds
                                      ImportData(data, BondsTable, QueryBondDescr)
                                      LoadStep1(New HashSet(Of String)(requiredRics))
                                  Catch ex As Exception
+                                     Logger.Error("Exception = {0}", ex.ToString())
                                      RaiseEvent Progress(New ProgressEvent(MessageKind.Fail, "Failed to import chain metadata"))
                                  End Try
                              Else

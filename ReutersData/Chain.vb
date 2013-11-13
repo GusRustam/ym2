@@ -98,7 +98,8 @@ Public Class Chain
                 Try
                     If datastatus = RT_DataStatus.RT_DS_FULL Then
                         For i = chainMan.Data.GetLowerBound(0) To chainMan.Data.GetUpperBound(0)
-                            _result(ricName).Add(chainMan.Data.GetValue(i).ToString())
+                            Dim item = chainMan.Data.GetValue(i).ToString().Trim()
+                            If Not String.IsNullOrEmpty(item) Then _result(ricName).Add(item)
                         Next
                         _rics.TryTake(ricName)
                     ElseIf datastatus <> RT_DataStatus.RT_DS_PARTIAL Then
